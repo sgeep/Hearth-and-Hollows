@@ -29,8 +29,6 @@ namespace Hearthdelve.Editor
     /// </summary>
     public static class GreyboxSceneBuilder
     {
-        public const int ReferenceWidth = 640;
-        public const int ReferenceHeight = 360;
         const int k_LevelWidth = 100;
         const int k_LevelTop = 24;
         const int k_FloorBottom = -4;
@@ -70,7 +68,7 @@ namespace Hearthdelve.Editor
             CreateUI(actions);
 
             EditorSceneManager.SaveScene(scene, EditorPaths.GreyboxScene);
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(EditorPaths.GreyboxScene, true) };
+            SceneKit.AddToBuild(EditorPaths.GreyboxScene);
         }
 
         static Vector3 Cell(int x, int y) => new(x + 0.5f, y, 0f);
@@ -178,23 +176,8 @@ namespace Hearthdelve.Editor
 
         static void CreateCamera(Transform player, Collider2D bounds)
         {
-            float orthoSize = ReferenceHeight / 2f / PixelArtImportPostprocessor.PixelsPerUnit;
-
-            var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
-            camGo.transform.position = new Vector3(player.position.x, player.position.y, -10f);
-            var cam = camGo.AddComponent<UnityEngine.Camera>();
-            cam.orthographic = true;
-            cam.orthographicSize = orthoSize;
-            cam.clearFlags = CameraClearFlags.SolidColor;
-            cam.backgroundColor = new Color(0.08f, 0.09f, 0.12f);
-            camGo.AddComponent<UniversalAdditionalCameraData>();
-            var ppc = camGo.AddComponent<PixelPerfectCamera>();
-            ppc.assetsPPU = PixelArtImportPostprocessor.PixelsPerUnit;
-            ppc.refResolutionX = ReferenceWidth;
-            ppc.refResolutionY = ReferenceHeight;
-            ppc.gridSnapping = PixelPerfectCamera.GridSnapping.UpscaleRenderTexture;
-            ppc.cropFrame = PixelPerfectCamera.CropFrame.None;
-            camGo.AddComponent<CinemachineBrain>();
+            float orthoSize = SceneKit.OrthoSize;
+            var camGo = SceneKit.CreatePixelCamera(new Vector3(player.position.x, player.position.y, -10f), new Color(0.08f, 0.09f, 0.12f), withCinemachineBrain: true).gameObject;
 
             var vcamGo = new GameObject("CM Follow Camera");
             vcamGo.transform.position = camGo.transform.position;
@@ -240,55 +223,16 @@ namespace Hearthdelve.Editor
             shakeGo.AddComponent<ScreenShaker>();
         }
 
-        static void CreateLighting()
-        {
-            var go = new GameObject("Global Light 2D");
-            var light = go.AddComponent<Light2D>();
-            light.lightType = Light2D.LightType.Global;
-            light.intensity = 1f;
-        }
+        static void CreateLighting() => SceneKit.CreateGlobalLight();
 
         static void CreateUI(InputActionAsset actions)
         {
-            var panel = ContentGenerator.LoadOrCreate<PanelSettings>($"{EditorPaths.UI}/HearthdelvePanelSettings.asset", p =>
-            {
-                p.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-                p.referenceResolution = new Vector2Int(1280, 720);
-                p.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-                p.match = 0.5f;
-            });
-            panel.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>($"{EditorPaths.UI}/HearthdelveTheme.tss");
-            EditorUtility.SetDirty(panel);
-
+            var panel = SceneKit.PanelSettings();
             var ui = new GameObject("UI");
-            AddDocument<DungeonHud>(ui.transform, "HUD", panel, "DungeonHud.uxml", 0);
-            AddDocument<SwapPrompt>(ui.transform, "Swap Prompt", panel, "SwapPrompt.uxml", 5);
-            AddDocument<DeathScreen>(ui.transform, "Death Screen", panel, "DeathScreen.uxml", 10);
-
-            var eventSystem = new GameObject("EventSystem", typeof(EventSystem));
-            var module = eventSystem.AddComponent<InputSystemUIInputModule>();
-            module.actionsAsset = actions;
-            var refs = AssetDatabase.LoadAllAssetsAtPath(EditorPaths.InputActions).OfType<InputActionReference>().ToArray();
-            InputActionReference Ref(string action) => refs.FirstOrDefault(r => r.action != null && r.action.actionMap.name == "UI" && r.action.name == action);
-            module.move = Ref("Navigate");
-            module.submit = Ref("Submit");
-            module.cancel = Ref("Cancel");
-            module.point = Ref("Point");
-            module.leftClick = Ref("Click");
-            module.rightClick = Ref("RightClick");
-            module.middleClick = Ref("MiddleClick");
-            module.scrollWheel = Ref("ScrollWheel");
-        }
-
-        static void AddDocument<T>(Transform parent, string name, PanelSettings panel, string uxml, float sortingOrder) where T : Component
-        {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            var doc = go.AddComponent<UIDocument>();
-            doc.panelSettings = panel;
-            doc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>($"{EditorPaths.UI}/{uxml}");
-            doc.sortingOrder = sortingOrder;
-            go.AddComponent<T>();
+            SceneKit.AddDocument<DungeonHud>(ui.transform, "HUD", panel, "DungeonHud.uxml", 0);
+            SceneKit.AddDocument<SwapPrompt>(ui.transform, "Swap Prompt", panel, "SwapPrompt.uxml", 5);
+            SceneKit.AddDocument<DeathScreen>(ui.transform, "Death Screen", panel, "DeathScreen.uxml", 10);
+            SceneKit.CreateEventSystem(actions);
         }
     }
 }

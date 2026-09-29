@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Hearthdelve.UI.Localization;
 using UnityEditor;
 using UnityEditor.Localization;
@@ -52,7 +53,7 @@ namespace Hearthdelve.Editor
                 LocalizationEditorSettings.AddLocale(english);
             }
 
-            FillTable(Loc.UITable, LocKeys.English);
+            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English));
             FillTable(Loc.ContentTable, ContentEntries);
             AssetDatabase.SaveAssets();
         }

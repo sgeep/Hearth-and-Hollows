@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf01a49ab9b58942a03aa8e95376fd7, type: 3}
+  m_Name: Recipe_CoreTonic
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Recipes.RecipeDefinition
+  id: core_tonic
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: Content
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: recipe.core_tonic
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  station: 1
+  slots:
+  - match: 0
+    ingredient: {fileID: 11400000, guid: 62cb142cf19470742bd2a4d436de2451, type: 2}
+    categories: 0
+    count: 1
+    optional: 0
+  - match: 0
+    ingredient: {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
+    categories: 0
+    count: 1
+    optional: 0
+  baseValue: 18
+  flavors: 130
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.35, g: 0.9, b: 0.88, a: 1}
+  references:
+    version: 2
+    RefIds: []

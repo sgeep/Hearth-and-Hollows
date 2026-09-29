@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8d57da24ea40e543b5e2e9a99c877a2, type: 3}
+  m_Name: TavernContent
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Scene.TavernContent
+  recipes:
+  - {fileID: 11400000, guid: 5df2507673983e3499f0e935c87ce03d, type: 2}
+  - {fileID: 11400000, guid: f02a09ff22ed85b43beb7e76ce0bdd1b, type: 2}
+  - {fileID: 11400000, guid: 61f6079344604f64eb2a881b1a8e1644, type: 2}
+  - {fileID: 11400000, guid: dfc9332265728464bb4447e0821cbc50, type: 2}
+  - {fileID: 11400000, guid: d7846d82a70e3ab469895708fc7fd1a6, type: 2}
+  customers:
+  - {fileID: 11400000, guid: fbcea82d5b92b8942904d87ea9fae426, type: 2}
+  - {fileID: 11400000, guid: 6c0f11688acc95c4f855e0b38b914764, type: 2}
+  - {fileID: 11400000, guid: 93039d79b4c97704baed7c5c19f4e444, type: 2}
+  staff:
+  - {fileID: 11400000, guid: 18f1b867ffa4aaa4cb544fab7add7eaf, type: 2}
+  debugStockIngredients:
+  - {fileID: 11400000, guid: 98c7efdca280afb42a749aa85b5f9eef, type: 2}
+  - {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
+  - {fileID: 11400000, guid: a9638819317ee6f4f971a403a0c1b350, type: 2}
+  - {fileID: 11400000, guid: 62cb142cf19470742bd2a4d436de2451, type: 2}
+  - {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
+  - {fileID: 11400000, guid: 043e0099fdffbae4d85cd360d8627bd1, type: 2}
+  service: {fileID: 11400000, guid: 08dca8154ad0bb14ab666389b4640dee, type: 2}
+  economy: {fileID: 11400000, guid: 219195a0cfd0fa24f9ac9ae5038ecf77, type: 2}
+  grill: {fileID: 11400000, guid: 78ffea8242b31f748810c3e55073cc7d, type: 2}
+  tap: {fileID: 11400000, guid: a7eeeeaa41bc11f4d83780bfcf4e8fc6, type: 2}
+  serving: {fileID: 11400000, guid: 2cac70e4108ce39409268ca2bedacd48, type: 2}

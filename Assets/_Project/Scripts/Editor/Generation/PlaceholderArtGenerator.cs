@@ -29,9 +29,9 @@ namespace Hearthdelve.Editor
         public const string Spore = "PH_Spore";
         public const string Slash = "PH_Slash";
 
-        static readonly Color32 Clear = new(0, 0, 0, 0);
-        static readonly Color32 White = new(235, 235, 235, 255);
-        static readonly Color32 Outline = new(40, 36, 44, 255);
+        internal static readonly Color32 Clear = new(0, 0, 0, 0);
+        internal static readonly Color32 White = new(235, 235, 235, 255);
+        internal static readonly Color32 Outline = new(40, 36, 44, 255);
         static readonly Color32 Eye = new(20, 18, 24, 255);
 
         [MenuItem("Hearthdelve/Generate/Placeholder Art", priority = 100)]
@@ -120,7 +120,7 @@ namespace Hearthdelve.Editor
             AssetDatabase.LoadAssetAtPath<Sprite>($"{EditorPaths.Placeholders}/{name}.png");
 
         /// <summary>Only writes files that don't exist, so real art dropped in under the same name is kept.</summary>
-        static void Write(string name, int width, int height, Func<int, int, int, int, Color32> pixel)
+        internal static void Write(string name, int width, int height, Func<int, int, int, int, Color32> pixel)
         {
             string path = $"{EditorPaths.Placeholders}/{name}.png";
             if (File.Exists(path)) return;
@@ -138,7 +138,7 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>Fills a shape in white with a 1 px dark outline and an optional eye.</summary>
-        static Color32 Outlined(int x, int y, int w, int h, Func<int, int, bool> inside, (int x, int y)? eye)
+        internal static Color32 Outlined(int x, int y, int w, int h, Func<int, int, bool> inside, (int x, int y)? eye)
         {
             bool In(int px, int py) => px >= 0 && py >= 0 && px < w && py < h && inside(px, py);
             if (!In(x, y)) return Clear;
@@ -147,7 +147,7 @@ namespace Hearthdelve.Editor
             return edge ? Outline : White;
         }
 
-        static bool Ellipse(int x, int y, float cx, float ry, float rx)
+        internal static bool Ellipse(int x, int y, float cx, float ry, float rx)
         {
             float dx = (x + 0.5f - cx) / rx, dy = y / ry;
             return dx * dx + dy * dy <= 1f;

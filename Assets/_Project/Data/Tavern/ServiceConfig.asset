@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faaea324e04cc194f8e35938a9e00edb, type: 3}
+  m_Name: ServiceConfig
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Service.ServiceConfig
+  service:
+    lengthSeconds: 360
+    lastOrdersSeconds: 45
+    minArrivalGap: 8
+    maxArrivalGap: 16
+    maxCustomers: 8
+    maxMenuSize: 3
+  player:
+    walkSpeed: 4.5
+    interactRange: 0.9
+    bumpDistance: 0.45
