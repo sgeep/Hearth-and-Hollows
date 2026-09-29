@@ -28,6 +28,8 @@ namespace Hearthdelve.Dungeon.Enemies
 
         readonly Countdown m_Stagger = new();
         readonly Countdown m_HurtFlash = new();
+        const float k_HitFlashTime = 0.15f;
+        const float k_HitShake = 0.06f;
         float m_SinceHit;
         int m_PatrolDirection = -1;
 
@@ -94,6 +96,10 @@ namespace Hearthdelve.Dungeon.Enemies
             m_Body.transform.localScale = scale;
             if (m_HurtFlash.IsRunning && !Cycle.IsAttacking) m_Body.color = Color.white;
             else if (!Cycle.IsAttacking) m_Body.color = m_Definition.placeholderColor;
+
+            // Hit shake: jolt the sprite sideways. Unscaled time so it reads during hit-stop.
+            float shake = m_HurtFlash.IsRunning ? Mathf.Sin(Time.unscaledTime * 90f) * k_HitShake : 0f;
+            m_Body.transform.localPosition = new Vector3(shake, 0f, 0f);
         }
 
         void Think(float dt, Transform player)
@@ -173,7 +179,7 @@ namespace Hearthdelve.Dungeon.Enemies
         void OnDamaged(DamageInfo hit, DamageResult result)
         {
             m_SinceHit = 0f;
-            m_HurtFlash.Start(0.08f);
+            m_HurtFlash.Start(k_HitFlashTime);
             bool armored = m_Definition.superArmorWhileAttacking && Cycle.IsAttacking;
             if (armored) return;
 

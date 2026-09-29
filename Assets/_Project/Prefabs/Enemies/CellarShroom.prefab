@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 8842264696780989764}
   - component: {fileID: 5585654774643616737}
   - component: {fileID: 2459879358252847035}
-  - component: {fileID: 2149500851601655670}
+  - component: {fileID: 907875170224888447}
   m_Layer: 9
   m_Name: CellarShroom
   m_TagString: Untagged
@@ -343,7 +343,7 @@ MonoBehaviour:
   m_GroundMarker: {fileID: 0}
   m_FlashColor: {r: 1, g: 0.95, b: 0.55, a: 1}
   m_PulseRate: 14
---- !u!114 &2149500851601655670
+--- !u!114 &907875170224888447
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -352,7 +352,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4242024177884553214}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 9141c76afbf8b854cb1efb48abb77b70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.ShroomBehaviour
   m_Definition: {fileID: 11400000, guid: 5434a325a6778df499b3e864c060baec, type: 2}
