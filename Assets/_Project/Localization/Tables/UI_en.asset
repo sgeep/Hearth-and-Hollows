@@ -1,0 +1,140 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UI_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 15c99b07adb0f574b936695a3c957a58, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 1477795840
+    m_Localized: Essence
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1591042048
+    m_Localized: Satchel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236352
+    m_Localized: "Satchel full \u2014 press {0} to swap"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236353
+    m_Localized: Clean kill!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236354
+    m_Localized: Overkill!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236355
+    m_Localized: '{0} was destroyed'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236356
+    m_Localized: Finisher!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236357
+    m_Localized: "{0} \xD7{1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236358
+    m_Localized: Poor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236359
+    m_Localized: Standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236360
+    m_Localized: Fine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236361
+    m_Localized: Premium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236362
+    m_Localized: Seared
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236363
+    m_Localized: Chilled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236364
+    m_Localized: Inedible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236365
+    m_Localized: '{0} {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236366
+    m_Localized: '{0} {1} ({2})'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236367
+    m_Localized: Empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236368
+    m_Localized: "\xD7{0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236369
+    m_Localized: Your Essence Fades
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236370
+    m_Localized: "The dungeon casts you back to the surface. Choose one part to save
+      in your Lockbox \u2014 the rest of the haul is lost."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236371
+    m_Localized: The dungeon casts you back to the surface. Your satchel is empty.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236372
+    m_Localized: 'Lockbox: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236373
+    m_Localized: 'Lockbox: nothing'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236374
+    m_Localized: Return to the surface
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236375
+    m_Localized: Keep nothing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236376
+    m_Localized: Satchel Full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236377
+    m_Localized: "Found {0} \xD7{1}. Choose a slot to drop for it."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236378
+    m_Localized: Leave it
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

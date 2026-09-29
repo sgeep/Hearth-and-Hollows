@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -11,12 +11,12 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Ground
+  - OneWayPlatform
+  - Player
+  - Enemy
+  - Pickup
+  - Projectile
   - 
   - 
   - 
@@ -41,3 +41,26 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 275768050
+    locked: 0
+  - name: Level
+    uniqueID: 299808236
+    locked: 0
+  - name: Pickups
+    uniqueID: 1530966094
+    locked: 0
+  - name: Enemies
+    uniqueID: 1613500383
+    locked: 0
+  - name: Player
+    uniqueID: 1918770171
+    locked: 0
+  - name: FX
+    uniqueID: 1464037883
+    locked: 0
+  - name: Foreground
+    uniqueID: 308342647
+    locked: 0
+  m_RenderingLayers:
+  - Default

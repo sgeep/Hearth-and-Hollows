@@ -1,0 +1,144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: UI Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: UI
+  m_TableCollectionNameGuidString: 15c99b07adb0f574b936695a3c957a58
+  m_Entries:
+  - m_Id: 1477795840
+    m_Key: hud.essence
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1591042048
+    m_Key: hud.satchel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236352
+    m_Key: hud.satchel_full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236353
+    m_Key: harvest.clean_kill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236354
+    m_Key: harvest.overkill
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236355
+    m_Key: harvest.destroyed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236356
+    m_Key: harvest.finisher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236357
+    m_Key: harvest.got
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236358
+    m_Key: quality.poor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236359
+    m_Key: quality.standard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236360
+    m_Key: quality.fine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236361
+    m_Key: quality.premium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236362
+    m_Key: prep.seared
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236363
+    m_Key: prep.chilled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236364
+    m_Key: prep.inedible
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236365
+    m_Key: item.format
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236366
+    m_Key: item.format_prep
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236367
+    m_Key: slot.empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236368
+    m_Key: slot.count
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236369
+    m_Key: death.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236370
+    m_Key: death.subtitle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236371
+    m_Key: death.subtitle_empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236372
+    m_Key: death.selected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236373
+    m_Key: death.selected_none
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236374
+    m_Key: death.confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236375
+    m_Key: death.keep_nothing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236376
+    m_Key: swap.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236377
+    m_Key: swap.subtitle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1595236378
+    m_Key: swap.cancel
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 3572246883413000216
+  references:
+    version: 2
+    RefIds:
+    - rid: 3572246883413000216
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1790709239328
