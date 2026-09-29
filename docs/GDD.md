@@ -301,7 +301,7 @@
 <li><strong>Category:</strong> Meat, Offal, Fish, Fungus, Plant, Egg, Spice, Liquid, Magical.</li>
 <li><strong>Flavor Tags:</strong> Savory, Sweet, Spicy, Sour, Bitter, Umami, Earthy, Arcane.</li>
 <li><strong>Quality:</strong> Poor / Standard / Fine / Premium (from the Harvest system).</li>
-<li><strong>Freshness:</strong> 0–100%, decays over time; affects dish score.</li>
+<li><strong>Freshness:</strong> 0–100%, decays over time; affects dish score. Tracked per stack: when two stacks of the same part merge, freshness becomes the count-weighted average. Kitchens use the least-fresh stock first (on a tie, the lower quality first). Freshness is designed to also drop in the storeroom overnight, slowed by preservation upgrades (salt, ice runes, jars); storeroom decay is not in the Phase 2 prototype.</li>
 <li><strong>Rarity:</strong> Common → Legendary; affects price.</li>
 <li><strong>Special Effects:</strong> some ingredients carry buffs (e.g. Fire Drake Heart grants fire resistance when eaten).</li>
 </ul>

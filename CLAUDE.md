@@ -8,6 +8,7 @@ You are the lead gameplay programmer on **Hearthdelve**, a 2D side-scrolling hac
 - **Protagonist:** customizable (name, body, hair, colors). Build the character from layered sprites that share one animation rig so customization doesn't multiply animation work.
 - **Essence (delve timer):** no calendar or deadline. Delves are limited by **Essence**, which drains over time in the dungeon and drops when the player takes damage. At zero Essence the player is forced out (treated as a death). Max Essence and drain rate are upgradeable in the tavern. Essence is the dungeon equivalent of Dave the Diver's oxygen. **Essence is the player's only health pool** — there is no separate HP.
 - **Satchel:** 6 slots by default (upgradeable later). Identical parts (same ingredient, quality, and prep state) stack in one slot, up to 3 per slot by default (tunable in `DelveConfig`). When the satchel is full, picking up a new part opens a swap prompt.
+- **Freshness:** stored per stack as a value from 0 to 1. When stacks merge, freshness is the count-weighted average. Stock is used least-fresh first; on a tie, lower quality first. Freshness is designed to drop in the storeroom overnight later (slowed by preservation upgrades), but storeroom decay isn't implemented yet.
 - **Death penalty:** on death (or Essence depletion) the player loses the entire haul except **one satchel slot they choose to keep — the whole stack in it** (the Lockbox, chosen on the death screen). Permanent unlocks, relics, gold already banked, and tavern progress are never lost. Unspent run currency is lost.
 - **Co-op:** none. Single-player only; do not build networking abstractions.
 - **Dialogue:** Yarn Spinner for Unity. Dialogue lives in `.yarn` files under `Assets/_Project/Dialogue/`. Expose game state to Yarn through custom commands and functions rather than hard-coding story logic in C#.
@@ -26,6 +27,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 
 - Data-driven: gameplay content is ScriptableObjects (`IngredientDefinition`, `RecipeDefinition`, `EnemyDefinition`, `WeaponDefinition`, `CustomerProfile`, `BiomeDefinition`, `RoomDefinition`, `TavernUpgradeDefinition`). No balance numbers hard-coded in MonoBehaviours.
 - Systems communicate through event channels or a lightweight event bus, not direct references across the Dungeon/Tavern boundary.
+- **UI layering:** `Hearthdelve.UI` may read gameplay state from `Hearthdelve.Tavern` and `Hearthdelve.Dungeon` directly (e.g. live minigame meters). Gameplay assemblies never reference UI; they publish events or expose read-only state.
 - Assembly definitions: `Hearthdelve.Core`, `Hearthdelve.Dungeon`, `Hearthdelve.Tavern`, `Hearthdelve.Shared`, `Hearthdelve.UI`, `Hearthdelve.Editor`, `Hearthdelve.Tests`. Dungeon and Tavern must not reference each other; they share through Core/Shared.
 - Pure logic (damage calculation, harvest rules, recipe scoring, economy, Essence drain, save serialization) lives in plain C# classes with EditMode unit tests. MonoBehaviours stay thin.
 - Minigames implement a common `IMinigame` interface (Begin, Tick, Evaluate returning a 0–1 score) so staff can auto-resolve any station.
@@ -43,6 +45,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 ## Workflow rules
 
 - Work one milestone at a time, following the phases in GDD Section 11. At the start of each phase, propose a plan (systems, files, tests, what I'll need to do in the editor) and wait for approval.
+- Push `main` to the private GitHub repo (`origin`) at the end of each work session.
 - Commit in small, logical steps with clear messages. The repo uses Git with Unity's standard `.gitignore` and Git LFS for art and audio.
 - Keep `docs/PROGRESS.md` updated: what's done, what's next, known issues, and any open design questions.
 - If a GDD detail is ambiguous or a design choice would be expensive to reverse, ask me rather than guessing.
