@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Hearthdelve.uss" />
+    <ui:VisualElement name="hud" class="hd-hud" picking-mode="Ignore">
+        <ui:VisualElement class="hd-hud__top" picking-mode="Ignore">
+            <ui:VisualElement class="hd-essence" picking-mode="Ignore">
+                <ui:Label name="essence-label" class="hd-essence__label" />
+                <ui:VisualElement name="essence-bar" picking-mode="Ignore">
+                    <ui:VisualElement name="essence-fill" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="harvest-feed" class="hd-feed" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement class="hd-hud__bottom" picking-mode="Ignore">
+            <ui:Label name="satchel-hint" class="hd-hint" />
+            <ui:Label name="satchel-label" class="hd-satchel__label" />
+            <ui:VisualElement name="satchel-slots" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
