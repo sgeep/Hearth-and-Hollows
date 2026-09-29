@@ -1,6 +1,7 @@
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Ingredients;
+using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Run;
 using UnityEngine;
 
@@ -52,15 +53,15 @@ namespace Hearthdelve.Dungeon.Harvest
             {
                 EventBus<HarvestFeedback>.Publish(new HarvestFeedback(drop.Item, drop.Count, drop.Flags));
                 if (drop.Count > 0)
-                    Spawn(drop.Item, drop.Count, evt.Position, new Vector2((m_Random.Value() - 0.5f) * 6f, 6f + m_Random.Value() * 3f));
+                    Spawn(new IngredientStack(drop.Item, drop.Count), evt.Position, new Vector2((m_Random.Value() - 0.5f) * 6f, 6f + m_Random.Value() * 3f));
             }
         }
 
-        public IngredientPickup Spawn(IngredientItem item, int count, Vector2 position, Vector2 velocity)
+        public IngredientPickup Spawn(IngredientStack stack, Vector2 position, Vector2 velocity)
         {
-            if (m_PickupPrefab == null || !item.IsValid || count <= 0) return null;
+            if (m_PickupPrefab == null || stack.IsEmpty || !stack.Item.IsValid) return null;
             var pickup = Instantiate(m_PickupPrefab, position, Quaternion.identity);
-            pickup.Initialize(item, count, velocity);
+            pickup.Initialize(stack, velocity);
             return pickup;
         }
     }

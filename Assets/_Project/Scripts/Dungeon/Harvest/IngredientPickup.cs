@@ -1,4 +1,5 @@
 using Hearthdelve.Shared.Ingredients;
+using Hearthdelve.Shared.Inventory;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Harvest
@@ -17,6 +18,8 @@ namespace Hearthdelve.Dungeon.Harvest
 
         public IngredientItem Item { get; private set; }
         public int Count { get; set; }
+        public float Freshness { get; private set; } = 1f;
+        public IngredientStack Stack => new(Item, Count, Freshness);
         public bool IsCollectable => m_Age >= m_PickupDelay && Count > 0 && !m_WaitingForPlayerToLeave;
 
         const float k_LeaveDistance = 2f;
@@ -36,10 +39,12 @@ namespace Hearthdelve.Dungeon.Harvest
 
         void Awake() => m_Body = GetComponent<Rigidbody2D>();
 
-        public void Initialize(IngredientItem item, int count, Vector2 velocity)
+        public void Initialize(IngredientStack stack, Vector2 velocity)
         {
+            var item = stack.Item;
             Item = item;
-            Count = count;
+            Count = stack.Count;
+            Freshness = stack.Freshness;
             m_Age = 0f;
             m_Body.linearVelocity = velocity;
 

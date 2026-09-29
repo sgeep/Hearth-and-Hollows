@@ -57,7 +57,7 @@ namespace Hearthdelve.Dungeon.Harvest
                 var pickup = m_Overlaps[i].GetComponentInParent<IngredientPickup>();
                 if (pickup == null || !pickup.IsCollectable) continue;
 
-                int remainder = satchel.Add(pickup.Item, pickup.Count);
+                int remainder = satchel.Add(pickup.Item, pickup.Count, pickup.Freshness);
                 if (remainder == 0) Destroy(pickup.gameObject);
                 else
                 {
@@ -83,21 +83,21 @@ namespace Hearthdelve.Dungeon.Harvest
             GamePause.PushMenuPause();
             InputMaps.ActivateUIOnly();
 
-            EventBus<SwapPromptRequested>.Publish(new SwapPromptRequested(satchel, pickup.Item, pickup.Count, slot =>
+            EventBus<SwapPromptRequested>.Publish(new SwapPromptRequested(satchel, pickup.Stack, slot =>
             {
                 m_Prompting = false;
                 GamePause.PopMenuPause();
                 InputMaps.Activate(InputMaps.Dungeon);
                 if (slot < 0 || pickup == null) return;
 
-                var discarded = satchel.ReplaceAt(slot, pickup.Item, pickup.Count, out int placed);
+                var discarded = satchel.ReplaceAt(slot, pickup.Stack, out int placed);
                 pickup.Count -= placed;
                 if (pickup.Count <= 0) Destroy(pickup.gameObject);
 
                 // The discarded stack drops at the player's feet so they can change their mind.
                 if (!discarded.IsEmpty && HarvestSystem.Instance != null)
                 {
-                    var dropped = HarvestSystem.Instance.Spawn(discarded.Item, discarded.Count,
+                    var dropped = HarvestSystem.Instance.Spawn(discarded,
                         m_Controller.Mover.Position + Vector2.up * 0.5f, new Vector2(-m_Controller.Facing * 3f, 5f));
                     if (dropped != null) dropped.WaitForPlayerToLeave();
                 }

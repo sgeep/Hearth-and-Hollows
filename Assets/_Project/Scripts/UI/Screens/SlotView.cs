@@ -13,7 +13,7 @@ namespace Hearthdelve.UI.Screens
         public const string SelectedClass = "hd-slot--selected";
 
         /// <summary>Fills <paramref name="root"/> with the slot's contents. Pass compact for the HUD.</summary>
-        public static void Populate(VisualElement root, SatchelSlot slot, bool compact)
+        public static void Populate(VisualElement root, IngredientStack slot, bool compact)
         {
             root.Clear();
             root.AddToClassList(SlotClass);

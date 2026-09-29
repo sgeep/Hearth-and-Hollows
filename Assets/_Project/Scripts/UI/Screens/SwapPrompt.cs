@@ -26,7 +26,7 @@ namespace Hearthdelve.UI.Screens
         void OnRequested(SwapPromptRequested evt)
         {
             m_Title.text = Loc.UI(LocKeys.SwapTitle);
-            m_Subtitle.text = Loc.UI(LocKeys.SwapSubtitle, Loc.ItemName(evt.Incoming), evt.IncomingCount);
+            m_Subtitle.text = Loc.UI(LocKeys.SwapSubtitle, Loc.ItemName(evt.Incoming.Item), evt.Incoming.Count);
             m_Cancel.text = Loc.UI(LocKeys.SwapCancel);
             Open(evt.Satchel, evt.OnChosen, emptySlotsSelectable: true);
             FocusLater(m_Cancel);

@@ -114,7 +114,7 @@ namespace Hearthdelve.Tests
             s.Add(old, 3);
             var incoming = new IngredientItem(Haunch, Quality.Premium);
 
-            var discarded = s.ReplaceAt(0, incoming, 2, out int placed);
+            var discarded = s.ReplaceAt(0, new IngredientStack(incoming, 2, 0.4f), out int placed);
 
             Assert.That(discarded.Item, Is.EqualTo(old));
             Assert.That(discarded.Count, Is.EqualTo(3));
@@ -123,10 +123,38 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
+        public void ReplaceAt_KeepsIncomingFreshness()
+        {
+            var s = new Satchel(1, 5);
+            s.ReplaceAt(0, new IngredientStack(new IngredientItem(Haunch, Quality.Fine), 2, 0.4f), out _);
+            Assert.That(s.Slots[0].Freshness, Is.EqualTo(0.4f).Within(1e-5f));
+        }
+
+        [Test]
+        public void Merging_UsesCountWeightedFreshness()
+        {
+            var s = new Satchel(6, 5);
+            var item = new IngredientItem(Haunch, Quality.Standard);
+            s.Add(item, 1, 1.0f);
+            s.Add(item, 3, 0.2f);
+            // (1×1.0 + 3×0.2) / 4 = 0.4
+            Assert.That(s.Slots[0].Count, Is.EqualTo(4));
+            Assert.That(s.Slots[0].Freshness, Is.EqualTo(0.4f).Within(1e-5f));
+        }
+
+        [Test]
+        public void NewStack_DefaultsToFullyFresh()
+        {
+            var s = new Satchel(6, 5);
+            s.Add(new IngredientItem(Haunch, Quality.Standard));
+            Assert.That(s.Slots[0].Freshness, Is.EqualTo(1f));
+        }
+
+        [Test]
         public void ReplaceAt_ClampsToMaxStack()
         {
             var s = new Satchel(1, 5);
-            s.ReplaceAt(0, new IngredientItem(Haunch, Quality.Standard), 9, out int placed);
+            s.ReplaceAt(0, new IngredientStack(new IngredientItem(Haunch, Quality.Standard), 9), out int placed);
             Assert.That(placed, Is.EqualTo(5));
         }
 

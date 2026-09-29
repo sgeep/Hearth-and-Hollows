@@ -4,41 +4,26 @@ using Hearthdelve.Shared.Ingredients;
 
 namespace Hearthdelve.Shared.Inventory
 {
-    /// <summary>One satchel slot. Empty when <see cref="Count"/> is 0.</summary>
-    public readonly struct SatchelSlot
-    {
-        public readonly IngredientItem Item;
-        public readonly int Count;
-
-        public SatchelSlot(IngredientItem item, int count)
-        {
-            Item = count > 0 ? item : default;
-            Count = Math.Max(0, count);
-        }
-
-        public bool IsEmpty => Count == 0;
-        public static SatchelSlot Empty => default;
-    }
-
     /// <summary>
     /// The delve carry inventory (GDD §4.4). Fixed slot count; identical items stack up to
-    /// <see cref="MaxStack"/> per slot. Pure logic, no Unity dependencies beyond data types.
+    /// <see cref="MaxStack"/> per slot, and merged stacks take the count-weighted freshness.
+    /// Pure logic, no Unity dependencies beyond data types.
     /// </summary>
     public sealed class Satchel
     {
-        SatchelSlot[] m_Slots;
+        readonly IngredientStack[] m_Slots;
 
         public Satchel(int capacity, int maxStack)
         {
             if (capacity < 1) throw new ArgumentOutOfRangeException(nameof(capacity));
             if (maxStack < 1) throw new ArgumentOutOfRangeException(nameof(maxStack));
-            m_Slots = new SatchelSlot[capacity];
+            m_Slots = new IngredientStack[capacity];
             MaxStack = maxStack;
         }
 
         public int Capacity => m_Slots.Length;
         public int MaxStack { get; }
-        public IReadOnlyList<SatchelSlot> Slots => m_Slots;
+        public IReadOnlyList<IngredientStack> Slots => m_Slots;
 
         /// <summary>Raised after any change to slot contents.</summary>
         public event Action Changed;
@@ -81,7 +66,7 @@ namespace Hearthdelve.Shared.Inventory
         /// Adds up to <paramref name="count"/>, topping up matching stacks first, then empty slots.
         /// Returns how many could NOT be added.
         /// </summary>
-        public int Add(IngredientItem item, int count = 1)
+        public int Add(IngredientItem item, int count = 1, float freshness = Freshness.Max)
         {
             if (!item.IsValid) throw new ArgumentException("Item has no definition.", nameof(item));
             if (count <= 0) return 0;
@@ -92,14 +77,14 @@ namespace Hearthdelve.Shared.Inventory
                 var slot = m_Slots[i];
                 if (slot.IsEmpty || slot.Item != item || slot.Count >= MaxStack) continue;
                 int moved = Math.Min(remaining, MaxStack - slot.Count);
-                m_Slots[i] = new SatchelSlot(item, slot.Count + moved);
+                m_Slots[i] = new IngredientStack(item, slot.Count + moved, Freshness.Merge(slot.Count, slot.Freshness, moved, freshness));
                 remaining -= moved;
             }
             for (int i = 0; i < m_Slots.Length && remaining > 0; i++)
             {
                 if (!m_Slots[i].IsEmpty) continue;
                 int moved = Math.Min(remaining, MaxStack);
-                m_Slots[i] = new SatchelSlot(item, moved);
+                m_Slots[i] = new IngredientStack(item, moved, freshness);
                 remaining -= moved;
             }
 
@@ -108,12 +93,12 @@ namespace Hearthdelve.Shared.Inventory
         }
 
         /// <summary>Empties a slot and returns what was in it.</summary>
-        public SatchelSlot RemoveAt(int index)
+        public IngredientStack RemoveAt(int index)
         {
             CheckIndex(index);
             var removed = m_Slots[index];
             if (removed.IsEmpty) return removed;
-            m_Slots[index] = SatchelSlot.Empty;
+            m_Slots[index] = IngredientStack.Empty;
             Changed?.Invoke();
             return removed;
         }
@@ -123,15 +108,14 @@ namespace Hearthdelve.Shared.Inventory
         /// (up to <see cref="MaxStack"/>). Returns the discarded contents; <paramref name="placed"/>
         /// is how many of the incoming items went in.
         /// </summary>
-        public SatchelSlot ReplaceAt(int index, IngredientItem item, int count, out int placed)
+        public IngredientStack ReplaceAt(int index, IngredientStack incoming, out int placed)
         {
             CheckIndex(index);
-            if (!item.IsValid) throw new ArgumentException("Item has no definition.", nameof(item));
-            if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (incoming.IsEmpty || !incoming.Item.IsValid) throw new ArgumentException("Incoming stack is empty.", nameof(incoming));
 
             var removed = m_Slots[index];
-            placed = Math.Min(count, MaxStack);
-            m_Slots[index] = new SatchelSlot(item, placed);
+            placed = Math.Min(incoming.Count, MaxStack);
+            m_Slots[index] = incoming.WithCount(placed);
             Changed?.Invoke();
             return removed;
         }

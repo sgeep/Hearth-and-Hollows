@@ -6,11 +6,11 @@ namespace Hearthdelve.Shared.Run
     public readonly struct DeathPenaltyResult
     {
         /// <summary>The stack saved in the Lockbox (empty if nothing was kept).</summary>
-        public readonly SatchelSlot Kept;
+        public readonly IngredientStack Kept;
         public readonly int ItemsLost;
         public readonly int RunCurrencyLost;
 
-        public DeathPenaltyResult(SatchelSlot kept, int itemsLost, int runCurrencyLost)
+        public DeathPenaltyResult(IngredientStack kept, int itemsLost, int runCurrencyLost)
         {
             Kept = kept;
             ItemsLost = itemsLost;
@@ -37,7 +37,7 @@ namespace Hearthdelve.Shared.Run
             if (keepSlotIndex != KeepNothing && (keepSlotIndex < 0 || keepSlotIndex >= satchel.Capacity))
                 throw new ArgumentOutOfRangeException(nameof(keepSlotIndex));
 
-            var kept = keepSlotIndex == KeepNothing ? SatchelSlot.Empty : satchel.Slots[keepSlotIndex];
+            var kept = keepSlotIndex == KeepNothing ? IngredientStack.Empty : satchel.Slots[keepSlotIndex];
             int lost = satchel.TotalCount - kept.Count;
             satchel.Clear();
             return new DeathPenaltyResult(kept, lost, Math.Max(0, runCurrency));

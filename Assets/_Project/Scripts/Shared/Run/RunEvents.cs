@@ -72,15 +72,13 @@ namespace Hearthdelve.Shared.Run
     public readonly struct SwapPromptRequested : IEvent
     {
         public readonly Satchel Satchel;
-        public readonly IngredientItem Incoming;
-        public readonly int IncomingCount;
+        public readonly IngredientStack Incoming;
         public readonly Action<int> OnChosen;
 
-        public SwapPromptRequested(Satchel satchel, IngredientItem incoming, int incomingCount, Action<int> onChosen)
+        public SwapPromptRequested(Satchel satchel, IngredientStack incoming, Action<int> onChosen)
         {
             Satchel = satchel;
             Incoming = incoming;
-            IncomingCount = incomingCount;
             OnChosen = onChosen;
         }
     }

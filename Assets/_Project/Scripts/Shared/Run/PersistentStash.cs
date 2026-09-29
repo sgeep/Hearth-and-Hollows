@@ -10,9 +10,9 @@ namespace Hearthdelve.Shared.Run
     /// </summary>
     public static class PersistentStash
     {
-        static readonly List<SatchelSlot> s_Stacks = new();
+        static readonly List<IngredientStack> s_Stacks = new();
 
-        public static IReadOnlyList<SatchelSlot> Stacks => s_Stacks;
+        public static IReadOnlyList<IngredientStack> Stacks => s_Stacks;
 
         public static int TotalCount
         {
@@ -24,7 +24,7 @@ namespace Hearthdelve.Shared.Run
             }
         }
 
-        public static void Deposit(SatchelSlot stack)
+        public static void Deposit(IngredientStack stack)
         {
             if (!stack.IsEmpty && stack.Item.IsValid) s_Stacks.Add(stack);
         }
