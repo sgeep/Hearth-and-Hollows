@@ -169,3 +169,15 @@ Packages/packages-lock.json linguist-generated
 
 # Exceptions for .asset files such as lightning pre-baking
 LightingData.asset     binary
+
+# --- Hearthdelve additions ---
+# Pixel-art source files
+*.aseprite              lfs
+*.ase                   lfs
+*.kra                   lfs
+*.psb                   lfs
+# Extra audio / font formats
+*.flac                  lfs
+*.ttc                   lfs
+*.woff                  lfs
+*.woff2                 lfs

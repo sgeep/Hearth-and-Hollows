@@ -105,3 +105,16 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# --- Hearthdelve additions ---
+# IDE-generated solution files (Unity regenerates these)
+*.slnx
+.idea/
+.vscode/
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+# Batch-mode test results / logs written to the project root
+/TestResults*.xml
+/[Bb]atch[Ll]ogs/
