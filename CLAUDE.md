@@ -19,7 +19,7 @@ You are the lead gameplay programmer on **Hearthdelve**, a 2D side-scrolling hac
 URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Cinemachine, UI Toolkit (uGUI only for world-space UI), 2D Animation or sprite-sheet animation, Physics 2D with a custom kinematic character controller, Addressables, Localization, Yarn Spinner, Unity Test Framework.
 
 - **Localization:** installed from Phase 1. Every player-facing string goes through a Localization string table — no literal UI text in C# or UXML.
-- **Addressables:** deferred. Do not install or use it until we build biome/room loading; add it then.
+- **Addressables:** deferred. Do not use Addressables for game content until we build biome/room loading. (The package is present only as a transitive dependency of Localization, which stores its string tables in Addressables groups; leave those Localization-managed groups alone and don't add our own yet.)
 - **Yarn Spinner:** install when the first dialogue work begins. Verify package versions against what Unity 6.3 LTS actually ships with; don't assume APIs from older Unity versions (e.g. Cinemachine 3 namespaces differ from Cinemachine 2).
 
 ## Architecture rules
