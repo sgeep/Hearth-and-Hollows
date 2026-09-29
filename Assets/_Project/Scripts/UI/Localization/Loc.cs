@@ -138,9 +138,9 @@ namespace Hearthdelve.UI.Localization
             (SlotCount, "×{0}"),
 
             (DeathTitle, "Your Essence Fades"),
-            (DeathSubtitle, "The dungeon casts you back to the surface. Choose one part to save in your Lockbox — the rest of the haul is lost."),
+            (DeathSubtitle, "The dungeon casts you back to the surface. Choose one slot to save in your Lockbox — its whole stack is kept, the rest of the haul is lost."),
             (DeathSubtitleEmpty, "The dungeon casts you back to the surface. Your satchel is empty."),
-            (DeathSelected, "Lockbox: {0}"),
+            (DeathSelected, "Lockbox: {0} ×{1}"),
             (DeathSelectedNone, "Lockbox: nothing"),
             (DeathConfirm, "Return to the surface"),
             (DeathKeepNothing, "Keep nothing"),

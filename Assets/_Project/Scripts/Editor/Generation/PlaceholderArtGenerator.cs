@@ -23,6 +23,8 @@ namespace Hearthdelve.Editor
         public const string Pickup = "PH_Pickup";
         public const string Pip = "PH_Pip";
         public const string Exclaim = "PH_Exclaim";
+        public const string ExclaimHeavy = "PH_ExclaimHeavy";
+        public const string CleanKill = "PH_CleanKill";
         public const string Marker = "PH_Marker";
         public const string Spore = "PH_Spore";
         public const string Slash = "PH_Slash";
@@ -69,6 +71,25 @@ namespace Hearthdelve.Editor
                 bool inner = (x >= 3 && x <= 4) && ((y >= 6 && y <= 14) || y == 1);
                 if (inner) return new Color32(255, 214, 64, 255);
                 return bar || dot ? Outline : Clear;
+            });
+            // Double "!!" in red-orange: the uninterruptible (super-armor) wind-up.
+            Write(ExclaimHeavy, 14, 16, (x, y, w, h) =>
+            {
+                int lx = x < 7 ? x : x - 7;
+                bool bar = lx >= 1 && lx <= 4 && y >= 5;
+                bool dot = lx >= 1 && lx <= 4 && y <= 2;
+                bool inner = lx >= 2 && lx <= 3 && ((y >= 6 && y <= 14) || y == 1);
+                if (inner) return new Color32(255, 110, 70, 255);
+                return bar || dot ? Outline : Clear;
+            });
+            // Check mark in green: "a light hit here is a Clean Kill".
+            Write(CleanKill, 12, 10, (x, y, w, h) =>
+            {
+                bool Mark(int px, int py) => (px >= 1 && px <= 4 && py == 6 - px) || (px >= 4 && px <= 10 && py == px - 3);
+                bool Thick(int px, int py) => Mark(px, py) || Mark(px, py - 1);
+                if (Thick(x, y)) return new Color32(120, 235, 120, 255);
+                if (Thick(x - 1, y) || Thick(x + 1, y) || Thick(x, y - 1) || Thick(x, y + 1)) return Outline;
+                return Clear;
             });
             Write(Marker, 40, 6, (x, y, w, h) =>
             {

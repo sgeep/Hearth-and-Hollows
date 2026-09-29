@@ -34,7 +34,8 @@ namespace Hearthdelve.Editor
             p.Spore = Save(BuildSpore(), PrefabPath("Enemies", "SporeProjectile")).GetComponent<SporeProjectile>();
             p.Player = Save(BuildPlayer(content), PrefabPath("Player", "Player"));
             p.Rat = Save(BuildEnemy<RatBehaviour>("GiantRat", content.Rat, PlaceholderArtGenerator.Rat, new Vector2(1.0f, 0.55f), withMarker: false), PrefabPath("Enemies", "GiantRat"));
-            p.Slime = Save(BuildEnemy<SlimeBehaviour>("GreenSlime", content.Slime, PlaceholderArtGenerator.Slime, new Vector2(0.85f, 0.6f), withMarker: true), PrefabPath("Enemies", "GreenSlime"));
+            p.Slime = Save(BuildEnemy<SlimeBehaviour>("GreenSlime", content.Slime, PlaceholderArtGenerator.Slime, new Vector2(0.85f, 0.6f), withMarker: true,
+                telegraphIcon: PlaceholderArtGenerator.ExclaimHeavy, telegraphFlash: new Color(1f, 0.45f, 0.3f)), PrefabPath("Enemies", "GreenSlime"));
 
             var shroom = BuildEnemy<ShroomBehaviour>("CellarShroom", content.Shroom, PlaceholderArtGenerator.Shroom, new Vector2(0.65f, 1.0f), withMarker: false);
             shroom.GetComponent<ShroomBehaviour>().ConfigureProjectile(p.Spore);
@@ -76,7 +77,9 @@ namespace Hearthdelve.Editor
             return go;
         }
 
-        static GameObject BuildEnemy<T>(string name, EnemyDefinition def, string sprite, Vector2 size, bool withMarker) where T : EnemyController
+        /// <param name="telegraphIcon">Wind-up icon; super-armored enemies get a distinct one.</param>
+        static GameObject BuildEnemy<T>(string name, EnemyDefinition def, string sprite, Vector2 size, bool withMarker,
+            string telegraphIcon = PlaceholderArtGenerator.Exclaim, Color? telegraphFlash = null) where T : EnemyController
         {
             var go = new GameObject(name) { layer = Layer(Layers.Enemy) };
             AddKinematicBody(go, size);
@@ -85,14 +88,16 @@ namespace Hearthdelve.Editor
 
             var bodySprite = AddSprite(go.transform, "Body", sprite, SortingLayers.Enemies, 0, def.placeholderColor, Vector3.zero);
             float top = bodySprite.sprite != null ? bodySprite.sprite.bounds.max.y : size.y;
-            var icon = AddSprite(go.transform, "TelegraphIcon", PlaceholderArtGenerator.Exclaim, SortingLayers.FX, 0, Color.white, new Vector3(0f, top + 0.45f, 0f));
+            var icon = AddSprite(go.transform, "TelegraphIcon", telegraphIcon, SortingLayers.FX, 0, Color.white, new Vector3(0f, top + 0.45f, 0f));
+            var cleanKill = AddSprite(go.transform, "CleanKillIcon", PlaceholderArtGenerator.CleanKill, SortingLayers.FX, 1, Color.white, new Vector3(0f, top + 1.0f, 0f));
+            cleanKill.enabled = false;
             SpriteRenderer marker = null;
             if (withMarker)
                 marker = AddSprite(go.transform, "LandingMarker", PlaceholderArtGenerator.Marker, SortingLayers.FX, -1, Color.white, Vector3.zero);
 
             var telegraph = go.AddComponent<TelegraphIndicator>();
-            telegraph.Configure(bodySprite, icon, marker);
-            go.AddComponent<T>().Configure(def, telegraph, bodySprite, Mask(Layers.Player));
+            telegraph.Configure(bodySprite, icon, marker, telegraphFlash);
+            go.AddComponent<T>().Configure(def, telegraph, bodySprite, Mask(Layers.Player), cleanKill);
             return go;
         }
 

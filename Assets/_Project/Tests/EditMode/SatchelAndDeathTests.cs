@@ -164,14 +164,15 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void KeepsExactlyOnePart_FromChosenSlot_LosesRest()
+        public void KeepsWholeStack_FromChosenSlot_LosesRest()
         {
             var s = Filled();
             var result = DeathPenalty.Resolve(s, keepSlotIndex: 0, runCurrency: 40);
 
-            Assert.That(result.Kept.HasValue);
-            Assert.That(result.Kept.Value, Is.EqualTo(new IngredientItem(Haunch, Quality.Premium)));
-            Assert.That(result.ItemsLost, Is.EqualTo(4));
+            Assert.That(result.KeptSomething);
+            Assert.That(result.Kept.Item, Is.EqualTo(new IngredientItem(Haunch, Quality.Premium)));
+            Assert.That(result.Kept.Count, Is.EqualTo(3), "the whole stack is kept");
+            Assert.That(result.ItemsLost, Is.EqualTo(2));
             Assert.That(s.IsEmpty, "the satchel is emptied");
         }
 
@@ -187,7 +188,7 @@ namespace Hearthdelve.Tests
         {
             var s = Filled();
             var result = DeathPenalty.Resolve(s, DeathPenalty.KeepNothing, 0);
-            Assert.That(result.Kept.HasValue, Is.False);
+            Assert.That(result.KeptSomething, Is.False);
             Assert.That(result.ItemsLost, Is.EqualTo(5));
             Assert.That(s.IsEmpty);
         }
@@ -196,7 +197,7 @@ namespace Hearthdelve.Tests
         public void ChoosingEmptySlot_KeepsNothing()
         {
             var result = DeathPenalty.Resolve(Filled(), 4, 0);
-            Assert.That(result.Kept.HasValue, Is.False);
+            Assert.That(result.KeptSomething, Is.False);
         }
 
         [Test]

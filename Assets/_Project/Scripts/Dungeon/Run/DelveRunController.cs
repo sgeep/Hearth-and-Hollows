@@ -67,7 +67,7 @@ namespace Hearthdelve.Dungeon.Run
         void FinishDelve(int keepSlot)
         {
             var result = DeathPenalty.Resolve(Satchel, keepSlot, RunCurrency);
-            if (result.Kept.HasValue) PersistentStash.Deposit(result.Kept.Value);
+            if (result.KeptSomething) PersistentStash.Deposit(result.Kept);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
 

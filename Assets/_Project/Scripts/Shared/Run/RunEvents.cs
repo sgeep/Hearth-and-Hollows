@@ -92,7 +92,7 @@ namespace Hearthdelve.Shared.Run
 
     /// <summary>
     /// Ask the UI to show the death screen. The UI answers through <see cref="OnChosen"/> with the
-    /// slot to keep one part from, or <see cref="DeathPenalty.KeepNothing"/>.
+    /// slot whose whole stack is kept, or <see cref="DeathPenalty.KeepNothing"/>.
     /// </summary>
     public readonly struct DeathScreenRequested : IEvent
     {

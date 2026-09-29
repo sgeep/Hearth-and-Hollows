@@ -88,6 +88,35 @@ namespace Hearthdelve.Dungeon.Harvest
             _ => PrepState.Raw,
         };
 
+        /// <summary>
+        /// Would a hit of <paramref name="finishingDamage"/> kill without an Overkill penalty?
+        /// Because the threshold is a fraction of max health, big hits only overkill on
+        /// nearly-dead or fragile monsters; on tougher ones a heavy finisher stays clean.
+        /// </summary>
+        public static bool KillsWithoutOverkill(float currentHealth, float maxHealth, float finishingDamage, in HarvestRuleSettings settings)
+        {
+            if (currentHealth <= 0f || maxHealth <= 0f || finishingDamage < currentHealth) return false;
+            return (finishingDamage - currentHealth) / maxHealth < settings.overkillRatio;
+        }
+
+        /// <summary>Does the weapon earn a Clean Kill bonus on any part this monster can drop?</summary>
+        public static bool HasCleanKillAffinity(IReadOnlyList<HarvestPart> parts, IngredientCategory cleanKillCategories)
+        {
+            if (parts == null) return false;
+            foreach (var part in parts)
+                if (part?.ingredient != null && (part.ingredient.category & cleanKillCategories) != 0) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// The clean-kill cue: the weapon's lightest hit would finish the monster without
+        /// overkill, and the weapon suits at least one of its parts.
+        /// </summary>
+        public static bool InCleanKillRange(float currentHealth, float maxHealth, float lightestHit,
+            IReadOnlyList<HarvestPart> parts, IngredientCategory cleanKillCategories, in HarvestRuleSettings settings) =>
+            HasCleanKillAffinity(parts, cleanKillCategories) &&
+            KillsWithoutOverkill(currentHealth, maxHealth, lightestHit, settings);
+
         public static List<HarvestDrop> Resolve(IReadOnlyList<HarvestPart> parts, in KillContext kill, in HarvestRuleSettings settings, IRandom random)
         {
             if (random == null) throw new ArgumentNullException(nameof(random));

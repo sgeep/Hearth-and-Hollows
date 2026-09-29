@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 namespace Hearthdelve.UI.Screens
 {
     /// <summary>
-    /// Death / Essence-depleted screen: pick one satchel part for the Lockbox, then return.
+    /// Death / Essence-depleted screen: pick one satchel slot (its whole stack) for the Lockbox, then return.
     /// Selecting a slot highlights it; the confirm button commits.
     /// </summary>
     public sealed class DeathScreen : SlotPickerScreen
@@ -63,7 +63,7 @@ namespace Hearthdelve.UI.Screens
 
             m_Selection.text = index == DeathPenalty.KeepNothing
                 ? Loc.UI(LocKeys.DeathSelectedNone)
-                : Loc.UI(LocKeys.DeathSelected, Loc.ItemName(m_Satchel.Slots[index].Item));
+                : Loc.UI(LocKeys.DeathSelected, Loc.ItemName(m_Satchel.Slots[index].Item), m_Satchel.Slots[index].Count);
         }
     }
 }

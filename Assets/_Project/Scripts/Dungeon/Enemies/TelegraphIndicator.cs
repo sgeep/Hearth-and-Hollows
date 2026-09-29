@@ -19,11 +19,12 @@ namespace Hearthdelve.Dungeon.Enemies
         float m_Timer;
         Vector2 m_MarkerPosition;
 
-        public void Configure(SpriteRenderer body, SpriteRenderer icon, SpriteRenderer groundMarker)
+        public void Configure(SpriteRenderer body, SpriteRenderer icon, SpriteRenderer groundMarker, Color? flashColor = null)
         {
             m_Body = body;
             m_Icon = icon;
             m_GroundMarker = groundMarker;
+            if (flashColor.HasValue) m_FlashColor = flashColor.Value;
         }
 
         void Awake()

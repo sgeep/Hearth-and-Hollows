@@ -21,6 +21,9 @@ namespace Hearthdelve.Dungeon.Harvest
 
         public static HarvestSystem Instance { get; private set; }
 
+        /// <summary>Current rules (the enemy clean-kill cue uses the overkill threshold).</summary>
+        public HarvestRuleSettings Rules => m_Rules != null ? m_Rules.rules : HarvestRuleSettings.Default;
+
         public void Configure(HarvestRulesConfig rules, IngredientPickup pickupPrefab)
         {
             m_Rules = rules;

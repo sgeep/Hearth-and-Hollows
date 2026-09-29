@@ -13,8 +13,8 @@ _Last updated: 2026-09-29_
 | Three enemies with distinct telegraphed attacks | `RatBehaviour` (crouch + flash + "!" → lunge), `SlimeBehaviour` (squash + landing marker → leap slam, super armor), `ShroomBehaviour` (swell + glow → arcing spore) | `AttackCycle` EditMode tests; scene smoke test |
 | Kills drop ingredients through Harvest (clean kill / overkill / element → quality) | `HarvestRules`, `HarvestSystem`, `IngredientPickup` | 19 EditMode harvest tests; PlayMode kill-context test |
 | Essence drains over time and on damage, forces exit at zero | `EssenceMeter`, `PlayerVitals`, `DelveRunController` | 10 EditMode Essence tests; PlayMode depletion + scene death-loop tests |
-| Death screen: pick one item to keep | `DeathScreen` (UI Toolkit), `DeathPenalty`, `PersistentStash` | 6 EditMode death-penalty tests; scene test picks slot 0 and verifies it is banked |
-| Core logic has EditMode tests; clean batch compile | `Assets/_Project/Tests` | **98 project EditMode tests + 9 PlayMode tests, all passing; 0 compiler warnings** (the batch run reports 99 EditMode because the Addressables package adds a stub test) |
+| Death screen: pick one slot (whole stack) to keep | `DeathScreen` (UI Toolkit), `DeathPenalty`, `PersistentStash` | 6 EditMode death-penalty tests; scene test picks slot 0 and verifies it is banked |
+| Core logic has EditMode tests; clean batch compile | `Assets/_Project/Tests` | **107 project EditMode tests + 10 PlayMode tests, all passing; 0 compiler warnings** (the batch run reports one more EditMode test because the Addressables package adds a stub test) |
 
 ## Done
 
@@ -100,14 +100,17 @@ _Last updated: 2026-09-29_
 - **Deferred** (not in the Phase 1 criteria): ledge grab, double jump, harvest finisher move (the rules already support `IsFinisher`), freshness decay, extraction points, secondary weapon/skills, damage numbers, audio.
 - **Localization lookups** are synchronous (`WaitForCompletion`). That's fine on PC and consoles but wouldn't work on WebGL.
 
+## Decided (2026-09-29)
+
+1. **Lockbox keeps the whole stack** in the chosen slot. (`DeathPenalty`; CLAUDE.md updated.)
+2. **Stack size defaults to 3** per slot. Tune it in `Data/Config/DelveConfig`.
+3. **Overkill tension stays.**
+   - A green **check-mark icon** appears over a monster when your lightest hit would finish it without overkill *and* your weapon earns a Clean Kill bonus on its parts (e.g. the Cleaver on Rats, but not Slimes).
+   - The overkill threshold scales with max HP, so the heavy hit only costs quality on small or nearly-dead monsters. It stays clean on tougher ones; this is covered by tests.
+4. **Inedible drops stay.** The GDD now notes they'll get a later use (small sale value, poisons, or traps).
+5. **The Slime stays uninterruptible.** Its wind-up now has its own tell: a red-orange **"!!"** icon instead of "!", a red-orange flash, and a visible tremble.
+
 ## Open design questions
 
-1. **Death penalty granularity:** the Lockbox keeps **one part** from the chosen slot (e.g. one Rat Haunch out of a stack of 3). Should it keep the whole stack instead?
-2. **Stack size:** identical parts stack to **5 per slot** (`DelveConfig`). Is that the right pressure alongside 6 slots?
-3. **Overkill thresholds:**
-   - Overkill of at least 50% of max HP costs one tier.
-   - Overkill of at least 150% gives each part a 50% chance to be destroyed.
-   - The Cleaver's heavy third hit (20 damage) often overkills Rats (22 HP). The intended skill expression is "finish with light hits for Clean Kills". Is that the tension you want?
-4. **Poison kills** currently drop parts marked *Inedible*, rather than dropping nothing. Keep them (e.g. sellable for alchemy later) or drop nothing?
-5. **Interrupting telegraphs:** hitting a Rat or Shroom during its wind-up interrupts it; the Slime has super armor. Is that the intended readability/aggression balance?
-6. **Stronghold defense events:** still undecided (not built; the Tavern scene will stay combat-capable).
+1. **Stronghold defense events:** still undecided (not built; the Tavern scene stays combat-capable).
+2. **Clean-kill cue scope:** the cue only shows when the weapon has a Clean Kill affinity for the monster's parts. Should monsters without affinity show a different cue for "finish without overkill"?

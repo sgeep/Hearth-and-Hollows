@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Hearthdelve.Core.Events;
+using Hearthdelve.Dungeon.Combat;
 using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Dungeon.Player;
 using Hearthdelve.Dungeon.Run;
@@ -74,6 +75,33 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator CleanKillCue_ShowsOnWeakenedRat_NotOnSlime()
+        {
+            yield return LoadScene();
+            yield return null;
+
+            var rat = Object.FindFirstObjectByType<RatBehaviour>();
+            var slime = Object.FindFirstObjectByType<SlimeBehaviour>();
+            yield return null;
+            Assert.That(rat.InCleanKillRange, Is.False, "full-health rat isn't finishable by a light hit");
+
+            // Bring both to 6 HP: the Cleaver's light hit (8) would finish them with little overkill.
+            Weaken(rat, 6f);
+            Weaken(slime, 6f);
+            yield return null;
+
+            Assert.That(rat.InCleanKillRange, Is.True);
+            Assert.That(rat.transform.Find("CleanKillIcon").GetComponent<SpriteRenderer>().enabled, Is.True);
+            Assert.That(slime.InCleanKillRange, Is.False, "Cleaver earns no Clean Kill bonus on slime parts");
+        }
+
+        static void Weaken(EnemyController enemy, float leaveHealth)
+        {
+            var health = enemy.GetComponent<EnemyHealth>();
+            health.ReceiveHit(new DamageInfo { Amount = health.Current - leaveHealth });
+        }
+
+        [UnityTest]
         public IEnumerator EssenceDepleted_ShowsDeathScreen_KeepsChosenPart_AndRestarts()
         {
             yield return LoadScene();
@@ -82,7 +110,7 @@ namespace Hearthdelve.Tests.PlayMode
             var part = ScriptableObject.CreateInstance<IngredientDefinition>();
             part.id = "test_part";
             var kept = new IngredientItem(part, Quality.Fine);
-            DelveRunController.Active.Satchel.Add(kept, 3);
+            Assert.That(DelveRunController.Active.Satchel.Add(kept, 3), Is.EqualTo(0));
 
             Action<int> choose = null;
             void Capture(DeathScreenRequested e) => choose = e.OnChosen;
@@ -107,8 +135,9 @@ namespace Hearthdelve.Tests.PlayMode
                    && Time.realtimeSinceStartup < timeout)
                 yield return null;
 
-            Assert.That(PersistentStash.Items, Has.Count.EqualTo(1));
-            Assert.That(PersistentStash.Items[0], Is.EqualTo(kept));
+            Assert.That(PersistentStash.Stacks, Has.Count.EqualTo(1));
+            Assert.That(PersistentStash.Stacks[0].Item, Is.EqualTo(kept));
+            Assert.That(PersistentStash.Stacks[0].Count, Is.EqualTo(3), "the whole stack is banked");
             Assert.That(DelveRunController.Active.Satchel.IsEmpty, "the rest of the haul is gone");
             Assert.That(Time.timeScale, Is.EqualTo(1f));
             Object.Destroy(part);

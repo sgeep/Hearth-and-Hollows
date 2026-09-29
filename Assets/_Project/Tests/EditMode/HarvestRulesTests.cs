@@ -189,6 +189,56 @@ namespace Hearthdelve.Tests
             Assert.That(seen, Is.EquivalentTo(new[] { 1, 2, 3 }));
         }
 
+        // --- Clean-kill cue ---
+
+        [Test]
+        public void KillsWithoutOverkill_LightHitOnLowHealth_IsClean()
+        {
+            // Giant Rat: 22 max HP, 6 left, Cleaver light hit 8 → 2 overkill (9%) < 50%.
+            Assert.That(HarvestRules.KillsWithoutOverkill(6f, 22f, 8f, Rules()), Is.True);
+        }
+
+        [Test]
+        public void KillsWithoutOverkill_HeavyHitOnWeakenedRat_Overkills()
+        {
+            // Heavy hit 20 on a 22 HP rat at 6 HP → 14 overkill (64%) ≥ 50%.
+            Assert.That(HarvestRules.KillsWithoutOverkill(6f, 22f, 20f, Rules()), Is.False);
+        }
+
+        [Test]
+        public void KillsWithoutOverkill_HitThatDoesNotKill_IsFalse()
+        {
+            Assert.That(HarvestRules.KillsWithoutOverkill(15f, 22f, 8f, Rules()), Is.False);
+        }
+
+        [TestCase(34f, 14f)]   // Green Slime at 14 HP
+        [TestCase(60f, 12f)]   // a tougher monster, well below the heavy hit
+        [TestCase(120f, 3f)]   // a big monster on its last sliver
+        public void HeavyHit_StaysCleanOnTougherEnemies(float maxHealth, float currentHealth)
+        {
+            // The overkill threshold scales with max health, so the Cleaver's heavy 20-damage hit
+            // only costs quality on small or nearly-dead monsters.
+            Assert.That(HarvestRules.KillsWithoutOverkill(currentHealth, maxHealth, 20f, Rules()), Is.True);
+        }
+
+        [Test]
+        public void CleanKillAffinity_RequiresMatchingCategory()
+        {
+            var parts = new[] { Part(m_Gel) };
+            Assert.That(HarvestRules.HasCleanKillAffinity(parts, IngredientCategory.Meat), Is.False);
+            Assert.That(HarvestRules.HasCleanKillAffinity(new[] { Part(m_Gel), Part(m_Haunch) }, IngredientCategory.Meat), Is.True);
+        }
+
+        [Test]
+        public void InCleanKillRange_NeedsBothAffinityAndCleanFinish()
+        {
+            var rat = new[] { Part(m_Haunch) };
+            var slime = new[] { Part(m_Gel) };
+            Assert.That(HarvestRules.InCleanKillRange(6f, 22f, 8f, rat, IngredientCategory.Meat, Rules()), Is.True);
+            Assert.That(HarvestRules.InCleanKillRange(15f, 22f, 8f, rat, IngredientCategory.Meat, Rules()), Is.False, "not yet killable");
+            Assert.That(HarvestRules.InCleanKillRange(6f, 22f, 8f, slime, IngredientCategory.Meat, Rules()), Is.False, "Cleaver has no bonus on gel");
+        }
+
         [Test]
         public void NullOrEmptyParts_AreSkipped()
         {

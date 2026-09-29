@@ -43,5 +43,17 @@ namespace Hearthdelve.Dungeon.Combat
         public float inputBuffer = 0.15f;
         [Min(0), Tooltip("After an attack fully recovers, how long a press still continues the combo.")]
         public float comboLinkWindow = 0.2f;
+
+        /// <summary>Damage of the weakest attack in the combo (the clean finisher).</summary>
+        public float LightestHitDamage
+        {
+            get
+            {
+                float lightest = float.MaxValue;
+                foreach (var attack in combo)
+                    if (attack != null && attack.damage > 0f && attack.damage < lightest) lightest = attack.damage;
+                return lightest == float.MaxValue ? 0f : lightest;
+            }
+        }
     }
 }

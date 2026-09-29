@@ -11,7 +11,8 @@ namespace Hearthdelve.Editor
 {
     /// <summary>
     /// Creates Localization settings, the English locale, and the "UI" and "Content" string
-    /// tables. Adds missing keys only: never overwrites text edited in the Tables window.
+    /// tables. English is the source language and is owned by code (LocKeys.English and the
+    /// content generator), so its text is synced on every run; other locales are never touched.
     /// </summary>
     public static class LocalizationBuilder
     {
@@ -63,7 +64,11 @@ namespace Hearthdelve.Editor
             var table = collection.GetTable(k_English) as StringTable ?? collection.AddNewTable(k_English) as StringTable;
 
             foreach (var (key, text) in entries)
-                if (table.GetEntry(key) == null) table.AddEntry(key, text);
+            {
+                var entry = table.GetEntry(key);
+                if (entry == null) table.AddEntry(key, text);
+                else if (entry.Value != text) entry.Value = text;
+            }
 
             EditorUtility.SetDirty(table);
             EditorUtility.SetDirty(table.SharedData);

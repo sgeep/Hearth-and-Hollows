@@ -17,6 +17,8 @@ namespace Hearthdelve.Dungeon.Enemies
         [SerializeField] protected TelegraphIndicator m_Telegraph;
         [SerializeField] protected SpriteRenderer m_Body;
         [SerializeField] protected LayerMask m_PlayerMask;
+        [SerializeField, Tooltip("Shown when the player's lightest hit would finish this monster as a Clean Kill.")]
+        SpriteRenderer m_CleanKillIcon;
 
         protected KinematicMover2D Mover { get; private set; }
         protected EnemyHealth Health { get; private set; }
@@ -30,19 +32,26 @@ namespace Hearthdelve.Dungeon.Enemies
         readonly Countdown m_HurtFlash = new();
         const float k_HitFlashTime = 0.15f;
         const float k_HitShake = 0.06f;
+        const float k_ArmorTremble = 0.04f;
         float m_SinceHit;
         int m_PatrolDirection = -1;
+        Transform m_CachedPlayerTransform;
+        PlayerController m_CachedPlayer;
 
         public EnemyDefinition Definition => m_Definition;
         public EnemyAttackPhase AttackPhase => Cycle?.Phase ?? EnemyAttackPhase.Ready;
 
-        public void Configure(EnemyDefinition definition, TelegraphIndicator telegraph, SpriteRenderer body, LayerMask playerMask)
+        public void Configure(EnemyDefinition definition, TelegraphIndicator telegraph, SpriteRenderer body, LayerMask playerMask, SpriteRenderer cleanKillIcon = null)
         {
             m_Definition = definition;
             m_Telegraph = telegraph;
             m_Body = body;
             m_PlayerMask = playerMask;
+            m_CleanKillIcon = cleanKillIcon;
         }
+
+        /// <summary>True while the clean-kill cue is showing.</summary>
+        public bool InCleanKillRange { get; private set; }
 
         protected virtual void Awake()
         {
@@ -99,7 +108,37 @@ namespace Hearthdelve.Dungeon.Enemies
 
             // Hit shake: jolt the sprite sideways. Unscaled time so it reads during hit-stop.
             float shake = m_HurtFlash.IsRunning ? Mathf.Sin(Time.unscaledTime * 90f) * k_HitShake : 0f;
+            // Super-armored wind-up trembles, so "this can't be interrupted" reads at a glance.
+            if (m_Definition.superArmorWhileAttacking && Cycle.Phase == EnemyAttackPhase.Telegraph)
+                shake += Mathf.Sin(Time.unscaledTime * 55f) * k_ArmorTremble;
             m_Body.transform.localPosition = new Vector3(shake, 0f, 0f);
+
+            UpdateCleanKillCue();
+        }
+
+        void UpdateCleanKillCue()
+        {
+            var player = GetPlayer();
+            var harvest = HarvestSystem.Instance;
+            InCleanKillRange = player != null && player.Weapon != null && harvest != null && !Health.IsDead &&
+                HarvestRules.InCleanKillRange(Health.Current, Health.Max, player.Weapon.LightestHitDamage,
+                    m_Definition.harvest, player.Weapon.cleanKillCategories, harvest.Rules);
+
+            if (m_CleanKillIcon == null) return;
+            m_CleanKillIcon.enabled = InCleanKillRange;
+            if (InCleanKillRange)
+                m_CleanKillIcon.transform.localScale = Vector3.one * (1f + 0.12f * Mathf.Sin(Time.unscaledTime * 8f));
+        }
+
+        PlayerController GetPlayer()
+        {
+            var t = PlayerLocator.Player;
+            if (t != m_CachedPlayerTransform)
+            {
+                m_CachedPlayerTransform = t;
+                m_CachedPlayer = t != null ? t.GetComponent<PlayerController>() : null;
+            }
+            return m_CachedPlayer;
         }
 
         void Think(float dt, Transform player)

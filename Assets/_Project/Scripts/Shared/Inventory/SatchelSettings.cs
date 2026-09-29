@@ -10,6 +10,6 @@ namespace Hearthdelve.Shared.Inventory
         [Min(1), Tooltip("How many identical parts fit in one slot.")]
         public int maxStack;
 
-        public static SatchelSettings Default => new() { capacity = 6, maxStack = 5 };
+        public static SatchelSettings Default => new() { capacity = 6, maxStack = 3 };
     }
 }

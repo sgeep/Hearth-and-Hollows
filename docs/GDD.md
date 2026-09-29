@@ -215,7 +215,7 @@
 <ul>
 <li><strong>Clean Kill:</strong> finishing with a matching tool type or a finisher move yields higher quality parts.</li>
 <li><strong>Overkill:</strong> excessive damage (big explosions, over‑hits) damages parts, lowering quality or destroying some.</li>
-<li><strong>Elemental Kills:</strong> fire‑killed monsters may drop &quot;Seared&quot; parts (pre‑cooked, faster to prepare but some recipes need raw). Ice‑killed monsters drop &quot;Chilled&quot; parts that stay fresh longer. Poison kills make parts inedible.</li>
+<li><strong>Elemental Kills:</strong> fire‑killed monsters may drop &quot;Seared&quot; parts (pre‑cooked, faster to prepare but some recipes need raw). Ice‑killed monsters drop &quot;Chilled&quot; parts that stay fresh longer. Poison kills make parts inedible. Inedible parts still drop and can be carried; they will get a use later (a small sale value, poisons, or traps).</li>
 <li><strong>Harvest Finisher:</strong> when an enemy is low, a prompt allows a quick finisher that guarantees a premium part at the cost of a moment of vulnerability. Risk/reward.</li>
 </ul>
 <h3>4.4 Inventory, Freshness, and Extraction</h3>
