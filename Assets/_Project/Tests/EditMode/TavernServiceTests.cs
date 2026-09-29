@@ -28,20 +28,20 @@ namespace Hearthdelve.Tests
         [Test]
         public void NeutralDish_IsHalf()
         {
-            Assert.That(Preferences.FlavorMatch(FlavorTags.Umami, CookStation.Grill, Dwarf), Is.EqualTo(0.5f).Within(1e-5f));
+            Assert.That(Preferences.FlavorMatch(FlavorTags.Umami, CookStation.Grill, Dwarf, ServiceEconomySettings.Default), Is.EqualTo(0.5f).Within(1e-5f));
         }
 
         [Test]
         public void LikedFlavors_RaiseMatch_DislikedLowerIt()
         {
-            Assert.That(Preferences.FlavorMatch(FlavorTags.Savory | FlavorTags.Earthy, CookStation.Grill, Dwarf), Is.EqualTo(1f).Within(1e-5f));
-            Assert.That(Preferences.FlavorMatch(FlavorTags.Sweet, CookStation.Grill, Dwarf), Is.EqualTo(0.2f).Within(1e-5f));
+            Assert.That(Preferences.FlavorMatch(FlavorTags.Savory | FlavorTags.Earthy, CookStation.Grill, Dwarf, ServiceEconomySettings.Default), Is.EqualTo(1f).Within(1e-5f));
+            Assert.That(Preferences.FlavorMatch(FlavorTags.Sweet, CookStation.Grill, Dwarf, ServiceEconomySettings.Default), Is.EqualTo(0.2f).Within(1e-5f));
         }
 
         [Test]
         public void FavoriteStation_AddsBonus()
         {
-            Assert.That(Preferences.FlavorMatch(FlavorTags.Umami, CookStation.Tap, Dwarf), Is.EqualTo(0.7f).Within(1e-5f));
+            Assert.That(Preferences.FlavorMatch(FlavorTags.Umami, CookStation.Tap, Dwarf, ServiceEconomySettings.Default), Is.EqualTo(0.7f).Within(1e-5f));
         }
     }
 

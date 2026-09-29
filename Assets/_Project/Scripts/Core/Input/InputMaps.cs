@@ -32,6 +32,22 @@ namespace Hearthdelve.Core.Input
             InputSystem.actions?.FindAction($"{map}/{action}", throwIfNotFound: false);
     }
 
+    public static class TavernActions
+    {
+        public const string Move = "Move";
+        public const string Interact = "Interact";
+        public const string Cancel = "Cancel";
+        public const string Pause = "Pause";
+    }
+
+    public static class MinigameActions
+    {
+        public const string Aim = "Aim";
+        public const string Action = "Action";
+        public const string AltAction = "AltAction";
+        public const string Cancel = "Cancel";
+    }
+
     public static class DungeonActions
     {
         public const string Move = "Move";

@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Hearthdelve.uss" />
+    <Style src="Tavern.uss" />
+    <ui:VisualElement name="screen" class="hd-screen">
+        <ui:VisualElement class="hd-panel">
+            <ui:Label name="title" class="hd-title" />
+            <ui:VisualElement name="rows" class="hd-results" />
+            <ui:Button name="again" class="hd-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

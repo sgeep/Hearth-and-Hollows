@@ -55,12 +55,21 @@ namespace Hearthdelve.Shared.Economy
         [Tooltip("Renown change when a customer leaves because everything they'd order is sold out. Smaller than a walkout.")]
         public int soldOutRenown;
 
+        [Header("Flavor preferences")]
+        [Range(0, 1), Tooltip("Flavor match gained per liked flavor in a dish (neutral dish = 0.5).")]
+        public float likedFlavorBonus;
+        [Range(0, 1), Tooltip("Flavor match lost per disliked flavor in a dish.")]
+        public float dislikedFlavorPenalty;
+        [Min(0), Tooltip("Base chance weight of ordering any available dish; higher = less picky ordering.")]
+        public float baseOrderWeight;
+
         public static ServiceEconomySettings Default => new()
         {
             dishWeight = 0.6f, flavorWeight = 0.25f, waitWeight = 0.15f,
             tipThreshold = 0.5f, maxTipFraction = 0.5f,
             renownNeutral = 0.5f, renownScale = 4f,
             walkoutRenown = -3, soldOutRenown = -1,
+            likedFlavorBonus = 0.25f, dislikedFlavorPenalty = 0.3f, baseOrderWeight = 0.1f,
         };
     }
 

@@ -166,7 +166,7 @@ namespace Hearthdelve.Tavern.Service
 
         void OnOrderRequested(CustomerLogic customer)
         {
-            var choice = Preferences.ChooseOrder(AvailableDishes(), customer.Traits, m_Random);
+            var choice = Preferences.ChooseOrder(AvailableDishes(), customer.Traits, m_Economy, m_Random);
             var reserved = choice != null ? RecipeMatcher.TryTake(choice, Storeroom) : null;
             if (reserved == null)
             {
@@ -229,7 +229,7 @@ namespace Hearthdelve.Tavern.Service
         void Settle(CustomerLogic customer, Ticket ticket)
         {
             if (ticket == null) return;
-            float match = Preferences.FlavorMatch(ticket.Reserved.Flavors, ticket.Recipe.station, customer.Traits);
+            float match = Preferences.FlavorMatch(ticket.Reserved.Flavors, ticket.Recipe.station, customer.Traits, m_Economy);
             float satisfaction = ServiceEconomy.Satisfaction(ticket.DishQuality, match, customer.WaitFraction, m_Economy);
             Ledger.DishesServed++;
             Ledger.Gold += ServiceEconomy.Payment(ticket.DishValue);
@@ -288,6 +288,15 @@ namespace Hearthdelve.Tavern.Service
             ticket.ClaimedBy = cook;
             TicketChanged?.Invoke(ticket);
             return true;
+        }
+
+        /// <summary>The cook walked away mid-minigame: the order goes back in the queue untouched.</summary>
+        public void AbandonCooking(Ticket ticket)
+        {
+            if (ticket == null || ticket.State != TicketState.Cooking) return;
+            ticket.State = TicketState.Queued;
+            ticket.ClaimedBy = null;
+            TicketChanged?.Invoke(ticket);
         }
 
         /// <summary>The cooking minigame finished; the dish goes on the pass.</summary>

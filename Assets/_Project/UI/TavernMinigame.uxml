@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Hearthdelve.uss" />
+    <Style src="Tavern.uss" />
+    <ui:VisualElement class="hd-minigame-layer" picking-mode="Ignore">
+        <ui:VisualElement name="grill" class="hd-panel hd-minigame" picking-mode="Ignore">
+            <ui:Label name="grill-title" class="hd-title" />
+            <ui:Label name="grill-side" class="hd-subtitle" />
+            <ui:VisualElement class="hd-grill__track" picking-mode="Ignore">
+                <ui:VisualElement name="grill-band" class="hd-grill__band" picking-mode="Ignore" />
+                <ui:VisualElement class="hd-grill__burn" picking-mode="Ignore" />
+                <ui:VisualElement name="grill-needle" class="hd-grill__needle" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="grill-prompt" class="hd-minigame__prompt" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tap" class="hd-panel hd-minigame" picking-mode="Ignore">
+            <ui:Label name="tap-title" class="hd-title" />
+            <ui:VisualElement name="tap-glass" class="hd-tap__glass" picking-mode="Ignore">
+                <ui:VisualElement name="tap-foam-zone" class="hd-tap__foam-zone" picking-mode="Ignore" />
+                <ui:VisualElement name="tap-liquid" class="hd-tap__liquid" picking-mode="Ignore" />
+                <ui:VisualElement name="tap-foam" class="hd-tap__foam" picking-mode="Ignore" />
+                <ui:VisualElement name="tap-line" class="hd-tap__line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label name="tap-prompt" class="hd-minigame__prompt" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

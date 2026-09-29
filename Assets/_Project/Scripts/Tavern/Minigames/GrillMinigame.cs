@@ -22,6 +22,10 @@ namespace Hearthdelve.Tavern.Minigames
         public float flipPause;
         [Min(1)] public int sides;
 
+        [Header("Staff auto-play")]
+        [Min(0), Tooltip("Largest flip-timing error (in meter units) for a skill-0 staff member; scales down with skill.")]
+        public float autoMaxError;
+
         public static GrillSettings Default => new()
         {
             cookRate = 0.22f,
@@ -30,6 +34,7 @@ namespace Hearthdelve.Tavern.Minigames
             undercookFalloff = 0.4f,
             flipPause = 0.4f,
             sides = 2,
+            autoMaxError = 0.6f,
         };
 
         public float BandCenter => (bandMin + bandMax) * 0.5f;
@@ -127,9 +132,6 @@ namespace Hearthdelve.Tavern.Minigames
     /// <summary>Flips near the band centre, with timing error that grows as skill drops.</summary>
     public sealed class GrillAutoPlayer : IMinigameAutoPlayer
     {
-        /// <summary>Largest meter error at skill 0.</summary>
-        public const float MaxError = 0.6f;
-
         readonly GrillMinigame m_Game;
         readonly float m_Skill;
         readonly IRandom m_Random;
@@ -149,7 +151,7 @@ namespace Hearthdelve.Tavern.Minigames
             if (m_PlannedSide != m_Game.Side)
             {
                 m_PlannedSide = m_Game.Side;
-                float error = (m_Random.Value() * 2f - 1f) * (1f - m_Skill) * MaxError;
+                float error = (m_Random.Value() * 2f - 1f) * (1f - m_Skill) * m_Game.Settings.autoMaxError;
                 m_Target = m_Game.Settings.BandCenter + error;
             }
             // Next tick's meter is what the flip will be scored at.

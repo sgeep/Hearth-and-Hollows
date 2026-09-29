@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Hearthdelve.Core.Random;
+using Hearthdelve.Shared.Economy;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Recipes;
 using UnityEngine;
@@ -10,15 +11,13 @@ namespace Hearthdelve.Tavern.Customers
     public static class Preferences
     {
         public const float Neutral = 0.5f;
-        public const float PerLiked = 0.25f;
-        public const float PerDisliked = 0.3f;
 
         /// <summary>0–1: 0.5 for a neutral dish, up for liked flavors / favourite station, down for disliked.</summary>
-        public static float FlavorMatch(FlavorTags dishFlavors, CookStation station, in CustomerTraits traits)
+        public static float FlavorMatch(FlavorTags dishFlavors, CookStation station, in CustomerTraits traits, in ServiceEconomySettings s)
         {
             float score = Neutral
-                          + PerLiked * CountBits(dishFlavors & traits.liked)
-                          - PerDisliked * CountBits(dishFlavors & traits.disliked);
+                          + s.likedFlavorBonus * CountBits(dishFlavors & traits.liked)
+                          - s.dislikedFlavorPenalty * CountBits(dishFlavors & traits.disliked);
             if (traits.hasFavoriteStation && station == traits.favoriteStation) score += traits.favoriteStationBonus;
             return Mathf.Clamp01(score);
         }
@@ -27,16 +26,17 @@ namespace Hearthdelve.Tavern.Customers
         /// Picks from the dishes still available, weighted toward ones the customer likes.
         /// Returns null if nothing is available (everything on the menu is sold out).
         /// </summary>
-        public static RecipeDefinition ChooseOrder(IReadOnlyList<RecipeDefinition> available, in CustomerTraits traits, IRandom random)
+        public static RecipeDefinition ChooseOrder(IReadOnlyList<RecipeDefinition> available, in CustomerTraits traits,
+            in ServiceEconomySettings s, IRandom random)
         {
             if (available == null || available.Count == 0) return null;
             float total = 0f;
             var weights = new float[available.Count];
             for (int i = 0; i < available.Count; i++)
             {
-                // Everyone might order anything, but liked dishes are far more likely.
-                float match = FlavorMatch(available[i].flavors, available[i].station, traits);
-                weights[i] = 0.1f + match * match;
+                // Anyone might order anything, but liked dishes are far more likely.
+                float match = FlavorMatch(available[i].flavors, available[i].station, traits, s);
+                weights[i] = s.baseOrderWeight + match * match;
                 total += weights[i];
             }
             float pick = random.Value() * total;

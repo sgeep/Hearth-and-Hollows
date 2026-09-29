@@ -46,6 +46,8 @@ namespace Hearthdelve.Tavern.Customers
         public CustomerTraits traits = CustomerTraits.Default;
         [Min(0), Tooltip("Relative chance this type walks in.")]
         public float spawnWeight = 1f;
+        public Sprite sprite;
+        [Tooltip("Tint for placeholder art until real sprites exist.")]
         public Color placeholderColor = Color.white;
     }
 }

@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Hearthdelve.uss" />
+    <Style src="Tavern.uss" />
+    <ui:VisualElement name="screen" class="hd-screen">
+        <ui:VisualElement class="hd-panel hd-prep">
+            <ui:Label name="title" class="hd-title" />
+            <ui:VisualElement class="hd-prep__columns">
+                <ui:VisualElement class="hd-prep__column">
+                    <ui:Label name="stock-header" class="hd-prep__header" />
+                    <ui:ScrollView name="stock-scroll" class="hd-prep__stock">
+                        <ui:VisualElement name="stock-list" />
+                    </ui:ScrollView>
+                    <ui:Button name="fill" class="hd-button hd-button--small" />
+                </ui:VisualElement>
+                <ui:VisualElement class="hd-prep__column">
+                    <ui:Label name="menu-header" class="hd-prep__header" />
+                    <ui:VisualElement name="recipe-list" class="hd-prep__recipes" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement class="hd-prep__staff">
+                <ui:Label name="staff-label" class="hd-prep__header" />
+                <ui:VisualElement name="staff-buttons" class="hd-buttons" />
+            </ui:VisualElement>
+            <ui:Button name="open" class="hd-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

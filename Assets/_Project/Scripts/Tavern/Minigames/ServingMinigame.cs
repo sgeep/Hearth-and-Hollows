@@ -26,6 +26,10 @@ namespace Hearthdelve.Tavern.Minigames
         [Min(0), Tooltip("Can't be bumped again for this long after a bump.")]
         public float bumpCooldown;
 
+        [Header("Staff auto-play")]
+        [Range(0.1f, 1), Tooltip("Walking speed (fraction of carry speed) of a skill-0 staff member; skill 1 walks at full speed.")]
+        public float autoSlowestSpeed;
+
         public static ServingSettings Default => new()
         {
             carrySpeed = 1.6f,
@@ -35,6 +39,7 @@ namespace Hearthdelve.Tavern.Minigames
             parFactor = 1.2f,
             parSlack = 0.5f,
             bumpCooldown = 0.6f,
+            autoSlowestSpeed = 0.55f,
         };
     }
 
@@ -117,7 +122,7 @@ namespace Hearthdelve.Tavern.Minigames
         {
             m_Game = game;
             float s = Mathf.Clamp01(skill);
-            m_Speed = Mathf.Lerp(0.55f, 1f, s) * Mathf.Lerp(0.9f, 1f, random.Value());
+            m_Speed = Mathf.Lerp(game.Settings.autoSlowestSpeed, 1f, s) * Mathf.Lerp(0.9f, 1f, random.Value());
         }
 
         public MinigameInput NextInput(float deltaTime) =>

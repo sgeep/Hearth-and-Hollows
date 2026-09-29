@@ -34,6 +34,12 @@ namespace Hearthdelve.Tavern.Minigames
         [Min(1), Tooltip("Gives up (scores 0) if nothing is poured by then.")]
         public float timeout;
 
+        [Header("Staff auto-play")]
+        [Range(0, 1), Tooltip("Largest tilt error for a skill-0 staff member; scales down with skill.")]
+        public float autoMaxTiltError;
+        [Range(0, 0.5f), Tooltip("Largest fill-line error for a skill-0 staff member; scales down with skill.")]
+        public float autoMaxLineError;
+
         public static TapSettings Default => new()
         {
             pourRate = 0.16f,
@@ -47,6 +53,8 @@ namespace Hearthdelve.Tavern.Minigames
             foamFalloff = 0.15f,
             tiltSpeed = 3f,
             timeout = 12f,
+            autoMaxTiltError = 0.5f,
+            autoMaxLineError = 0.15f,
         };
 
         public float FoamBandCenter => (foamBandMin + foamBandMax) * 0.5f;
@@ -141,9 +149,6 @@ namespace Hearthdelve.Tavern.Minigames
     /// <summary>Pours with an imperfect tilt and releases near the line; errors grow as skill drops.</summary>
     public sealed class TapAutoPlayer : IMinigameAutoPlayer
     {
-        public const float MaxTiltError = 0.5f;
-        public const float MaxLineError = 0.15f;
-
         readonly TapMinigame m_Game;
         readonly float m_TiltTarget;
         readonly float m_ReleaseAt;
@@ -153,8 +158,8 @@ namespace Hearthdelve.Tavern.Minigames
             m_Game = game;
             float miss = 1f - Mathf.Clamp01(skill);
             var s = game.Settings;
-            m_TiltTarget = Mathf.Clamp01(TapMinigame.IdealTilt(s) + (random.Value() * 2f - 1f) * miss * MaxTiltError);
-            m_ReleaseAt = Mathf.Min(0.99f, s.fillLine + (random.Value() * 2f - 1f) * miss * MaxLineError);
+            m_TiltTarget = Mathf.Clamp01(TapMinigame.IdealTilt(s) + (random.Value() * 2f - 1f) * miss * s.autoMaxTiltError);
+            m_ReleaseAt = Mathf.Min(0.99f, s.fillLine + (random.Value() * 2f - 1f) * miss * s.autoMaxLineError);
         }
 
         public MinigameInput NextInput(float deltaTime)
