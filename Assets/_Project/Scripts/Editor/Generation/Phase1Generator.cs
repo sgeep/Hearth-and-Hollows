@@ -27,6 +27,9 @@ namespace Hearthdelve.Editor
         static void RebuildSceneMenu()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            if (File.Exists(EditorPaths.GreyboxScene) &&
+                !EditorUtility.DisplayDialog("Hearthdelve", "Overwrite the CombatGreybox scene? Manual edits to it will be lost.", "Overwrite", "Cancel"))
+                return;
             Run(rebuildScene: true);
             EditorSceneManager.OpenScene(EditorPaths.GreyboxScene);
         }
@@ -39,15 +42,17 @@ namespace Hearthdelve.Editor
             var content = ContentGenerator.Generate();
             LocalizationBuilder.Build();
             var prefabs = PrefabGenerator.Generate(content);
-            if (rebuildScene || !File.Exists(EditorPaths.GreyboxScene))
-                GreyboxSceneBuilder.Build(content, prefabs, actions);
+            GreyboxSceneBuilder.Build(content, prefabs, actions, overwriteApproved: rebuildScene);
             ProjectConfigurator.RemoveTemplateAssets();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("[Hearthdelve] Phase 1 generation complete.");
         }
 
-        /// <summary>Batch-mode entry. Rebuilds the scene only if it doesn't exist yet.</summary>
+        /// <summary>
+        /// Batch-mode entry. Creates the scene only if it doesn't exist; pass -rebuildScene to
+        /// overwrite it, and only with the user's approval (CLAUDE.md).
+        /// </summary>
         public static void RunBatch()
         {
             try

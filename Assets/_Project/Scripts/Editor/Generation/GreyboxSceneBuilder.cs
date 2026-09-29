@@ -35,8 +35,14 @@ namespace Hearthdelve.Editor
         const int k_LevelTop = 24;
         const int k_FloorBottom = -4;
 
-        public static void Build(ContentGenerator.Content content, PrefabGenerator.Prefabs prefabs, InputActionAsset actions)
+        /// <param name="overwriteApproved">Must be true to replace an existing scene (CLAUDE.md: never overwrite a scene without asking).</param>
+        public static void Build(ContentGenerator.Content content, PrefabGenerator.Prefabs prefabs, InputActionAsset actions, bool overwriteApproved)
         {
+            if (System.IO.File.Exists(EditorPaths.GreyboxScene) && !overwriteApproved)
+            {
+                Debug.Log("[Hearthdelve] CombatGreybox exists and overwrite wasn't approved; leaving it untouched.");
+                return;
+            }
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorPaths.Ensure(EditorPaths.Tiles);
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

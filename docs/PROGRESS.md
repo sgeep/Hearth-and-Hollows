@@ -109,8 +109,8 @@ _Last updated: 2026-09-29_
    - The overkill threshold scales with max HP, so the heavy hit only costs quality on small or nearly-dead monsters. It stays clean on tougher ones; this is covered by tests.
 4. **Inedible drops stay.** The GDD now notes they'll get a later use (small sale value, poisons, or traps).
 5. **The Slime stays uninterruptible.** Its wind-up now has its own tell: a red-orange **"!!"** icon instead of "!", a red-orange flash, and a visible tremble.
+6. **The check mark only means "this weapon earns a Clean Kill bonus here."** No second "finish without overkill" cue for now.
 
 ## Open design questions
 
 1. **Stronghold defense events:** still undecided (not built; the Tavern scene stays combat-capable).
-2. **Clean-kill cue scope:** the cue only shows when the weapon has a Clean Kill affinity for the monster's parts. Should monsters without affinity show a different cue for "finish without overkill"?

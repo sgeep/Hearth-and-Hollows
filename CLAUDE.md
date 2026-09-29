@@ -35,6 +35,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 
 - Prefer writing **Editor scripts** (menu items under `Hearthdelve/…`) that generate prefabs, ScriptableObject assets, and scenes, instead of hand-editing `.unity`, `.prefab`, or `.asset` YAML. Hand-edit YAML only for small, well-understood changes.
 - Never hand-write or modify `.meta` files or GUIDs; let Unity generate them.
+- **Scenes are never overwritten without asking.** Generators may create a scene that doesn't exist, but must not overwrite an existing scene unless I've explicitly approved it for that run (in the editor they show a confirmation dialog; in batch mode, don't pass `-rebuildScene` without my go-ahead). If a generator change needs a scene rebuild, ask first, or add the new objects to the existing scene instead.
 - When Unity is available on the command line, verify work by running batch mode compiles and tests (EditMode and PlayMode via `-runTests`). Report failures honestly; don't claim something works without running it.
 - Use placeholder art (colored rectangles, simple generated sprites) until real pixel art exists. Name placeholders clearly so they're easy to replace.
 - Some things need me in the editor (playtesting feel, wiring references a script can't set, importing art). When you hit one, give me short numbered steps and continue with whatever doesn't depend on it.
