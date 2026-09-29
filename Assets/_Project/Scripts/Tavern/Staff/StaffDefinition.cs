@@ -1,0 +1,28 @@
+using UnityEngine;
+using UnityEngine.Localization;
+
+namespace Hearthdelve.Tavern.Staff
+{
+    public enum StaffStation
+    {
+        None,
+        Grill,
+        Tap,
+        Serving,
+    }
+
+    /// <summary>A hired helper who can run one station on their own (GDD §6.2, §7.2).</summary>
+    [CreateAssetMenu(menuName = "Hearthdelve/Staff Definition", fileName = "Staff_")]
+    public sealed class StaffDefinition : ScriptableObject
+    {
+        public string id;
+        public LocalizedString displayName;
+        [Range(0, 1), Tooltip("Drives the auto-player's timing accuracy: 1 plays like an expert.")]
+        public float skill = 0.6f;
+        [Range(0, 1), Tooltip("Hard cap on staff results, so staffed stations are always worse than good play.")]
+        public float qualityCap = 0.85f;
+        [Min(0), Tooltip("Pause between jobs, in seconds.")]
+        public float restBetweenJobs = 1f;
+        public Color placeholderColor = new(0.6f, 0.75f, 0.95f);
+    }
+}
