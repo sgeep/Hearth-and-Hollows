@@ -4,39 +4,76 @@ _Last updated: 2026-09-29_
 
 ## Status
 
-**Phase 1 (Combat Prototype): implemented and passing automated verification. Not yet playtested by a human.** Every Phase 1 "done" criterion is built and covered by tests. Feel tuning needs you in the editor.
+- **Phase 1 (Combat Prototype):** done and playtested by you in the editor. Feel tuning is ongoing.
+- **Phase 2 (Tavern Prototype):** implemented and passing automated verification. **Not yet playtested by a human.**
 
-| Phase 1 criterion | Where | Verified by |
+Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+
+### Phase 2 criteria
+
+| Criterion | Where | Verified by |
 |---|---|---|
-| Run, jump (coyote time + jump buffer), dodge roll with i-frames, wall slide/jump, drop-through platforms | `PlatformerMotor`, `KinematicMover2D`, `PlayerController` | 24 EditMode motor tests; PlayMode landing/wall/one-way tests |
-| Butcher's Cleaver 3-hit combo with hit-stop and screen shake | `ComboLogic`, `WeaponDefinition` (`Data/Weapons`), `HitStopDriver`, `ScreenShaker` | 7 EditMode combo tests; 4 hit-stop tests; PlayMode hit-kills-enemy test |
-| Three enemies with distinct telegraphed attacks | `RatBehaviour` (crouch + flash + "!" → lunge), `SlimeBehaviour` (squash + landing marker → leap slam, super armor), `ShroomBehaviour` (swell + glow → arcing spore) | `AttackCycle` EditMode tests; scene smoke test |
-| Kills drop ingredients through Harvest (clean kill / overkill / element → quality) | `HarvestRules`, `HarvestSystem`, `IngredientPickup` | 19 EditMode harvest tests; PlayMode kill-context test |
-| Essence drains over time and on damage, forces exit at zero | `EssenceMeter`, `PlayerVitals`, `DelveRunController` | 10 EditMode Essence tests; PlayMode depletion + scene death-loop tests |
-| Death screen: pick one slot (whole stack) to keep | `DeathScreen` (UI Toolkit), `DeathPenalty`, `PersistentStash` | 6 EditMode death-penalty tests; scene test picks slot 0 and verifies it is banked |
-| Core logic has EditMode tests; clean batch compile | `Assets/_Project/Tests` | **107 project EditMode tests + 10 PlayMode tests, all passing; 0 compiler warnings** (the batch run reports one more EditMode test because the Addressables package adds a stub test) |
+| Debug action fills the storeroom with Phase 1 ingredients at mixed quality and freshness | `DebugStockFiller`, prep screen button, F4 | EditMode fill test; PlayMode prep test |
+| Pick a menu of up to 3 dishes from 5 Biome 1 recipes before service | `TavernDirector.ToggleMenu`, `TavernPrepScreen`, `Data/Recipes` | EditMode menu-size test; PlayMode cap test |
+| Grill, Tap and Serving work through `IMinigame` | `GrillMinigame`, `TapMinigame`, `ServingMinigame` (Core `IMinigame`) | 17 EditMode minigame tests, including "default tuning takes 5–10 s" |
+| Villager, adventurer and dwarf enter, sit, order, wait (patience), eat, pay and leave, with flavor preferences affecting satisfaction | `CustomerLogic`, `Preferences`, `CustomerProfile` (`Data/Customers`), `CustomerAgent` | Customer lifecycle and preference tests; PlayMode service run |
+| Dish score = recipe value × ingredient quality × freshness × minigame score, driving payment, tips and renown | `DishScoring`, `ServiceEconomy` (Shared), `ServiceSession.Settle` | 12 EditMode economy tests; full-loop ledger test |
+| Tunable service length (default 6 min) and a results screen (dishes served, gold, tips, renown, walkouts) | `ServiceConfig`, `ServiceSession` clock, `TavernResultsScreen` | Clock and last-orders tests; PlayMode results test |
+| One staff helper auto-resolves a station through `IMinigame` at reduced quality | `StaffDefinition` (Pip), `StaffCook`, `StaffAgent`, per-minigame auto-players | Auto-player tests (below expert, above zero); staff-cook test; PlayMode staff-only service |
+| Tuning in ScriptableObjects, text localized, core logic tested | `Data/Tavern/*`, `Data/Config/EconomyConfig`, `TavernLocKeys` | Batch EditMode + PlayMode runs; file-name guard test |
+| **Also asked for:** sold-out dishes marked on the HUD; new customers order something else or leave with a smaller penalty than a walkout | `ServiceSession` (per-order ingredient reservation, sold-out tracking), `TavernHud` | 6 EditMode sold-out/cancellation tests; PlayMode HUD test |
 
-## Done
+### Phase 1 criteria (unchanged)
 
-- **Setup:** Git LFS and ignore rules. Packages: Cinemachine 3.1.7, Localization 1.5.8, plus the URP / Input System / Test Framework versions that were already installed. Removed Visual Scripting, Multiplayer Center and Collab Proxy.
-- **Assemblies:** `Core`, `Shared`, `Dungeon`, `Tavern` (empty), `UI`, `Editor`, `Tests`, `Tests.PlayMode`. Dungeon and Tavern never reference each other. UI talks to gameplay only through `EventBus` events in Core/Shared.
-- **Project settings (via `Hearthdelve/Setup/Configure Project Settings`):**
-  - Layers: Ground, OneWayPlatform, Player, Enemy, Pickup, Projectile.
-  - Seven sorting layers.
-  - Physics queries ignore triggers.
-  - Fixed timestep of 1/60 s.
-  - `Hearthdelve.inputactions` as the project-wide actions (Dungeon, Tavern, Minigame and UI maps).
-- **Rendering:** URP 2D renderer, a global 2D light, and a Pixel Perfect Camera at 640×360 / 32 PPU with Cinemachine 3 (position composer, 2D confiner, pixel-perfect extension, impulse listener).
-- **Localization:** English locale plus `UI` and `Content` string tables. All player-facing text uses table keys. The debug overlay is developer-only and not localized.
-- **Content:** Butcher's Cleaver; Giant Rat, Green Slime, Cellar Shroom and a Training Dummy; six Cellars ingredients. All numbers live in ScriptableObjects under `Assets/_Project/Data`.
-- **Greybox level:** `Assets/_Project/Scenes/CombatGreybox.unity`, laid out left to right:
-  1. Start area with the training dummy.
-  2. Wall-jump shaft.
-  3. One-way platform tower.
-  4. Arena with a slime and a rat.
-  5. Shroom perch.
+| Criterion | Where |
+|---|---|
+| Movement (coyote time, jump buffer, dodge i-frames, wall slide/jump, drop-through) | `PlatformerMotor`, `KinematicMover2D`, `PlayerController` |
+| Butcher's Cleaver 3-hit combo with hit-stop and screen shake | `ComboLogic`, `WeaponDefinition`, `HitStopDriver`, `ScreenShaker` |
+| Three enemies with telegraphed attacks | `RatBehaviour`, `SlimeBehaviour`, `ShroomBehaviour` |
+| Harvest drops (clean kill / overkill / element → quality) | `HarvestRules`, `HarvestSystem`, `IngredientPickup` |
+| Essence meter and forced exit at zero | `EssenceMeter`, `PlayerVitals`, `DelveRunController` |
+| Death screen, keeping one slot (the whole stack) | `DeathScreen`, `DeathPenalty`, `PersistentStash` |
 
-## Controls
+## How a service works
+
+1. **Prep screen:**
+   - Fill the storeroom with the debug button or F4.
+   - Pick up to 3 dishes. Each shows its station, gold value and how many servings your stock can make.
+   - Put Pip on the Grill, Tap or Serving, or leave them off duty.
+   - **Open the doors.**
+2. **Customers arrive.**
+   - They sit if a seat is free (6 seats); otherwise they queue by the door.
+   - After reading the menu they order a dish that's still available, choosing by their tastes.
+   - Placing an order **reserves** the ingredients, so it can't later become impossible to make.
+   - The order appears on the rail on the right.
+3. **Cooking:** walk to the Grill or Tap and press **E / A** to cook the next order for that station. The Grill and Tap panels show the minigame.
+4. **Serving:** at the pass, press **E** to pick up the next dish. Walking it to the customer *is* the Serving minigame: customers walking across the floor bump you and spill the plate, and a full spill meter drops it.
+5. **Eating and paying:** customers eat, pay the dish value, tip if they're happy, and change your renown.
+   - **Walkout:** patience runs out. −3 renown, and uncooked reserved stock goes back to the storeroom.
+   - **Sold out:** nothing they'd order can be made. −1 renown, and the HUD marks the dish "Sold out".
+6. **Results:** the service ends after 6 minutes (no new arrivals in the last 45 s). "Prepare another evening" restarts the scene with an empty storeroom.
+
+## Tavern controls
+
+| | Keyboard/Mouse | Gamepad |
+|---|---|---|
+| Walk | A/D or arrows | Left stick / D-pad |
+| Use station / pick up dish | E or Space | A / Cross |
+| Grill: flip | Space or Left Mouse | A / Cross |
+| Tap: pour (hold) / tilt glass | Space or Left Mouse / W–S | A / Cross / Left stick |
+| Step away from a station | Esc | B / Circle |
+
+**Tavern debug keys:**
+
+| Key | Action |
+|---|---|
+| F1 | Show/hide the overlay |
+| F4 | Fill the storeroom |
+| F5 | End service now |
+| F6 | Spawn a customer |
+| F7 | Restart |
+
+## Dungeon controls
 
 | | Keyboard/Mouse | Gamepad |
 |---|---|---|
@@ -47,70 +84,90 @@ _Last updated: 2026-09-29_
 | Drop through platform | S + Space | Down + A |
 | Swap when satchel full | E | D-pad Up |
 
-**Debug** (editor/dev builds only):
+**Dungeon debug keys:**
 
 | Key | Action |
 |---|---|
 | F1 | Show/hide the overlay |
-| 1 / 2 / 3 / 4 | Weapon element: none / fire / ice / poison (to test Seared, Chilled and Inedible drops) |
+| 1 / 2 / 3 / 4 | Weapon element: none / fire / ice / poison |
 | F2 | Toggle screen shake |
 | F3 | Toggle hit-stop |
 | F4 | Refill Essence |
-| F5 | Set Essence to 3 (quick death-screen test) |
+| F5 | Set Essence to 3 |
 | F6 | God mode |
-| F7 | Restart the level |
+| F7 | Restart |
 
 ## Regenerating and verifying
 
-- In the editor: **Hearthdelve → Generate → Phase 1 (All)**. It asks before overwriting the scene.
-  - Data assets are only ever *created*; existing ones keep your tuning.
-  - Prefabs are rebuilt every run.
-  - Placeholder PNGs are kept if a file with the same name already exists.
-- From the command line (close the editor first):
+- **Menus:** *Hearthdelve → Generate → Phase 1 (All)* and *Phase 2 Tavern (All)*.
+  - They create missing scenes but **never overwrite an existing scene without asking** (CLAUDE.md).
+  - Data assets are only ever created, so your tuning is kept. Prefabs are rebuilt every run.
+- **Command line** (close the editor first):
 
 ```
-"C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -executeMethod Hearthdelve.Editor.Phase1Generator.RunBatch -logFile BatchLogs/generate.log
+"C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -executeMethod Hearthdelve.Editor.Phase2Generator.RunBatch -logFile BatchLogs/generate2.log
 "C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults BatchLogs/editmode.xml -logFile BatchLogs/editmode.log
 "C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform PlayMode -testResults BatchLogs/playmode.xml -logFile BatchLogs/playmode.log
 ```
 
-## Next
-
-1. **You:** playtest the greybox and tune feel (see "Needs you in the editor" below). Report anything that feels off, and I'll adjust defaults or mechanics.
-2. Phase 2 (Tavern prototype) planning. I'll propose a plan and wait for approval, per CLAUDE.md.
-
 ## Needs you in the editor
 
-1. Open `Assets/_Project/Scenes/CombatGreybox.unity`. Set the Game view to a 16:9 resolution (1920×1080 scales 640×360 by exactly 3×). Press Play.
-2. Tune while playing. Changes made in Play mode are kept after you exit.
-   - `Data/Config/PlayerMovementConfig`, the Cleaver's combo frame data, and `HarvestRulesConfig` all apply live.
-   - `EssenceConfig` and `DelveConfig` apply on the next level restart (F7).
-3. Check the pixel-perfect camera. Grid snapping is **Upscale Render Texture** (most faithful to pixel art). If camera motion looks steppy, try **Pixel Snapping** on the Main Camera's Pixel Perfect Camera component and tell me which you prefer.
-4. Before making a standalone build, build the Localization Addressables content once: *Window → Asset Management → Addressables → Groups → Build → New Build → Default Build Script*. The editor doesn't need this.
+1. **Play a service:** open `Assets/_Project/Scenes/TavernGreybox.unity` with a 16:9 Game view (1920×1080 works well) and press Play.
+2. **Tuning.** Changes made in Play mode are kept after you exit.
+
+   | Asset | What's in it | When changes apply |
+   |---|---|---|
+   | `Data/Tavern/ServiceConfig` | Length, arrival gaps, walk speed | Next evening |
+   | `Data/Tavern/GrillConfig`, `TapConfig`, `ServingConfig` | Timing windows, staff error ranges; each notes the 5–10 s target | Next minigame |
+   | `Data/Config/EconomyConfig` | Quality/freshness multipliers, tips, renown, flavor weights | Next dish |
+   | `Data/Customers/*` | Patience, tastes, generosity | Next customer |
+   | `Data/Staff/Staff_Pip` | Skill, quality cap | Next evening |
+   | `Data/Recipes/*` | Ingredients, values | Next evening |
+
+3. **Nothing needs manual wiring.**
 
 ## Known issues / limitations
 
-- **No human playtest yet.** Movement, combo and enemy numbers are first-pass guesses.
-- **Air attacks** stop horizontal drift while the swing plays. That may feel sticky; easy to change once you've tried it.
-- **Enemies** have no contact damage and don't block each other or the player; only their attack hitboxes hurt.
-- **The Shroom** aims at where you stood when its telegraph started, so moving during the wind-up dodges it.
-- **Harvest feed text** is built by joining two localized strings (e.g. "Clean kill!" + "Fine Rat Haunch ×2"). Some languages may need that as one formatted string later.
+**Tavern (Phase 2):**
+- **No human playtest yet.** Patience, arrival rate, prices and minigame windows are first-pass numbers, and the UI layout hasn't been checked on screen.
+- **No storeroom decay.** Freshness only comes from the debug fill; overnight decay is designed for but not implemented.
+- **One staff helper.** The PlayMode test adds a second, test-only cook to run an end-to-end service with no player input.
+- **Flat floor.** Customers walk along the floor only and walk through each other; the only collision that matters is plate bumps.
+- **Restart empties the storeroom.** "Prepare another evening" reloads the scene, and nothing persists between evenings until the Phase 3 save and loop.
+- **Minigame hints:** the Tap prompt names the Aim binding generically (e.g. "W/S"). Proper button icons will come with real UI art.
+
+**Dungeon (Phase 1):**
+- Air attacks stop horizontal drift.
+- Enemies have no contact damage.
+- The Shroom aims where you stood when its telegraph began.
+- **Harvest feed text** is built by joining two localized strings; some languages may need one formatted string later.
+- **Lockbox storage:** `PersistentStash` is in memory only until the Phase 3 save system.
+- **Deferred** (not in the Phase 1 criteria): ledge grab, double jump, harvest finisher, extraction points, secondary weapon/skills, damage numbers, audio.
+
+**General:**
 - **UI scale:** the UI uses a 1280×720 reference resolution so the default font stays readable. Pixel-art UI at 640×360 will come with a proper pixel font.
-- **Lockbox storage:** `PersistentStash` (what you keep on death) is in memory only until the Phase 3 save system. After death the level restarts rather than returning to a tavern.
-- **Deferred** (not in the Phase 1 criteria): ledge grab, double jump, harvest finisher move (the rules already support `IsFinisher`), freshness decay, extraction points, secondary weapon/skills, damage numbers, audio.
 - **Localization lookups** are synchronous (`WaitForCompletion`). That's fine on PC and consoles but wouldn't work on WebGL.
+- **Standalone builds:** build the Localization Addressables content first (*Window → Asset Management → Addressables → Groups → Build → New Build → Default Build Script*). The editor doesn't need this.
 
-## Decided (2026-09-29)
+## Decided
 
-1. **Lockbox keeps the whole stack** in the chosen slot. (`DeathPenalty`; CLAUDE.md updated.)
-2. **Stack size defaults to 3** per slot. Tune it in `Data/Config/DelveConfig`.
-3. **Overkill tension stays.**
-   - A green **check-mark icon** appears over a monster when your lightest hit would finish it without overkill *and* your weapon earns a Clean Kill bonus on its parts (e.g. the Cleaver on Rats, but not Slimes).
-   - The overkill threshold scales with max HP, so the heavy hit only costs quality on small or nearly-dead monsters. It stays clean on tougher ones; this is covered by tests.
-4. **Inedible drops stay.** The GDD now notes they'll get a later use (small sale value, poisons, or traps).
-5. **The Slime stays uninterruptible.** Its wind-up now has its own tell: a red-orange **"!!"** icon instead of "!", a red-orange flash, and a visible tremble.
-6. **The check mark only means "this weapon earns a Clean Kill bonus here."** No second "finish without overkill" cue for now.
+**Phase 2 (2026-09-29):**
+1. **Freshness:**
+   - Stored per stack, from 0 to 1; merged stacks take the count-weighted average.
+   - Stock is used least-fresh first, then lower quality first.
+   - Designed for later overnight storeroom decay with preservation upgrades (recorded in the GDD and CLAUDE.md).
+2. **UI layering:** UI may read Tavern/Dungeon state; gameplay never references UI (CLAUDE.md).
+3. **Sold out:**
+   - Marked on the HUD.
+   - New customers order something else, or leave with −1 renown (a walkout is −3).
+   - Orders reserve their ingredients when placed.
+4. **Minigame length:** 5–10 s each at default tuning, noted in each config and enforced by tests.
+5. **Scenes:** never overwritten without approval. **Pushing:** at the end of each session.
+
+**Phase 1:** whole-stack Lockbox; stack size 3; overkill tension with a clean-kill check mark; Inedible drops kept; uninterruptible Slime with its own tell.
 
 ## Open design questions
 
-1. **Stronghold defense events:** still undecided (not built; the Tavern scene stays combat-capable).
+1. **Stronghold defense events:** still undecided. Not built; the Tavern floor is solid ground so combat could be added.
+2. **Dropped plates:** a dropped plate currently re-queues the order if stock allows, costing the ingredients again; otherwise the customer leaves as sold out. Is that the right cost?
+3. **Staff scope:** one helper covers one station. Should later staff cover multiple stations, or share one?
