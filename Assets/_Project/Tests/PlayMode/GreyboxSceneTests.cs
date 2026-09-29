@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Hearthdelve.Core.Events;
+using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Dungeon.Player;
 using Hearthdelve.Dungeon.Run;
 using Hearthdelve.Shared.Ingredients;
@@ -39,6 +40,37 @@ namespace Hearthdelve.Tests.PlayMode
             var hudRoot = Object.FindFirstObjectByType<DungeonHud>().GetComponent<UIDocument>().rootVisualElement;
             Assert.That(hudRoot.Q<Label>("essence-label").text, Is.EqualTo("Essence"), "HUD text should come from the UI string table");
             Assert.That(hudRoot.Q("satchel-slots").childCount, Is.EqualTo(6));
+        }
+
+        [UnityTest]
+        public IEnumerator Scene_PlayerAndEnemies_StandOnLevelGeometry()
+        {
+            yield return LoadScene();
+            yield return new WaitForSeconds(1f);
+
+            var player = Object.FindFirstObjectByType<PlayerController>();
+            Assert.That(player.Mover.Contacts.Grounded, Is.True, "player must land on the tilemap floor, not fall through");
+            Assert.That(player.Mover.Position.y, Is.EqualTo(0f).Within(0.05f));
+
+            foreach (var enemy in Object.FindObjectsByType<EnemyController>(FindObjectsSortMode.None))
+                Assert.That(enemy.GetComponent<KinematicMover2D>().Contacts.Grounded, Is.True, $"{enemy.name} fell through the level");
+        }
+
+        [UnityTest]
+        public IEnumerator Scene_PlayerRunsAcrossTileSeams_WithoutSnagging()
+        {
+            yield return LoadScene();
+            yield return new WaitForSeconds(0.5f);
+
+            var player = Object.FindFirstObjectByType<PlayerController>();
+            float startX = player.Mover.Position.x;
+            player.GetComponent<PlayerInputReader>().Override = new PlayerFrameInput { Move = Vector2.right };
+            yield return new WaitForSeconds(0.8f);
+            player.GetComponent<PlayerInputReader>().Override = null;
+
+            Assert.That(player.Mover.Position.x - startX, Is.GreaterThan(5f), "running should cover ground freely");
+            Assert.That(player.Mover.Position.y, Is.EqualTo(0f).Within(0.05f));
+            Assert.That(player.Mover.Contacts.Grounded, Is.True);
         }
 
         [UnityTest]

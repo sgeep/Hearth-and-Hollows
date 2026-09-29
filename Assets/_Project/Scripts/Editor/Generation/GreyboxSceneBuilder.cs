@@ -94,12 +94,10 @@ namespace Hearthdelve.Editor
             var solidGo = new GameObject("Solid", typeof(Tilemap), typeof(TilemapRenderer)) { layer = LayerMask.NameToLayer(Layers.Ground) };
             solidGo.transform.SetParent(grid.transform, false);
             solidGo.GetComponent<TilemapRenderer>().sortingLayerName = SortingLayers.Level;
-            var rb = solidGo.AddComponent<Rigidbody2D>();
-            rb.bodyType = RigidbodyType2D.Static;
-            var solidCollider = solidGo.AddComponent<TilemapCollider2D>();
-            solidCollider.compositeOperation = Collider2D.CompositeOperation.Merge;
-            var composite = solidGo.AddComponent<CompositeCollider2D>();
-            composite.geometryType = CompositeCollider2D.GeometryType.Polygons;
+            // Plain per-tile colliders. A CompositeCollider2D here generated no shapes at all for
+            // the level shell (one ring-shaped outline), leaving no floor. KinematicMover2D insets
+            // its casts, so seams between tiles don't snag.
+            solidGo.AddComponent<TilemapCollider2D>();
 
             var oneWayGo = new GameObject("OneWay", typeof(Tilemap), typeof(TilemapRenderer)) { layer = LayerMask.NameToLayer(Layers.OneWayPlatform) };
             oneWayGo.transform.SetParent(grid.transform, false);

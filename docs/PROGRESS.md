@@ -14,7 +14,7 @@ _Last updated: 2026-09-29_
 | Kills drop ingredients through Harvest (clean kill / overkill / element → quality) | `HarvestRules`, `HarvestSystem`, `IngredientPickup` | 19 EditMode harvest tests; PlayMode kill-context test |
 | Essence drains over time and on damage, forces exit at zero | `EssenceMeter`, `PlayerVitals`, `DelveRunController` | 10 EditMode Essence tests; PlayMode depletion + scene death-loop tests |
 | Death screen: pick one item to keep | `DeathScreen` (UI Toolkit), `DeathPenalty`, `PersistentStash` | 6 EditMode death-penalty tests; scene test picks slot 0 and verifies it is banked |
-| Core logic has EditMode tests; clean batch compile | `Assets/_Project/Tests` | **98 project EditMode tests + 7 PlayMode tests, all passing; 0 compiler warnings** (the batch run reports 99 EditMode because the Addressables package adds a stub test) |
+| Core logic has EditMode tests; clean batch compile | `Assets/_Project/Tests` | **98 project EditMode tests + 9 PlayMode tests, all passing; 0 compiler warnings** (the batch run reports 99 EditMode because the Addressables package adds a stub test) |
 
 ## Done
 
