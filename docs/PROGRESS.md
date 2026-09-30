@@ -5,22 +5,26 @@ _Last updated: 2026-09-29_
 ## Status
 
 - **Phase 1 (Combat Prototype):** done and playtested by you in the editor. Feel tuning is ongoing.
-- **Phase 2 (Tavern Prototype):** implemented and playtested once (2026-09-29). First round of feedback applied: hand delivery with a button, spare plates, final sold-out, and closing early when everything sells out. Waiting on the next playtest.
+- **Phase 2 (Tavern Prototype):** implemented and playtested once (2026-09-29). Feedback applied:
+  - **Round 1:** hand delivery with a button, spare plates, final sold-out, and closing early when everything sells out.
+  - **Round 2:** a 2.5-minute service, Pip on Serving by default, and a Stew Pot station with a chopping minigame (beyond the GDD's Phase 2 scope, approved).
+  - **Not yet playtested:** chopping and the stew pot.
 
-Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
 
 ### Phase 2 criteria
 
 | Criterion | Where | Verified by |
 |---|---|---|
 | Debug action fills the storeroom with Phase 1 ingredients at mixed quality and freshness | `DebugStockFiller`, prep screen button, F4 | EditMode fill test; PlayMode prep test |
-| Pick a menu of up to 3 dishes from 5 Biome 1 recipes before service | `TavernDirector.ToggleMenu`, `TavernPrepScreen`, `Data/Recipes` | EditMode menu-size test; PlayMode cap test |
+| Pick a menu of up to 3 dishes from 5 Biome 1 recipes before service (now 7, with two stews) | `TavernDirector.ToggleMenu`, `TavernPrepScreen`, `Data/Recipes` | EditMode menu-size test; PlayMode cap test |
 | Grill, Tap and Serving work through `IMinigame` | `GrillMinigame`, `TapMinigame`, `ServingMinigame` (Core `IMinigame`) | 17 EditMode minigame tests, including "default tuning takes 5–10 s" |
 | Villager, adventurer and dwarf enter, sit, order, wait (patience), eat, pay and leave, with flavor preferences affecting satisfaction | `CustomerLogic`, `Preferences`, `CustomerProfile` (`Data/Customers`), `CustomerAgent` | Customer lifecycle and preference tests; PlayMode service run |
 | Dish score = recipe value × ingredient quality × freshness × minigame score, driving payment, tips and renown | `DishScoring`, `ServiceEconomy` (Shared), `ServiceSession.Settle` | 12 EditMode economy tests; full-loop ledger test |
 | Tunable service length (default 2.5 min, shortened from 6 after the first playtest) and a results screen (dishes served, gold, tips, renown, walkouts) | `ServiceConfig`, `ServiceSession` clock, `TavernResultsScreen` | Clock and last-orders tests; PlayMode results test |
 | One staff helper auto-resolves a station through `IMinigame` at reduced quality | `StaffDefinition` (Pip), `StaffCook`, `StaffAgent`, per-minigame auto-players | Auto-player tests (below expert, above zero); staff-cook test; PlayMode staff-only service |
 | Tuning in ScriptableObjects, text localized, core logic tested | `Data/Tavern/*`, `Data/Config/EconomyConfig`, `TavernLocKeys` | Batch EditMode + PlayMode runs; file-name guard test |
+| **Added after playtest:** Stew Pot station with a chopping minigame. Chop accuracy sets helpings (3–5); the pot simmers on its own; stew orders are ladled onto the pass automatically. Pip can run the pot. | `ChopMinigame` + `ChopAutoPlayer`, `StewPot`, `ServiceSession` (stew section), `StaffPotCook`, `StewPotView`, `Data/Tavern/StewConfig` | 19 EditMode chop/pot tests (including "a two-ingredient batch takes 5–10 s"); PlayMode mouse-chop and Pip-on-pot tests |
 | **Also asked for:** sold-out dishes marked on the HUD; new customers order something else or leave with a smaller penalty than a walkout | `ServiceSession` (per-order ingredient reservation, sold-out tracking), `TavernHud` | 6 EditMode sold-out/cancellation tests; PlayMode HUD test |
 
 ### Phase 1 criteria (unchanged)
@@ -38,15 +42,23 @@ Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler
 
 1. **Prep screen:**
    - Fill the storeroom with the debug button or F4.
-   - Pick up to 3 dishes. Each shows its station, gold value and how many servings your stock can make.
-   - Put Pip on the Grill, Tap or Serving, or leave them off duty.
+   - Pick up to 3 dishes. Each shows its station, gold value and how many servings your stock can make. For a stew it shows how many pots, and the helpings range per pot.
+   - Pip starts on **Serving**. You can move them to the Grill, Tap or Stew Pot, or take them off duty.
    - **Open the doors.**
 2. **Customers arrive.**
    - They sit if a seat is free (6 seats); otherwise they queue by the door.
    - After reading the menu they order a dish that's still available, choosing by their tastes.
-   - Placing an order **reserves** the ingredients, so it can't later become impossible to make.
+   - Placing an order **reserves** the ingredients, so it can't later become impossible to make. Stews are the exception: ingredients are taken per batch when the pot goes on.
    - The order appears on the rail on the right.
 3. **Cooking:** walk to the Grill or Tap and press **E / A** to cook the next order for that station. The Grill and Tap panels show the minigame.
+   - **Stew Pot** (right-hand wall):
+     - While the pot is empty and a stew on the menu can be made, press **E** to put a batch on. It takes one full set of the recipe's ingredients and makes the stew with the most orders waiting.
+     - **Chop** each ingredient. Move the knife with the mouse (or the stick / A–D) and click (or Space / A) on each guide line. Each cut counts for the nearest uncut line and scores by how close it lands.
+     - Each ingredient has a time limit (the bar under the board). Esc steps away and returns the ingredients.
+     - Chop accuracy sets the helpings: 3 (sloppy) to 5 (clean). The quality of a stew comes from its ingredients, freshness and serving.
+     - The pot then **simmers on its own** for 25 s, with a bar above it. Pips above the pot show the helpings: dim while simmering, bright when ready.
+     - Stew orders show "Waiting on the pot" on the rail. Each is **ladled onto the pass automatically** when a helping is ready, for you or Pip to carry. The pot empties when the last helping goes.
+     - A stew stays on the menu while the helpings in the pot, plus 3 per batch the storeroom can still make, cover the orders waiting.
 4. **Serving:** at the pass, press **E** to pick up the next dish. Carrying it *is* the Serving minigame: customers walking across the floor bump you and spill the plate, and a full spill meter drops it.
    - Press **E** next to a seated customer who ordered that dish to serve it. It doesn't have to be the customer it was cooked for. The customer who would receive the plate gets a gold ring on the floor, like a station in reach.
    - If you give A's plate to B, B's order passes to A.
@@ -76,6 +88,7 @@ Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler
 | Use station / pick up dish / serve / put plate back | E or Space | A / Cross |
 | Grill: flip | Space or Left Mouse | A / Cross |
 | Tap: pour (hold) / tilt glass | Space or Left Mouse / W–S | A / Cross / Left stick |
+| Chop: move knife / cut | Mouse, or A–D / arrows / Left Mouse / Space | Left stick / A / Cross |
 | Step away from a station | Esc | B / Circle |
 
 **Tavern debug keys:**
@@ -134,6 +147,7 @@ Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler
    |---|---|---|
    | `Data/Tavern/ServiceConfig` | Length, arrival gaps, walk speed | Next evening |
    | `Data/Tavern/GrillConfig`, `TapConfig`, `ServingConfig` | Timing windows, staff error ranges; each notes the 5–10 s target | Next minigame |
+   | `Data/Tavern/StewConfig` | Chop: lines per ingredient, accuracy window, time limit, knife speed, board position on screen. Pot: simmer time, helpings range | Next batch |
    | `Data/Config/EconomyConfig` | Quality/freshness multipliers, tips, renown, flavor weights | Next dish |
    | `Data/Customers/*` | Patience, tastes, generosity | Next customer |
    | `Data/Staff/Staff_Pip` | Skill, quality cap | Next evening |
@@ -144,6 +158,10 @@ Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler
 ## Known issues / limitations
 
 **Tavern (Phase 2):**
+- **Chopping and the stew pot haven't been playtested.** The chop board layout has only been checked by tests, not on screen, and simmer time, helpings and stew prices are first-pass numbers.
+- **Pip on the Stew Pot** keeps a batch going whenever the pot is empty, which can use up ingredients the Grill dishes need.
+- **Stew orders aren't reserved.** A Grill dish can use up ingredients a waiting stew order was counting on. That order then waits until it walks out.
+- **Leftover helpings** in the pot at closing are discarded.
 - **One playtest so far.** Patience, arrival rate, prices and minigame windows are still first-pass numbers.
 - **Delivery reach** reuses `ServiceConfig → player → interactRange` (0.9 tiles). The nearest matching customer in reach is served and gets the gold floor ring (a placeholder until real art brings a sprite outline).
 - **Spare plates left at closing** are simply discarded.
@@ -167,6 +185,14 @@ Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler
 - **Standalone builds:** build the Localization Addressables content first (*Window → Asset Management → Addressables → Groups → Build → New Build → Default Build Script*). The editor doesn't need this.
 
 ## Decided
+
+**Phase 2 playtest feedback, round 2 (2026-09-29):**
+1. **Service length:** 2.5 minutes, with last orders 20 s before the end.
+2. **Pip defaults to Serving.**
+3. **Chopping and the Stew Pot:**
+   - Mouse or stick moves the knife.
+   - Chop accuracy sets the helpings (not quality).
+   - Stew orders are ladled onto the pass automatically.
 
 **Phase 2 playtest feedback (2026-09-29):**
 1. **Hand delivery:** a button serves a plate. Any waiting customer who ordered the same dish can take it; their order passes to the plate's original customer, or is cancelled with its stock returned if that customer has gone.
