@@ -57,5 +57,7 @@ namespace Hearthdelve.Shared.Recipes
         public Sprite icon;
         [Tooltip("Tint for placeholder art until a real icon exists.")]
         public Color placeholderColor = Color.white;
+        [Tooltip("Buff when eaten for breakfast before a delve. None: not offered at breakfast.")]
+        public MealBuffSettings mealBuff;
     }
 }

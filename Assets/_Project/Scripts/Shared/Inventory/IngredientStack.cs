@@ -54,7 +54,7 @@ namespace Hearthdelve.Shared.Inventory
             return ((int)a.Item.Quality).CompareTo((int)b.Item.Quality);
         }
 
-        // Overnight storeroom decay (slowed by preservation upgrades) is designed for but not
-        // implemented yet; it will be a pure function here that returns the decayed freshness.
+        /// <summary>Freshness after losing <paramref name="amount"/> (never below 0; spoiled parts are still usable, just worth less).</summary>
+        public static float Decay(float freshness, float amount) => Clamp(freshness - Math.Max(0f, amount));
     }
 }

@@ -120,6 +120,21 @@ namespace Hearthdelve.Shared.Inventory
             return removed;
         }
 
+        /// <summary>
+        /// Ages every stack by <paramref name="baseLoss"/> (Chilled parts lose less, see
+        /// <see cref="FreshnessSettings"/>). Continuous, so it doesn't raise <see cref="Changed"/>.
+        /// </summary>
+        public void Decay(in FreshnessSettings settings, float baseLoss)
+        {
+            if (baseLoss <= 0f) return;
+            for (int i = 0; i < m_Slots.Length; i++)
+            {
+                var slot = m_Slots[i];
+                if (slot.IsEmpty) continue;
+                m_Slots[i] = slot.WithFreshness(Freshness.Decay(slot.Freshness, settings.LossFor(slot.Item, baseLoss)));
+            }
+        }
+
         public void Clear()
         {
             if (IsEmpty) return;

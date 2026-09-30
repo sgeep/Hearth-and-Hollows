@@ -96,6 +96,18 @@ namespace Hearthdelve.Shared.Inventory
             return taken;
         }
 
+        /// <summary>Ages every stack by <paramref name="baseLoss"/> (overnight). Chilled parts lose less.</summary>
+        public void Decay(in FreshnessSettings settings, float baseLoss)
+        {
+            if (baseLoss <= 0f || m_Stacks.Count == 0) return;
+            for (int i = 0; i < m_Stacks.Count; i++)
+            {
+                var s = m_Stacks[i];
+                m_Stacks[i] = s.WithFreshness(Freshness.Decay(s.Freshness, settings.LossFor(s.Item, baseLoss)));
+            }
+            Changed?.Invoke();
+        }
+
         /// <summary>Independent copy (used to test whether a recipe can be made without touching stock).</summary>
         public Storeroom Clone()
         {
