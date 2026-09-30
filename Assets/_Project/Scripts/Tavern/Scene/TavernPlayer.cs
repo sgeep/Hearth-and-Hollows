@@ -1,5 +1,6 @@
 using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Minigames;
+using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
@@ -27,13 +28,20 @@ namespace Hearthdelve.Tavern.Scene
         WrongDish,
         /// <summary>Carrying a plate at the pass.</summary>
         PutBack,
+        /// <summary>At the empty stew pot with a stew to make (<see cref="TavernPlayer.HintRecipe"/>).</summary>
+        StartStew,
+        /// <summary>At the stew pot while it simmers.</summary>
+        Simmering,
+        /// <summary>At the stew pot while it has helpings left.</summary>
+        StewReady,
     }
 
     /// <summary>
     /// The keeper during service: walks the floor (Tavern map), cooks at the Grill/Tap (Minigame
     /// map), and carries plates from the pass (the Serving minigame drives movement while
     /// carrying). A plate is served with Interact next to anyone waiting for that dish, or put
-    /// back with Interact at the pass.
+    /// back with Interact at the pass. At the empty stew pot, Interact puts a batch on and starts
+    /// the chopping minigame (mouse or stick moves the knife).
     /// </summary>
     public sealed class TavernPlayer : MonoBehaviour
     {
@@ -41,9 +49,12 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] SpriteRenderer m_Plate;
 
         TavernDirector m_Director;
-        InputAction m_Move, m_Interact, m_Aim, m_Action, m_MinigameCancel;
+        InputAction m_Move, m_Interact, m_Aim, m_Action, m_MinigameCancel, m_Point;
         Station m_Near;
         CustomerAgent m_ServeTarget;
+        readonly IRandom m_Random = new SeededRandom();
+        Vector2 m_LastPointer;
+        bool m_ChoppingPot;
 
         public IMinigame ActiveCook { get; private set; }
         public Ticket CookTicket { get; private set; }
@@ -67,6 +78,7 @@ namespace Hearthdelve.Tavern.Scene
             m_Aim = InputMaps.Find(InputMaps.Minigame, MinigameActions.Aim);
             m_Action = InputMaps.Find(InputMaps.Minigame, MinigameActions.Action);
             m_MinigameCancel = InputMaps.Find(InputMaps.Minigame, MinigameActions.Cancel);
+            m_Point = InputMaps.Find(InputMaps.Minigame, MinigameActions.Point);
             if (m_Plate != null) m_Plate.enabled = false;
         }
 
@@ -99,7 +111,7 @@ namespace Hearthdelve.Tavern.Scene
             var layout = m_Director.Layout;
             Station best = null;
             float bestDistance = m_Director.PlayerSettings.interactRange;
-            foreach (var s in new[] { layout.Grill, layout.Tap, layout.Pass })
+            foreach (var s in new[] { layout.Grill, layout.Tap, layout.Pass, layout.StewPot })
             {
                 if (s == null) continue;
                 float d = Mathf.Abs(s.X - X);
@@ -123,6 +135,28 @@ namespace Hearthdelve.Tavern.Scene
             else if (m_Director.Staff != null && m_Director.Staff.Works(m_Near.Kind))
             {
                 Hint = PlayerHint.Staffed;
+            }
+            else if (m_Near.Kind == StationKind.StewPot)
+            {
+                var pot = session.Pot;
+                switch (pot.State)
+                {
+                    case PotState.Empty:
+                        HintRecipe = session.NextBatch();
+                        Hint = HintRecipe != null ? PlayerHint.StartStew : PlayerHint.Idle;
+                        break;
+                    case PotState.Simmering:
+                        Hint = PlayerHint.Simmering;
+                        HintRecipe = pot.Recipe;
+                        break;
+                    case PotState.Ready:
+                        Hint = PlayerHint.StewReady;
+                        HintRecipe = pot.Recipe;
+                        break;
+                    default:
+                        Hint = PlayerHint.Idle;
+                        break;
+                }
             }
             else
             {
@@ -164,6 +198,15 @@ namespace Hearthdelve.Tavern.Scene
                 ActiveCook.Begin();
                 InputMaps.Activate(InputMaps.Minigame);
             }
+            else if (Hint == PlayerHint.StartStew)
+            {
+                if (!session.StartBatch(session.NextBatch(), this)) return;
+                m_ChoppingPot = true;
+                ActiveCook = m_Director.Minigames.CreateChop(session.Pot.ChopItems.Count, m_Random);
+                ActiveCook.Begin();
+                m_LastPointer = ReadPointer();
+                InputMaps.Activate(InputMaps.Minigame);
+            }
             else if (Hint == PlayerHint.PickUp)
             {
                 var ticket = session.NextToServe();
@@ -183,29 +226,48 @@ namespace Hearthdelve.Tavern.Scene
         void TickCook(float dt)
         {
             var session = m_Director.Session;
-            if (CookTicket.State != TicketState.Cooking)
+            bool stillMine = m_ChoppingPot
+                ? session.Pot.State == PotState.Chopping && ReferenceEquals(session.Pot.ClaimedBy, this)
+                : CookTicket.State == TicketState.Cooking;
+            if (!stillMine)
             {
-                EndCook(); // the customer left mid-cook
+                EndCook();
                 return;
             }
             if (m_MinigameCancel != null && m_MinigameCancel.WasPressedThisFrame())
             {
-                session.AbandonCooking(CookTicket);
+                if (m_ChoppingPot) session.AbandonBatch(this);
+                else session.AbandonCooking(CookTicket);
                 EndCook();
                 return;
             }
 
+            var pointer = ReadPointer();
             var input = new MinigameInput
             {
                 ActionPressed = m_Action != null && m_Action.WasPressedThisFrame(),
                 ActionHeld = m_Action != null && m_Action.IsPressed(),
                 ActionReleased = m_Action != null && m_Action.WasReleasedThisFrame(),
                 Aim = m_Aim != null ? m_Aim.ReadValue<Vector2>() : Vector2.zero,
+                PointerActive = pointer != m_LastPointer,
+                Pointer = BoardFraction(pointer.x),
             };
+            m_LastPointer = pointer;
             ActiveCook.Tick(dt, input);
             if (!ActiveCook.IsComplete) return;
-            session.FinishCooking(CookTicket, ActiveCook.Evaluate());
+            if (m_ChoppingPot) session.FinishChopping(this, ActiveCook.Evaluate());
+            else session.FinishCooking(CookTicket, ActiveCook.Evaluate());
             EndCook();
+        }
+
+        Vector2 ReadPointer() => m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
+
+        /// <summary>Screen x (pixels) to 0–1 across the chopping board, which the UI draws at the same screen span.</summary>
+        float BoardFraction(float screenX)
+        {
+            var chop = m_Director.Minigames.Chop;
+            float width = Mathf.Max(1f, Screen.width);
+            return (screenX / width - chop.boardLeft) / Mathf.Max(0.01f, chop.boardWidth);
         }
 
         void TickServing(float dt)
@@ -329,6 +391,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             ActiveCook = null;
             CookTicket = null;
+            m_ChoppingPot = false;
             if (m_Director.Phase == TavernPhase.Service) InputMaps.Activate(InputMaps.Tavern);
         }
 
@@ -342,6 +405,11 @@ namespace Hearthdelve.Tavern.Scene
             if (m_Plate != null) m_Plate.enabled = false;
         }
 
-        public static CookStation ToCookStation(StationKind kind) => kind == StationKind.Tap ? CookStation.Tap : CookStation.Grill;
+        public static CookStation ToCookStation(StationKind kind) => kind switch
+        {
+            StationKind.Tap => CookStation.Tap,
+            StationKind.StewPot => CookStation.StewPot,
+            _ => CookStation.Grill,
+        };
     }
 }

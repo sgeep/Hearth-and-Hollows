@@ -75,7 +75,10 @@ namespace Hearthdelve.Tavern.Scene
         {
             Instance = this;
             m_Random = m_Seed != 0 ? new SeededRandom(m_Seed) : new SeededRandom();
-            Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving);
+            Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving,
+                m_Content.stew != null ? m_Content.stew.chop : ChopSettings.Default);
+            // Pip starts the evening carrying plates (playtest: most useful there); changeable at prep.
+            StaffAssignment = StaffMember != null ? StaffStation.Serving : StaffStation.None;
             Storeroom.Changed += () => PrepChanged?.Invoke();
         }
 
@@ -116,7 +119,7 @@ namespace Hearthdelve.Tavern.Scene
             if (!CanOpen) return;
             var economy = m_Content.economy;
             Session = new ServiceSession(m_Content.service.service, economy.dishScoring, economy.service,
-                Storeroom, m_Menu, m_Layout.SeatCount, m_Random);
+                Storeroom, m_Menu, m_Layout.SeatCount, m_Random, m_Content.stew != null ? m_Content.stew.pot : StewPotSettings.Default);
             Session.Ended += OnServiceEnded;
             m_Arrivals = new ArrivalSchedule(m_Content.service.service, m_Content.customers, m_Random);
             if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);

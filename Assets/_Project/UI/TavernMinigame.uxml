@@ -23,4 +23,17 @@
             <ui:Label name="tap-prompt" class="hd-minigame__prompt" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:VisualElement name="chop" class="hd-chop" picking-mode="Ignore">
+        <ui:VisualElement class="hd-panel hd-chop__header" picking-mode="Ignore">
+            <ui:Label name="chop-title" class="hd-title" />
+            <ui:Label name="chop-progress" class="hd-subtitle" />
+            <ui:Label name="chop-prompt" class="hd-minigame__prompt" />
+        </ui:VisualElement>
+        <ui:VisualElement name="chop-board" class="hd-chop__board" picking-mode="Ignore">
+            <ui:VisualElement name="chop-food" class="hd-chop__food" picking-mode="Ignore" />
+            <ui:VisualElement name="chop-marks" class="hd-chop__marks" picking-mode="Ignore" />
+            <ui:VisualElement name="chop-knife" class="hd-chop__knife" picking-mode="Ignore" />
+            <ui:VisualElement name="chop-timer" class="hd-chop__timer" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>

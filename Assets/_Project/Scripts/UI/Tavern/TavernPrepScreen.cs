@@ -1,5 +1,7 @@
 using System.Linq;
+using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Scene;
+using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
 using Hearthdelve.UI.Localization;
 using UnityEngine;
@@ -86,7 +88,11 @@ namespace Hearthdelve.UI.Tavern
                 swatch.style.backgroundColor = r.placeholderColor;
                 button.Add(swatch);
                 button.Add(Row(TavernUI.RecipeName(r), "hd-recipe__name"));
-                button.Add(Row(Loc.UI(TavernLocKeys.PrepRecipeDetails, TavernUI.Station(r.station), r.baseValue, servings), "hd-recipe__details"));
+                var pot = m_Director.Content.stew != null ? m_Director.Content.stew.pot : StewPotSettings.Default;
+                string details = r.station == CookStation.StewPot
+                    ? Loc.UI(TavernLocKeys.PrepRecipeDetailsStew, TavernUI.Station(r.station), r.baseValue, servings, pot.minHelpings, pot.maxHelpings)
+                    : Loc.UI(TavernLocKeys.PrepRecipeDetails, TavernUI.Station(r.station), r.baseValue, servings);
+                button.Add(Row(details, "hd-recipe__details"));
                 button.SetEnabled(servings > 0 || m_Director.SelectedMenu.Contains(r));
                 m_Recipes.Add(button);
             }

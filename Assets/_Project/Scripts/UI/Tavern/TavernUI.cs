@@ -9,14 +9,19 @@ namespace Hearthdelve.UI.Tavern
     /// <summary>Small localized-text helpers shared by the tavern screens.</summary>
     public static class TavernUI
     {
-        public static string Station(CookStation station) =>
-            Loc.UI(station == CookStation.Tap ? TavernLocKeys.StationTap : TavernLocKeys.StationGrill);
+        public static string Station(CookStation station) => Loc.UI(station switch
+        {
+            CookStation.Tap => TavernLocKeys.StationTap,
+            CookStation.StewPot => TavernLocKeys.StationStewPot,
+            _ => TavernLocKeys.StationGrill,
+        });
 
         public static string Station(StaffStation station) => station switch
         {
             StaffStation.Grill => Loc.UI(TavernLocKeys.StationGrill),
             StaffStation.Tap => Loc.UI(TavernLocKeys.StationTap),
             StaffStation.Serving => Loc.UI(TavernLocKeys.StationServing),
+            StaffStation.StewPot => Loc.UI(TavernLocKeys.StationStewPot),
             _ => Loc.UI(TavernLocKeys.PrepStaffOff),
         };
 

@@ -1,4 +1,5 @@
 using Hearthdelve.Core.Input;
+using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.UI.Localization;
@@ -134,6 +135,7 @@ namespace Hearthdelve.UI.Tavern
                 var state = new Label(Loc.UI(t.State switch
                 {
                     _ when t.IsSpare && t.State == TicketState.Ready => TavernLocKeys.TicketSpare,
+                    TicketState.Queued when t.Recipe.station == CookStation.StewPot => TavernLocKeys.TicketStewWaiting,
                     TicketState.Cooking => TavernLocKeys.TicketCooking,
                     TicketState.Ready => TavernLocKeys.TicketReady,
                     TicketState.Delivering => TavernLocKeys.TicketDelivering,
@@ -162,6 +164,9 @@ namespace Hearthdelve.UI.Tavern
                     PlayerHint.Serve => Loc.UI(TavernLocKeys.HintServe, interact, recipe),
                     PlayerHint.PutBack => Loc.UI(TavernLocKeys.HintPutBack, interact, recipe),
                     PlayerHint.WrongDish => Loc.UI(TavernLocKeys.HintWrongDish, recipe),
+                    PlayerHint.StartStew => Loc.UI(TavernLocKeys.HintStartStew, interact, recipe),
+                    PlayerHint.Simmering => Loc.UI(TavernLocKeys.HintSimmering, recipe),
+                    PlayerHint.StewReady => Loc.UI(TavernLocKeys.HintStewReady, recipe, m_Session.Pot.Helpings),
                     PlayerHint.Staffed => Loc.UI(TavernLocKeys.HintStaffed,
                         m_Director.StaffMember != null ? Loc.Get(m_Director.StaffMember.displayName) : string.Empty),
                     _ => string.Empty,

@@ -8,6 +8,8 @@ namespace Hearthdelve.Tavern.Scene
         Tap,
         /// <summary>Where finished dishes wait to be carried out.</summary>
         Pass,
+        /// <summary>Batch stews: chop the ingredients, then it simmers on its own.</summary>
+        StewPot,
     }
 
     /// <summary>An interactable spot on the tavern floor.</summary>

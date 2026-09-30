@@ -24,6 +24,7 @@ namespace Hearthdelve.Tavern.Scene
         StaffDefinition m_Definition;
         StaffStation m_Station = StaffStation.None;
         StaffCook m_Cook;
+        StaffPotCook m_PotCook;
         IRandom m_Random;
         ServingMinigame m_Serving;
         IMinigameAutoPlayer m_ServingPlayer;
@@ -33,7 +34,7 @@ namespace Hearthdelve.Tavern.Scene
         bool m_Returning;
 
         public StaffStation Station => m_Station;
-        public bool IsBusy => (m_Cook != null && m_Cook.IsBusy) || m_Carrying != null;
+        public bool IsBusy => (m_Cook != null && m_Cook.IsBusy) || (m_PotCook != null && m_PotCook.IsBusy) || m_Carrying != null;
 
         public void Configure(SpriteRenderer body, SpriteRenderer plate, SpriteRenderer workingIcon)
         {
@@ -44,7 +45,8 @@ namespace Hearthdelve.Tavern.Scene
 
         public bool Works(StationKind kind) =>
             (kind == StationKind.Grill && m_Station == StaffStation.Grill) ||
-            (kind == StationKind.Tap && m_Station == StaffStation.Tap);
+            (kind == StationKind.Tap && m_Station == StaffStation.Tap) ||
+            (kind == StationKind.StewPot && m_Station == StaffStation.StewPot);
 
         public void Begin(StaffStation station, StaffDefinition definition, TavernDirector director, IRandom random)
         {
@@ -71,12 +73,17 @@ namespace Hearthdelve.Tavern.Scene
                 case StaffStation.Serving:
                     PlaceAt(layout.Pass.X);
                     break;
+                case StaffStation.StewPot:
+                    PlaceAt(layout.StewPot.X - 0.35f);
+                    m_PotCook = new StaffPotCook(director.Session, director.Minigames, definition.skill, definition.qualityCap, definition.restBetweenJobs, random);
+                    break;
             }
         }
 
         public void StopWork()
         {
             m_Cook = null;
+            m_PotCook = null;
             m_Carrying = null;
             m_For = null;
             m_Serving = null;
@@ -90,6 +97,7 @@ namespace Hearthdelve.Tavern.Scene
             float dt = Time.deltaTime;
 
             if (m_Cook != null) m_Cook.Tick(dt);
+            else if (m_PotCook != null) m_PotCook.Tick(dt);
             else if (m_Station == StaffStation.Serving) TickServing(dt);
 
             if (m_WorkingIcon != null) m_WorkingIcon.enabled = IsBusy;

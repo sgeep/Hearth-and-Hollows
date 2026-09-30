@@ -26,5 +26,6 @@ namespace Hearthdelve.Tavern.Scene
         public GrillConfig grill;
         public TapConfig tap;
         public ServingConfig serving;
+        public StewConfig stew;
     }
 }

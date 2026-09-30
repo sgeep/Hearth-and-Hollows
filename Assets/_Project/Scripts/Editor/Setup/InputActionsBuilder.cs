@@ -30,6 +30,8 @@ namespace Hearthdelve.Editor
                 AssetDatabase.ImportAsset(EditorPaths.InputActions, ImportAssetOptions.ForceUpdate);
             }
 
+            AddMissingActions();
+
             var imported = AssetDatabase.LoadAssetAtPath<InputActionAsset>(EditorPaths.InputActions);
             if (imported == null)
             {
@@ -79,6 +81,7 @@ namespace Hearthdelve.Editor
             Button(m, "Action", ("<Keyboard>/space", KM), ("<Mouse>/leftButton", KM), ("<Gamepad>/buttonSouth", GP));
             Button(m, "AltAction", ("<Keyboard>/k", KM), ("<Mouse>/rightButton", KM), ("<Gamepad>/buttonNorth", GP));
             Button(m, "Cancel", ("<Keyboard>/escape", KM), ("<Gamepad>/buttonEast", GP));
+            AddPoint(m);
 
             // --- UI (drives UI Toolkit through InputSystemUIInputModule) ---
             var ui = asset.AddActionMap(InputMaps.UI);
@@ -100,6 +103,35 @@ namespace Hearthdelve.Editor
             ui.AddAction("ScrollWheel", InputActionType.PassThrough, "<Mouse>/scroll", expectedControlLayout: "Vector2");
 
             return asset;
+        }
+
+        /// <summary>
+        /// Adds actions introduced after the asset was first generated, leaving everything else in
+        /// the file (including edits made in the Input Actions editor) as it is.
+        /// </summary>
+        static void AddMissingActions()
+        {
+            var asset = InputActionAsset.FromJson(File.ReadAllText(EditorPaths.InputActions));
+            var minigame = asset.FindActionMap(InputMaps.Minigame);
+            bool changed = false;
+            if (minigame != null && minigame.FindAction(MinigameActions.Point) == null)
+            {
+                AddPoint(minigame);
+                changed = true;
+            }
+            if (changed)
+            {
+                File.WriteAllText(EditorPaths.InputActions, asset.ToJson());
+                AssetDatabase.ImportAsset(EditorPaths.InputActions, ImportAssetOptions.ForceUpdate);
+                Debug.Log("[Hearthdelve] Added missing input actions (Minigame/Point).");
+            }
+            Object.DestroyImmediate(asset);
+        }
+
+        static void AddPoint(InputActionMap map)
+        {
+            var point = map.AddAction(MinigameActions.Point, InputActionType.PassThrough, expectedControlLayout: "Vector2");
+            point.AddBinding("<Pointer>/position", groups: KM);
         }
 
         static void AddMove(InputActionMap map, string name)

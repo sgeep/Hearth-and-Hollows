@@ -46,6 +46,8 @@ namespace Hearthdelve.Core.Input
         public const string Action = "Action";
         public const string AltAction = "AltAction";
         public const string Cancel = "Cancel";
+        /// <summary>Mouse / pointer position in screen pixels (e.g. the chopping knife).</summary>
+        public const string Point = "Point";
     }
 
     public static class DungeonActions

@@ -294,6 +294,89 @@
     background-color: rgb(255, 90, 70);
 }
 
+/* Chopping: the board sits at a fixed share of the screen (ChopSettings.boardLeft/boardWidth,
+   set from code) so the mouse maps straight onto it. */
+.hd-chop {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.hd-chop__header {
+    position: absolute;
+    top: 16%;
+    left: 25%;
+    width: 50%;
+    align-items: center;
+}
+
+.hd-chop__board {
+    position: absolute;
+    top: 50%;
+    height: 130px;
+    background-color: rgb(150, 104, 62);
+    border-width: 3px;
+    border-color: var(--hd-panel-edge);
+    border-radius: 6px;
+}
+
+.hd-chop__food {
+    position: absolute;
+    left: 3%;
+    right: 3%;
+    top: 28px;
+    bottom: 28px;
+    border-radius: 18px;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.45);
+}
+
+.hd-chop__marks {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.hd-chop__line {
+    position: absolute;
+    top: 16px;
+    bottom: 16px;
+    width: 2px;
+    margin-left: -1px;
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.hd-chop__cut {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    width: 5px;
+    margin-left: -2px;
+}
+
+.hd-chop__knife {
+    position: absolute;
+    top: -46px;
+    bottom: -8px;
+    width: 6px;
+    margin-left: -3px;
+    background-color: rgb(215, 220, 230);
+    border-width: 1px;
+    border-color: rgb(50, 50, 60);
+}
+
+.hd-chop__timer {
+    position: absolute;
+    left: 0;
+    bottom: -12px;
+    height: 6px;
+    background-color: rgb(230, 170, 60);
+}
+
 /* ---------- Results ---------- */
 
 .hd-results {

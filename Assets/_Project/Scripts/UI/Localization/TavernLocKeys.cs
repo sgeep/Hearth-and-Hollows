@@ -10,6 +10,7 @@ namespace Hearthdelve.UI.Localization
         public const string PrepFill = "tavern.prep.fill";
         public const string PrepMenu = "tavern.prep.menu";
         public const string PrepRecipeDetails = "tavern.prep.recipe_details";
+        public const string PrepRecipeDetailsStew = "tavern.prep.recipe_details_stew";
         public const string PrepStaff = "tavern.prep.staff";
         public const string PrepStaffOff = "tavern.prep.staff_off";
         public const string PrepOpen = "tavern.prep.open";
@@ -17,6 +18,7 @@ namespace Hearthdelve.UI.Localization
         public const string StationGrill = "station.grill";
         public const string StationTap = "station.tap";
         public const string StationServing = "station.serving";
+        public const string StationStewPot = "station.stew_pot";
 
         public const string HudTime = "tavern.hud.time";
         public const string HudGold = "tavern.hud.gold";
@@ -31,12 +33,16 @@ namespace Hearthdelve.UI.Localization
         public const string TicketReady = "ticket.ready";
         public const string TicketDelivering = "ticket.delivering";
         public const string TicketSpare = "ticket.spare";
+        public const string TicketStewWaiting = "ticket.stew_waiting";
 
         public const string HintCook = "tavern.hint.cook";
         public const string HintPickUp = "tavern.hint.pick_up";
         public const string HintServe = "tavern.hint.serve";
         public const string HintPutBack = "tavern.hint.put_back";
         public const string HintWrongDish = "tavern.hint.wrong_dish";
+        public const string HintStartStew = "tavern.hint.start_stew";
+        public const string HintSimmering = "tavern.hint.simmering";
+        public const string HintStewReady = "tavern.hint.stew_ready";
         public const string HintStaffed = "tavern.hint.staffed";
         public const string HintStepAway = "tavern.hint.step_away";
         public const string Spill = "serving.spill";
@@ -44,6 +50,9 @@ namespace Hearthdelve.UI.Localization
         public const string GrillPrompt = "grill.prompt";
         public const string GrillSide = "grill.side";
         public const string TapPrompt = "tap.prompt";
+        public const string ChopTitle = "chop.title";
+        public const string ChopProgress = "chop.progress";
+        public const string ChopPrompt = "chop.prompt";
 
         public const string ResultsTitle = "results.title";
         public const string ResultsClosedEarly = "results.closed_early";
@@ -65,6 +74,7 @@ namespace Hearthdelve.UI.Localization
             (PrepFill, "Fill storeroom (debug)"),
             (PrepMenu, "Tonight's menu (up to {0})"),
             (PrepRecipeDetails, "{0} · {1} gold · {2} servings"),
+            (PrepRecipeDetailsStew, "{0} · {1} gold a helping · {2} pots of {3}–{4}"),
             (PrepStaff, "Staff helper: {0}"),
             (PrepStaffOff, "Off duty"),
             (PrepOpen, "Open the doors"),
@@ -72,6 +82,7 @@ namespace Hearthdelve.UI.Localization
             (StationGrill, "Grill"),
             (StationTap, "Tap"),
             (StationServing, "Serving"),
+            (StationStewPot, "Stew Pot"),
 
             (HudTime, "Time left {0}"),
             (HudGold, "Gold {0}"),
@@ -86,12 +97,16 @@ namespace Hearthdelve.UI.Localization
             (TicketReady, "On the pass"),
             (TicketDelivering, "Serving"),
             (TicketSpare, "Spare"),
+            (TicketStewWaiting, "Waiting on the pot"),
 
             (HintCook, "{0}: cook {1}"),
             (HintPickUp, "{0}: pick up {1}"),
             (HintServe, "{0}: serve {1}"),
             (HintPutBack, "{0}: put {1} back on the pass"),
             (HintWrongDish, "They ordered {0}"),
+            (HintStartStew, "{0}: make {1}"),
+            (HintSimmering, "{0} is simmering"),
+            (HintStewReady, "{0}: {1} helpings left"),
             (HintStaffed, "{0} is working here"),
             (HintStepAway, "{0}: step away"),
             (Spill, "Spill"),
@@ -99,6 +114,9 @@ namespace Hearthdelve.UI.Localization
             (GrillPrompt, "{0}: flip while the meter is in the golden band"),
             (GrillSide, "Side {0} of {1}"),
             (TapPrompt, "Hold {0} to pour to the line · tilt with {1} to control the foam"),
+            (ChopTitle, "Chop the {0}"),
+            (ChopProgress, "Ingredient {0} of {1}"),
+            (ChopPrompt, "Move the knife with the mouse or {0} · {1} to chop on each line"),
 
             (ResultsTitle, "Service Over"),
             (ResultsClosedEarly, "Everything sold out, so we closed early."),

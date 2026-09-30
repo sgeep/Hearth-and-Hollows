@@ -16,6 +16,7 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] Station m_Grill;
         [SerializeField] Station m_Tap;
         [SerializeField] Station m_Pass;
+        [SerializeField] Station m_StewPot;
         [SerializeField] float m_MinX = 0.5f;
         [SerializeField] float m_MaxX = 19.5f;
 
@@ -26,10 +27,12 @@ namespace Hearthdelve.Tavern.Scene
         public Station Grill => m_Grill;
         public Station Tap => m_Tap;
         public Station Pass => m_Pass;
+        public Station StewPot => m_StewPot;
         public float MinX => m_MinX;
         public float MaxX => m_MaxX;
 
-        public void Configure(Transform door, Transform[] seats, Transform queueFront, Station grill, Station tap, Station pass, float minX, float maxX)
+        public void Configure(Transform door, Transform[] seats, Transform queueFront, Station grill, Station tap, Station pass, Station stewPot,
+            float minX, float maxX)
         {
             m_Door = door;
             m_Seats = seats;
@@ -37,6 +40,7 @@ namespace Hearthdelve.Tavern.Scene
             m_Grill = grill;
             m_Tap = tap;
             m_Pass = pass;
+            m_StewPot = stewPot;
             m_MinX = minX;
             m_MaxX = maxX;
         }
@@ -49,6 +53,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             StationKind.Grill => m_Grill,
             StationKind.Tap => m_Tap,
+            StationKind.StewPot => m_StewPot,
             _ => m_Pass,
         };
     }
