@@ -7,6 +7,7 @@ using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Dungeon.Player;
 using Hearthdelve.Dungeon.Run;
 using Hearthdelve.Shared.Ingredients;
+using Hearthdelve.Shared.Inventory;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,6 +26,7 @@ namespace Hearthdelve.Editor
             public EssenceConfig Essence;
             public HarvestRulesConfig HarvestRules;
             public DelveConfig Delve;
+            public FreshnessConfig Freshness;
             public WeaponDefinition Cleaver;
             public EnemyDefinition Rat, Slime, Shroom, Dummy;
             public readonly Dictionary<string, IngredientDefinition> Ingredients = new();
@@ -48,7 +50,14 @@ namespace Hearthdelve.Editor
                 Essence = LoadOrCreate<EssenceConfig>($"{EditorPaths.Config}/EssenceConfig.asset", _ => { }),
                 HarvestRules = LoadOrCreate<HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset", _ => { }),
                 Delve = LoadOrCreate<DelveConfig>($"{EditorPaths.Config}/DelveConfig.asset", _ => { }),
+                Freshness = LoadOrCreate<FreshnessConfig>($"{EditorPaths.Config}/FreshnessConfig.asset", _ => { }),
             };
+            // Wire the shared freshness tuning into the delve (only if unset, so a manual choice is kept).
+            if (c.Delve.freshness == null)
+            {
+                c.Delve.freshness = c.Freshness;
+                EditorUtility.SetDirty(c.Delve);
+            }
 
             Ingredient(c, "rat_haunch", "Rat Haunch", IngredientCategory.Meat, FlavorTags.Savory, Rarity.Common, 6, new Color(0.78f, 0.45f, 0.38f));
             Ingredient(c, "rat_liver", "Rat Liver", IngredientCategory.Offal, FlavorTags.Bitter | FlavorTags.Savory, Rarity.Common, 5, new Color(0.55f, 0.2f, 0.28f));

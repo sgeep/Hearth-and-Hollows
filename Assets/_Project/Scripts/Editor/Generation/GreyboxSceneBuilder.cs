@@ -25,7 +25,8 @@ namespace Hearthdelve.Editor
     /// <summary>
     /// Builds the CombatGreybox test level: a tilemap course that exercises every Phase 1
     /// move (wall-jump shaft, one-way platform tower), the three Cellars enemies, a training
-    /// dummy, pixel-perfect Cinemachine camera with impulse shake, HUD and menus.
+    /// dummy, the exit back to the tavern at the far end, pixel-perfect Cinemachine camera with
+    /// impulse shake, HUD and menus.
     /// </summary>
     public static class GreyboxSceneBuilder
     {
@@ -61,6 +62,7 @@ namespace Hearthdelve.Editor
             Spawn(prefabs.Shroom, 86, 3);
             Spawn(prefabs.Slime, 94, 3);
             Spawn(prefabs.Shroom, 92, 6);
+            CreateExit(96, 3);
 
             CreateCamera(player.transform, bounds);
             CreateSystems(content, prefabs, player.GetComponent<PlayerController>());
@@ -77,6 +79,21 @@ namespace Hearthdelve.Editor
         {
             var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             go.transform.position = Cell(x, y);
+        }
+
+        /// <summary>The way back up: a door on the raised block past the last enemies (surface y = 3).</summary>
+        static void CreateExit(int x, int surfaceY)
+        {
+            TavernArtGenerator.Generate(); // the door placeholder lives with the tavern art
+            var door = PlaceholderArtGenerator.Load(TavernArtGenerator.Door);
+            float half = door != null ? door.bounds.extents.y : 1f;
+            var go = new GameObject("Delve Exit");
+            go.transform.position = new Vector3(x + 0.5f, surfaceY, 0f);
+            SceneKit.AddSprite(go.transform, "Door", door, SortingLayers.Level, 2, new Color(0.85f, 0.9f, 1f), new Vector3(0f, half, 0f));
+            var ring = SceneKit.AddSprite(go.transform, "Highlight", PlaceholderArtGenerator.Load(PlaceholderArtGenerator.Marker), SortingLayers.FX, -1,
+                new Color(1f, 0.85f, 0.3f), new Vector3(0f, 0.05f, 0f));
+            ring.enabled = false;
+            go.AddComponent<DelveExit>().Configure(ring);
         }
 
         static (Tile solid, Tile oneWay) CreateTiles()

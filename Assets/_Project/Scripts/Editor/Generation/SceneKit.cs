@@ -98,6 +98,14 @@ namespace Hearthdelve.Editor
             EditorBuildSettings.scenes = scenes.ToArray();
         }
 
+        /// <summary>Puts these scenes first in the build list, in this order, keeping any others after them.</summary>
+        public static void SetBuildOrder(params string[] firstScenes)
+        {
+            var ordered = firstScenes.Where(System.IO.File.Exists).Select(p => new EditorBuildSettingsScene(p, true)).ToList();
+            ordered.AddRange(EditorBuildSettings.scenes.Where(s => !firstScenes.Contains(s.path)));
+            EditorBuildSettings.scenes = ordered.ToArray();
+        }
+
         public static SpriteRenderer AddSprite(Transform parent, string name, Sprite sprite, string sortingLayer, int order, Color color, Vector3 localPosition)
         {
             var child = new GameObject(name);

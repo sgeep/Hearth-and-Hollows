@@ -12,8 +12,9 @@ using UnityEngine.Tilemaps;
 namespace Hearthdelve.Editor
 {
     /// <summary>
-    /// Builds the TavernGreybox scene: a one-screen side view with the door on the left, three
-    /// tables (six seats), and the Tap, pass, Grill and Stew Pot on the right. The floor is a solid tilemap
+    /// Builds the TavernGreybox scene: a one-screen side view with the door on the left, four
+    /// tables (eight seats; stools beyond the seats bought are hidden), and the Tap, pass, Grill
+    /// and Stew Pot on the right. The floor is a solid tilemap
     /// on the Ground layer so dungeon-style combat could be added here later (stronghold defense).
     /// </summary>
     public static class TavernSceneBuilder
@@ -21,7 +22,7 @@ namespace Hearthdelve.Editor
         public const string ScenePath = EditorPaths.Scenes + "/TavernGreybox.unity";
         public const string CustomerPrefabPath = EditorPaths.Prefabs + "/Tavern/CustomerAgent.prefab";
 
-        static readonly float[] k_TableX = { 4.5f, 8f, 11.5f };
+        static readonly float[] k_TableX = { 4.3f, 6.9f, 9.5f, 12.1f };
         const float k_StoolOffset = 0.7f;
         const float k_TapX = 14.2f, k_PassX = 15.8f, k_GrillX = 17.4f, k_PotX = 19.0f, k_DoorX = 0.8f, k_QueueFrontX = 2.6f;
 
@@ -75,6 +76,8 @@ namespace Hearthdelve.Editor
             SceneKit.AddDocument<TavernHud>(ui.transform, "Service HUD", panel, "TavernHud.uxml", 0);
             SceneKit.AddDocument<StationMinigamePanel>(ui.transform, "Minigame Panel", panel, "TavernMinigame.uxml", 5);
             SceneKit.AddDocument<TavernPrepScreen>(ui.transform, "Prep Screen", panel, "TavernPrep.uxml", 10);
+            SceneKit.AddDocument<TavernMorningScreen>(ui.transform, "Morning Screen", panel, "TavernMorning.uxml", 10);
+            SceneKit.AddDocument<TavernNightScreen>(ui.transform, "Night Screen", panel, "TavernNight.uxml", 10);
             SceneKit.AddDocument<TavernResultsScreen>(ui.transform, "Results Screen", panel, "TavernResults.uxml", 20);
             SceneKit.CreateEventSystem(actions);
 
@@ -117,13 +120,15 @@ namespace Hearthdelve.Editor
             var door = Prop(root.transform, "Door", TavernArtGenerator.Door, k_DoorX, SortingLayers.Level, 2);
 
             var seats = new Transform[k_TableX.Length * 2];
+            var stools = new SpriteRenderer[seats.Length];
+            var tables = new SpriteRenderer[k_TableX.Length];
             for (int i = 0; i < k_TableX.Length; i++)
             {
-                Prop(root.transform, $"Table {i + 1}", TavernArtGenerator.Table, k_TableX[i], SortingLayers.Level, 2);
+                tables[i] = Prop(root.transform, $"Table {i + 1}", TavernArtGenerator.Table, k_TableX[i], SortingLayers.Level, 2);
                 for (int side = 0; side < 2; side++)
                 {
                     float x = k_TableX[i] + (side == 0 ? -k_StoolOffset : k_StoolOffset);
-                    Prop(root.transform, $"Stool {i * 2 + side + 1}", TavernArtGenerator.Stool, x, SortingLayers.Level, 1);
+                    stools[i * 2 + side] = Prop(root.transform, $"Stool {i * 2 + side + 1}", TavernArtGenerator.Stool, x, SortingLayers.Level, 1);
                     var seat = new GameObject($"Seat {i * 2 + side + 1}").transform;
                     seat.SetParent(root.transform, false);
                     seat.position = new Vector3(x, 0f, 0f);
@@ -147,6 +152,7 @@ namespace Hearthdelve.Editor
 
             var layout = root.AddComponent<TavernLayout>();
             layout.Configure(doorAnchor, seats, queue, grill, tap, pass, pot, minX: 0.5f, maxX: 19.6f);
+            layout.ConfigureProps(stools, tables);
             return layout;
         }
 
