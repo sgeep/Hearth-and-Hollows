@@ -7,7 +7,7 @@ _Last updated: 2026-09-29_
 - **Phase 1 (Combat Prototype):** done and playtested by you in the editor. Feel tuning is ongoing.
 - **Phase 2 (Tavern Prototype):** implemented and playtested once (2026-09-29). First round of feedback applied: hand delivery with a button, spare plates, final sold-out, and closing early when everything sells out. Waiting on the next playtest.
 
-Tests: **193 project EditMode tests + 15 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+Tests: **193 project EditMode tests + 16 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
 
 ### Phase 2 criteria
 
@@ -48,7 +48,7 @@ Tests: **193 project EditMode tests + 15 PlayMode tests, all passing, 0 compiler
    - The order appears on the rail on the right.
 3. **Cooking:** walk to the Grill or Tap and press **E / A** to cook the next order for that station. The Grill and Tap panels show the minigame.
 4. **Serving:** at the pass, press **E** to pick up the next dish. Carrying it *is* the Serving minigame: customers walking across the floor bump you and spill the plate, and a full spill meter drops it.
-   - Press **E** next to a seated customer who ordered that dish to serve it. It doesn't have to be the customer it was cooked for.
+   - Press **E** next to a seated customer who ordered that dish to serve it. It doesn't have to be the customer it was cooked for. The customer who would receive the plate gets a gold ring on the floor, like a station in reach.
    - If you give A's plate to B, B's order passes to A.
    - Next to someone who ordered something else, the hint shows what they ordered.
    - Press **E** at the pass to put the plate back.
@@ -145,7 +145,7 @@ Tests: **193 project EditMode tests + 15 PlayMode tests, all passing, 0 compiler
 
 **Tavern (Phase 2):**
 - **One playtest so far.** Patience, arrival rate, prices and minigame windows are still first-pass numbers.
-- **Delivery reach** reuses `ServiceConfig → player → interactRange` (0.9 tiles). The nearest matching customer in reach is served. There's no highlight on the target customer yet, only the hint text.
+- **Delivery reach** reuses `ServiceConfig → player → interactRange` (0.9 tiles). The nearest matching customer in reach is served and gets the gold floor ring (a placeholder until real art brings a sprite outline).
 - **Spare plates left at closing** are simply discarded.
 - **No storeroom decay.** Freshness only comes from the debug fill; overnight decay is designed for but not implemented.
 - **One staff helper.** The PlayMode test adds a second, test-only cook to run an end-to-end service with no player input.

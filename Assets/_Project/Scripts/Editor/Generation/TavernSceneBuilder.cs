@@ -36,9 +36,12 @@ namespace Hearthdelve.Editor
             fill.transform.localScale = new Vector3(6f, 0.7f, 1f);
             var order = SceneKit.AddSprite(go.transform, "OrderIcon", Sprite(TavernArtGenerator.Plate), SortingLayers.FX, 0, Color.white, new Vector3(0f, 1.85f, 0f));
             var upset = SceneKit.AddSprite(go.transform, "UpsetIcon", Sprite(PlaceholderArtGenerator.ExclaimHeavy), SortingLayers.FX, 0, Color.white, new Vector3(0f, 1.9f, 0f));
-            foreach (var sr in new[] { back, fill, order, upset }) sr.enabled = false;
+            // Same gold floor ring as a station in reach: "Interact acts on this".
+            var highlight = SceneKit.AddSprite(go.transform, "Highlight", Sprite(PlaceholderArtGenerator.Marker), SortingLayers.FX, -1,
+                new Color(1f, 0.85f, 0.3f), new Vector3(0f, 0.05f, 0f));
+            foreach (var sr in new[] { back, fill, order, upset, highlight }) sr.enabled = false;
 
-            go.AddComponent<CustomerAgent>().Configure(body, back, fill, order, upset);
+            go.AddComponent<CustomerAgent>().Configure(body, back, fill, order, upset, highlight);
             var prefab = PrefabUtility.SaveAsPrefabAsset(go, CustomerPrefabPath);
             Object.DestroyImmediate(go);
             return prefab.GetComponent<CustomerAgent>();

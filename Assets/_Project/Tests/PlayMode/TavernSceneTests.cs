@@ -4,11 +4,14 @@ using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.Tavern.Staff;
 using Hearthdelve.UI.Tavern;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UnityEngine.UIElements;
@@ -96,6 +99,79 @@ namespace Hearthdelve.Tests.PlayMode
             var results = Root<TavernResultsScreen>();
             Assert.That(results.Q("screen").style.display.value, Is.EqualTo(DisplayStyle.Flex));
             Assert.That(results.Q("rows").childCount, Is.GreaterThanOrEqualTo(5));
+        }
+
+        [UnityTest]
+        public IEnumerator CarryingAPlate_HighlightsTheCustomerInteractWouldServe_AndInteractServesThem()
+        {
+            yield return Load();
+            var director = TavernDirector.Instance;
+            var grilled = director.Content.recipes.First(r => r.id == "grilled_haunch");
+            director.Storeroom.Add(new IngredientStack(new IngredientItem(grilled.slots[0].ingredient, Quality.Standard), 1));
+            director.ToggleMenu(grilled);
+            director.OpenService();
+
+            // Batch runs have no window focus; by default the Input System ignores keyboards without it.
+            var originalSettings = InputSystem.settings;
+            var settings = Object.Instantiate(originalSettings);
+            settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            InputSystem.settings = settings;
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            try
+            {
+                Time.timeScale = 6f;
+                director.SpawnCustomer(director.Content.customers[0]);
+                float timeout = Time.realtimeSinceStartup + 20f;
+                while (director.Session.Tickets.Count == 0 && Time.realtimeSinceStartup < timeout) yield return null;
+                Assert.That(director.Session.Tickets, Has.Count.EqualTo(1), "someone ordered the only serving");
+                var ticket = director.Session.Tickets[0];
+                var agent = director.Agents.First(a => a.Logic == ticket.Customer);
+                director.Session.StartCooking(ticket, this);
+                director.Session.FinishCooking(ticket, 1f);
+                Assert.That(agent.IsHighlighted, Is.False);
+
+                // Pick the plate up at the pass.
+                var player = director.Player;
+                var p = player.transform.position;
+                player.transform.position = new Vector3(director.Layout.Pass.X, p.y, p.z);
+                yield return Press(keyboard, Key.E);
+                Assert.That(player.Carrying, Is.Not.Null, "Interact at the pass picks the dish up");
+                Assert.That(agent.IsHighlighted, Is.False, "out of reach");
+
+                // Walk left to the customer.
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.A));
+                timeout = Time.realtimeSinceStartup + 20f;
+                while (player.X - agent.X > 0.3f && Time.realtimeSinceStartup < timeout) yield return null;
+                InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+                yield return null;
+                yield return null;
+
+                Assert.That(player.ServeTarget, Is.SameAs(agent));
+                Assert.That(agent.IsHighlighted, "the customer who'd receive the plate is highlighted");
+                Assert.That(director.Agents.Where(a => a != agent).All(a => !a.IsHighlighted));
+
+                yield return Press(keyboard, Key.E);
+                Assert.That(player.Carrying, Is.Null);
+                Assert.That(agent.Logic.State, Is.EqualTo(CustomerState.Eating), "Interact served them");
+                Assert.That(agent.IsHighlighted, Is.False, "highlight clears once the plate is handed over");
+            }
+            finally
+            {
+                Time.timeScale = 1f;
+                InputSystem.RemoveDevice(keyboard);
+                InputSystem.settings = originalSettings;
+                Object.Destroy(settings);
+            }
+        }
+
+        static IEnumerator Press(Keyboard keyboard, Key key)
+        {
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(key));
+            yield return null;
+            Assert.That(keyboard[key].isPressed, $"{key} press reached the virtual keyboard");
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState());
+            yield return null;
         }
 
         [UnityTest]

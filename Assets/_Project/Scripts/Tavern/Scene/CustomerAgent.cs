@@ -14,6 +14,8 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] SpriteRenderer m_PatienceFill;
         [SerializeField] SpriteRenderer m_OrderIcon;
         [SerializeField] SpriteRenderer m_UpsetIcon;
+        [SerializeField, Tooltip("Floor ring shown when Interact would serve this customer the carried plate.")]
+        SpriteRenderer m_Highlight;
         [SerializeField] Color m_PatienceFull = new(0.4f, 0.9f, 0.4f);
         [SerializeField] Color m_PatienceEmpty = new(0.95f, 0.3f, 0.25f);
 
@@ -25,13 +27,22 @@ namespace Hearthdelve.Tavern.Scene
         public bool IsWalking { get; private set; }
         public float X => transform.position.x;
 
-        public void Configure(SpriteRenderer body, SpriteRenderer patienceBack, SpriteRenderer patienceFill, SpriteRenderer orderIcon, SpriteRenderer upsetIcon)
+        public void Configure(SpriteRenderer body, SpriteRenderer patienceBack, SpriteRenderer patienceFill, SpriteRenderer orderIcon,
+            SpriteRenderer upsetIcon, SpriteRenderer highlight)
         {
             m_Body = body;
             m_PatienceBack = patienceBack;
             m_PatienceFill = patienceFill;
             m_OrderIcon = orderIcon;
             m_UpsetIcon = upsetIcon;
+            m_Highlight = highlight;
+        }
+
+        public bool IsHighlighted => m_Highlight != null && m_Highlight.enabled;
+
+        public void SetHighlighted(bool on)
+        {
+            if (m_Highlight != null) m_Highlight.enabled = on;
         }
 
         public void Initialize(CustomerLogic logic, TavernDirector director)

@@ -140,6 +140,17 @@ namespace Hearthdelve.Tavern.Scene
             m_Near = station;
         }
 
+        /// <summary>The customer Interact would serve right now; they get the floor highlight.</summary>
+        public CustomerAgent ServeTarget => m_ServeTarget;
+
+        void SetServeTarget(CustomerAgent agent)
+        {
+            if (m_ServeTarget == agent) return;
+            if (m_ServeTarget != null) m_ServeTarget.SetHighlighted(false);
+            if (agent != null) agent.SetHighlighted(true);
+            m_ServeTarget = agent;
+        }
+
         void Interact()
         {
             var session = m_Director.Session;
@@ -264,7 +275,7 @@ namespace Hearthdelve.Tavern.Scene
                 }
             }
 
-            m_ServeTarget = serve;
+            SetServeTarget(serve);
             var pass = m_Director.Layout.Pass;
             if (serve != null)
             {
@@ -325,7 +336,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             Carrying = null;
             CarryTicket = null;
-            m_ServeTarget = null;
+            SetServeTarget(null);
             Hint = PlayerHint.None;
             HintRecipe = null;
             if (m_Plate != null) m_Plate.enabled = false;
