@@ -9,6 +9,7 @@ namespace Hearthdelve.Tavern.Staff
         Grill,
         Tap,
         Serving,
+        StewPot,
     }
 
     /// <summary>A hired helper who can run one station on their own (GDD §6.2, §7.2).</summary>

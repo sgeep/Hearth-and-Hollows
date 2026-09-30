@@ -82,7 +82,7 @@ namespace Hearthdelve.Tavern.Service
         readonly HashSet<RecipeDefinition> m_SoldOut = new();
 
         public ServiceSession(ServiceSettings settings, DishScoringSettings scoring, ServiceEconomySettings economy,
-            Storeroom storeroom, IReadOnlyList<RecipeDefinition> menu, int seatCount, IRandom random)
+            Storeroom storeroom, IReadOnlyList<RecipeDefinition> menu, int seatCount, IRandom random, StewPotSettings? pot = null)
         {
             if (menu == null || menu.Count == 0) throw new ArgumentException("The menu needs at least one dish.", nameof(menu));
             if (menu.Count > settings.maxMenuSize) throw new ArgumentException($"The menu holds at most {settings.maxMenuSize} dishes.", nameof(menu));
@@ -93,10 +93,13 @@ namespace Hearthdelve.Tavern.Service
             m_Menu = new List<RecipeDefinition>(menu);
             m_Seats = new CustomerLogic[Math.Max(1, seatCount)];
             m_Random = random ?? new SeededRandom();
+            Pot = new StewPot(pot ?? StewPotSettings.Default);
             RefreshSoldOut();
         }
 
         public Storeroom Storeroom { get; }
+        /// <summary>The stew pot (batch cooking for StewPot recipes).</summary>
+        public StewPot Pot { get; }
         public ServiceLedger Ledger { get; } = new();
         public IReadOnlyList<RecipeDefinition> Menu => m_Menu;
         public IReadOnlyList<Ticket> Tickets => m_Tickets;
@@ -114,6 +117,7 @@ namespace Hearthdelve.Tavern.Service
 
         public event Action SoldOutChanged;
         public event Action<Ticket> TicketChanged;
+        public event Action PotChanged;
         public event Action<CustomerLogic> CustomerLeft;
         public event Action Ended;
 
@@ -132,6 +136,11 @@ namespace Hearthdelve.Tavern.Service
         {
             if (IsOver || deltaTime <= 0f) return;
             Elapsed += deltaTime;
+            if (Pot.Tick(deltaTime))
+            {
+                PotChanged?.Invoke();
+                LadleStew();
+            }
             foreach (var c in m_Customers.ToArray()) c.Tick(deltaTime);
             if (Elapsed >= m_Settings.lengthSeconds) End();
             else if (AllSoldOut && !HasOpenOrders && !AnyoneEating)
@@ -211,6 +220,17 @@ namespace Hearthdelve.Tavern.Service
                 spare.Customer = customer;
                 customer.PlaceOrder(choice);
                 TicketChanged?.Invoke(spare);
+                return;
+            }
+            if (choice != null && choice.station == CookStation.StewPot)
+            {
+                // Stew comes out of the pot: the order waits for a helping (ingredients are taken per batch).
+                var order = new Ticket(customer, choice, null);
+                m_Tickets.Add(order);
+                customer.PlaceOrder(choice);
+                TicketChanged?.Invoke(order);
+                LadleStew();
+                RefreshSoldOut();
                 return;
             }
             var reserved = choice != null ? RecipeMatcher.TryTake(choice, Storeroom) : null;
@@ -334,8 +354,106 @@ namespace Hearthdelve.Tavern.Service
         {
             bool changed = false;
             foreach (var r in m_Menu)
-                if (!m_SoldOut.Contains(r) && !RecipeMatcher.CanCook(r, Storeroom) && m_SoldOut.Add(r)) changed = true;
+                if (!m_SoldOut.Contains(r) && !CanStillMake(r) && m_SoldOut.Add(r)) changed = true;
             if (changed) SoldOutChanged?.Invoke();
+        }
+
+        bool CanStillMake(RecipeDefinition recipe)
+        {
+            if (recipe.station != CookStation.StewPot) return RecipeMatcher.CanCook(recipe, Storeroom);
+            // Stew: helpings the pot can still promise, plus the fewest helpings each batch the
+            // storeroom can still make would give, must cover the orders already waiting.
+            int batches = RecipeMatcher.ServingsAvailable(recipe, Storeroom);
+            return Pot.Capacity(recipe) + batches * Pot.Settings.minHelpings - WaitingForStew(recipe) > 0;
+        }
+
+        /// <summary>Stew orders still waiting for a helping.</summary>
+        public int WaitingForStew(RecipeDefinition recipe)
+        {
+            int n = 0;
+            foreach (var t in m_Tickets)
+                if (t.Recipe == recipe && t.State == TicketState.Queued && t.Recipe.station == CookStation.StewPot) n++;
+            return n;
+        }
+
+        // ---------- Stew pot ----------
+
+        /// <summary>
+        /// The stew to put on next, or null if the pot is busy or nothing can be made: the one
+        /// with the most orders waiting, else the first stew still on the menu.
+        /// </summary>
+        public RecipeDefinition NextBatch()
+        {
+            if (IsOver || Pot.State != PotState.Empty) return null;
+            RecipeDefinition best = null;
+            int bestWaiting = 0;
+            foreach (var r in m_Menu)
+            {
+                if (r.station != CookStation.StewPot || !RecipeMatcher.CanCook(r, Storeroom)) continue;
+                int waiting = WaitingForStew(r);
+                if (waiting == 0 && m_SoldOut.Contains(r)) continue;
+                if (best == null || waiting > bestWaiting)
+                {
+                    best = r;
+                    bestWaiting = waiting;
+                }
+            }
+            return best;
+        }
+
+        /// <summary>Takes a batch of ingredients into the empty pot; <paramref name="cook"/> then chops them.</summary>
+        public bool StartBatch(RecipeDefinition recipe, object cook)
+        {
+            if (IsOver || Pot.State != PotState.Empty || recipe == null || recipe.station != CookStation.StewPot || !m_Menu.Contains(recipe)) return false;
+            var batch = RecipeMatcher.TryTake(recipe, Storeroom);
+            if (batch == null) return false;
+            Pot.Fill(recipe, batch, cook);
+            PotChanged?.Invoke();
+            RefreshSoldOut();
+            return true;
+        }
+
+        /// <summary>The cook walked away mid-chop: the ingredients go back to the storeroom.</summary>
+        public void AbandonBatch(object cook)
+        {
+            if (Pot.State != PotState.Chopping || Pot.ClaimedBy != cook) return;
+            Storeroom.AddRange(Pot.Batch.Used);
+            Pot.Empty();
+            PotChanged?.Invoke();
+        }
+
+        /// <summary>Chopping finished: accuracy sets the helpings, then the pot simmers on its own.</summary>
+        public void FinishChopping(object cook, float chopScore)
+        {
+            if (Pot.State != PotState.Chopping || Pot.ClaimedBy != cook) return;
+            Pot.StartSimmering(chopScore);
+            PotChanged?.Invoke();
+            LadleStew();
+            RefreshSoldOut();
+        }
+
+        /// <summary>Ladles a helping onto the pass for each waiting stew order, oldest first, while the pot has any.</summary>
+        void LadleStew()
+        {
+            bool ladled = false;
+            while (Pot.State == PotState.Ready)
+            {
+                Ticket next = null;
+                foreach (var t in m_Tickets)
+                {
+                    if (t.Recipe != Pot.Recipe || t.State != TicketState.Queued || t.IsSpare) continue;
+                    next = t;
+                    break;
+                }
+                if (next == null) break;
+                next.Reserved = Pot.Batch;
+                next.CookScore = 1f; // chopping sets the helpings, not the quality
+                next.State = TicketState.Ready;
+                Pot.TakeHelping();
+                ladled = true;
+                TicketChanged?.Invoke(next);
+            }
+            if (ladled) PotChanged?.Invoke();
         }
 
         // ---------- Kitchen ----------
@@ -462,6 +580,17 @@ namespace Hearthdelve.Tavern.Service
             if (ticket.IsSpare)
             {
                 Cancel(ticket);
+                return;
+            }
+            if (ticket.Recipe.station == CookStation.StewPot)
+            {
+                // Back in line for the next helping.
+                ticket.Reserved = null;
+                ticket.CookScore = 0f;
+                ticket.State = TicketState.Queued;
+                TicketChanged?.Invoke(ticket);
+                LadleStew();
+                RefreshSoldOut();
                 return;
             }
             var again = RecipeMatcher.TryTake(ticket.Recipe, Storeroom);

@@ -8,16 +8,18 @@ namespace Hearthdelve.Tavern.Minigames
     /// <summary>Creates station minigames and matching auto-players from tuning data.</summary>
     public sealed class MinigameFactory
     {
-        public MinigameFactory(GrillSettings grill, TapSettings tap, ServingSettings serving)
+        public MinigameFactory(GrillSettings grill, TapSettings tap, ServingSettings serving, ChopSettings? chop = null)
         {
             Grill = grill;
             Tap = tap;
             Serving = serving;
+            Chop = chop ?? ChopSettings.Default;
         }
 
         public GrillSettings Grill { get; }
         public TapSettings Tap { get; }
         public ServingSettings Serving { get; }
+        public ChopSettings Chop { get; }
 
         public IMinigame CreateCook(CookStation station) => station switch
         {
@@ -28,6 +30,9 @@ namespace Hearthdelve.Tavern.Minigames
 
         public ServingMinigame CreateServing(float fromX, float toX) => new(Serving, fromX, toX);
 
+        /// <summary>Chopping <paramref name="items"/> ingredients for a stew batch.</summary>
+        public ChopMinigame CreateChop(int items, IRandom random) => new(Chop, items, random);
+
         /// <summary>A plate carried freely; the carrier picks the table (<see cref="ServingMinigame.Deliver"/>).</summary>
         public ServingMinigame CreateServing(float fromX) => new(Serving, fromX);
 
@@ -37,6 +42,7 @@ namespace Hearthdelve.Tavern.Minigames
             GrillMinigame g => new GrillAutoPlayer(g, skill, random),
             TapMinigame t => new TapAutoPlayer(t, skill, random),
             ServingMinigame s => new ServingAutoPlayer(s, skill, random),
+            ChopMinigame c => new ChopAutoPlayer(c, skill, random),
             _ => throw new ArgumentException($"No auto-player for {game?.GetType().Name}", nameof(game)),
         };
     }

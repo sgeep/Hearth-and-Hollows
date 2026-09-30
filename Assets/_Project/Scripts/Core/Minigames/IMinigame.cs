@@ -12,6 +12,10 @@ namespace Hearthdelve.Core.Minigames
         public Vector2 Aim;
         /// <summary>Horizontal movement -1..1 (movement-based minigames such as Serving).</summary>
         public float Move;
+        /// <summary>True when the mouse moved this tick; <see cref="Pointer"/> is then valid.</summary>
+        public bool PointerActive;
+        /// <summary>Horizontal pointer position, 0–1 across the minigame's play area (e.g. the chopping board).</summary>
+        public float Pointer;
     }
 
     /// <summary>

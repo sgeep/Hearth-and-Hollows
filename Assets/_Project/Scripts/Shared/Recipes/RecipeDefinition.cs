@@ -11,6 +11,8 @@ namespace Hearthdelve.Shared.Recipes
     {
         Grill,
         Tap,
+        /// <summary>Batch cooking: one pot of the recipe's ingredients makes several helpings.</summary>
+        StewPot,
     }
 
     public enum SlotMatch
