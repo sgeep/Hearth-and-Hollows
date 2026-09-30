@@ -1,6 +1,7 @@
 using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Minigames;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
@@ -20,11 +21,19 @@ namespace Hearthdelve.Tavern.Scene
         Staffed,
         /// <summary>At a station with nothing to do.</summary>
         Idle,
+        /// <summary>Carrying a plate next to someone waiting for that dish.</summary>
+        Serve,
+        /// <summary>Carrying a plate next to someone waiting for a different dish (<see cref="TavernPlayer.HintRecipe"/> is theirs).</summary>
+        WrongDish,
+        /// <summary>Carrying a plate at the pass.</summary>
+        PutBack,
     }
 
     /// <summary>
     /// The keeper during service: walks the floor (Tavern map), cooks at the Grill/Tap (Minigame
-    /// map), and carries plates from the pass (the Serving minigame drives movement while carrying).
+    /// map), and carries plates from the pass (the Serving minigame drives movement while
+    /// carrying). A plate is served with Interact next to anyone waiting for that dish, or put
+    /// back with Interact at the pass.
     /// </summary>
     public sealed class TavernPlayer : MonoBehaviour
     {
@@ -34,6 +43,7 @@ namespace Hearthdelve.Tavern.Scene
         TavernDirector m_Director;
         InputAction m_Move, m_Interact, m_Aim, m_Action, m_MinigameCancel;
         Station m_Near;
+        CustomerAgent m_ServeTarget;
 
         public IMinigame ActiveCook { get; private set; }
         public Ticket CookTicket { get; private set; }
@@ -99,12 +109,7 @@ namespace Hearthdelve.Tavern.Scene
                     bestDistance = d;
                 }
             }
-            if (m_Near != best)
-            {
-                if (m_Near != null) m_Near.SetHighlighted(false);
-                if (best != null) best.SetHighlighted(true);
-                m_Near = best;
-            }
+            SetNear(best);
 
             var session = m_Director.Session;
             HintRecipe = null;
@@ -127,6 +132,14 @@ namespace Hearthdelve.Tavern.Scene
             }
         }
 
+        void SetNear(Station station)
+        {
+            if (m_Near == station) return;
+            if (m_Near != null) m_Near.SetHighlighted(false);
+            if (station != null) station.SetHighlighted(true);
+            m_Near = station;
+        }
+
         void Interact()
         {
             var session = m_Director.Session;
@@ -145,8 +158,9 @@ namespace Hearthdelve.Tavern.Scene
                 var ticket = session.NextToServe();
                 if (!session.StartDelivery(ticket, this)) return;
                 CarryTicket = ticket;
-                Carrying = m_Director.Minigames.CreateServing(X, m_Director.Layout.SeatX(ticket.Customer.Seat));
+                Carrying = m_Director.Minigames.CreateServing(X);
                 Carrying.Begin();
+                SetNear(null);
                 if (m_Plate != null)
                 {
                     m_Plate.enabled = true;
@@ -188,7 +202,7 @@ namespace Hearthdelve.Tavern.Scene
             var session = m_Director.Session;
             if (CarryTicket.State != TicketState.Delivering)
             {
-                EndCarry(); // the customer left; the plate is wasted
+                EndCarry();
                 return;
             }
 
@@ -203,11 +217,74 @@ namespace Hearthdelve.Tavern.Scene
             {
                 session.Dropped(CarryTicket);
                 EndCarry();
+                return;
             }
-            else if (Carrying.Arrived)
+
+            UpdateCarryHint();
+            if (m_Interact == null || !m_Interact.WasPressedThisFrame()) return;
+            if (Hint == PlayerHint.Serve)
             {
-                session.Delivered(CarryTicket, Carrying.Evaluate());
+                Carrying.Deliver(m_ServeTarget.X);
+                session.Deliver(CarryTicket, m_ServeTarget.Logic, Carrying.Evaluate());
                 EndCarry();
+            }
+            else if (Hint == PlayerHint.PutBack)
+            {
+                session.PutBack(CarryTicket);
+                EndCarry();
+            }
+        }
+
+        /// <summary>
+        /// While carrying: the nearest seated customer in reach who ordered this dish can be
+        /// served; otherwise the pass takes the plate back; otherwise say what a nearby customer wants.
+        /// </summary>
+        void UpdateCarryHint()
+        {
+            var session = m_Director.Session;
+            float range = m_Director.PlayerSettings.interactRange;
+            CustomerAgent serve = null, other = null;
+            float serveDistance = range, otherDistance = range;
+            foreach (var agent in m_Director.Agents)
+            {
+                if (agent == null || agent.IsWalking || agent.Logic.State != CustomerState.WaitingForFood) continue;
+                float d = Mathf.Abs(agent.X - X);
+                if (session.CanDeliver(CarryTicket, agent.Logic))
+                {
+                    if (d <= serveDistance)
+                    {
+                        serve = agent;
+                        serveDistance = d;
+                    }
+                }
+                else if (d <= otherDistance)
+                {
+                    other = agent;
+                    otherDistance = d;
+                }
+            }
+
+            m_ServeTarget = serve;
+            var pass = m_Director.Layout.Pass;
+            if (serve != null)
+            {
+                Hint = PlayerHint.Serve;
+                HintRecipe = CarryTicket.Recipe;
+            }
+            else if (pass != null && Mathf.Abs(pass.X - X) <= range)
+            {
+                Hint = PlayerHint.PutBack;
+                HintRecipe = CarryTicket.Recipe;
+            }
+            else if (other != null)
+            {
+                Hint = PlayerHint.WrongDish;
+                HintRecipe = other.Logic.Order;
+            }
+            else
+            {
+                Hint = PlayerHint.None;
+                HintRecipe = null;
             }
         }
 
@@ -248,6 +325,9 @@ namespace Hearthdelve.Tavern.Scene
         {
             Carrying = null;
             CarryTicket = null;
+            m_ServeTarget = null;
+            Hint = PlayerHint.None;
+            HintRecipe = null;
             if (m_Plate != null) m_Plate.enabled = false;
         }
 

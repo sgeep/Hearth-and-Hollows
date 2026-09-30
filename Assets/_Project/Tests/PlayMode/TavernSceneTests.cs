@@ -99,6 +99,40 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator SellingOut_ClosesEarly_OnceTheLastOrderIsServedAndPaid()
+        {
+            yield return Load();
+            var director = TavernDirector.Instance;
+            var grilled = director.Content.recipes.First(r => r.id == "grilled_haunch");
+            var haunch = grilled.slots[0].ingredient;
+            director.Storeroom.Add(new IngredientStack(new IngredientItem(haunch, Quality.Standard), 1));
+            director.ToggleMenu(grilled);
+            director.AssignStaff(StaffStation.Serving);
+            director.OpenService();
+
+            var staff = director.StaffMember;
+            var cook = new StaffCook(director.Session, director.Minigames, CookStation.Grill, staff.skill, staff.qualityCap, 0.2f, new SeededRandom(4));
+            Time.timeScale = 6f;
+            director.SpawnCustomer(director.Content.customers[0]);
+            float timeout = Time.realtimeSinceStartup + 40f;
+            while (director.Phase == TavernPhase.Service && Time.realtimeSinceStartup < timeout)
+            {
+                if (director.Session.AllSoldOut) Assert.That(director.Session.CanAdmitCustomer, Is.False, "the door closes once everything is sold out");
+                cook.Tick(Time.deltaTime);
+                yield return null;
+            }
+            Time.timeScale = 1f;
+            yield return null;
+
+            Assert.That(director.Phase, Is.EqualTo(TavernPhase.Results));
+            Assert.That(director.Session.ClosedEarly);
+            Assert.That(director.Session.Ledger.DishesServed, Is.EqualTo(1), "the last order was still served and paid for");
+            Assert.That(director.Session.Remaining, Is.GreaterThan(0f));
+            var rows = Root<TavernResultsScreen>().Q("rows").Query<Label>().ToList();
+            Assert.That(rows.Select(l => l.text), Has.Member("Everything sold out, so we closed early."));
+        }
+
+        [UnityTest]
         public IEnumerator SoldOut_IsMarkedOnHud_AndNextCustomerLeavesWithSmallPenalty()
         {
             yield return Load();

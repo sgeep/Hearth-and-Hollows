@@ -30,9 +30,13 @@ namespace Hearthdelve.UI.Localization
         public const string TicketCooking = "ticket.cooking";
         public const string TicketReady = "ticket.ready";
         public const string TicketDelivering = "ticket.delivering";
+        public const string TicketSpare = "ticket.spare";
 
         public const string HintCook = "tavern.hint.cook";
         public const string HintPickUp = "tavern.hint.pick_up";
+        public const string HintServe = "tavern.hint.serve";
+        public const string HintPutBack = "tavern.hint.put_back";
+        public const string HintWrongDish = "tavern.hint.wrong_dish";
         public const string HintStaffed = "tavern.hint.staffed";
         public const string HintStepAway = "tavern.hint.step_away";
         public const string Spill = "serving.spill";
@@ -42,6 +46,7 @@ namespace Hearthdelve.UI.Localization
         public const string TapPrompt = "tap.prompt";
 
         public const string ResultsTitle = "results.title";
+        public const string ResultsClosedEarly = "results.closed_early";
         public const string ResultsServed = "results.served";
         public const string ResultsGold = "results.gold";
         public const string ResultsTips = "results.tips";
@@ -80,9 +85,13 @@ namespace Hearthdelve.UI.Localization
             (TicketCooking, "Cooking"),
             (TicketReady, "On the pass"),
             (TicketDelivering, "Serving"),
+            (TicketSpare, "Spare"),
 
             (HintCook, "{0}: cook {1}"),
             (HintPickUp, "{0}: pick up {1}"),
+            (HintServe, "{0}: serve {1}"),
+            (HintPutBack, "{0}: put {1} back on the pass"),
+            (HintWrongDish, "They ordered {0}"),
             (HintStaffed, "{0} is working here"),
             (HintStepAway, "{0}: step away"),
             (Spill, "Spill"),
@@ -92,6 +101,7 @@ namespace Hearthdelve.UI.Localization
             (TapPrompt, "Hold {0} to pour to the line · tilt with {1} to control the foam"),
 
             (ResultsTitle, "Service Over"),
+            (ResultsClosedEarly, "Everything sold out, so we closed early."),
             (ResultsServed, "Dishes served: {0}"),
             (ResultsGold, "Gold earned: {0}"),
             (ResultsTips, "Tips: {0}"),

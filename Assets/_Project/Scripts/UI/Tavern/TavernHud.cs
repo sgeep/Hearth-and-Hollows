@@ -130,8 +130,10 @@ namespace Hearthdelve.UI.Tavern
                 swatch.style.backgroundColor = t.Recipe.placeholderColor;
                 row.Add(swatch);
                 row.Add(new Label(TavernUI.RecipeName(t.Recipe)));
+                row.EnableInClassList("hd-ticket--spare", t.IsSpare);
                 var state = new Label(Loc.UI(t.State switch
                 {
+                    _ when t.IsSpare && t.State == TicketState.Ready => TavernLocKeys.TicketSpare,
                     TicketState.Cooking => TavernLocKeys.TicketCooking,
                     TicketState.Ready => TavernLocKeys.TicketReady,
                     TicketState.Delivering => TavernLocKeys.TicketDelivering,
@@ -149,13 +151,17 @@ namespace Hearthdelve.UI.Tavern
             string text = string.Empty;
             if (player.ActiveCook != null)
                 text = Loc.UI(TavernLocKeys.HintStepAway, TavernUI.Binding(InputMaps.Minigame, MinigameActions.Cancel));
-            else if (player.Carrying == null)
+            else
             {
                 string interact = TavernUI.Binding(InputMaps.Tavern, TavernActions.Interact);
+                string recipe = TavernUI.RecipeName(player.HintRecipe);
                 text = player.Hint switch
                 {
-                    PlayerHint.Cook => Loc.UI(TavernLocKeys.HintCook, interact, TavernUI.RecipeName(player.HintRecipe)),
-                    PlayerHint.PickUp => Loc.UI(TavernLocKeys.HintPickUp, interact, TavernUI.RecipeName(player.HintRecipe)),
+                    PlayerHint.Cook => Loc.UI(TavernLocKeys.HintCook, interact, recipe),
+                    PlayerHint.PickUp => Loc.UI(TavernLocKeys.HintPickUp, interact, recipe),
+                    PlayerHint.Serve => Loc.UI(TavernLocKeys.HintServe, interact, recipe),
+                    PlayerHint.PutBack => Loc.UI(TavernLocKeys.HintPutBack, interact, recipe),
+                    PlayerHint.WrongDish => Loc.UI(TavernLocKeys.HintWrongDish, recipe),
                     PlayerHint.Staffed => Loc.UI(TavernLocKeys.HintStaffed,
                         m_Director.StaffMember != null ? Loc.Get(m_Director.StaffMember.displayName) : string.Empty),
                     _ => string.Empty,

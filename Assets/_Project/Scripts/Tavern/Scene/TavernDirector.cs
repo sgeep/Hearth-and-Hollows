@@ -55,7 +55,8 @@ namespace Hearthdelve.Tavern.Scene
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
         public StaffDefinition StaffMember => m_Content != null && m_Content.staff.Count > 0 ? m_Content.staff[0] : null;
         public int MaxMenuSize => m_Content.service.service.maxMenuSize;
-        public bool CanOpen => Phase == TavernPhase.Prep && m_Menu.Count > 0;
+        /// <summary>A menu is set and the stock can make at least one dish on it (otherwise service would close at once, sold out).</summary>
+        public bool CanOpen => Phase == TavernPhase.Prep && m_Menu.Exists(r => RecipeMatcher.CanCook(r, Storeroom));
         public TavernPlayerSettings PlayerSettings => m_Content.service.player;
 
         public event Action PhaseChanged;

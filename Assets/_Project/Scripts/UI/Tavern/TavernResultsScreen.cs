@@ -46,6 +46,7 @@ namespace Hearthdelve.UI.Tavern
             m_Title.text = Loc.UI(TavernLocKeys.ResultsTitle);
             m_Again.text = Loc.UI(TavernLocKeys.ResultsAgain);
             m_Rows.Clear();
+            if (m_Director.Session.ClosedEarly) AddRow(Loc.UI(TavernLocKeys.ResultsClosedEarly));
             Add(TavernLocKeys.ResultsServed, l.DishesServed);
             Add(TavernLocKeys.ResultsGold, l.Gold);
             Add(TavernLocKeys.ResultsTips, l.Tips);
@@ -56,9 +57,11 @@ namespace Hearthdelve.UI.Tavern
             m_Screen.schedule.Execute(() => m_Again.Focus());
         }
 
-        void Add(string key, int value)
+        void Add(string key, int value) => AddRow(Loc.UI(key, value));
+
+        void AddRow(string text)
         {
-            var row = new Label(Loc.UI(key, value));
+            var row = new Label(text);
             row.AddToClassList("hd-results__row");
             m_Rows.Add(row);
         }

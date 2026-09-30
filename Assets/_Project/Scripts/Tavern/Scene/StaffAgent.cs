@@ -1,6 +1,7 @@
 using Hearthdelve.Core.Minigames;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
@@ -27,6 +28,7 @@ namespace Hearthdelve.Tavern.Scene
         ServingMinigame m_Serving;
         IMinigameAutoPlayer m_ServingPlayer;
         Ticket m_Carrying;
+        CustomerLogic m_For;
         float m_Rest;
         bool m_Returning;
 
@@ -76,6 +78,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             m_Cook = null;
             m_Carrying = null;
+            m_For = null;
             m_Serving = null;
             if (m_Plate != null) m_Plate.enabled = false;
             if (m_WorkingIcon != null) m_WorkingIcon.enabled = false;
@@ -111,9 +114,10 @@ namespace Hearthdelve.Tavern.Scene
                     m_Rest -= dt;
                     return;
                 }
-                var next = session.NextToServe();
+                var next = session.NextToServe(includeSpares: false);
                 if (next == null || !session.StartDelivery(next, this)) return;
                 m_Carrying = next;
+                m_For = next.Customer;
                 m_Serving = m_Director.Minigames.CreateServing(transform.position.x, layout.SeatX(next.Customer.Seat));
                 m_ServingPlayer = MinigameFactory.CreateAutoPlayer(m_Serving, m_Definition.skill, m_Random);
                 m_Serving.Begin();
@@ -126,7 +130,19 @@ namespace Hearthdelve.Tavern.Scene
 
             if (m_Carrying.State != TicketState.Delivering)
             {
-                FinishDelivery(); // customer left
+                FinishDelivery();
+                return;
+            }
+
+            if (m_Serving == null || m_Carrying.Customer != m_For)
+            {
+                // The customer left (or the keeper served them another plate): take it back to the pass.
+                m_Serving = null;
+                float speed = m_Director.PlayerSettings.walkSpeed;
+                PlaceAt(Mathf.MoveTowards(transform.position.x, layout.Pass.X, speed * dt));
+                if (Mathf.Abs(transform.position.x - layout.Pass.X) > 0.05f) return;
+                session.PutBack(m_Carrying);
+                FinishDelivery();
                 return;
             }
 
@@ -141,7 +157,8 @@ namespace Hearthdelve.Tavern.Scene
             }
             else if (m_Serving.Arrived)
             {
-                session.Delivered(m_Carrying, Mathf.Min(m_Serving.Evaluate(), m_Definition.qualityCap));
+                if (!session.Deliver(m_Carrying, m_For, Mathf.Min(m_Serving.Evaluate(), m_Definition.qualityCap)))
+                    session.PutBack(m_Carrying);
                 FinishDelivery();
             }
         }
@@ -149,6 +166,7 @@ namespace Hearthdelve.Tavern.Scene
         void FinishDelivery()
         {
             m_Carrying = null;
+            m_For = null;
             m_Serving = null;
             m_ServingPlayer = null;
             m_Rest = m_Definition.restBetweenJobs;
