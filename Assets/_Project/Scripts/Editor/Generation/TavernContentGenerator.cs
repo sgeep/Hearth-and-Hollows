@@ -14,7 +14,8 @@ using UnityEngine;
 namespace Hearthdelve.Editor
 {
     /// <summary>
-    /// Phase 2 data: 5 Biome 1 recipes, 3 customer types, 1 staff helper, and tavern tuning.
+    /// Phase 2 data: 7 Biome 1 recipes (5 single dishes, 2 stews), 3 customer types, 1 staff
+    /// helper, and tavern tuning.
     /// Like Phase 1, assets are only created, never overwritten, so inspector tuning is kept.
     /// </summary>
     public static class TavernContentGenerator
@@ -42,6 +43,11 @@ namespace Hearthdelve.Editor
                     Slot(ing["slime_gel"], 2)),
                 Recipe("core_tonic", "Core Tonic", CookStation.Tap, 18, FlavorTags.Sweet | FlavorTags.Arcane, new Color(0.35f, 0.9f, 0.88f),
                     Slot(ing["slime_core"]), Slot(ing["slime_gel"])),
+                // Stews: one batch of these ingredients makes several helpings; value is per helping.
+                Recipe("cellar_stew", "Cellar Stew", CookStation.StewPot, 9, FlavorTags.Savory | FlavorTags.Umami, new Color(0.62f, 0.4f, 0.26f),
+                    Slot(ing["rat_haunch"]), Slot(ing["shroom_cap"]), Slot(ing["spore_sac"], optional: true)),
+                Recipe("offal_pottage", "Offal Pottage", CookStation.StewPot, 8, FlavorTags.Savory | FlavorTags.Earthy, new Color(0.5f, 0.3f, 0.34f),
+                    Slot(ing["rat_liver"]), Slot(ing["shroom_cap"])),
             };
 
             var customers = new List<CustomerProfile>
@@ -76,6 +82,7 @@ namespace Hearthdelve.Editor
             content.grill = ContentGenerator.LoadOrCreate<GrillConfig>($"{TavernData}/GrillConfig.asset", _ => { });
             content.tap = ContentGenerator.LoadOrCreate<TapConfig>($"{TavernData}/TapConfig.asset", _ => { });
             content.serving = ContentGenerator.LoadOrCreate<ServingConfig>($"{TavernData}/ServingConfig.asset", _ => { });
+            content.stew = ContentGenerator.LoadOrCreate<StewConfig>($"{TavernData}/StewConfig.asset", _ => { });
             EditorUtility.SetDirty(content);
             AssetDatabase.SaveAssets();
             return content;

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e551e7fb5a4fc4e80f26786bf8cb4b, type: 3}
+  m_Name: StewConfig
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Service.StewConfig
+  chop:
+    minLines: 3
+    maxLines: 4
+    edgeMargin: 0.15
+    jitter: 0.25
+    perfectDistance: 0.015
+    falloff: 0.1
+    knifeSpeed: 1.1
+    itemTimeLimit: 6
+    itemPause: 0.35
+    boardLeft: 0.25
+    boardWidth: 0.5
+    autoMaxError: 0.12
+    autoMaxHesitation: 0.6
+  pot:
+    simmerSeconds: 25
+    minHelpings: 3
+    maxHelpings: 5

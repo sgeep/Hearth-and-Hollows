@@ -5,7 +5,9 @@ using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
+using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Scene;
+using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
 using Hearthdelve.UI.Tavern;
 using NUnit.Framework;
@@ -48,7 +50,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(director.Storeroom.TotalCount, Is.GreaterThan(0));
             Assert.That(director.Storeroom.Stacks.Select(s => s.Item.Quality).Distinct().Count(), Is.GreaterThan(1));
-            Assert.That(director.Content.recipes, Has.Count.EqualTo(5));
+            Assert.That(director.Content.recipes, Has.Count.EqualTo(7), "5 dishes + 2 stews");
+            Assert.That(director.StaffAssignment, Is.EqualTo(StaffStation.Serving), "Pip starts on Serving");
             Assert.That(director.Content.recipes.All(r => director.ServingsAvailable(r) > 0), "a debug fill can make every recipe");
         }
 
@@ -109,14 +112,10 @@ namespace Hearthdelve.Tests.PlayMode
             var grilled = director.Content.recipes.First(r => r.id == "grilled_haunch");
             director.Storeroom.Add(new IngredientStack(new IngredientItem(grilled.slots[0].ingredient, Quality.Standard), 1));
             director.ToggleMenu(grilled);
+            director.AssignStaff(StaffStation.None); // the player carries this one
             director.OpenService();
 
-            // Batch runs have no window focus; by default the Input System ignores keyboards without it.
-            var originalSettings = InputSystem.settings;
-            var settings = Object.Instantiate(originalSettings);
-            settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
-            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
-            InputSystem.settings = settings;
+            var restoreInput = UseInputWithoutFocus();
             var keyboard = InputSystem.AddDevice<Keyboard>();
             try
             {
@@ -160,9 +159,121 @@ namespace Hearthdelve.Tests.PlayMode
             {
                 Time.timeScale = 1f;
                 InputSystem.RemoveDevice(keyboard);
-                InputSystem.settings = originalSettings;
-                Object.Destroy(settings);
+                restoreInput();
             }
+        }
+
+        /// <summary>
+        /// Batch runs have no window focus, and by default the Input System ignores keyboards and
+        /// mice without it. Swaps in settings that ignore focus; call the result to restore them.
+        /// </summary>
+        static System.Action UseInputWithoutFocus()
+        {
+            var original = InputSystem.settings;
+            var settings = Object.Instantiate(original);
+            settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
+            settings.editorInputBehaviorInPlayMode = InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            InputSystem.settings = settings;
+            return () =>
+            {
+                InputSystem.settings = original;
+                Object.Destroy(settings);
+            };
+        }
+
+        static void Stock(TavernDirector director, RecipeDefinition recipe)
+        {
+            foreach (var slot in recipe.slots)
+                if (!slot.optional) director.Storeroom.Add(new IngredientStack(new IngredientItem(slot.ingredient, Quality.Standard), slot.count));
+        }
+
+        [UnityTest]
+        public IEnumerator PlayerChopsWithTheMouse_PerfectCutsFillThePotWithTheMostHelpings()
+        {
+            yield return Load();
+            var director = TavernDirector.Instance;
+            var stew = director.Content.recipes.First(r => r.id == "cellar_stew");
+            Stock(director, stew);
+            director.ToggleMenu(stew);
+            director.AssignStaff(StaffStation.None);
+            director.OpenService();
+
+            var restoreInput = UseInputWithoutFocus();
+            var keyboard = InputSystem.AddDevice<Keyboard>();
+            var mouse = InputSystem.AddDevice<Mouse>();
+            try
+            {
+                var player = director.Player;
+                var p = player.transform.position;
+                player.transform.position = new Vector3(director.Layout.StewPot.X, p.y, p.z);
+                yield return null;
+                Assert.That(player.Hint, Is.EqualTo(PlayerHint.StartStew));
+                yield return Press(keyboard, Key.E);
+
+                var chop = player.ActiveCook as ChopMinigame;
+                Assert.That(chop, Is.Not.Null, "Interact at the empty pot starts chopping");
+                Assert.That(director.Session.Pot.State, Is.EqualTo(PotState.Chopping));
+                Assert.That(chop.ItemCount, Is.EqualTo(2), "haunch and cap (no spore sac in stock)");
+                yield return null;
+                Assert.That(Root<StationMinigamePanel>().Q("chop").style.display.value, Is.EqualTo(DisplayStyle.Flex));
+
+                var s = chop.Settings;
+                for (int item = 0; item < chop.ItemCount; item++)
+                {
+                    float timeout = Time.realtimeSinceStartup + 5f;
+                    while ((chop.Item != item || chop.IsPausing) && Time.realtimeSinceStartup < timeout) yield return null;
+                    foreach (float x in chop.LinesOf(item))
+                    {
+                        var at = new Vector2((s.boardLeft + x * s.boardWidth) * Screen.width, Screen.height * 0.5f);
+                        InputSystem.QueueStateEvent(mouse, new MouseState { position = at });
+                        yield return null;
+                        InputSystem.QueueStateEvent(mouse, new MouseState { position = at }.WithButton(UnityEngine.InputSystem.LowLevel.MouseButton.Left));
+                        yield return null;
+                        InputSystem.QueueStateEvent(mouse, new MouseState { position = at });
+                        yield return null;
+                    }
+                }
+                yield return null;
+
+                Assert.That(player.ActiveCook, Is.Null);
+                Assert.That(chop.Evaluate(), Is.EqualTo(1f).Within(1e-3f), "every cut landed on its line");
+                Assert.That(director.Session.Pot.State, Is.EqualTo(PotState.Simmering));
+                Assert.That(director.Session.Pot.Helpings, Is.EqualTo(director.Content.stew.pot.maxHelpings));
+                Assert.That(Root<StationMinigamePanel>().Q("chop").style.display.value, Is.EqualTo(DisplayStyle.None));
+            }
+            finally
+            {
+                InputSystem.RemoveDevice(mouse);
+                InputSystem.RemoveDevice(keyboard);
+                restoreInput();
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator PipOnTheStewPot_MakesABatch_AndStewOrdersAreLadledOntoThePass()
+        {
+            yield return Load();
+            var director = TavernDirector.Instance;
+            var stew = director.Content.recipes.First(r => r.id == "cellar_stew");
+            Stock(director, stew);
+            director.ToggleMenu(stew);
+            director.AssignStaff(StaffStation.StewPot);
+            director.OpenService();
+
+            Time.timeScale = 6f;
+            director.SpawnCustomer(director.Content.customers[0]);
+            float timeout = Time.realtimeSinceStartup + 30f;
+            while (!director.Session.Tickets.Any(t => t.State == TicketState.Ready) && Time.realtimeSinceStartup < timeout) yield return null;
+            Time.timeScale = 1f;
+            yield return null;
+
+            var pot = director.Session.Pot;
+            Assert.That(director.Session.Tickets.Any(t => t.State == TicketState.Ready), "a helping was ladled onto the pass");
+            Assert.That(pot.State, Is.EqualTo(PotState.Ready));
+            var view = Object.FindFirstObjectByType<StewPotView>();
+            Assert.That(view.transform.Find("Contents").GetComponent<SpriteRenderer>().enabled, "the pot shows stew inside");
+            int pips = view.GetComponentsInChildren<SpriteRenderer>().Count(r => r.name.StartsWith("Helping") && r.enabled);
+            Assert.That(pips, Is.EqualTo(pot.Helpings), "one pip per helping left");
         }
 
         static IEnumerator Press(Keyboard keyboard, Key key)

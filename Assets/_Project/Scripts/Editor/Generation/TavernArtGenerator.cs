@@ -12,6 +12,8 @@ namespace Hearthdelve.Editor
         public const string Grill = "PH_Station_Grill";
         public const string Tap = "PH_Station_Tap";
         public const string Pass = "PH_Station_Pass";
+        public const string StewPot = "PH_Station_StewPot";
+        public const string PotContents = "PH_PotContents";
         public const string Table = "PH_Table";
         public const string Stool = "PH_Stool";
         public const string Door = "PH_Door";
@@ -51,6 +53,26 @@ namespace Hearthdelve.Editor
                 bool edge = x == 0 || x == w - 1 || y == 0 || y == h - 1;
                 if (y >= h - 5) return new Color32(200, 190, 170, 255);
                 return edge ? Outline : new Color32(120, 84, 52, 255);
+            });
+            // Stew pot: an iron cauldron on a small fire; the stew surface is a separate tinted sprite.
+            Write(StewPot, 40, 36, (x, y, w, h) =>
+            {
+                bool fire = y < 6 && x > 12 && x < 28 && (x + y) % 3 != 0;
+                bool body = y >= 5 && y < 31 && Ellipse(x, y - 17, w / 2f, 14f, w / 2f - 2f);
+                bool rim = y >= 29 && y < 33 && x >= 2 && x < w - 2;
+                bool handle = y >= 22 && y < 27 && (x < 2 || x >= w - 2);
+                if (fire) return new Color32(230, 110, 40, 255);
+                if (rim) return y == 32 || x == 2 || x == w - 3 ? Outline : new Color32(80, 78, 84, 255);
+                if (handle) return Outline;
+                if (!body) return Clear;
+                bool edge = !Ellipse(x, y - 17, w / 2f, 13f, w / 2f - 3f);
+                return edge ? Outline : new Color32(56, 54, 60, 255);
+            });
+            Write(PotContents, 32, 6, (x, y, w, h) =>
+            {
+                float dx = (x + 0.5f - w / 2f) / (w / 2f), dy = (y + 0.5f - h / 2f) / (h / 2f);
+                bool bubble = (x == 9 && y == 3) || (x == 21 && y == 2);
+                return dx * dx + dy * dy > 1f ? Clear : bubble ? new Color32(255, 255, 255, 255) : White;
             });
             Write(Table, 64, 26, (x, y, w, h) =>
             {

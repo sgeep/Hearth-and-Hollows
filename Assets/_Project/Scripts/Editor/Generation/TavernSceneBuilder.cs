@@ -13,7 +13,7 @@ namespace Hearthdelve.Editor
 {
     /// <summary>
     /// Builds the TavernGreybox scene: a one-screen side view with the door on the left, three
-    /// tables (six seats), and the Tap, pass and Grill on the right. The floor is a solid tilemap
+    /// tables (six seats), and the Tap, pass, Grill and Stew Pot on the right. The floor is a solid tilemap
     /// on the Ground layer so dungeon-style combat could be added here later (stronghold defense).
     /// </summary>
     public static class TavernSceneBuilder
@@ -23,7 +23,7 @@ namespace Hearthdelve.Editor
 
         static readonly float[] k_TableX = { 4.5f, 8f, 11.5f };
         const float k_StoolOffset = 0.7f;
-        const float k_TapX = 14.5f, k_PassX = 16.2f, k_GrillX = 18.2f, k_DoorX = 0.8f, k_QueueFrontX = 2.6f;
+        const float k_TapX = 14.2f, k_PassX = 15.8f, k_GrillX = 17.4f, k_PotX = 19.0f, k_DoorX = 0.8f, k_QueueFrontX = 2.6f;
 
         public static CustomerAgent BuildCustomerPrefab()
         {
@@ -61,7 +61,7 @@ namespace Hearthdelve.Editor
             SceneKit.CreatePixelCamera(new Vector3(10f, 4.1f, -10f), new Color(0.12f, 0.08f, 0.06f), withCinemachineBrain: false);
             SceneKit.CreateGlobalLight();
             BuildRoom();
-            var layout = BuildLayout();
+            var layout = BuildLayout(content);
 
             var player = BuildPlayer();
             var staff = BuildStaff();
@@ -111,7 +111,7 @@ namespace Hearthdelve.Editor
             }
         }
 
-        static TavernLayout BuildLayout()
+        static TavernLayout BuildLayout(TavernContent content)
         {
             var root = new GameObject("Layout");
             var door = Prop(root.transform, "Door", TavernArtGenerator.Door, k_DoorX, SortingLayers.Level, 2);
@@ -138,13 +138,15 @@ namespace Hearthdelve.Editor
             var tap = StationAt(root.transform, "Tap", TavernArtGenerator.Tap, k_TapX, StationKind.Tap);
             var pass = StationAt(root.transform, "Pass", TavernArtGenerator.Pass, k_PassX, StationKind.Pass);
             var grill = StationAt(root.transform, "Grill", TavernArtGenerator.Grill, k_GrillX, StationKind.Grill);
+            var pot = StationAt(root.transform, "Stew Pot", TavernArtGenerator.StewPot, k_PotX, StationKind.StewPot);
+            AddPotView(pot, content.stew != null ? content.stew.pot.maxHelpings : 5);
 
             var doorAnchor = new GameObject("Door Anchor").transform;
             doorAnchor.SetParent(root.transform, false);
             doorAnchor.position = new Vector3(door.transform.position.x, 0f, 0f);
 
             var layout = root.AddComponent<TavernLayout>();
-            layout.Configure(doorAnchor, seats, queue, grill, tap, pass, minX: 0.5f, maxX: 19.5f);
+            layout.Configure(doorAnchor, seats, queue, grill, tap, pass, pot, minX: 0.5f, maxX: 19.6f);
             return layout;
         }
 
@@ -169,10 +171,31 @@ namespace Hearthdelve.Editor
             return station;
         }
 
+        /// <summary>Stew surface, simmer bar and helping pips on the pot (see <see cref="StewPotView"/>).</summary>
+        static void AddPotView(Station pot, int maxHelpings)
+        {
+            var t = pot.transform;
+            var contents = SceneKit.AddSprite(t, "Contents", Sprite(TavernArtGenerator.PotContents), SortingLayers.Level, 4, Color.white, new Vector3(0f, 0.36f, 0f));
+            var back = SceneKit.AddSprite(t, "SimmerBack", Sprite(TavernArtGenerator.Bar), SortingLayers.FX, 0, new Color(0f, 0f, 0f, 0.7f), new Vector3(0f, 1.05f, 0f));
+            back.transform.localScale = new Vector3(6.5f, 1.2f, 1f);
+            var fill = SceneKit.AddSprite(t, "SimmerFill", Sprite(TavernArtGenerator.Bar), SortingLayers.FX, 1, new Color(0.95f, 0.65f, 0.25f), new Vector3(0f, 1.05f, 0f));
+            fill.transform.localScale = new Vector3(6f, 0.7f, 1f);
+            var pips = new SpriteRenderer[Mathf.Max(1, maxHelpings)];
+            const float spacing = 0.2f;
+            for (int i = 0; i < pips.Length; i++)
+            {
+                float x = (i - (pips.Length - 1) * 0.5f) * spacing;
+                pips[i] = SceneKit.AddSprite(t, $"Helping {i + 1}", Sprite(PlaceholderArtGenerator.Pip), SortingLayers.FX, 0, Color.white, new Vector3(x, 0.8f, 0f));
+                pips[i].enabled = false;
+            }
+            foreach (var sr in new[] { contents, back, fill }) sr.enabled = false;
+            pot.gameObject.AddComponent<StewPotView>().Configure(contents, back, fill, pips);
+        }
+
         static TavernPlayer BuildPlayer()
         {
             var go = new GameObject("Keeper");
-            go.transform.position = new Vector3(15.4f, 0f, 0f);
+            go.transform.position = new Vector3(15.0f, 0f, 0f);
             var body = SceneKit.AddSprite(go.transform, "Body", Sprite(PlaceholderArtGenerator.Player), SortingLayers.Player, 0,
                 new Color(0.95f, 0.82f, 0.62f), Vector3.zero);
             var plate = SceneKit.AddSprite(go.transform, "Plate", Sprite(TavernArtGenerator.Plate), SortingLayers.FX, 0, Color.white, new Vector3(0.35f, 1.1f, 0f));
