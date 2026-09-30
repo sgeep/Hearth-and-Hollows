@@ -20,7 +20,11 @@ namespace Hearthdelve.Tavern.Service
         Cancelled,
     }
 
-    /// <summary>One order. Ingredients are reserved from the storeroom when it's placed.</summary>
+    /// <summary>
+    /// One order. Ingredients are reserved from the storeroom when it's placed. If its customer
+    /// leaves once cooking has started, the dish becomes a spare (<see cref="Customer"/> null)
+    /// that can go to anyone else who ordered the same dish.
+    /// </summary>
     public sealed class Ticket
     {
         static int s_NextId;
@@ -34,7 +38,9 @@ namespace Hearthdelve.Tavern.Service
         }
 
         public int Id { get; }
-        public CustomerLogic Customer { get; }
+        /// <summary>Who the dish is for; null for a spare.</summary>
+        public CustomerLogic Customer { get; internal set; }
+        public bool IsSpare => Customer == null;
         public RecipeDefinition Recipe { get; }
         public CookedIngredients Reserved { get; internal set; }
         public TicketState State { get; internal set; } = TicketState.Queued;
@@ -100,7 +106,11 @@ namespace Hearthdelve.Tavern.Service
         public float Remaining => Math.Max(0f, m_Settings.lengthSeconds - Elapsed);
         public bool IsLastOrders => Remaining <= m_Settings.lastOrdersSeconds;
         public bool IsOver { get; private set; }
-        public bool CanAdmitCustomer => !IsOver && !IsLastOrders && m_Customers.Count < m_Settings.maxCustomers;
+        /// <summary>Service ended before the clock ran out because everything sold out.</summary>
+        public bool ClosedEarly { get; private set; }
+        /// <summary>Every dish on the menu is sold out: the door closes to new customers.</summary>
+        public bool AllSoldOut => m_SoldOut.Count == m_Menu.Count;
+        public bool CanAdmitCustomer => !IsOver && !IsLastOrders && !AllSoldOut && m_Customers.Count < m_Settings.maxCustomers;
 
         public event Action SoldOutChanged;
         public event Action<Ticket> TicketChanged;
@@ -124,6 +134,33 @@ namespace Hearthdelve.Tavern.Service
             Elapsed += deltaTime;
             foreach (var c in m_Customers.ToArray()) c.Tick(deltaTime);
             if (Elapsed >= m_Settings.lengthSeconds) End();
+            else if (AllSoldOut && !HasOpenOrders && !AnyoneEating)
+            {
+                // Nothing left to sell and nothing left to serve: close early.
+                ClosedEarly = true;
+                End();
+            }
+        }
+
+        /// <summary>A customer is still waiting on an order (queued, cooking, on the pass, or being carried).</summary>
+        public bool HasOpenOrders
+        {
+            get
+            {
+                foreach (var t in m_Tickets)
+                    if (!t.IsSpare && t.State is TicketState.Queued or TicketState.Cooking or TicketState.Ready or TicketState.Delivering)
+                        return true;
+                return false;
+            }
+        }
+
+        bool AnyoneEating
+        {
+            get
+            {
+                foreach (var c in m_Customers) if (c.State == CustomerState.Eating) return true;
+                return false;
+            }
         }
 
         public void End()
@@ -167,6 +204,15 @@ namespace Hearthdelve.Tavern.Service
         void OnOrderRequested(CustomerLogic customer)
         {
             var choice = Preferences.ChooseOrder(AvailableDishes(), customer.Traits, m_Economy, m_Random);
+            var spare = choice != null ? SpareOf(choice) : null;
+            if (spare != null)
+            {
+                // A dish someone else left behind: it's theirs, and no more stock is used.
+                spare.Customer = customer;
+                customer.PlaceOrder(choice);
+                TicketChanged?.Invoke(spare);
+                return;
+            }
             var reserved = choice != null ? RecipeMatcher.TryTake(choice, Storeroom) : null;
             if (reserved == null)
             {
@@ -212,15 +258,15 @@ namespace Hearthdelve.Tavern.Service
                 case Departure.WalkedOut:
                     Ledger.Walkouts++;
                     Ledger.Renown += m_Economy.walkoutRenown;
-                    CancelTicket(ticket);
+                    Release(ticket);
                     break;
                 case Departure.SoldOut:
                     Ledger.SoldOutLeaves++;
                     Ledger.Renown += m_Economy.soldOutRenown;
-                    CancelTicket(ticket);
+                    Release(ticket);
                     break;
                 case Departure.ClosingTime:
-                    CancelTicket(ticket);
+                    Release(ticket);
                     break;
             }
             CustomerLeft?.Invoke(customer);
@@ -240,34 +286,55 @@ namespace Hearthdelve.Tavern.Service
         }
 
         /// <summary>
-        /// Drops an unserved ticket. Ingredients that were only reserved (not cooked yet) go back
-        /// to the storeroom; a dish already cooked is wasted.
+        /// The ticket's customer is gone. An order nobody has started cooking is cancelled and its
+        /// reserved ingredients go back to the storeroom; a dish already cooking or cooked stays
+        /// as a spare for someone else who orders it.
         /// </summary>
-        void CancelTicket(Ticket ticket)
+        void Release(Ticket ticket)
         {
             if (ticket == null || ticket.State is TicketState.Served or TicketState.Cancelled) return;
-            if (ticket.State == TicketState.Queued && ticket.Reserved != null) Storeroom.AddRange(ticket.Reserved.Used);
-            ticket.State = TicketState.Cancelled;
-            ticket.ClaimedBy = null;
-            m_Tickets.Remove(ticket);
-            RefreshSoldOut();
+            ticket.Customer = null;
+            if (ticket.State == TicketState.Queued)
+            {
+                if (ticket.Reserved != null) Storeroom.AddRange(ticket.Reserved.Used);
+                Cancel(ticket);
+                return;
+            }
             TicketChanged?.Invoke(ticket);
         }
 
-        Ticket TicketFor(CustomerLogic customer)
+        void Cancel(Ticket ticket)
         {
-            foreach (var t in m_Tickets) if (t.Customer == customer) return t;
+            ticket.State = TicketState.Cancelled;
+            ticket.ClaimedBy = null;
+            m_Tickets.Remove(ticket);
+            TicketChanged?.Invoke(ticket);
+        }
+
+        Ticket TicketFor(CustomerLogic customer, Ticket except = null)
+        {
+            foreach (var t in m_Tickets) if (t.Customer == customer && t != except) return t;
             return null;
         }
 
+        /// <summary>The oldest spare of a dish not already on its way to someone, or null.</summary>
+        Ticket SpareOf(RecipeDefinition recipe)
+        {
+            foreach (var t in m_Tickets)
+                if (t.IsSpare && t.Recipe == recipe && t.State is TicketState.Cooking or TicketState.Ready or TicketState.Delivering)
+                    return t;
+            return null;
+        }
+
+        /// <summary>
+        /// Marks dishes the stock can no longer make as sold out. Sold out is final for the night:
+        /// ingredients that come back later (a walkout's reservation) stay in the storeroom.
+        /// </summary>
         void RefreshSoldOut()
         {
             bool changed = false;
             foreach (var r in m_Menu)
-            {
-                bool soldOut = !RecipeMatcher.CanCook(r, Storeroom);
-                if (soldOut ? m_SoldOut.Add(r) : m_SoldOut.Remove(r)) changed = true;
-            }
+                if (!m_SoldOut.Contains(r) && !RecipeMatcher.CanCook(r, Storeroom) && m_SoldOut.Add(r)) changed = true;
             if (changed) SoldOutChanged?.Invoke();
         }
 
@@ -309,12 +376,20 @@ namespace Hearthdelve.Tavern.Service
             TicketChanged?.Invoke(ticket);
         }
 
-        /// <summary>Oldest unclaimed dish on the pass, or null.</summary>
-        public Ticket NextToServe()
+        /// <summary>
+        /// Oldest unclaimed dish on the pass that someone is waiting for; failing that, the oldest
+        /// spare (unless <paramref name="includeSpares"/> is false). Null if the pass is empty.
+        /// </summary>
+        public Ticket NextToServe(bool includeSpares = true)
         {
+            Ticket spare = null;
             foreach (var t in m_Tickets)
-                if (t.State == TicketState.Ready && t.ClaimedBy == null) return t;
-            return null;
+            {
+                if (t.State != TicketState.Ready || t.ClaimedBy != null) continue;
+                if (!t.IsSpare) return t;
+                spare ??= t;
+            }
+            return includeSpares ? spare : null;
         }
 
         public bool StartDelivery(Ticket ticket, object carrier)
@@ -326,28 +401,69 @@ namespace Hearthdelve.Tavern.Service
             return true;
         }
 
-        /// <summary>The plate reached the table. Scores the dish and starts the customer eating.</summary>
-        public void Delivered(Ticket ticket, float servingScore)
+        /// <summary>Whether this carried plate can be served to this customer: they're waiting and ordered this dish.</summary>
+        public bool CanDeliver(Ticket ticket, CustomerLogic customer) =>
+            ticket != null && ticket.State == TicketState.Delivering && customer != null &&
+            customer.State == CustomerState.WaitingForFood && customer.Order == ticket.Recipe;
+
+        /// <summary>
+        /// Serves a carried plate to <paramref name="customer"/>, who may not be the one it was
+        /// cooked for. Their own order then passes to the plate's original customer (or, for a
+        /// spare, is released: cancelled if not started, otherwise a spare itself). Scores the
+        /// dish and starts them eating. Returns false if they can't take it.
+        /// </summary>
+        public bool Deliver(Ticket ticket, CustomerLogic customer, float servingScore)
         {
-            if (ticket == null || ticket.State != TicketState.Delivering) return;
+            if (!CanDeliver(ticket, customer)) return false;
+            if (ticket.Customer != customer)
+            {
+                var theirs = TicketFor(customer, except: ticket);
+                var original = ticket.Customer;
+                ticket.Customer = customer;
+                if (theirs != null)
+                {
+                    if (original != null)
+                    {
+                        theirs.Customer = original;
+                        TicketChanged?.Invoke(theirs);
+                    }
+                    else Release(theirs);
+                }
+            }
+
             float minigame = DishScoring.MinigameScore(ticket.CookScore, servingScore, m_Scoring);
             ticket.DishQuality = DishScoring.DishQuality(ticket.Reserved.Used, minigame, m_Scoring);
             ticket.DishValue = DishScoring.DishValue(ticket.Recipe.baseValue, ticket.DishQuality);
             ticket.State = TicketState.Served;
             ticket.ClaimedBy = null;
-            ticket.Customer.Serve(ticket.DishQuality);
+            customer.Serve(ticket.DishQuality);
+            TicketChanged?.Invoke(ticket);
+            return true;
+        }
+
+        /// <summary>The carrier put the plate back on the pass.</summary>
+        public void PutBack(Ticket ticket)
+        {
+            if (ticket == null || ticket.State != TicketState.Delivering) return;
+            ticket.State = TicketState.Ready;
+            ticket.ClaimedBy = null;
             TicketChanged?.Invoke(ticket);
         }
 
         /// <summary>
         /// The plate was dropped: those ingredients are lost. The order goes back to the kitchen
-        /// if the stock allows; otherwise the customer leaves as sold out.
+        /// if the stock allows; otherwise the customer leaves as sold out. A dropped spare is just gone.
         /// </summary>
         public void Dropped(Ticket ticket)
         {
             if (ticket == null || ticket.State != TicketState.Delivering) return;
             Ledger.DroppedDishes++;
             ticket.ClaimedBy = null;
+            if (ticket.IsSpare)
+            {
+                Cancel(ticket);
+                return;
+            }
             var again = RecipeMatcher.TryTake(ticket.Recipe, Storeroom);
             if (again != null)
             {
@@ -357,11 +473,9 @@ namespace Hearthdelve.Tavern.Service
                 TicketChanged?.Invoke(ticket);
                 return;
             }
-            ticket.State = TicketState.Cancelled;
-            m_Tickets.Remove(ticket);
-            RefreshSoldOut();
-            TicketChanged?.Invoke(ticket);
-            ticket.Customer.NothingToOrder();
+            var customer = ticket.Customer;
+            Cancel(ticket);
+            customer.NothingToOrder();
         }
     }
 }

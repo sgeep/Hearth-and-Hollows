@@ -28,6 +28,9 @@ namespace Hearthdelve.Tavern.Minigames
 
         public ServingMinigame CreateServing(float fromX, float toX) => new(Serving, fromX, toX);
 
+        /// <summary>A plate carried freely; the carrier picks the table (<see cref="ServingMinigame.Deliver"/>).</summary>
+        public ServingMinigame CreateServing(float fromX) => new(Serving, fromX);
+
         /// <summary>An auto-player for any minigame this factory makes (staff auto-resolve).</summary>
         public static IMinigameAutoPlayer CreateAutoPlayer(IMinigame game, float skill, IRandom random) => game switch
         {

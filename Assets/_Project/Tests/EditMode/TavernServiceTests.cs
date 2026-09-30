@@ -83,6 +83,17 @@ namespace Hearthdelve.Tests
             return c;
         }
 
+        /// <summary>Cook and carry out the customer's own ticket.</summary>
+        static Ticket ServeTheirOrder(ServiceSession s, CustomerLogic c, float score = 1f)
+        {
+            var t = s.Tickets.First(x => x.Customer == c);
+            s.StartCooking(t, "cook");
+            s.FinishCooking(t, score);
+            s.StartDelivery(t, "carrier");
+            Assert.That(s.Deliver(t, c, score));
+            return t;
+        }
+
         // ---------- Menu ----------
 
         [Test]
@@ -140,7 +151,9 @@ namespace Hearthdelve.Tests
         public void WhenEverythingIsSoldOut_CustomerLeaves_WithSmallerPenaltyThanWalkout()
         {
             var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
             var s = Session(stock, 4, m_Grilled);
+            Seat(s, Quick()); // takes the last serving; their order keeps service open
             var c = Seat(s, Quick());
             Assert.That(c.State, Is.EqualTo(CustomerState.Leaving));
             Assert.That(c.Departure, Is.EqualTo(Departure.SoldOut));
@@ -151,7 +164,7 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void Walkout_BeforeCooking_ReturnsReservedIngredients_AndUnSellsOut()
+        public void Walkout_BeforeCooking_ReturnsReservedIngredients_ButDishStaysSoldOut()
         {
             var stock = new Storeroom();
             stock.Add(Stack(Haunch, 1));
@@ -163,11 +176,12 @@ namespace Hearthdelve.Tests
             Assert.That(s.Ledger.Walkouts, Is.EqualTo(1));
             Assert.That(s.Ledger.Renown, Is.EqualTo(ServiceEconomySettings.Default.walkoutRenown));
             Assert.That(stock.TotalCount, Is.EqualTo(1), "uncooked ingredients go back");
-            Assert.That(s.IsSoldOut(m_Grilled), Is.False);
+            Assert.That(s.IsSoldOut(m_Grilled), "sold out is final for the night");
+            Assert.That(s.AvailableDishes(), Is.Empty);
         }
 
         [Test]
-        public void Walkout_AfterCooking_WastesTheDish()
+        public void Walkout_AfterCooking_LeavesASpareDish()
         {
             var stock = new Storeroom();
             stock.Add(Stack(Haunch, 1));
@@ -178,7 +192,9 @@ namespace Hearthdelve.Tests
             s.FinishCooking(t, 1f);
             Run(s, 31f);
             Assert.That(stock.TotalCount, Is.EqualTo(0));
-            Assert.That(t.State, Is.EqualTo(TicketState.Cancelled));
+            Assert.That(t.State, Is.EqualTo(TicketState.Ready));
+            Assert.That(t.IsSpare);
+            Assert.That(s.Tickets, Has.Member(t));
         }
 
         // ---------- Full loop ----------
@@ -196,7 +212,7 @@ namespace Hearthdelve.Tests
             s.FinishCooking(t, 1f);
             Assert.That(s.NextToServe(), Is.SameAs(t));
             Assert.That(s.StartDelivery(t, this));
-            s.Delivered(t, 1f);
+            Assert.That(s.Deliver(t, c, 1f));
             Assert.That(c.State, Is.EqualTo(CustomerState.Eating));
 
             Run(s, 1.5f);
@@ -216,12 +232,12 @@ namespace Hearthdelve.Tests
                 var stock = new Storeroom();
                 stock.Add(Stack(Haunch, 1, q, fresh));
                 var s = Session(stock, 4, m_Grilled);
-                Seat(s, Quick());
+                var c = Seat(s, Quick());
                 var t = s.NextToCook(CookStation.Grill);
                 s.StartCooking(t, this);
                 s.FinishCooking(t, cook);
                 s.StartDelivery(t, this);
-                s.Delivered(t, 1f);
+                s.Deliver(t, c, 1f);
                 Run(s, 1.5f);
                 return s.Ledger.Gold;
             }
@@ -264,13 +280,203 @@ namespace Hearthdelve.Tests
             Assert.That(s.Ledger.DroppedDishes, Is.EqualTo(2));
         }
 
+        // ---------- Delivering by hand & spare dishes ----------
+
+        [Test]
+        public void Deliver_ToAnotherCustomerWithTheSameOrder_PassesTheirOrderToTheFirst()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 4, m_Grilled);
+            var a = Seat(s, Quick());
+            var b = Seat(s, Quick());
+            var forA = s.Tickets.First(t => t.Customer == a);
+            var forB = s.Tickets.First(t => t.Customer == b);
+            s.StartCooking(forA, this);
+            s.FinishCooking(forA, 1f);
+            s.StartDelivery(forA, this);
+
+            Assert.That(s.Deliver(forA, b, 1f), Is.True);
+            Assert.That(b.State, Is.EqualTo(CustomerState.Eating));
+            Assert.That(forA.Customer, Is.SameAs(b));
+            Assert.That(a.State, Is.EqualTo(CustomerState.WaitingForFood), "A still gets a dish");
+            Assert.That(forB.Customer, Is.SameAs(a), "B's order now belongs to A");
+            Assert.That(forB.State, Is.EqualTo(TicketState.Queued));
+        }
+
+        [Test]
+        public void Deliver_ToSomeoneWhoOrderedADifferentDish_IsRefused()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
+            stock.Add(Stack(Gel, 2));
+            var s = Session(stock, 4, m_Grilled, m_Gelbrew);
+            Seat(s, Quick());
+            Seat(s, Quick()); // the first took one dish's only serving, so these two ordered different dishes
+            var grilled = s.Tickets.First(t => t.Recipe == m_Grilled);
+            var gelbrew = s.Tickets.First(t => t.Recipe == m_Gelbrew);
+            s.StartCooking(grilled, this);
+            s.FinishCooking(grilled, 1f);
+            s.StartDelivery(grilled, this);
+
+            Assert.That(s.CanDeliver(grilled, gelbrew.Customer), Is.False);
+            Assert.That(s.Deliver(grilled, gelbrew.Customer, 1f), Is.False);
+            Assert.That(grilled.State, Is.EqualTo(TicketState.Delivering), "still in hand");
+            Assert.That(s.Deliver(grilled, grilled.Customer, 1f), Is.True);
+        }
+
+        [Test]
+        public void PutBack_ReturnsThePlateToThePass()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
+            var s = Session(stock, 4, m_Grilled);
+            Seat(s, Quick());
+            var t = s.NextToCook(CookStation.Grill);
+            s.StartCooking(t, this);
+            s.FinishCooking(t, 1f);
+            s.StartDelivery(t, this);
+            s.PutBack(t);
+            Assert.That(t.State, Is.EqualTo(TicketState.Ready));
+            Assert.That(s.NextToServe(), Is.SameAs(t));
+        }
+
+        [Test]
+        public void Spare_GoesToTheNextCustomerWhoOrdersIt_WithoutUsingMoreStock()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 4, m_Grilled);
+            Seat(s, Quick());
+            var t = s.NextToCook(CookStation.Grill);
+            s.StartCooking(t, this);
+            s.FinishCooking(t, 1f);
+            Run(s, 31f); // they walk out; the dish is left on the pass
+            Assert.That(t.IsSpare);
+            Assert.That(stock.TotalCount, Is.EqualTo(1));
+
+            var next = Seat(s, Quick());
+            Assert.That(next.Order, Is.SameAs(m_Grilled));
+            Assert.That(t.Customer, Is.SameAs(next));
+            Assert.That(stock.TotalCount, Is.EqualTo(1), "the spare was used, not the storeroom");
+            Assert.That(s.Tickets, Has.Count.EqualTo(1));
+        }
+
+        [Test]
+        public void Spare_HandDeliveredToSomeoneWaiting_CancelsTheirOrder_AndReturnsItsStock()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 4, m_Grilled);
+            var impatient = Quick();
+            impatient.orderPatience = 5f;
+            var a = Seat(s, impatient);
+            var b = Seat(s, Quick());
+            var forA = s.Tickets.First(t => t.Customer == a);
+            var forB = s.Tickets.First(t => t.Customer == b);
+            s.StartCooking(forA, this);
+            s.FinishCooking(forA, 1f);
+            Run(s, 6f); // A walks out
+            Assert.That(forA.IsSpare);
+            Assert.That(stock.TotalCount, Is.EqualTo(0));
+
+            Assert.That(s.NextToServe(includeSpares: false), Is.Null, "staff don't carry spares");
+            Assert.That(s.NextToServe(), Is.SameAs(forA));
+            s.StartDelivery(forA, this);
+            Assert.That(s.Deliver(forA, b, 1f), Is.True);
+            Assert.That(b.State, Is.EqualTo(CustomerState.Eating));
+            Assert.That(forB.State, Is.EqualTo(TicketState.Cancelled));
+            Assert.That(stock.TotalCount, Is.EqualTo(1), "B's reserved haunch goes back");
+        }
+
+        [Test]
+        public void CarriedPlate_WhoseCustomerLeaves_StaysInHand_AsASpare()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
+            var s = Session(stock, 4, m_Grilled);
+            Seat(s, Quick());
+            var t = s.NextToCook(CookStation.Grill);
+            s.StartCooking(t, this);
+            s.FinishCooking(t, 1f);
+            s.StartDelivery(t, this);
+            Run(s, 31f);
+            Assert.That(t.State, Is.EqualTo(TicketState.Delivering));
+            Assert.That(t.IsSpare);
+            s.Dropped(t);
+            Assert.That(t.State, Is.EqualTo(TicketState.Cancelled), "a dropped spare is simply gone");
+            Assert.That(s.Ledger.DroppedDishes, Is.EqualTo(1));
+        }
+
+        // ---------- Selling out closes early ----------
+
+        [Test]
+        public void AllSoldOut_ClosesTheDoor_ThenEndsServiceOnceTheLastDinerPays()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
+            var s = Session(stock, 4, m_Grilled);
+            bool ended = false;
+            s.Ended += () => ended = true;
+            var c = Seat(s, Quick());
+            Assert.That(s.AllSoldOut);
+            Assert.That(s.CanAdmitCustomer, Is.False, "no one new comes in");
+            Run(s, 2f);
+            Assert.That(s.IsOver, Is.False, "the open order can still be cooked and served");
+
+            ServeTheirOrder(s, c);
+            Run(s, 0.5f);
+            Assert.That(s.IsOver, Is.False, "still eating");
+            Run(s, 1f);
+            Assert.That(c.Departure, Is.EqualTo(Departure.Paid));
+            Assert.That(ended);
+            Assert.That(s.ClosedEarly);
+            Assert.That(s.Ledger.DishesServed, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void NotAllSoldOut_KeepsServiceOpen()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
+            stock.Add(Stack(Gel, 2));
+            var s = Session(stock, 4, m_Grilled, m_Gelbrew);
+            Seat(s, Quick());
+            Assert.That(s.AllSoldOut, Is.False);
+            Assert.That(s.CanAdmitCustomer);
+            Run(s, 40f); // the order walks out; the other dish is still on
+            Assert.That(s.IsOver, Is.False);
+        }
+
+        [Test]
+        public void ClosingTime_WhileEating_TheDinerStillPays()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 3));
+            var settings = ServiceSettings.Default;
+            settings.lengthSeconds = 20f;
+            var s = new ServiceSession(settings, DishScoringSettings.Default, ServiceEconomySettings.Default,
+                stock, new[] { m_Grilled }, 4, new SeededRandom(1));
+            var slowEater = Quick();
+            slowEater.eatSeconds = 100f;
+            var c = Seat(s, slowEater);
+            ServeTheirOrder(s, c);
+            Run(s, 21f);
+            Assert.That(s.IsOver);
+            Assert.That(s.ClosedEarly, Is.False);
+            Assert.That(c.Departure, Is.EqualTo(Departure.Paid));
+            Assert.That(s.Ledger.DishesServed, Is.EqualTo(1));
+            Assert.That(s.Ledger.Gold, Is.GreaterThan(0));
+        }
+
         // ---------- Seating & clock ----------
 
         [Test]
         public void NoFreeSeat_Queues_ThenSitsWhenSomeoneLeaves()
         {
             var stock = new Storeroom();
-            var s = Session(stock, 1, m_Grilled); // nothing in stock: seated customer leaves sold out
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 1, m_Grilled);
             var first = new CustomerLogic(Quick());
             var second = new CustomerLogic(Quick());
             Assert.That(s.AdmitCustomer(first), Is.EqualTo(0));
@@ -278,7 +484,9 @@ namespace Hearthdelve.Tests
             Assert.That(second.State, Is.EqualTo(CustomerState.Queueing));
 
             first.ArrivedAtSeat();
-            Run(s, 0.2f); // first orders, finds nothing, leaves
+            Run(s, 0.2f);
+            ServeTheirOrder(s, first);
+            Run(s, 1.5f); // first eats, pays and leaves
             Assert.That(second.State, Is.EqualTo(CustomerState.WalkingToSeat));
             Assert.That(second.Seat, Is.EqualTo(0));
         }
@@ -286,7 +494,9 @@ namespace Hearthdelve.Tests
         [Test]
         public void QueuePatience_RunsOut_CountsAsWalkout()
         {
-            var s = Session(new Storeroom(), 1, m_Grilled);
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 1, m_Grilled);
             s.AdmitCustomer(new CustomerLogic(Quick()));
             var waiting = new CustomerLogic(Quick());
             s.AdmitCustomer(waiting);
@@ -320,8 +530,10 @@ namespace Hearthdelve.Tests
             var settings = ServiceSettings.Default;
             settings.lengthSeconds = 60f;
             settings.lastOrdersSeconds = 10f;
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 1));
             var s = new ServiceSession(settings, DishScoringSettings.Default, ServiceEconomySettings.Default,
-                new Storeroom(), new[] { m_Grilled }, 4, new SeededRandom(1));
+                stock, new[] { m_Grilled }, 4, new SeededRandom(1));
             Assert.That(s.CanAdmitCustomer);
             Run(s, 51f);
             Assert.That(s.IsLastOrders);

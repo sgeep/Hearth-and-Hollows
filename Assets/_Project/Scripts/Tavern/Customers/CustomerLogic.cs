@@ -120,11 +120,11 @@ namespace Hearthdelve.Tavern.Customers
             m_Timer = m_Traits.eatSeconds;
         }
 
-        /// <summary>Service is over; anyone not already leaving goes home (no penalty).</summary>
+        /// <summary>Service is over; anyone not already leaving goes home (no penalty). Diners pay for what they're eating.</summary>
         public void CloseService()
         {
             if (State is CustomerState.Leaving or CustomerState.Gone) return;
-            Leave(Departure.ClosingTime);
+            Leave(State == CustomerState.Eating ? Departure.Paid : Departure.ClosingTime);
         }
 
         public void ArrivedAtExit()

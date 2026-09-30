@@ -46,7 +46,9 @@ namespace Hearthdelve.Tavern.Minigames
     /// <summary>
     /// Serving: carry a plate along the tavern floor (x axis) from the pass to a table. Each
     /// bump into a customer crossing the floor spills; a full spill meter drops the plate (0).
-    /// Score = time factor (vs par) × spill factor.
+    /// Score = time factor (vs par, from the straight-line distance to where it was delivered)
+    /// × spill factor. With a target (staff) it completes on arrival; without one (the player)
+    /// it completes when <see cref="Deliver"/> is called at the chosen table.
     /// </summary>
     public sealed class ServingMinigame : IMinigame
     {
@@ -56,17 +58,27 @@ namespace Hearthdelve.Tavern.Minigames
         readonly float m_Start;
         float m_BumpCooldown;
 
-        public ServingMinigame(ServingSettings settings, float startX, float targetX)
+        /// <summary>Carry to a fixed table; arriving there delivers the plate.</summary>
+        public ServingMinigame(ServingSettings settings, float startX, float targetX) : this(settings, startX)
+        {
+            Target = targetX;
+            HasTarget = true;
+        }
+
+        /// <summary>Carry freely; the carrier chooses who to serve with <see cref="Deliver"/>.</summary>
+        public ServingMinigame(ServingSettings settings, float startX)
         {
             m_Settings = settings;
             m_Start = startX;
-            Target = targetX;
+            Target = startX;
             Position = startX;
         }
 
         public ServingSettings Settings => m_Settings;
         public float Position { get; private set; }
-        public float Target { get; }
+        /// <summary>Where the plate is headed (or was delivered). Equals the start until one is known.</summary>
+        public float Target { get; private set; }
+        public bool HasTarget { get; private set; }
         public float Spill { get; private set; }
         public bool Dropped { get; private set; }
         public bool Arrived { get; private set; }
@@ -89,7 +101,17 @@ namespace Hearthdelve.Tavern.Minigames
             Elapsed += deltaTime;
             if (m_BumpCooldown > 0f) m_BumpCooldown -= deltaTime;
             Position += Mathf.Clamp(input.Move, -1f, 1f) * m_Settings.carrySpeed * deltaTime;
-            if (Mathf.Abs(Position - Target) <= m_Settings.arriveDistance) Arrived = true;
+            if (HasTarget && Mathf.Abs(Position - Target) <= m_Settings.arriveDistance) Arrived = true;
+        }
+
+        /// <summary>Hands the plate over at a table at <paramref name="tableX"/> (the carrier checks reach). Returns false if already finished.</summary>
+        public bool Deliver(float tableX)
+        {
+            if (IsComplete) return false;
+            Target = tableX;
+            HasTarget = true;
+            Arrived = true;
+            return true;
         }
 
         /// <summary>Called by the world when the carrier collides with someone. Returns true if it counted.</summary>

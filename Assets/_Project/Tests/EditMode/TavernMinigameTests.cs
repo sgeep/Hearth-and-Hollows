@@ -199,6 +199,30 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
+        public void FreeCarry_OnlyCompletesWhenDelivered_AndScoresAgainstThatTable()
+        {
+            var m = new ServingMinigame(S, 15f);
+            m.Begin();
+            while (m.Position > 5f) m.Tick(Dt, new MinigameInput { Move = -1f });
+            Assert.That(m.IsComplete, Is.False, "walking past tables doesn't hand the plate over");
+            Assert.That(m.Deliver(5f), Is.True);
+            Assert.That(m.Arrived);
+            Assert.That(m.Evaluate(), Is.EqualTo(1f).Within(1e-4f));
+            Assert.That(m.Deliver(5f), Is.False, "only once");
+        }
+
+        [Test]
+        public void FreeCarry_Wandering_ScoresBelowADirectDelivery()
+        {
+            var m = new ServingMinigame(S, 15f);
+            m.Begin();
+            while (m.Position > 3f) m.Tick(Dt, new MinigameInput { Move = -1f }); // overshoot to the far end
+            while (m.Position < 11f) m.Tick(Dt, new MinigameInput { Move = 1f });  // then back to a near table
+            m.Deliver(11f);
+            Assert.That(m.Evaluate(), Is.LessThan(0.5f));
+        }
+
+        [Test]
         public void DefaultTuning_MidFloorTable_TakesFiveToTenSeconds()
         {
             var m = new ServingMinigame(S, 15f, 5f); // 10 tiles
