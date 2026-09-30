@@ -16,7 +16,7 @@ namespace Hearthdelve.UI.Tavern
     public sealed class TavernHud : MonoBehaviour
     {
         VisualElement m_Hud, m_Menu, m_Tickets, m_SpillBar, m_SpillFill;
-        Label m_Clock, m_Gold, m_Tips, m_Renown, m_LastOrders, m_MenuHeader, m_OrdersHeader, m_Hint, m_SpillLabel;
+        Label m_Day, m_Clock, m_Gold, m_Tips, m_Renown, m_LastOrders, m_MenuHeader, m_OrdersHeader, m_Hint, m_SpillLabel;
         TavernDirector m_Director;
         ServiceSession m_Session;
         bool m_ListsDirty = true;
@@ -25,6 +25,7 @@ namespace Hearthdelve.UI.Tavern
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
             m_Hud = root.Q("hud");
+            m_Day = root.Q<Label>("day");
             m_Clock = root.Q<Label>("clock");
             m_Gold = root.Q<Label>("gold");
             m_Tips = root.Q<Label>("tips");
@@ -66,6 +67,8 @@ namespace Hearthdelve.UI.Tavern
             m_OrdersHeader.text = Loc.UI(TavernLocKeys.HudOrders);
             m_LastOrders.text = Loc.UI(TavernLocKeys.HudLastOrders);
             m_SpillLabel.text = Loc.UI(TavernLocKeys.Spill);
+            m_Day.style.display = m_Director.Flow != null ? DisplayStyle.Flex : DisplayStyle.None;
+            m_Day.text = Loc.UI(LoopLocKeys.HudDay, m_Director.Day);
             MarkDirty();
         }
 

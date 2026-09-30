@@ -8,9 +8,11 @@
                     <ui:VisualElement name="essence-fill" picking-mode="Ignore" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:Label name="day" class="hd-day" />
             <ui:VisualElement name="harvest-feed" class="hd-feed" picking-mode="Ignore" />
         </ui:VisualElement>
         <ui:VisualElement class="hd-hud__bottom" picking-mode="Ignore">
+            <ui:Label name="exit-hint" class="hd-hint" />
             <ui:Label name="satchel-hint" class="hd-hint" />
             <ui:Label name="satchel-label" class="hd-satchel__label" />
             <ui:VisualElement name="satchel-slots" picking-mode="Ignore" />

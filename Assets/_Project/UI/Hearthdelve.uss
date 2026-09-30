@@ -146,6 +146,38 @@
     font-size: 11px;
 }
 
+/* Freshness: a thin bar under each slot (length, plus a % label on full-size slots). */
+.hd-slot__fresh {
+    height: 4px;
+    width: 100%;
+    margin-top: 2px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#satchel-slots .hd-slot__fresh {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    bottom: -1px;
+    width: auto;
+}
+
+.hd-slot__fresh-fill {
+    height: 100%;
+    background-color: rgb(120, 200, 110);
+}
+
+.hd-slot__freshness {
+    font-size: 11px;
+    color: var(--hd-ink-dim);
+}
+
+.hd-day {
+    color: var(--hd-ink);
+    -unity-font-style: bold;
+    margin: 0 12px;
+}
+
 /* ---------- Modal screens ---------- */
 
 .hd-screen {

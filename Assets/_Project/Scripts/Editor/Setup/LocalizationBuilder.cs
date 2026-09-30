@@ -53,7 +53,7 @@ namespace Hearthdelve.Editor
                 LocalizationEditorSettings.AddLocale(english);
             }
 
-            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English));
+            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English));
             FillTable(Loc.ContentTable, ContentEntries);
             AssetDatabase.SaveAssets();
         }

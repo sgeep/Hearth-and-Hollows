@@ -3,6 +3,7 @@
     <Style src="Tavern.uss" />
     <ui:VisualElement name="hud" class="hd-hud" picking-mode="Ignore">
         <ui:VisualElement class="hd-tavern-bar" picking-mode="Ignore">
+            <ui:Label name="day" class="hd-tavern-bar__item" />
             <ui:Label name="clock" class="hd-tavern-bar__item hd-tavern-bar__clock" />
             <ui:Label name="last-orders" class="hd-tavern-bar__item hd-tag--last-orders" />
             <ui:Label name="gold" class="hd-tavern-bar__item" />

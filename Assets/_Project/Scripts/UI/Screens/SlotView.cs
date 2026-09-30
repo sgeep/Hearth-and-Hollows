@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace Hearthdelve.UI.Screens
 {
-    /// <summary>Builds the visual for one satchel slot (icon swatch, name, quality, count).</summary>
+    /// <summary>Builds the visual for one satchel slot (icon swatch, name, quality, count, freshness).</summary>
     public static class SlotView
     {
         public const string SlotClass = "hd-slot";
@@ -46,6 +46,17 @@ namespace Hearthdelve.UI.Screens
                 if (!string.IsNullOrEmpty(prep)) root.Add(MakeLabel(prep, "hd-slot__prep"));
             }
             if (slot.Count > 1 || !compact) root.Add(MakeLabel(Loc.UI(LocKeys.SlotCount, slot.Count), "hd-slot__count"));
+
+            // Freshness: bar length (plus a % label when there's room), not colour alone.
+            var fresh = new VisualElement { pickingMode = PickingMode.Ignore };
+            fresh.AddToClassList("hd-slot__fresh");
+            var fill = new VisualElement { pickingMode = PickingMode.Ignore };
+            fill.AddToClassList("hd-slot__fresh-fill");
+            fill.style.width = Length.Percent(Mathf.Clamp01(slot.Freshness) * 100f);
+            fill.style.backgroundColor = Color.Lerp(new Color(0.8f, 0.45f, 0.25f), new Color(0.47f, 0.78f, 0.43f), slot.Freshness);
+            fresh.Add(fill);
+            root.Add(fresh);
+            if (!compact) root.Add(MakeLabel(Loc.UI(LoopLocKeys.SlotFreshness, Mathf.RoundToInt(slot.Freshness * 100f)), "hd-slot__freshness"));
         }
 
         static Label MakeLabel(string text, string cls)

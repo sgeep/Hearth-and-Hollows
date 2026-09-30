@@ -1,5 +1,6 @@
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Run;
 using Hearthdelve.UI.Localization;
@@ -13,8 +14,9 @@ using UnityEngine.UIElements;
 namespace Hearthdelve.UI.Hud
 {
     /// <summary>
-    /// Minimal dungeon HUD (GDD §8.2): Essence bar, satchel slots, harvest feed, and the
-    /// satchel-full hint. Driven entirely by events; knows nothing about Dungeon types.
+    /// Minimal dungeon HUD (GDD §8.2): Essence bar, satchel slots (with freshness), harvest feed,
+    /// the satchel-full and exit hints, and the day. Driven by events and the Shared GameFlow;
+    /// knows nothing about Dungeon types.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class DungeonHud : MonoBehaviour
@@ -29,6 +31,8 @@ namespace Hearthdelve.UI.Hud
         VisualElement m_Slots;
         VisualElement m_Feed;
         Label m_Hint;
+        Label m_ExitHint;
+        Label m_Day;
         Satchel m_Satchel;
 
         void OnEnable()
@@ -42,11 +46,17 @@ namespace Hearthdelve.UI.Hud
             m_Feed = root.Q("harvest-feed");
             m_Hint = root.Q<Label>("satchel-hint");
             m_Hint.style.display = DisplayStyle.None;
+            m_ExitHint = root.Q<Label>("exit-hint");
+            m_ExitHint.style.display = DisplayStyle.None;
+            m_Day = root.Q<Label>("day");
+            // Freshness drains continuously without a Changed event; redraw the slots now and then.
+            m_Slots.schedule.Execute(RefreshSlots).Every(1000);
 
             EventBus<EssenceChanged>.Subscribe(OnEssence);
             EventBus<SatchelBound>.Subscribe(OnSatchelBound);
             EventBus<HarvestFeedback>.Subscribe(OnHarvest);
             EventBus<SatchelFullHint>.Subscribe(OnHint);
+            EventBus<DelveExitHint>.Subscribe(OnExitHint);
             LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
             RefreshStaticText();
         }
@@ -57,6 +67,7 @@ namespace Hearthdelve.UI.Hud
             EventBus<SatchelBound>.Unsubscribe(OnSatchelBound);
             EventBus<HarvestFeedback>.Unsubscribe(OnHarvest);
             EventBus<SatchelFullHint>.Unsubscribe(OnHint);
+            EventBus<DelveExitHint>.Unsubscribe(OnExitHint);
             LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
             if (m_Satchel != null) m_Satchel.Changed -= RefreshSlots;
         }
@@ -71,6 +82,18 @@ namespace Hearthdelve.UI.Hud
         {
             m_EssenceLabel.text = Loc.UI(LocKeys.HudEssence);
             m_SatchelLabel.text = Loc.UI(LocKeys.HudSatchel);
+            var flow = GameFlow.Instance;
+            bool inLoop = flow != null && flow.InGame;
+            m_Day.style.display = inLoop ? DisplayStyle.Flex : DisplayStyle.None;
+            if (inLoop) m_Day.text = Loc.UI(LoopLocKeys.HudDay, flow.State.Day);
+        }
+
+        void OnExitHint(DelveExitHint evt)
+        {
+            m_ExitHint.style.display = evt.Visible ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!evt.Visible) return;
+            var interact = InputMaps.Find(InputMaps.Dungeon, DungeonActions.Interact);
+            m_ExitHint.text = Loc.UI(LoopLocKeys.HudExit, interact != null ? interact.GetBindingDisplayString() : "?");
         }
 
         void OnEssence(EssenceChanged evt)

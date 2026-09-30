@@ -388,3 +388,40 @@
     font-size: 20px;
     margin-bottom: 4px;
 }
+
+/* ---------- Day loop (Morning, Night, main menu) ---------- */
+
+.hd-loop__status {
+    margin-top: 8px;
+    white-space: normal;
+    color: var(--hd-premium);
+}
+
+.hd-loop__note {
+    margin: 6px 0;
+    white-space: normal;
+    color: var(--hd-ink-dim);
+    -unity-text-align: middle-center;
+}
+
+.hd-loop__summary {
+    background-color: rgba(0, 0, 0, 0.25);
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+.hd-loop__summary Label {
+    white-space: normal;
+    margin-bottom: 3px;
+}
+
+.hd-menu {
+    width: 380px;
+    align-items: stretch;
+}
+
+.hd-menu__title {
+    font-size: 36px;
+    -unity-text-align: middle-center;
+    margin-bottom: 16px;
+}

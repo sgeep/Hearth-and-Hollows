@@ -25,7 +25,7 @@ namespace Hearthdelve.Tavern.Scene
             if (kb == null || director == null) return;
 
             if (kb.f1Key.wasPressedThisFrame) m_Visible = !m_Visible;
-            if (kb.f4Key.wasPressedThisFrame) director.FillStoreroom();
+            if (kb.f4Key.wasPressedThisFrame && director.CanDebugFill) director.FillStoreroom();
             if (kb.f5Key.wasPressedThisFrame) director.EndServiceNow();
             if (kb.f6Key.wasPressedThisFrame && director.Session != null && director.Content.customers.Count > 0)
                 director.SpawnCustomer(director.Content.customers[m_Random.Range(0, director.Content.customers.Count - 1)]);
@@ -40,7 +40,9 @@ namespace Hearthdelve.Tavern.Scene
             GUILayout.Label($"<b>DEBUG</b> (F1 hide)   phase: {director.Phase}   stock: {director.Storeroom.TotalCount} parts");
             if (director.Session != null)
                 GUILayout.Label($"time left: {director.Session.Remaining:0}s   customers: {director.Agents.Count}   tickets: {director.Session.Tickets.Count}");
-            GUILayout.Label("F4 fill storeroom   F5 end service   F6 spawn customer   F7 restart");
+            GUILayout.Label(director.Flow == null
+                ? "F4 fill storeroom   F5 end service   F6 spawn customer   F7 restart"
+                : $"{(director.CanDebugFill ? "F4 fill storeroom   " : "F4 off (GameDatabase)   ")}F5 end service   F6 spawn customer");
             GUILayout.EndArea();
         }
     }

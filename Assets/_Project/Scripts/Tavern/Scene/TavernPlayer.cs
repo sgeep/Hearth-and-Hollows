@@ -55,6 +55,8 @@ namespace Hearthdelve.Tavern.Scene
         readonly IRandom m_Random = new SeededRandom();
         Vector2 m_LastPointer;
         bool m_ChoppingPot;
+        RecipeDefinition m_BreakfastRecipe;
+        CookedIngredients m_BreakfastIngredients;
 
         public IMinigame ActiveCook { get; private set; }
         public Ticket CookTicket { get; private set; }
@@ -84,6 +86,11 @@ namespace Hearthdelve.Tavern.Scene
 
         void Update()
         {
+            if (m_Director != null && m_Director.Phase == TavernPhase.Morning && m_BreakfastRecipe != null)
+            {
+                TickBreakfast(Time.deltaTime);
+                return;
+            }
             if (m_Director == null || m_Director.Phase != TavernPhase.Service || m_Director.Session == null) return;
             float dt = Time.deltaTime;
 
@@ -242,6 +249,15 @@ namespace Hearthdelve.Tavern.Scene
                 return;
             }
 
+            ActiveCook.Tick(dt, ReadMinigameInput());
+            if (!ActiveCook.IsComplete) return;
+            if (m_ChoppingPot) session.FinishChopping(this, ActiveCook.Evaluate());
+            else session.FinishCooking(CookTicket, ActiveCook.Evaluate());
+            EndCook();
+        }
+
+        MinigameInput ReadMinigameInput()
+        {
             var pointer = ReadPointer();
             var input = new MinigameInput
             {
@@ -253,11 +269,52 @@ namespace Hearthdelve.Tavern.Scene
                 Pointer = BoardFraction(pointer.x),
             };
             m_LastPointer = pointer;
-            ActiveCook.Tick(dt, input);
+            return input;
+        }
+
+        // ---------- Breakfast (Morning) ----------
+
+        /// <summary>
+        /// Takes one serving's ingredients and starts the dish's station minigame (the minigame
+        /// panel draws it). Finishing eats it for the delve buff; Cancel puts the ingredients back.
+        /// </summary>
+        public bool CookBreakfast(RecipeDefinition recipe)
+        {
+            if (ActiveCook != null || recipe == null || recipe.station == CookStation.StewPot) return false;
+            var used = RecipeMatcher.TryTake(recipe, m_Director.Storeroom);
+            if (used == null) return false;
+            m_BreakfastRecipe = recipe;
+            m_BreakfastIngredients = used;
+            ActiveCook = m_Director.Minigames.CreateCook(recipe.station);
+            ActiveCook.Begin();
+            m_LastPointer = ReadPointer();
+            InputMaps.Activate(InputMaps.Minigame);
+            return true;
+        }
+
+        void TickBreakfast(float dt)
+        {
+            if (m_MinigameCancel != null && m_MinigameCancel.WasPressedThisFrame())
+            {
+                m_Director.Storeroom.AddRange(m_BreakfastIngredients.Used);
+                EndBreakfast();
+                return;
+            }
+            ActiveCook.Tick(dt, ReadMinigameInput());
             if (!ActiveCook.IsComplete) return;
-            if (m_ChoppingPot) session.FinishChopping(this, ActiveCook.Evaluate());
-            else session.FinishCooking(CookTicket, ActiveCook.Evaluate());
-            EndCook();
+            var recipe = m_BreakfastRecipe;
+            var used = m_BreakfastIngredients;
+            float score = ActiveCook.Evaluate();
+            EndBreakfast();
+            m_Director.EatBreakfast(recipe, used, score);
+        }
+
+        void EndBreakfast()
+        {
+            m_BreakfastRecipe = null;
+            m_BreakfastIngredients = null;
+            ActiveCook = null;
+            InputMaps.ActivateUIOnly();
         }
 
         Vector2 ReadPointer() => m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
@@ -381,6 +438,11 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Service ended: put everything down.</summary>
         public void StopWork()
         {
+            if (m_BreakfastRecipe != null)
+            {
+                m_Director.Storeroom.AddRange(m_BreakfastIngredients.Used);
+                EndBreakfast();
+            }
             if (ActiveCook != null) EndCook();
             if (Carrying != null) EndCarry();
             if (m_Near != null) m_Near.SetHighlighted(false);

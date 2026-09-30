@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="Hearthdelve.uss" />
+    <Style src="Tavern.uss" />
+    <ui:VisualElement name="screen" class="hd-screen">
+        <ui:VisualElement class="hd-panel hd-prep">
+            <ui:Label name="title" class="hd-title" />
+            <ui:Label name="purse" class="hd-subtitle" />
+            <ui:VisualElement class="hd-prep__columns">
+                <ui:VisualElement class="hd-prep__column">
+                    <ui:Label name="upgrades-header" class="hd-prep__header" />
+                    <ui:VisualElement name="upgrade-list" class="hd-prep__recipes" />
+                </ui:VisualElement>
+                <ui:VisualElement name="summary" class="hd-prep__column hd-loop__summary">
+                    <ui:Label name="summary-header" class="hd-prep__header" />
+                    <ui:VisualElement name="summary-rows" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="saved" class="hd-loop__note" />
+            <ui:Button name="sleep" class="hd-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

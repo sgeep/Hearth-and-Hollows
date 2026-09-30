@@ -21,7 +21,7 @@ namespace Hearthdelve.UI.Tavern
             m_Rows = root.Q("rows");
             m_Title = root.Q<Label>("title");
             m_Again = root.Q<Button>("again");
-            m_Again.clicked += () => m_Director?.Restart();
+            m_Again.clicked += () => m_Director?.FinishEvening();
             m_Screen.style.display = DisplayStyle.None;
         }
 
@@ -44,7 +44,7 @@ namespace Hearthdelve.UI.Tavern
 
             var l = m_Director.Session.Ledger;
             m_Title.text = Loc.UI(TavernLocKeys.ResultsTitle);
-            m_Again.text = Loc.UI(TavernLocKeys.ResultsAgain);
+            m_Again.text = Loc.UI(m_Director.Flow != null ? LoopLocKeys.ResultsToNight : TavernLocKeys.ResultsAgain);
             m_Rows.Clear();
             if (m_Director.Session.ClosedEarly) AddRow(Loc.UI(TavernLocKeys.ResultsClosedEarly));
             Add(TavernLocKeys.ResultsServed, l.DishesServed);

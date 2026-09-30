@@ -15,7 +15,7 @@ namespace Hearthdelve.UI.Tavern
     {
         VisualElement m_Screen, m_Stock, m_Recipes, m_StaffButtons;
         Label m_Title, m_StockHeader, m_MenuHeader, m_StaffLabel;
-        Button m_Fill, m_Open;
+        Button m_Fill, m_Open, m_Close;
         TavernDirector m_Director;
 
         void OnEnable()
@@ -31,10 +31,10 @@ namespace Hearthdelve.UI.Tavern
             m_StaffButtons = root.Q("staff-buttons");
             m_Fill = root.Q<Button>("fill");
             m_Open = root.Q<Button>("open");
+            m_Close = root.Q<Button>("close");
             m_Fill.clicked += () => m_Director?.FillStoreroom();
             m_Open.clicked += () => m_Director?.OpenService();
-            // Hide the debug fill outside development builds.
-            m_Fill.style.display = Debug.isDebugBuild ? DisplayStyle.Flex : DisplayStyle.None;
+            m_Close.clicked += () => m_Director?.CloseForTheNight();
         }
 
         void Start()
@@ -65,14 +65,12 @@ namespace Hearthdelve.UI.Tavern
             m_Fill.text = Loc.UI(TavernLocKeys.PrepFill);
             m_Open.text = Loc.UI(TavernLocKeys.PrepOpen);
             m_Open.SetEnabled(m_Director.CanOpen);
+            // The debug fill: development builds only, and in the day loop only when enabled.
+            m_Fill.style.display = Debug.isDebugBuild && m_Director.CanDebugFill ? DisplayStyle.Flex : DisplayStyle.None;
+            m_Close.text = Loc.UI(LoopLocKeys.PrepClose);
+            m_Close.style.display = m_Director.Flow != null ? DisplayStyle.Flex : DisplayStyle.None;
 
-            m_Stock.Clear();
-            var stacks = m_Director.Storeroom.Stacks
-                .OrderBy(s => s.Item.Definition.id).ThenByDescending(s => s.Item.Quality).ToList();
-            if (stacks.Count == 0) m_Stock.Add(Row(Loc.UI(TavernLocKeys.PrepStoreroomEmpty), "hd-prep__empty"));
-            foreach (var s in stacks)
-                m_Stock.Add(Row(Loc.UI(TavernLocKeys.PrepStockRow, Loc.ItemName(s.Item), s.Count, Mathf.RoundToInt(s.Freshness * 100f)),
-                    $"hd-quality--{s.Item.Quality.ToString().ToLowerInvariant()}"));
+            TavernUI.StockRows(m_Stock, m_Director.Storeroom);
 
             m_MenuHeader.text = Loc.UI(TavernLocKeys.PrepMenu, m_Director.MaxMenuSize);
             m_Recipes.Clear();
@@ -112,11 +110,6 @@ namespace Hearthdelve.UI.Tavern
             }
         }
 
-        static Label Row(string text, string cls)
-        {
-            var l = new Label(text);
-            l.AddToClassList(cls);
-            return l;
-        }
+        static Label Row(string text, string cls) => TavernUI.Row(text, cls);
     }
 }
