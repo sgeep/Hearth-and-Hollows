@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ServiceConfig
   m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Service.ServiceConfig
   service:
-    lengthSeconds: 360
-    lastOrdersSeconds: 45
+    lengthSeconds: 150
+    lastOrdersSeconds: 20
     minArrivalGap: 8
     maxArrivalGap: 16
     maxCustomers: 8

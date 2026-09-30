@@ -6,7 +6,7 @@ namespace Hearthdelve.Tavern.Service
     [Serializable]
     public struct ServiceSettings
     {
-        [Min(10), Tooltip("Length of evening service in seconds (default 6 minutes).")]
+        [Min(10), Tooltip("Length of evening service in seconds (default 2.5 minutes).")]
         public float lengthSeconds;
         [Min(0), Tooltip("No new customers arrive in the last this-many seconds.")]
         public float lastOrdersSeconds;
@@ -19,8 +19,8 @@ namespace Hearthdelve.Tavern.Service
 
         public static ServiceSettings Default => new()
         {
-            lengthSeconds = 360f,
-            lastOrdersSeconds = 45f,
+            lengthSeconds = 150f,
+            lastOrdersSeconds = 20f,
             minArrivalGap = 8f,
             maxArrivalGap = 16f,
             maxCustomers = 8,
