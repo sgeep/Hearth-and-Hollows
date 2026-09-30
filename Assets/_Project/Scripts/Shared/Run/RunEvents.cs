@@ -58,6 +58,13 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
+    /// <summary>Show/hide the "leave the dungeon" prompt while standing at the exit.</summary>
+    public readonly struct DelveExitHint : IEvent
+    {
+        public readonly bool Visible;
+        public DelveExitHint(bool visible) => Visible = visible;
+    }
+
     /// <summary>Show/hide the "satchel full — swap?" hint while standing on a pickup.</summary>
     public readonly struct SatchelFullHint : IEvent
     {
@@ -106,7 +113,7 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
-    /// <summary>Raised after the death penalty is applied, before the level restarts.</summary>
+    /// <summary>Raised after the death penalty is applied, before the player leaves the dungeon.</summary>
     public readonly struct DelveEnded : IEvent
     {
         public readonly DeathPenaltyResult Result;

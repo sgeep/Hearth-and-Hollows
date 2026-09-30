@@ -1,6 +1,7 @@
 using Hearthdelve.Core.Events;
 using Hearthdelve.Dungeon.Combat;
 using Hearthdelve.Dungeon.Essence;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Run;
 using UnityEngine;
 
@@ -37,8 +38,9 @@ namespace Hearthdelve.Dungeon.Player
                 enabled = false;
                 return;
             }
-            // Tavern upgrades will supply modifiers here once the loop exists (Phase 3).
-            Essence = new EssenceMeter(m_Config.essence, EssenceModifiers.None);
+            // Upgrades (max Essence) and breakfast (max Essence or slower drain) from the day loop.
+            var loadout = GameFlow.Instance != null ? GameFlow.Instance.Loadout : DelveLoadout.None;
+            Essence = new EssenceMeter(m_Config.essence, new EssenceModifiers { MaxBonus = loadout.MaxEssenceBonus, DrainMultiplier = loadout.DrainMultiplier });
             Essence.Changed += OnEssenceChanged;
             Essence.Depleted += OnDepleted;
         }

@@ -26,9 +26,6 @@ namespace Hearthdelve.Tests.PlayMode
     {
         const string k_Scene = "CombatGreybox";
 
-        [SetUp]
-        public void SetUp() => PersistentStash.Clear();
-
         [UnityTest]
         public IEnumerator Scene_Loads_Runs_AndLocalizesHud()
         {
@@ -113,8 +110,11 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(DelveRunController.Active.Satchel.Add(kept, 3), Is.EqualTo(0));
 
             Action<int> choose = null;
+            DelveEnded? ended = null;
             void Capture(DeathScreenRequested e) => choose = e.OnChosen;
+            void CaptureEnd(DelveEnded e) => ended = e;
             EventBus<DeathScreenRequested>.Subscribe(Capture);
+            EventBus<DelveEnded>.Subscribe(CaptureEnd);
 
             var vitals = Object.FindFirstObjectByType<PlayerVitals>();
             vitals.Essence.TakeDamage(10000f);
@@ -128,16 +128,17 @@ namespace Hearthdelve.Tests.PlayMode
 
             EventBus<DeathScreenRequested>.Unsubscribe(Capture);
             choose(0); // what the Confirm button does with slot 0 selected
+            EventBus<DelveEnded>.Unsubscribe(CaptureEnd);
 
-            // Level reloads with a fresh run.
+            // Played on its own (no day loop), the level reloads with a fresh run.
             float timeout = Time.realtimeSinceStartup + 5f;
             while ((DelveRunController.Active == null || !DelveRunController.Active.Satchel.IsEmpty || Time.timeScale == 0f)
                    && Time.realtimeSinceStartup < timeout)
                 yield return null;
 
-            Assert.That(PersistentStash.Stacks, Has.Count.EqualTo(1));
-            Assert.That(PersistentStash.Stacks[0].Item, Is.EqualTo(kept));
-            Assert.That(PersistentStash.Stacks[0].Count, Is.EqualTo(3), "the whole stack is banked");
+            Assert.That(ended.HasValue, "the delve reports its end");
+            Assert.That(ended.Value.Result.Kept.Item, Is.EqualTo(kept));
+            Assert.That(ended.Value.Result.Kept.Count, Is.EqualTo(3), "the whole stack is kept");
             Assert.That(DelveRunController.Active.Satchel.IsEmpty, "the rest of the haul is gone");
             Assert.That(Time.timeScale, Is.EqualTo(1f));
             Object.Destroy(part);

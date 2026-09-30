@@ -52,6 +52,8 @@ namespace Hearthdelve.Dungeon.Essence
         }
 
         public float Max { get; }
+        /// <summary>The upgrade and breakfast modifiers this meter was built with.</summary>
+        public EssenceModifiers Modifiers => m_Modifiers;
         public float Current { get; private set; }
         public float Normalized => Current / Max;
         public bool IsLow => Normalized <= m_Settings.lowThreshold;

@@ -65,7 +65,7 @@ namespace Hearthdelve.Dungeon.DebugTools
             GUILayout.Label($"shake: {(GameSettings.ScreenShakeScale > 0 ? "on" : "off")} [F2]  hit-stop: {(GameSettings.HitStopEnabled ? "on" : "off")} [F3]");
             GUILayout.Label("F4 refill essence   F5 essence to 3   F6 god mode   F7 restart");
             var run = DelveRunController.Active;
-            GUILayout.Label($"satchel: {(run != null ? run.Satchel.TotalCount : 0)} parts   stash (kept): {PersistentStash.TotalCount}");
+            GUILayout.Label($"satchel: {(run != null ? run.Satchel.TotalCount : 0)} parts in {(run != null ? run.Satchel.Capacity : 0)} slots");
             GUILayout.EndArea();
         }
     }

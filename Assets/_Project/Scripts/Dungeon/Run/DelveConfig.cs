@@ -7,5 +7,7 @@ namespace Hearthdelve.Dungeon.Run
     public sealed class DelveConfig : ScriptableObject
     {
         public SatchelSettings satchel = SatchelSettings.Default;
+        [Tooltip("How fast carried parts lose freshness (shared with the overnight storeroom loss).")]
+        public FreshnessConfig freshness;
     }
 }

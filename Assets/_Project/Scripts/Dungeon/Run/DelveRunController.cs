@@ -1,6 +1,7 @@
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Services;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Run;
 using UnityEngine;
@@ -9,9 +10,10 @@ using UnityEngine.SceneManagement;
 namespace Hearthdelve.Dungeon.Run
 {
     /// <summary>
-    /// Owns the state of one delve (the satchel) and its ending: on defeat it freezes play,
-    /// asks the UI for the Lockbox pick, applies <see cref="DeathPenalty"/>, and restarts.
-    /// (Phase 3 will send the player to the tavern instead of restarting the level.)
+    /// Owns one delve: the satchel (sized by upgrades), its freshness loss, and how the delve
+    /// ends. At the exit the whole satchel goes home; on defeat the UI picks the Lockbox stack
+    /// and only that goes home. Either way the haul is handed to <see cref="GameFlow"/>, which
+    /// moves the day on to Evening. Played on its own (no GameFlow), the level restarts instead.
     /// </summary>
     public sealed class DelveRunController : MonoBehaviour
     {
@@ -21,8 +23,11 @@ namespace Hearthdelve.Dungeon.Run
 
         public static DelveRunController Active { get; private set; }
         public Satchel Satchel { get; private set; }
-        /// <summary>Delve Marks collected this run (none drop yet in Phase 1).</summary>
+        /// <summary>Delve Marks collected this run (none drop yet).</summary>
         public int RunCurrency { get; set; }
+        public bool IsEnding => m_Ending;
+
+        FreshnessSettings Freshness => m_Config != null && m_Config.freshness != null ? m_Config.freshness.freshness : FreshnessSettings.Default;
 
         public void Configure(DelveConfig config) => m_Config = config;
 
@@ -30,11 +35,21 @@ namespace Hearthdelve.Dungeon.Run
         {
             Active = this;
             var settings = m_Config != null ? m_Config.satchel : SatchelSettings.Default;
-            Satchel = new Satchel(settings.capacity, settings.maxStack);
+            var loadout = GameFlow.Instance != null ? GameFlow.Instance.Loadout : DelveLoadout.None;
+            Satchel = new Satchel(settings.capacity + Mathf.Max(0, loadout.ExtraSatchelSlots), settings.maxStack);
         }
 
-        void OnEnable() => EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
-        void OnDisable() => EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
+        void OnEnable()
+        {
+            EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
+            EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
+        }
+
+        void OnDisable()
+        {
+            EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
+            EventBus<DebugSkipPhaseRequested>.Unsubscribe(OnDebugSkip);
+        }
 
         void Start()
         {
@@ -42,9 +57,27 @@ namespace Hearthdelve.Dungeon.Run
             EventBus<SatchelBound>.Publish(new SatchelBound(Satchel));
         }
 
+        void Update()
+        {
+            // Scaled time: menus and hit-stop don't age the haul.
+            if (!m_Ending) Satchel.Decay(Freshness, Freshness.dungeonLossPerMinute / 60f * Time.deltaTime);
+        }
+
         void OnDestroy()
         {
             if (Active == this) Active = null;
+        }
+
+        void OnDebugSkip(DebugSkipPhaseRequested _) => Extract();
+
+        /// <summary>Leave through the exit with everything in the satchel.</summary>
+        public void Extract()
+        {
+            if (m_Ending) return;
+            m_Ending = true;
+            var report = DelveReport.Extraction(Satchel);
+            Satchel.Clear();
+            Leave(report);
         }
 
         void OnPlayerDefeated(PlayerDefeated evt)
@@ -67,12 +100,17 @@ namespace Hearthdelve.Dungeon.Run
         void FinishDelve(int keepSlot)
         {
             var result = DeathPenalty.Resolve(Satchel, keepSlot, RunCurrency);
-            if (result.KeptSomething) PersistentStash.Deposit(result.Kept);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
-
             GamePause.PopMenuPause();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Leave(DelveReport.Death(result));
+        }
+
+        static void Leave(DelveReport report)
+        {
+            var flow = GameFlow.Instance;
+            if (flow != null && flow.InGame) flow.CompleteDelve(report);
+            else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // standalone greybox: restart
         }
     }
 }
