@@ -5,9 +5,9 @@ _Last updated: 2026-09-29_
 ## Status
 
 - **Phase 1 (Combat Prototype):** done and playtested by you in the editor. Feel tuning is ongoing.
-- **Phase 2 (Tavern Prototype):** implemented and passing automated verification. **Not yet playtested by a human.**
+- **Phase 2 (Tavern Prototype):** implemented and playtested once (2026-09-29). First round of feedback applied: hand delivery with a button, spare plates, final sold-out, and closing early when everything sells out. Waiting on the next playtest.
 
-Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+Tests: **193 project EditMode tests + 15 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
 
 ### Phase 2 criteria
 
@@ -47,18 +47,33 @@ Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler
    - Placing an order **reserves** the ingredients, so it can't later become impossible to make.
    - The order appears on the rail on the right.
 3. **Cooking:** walk to the Grill or Tap and press **E / A** to cook the next order for that station. The Grill and Tap panels show the minigame.
-4. **Serving:** at the pass, press **E** to pick up the next dish. Walking it to the customer *is* the Serving minigame: customers walking across the floor bump you and spill the plate, and a full spill meter drops it.
-5. **Eating and paying:** customers eat, pay the dish value, tip if they're happy, and change your renown.
+4. **Serving:** at the pass, press **E** to pick up the next dish. Carrying it *is* the Serving minigame: customers walking across the floor bump you and spill the plate, and a full spill meter drops it.
+   - Press **E** next to a seated customer who ordered that dish to serve it. It doesn't have to be the customer it was cooked for.
+   - If you give A's plate to B, B's order passes to A.
+   - Next to someone who ordered something else, the hint shows what they ordered.
+   - Press **E** at the pass to put the plate back.
+   - The score compares your time with the straight-line trip from the pass, so wandering costs quality.
+5. **Spare plates:** if a customer leaves after their dish started cooking, the dish isn't wasted. It becomes a *spare* (italic on the order rail, "Spare" once it's on the pass).
+   - You can serve it to anyone waiting for that dish. Their own order is then cancelled and its ingredients go back to the storeroom.
+   - A new customer who orders that dish gets the spare automatically, without using more stock.
+   - Pip, when serving, only carries plates someone is waiting for. If that customer leaves or you serve them first, Pip takes the plate back to the pass.
+6. **Eating and paying:** customers eat, pay the dish value, tip if they're happy, and change your renown.
    - **Walkout:** patience runs out. −3 renown, and uncooked reserved stock goes back to the storeroom.
-   - **Sold out:** nothing they'd order can be made. −1 renown, and the HUD marks the dish "Sold out".
-6. **Results:** the service ends after 6 minutes (no new arrivals in the last 45 s). "Prepare another evening" restarts the scene with an empty storeroom.
+   - **Sold out:** once the stock can't make a dish, it's marked "Sold out" and **stays off the menu for the rest of the night**, even if a walkout returns ingredients (they stay in the storeroom).
+   - A customer who finds nothing left to order leaves with −1 renown.
+7. **Closing:**
+   - The service ends after 6 minutes (no new arrivals in the last 45 s).
+   - **Everything sold out:** the door closes to new customers. Orders already placed can still be cooked and served. Service ends early once nobody is waiting for food and every diner has paid, and the results screen says you closed early.
+   - Diners still eating at closing time pay for their meal.
+   - "Prepare another evening" restarts the scene with an empty storeroom.
+   - **Open the doors** needs at least one menu dish the storeroom can make.
 
 ## Tavern controls
 
 | | Keyboard/Mouse | Gamepad |
 |---|---|---|
 | Walk | A/D or arrows | Left stick / D-pad |
-| Use station / pick up dish | E or Space | A / Cross |
+| Use station / pick up dish / serve / put plate back | E or Space | A / Cross |
 | Grill: flip | Space or Left Mouse | A / Cross |
 | Tap: pour (hold) / tilt glass | Space or Left Mouse / W–S | A / Cross / Left stick |
 | Step away from a station | Esc | B / Circle |
@@ -129,7 +144,9 @@ Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler
 ## Known issues / limitations
 
 **Tavern (Phase 2):**
-- **No human playtest yet.** Patience, arrival rate, prices and minigame windows are first-pass numbers, and the UI layout hasn't been checked on screen.
+- **One playtest so far.** Patience, arrival rate, prices and minigame windows are still first-pass numbers.
+- **Delivery reach** reuses `ServiceConfig → player → interactRange` (0.9 tiles). The nearest matching customer in reach is served. There's no highlight on the target customer yet, only the hint text.
+- **Spare plates left at closing** are simply discarded.
 - **No storeroom decay.** Freshness only comes from the debug fill; overnight decay is designed for but not implemented.
 - **One staff helper.** The PlayMode test adds a second, test-only cook to run an end-to-end service with no player input.
 - **Flat floor.** Customers walk along the floor only and walk through each other; the only collision that matters is plate bumps.
@@ -151,6 +168,11 @@ Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler
 
 ## Decided
 
+**Phase 2 playtest feedback (2026-09-29):**
+1. **Hand delivery:** a button serves a plate. Any waiting customer who ordered the same dish can take it; their order passes to the plate's original customer, or is cancelled with its stock returned if that customer has gone.
+2. **Sold out is final** for the night.
+3. **When everything sells out:** the door closes, open orders finish, and service ends early once the last diner has paid.
+
 **Phase 2 (2026-09-29):**
 1. **Freshness:**
    - Stored per stack, from 0 to 1; merged stacks take the count-weighted average.
@@ -169,5 +191,5 @@ Tests: **182 project EditMode tests + 14 PlayMode tests, all passing, 0 compiler
 ## Open design questions
 
 1. **Stronghold defense events:** still undecided. Not built; the Tavern floor is solid ground so combat could be added.
-2. **Dropped plates:** a dropped plate currently re-queues the order if stock allows, costing the ingredients again; otherwise the customer leaves as sold out. Is that the right cost?
+2. **Dropped plates:** a dropped plate currently re-queues the order if stock allows, costing the ingredients again; otherwise the customer leaves as sold out. (A dropped spare is just gone.) Is that the right cost?
 3. **Staff scope:** one helper covers one station. Should later staff cover multiple stations, or share one?
