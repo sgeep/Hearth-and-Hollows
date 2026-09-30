@@ -8,9 +8,27 @@ _Last updated: 2026-09-29_
 - **Phase 2 (Tavern Prototype):** implemented and playtested once (2026-09-29). Feedback applied:
   - **Round 1:** hand delivery with a button, spare plates, final sold-out, and closing early when everything sells out.
   - **Round 2:** a 2.5-minute service, Pip on Serving by default, and a Stew Pot station with a chopping minigame (beyond the GDD's Phase 2 scope, approved).
-  - **Not yet playtested:** chopping and the stew pot.
+  - Chopping and the stew pot were playtested by you and work.
+- **Phase 3 (Loop Prototype):** implemented and passing automated verification. **Not yet playtested.** Balance numbers are first-pass.
 
-Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+Tests: **237 project EditMode tests + 21 PlayMode tests, all passing, 0 compiler warnings.** The batch run reports one more EditMode test because the Addressables package adds a stub test.
+
+### Phase 3 criteria
+
+| Criterion | Where | Verified by |
+|---|---|---|
+| Day cycle Morning → Delve → Evening → Night → next Morning, with a day counter | `DayCycle`, `DayRules`, `GameState` (Shared/Game); day shown on both HUDs and the Morning/Night screens | EditMode cycle tests; PlayMode full day |
+| Main menu with New Game and Continue (one slot) | `MainMenu` scene, `MainMenuScreen`, `GameFlow.NewGame/Continue` | PlayMode full day (reload through Continue) |
+| Transitions go through persistent Boot services; Dungeon and Tavern never reference each other | `Boot` scene with `GameFlow` (Shared), content scenes loaded additively | Assembly references unchanged; PlayMode full day |
+| Exit at the end of the dungeon moves the whole satchel into the storeroom | `DelveExit`, `DelveRunController.Extract`, `DelveReport.Extraction` | EditMode extraction test; PlayMode full day (walk to exit, press E) |
+| Death or Essence depletion: only the Lockbox stack goes home, and the day continues to Evening | `DelveRunController.FinishDelve`, `DelveReport.Death` | EditMode death tests; PlayMode death test |
+| Dungeon freshness loss (tunable), overnight storeroom loss (tunable), Chilled parts keep better | `FreshnessSettings` (`Data/Config/FreshnessConfig`), `Satchel.Decay`, `Storeroom.Decay`, `DayRules.Sleep` | EditMode decay tests; PlayMode checks both |
+| F4 debug fill available but off by default | `GameDatabase.allowDebugFill`, `TavernDirector.CanDebugFill` | PlayMode full day |
+| Service gold persists and is spent at Night | `DayRules.CompleteService`, `TavernNightScreen` | EditMode service test; PlayMode full day |
+| Three upgrades as `TavernUpgradeDefinition` assets with tunable costs/effects: satchel slot, max Essence, seat | `Data/Upgrades/*`, `Upgrades`, `DelveLoadout`, `TavernLayout.SetActiveSeats` | EditMode upgrade tests; PlayMode (bought slot gives 7 satchel slots next day) |
+| A pre-delve breakfast from the storeroom, cooked with the existing minigames, buffs the next delve | Recipe `mealBuff`, `TavernMorningScreen`, `TavernPlayer.CookBreakfast`, `MealBuff`, `PlayerVitals` | EditMode buff tests; PlayMode Grill breakfast → Essence modifier in the dungeon |
+| Versioned JSON save of all persistent state, autosave at Night, older version loads | `SaveSystem`, `SaveData` (v2), `SaveDataV1` migration, `SaveStore` | EditMode round-trip, v1 migration, unknown-content, bad-file tests; PlayMode reload |
+| Debug end-of-day summary; debug keys to skip phases and add gold | `DaySummary`, Night screen panel (F10), `GameFlowDebugOverlay` (F8/F9) | EditMode summary checks |
 
 ### Phase 2 criteria
 
@@ -36,7 +54,36 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 | Three enemies with telegraphed attacks | `RatBehaviour`, `SlimeBehaviour`, `ShroomBehaviour` |
 | Harvest drops (clean kill / overkill / element → quality) | `HarvestRules`, `HarvestSystem`, `IngredientPickup` |
 | Essence meter and forced exit at zero | `EssenceMeter`, `PlayerVitals`, `DelveRunController` |
-| Death screen, keeping one slot (the whole stack) | `DeathScreen`, `DeathPenalty`, `PersistentStash` |
+| Death screen, keeping one slot (the whole stack) | `DeathScreen`, `DeathPenalty` (the kept stack now goes to the storeroom through `GameFlow`) |
+
+## How a day works
+
+1. **Start:** open `Assets/_Project/Scenes/Boot.unity` (or `MainMenu`, which opens Boot) and press Play.
+   - **New Game** starts Day 1 with an empty storeroom and no gold.
+   - **Continue** loads the one save slot and resumes where it was saved (Night, or Morning after you slept).
+2. **Morning (tavern):**
+   - The storeroom and today's delve bonuses are shown.
+   - **Breakfast (optional, one dish):** pick a Grill or Tap dish the storeroom can make, then play its minigame. It uses one serving's ingredients.
+     - Grill dishes add max Essence; Tap drinks slow Essence drain.
+     - The dish's quality scales the buff. Stews aren't offered.
+     - Esc puts the ingredients back.
+   - **Descend into the dungeon.**
+3. **Delve (dungeon):**
+   - Satchel slots and max Essence include your upgrades and breakfast.
+   - Carried parts lose freshness over time; the bar under each satchel slot shows it.
+   - **The exit** is the door on the raised block at the far right end. Stand at it and press **E** to go home with the whole satchel.
+   - If Essence runs out, pick one Lockbox slot on the death screen. Only that stack goes home, and the day still continues to Evening.
+4. **Evening (tavern):**
+   - The usual prep screen and service, cooking from the storeroom.
+   - If nothing can be cooked (or you'd rather not open), **Close for the night** goes straight to Night.
+   - On the results screen, **Close up for the night** banks the takings (payments + tips).
+5. **Night (tavern):**
+   - Gold and renown, and the three **upgrades**, each with a few levels at rising cost.
+   - The **debug day summary** (F10): parts brought back and lost, dishes sold, gold and tips earned, and the cheapest next upgrade.
+   - The game **autosaves** when Night starts and after each purchase.
+   - **Sleep:** storeroom stock loses a little freshness overnight, then it's the next Morning (and another autosave).
+
+When `TavernGreybox` or `CombatGreybox` is played on its own (no Boot), it behaves as before: a single evening with the debug fill, or a dungeon run that restarts.
 
 ## How a service works
 
@@ -77,8 +124,9 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
    - The service ends after 2.5 minutes (no new arrivals in the last 20 s).
    - **Everything sold out:** the door closes to new customers. Orders already placed can still be cooked and served. Service ends early once nobody is waiting for food and every diner has paid, and the results screen says you closed early.
    - Diners still eating at closing time pay for their meal.
-   - "Prepare another evening" restarts the scene with an empty storeroom.
+   - Played on its own, "Prepare another evening" restarts the scene with an empty storeroom. In the day loop the button is "Close up for the night".
    - **Open the doors** needs at least one menu dish the storeroom can make.
+   - **Seats:** 6 to start. The room has 8 stools, and the extra ones appear as seat upgrades are bought.
 
 ## Tavern controls
 
@@ -96,10 +144,18 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 | Key | Action |
 |---|---|
 | F1 | Show/hide the overlay |
-| F4 | Fill the storeroom |
+| F4 | Fill the storeroom (in the day loop, only if `GameDatabase → allowDebugFill` is on) |
 | F5 | End service now |
 | F6 | Spawn a customer |
-| F7 | Restart |
+| F7 | Restart (standalone only) |
+
+**Day-loop debug keys** (Boot scene, development builds):
+
+| Key | Action |
+|---|---|
+| F8 | Skip to the next phase. The current phase finishes properly: a delve extracts with the satchel, a service ends and shows results, results go to Night, Night sleeps. |
+| F9 | +100 gold |
+| F10 | Show/hide the day summary at Night |
 
 ## Dungeon controls
 
@@ -110,7 +166,7 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 | Attack (combo) | J or Left Mouse | X / Square |
 | Dodge roll | Left Shift or L | B / Circle |
 | Drop through platform | S + Space | Down + A |
-| Swap when satchel full | E | D-pad Up |
+| Swap when satchel full / leave at the exit | E | D-pad Up |
 
 **Dungeon debug keys:**
 
@@ -127,20 +183,22 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 
 ## Regenerating and verifying
 
-- **Menus:** *Hearthdelve → Generate → Phase 1 (All)* and *Phase 2 Tavern (All)*.
+- **Menus:** *Hearthdelve → Generate → Phase 3 Loop (All)*. This runs Phases 1 and 2 as well, and builds Boot and MainMenu. *Phase 1 (All)* and *Phase 2 Tavern (All)* still work on their own.
   - They create missing scenes but **never overwrite an existing scene without asking** (CLAUDE.md).
   - Data assets are only ever created, so your tuning is kept. Prefabs are rebuilt every run.
 - **Command line** (close the editor first):
 
 ```
-"C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -executeMethod Hearthdelve.Editor.Phase2Generator.RunBatch -logFile BatchLogs/generate2.log
+"C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -executeMethod Hearthdelve.Editor.Phase3Generator.RunBatch -logFile BatchLogs/generate3.log
 "C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults BatchLogs/editmode.xml -logFile BatchLogs/editmode.log
 "C:\Program Files\Unity\Hub\Editor\6000.3.19f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform PlayMode -testResults BatchLogs/playmode.xml -logFile BatchLogs/playmode.log
 ```
 
 ## Needs you in the editor
 
-1. **Play a service:** open `Assets/_Project/Scenes/TavernGreybox.unity` with a 16:9 Game view (1920×1080 works well) and press Play.
+1. **Play the loop:** open `Assets/_Project/Scenes/Boot.unity` with a 16:9 Game view (1920×1080 works well) and press Play. Use the Night summary (F10) to judge whether a day funds about one upgrade.
+   - Saves go to `Application.persistentDataPath` (`%USERPROFILE%\AppData\LocalLow\DefaultCompany\Hearthdelve\save_slot_1.json`). Delete that file for a clean start.
+   - To test service alone, `TavernGreybox` still plays on its own.
 2. **Tuning.** Changes made in Play mode are kept after you exit.
 
    | Asset | What's in it | When changes apply |
@@ -151,24 +209,38 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
    | `Data/Config/EconomyConfig` | Quality/freshness multipliers, tips, renown, flavor weights | Next dish |
    | `Data/Customers/*` | Patience, tastes, generosity | Next customer |
    | `Data/Staff/Staff_Pip` | Skill, quality cap | Next evening |
-   | `Data/Recipes/*` | Ingredients, values | Next evening |
+   | `Data/Recipes/*` | Ingredients, values, breakfast buff (kind + amount) | Next evening / next breakfast |
+   | `Data/Upgrades/*` | Levels: cost and amount per level | Next purchase (effects apply next delve / evening) |
+   | `Data/Config/FreshnessConfig` | Dungeon loss per minute, overnight loss, Chilled multiplier | Next delve / next night |
+   | `Data/GameDatabase` | New-game gold, `allowDebugFill`, the ingredient and upgrade lists saves look up | Next new game / immediately |
+   | `Data/Tavern/TavernContent` | `baseSeats` (before upgrades) | Next evening |
 
 3. **Nothing needs manual wiring.**
 
 ## Known issues / limitations
 
+**Day loop (Phase 3):**
+- **Not playtested yet.**
+  - **Upgrade costs:** 100/180/280 satchel, 80/150/240 Essence, 120/220 seats.
+  - **Breakfast buffs:** +15–25 max Essence (Grill), 20–30% slower drain (Tap).
+  - **Freshness:** 0.08 lost per dungeon minute and per night.
+  - All of these are estimates; the Night summary is there to check them.
+- **The same dungeon every day.** It's the one greybox level with fixed enemies, so the haul is similar each day. Procedural rooms are out of scope.
+- **No spoilage.** Parts at 0 freshness are still usable, just worth less.
+- **No staff wages or upkeep yet** (GDD §7.3).
+- **Quitting mid-day** loses progress back to the last save (Night or Morning), by design (GDD §10.6).
+- **Breakfast in `TavernGreybox` played on its own** isn't available; Morning only exists in the day loop.
+
 **Tavern (Phase 2):**
-- **Chopping and the stew pot haven't been playtested.** The chop board layout has only been checked by tests, not on screen, and simmer time, helpings and stew prices are first-pass numbers.
+- **Chopping and the stew pot:** playtested and working; simmer time, helpings and stew prices are still first-pass numbers.
 - **Pip on the Stew Pot** keeps a batch going whenever the pot is empty, which can use up ingredients the Grill dishes need.
 - **Stew orders aren't reserved.** A Grill dish can use up ingredients a waiting stew order was counting on. That order then waits until it walks out.
 - **Leftover helpings** in the pot at closing are discarded.
 - **One playtest so far.** Patience, arrival rate, prices and minigame windows are still first-pass numbers.
 - **Delivery reach** reuses `ServiceConfig → player → interactRange` (0.9 tiles). The nearest matching customer in reach is served and gets the gold floor ring (a placeholder until real art brings a sprite outline).
 - **Spare plates left at closing** are simply discarded.
-- **No storeroom decay.** Freshness only comes from the debug fill; overnight decay is designed for but not implemented.
 - **One staff helper.** The PlayMode test adds a second, test-only cook to run an end-to-end service with no player input.
 - **Flat floor.** Customers walk along the floor only and walk through each other; the only collision that matters is plate bumps.
-- **Restart empties the storeroom.** "Prepare another evening" reloads the scene, and nothing persists between evenings until the Phase 3 save and loop.
 - **Minigame hints:** the Tap prompt names the Aim binding generically (e.g. "W/S"). Proper button icons will come with real UI art.
 
 **Dungeon (Phase 1):**
@@ -176,8 +248,7 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 - Enemies have no contact damage.
 - The Shroom aims where you stood when its telegraph began.
 - **Harvest feed text** is built by joining two localized strings; some languages may need one formatted string later.
-- **Lockbox storage:** `PersistentStash` is in memory only until the Phase 3 save system.
-- **Deferred** (not in the Phase 1 criteria): ledge grab, double jump, harvest finisher, extraction points, secondary weapon/skills, damage numbers, audio.
+- **Deferred:** ledge grab, double jump, harvest finisher, secondary weapon/skills, damage numbers, audio. (One extraction point now exists, at the end of the level.)
 
 **General:**
 - **UI scale:** the UI uses a 1280×720 reference resolution so the default font stays readable. Pixel-art UI at 640×360 will come with a proper pixel font.
@@ -185,6 +256,16 @@ Tests: **212 project EditMode tests + 18 PlayMode tests, all passing, 0 compiler
 - **Standalone builds:** build the Localization Addressables content first (*Window → Asset Management → Addressables → Groups → Build → New Build → Default Build Script*). The editor doesn't need this.
 
 ## Decided
+
+**Phase 3 (2026-09-29):**
+1. **Where the loop lives:** `GameFlow` and the day logic are in `Hearthdelve.Shared`. The Boot scene stays loaded, and content scenes load additively. Played on their own, the Tavern and Combat scenes work as before.
+2. **Breakfast:**
+   - Each recipe has its own buff: Grill → max Essence, Tap → slower drain.
+   - Dish quality scales it, up to ×1.25.
+   - Grill and Tap dishes only; no stews.
+3. **Upgrades:** levels with rising cost, defined in the upgrade assets.
+4. **Saves:** v2 JSON with content saved by id; v1 is migrated. Autosave at Night (and after purchases, and after sleeping). Continue resumes at the saved phase.
+5. **Scenes:** CombatGreybox and TavernGreybox rebuilt (approved); Boot and MainMenu added; Boot is first in the build list.
 
 **Phase 2 playtest feedback, round 2 (2026-09-29):**
 1. **Service length:** 2.5 minutes, with last orders 20 s before the end.
