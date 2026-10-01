@@ -197,7 +197,7 @@ When `TavernGreybox` or `CombatGreybox` is played on its own (no Boot), it behav
 ## Needs you in the editor
 
 1. **Play the loop:** open `Assets/_Project/Scenes/Boot.unity` with a 16:9 Game view (1920×1080 works well) and press Play. Use the Night summary (F10) to judge whether a day funds about one upgrade.
-   - Saves go to `Application.persistentDataPath` (`%USERPROFILE%\AppData\LocalLow\DefaultCompany\Hearthdelve\save_slot_1.json`). Delete that file for a clean start.
+   - Saves go to `Application.persistentDataPath` (`%USERPROFILE%\AppData\LocalLow\sagaphy\Hearthdelve\save_slot_1.json`). Delete that file for a clean start.
    - To test service alone, `TavernGreybox` still plays on its own.
 2. **Tuning.** Changes made in Play mode are kept after you exit.
 
