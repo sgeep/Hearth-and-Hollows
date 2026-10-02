@@ -172,7 +172,7 @@ The heart of the fantasy. How a monster dies influences what it drops. Unchanged
 
 ### 4.5 Field Cooking (Optional Mechanic)
 
-At campfire rooms, the player can cook a quick meal from carried parts for a mid-run heal or buff. This sacrifices ingredients that could be sold, creating a meaningful choice, and echoes the *Delicious in Dungeon* spirit.
+At campfire rooms, the player can cook a quick meal from carried parts to restore Essence or grant a buff. This sacrifices ingredients that could be sold, creating a meaningful choice, and echoes the *Delicious in Dungeon* spirit.
 
 ### 4.6 Run Structure and Biomes (rewritten in v0.2)
 
