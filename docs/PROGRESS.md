@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-02_
+_Last updated: 2026-10-02 (4a build)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -49,14 +49,33 @@ Each is planned, approved, built and playtested separately. The web build must w
   - `GameSettings` gained vibration on/off, intensity and the reduced-intensity option.
 - Docs: `CLAUDE.md` updated, GDD rewritten as v0.2, `docs/THIRD_PARTY.md` and `docs/CREDITS.md` added.
 
-Tests: **243 project EditMode tests, all passing** in batch mode (the run reports 244; a package adds one stub test). No PlayMode tests yet.
+- **Project setup** (*Hearthdelve → Setup → Configure Project Settings*): no gravity; custom transparency sort axis (0, 1, 0) on the 2D renderer and in Graphics settings; a `Pickup` layer beside TDE's layers (which keep TDE's indices); the Nice Vibrations define on Standalone and Web; stale demo scenes removed from the build list.
+- **Input:** `HearthdelveInputManager`, a subclass of TDE's `InputSystemManager`, maps our Dungeon or Tavern action map onto TDE's movement and buttons. The Dungeon map was rebuilt for top-down (no jump; adds `AimPoint` and `Heavy`). Aim follows the mouse on keyboard and mouse and the movement direction on a gamepad (`AimControlSwitcher`).
+- **Minifantasy import pipeline:** `MinifantasySheets` lists every imported image and how it is sliced; *Hearthdelve → Art → Import Minifantasy* copies them from `C:\Dev\Minifantasy` and a postprocessor applies 8 PPU, point filtering, no compression and the slicing. 32 sheets from six packs are in (about 0.9 MB). `docs/ASSET_MAP.md` records what each sheet contains.
+- **Haptics:** `HapticPattern` assets for the whole starting vocabulary (15 patterns, `Data/Haptics`), a pure `HapticMixer` (one-shots, continuous channels, settings), and `HapticService`, which sends the result to the gamepad through Nice Vibrations. `MMF_HapticPattern` plays a pattern from an `MMF_Player`. With no controller, and always on the web, it does nothing.
+- **TDE boundary:** `TdeEventBridge` republishes TDE damage, death, revive and level-start events on our `EventBus` (`CharacterDamaged`, `CharacterDied`, `CharacterRevived`, `LevelStarted`). Nothing else of ours listens to `MMEventManager`.
+- **Essence:** `EssenceHealth`, a subclass of TDE's `Health` backed by `EssenceMeter`. It is the player's only health pool: it drains over time, drops when TDE applies damage, and at zero the character dies through TDE's death path and `PlayerDefeated` is published once.
+- **Tuning stays in assets:** `PlayerTuning` applies `PlayerMoveConfig` (walk speed, dodge distance, duration, cooldown, i-frames) to the TDE abilities; `ComboWeaponTuning` applies the cleaver's `WeaponDefinition` to the TDE combo weapon; `EnemyIdentity` applies `EnemyDefinition`.
+- **Sprite animation:** `SpriteAnimationSet` assets generated from the Minifantasy sheets and their frame-duration guides, shown by `CharacterSpriteAnimator` (four drawn facings, state taken from the TDE character). See "Open design questions".
+- **Harvest:** `HarvestSystem` turns an enemy's death into drops through the existing `HarvestRules`; `IngredientPickup` puts them in the satchel (`SatchelCarrier`).
+- **Localization on the web:** `Loc.Preload` loads the string tables without blocking; `LocalizationBoot` runs it in every scene and `LocalizedSuperText` refreshes when the tables arrive. On the web a lookup never waits synchronously.
+- **The look test** (*Hearthdelve → Generate → 4a Look Test (All)*): `LookTest_Dungeon` and `LookTest_Tavern`, with real Minifantasy art.
+  - Dungeon room: a 22×11-tile room from the Dungeon tileset with props and torches; the player (Human Townsfolk) with Essence, a dodge roll with i-frames and the three-hit cleaver combo; two Green Slimes that chase and deal contact damage; a harvest drop to pick up; one combined hit feedback (flash, screen shake, placeholder sound and the `Tap.Firm` haptic in a single `MMF_Player`); props that sort by Y.
+  - Tavern corner: the premade room from the Tavern Indoor add-on; the same TDE character without weapon or Essence; a cook behind the bar with a Super Text Mesh speech bubble that appears when the player is near.
+  - **F2** cycles the reference resolution (320×180, 240×135, 160×90) so character scale can be compared live. **F3** switches between the two scenes.
 
-**Next:**
+Tests, all passing in batch mode with 0 compiler warnings in our code:
 
-1. Project setup: no gravity, Y-sort axis, Pixel Perfect Camera at 320×180 and 8 PPU, TDE `InputSystemManager` subclass over our action maps.
-2. Minifantasy import pipeline and `docs/ASSET_MAP.md`.
-3. Haptic pattern library and service; TDE-to-`EventBus` bridge; `EssenceHealth`.
-4. The dungeon room and tavern corner, PlayMode tests, web build smoke test.
+- **273 project EditMode tests** (the run reports 274; a package adds one stub test). 30 are new in 4a: haptic envelope and mixer, the haptic library asset, sprite timing, Minifantasy import settings, and `IngredientItem` identity.
+- **13 PlayMode tests** against the two look-test scenes: the top-down setup, Essence as the only health pool and its drain, keyboard movement, walls, the dodge roll and its i-frames, enemy contact damage with its feedback, the combo killing a slime that drops a harvest the player picks up, death at zero Essence (reported once), haptics respecting settings and doing nothing without a controller, the tavern character, the localized speech bubble, table preloading, and the resolution switch.
+
+**Not done yet — 4a is not complete:**
+
+1. **Web build smoke test.** The Web build module is not installed for Unity 6000.6.4f1, and installing it needs a Windows elevation prompt. Once it is installed, *Hearthdelve → Build → Web (development)* (or `BuildTools.BuildWebBatch`) builds to `Builds/Web`; the preload fix and the no-haptics path then need checking in a browser.
+2. **Controller rumble check** in the editor (see "Needs you in the editor").
+3. **Your review of the look test**, which decides the resolution and character scale before 4b.
+
+**320×180 at 8 PPU is still provisional** until that review.
 
 ### Checks made for the pivot
 
@@ -79,22 +98,57 @@ Tests: **243 project EditMode tests, all passing** in batch mode (the run report
 5. **GDD** converted from an HTML export to Markdown.
 6. **Technical:** 320×180 at 8 PPU (to confirm in the look test), Unity 6.6 now and 6.7 LTS on release.
 
+### Needs you in the editor (4a)
+
+1. **Install the Web build module:** Unity Hub → Installs → 6000.6.4f1 → Add modules → Web Build Support (accept the Windows prompt). Then tell me, and I'll run the web smoke test.
+2. **Look test:** open `Assets/_Project/Scenes/LookTest_Dungeon.unity` with a 16:9 Game view (1920×1080) and press Play.
+   - Move with WASD or the left stick, attack with the left mouse button or X, dodge with Space or B.
+   - **F2** cycles 320×180 → 240×135 → 160×90. **F3** goes to the tavern corner and back.
+   - What to judge: character size and readability at each resolution, in both scenes.
+3. **Controller rumble:** with a controller connected, in the dungeon scene:
+   - Hit a slime: a short, firm tap on both motors (`Tap.Firm`).
+   - Get hit by a slime: a sharper, low thud (`Hit.Taken`).
+   - Pick up a drop: a very light, short buzz (`Tap.Light`).
+   - Unplug the controller and repeat: nothing should change apart from the missing rumble.
+   - To feel any other pattern, select its asset in `Assets/_Project/Data/Haptics` and play it from an `MMF_Player`'s *Haptic Pattern* feedback.
+4. **Tuning** (changes made in Play mode apply immediately): `Data/Config/PlayerMoveConfig` (walk speed, dodge), `Data/Weapons/Weapon_ButchersCleaver` (combo damage, timing, reach), `Data/Config/EssenceConfig` (drain, post-hit invulnerability), `Data/Enemies/Enemy_GreenSlime`, and the patterns in `Data/Haptics`.
+
+### Open design questions (4a)
+
+1. **Resolution and character scale:** 320×180, 240×135 or 160×90 at 8 PPU. Your call after the look test.
+2. **Sprite animation without Mecanim.** Characters are animated by `CharacterSpriteAnimator` reading `SpriteAnimationSet` assets, not by Animator Controllers and clips. With four facings per action, a controller per character would be 24 or more states each; the sets are generated straight from the sheets and the frame timing is unit-tested. TDE's animator parameters are therefore unused. If you would rather have Animator clips (the GDD says "clips generated from the Minifantasy sheets"), say so before 4b, while only three characters exist.
+3. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
+
 ### Known issues
 
 - **Character size:** at 320×180 a character is about 4% of screen height. This is the main thing to judge in the look test.
+- **The look-test UI is placeholder:** the Essence bar is a plain bar, and text uses Unity's built-in font through Super Text Mesh (no pixel font exists). I could not check the UI's appearance from batch mode; the tests only confirm it exists and shows localized text.
+- **2D lights** (cool room light, warm torches) are in the scenes, but I have only seen them in still captures, where the torch glow is faint.
+- **Look-test death:** at zero Essence the room restarts after 2.5 s. The real death screen and Lockbox flow are 4b.
+- **Heavy / charged attack** is bound (`Dungeon/Heavy`) but not built; it is 4b with the rest of combat.
+- **Slime behaviour** is chase and contact damage only. Telegraphed attacks from `AttackCycle` are 4b.
+- **Enemies ignore obstacles** when chasing; the grid A* is not wired to a TDE AI action yet (4b).
+- **No swap prompt:** a pickup that doesn't fit in the satchel stays on the floor (4b).
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
-- **Localization on WebGL:** the ported `Loc` uses synchronous lookups, which don't work on WebGL. 4a adds table preloading at boot.
 - **Leftovers to remove in 4b:** `GamePause`'s hit-stop flag and the `HitStopRequested` event (hit-stop moves to MMFeedbacks).
-- **Data assets** for enemies, ingredients and recipes still describe the old roster and have no icons.
+- **Data assets** for enemies, ingredients and recipes still describe the old roster; only the slime's two parts have icons.
 
 ### Regenerating and verifying (current project)
 
-Close the editor first.
+- **Menu:** *Hearthdelve → Generate → 4a Look Test (All)*. It configures the project, imports the Minifantasy sheets, and builds the data assets, prefabs and the two scenes.
+  - Scenes are created when missing and **never overwritten without asking** (a dialog in the editor; `-rebuildScene` in batch mode).
+  - Data assets (configs, haptic patterns) are only created, so your tuning is kept. Animation sets, tiles and prefabs are rebuilt every run.
+- **Command line** (close the editor first):
 
 ```
-"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -nographics -quit -projectPath . -logFile BatchLogs/compile.log
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -executeMethod Hearthdelve.Editor.LookTestBuilder.RunBatch -logFile BatchLogs/generate.log
 "C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults BatchLogs/editmode.xml -logFile BatchLogs/editmode.log
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -projectPath . -runTests -testPlatform PlayMode -testResults BatchLogs/playmode.xml -logFile BatchLogs/playmode.log
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -projectPath . -executeMethod Hearthdelve.Editor.BuildTools.CaptureLookTestBatch -logFile BatchLogs/capture.log
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -projectPath . -executeMethod Hearthdelve.Editor.BuildTools.BuildWebBatch -logFile BatchLogs/webbuild.log
 ```
+
+The capture command renders each look-test scene at 320×180 into `BatchLogs/looktest_*.png`. The web build needs the Web build module.
 
 ---
 

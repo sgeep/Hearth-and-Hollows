@@ -20,7 +20,7 @@ Rules for working with these are in `CLAUDE.md` ("Third-party code"). The repo s
 | Nice Vibrations (Lofelt) | 4.1.2, Lofelt Studio SDK 1.3.4 | `Assets/Feel/NiceVibrations` | Unity Asset Store EULA (obtained as part of Feel), plus `3RD-PARTY-LICENSES.md` in its folder | Gamepad rumble |
 | Feel (More Mountains) | 6.1 | not imported | Unity Asset Store EULA | **Licensed, but only its `NiceVibrations` folder is imported.** Never import Feel's `MMFeedbacks`, `MMTools` or demo folders. |
 | Super Text Mesh (Kai Clavier) | version not stated in the package | `Assets/Clavian/SuperTextMesh` | Unity Asset Store EULA, plus `3rdPartyComponentLicense.txt` | All player-facing text (uGUI and world space), Ultra shader under URP |
-| Minifantasy (Krishna Palacio) | per pack | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
+| Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, and the Tavern Indoor and Loot Icons exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
 
 ### License notes
 
@@ -68,6 +68,7 @@ These kept vendor files point at removed demo assets. None is used by our game; 
 
 ## Nice Vibrations notes
 
-- TDE's MMFeedbacks already contains the haptic feedbacks (`MMF_NVClip`, `MMF_NVContinuous`, `MMF_NVControl`, `MMF_NVEmphasis`, `MMF_NVPreset`). They compile only when the scripting define `MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED` is set; Nice Vibrations sets it for the **selected build target only**. It is set for Standalone; it must also be set for the Web build profile.
+- TDE's MMFeedbacks already contains the haptic feedbacks (`MMF_NVClip`, `MMF_NVContinuous`, `MMF_NVControl`, `MMF_NVEmphasis`, `MMF_NVPreset`). They compile only when the scripting define `MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED` is set; Nice Vibrations sets it for the **selected build target only**. *Hearthdelve → Setup → Configure Project Settings* sets it for both Standalone and Web.
 - To re-import from the Feel package: tick only `Feel/NiceVibrations` and `Feel/readme.txt`; untick `FeelDemos*`, `MMFeedbacks` and `MMTools`.
+- Our `HapticService` mixes the named patterns itself and hands Nice Vibrations a short rumble each frame (`GamepadRumbler.Load` / `Play`), so the motors switch off by themselves if updates stop. Nice Vibrations' own pattern playback uses `System.Timers`, which never fire in a web build; the service does not rely on it and uses a no-op output on the web.
 - Off mobile, rumble goes through the Input System's `Gamepad.SetMotorSpeeds` (low and high motor). Controller support therefore follows the Input System; see `docs/PROGRESS.md` for the test results.

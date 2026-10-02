@@ -8,7 +8,7 @@ What happens to every file of the side-scroller prototype (tag `v0-sidescroller-
 
 The **Ported** column shows whether the file is already in this project. "Adapt" files marked as ported were copied unchanged so the tests could pass first; their changes happen in the sub-milestone named in the reason. Files are copied together with their `.meta` files so asset references survive.
 
-Totals for `Assets/_Project`: **94 Keep, 72 Adapt, 105 Drop** (271 files); 135 already ported.
+Totals for `Assets/_Project`: **93 Keep, 72 Adapt, 106 Drop** (271 files). The **Ported** column is current as of 4a.
 
 Paths are relative to `Assets/_Project/`.
 
@@ -20,12 +20,12 @@ Paths are relative to `Assets/_Project/`.
 | `Events/CoreEvents.cs` | Adapt | yes | Ported as-is; `HitStopRequested` goes in 4b when MMFeedbacks freeze-frame replaces hit-stop |
 | `Events/EventBus.cs` | Keep | yes | Event bus is engine-agnostic; TDE events get bridged onto it |
 | `Hearthdelve.Core.asmdef` | Keep | yes | Assembly unchanged |
-| `Input/InputMaps.cs` | Adapt | yes | Ported as-is; map names stay, but Dungeon/Tavern now feed TDE through an `InputSystemManager` subclass |
-| `Layers.cs` | Adapt | yes | Ported as-is; layer names and indices must be reconciled with TDE's layers in 4a |
+| `Input/InputMaps.cs` | Adapt | yes | Done in 4a: Dungeon actions are top-down (`AimPoint`, `Heavy`; no jump); maps feed TDE through `HearthdelveInputManager` |
+| `Layers.cs` | Adapt | yes | Done in 4a: TDE layers keep their indices; ours (`Pickup`) use free slots; sorting layers follow TDE |
 | `Minigames/IMinigame.cs` | Keep | yes | Minigame contract is unchanged |
 | `Random/IRandom.cs` | Keep | yes | Seedable random used by pure logic and tests |
 | `Services/GamePause.cs` | Adapt | yes | Ported as-is; hit-stop flag goes in 4b, and pause must cooperate with TDE's pause |
-| `Services/GameSettings.cs` | Adapt | yes | Ported as-is; gains vibration on/off, intensity and reduced-intensity settings |
+| `Services/GameSettings.cs` | Adapt | yes | Vibration settings and the flash option added |
 | `Services/HitStop.cs` | Drop | no | Replaced by MMFeedbacks freeze-frame inside the combined hit feedback |
 | `Services/HitStopDriver.cs` | Drop | no | Replaced by MMFeedbacks freeze-frame inside the combined hit feedback |
 
@@ -40,7 +40,7 @@ Paths are relative to `Assets/_Project/`.
 | `Game/GameDatabase.cs` | Keep | yes | Perspective-neutral game logic (economy, day loop, inventory, recipes, upgrades, saves) |
 | `Game/GameFlow.cs` | Adapt | yes | Ported as-is; scene names and transitions change with the new scenes |
 | `Game/GameState.cs` | Keep | yes | Perspective-neutral game logic (economy, day loop, inventory, recipes, upgrades, saves) |
-| `Hearthdelve.Shared.asmdef` | Keep | yes | Assembly unchanged |
+| `Hearthdelve.Shared.asmdef` | Adapt | yes | References TDE, MMTools, Nice Vibrations, Cinemachine and the Input System (the TDE-facing code shared by dungeon and tavern lives here) |
 | `Ingredients/IngredientDefinition.cs` | Keep | yes | Perspective-neutral game logic (economy, day loop, inventory, recipes, upgrades, saves) |
 | `Ingredients/IngredientEnums.cs` | Keep | yes | Perspective-neutral game logic (economy, day loop, inventory, recipes, upgrades, saves) |
 | `Ingredients/IngredientItem.cs` | Adapt | yes | Ported with one fix: `GetInstanceID` is an error on Unity 6.6 |
@@ -75,7 +75,7 @@ Paths are relative to `Assets/_Project/`.
 | `Enemies/DummyBehaviour.cs` | Adapt | no | Behaviour rewritten as TDE AI actions/decisions; the rat is replaced (no rat art with an attack) |
 | `Enemies/EnemyController.cs` | Drop | no | Replaced by TDE `Character` + `AIBrain` |
 | `Enemies/EnemyDefinition.cs` | Adapt | yes | Ported as-is; gains TDE prefab and animation references; roster changes to fit the art |
-| `Enemies/EnemyHealth.cs` | Adapt | no | Becomes a TDE `Health` subclass that reports kill context to the harvest rules |
+| `Enemies/EnemyHealth.cs` | Adapt | yes | Replaced in 4a by TDE `Health` plus `EnemyIdentity`; kill context comes from the bridged death event |
 | `Enemies/RatBehaviour.cs` | Adapt | no | Behaviour rewritten as TDE AI actions/decisions; the rat is replaced (no rat art with an attack) |
 | `Enemies/ShroomBehaviour.cs` | Adapt | no | Behaviour rewritten as TDE AI actions/decisions; the rat is replaced (no rat art with an attack) |
 | `Enemies/SlimeBehaviour.cs` | Adapt | no | Behaviour rewritten as TDE AI actions/decisions; the rat is replaced (no rat art with an attack) |
@@ -85,10 +85,10 @@ Paths are relative to `Assets/_Project/`.
 | `Essence/EssenceMeter.cs` | Keep | yes | Pure Essence logic; backs the TDE `Health` subclass |
 | `Harvest/HarvestRules.cs` | Keep | yes | Pure harvest rules and their tuning are unchanged |
 | `Harvest/HarvestRulesConfig.cs` | Keep | yes | Pure harvest rules and their tuning are unchanged |
-| `Harvest/HarvestSystem.cs` | Adapt | no | Listens to bridged TDE death events instead of `EnemyHealth` |
-| `Harvest/IngredientPickup.cs` | Adapt | no | Rebuilt as a top-down pickup |
-| `Harvest/PlayerPickupCollector.cs` | Adapt | no | Same satchel/swap logic on the TDE character |
-| `Hearthdelve.Dungeon.asmdef` | Adapt | yes | Ported as-is; will add references to the TDE and MMTools assemblies |
+| `Harvest/HarvestSystem.cs` | Adapt | yes | Ported in 4a: listens to the bridged `CharacterDied` event |
+| `Harvest/IngredientPickup.cs` | Adapt | yes | Ported in 4a as a top-down trigger pickup; the swap prompt follows in 4b |
+| `Harvest/PlayerPickupCollector.cs` | Adapt | yes | Ported in 4a as `SatchelCarrier` (holds the satchel); swap logic follows in 4b |
+| `Hearthdelve.Dungeon.asmdef` | Adapt | yes | References the TDE and MMTools assemblies |
 | `Player/KinematicMover2D.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
 | `Player/MovementSettings.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
 | `Player/PlatformerMotor.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
@@ -96,7 +96,7 @@ Paths are relative to `Assets/_Project/`.
 | `Player/PlayerInputReader.cs` | Drop | no | Replaced by the TDE character, `InputSystemManager` subclass and animator |
 | `Player/PlayerMovementConfig.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
 | `Player/PlayerVisuals.cs` | Drop | no | Replaced by the TDE character, `InputSystemManager` subclass and animator |
-| `Player/PlayerVitals.cs` | Adapt | no | Becomes `EssenceHealth`, a TDE `Health` subclass backed by `EssenceMeter` |
+| `Player/PlayerVitals.cs` | Adapt | yes | Ported in 4a as `Essence/EssenceHealth.cs`, a TDE `Health` subclass backed by `EssenceMeter` |
 | `Player/Timers.cs` | Keep | yes | Small pure timers used by combo and AI logic |
 | `Run/DelveConfig.cs` | Keep | yes | Tuning ScriptableObject unchanged |
 | `Run/DelveExit.cs` | Adapt | no | Same extraction rule on a top-down interactable |
@@ -109,7 +109,7 @@ Paths are relative to `Assets/_Project/`.
 | `Customers/CustomerLogic.cs` | Keep | yes | Order, patience and preference logic is unchanged |
 | `Customers/CustomerProfile.cs` | Keep | yes | Order, patience and preference logic is unchanged |
 | `Customers/Preferences.cs` | Keep | yes | Order, patience and preference logic is unchanged |
-| `Hearthdelve.Tavern.asmdef` | Adapt | yes | Ported as-is; will add references to the TDE and MMTools assemblies |
+| `Hearthdelve.Tavern.asmdef` | Adapt | yes | References the TDE and MMTools assemblies |
 | `Minigames/ChopMinigame.cs` | Keep | yes | Panel minigames don't depend on perspective |
 | `Minigames/GrillConfig.cs` | Keep | yes | Panel minigames don't depend on perspective |
 | `Minigames/GrillMinigame.cs` | Keep | yes | Panel minigames don't depend on perspective |
@@ -143,7 +143,7 @@ Paths are relative to `Assets/_Project/`.
 | File | Status | Ported | Reason |
 |---|---|---|---|
 | `Debug/GameFlowDebugOverlay.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Hearthdelve.UI.asmdef` | Adapt | yes | Ported as-is; will reference Super Text Mesh and uGUI instead of UI Toolkit |
+| `Hearthdelve.UI.asmdef` | Adapt | yes | References Super Text Mesh and uGUI |
 | `Hud/DungeonHud.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
 | `Localization/Loc.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Localization/LoopLocKeys.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
@@ -174,16 +174,16 @@ Paths are relative to `Assets/_Project/`.
 | `Generation/Phase3Generator.cs` | Drop | no | Menu entry points for the old phases; Phase 4 gets its own |
 | `Generation/PlaceholderArtGenerator.cs` | Drop | no | Placeholder art replaced by Minifantasy |
 | `Generation/PrefabGenerator.cs` | Drop | no | Built side-view scenes and prefabs; new top-down builders replace them |
-| `Generation/SceneKit.cs` | Adapt | no | Scene helpers reused; UI Toolkit helpers removed |
+| `Generation/SceneKit.cs` | Drop | no | Not ported: its scene helpers were rewritten inside `LookTestBuilder.cs` for uGUI and Cinemachine 3 |
 | `Generation/TavernArtGenerator.cs` | Drop | no | Placeholder art replaced by Minifantasy |
 | `Generation/TavernContentGenerator.cs` | Adapt | no | Same data-asset generation, with content re-themed to the Minifantasy roster |
 | `Generation/TavernSceneBuilder.cs` | Drop | no | Built side-view scenes and prefabs; new top-down builders replace them |
-| `Hearthdelve.Editor.asmdef` | Adapt | no | Ported with the first editor tool; adds TDE and STM references |
-| `Setup/EditorPaths.cs` | Keep | no | Path constants; extended with third-party art paths |
-| `Setup/InputActionsBuilder.cs` | Adapt | no | Dungeon map changes for top-down (no jump or drop-through; adds aim and heavy attack) |
-| `Setup/LocalizationBuilder.cs` | Keep | no | Still builds the string tables |
-| `Setup/PixelArtImportPostprocessor.cs` | Adapt | no | Becomes the Minifantasy pipeline: point filter, no compression, 8 PPU, slicing |
-| `Setup/ProjectConfigurator.cs` | Adapt | no | New settings: no gravity, Y-sort axis, 320x180 pixel-perfect, TDE layers |
+| `Hearthdelve.Editor.asmdef` | Adapt | yes | Ported in 4a with TDE, STM and sprite-editor references |
+| `Setup/EditorPaths.cs` | Keep | yes | Ported in 4a, extended with third-party art paths |
+| `Setup/InputActionsBuilder.cs` | Adapt | yes | Ported in 4a: rebuilds only the Dungeon map for top-down, leaving the other maps as they are |
+| `Setup/LocalizationBuilder.cs` | Keep | yes | Still builds the string tables |
+| `Setup/PixelArtImportPostprocessor.cs` | Adapt | yes | Ported in 4a as `MinifantasyImportPostprocessor.cs` with `MinifantasySheets.cs` and `MinifantasyImporter.cs` |
+| `Setup/ProjectConfigurator.cs` | Adapt | yes | Ported in 4a: no gravity, Y-sort axis, layers, defines, build list |
 
 ## Tests: EditMode
 
@@ -276,7 +276,7 @@ Paths are relative to `Assets/_Project/`.
 
 | File | Status | Ported | Reason |
 |---|---|---|---|
-| `Hearthdelve.inputactions` | Adapt | yes | Ported as-is; Dungeon map changes for top-down |
+| `Hearthdelve.inputactions` | Adapt | yes | Dungeon map rebuilt for top-down in 4a |
 
 ## UI Toolkit assets
 
