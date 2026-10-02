@@ -12,6 +12,8 @@ namespace Hearthdelve.Core.Services
         /// <summary>0 = off, 1 = default. Multiplies every screen shake.</summary>
         public static float ScreenShakeScale = 1f;
         public static bool HitStopEnabled = true;
+        /// <summary>Screen and sprite flashes (photosensitivity option).</summary>
+        public static bool FlashEnabled = true;
 
         public static bool VibrationEnabled = true;
         /// <summary>The vibration intensity slider, 0–1. Scales every haptic.</summary>
@@ -28,6 +30,7 @@ namespace Hearthdelve.Core.Services
         {
             ScreenShakeScale = 1f;
             HitStopEnabled = true;
+            FlashEnabled = true;
             VibrationEnabled = true;
             VibrationIntensity = 1f;
             ReducedVibration = false;
