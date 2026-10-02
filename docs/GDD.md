@@ -451,7 +451,7 @@ Unity 6.6 now, moving to 6.7 LTS when it is released and staying there through l
 - **Input:** Input System with separate action maps (`Dungeon`, `Tavern`, `UI`, `Minigame`) and runtime rebinding. TDE reads input through a subclass of its `InputSystemManager` that maps our Dungeon and Tavern maps onto TDE's buttons.
 - **Camera:** Cinemachine 6.6 (TDE's Cinemachine 3 code path), room confiners, impulse-based shake.
 - **UI:** uGUI + STM + Minifantasy UI sprites. UI Toolkit is no longer used.
-- **Animation:** sprite-sheet animation, clips generated from the Minifantasy sheets and their frame-duration guides.
+- **Animation:** sprite-sheet animation through our own **SpriteSet** path, not Mecanim. Each character has a `SpriteAnimationSet` asset (per action: frames for the four drawn facings, a frame duration and a loop flag), generated from the Minifantasy sheets and their frame-duration guides. `CharacterSpriteAnimator` picks the action and facing from the TDE character's state and shows the frame. We deliberately don't use Animator Controllers or AnimationClips: four facings per action would mean 24 or more states per character, and TDE's animator parameters go unused. The animator is **presentation only**: TDE and our gameplay code stay authoritative for attack timing, damage, the dodge and its i-frames, and death, and the animator only reflects that state. It never drives gameplay, and gameplay never waits on an animation.
 - **Physics:** Physics 2D with no gravity.
 - **Pathfinding:** our own grid A* (TDE has none for 2D).
 - **Content Loading:** Addressables for biome assets and room prefabs when room loading is built; until then only Localization uses it.

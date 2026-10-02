@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-02 (4a build)_
+_Last updated: 2026-10-02 (4a final checks)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -56,7 +56,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 - **TDE boundary:** `TdeEventBridge` republishes TDE damage, death, revive and level-start events on our `EventBus` (`CharacterDamaged`, `CharacterDied`, `CharacterRevived`, `LevelStarted`). Nothing else of ours listens to `MMEventManager`.
 - **Essence:** `EssenceHealth`, a subclass of TDE's `Health` backed by `EssenceMeter`. It is the player's only health pool: it drains over time, drops when TDE applies damage, and at zero the character dies through TDE's death path and `PlayerDefeated` is published once.
 - **Tuning stays in assets:** `PlayerTuning` applies `PlayerMoveConfig` (walk speed, dodge distance, duration, cooldown, i-frames) to the TDE abilities; `ComboWeaponTuning` applies the cleaver's `WeaponDefinition` to the TDE combo weapon; `EnemyIdentity` applies `EnemyDefinition`.
-- **Sprite animation:** `SpriteAnimationSet` assets generated from the Minifantasy sheets and their frame-duration guides, shown by `CharacterSpriteAnimator` (four drawn facings, state taken from the TDE character). See "Open design questions".
+- **Sprite animation:** `SpriteAnimationSet` assets generated from the Minifantasy sheets and their frame-duration guides, shown by `CharacterSpriteAnimator` (four drawn facings, state taken from the TDE character). Approved as the animation path instead of Mecanim, presentation only (CLAUDE.md, GDD §10.1).
 - **Harvest:** `HarvestSystem` turns an enemy's death into drops through the existing `HarvestRules`; `IngredientPickup` puts them in the satchel (`SatchelCarrier`).
 - **Localization on the web:** `Loc.Preload` loads the string tables without blocking; `LocalizationBoot` runs it in every scene and `LocalizedSuperText` refreshes when the tables arrive. On the web a lookup never waits synchronously.
 - **The look test** (*Hearthdelve → Generate → 4a Look Test (All)*): `LookTest_Dungeon` and `LookTest_Tavern`, with real Minifantasy art.
@@ -66,16 +66,24 @@ Each is planned, approved, built and playtested separately. The web build must w
 
 Tests, all passing in batch mode with 0 compiler warnings in our code:
 
-- **273 project EditMode tests** (the run reports 274; a package adds one stub test). 30 are new in 4a: haptic envelope and mixer, the haptic library asset, sprite timing, Minifantasy import settings, and `IngredientItem` identity.
-- **13 PlayMode tests** against the two look-test scenes: the top-down setup, Essence as the only health pool and its drain, keyboard movement, walls, the dodge roll and its i-frames, enemy contact damage with its feedback, the combo killing a slime that drops a harvest the player picks up, death at zero Essence (reported once), haptics respecting settings and doing nothing without a controller, the tavern character, the localized speech bubble, table preloading, and the resolution switch.
+- **276 project EditMode tests** (the run reports 277; a package adds one stub test). 33 are new in 4a: haptic envelope and mixer, the haptic library asset, sprite timing, Minifantasy import settings, `IngredientItem` identity, and the render pipeline setup.
+- **17 PlayMode tests** against the two look-test scenes: the top-down setup, Essence as the only health pool and its drain, keyboard movement, walls, the dodge roll and its i-frames, gameplay with every sprite animator switched off (the animator is presentation only), enemy contact damage with its feedback, the combo killing a slime that drops a harvest the player picks up, death at zero Essence (reported once), haptics respecting settings and doing nothing without a controller, the tavern character, the bar and both table sets blocking the player from below, furniture footprints ending at their sort point, the localized speech bubble, table preloading, and the resolution switch.
 
-**Not done yet — 4a is not complete:**
+**Web smoke test (2026-10-02): passed.** A development web build (`Builds/Web`, 125 MB, 0 errors), served locally and played in Chrome:
 
-1. **Web build smoke test.** The Web build module is not installed for Unity 6000.6.4f1, and installing it needs a Windows elevation prompt. Once it is installed, *Hearthdelve → Build → Web (development)* (or `BuildTools.BuildWebBatch`) builds to `Builds/Web`; the preload fix and the no-haptics path then need checking in a browser.
-2. **Controller rumble check** in the editor (see "Needs you in the editor").
-3. **Your review of the look test**, which decides the resolution and character scale before 4b.
+- Both scenes render; the camera follows the player; walls and the bar block movement.
+- The Localization tables load from the build's Addressables bundles, and every Super Text Mesh text shows its English string: the HUD labels, the controls hint, the resolution label and the cook's speech bubble.
+- F2 changes the reference resolution and F3 switches scenes.
+- A slime's contact damage plays the combined hit feedback (flash, shake, sound, haptic) with no errors; rumble does nothing on the web, as intended.
+- Essence reaching zero kills the player and the room restarts.
+- The browser console shows no errors from the game.
 
-**320×180 at 8 PPU is still provisional** until that review.
+**Fixed after the first look-test review (2026-10-02):**
+
+- **Clipping into the bar from below.** Not movement through a collider: the bar's collider ended at the counter, 6 px above the bottom of its art (its stool row), so a player stopped below the counter was already behind the bar's sort point and drew behind it. The table sets had the same gap (their collider covered only the table, not the chairs). Each furniture piece now carries its own collision, and every footprint ends exactly at the bottom of its art. This is the rule for all solid furniture and props (CLAUDE.md, Y-sorting). The existing tavern scene was updated in place (*Hearthdelve → Generate → Update Tavern Furniture Collision*), not rebuilt.
+- **The project was not running URP.** Graphics Settings pointed at a render pipeline asset that doesn't exist: the 2026-10-02 project swap kept the old repo's `UniversalRP.asset.meta`, which gave the asset a different GUID. Unity fell back to the Built-in pipeline without any error, in the editor, the tests and every build. On the web this showed up as missing text: build-time shader stripping removed every URP-tagged shader, Super Text Mesh's included. `ProjectConfigurator` now assigns `Assets/Settings/UniversalRP.asset`, and an EditMode test guards it. The look is unchanged, because the generated sprites use the unlit default sprite material (see the open questions).
+
+**Before 4a sign-off:** your confirmation of the open questions below. Nothing in 4b starts, and nothing merges to `main`, until then.
 
 ### Checks made for the pivot
 
@@ -100,33 +108,23 @@ Tests, all passing in batch mode with 0 compiler warnings in our code:
 
 ### Needs you in the editor (4a)
 
-1. **Install the Web build module:** Unity Hub → Installs → 6000.6.4f1 → Add modules → Web Build Support (accept the Windows prompt). Then tell me, and I'll run the web smoke test.
-2. **Look test:** open `Assets/_Project/Scenes/LookTest_Dungeon.unity` with a 16:9 Game view (1920×1080) and press Play.
-   - Move with WASD or the left stick, attack with the left mouse button or X, dodge with Space or B.
-   - **F2** cycles 320×180 → 240×135 → 160×90. **F3** goes to the tavern corner and back.
-   - What to judge: character size and readability at each resolution, in both scenes.
-3. **Controller rumble:** with a controller connected, in the dungeon scene:
-   - Hit a slime: a short, firm tap on both motors (`Tap.Firm`).
-   - Get hit by a slime: a sharper, low thud (`Hit.Taken`).
-   - Pick up a drop: a very light, short buzz (`Tap.Light`).
-   - Unplug the controller and repeat: nothing should change apart from the missing rumble.
-   - To feel any other pattern, select its asset in `Assets/_Project/Data/Haptics` and play it from an `MMF_Player`'s *Haptic Pattern* feedback.
-4. **Tuning** (changes made in Play mode apply immediately): `Data/Config/PlayerMoveConfig` (walk speed, dodge), `Data/Weapons/Weapon_ButchersCleaver` (combo damage, timing, reach), `Data/Config/EssenceConfig` (drain, post-hit invulnerability), `Data/Enemies/Enemy_GreenSlime`, and the patterns in `Data/Haptics`.
+Done on 2026-10-02: Web Build Support installed; the look scenes, the camera scales and controller rumble tested and reported good.
+
+- **Tuning** (changes made in Play mode apply immediately): `Data/Config/PlayerMoveConfig` (walk speed, dodge), `Data/Weapons/Weapon_ButchersCleaver` (combo damage, timing, reach), `Data/Config/EssenceConfig` (drain, post-hit invulnerability), `Data/Enemies/Enemy_GreenSlime`, and the patterns in `Data/Haptics`.
 
 ### Open design questions (4a)
 
-1. **Resolution and character scale:** 320×180, 240×135 or 160×90 at 8 PPU. Your call after the look test.
-2. **Sprite animation without Mecanim.** Characters are animated by `CharacterSpriteAnimator` reading `SpriteAnimationSet` assets, not by Animator Controllers and clips. With four facings per action, a controller per character would be 24 or more states each; the sets are generated straight from the sheets and the frame timing is unit-tested. TDE's animator parameters are therefore unused. If you would rather have Animator clips (the GDD says "clips generated from the Minifantasy sheets"), say so before 4b, while only three characters exist.
+1. **Resolution:** you reported the camera scales look good "as is". Confirm that means keeping **320×180 at 8 PPU**, and it will be locked in CLAUDE.md and the GDD.
+2. **2D lighting.** Now that URP is really active, the scenes' 2D lights (cool room light, warm torches and hearth) still don't light anything. The generated sprites and tilemaps use the unlit default sprite material, which is what you approved. Switching them to URP's lit sprite material would bring in the lighting the GDD describes (§8.1), but it changes the look you approved. Decide whether to do it in 4b. Note that the generator already asks URP for its lit sprite material, so rebuilding the look-test scenes now would switch them to lit sprites.
 3. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
 
 ### Known issues
 
 - **Character size:** at 320×180 a character is about 4% of screen height. This is the main thing to judge in the look test.
-- **The look-test UI is placeholder:** the Essence bar is a plain bar, and text uses Unity's built-in font through Super Text Mesh (no pixel font exists). I could not check the UI's appearance from batch mode; the tests only confirm it exists and shows localized text.
-- **2D lights** (cool room light, warm torches) are in the scenes, but I have only seen them in still captures, where the torch glow is faint.
+- **The look-test UI is placeholder:** the Essence bar is a plain bar, and text uses Unity's built-in font through Super Text Mesh (no pixel font exists).
 - **Look-test death:** at zero Essence the room restarts after 2.5 s. The real death screen and Lockbox flow are 4b.
 - **Heavy / charged attack** is bound (`Dungeon/Heavy`) but not built; it is 4b with the rest of combat.
-- **Slime behaviour** is chase and contact damage only. Telegraphed attacks from `AttackCycle` are 4b.
+- **Slime behaviour** is chase and contact damage only. Telegraphed attacks from `AttackCycle` are 4b. TDE's move-towards action stops once the slime is lined up horizontally, so a slime can sit just above or below the player without touching (`UseMinimumXDistance`; fix with the 4b enemy work).
 - **Enemies ignore obstacles** when chasing; the grid A* is not wired to a TDE AI action yet (4b).
 - **No swap prompt:** a pickup that doesn't fit in the satchel stays on the floor (4b).
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
