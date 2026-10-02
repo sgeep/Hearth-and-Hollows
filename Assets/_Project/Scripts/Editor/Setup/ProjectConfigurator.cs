@@ -5,12 +5,13 @@ using Hearthdelve.Core;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace Hearthdelve.Editor
 {
     /// <summary>
-    /// One-time project settings for the top-down game: layers, no gravity, Y-sorting on the
+    /// One-time project settings for the top-down game: the URP 2D pipeline, layers, no gravity, Y-sorting on the
     /// 2D renderer, scripting defines, player settings and the build scene list. Safe to re-run.
     /// </summary>
     public static class ProjectConfigurator
@@ -20,6 +21,7 @@ namespace Hearthdelve.Editor
         [MenuItem("Hearthdelve/Setup/Configure Project Settings", priority = 0)]
         public static void ConfigureAll()
         {
+            ConfigureRenderPipeline();
             ConfigureLayers();
             ConfigurePhysics2D();
             ConfigureSorting();
@@ -30,8 +32,35 @@ namespace Hearthdelve.Editor
             Debug.Log("[Hearthdelve] Project settings configured.");
         }
 
+        /// <summary>Batch entry point: <c>-executeMethod Hearthdelve.Editor.ProjectConfigurator.ConfigureAllBatch</c>.</summary>
+        public static void ConfigureAllBatch()
+        {
+            ConfigureAll();
+            EditorApplication.Exit(GraphicsSettings.defaultRenderPipeline != null ? 0 : 1);
+        }
+
         static SerializedObject LoadSettings(string path) =>
             new(AssetDatabase.LoadAllAssetsAtPath(path)[0]);
+
+        public const string RenderPipelineAssetPath = "Assets/Settings/UniversalRP.asset";
+
+        /// <summary>
+        /// Makes the project's URP 2D asset the default render pipeline. Without it the editor and
+        /// every build silently run the Built-in pipeline: 2D lights do nothing, and builds strip
+        /// every URP-tagged shader (Super Text Mesh's included).
+        /// </summary>
+        public static void ConfigureRenderPipeline()
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(RenderPipelineAssetPath);
+            if (asset == null)
+            {
+                Debug.LogError($"[Hearthdelve] {RenderPipelineAssetPath} is missing; the project needs its URP 2D asset.");
+                return;
+            }
+            if (GraphicsSettings.defaultRenderPipeline == asset) return;
+            GraphicsSettings.defaultRenderPipeline = asset;
+            Debug.Log($"[Hearthdelve] Default render pipeline set to {RenderPipelineAssetPath}.");
+        }
 
         /// <summary>Names our layers. TDE's layers keep TDE's indices; a clash is reported, not overwritten.</summary>
         public static void ConfigureLayers()
