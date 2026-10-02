@@ -1,6 +1,98 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-09-29_
+_Last updated: 2026-10-02_
+
+## Phase 4 — Vertical slice, rebuilt top-down
+
+### The pivot (2026-10-02)
+
+Before Phase 4 the game changed from a side-scroller to a **top-down action roguelite with tavern management** (closer to Cult of the Lamb and Hades than to Dead Cells), rebuilt on a fresh Unity 6.6 project with third-party assets:
+
+- **TopDown Engine 5.0** for the character controller, combat, AI, camera and rooms, with its bundled **MMFeedbacks** for game feel.
+- **Nice Vibrations** (from Feel) for haptics.
+- **Super Text Mesh** with uGUI for all UI and text, replacing UI Toolkit.
+- **Minifantasy** (8×8, top-down) for all art.
+
+The core loop, Harvest system, Essence, ingredients, recipes, tavern minigames, economy and story are unchanged. Design details are in `docs/GDD.md` (v0.2); working rules are in `CLAUDE.md`.
+
+- The side-scroller prototype (Phases 1–3) is preserved at the tag **`v0-sidescroller-prototype`** and checked out read-only at `C:\Dev\Hearthdelve-v0`.
+- The pivot is on the branch **`pivot/top-down`**. It merges to `main` only after the 4a look test is approved.
+- Everything below the "Phase 1–3 history" heading describes the prototype at that tag, not the current project.
+
+### Sub-milestones
+
+Each is planned, approved, built and playtested separately. The web build must work at the end of each.
+
+| | Sub-milestone | Contents |
+|---|---|---|
+| **4a** | Integration and look test | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
+| 4b | Dungeon migration | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. |
+| 4c | Tavern and UI migration | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. |
+| 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
+| 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. |
+| 4f | Tavern Stage 1 content | Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement. |
+| 4g | Story and character creation | Yarn Spinner with an STM dialogue presenter, the Act I opening, onboarding. |
+| 4h | Menus, options and polish | Settings (screen shake, flash and vibration intensity), accessibility per GDD 12, audio system, web build. |
+
+### 4a status
+
+**Done:**
+
+- **Project swap.** The repo now holds the Unity 6000.6.4f1 project; history is preserved. Vendor demo and sample folders were removed before the first commit (Assets 488 MB → 92 MB, 69 MB in Git LFS). The list is in `docs/THIRD_PARTY.md`.
+- **Vendors compile cleanly** in batch mode: TopDown Engine 5.0, Super Text Mesh (with two assembly definitions we added), Nice Vibrations 4.1.2. Only one copy of MMFeedbacks/MMTools exists, and TDE's haptic feedbacks compile against Nice Vibrations.
+- **Port manifest** written: `docs/PORT_MANIFEST.md` (94 Keep, 72 Adapt, 105 Drop).
+- **Pure logic and EditMode tests ported:** 209 project EditMode tests pass in batch mode with 0 compiler errors and 0 warnings in our code. Retired with the code they covered: 24 platformer-motor tests and 4 hit-stop tests.
+- Docs: `CLAUDE.md` updated, GDD rewritten as v0.2, `docs/THIRD_PARTY.md` and `docs/CREDITS.md` added.
+
+**Next:**
+
+1. Project setup: no gravity, Y-sort axis, Pixel Perfect Camera at 320×180 and 8 PPU, TDE `InputSystemManager` subclass over our action maps.
+2. New pure logic with tests: grid A*, movement direction → facing, gameplay value → haptic intensity.
+3. Minifantasy import pipeline and `docs/ASSET_MAP.md`.
+4. Haptic pattern library and service; TDE-to-`EventBus` bridge; `EssenceHealth`.
+5. The dungeon room and tavern corner, PlayMode tests, web build smoke test.
+
+### Checks made for the pivot
+
+1. **Import:** TDE 5.0 and STM compile on Unity 6000.6.4f1 with 0 errors. STM gives 22 obsolete-API warnings (worth re-checking on 6.7). Package changes are listed in `docs/THIRD_PARTY.md`.
+2. **Nice Vibrations on its own:** works. Only `Feel/NiceVibrations` was imported; there is no duplicate MMTools/MMFeedbacks.
+3. **Rumble platforms:** off mobile, Nice Vibrations rumbles through the Input System (`Gamepad.SetMotorSpeeds`). Expected, **not yet tested on hardware**: Xbox controllers work; DualShock 4 and DualSense work over USB; Switch Pro has no rumble on PC unless Steam Input presents it as an Xbox pad; web builds have no rumble. Unsupported cases must do nothing, silently.
+4. **Art:**
+   - Sheets are 32×32 frames with an ~8×8 body, four rows for four **diagonal** facings (front-right, front-left, back-right, back-left); death is a single row.
+   - Creatures, True Heroes and many exclusives have full idle/walk/attack/damage/die sets.
+   - A Myriad of NPCs has layered outfits and hair only for idle, walk, damage and die, so it can't be a layered combat character. The Weapons pack layers weapons over a bare body for all attacks.
+   - There is no rat with an attack, no sound of any kind, and no pixel font found yet.
+5. **Pathfinding:** TDE's is NavMesh-based and 3D-only. We write our own grid A* in pure C#.
+
+### Decided for the pivot (2026-10-02)
+
+1. **Player customization:** a pre-clothed body with palette swaps (skin, hair, outfit colours), not layered outfits.
+2. **Biome 1 roster:** the Giant Rat is replaced by the Bat and Giant Spider; the boss is the Mother Slime, replacing the Cellar King. Final mapping is reviewed in `docs/ASSET_MAP.md`.
+3. **Super Text Mesh** gets two assembly definitions inside its folder (no code changes).
+4. **Sound:** generated placeholders for now. Real SFX and music need a source later.
+5. **GDD** converted from an HTML export to Markdown.
+6. **Technical:** 320×180 at 8 PPU (to confirm in the look test), Unity 6.6 now and 6.7 LTS on release.
+
+### Known issues
+
+- **Character size:** at 320×180 a character is about 4% of screen height. This is the main thing to judge in the look test.
+- **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
+- **Localization on WebGL:** the ported `Loc` uses synchronous lookups, which don't work on WebGL. 4a adds table preloading at boot.
+- **Leftovers to remove in 4b:** `GamePause`'s hit-stop flag and the `HitStopRequested` event (hit-stop moves to MMFeedbacks).
+- **Data assets** for enemies, ingredients and recipes still describe the old roster and have no icons.
+
+### Regenerating and verifying (current project)
+
+Close the editor first.
+
+```
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -nographics -quit -projectPath . -logFile BatchLogs/compile.log
+"C:\Program Files\Unity\Hub\Editor\6000.6.4f1\Editor\Unity.exe" -batchmode -nographics -projectPath . -runTests -testPlatform EditMode -testResults BatchLogs/editmode.xml -logFile BatchLogs/editmode.log
+```
+
+---
+
+# Phase 1–3 history (side-scroller prototype, tag `v0-sidescroller-prototype`)
 
 ## Status
 
