@@ -1,3 +1,4 @@
+using Hearthdelve.Core.Haptics;
 using UnityEngine;
 
 namespace Hearthdelve.Core.Services
@@ -12,11 +13,24 @@ namespace Hearthdelve.Core.Services
         public static float ScreenShakeScale = 1f;
         public static bool HitStopEnabled = true;
 
+        public static bool VibrationEnabled = true;
+        /// <summary>The vibration intensity slider, 0–1. Scales every haptic.</summary>
+        public static float VibrationIntensity = 1f;
+        /// <summary>Accessibility option: caps every haptic at <see cref="ReducedVibrationCap"/>.</summary>
+        public static bool ReducedVibration;
+        public const float ReducedVibrationCap = 0.4f;
+
+        public static HapticSettings Haptics =>
+            new(VibrationEnabled, VibrationIntensity, ReducedVibration, ReducedVibrationCap);
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Reset()
         {
             ScreenShakeScale = 1f;
             HitStopEnabled = true;
+            VibrationEnabled = true;
+            VibrationIntensity = 1f;
+            ReducedVibration = false;
         }
     }
 }

@@ -41,16 +41,22 @@ Each is planned, approved, built and playtested separately. The web build must w
 - **Project swap.** The repo now holds the Unity 6000.6.4f1 project; history is preserved. Vendor demo and sample folders were removed before the first commit (Assets 488 MB → 92 MB, 69 MB in Git LFS). The list is in `docs/THIRD_PARTY.md`.
 - **Vendors compile cleanly** in batch mode: TopDown Engine 5.0, Super Text Mesh (with two assembly definitions we added), Nice Vibrations 4.1.2. Only one copy of MMFeedbacks/MMTools exists, and TDE's haptic feedbacks compile against Nice Vibrations.
 - **Port manifest** written: `docs/PORT_MANIFEST.md` (94 Keep, 72 Adapt, 105 Drop).
-- **Pure logic and EditMode tests ported:** 209 project EditMode tests pass in batch mode with 0 compiler errors and 0 warnings in our code. Retired with the code they covered: 24 platformer-motor tests and 4 hit-stop tests.
+- **Pure logic and EditMode tests ported:** 209 ported EditMode tests pass in batch mode with 0 compiler errors and 0 warnings in our code. Retired with the code they covered: 24 platformer-motor tests and 4 hit-stop tests.
+- **New pure logic with tests** (34 tests), all in `Hearthdelve.Core`:
+  - `GridMap` / `GridPathfinder`: 8-direction A* that never cuts corners.
+  - `FacingLogic`: 8-direction input → the four drawn facings.
+  - `HapticMath` / `HapticRamp`: settings scaling, gameplay value → rumble strength, layering, low-Essence heartbeat timing.
+  - `GameSettings` gained vibration on/off, intensity and the reduced-intensity option.
 - Docs: `CLAUDE.md` updated, GDD rewritten as v0.2, `docs/THIRD_PARTY.md` and `docs/CREDITS.md` added.
+
+Tests: **243 project EditMode tests, all passing** in batch mode (the run reports 244; a package adds one stub test). No PlayMode tests yet.
 
 **Next:**
 
 1. Project setup: no gravity, Y-sort axis, Pixel Perfect Camera at 320×180 and 8 PPU, TDE `InputSystemManager` subclass over our action maps.
-2. New pure logic with tests: grid A*, movement direction → facing, gameplay value → haptic intensity.
-3. Minifantasy import pipeline and `docs/ASSET_MAP.md`.
-4. Haptic pattern library and service; TDE-to-`EventBus` bridge; `EssenceHealth`.
-5. The dungeon room and tavern corner, PlayMode tests, web build smoke test.
+2. Minifantasy import pipeline and `docs/ASSET_MAP.md`.
+3. Haptic pattern library and service; TDE-to-`EventBus` bridge; `EssenceHealth`.
+4. The dungeon room and tavern corner, PlayMode tests, web build smoke test.
 
 ### Checks made for the pivot
 
