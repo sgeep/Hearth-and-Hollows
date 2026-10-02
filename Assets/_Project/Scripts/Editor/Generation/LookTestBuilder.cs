@@ -452,6 +452,82 @@ namespace Hearthdelve.Editor
             Solid(parent, name, (a + b) * 0.5f, b - a);
         }
 
+        /// <summary>
+        /// What blocks movement under each furniture piece, in sheet pixels (x, y from the top-left,
+        /// width, height). Every footprint of a piece ends at the bottom of its art, which is also
+        /// its Y-sort point: a character stopped in front of a piece is always drawn in front of
+        /// it, and one that got behind it is always drawn behind. The bar's footprint covers its
+        /// stools, and a table set's covers its side chairs.
+        /// </summary>
+        static readonly (string piece, RectInt[] footprints)[] k_FurnitureFootprints =
+        {
+            ("Bar", new[] { new RectInt(246, 38, 55, 14), new RectInt(242, 30, 5, 22) }),
+            ("StoolA", new[] { new RectInt(235, 33, 5, 6) }),
+            ("StoolB", new[] { new RectInt(235, 40, 5, 6) }),
+            ("TableSetA", new[] { new RectInt(234, 64, 20, 16) }),
+            ("TableSetB", new[] { new RectInt(282, 64, 20, 16) }),
+        };
+
+        /// <summary>Gives each furniture piece its own collision, aligned with its sort point. Replaces any it had.</summary>
+        static void AddFurnitureFootprints(Transform furniture)
+        {
+            int obstacles = LayerMask.NameToLayer(Layers.Obstacles);
+            foreach (var (name, footprints) in k_FurnitureFootprints)
+            {
+                Transform piece = furniture.Find(name);
+                if (piece == null)
+                {
+                    Debug.LogError($"[Hearthdelve] Furniture '{name}' not found.");
+                    continue;
+                }
+                foreach (BoxCollider2D old in piece.GetComponents<BoxCollider2D>()) Object.DestroyImmediate(old);
+                piece.gameObject.layer = obstacles;
+                foreach (RectInt r in footprints)
+                {
+                    Vector2 bottomLeft = TavernPoint(r.x, r.yMax), topRight = TavernPoint(r.xMax, r.y);
+                    var box = piece.gameObject.AddComponent<BoxCollider2D>();
+                    box.size = topRight - bottomLeft;
+                    box.offset = (bottomLeft + topRight) * 0.5f - (Vector2)piece.position;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the furniture footprints to the existing tavern scene in place, without
+        /// rebuilding it: the old shared collision boxes go, each piece gets its own.
+        /// </summary>
+        [MenuItem("Hearthdelve/Generate/Update Tavern Furniture Collision", priority = 20)]
+        public static void UpdateTavernFurnitureCollision()
+        {
+            var scene = EditorSceneManager.OpenScene(EditorPaths.LookTestTavernScene, OpenSceneMode.Single);
+            foreach (string old in new[] { "Bar Counter", "Bar Return", "Table A", "Table B" })
+            {
+                GameObject box = GameObject.Find($"Collision/{old}");
+                if (box != null) Object.DestroyImmediate(box);
+            }
+            GameObject furniture = GameObject.Find("Furniture");
+            if (furniture == null) throw new System.InvalidOperationException("The tavern scene has no Furniture object.");
+            AddFurnitureFootprints(furniture.transform);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[Hearthdelve] Tavern furniture collision updated.");
+        }
+
+        /// <summary>Batch entry point for <see cref="UpdateTavernFurnitureCollision"/>.</summary>
+        public static void UpdateTavernFurnitureCollisionBatch()
+        {
+            try
+            {
+                UpdateTavernFurnitureCollision();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         static void BuildTavern(InputActionAsset actions, HapticLibrary library, GameObject player, GameObject cook)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -487,10 +563,7 @@ namespace Hearthdelve.Editor
             TavernSolid(solids, "Wall South", 220f, 96f, 316f, 104f);
             TavernSolid(solids, "Wall West", 220f, 0f, 228f, 104f);
             TavernSolid(solids, "Wall East", 308f, 0f, 316f, 104f);
-            TavernSolid(solids, "Bar Counter", 246f, 38f, 301f, 46f);
-            TavernSolid(solids, "Bar Return", 242f, 30f, 247f, 46f);
-            TavernSolid(solids, "Table A", 238f, 64f, 250f, 75f);
-            TavernSolid(solids, "Table B", 286f, 64f, 298f, 75f);
+            AddFurnitureFootprints(furniture);
 
             var cookInstance = (GameObject)PrefabUtility.InstantiatePrefab(cook);
             cookInstance.transform.position = TavernPoint(276f, 37f);

@@ -262,6 +262,36 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Player.transform.position.x - start.x, Is.GreaterThan(2f), "the roll covers ground");
         }
 
+        /// <summary>
+        /// The sprite animator is presentation only (CLAUDE.md): with every one switched off,
+        /// the dodge, its i-frames and taking damage behave exactly the same.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Gameplay_DoesNotDependOnTheSpriteAnimator()
+        {
+            yield return Load(DungeonScene);
+            FreezeEnemies();
+            foreach (var animator in Object.FindObjectsByType<Hearthdelve.Shared.Animation.CharacterSpriteAnimator>())
+                animator.enabled = false;
+            Teleport(Player, new Vector2(-3f, -2f));
+            yield return new WaitForFixedUpdate();
+
+            Hold(Key.D);
+            yield return null;
+            yield return null;
+            Hold(Key.D, Key.Space);
+            yield return WaitUntil(() => Player.MovementState.CurrentState == CharacterStates.MovementStates.Dashing, 0.5f, "the dodge roll to start");
+            Assert.That(Essence.Invulnerable, "i-frames come from TDE's dash, not the animation");
+            Hold(Key.D);
+            yield return WaitUntil(() => Player.MovementState.CurrentState != CharacterStates.MovementStates.Dashing, 1f, "the dodge roll to end");
+            ReleaseKeys();
+            yield return new WaitForSeconds(0.1f);
+
+            float before = Essence.CurrentHealth;
+            Essence.Damage(10f, null, 0f, 0f, Vector3.zero);
+            Assert.That(before - Essence.CurrentHealth, Is.GreaterThanOrEqualTo(9.99f), "damage applies without an animator");
+        }
+
         [UnityTest]
         public IEnumerator EnemyContact_DrainsEssence_WithOneCombinedFeedback()
         {
@@ -438,6 +468,75 @@ namespace Hearthdelve.Tests.PlayMode
             ReleaseKeys();
             yield return null;
             Assert.That(start.x - Player.transform.position.x, Is.GreaterThan(0.5f), "walks with the Tavern map");
+        }
+
+        /// <summary>The player's feet after walking into a piece of furniture from below, starting two tiles in front of it.</summary>
+        IEnumerator WalkUpInto(Transform piece, float xOffset)
+        {
+            Bounds art = piece.GetComponent<SpriteRenderer>().bounds;
+            Teleport(Player, new Vector2(art.center.x + xOffset, art.min.y - 2f));
+            yield return new WaitForFixedUpdate();
+            Hold(Key.W);
+            yield return new WaitForSeconds(1.5f);
+            ReleaseKeys();
+            yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+        }
+
+        void AssertBlockedInFront(Transform piece)
+        {
+            var body = Player.GetComponent<BoxCollider2D>();
+            Collider2D[] overlaps = Physics2D.OverlapBoxAll(body.bounds.center, body.bounds.size * 0.95f, 0f, LayerMask.GetMask(Layers.Obstacles));
+            Assert.That(overlaps.Select(c => c.name), Is.Empty, "the player's body is inside solid furniture");
+
+            float feet = Player.transform.position.y;
+            Assert.That(feet, Is.LessThan(piece.position.y), $"the player got past the front of {piece.name}, so it sorts behind it");
+            Assert.That(piece.position.y - feet, Is.LessThan(0.75f), $"the player should walk right up to {piece.name}");
+        }
+
+        [UnityTest]
+        public IEnumerator Bar_BlocksThePlayer_ApproachingFromBelow()
+        {
+            yield return Load(TavernScene);
+            Transform bar = GameObject.Find("Furniture/Bar").transform;
+            foreach (float x in new[] { -2f, 0f, 2.5f })
+            {
+                yield return WalkUpInto(bar, x);
+                AssertBlockedInFront(bar);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Tables_BlockThePlayer_ApproachingFromBelow()
+        {
+            yield return Load(TavernScene);
+            foreach (string name in new[] { "Furniture/TableSetA", "Furniture/TableSetB" })
+            {
+                Transform table = GameObject.Find(name).transform;
+                yield return WalkUpInto(table, 0f);
+                AssertBlockedInFront(table);
+            }
+        }
+
+        /// <summary>
+        /// The Y-sort contract for solid furniture: what blocks movement ends exactly at the
+        /// sort point (the bottom of the art), so a character stopped in front of a piece always
+        /// draws in front of it and one behind it always draws behind.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator SolidFurniture_FootprintEndsAtItsSortPoint()
+        {
+            yield return Load(TavernScene);
+            Transform furniture = GameObject.Find("Furniture").transform;
+            Assert.That(furniture.childCount, Is.GreaterThan(0));
+            foreach (Transform piece in furniture)
+            {
+                Collider2D[] solids = piece.GetComponentsInChildren<Collider2D>().Where(c => !c.isTrigger).ToArray();
+                Assert.That(solids, Is.Not.Empty, $"{piece.name} has no collision");
+                Assert.That(solids.Min(c => c.bounds.min.y), Is.EqualTo(piece.position.y).Within(0.02f), $"{piece.name}: footprint and sort point differ");
+                Assert.That(piece.GetComponent<SpriteRenderer>().spriteSortPoint, Is.EqualTo(SpriteSortPoint.Pivot));
+                Assert.That(piece.GetComponent<SpriteRenderer>().sprite.pivot.y, Is.EqualTo(0f), $"{piece.name}: the pivot is the bottom of the art");
+            }
         }
 
         [UnityTest]
