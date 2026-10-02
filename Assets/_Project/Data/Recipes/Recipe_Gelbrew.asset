@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddf01a49ab9b58942a03aa8e95376fd7, type: 3}
+  m_Name: Recipe_Gelbrew
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Recipes.RecipeDefinition
+  id: gelbrew
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: Content
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: recipe.gelbrew
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  station: 1
+  slots:
+  - match: 0
+    ingredient: {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
+    categories: 0
+    count: 2
+    optional: 0
+  baseValue: 8
+  flavors: 2
+  icon: {fileID: 0}
+  placeholderColor: {r: 0.55, g: 0.9, b: 0.45, a: 1}
+  mealBuff:
+    kind: 2
+    amount: 0.2
+  references:
+    version: 2
+    RefIds: []
