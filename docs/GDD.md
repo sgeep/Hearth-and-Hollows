@@ -521,7 +521,7 @@ Assets/
     Art/            (our own edits and placeholders)
     Audio/          (Music, SFX)
     Data/           (Ingredients, Recipes, Enemies, Weapons, Biomes, Customers, Haptics)
-    Dialogue/       (.yarn files)
+    Dialogue/       (Dialogue System and Quest Machine databases, 4g)
     Prefabs/        (Player, Enemies, Rooms, Tavern, UI)
     Scenes/
     Scripts/
