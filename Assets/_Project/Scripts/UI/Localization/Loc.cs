@@ -170,6 +170,14 @@ namespace Hearthdelve.UI.Localization
         public const string SwapCancel = "swap.cancel";
         public const string SwapSlotDetail = "swap.slot_detail";
 
+        public const string ResultTitleExtracted = "result.title_extracted";
+        public const string ResultTitleDied = "result.title_died";
+        public const string ResultSummary = "result.summary";
+        public const string ResultNothing = "result.nothing";
+        public const string ResultNothingLost = "result.nothing_lost";
+        public const string ResultDelveAgain = "result.delve_again";
+        public const string ResultBackToTavern = "result.back_to_tavern";
+
         public const string LookTestResolution = "looktest.resolution";
         public const string LookTestResolutionPixel = "looktest.resolution_pixel";
         public const string LookTestResolutionHalf = "looktest.resolution_half";
@@ -217,6 +225,14 @@ namespace Hearthdelve.UI.Localization
             (SwapSubtitle, "Found {0} ×{1}. Choose a slot to drop for it."),
             (SwapCancel, "Leave it"),
             (SwapSlotDetail, "{0} ×{1}, {2}% fresh"),
+
+            (ResultTitleExtracted, "Back from the Cellars"),
+            (ResultTitleDied, "Dragged Back to the Surface"),
+            (ResultSummary, "Brought home: {0} parts. Lost: {1}."),
+            (ResultNothing, "Nothing brought home."),
+            (ResultNothingLost, "Nothing brought home. Lost: {0} parts."),
+            (ResultDelveAgain, "Delve again"),
+            (ResultBackToTavern, "Back to the tavern"),
 
             (LookTestResolution, "{0}×{1}  (F2)   Scrolling: smooth (F4)"),
             (LookTestResolutionPixel, "{0}×{1}  (F2)   Scrolling: pixel-perfect (F4)"),

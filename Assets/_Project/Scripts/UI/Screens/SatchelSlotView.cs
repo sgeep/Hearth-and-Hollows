@@ -33,8 +33,23 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] Image[] m_Pips = new Image[4];
         [SerializeField] Image m_FreshnessBack;
         [SerializeField] Image m_FreshnessFill;
+        [SerializeField, Tooltip("An outline around the slot: the stack chosen for the Lockbox.")]
+        GameObject m_Mark;
 
         public IngredientStack Stack { get; private set; }
+        public bool IsMarked => m_Mark != null && m_Mark.activeSelf;
+
+        /// <summary>Shows or hides the outline that marks this slot as chosen (the Lockbox).</summary>
+        public void SetMarked(bool marked)
+        {
+            if (m_Mark != null) m_Mark.SetActive(marked);
+        }
+
+        public void SetMark(GameObject mark)
+        {
+            m_Mark = mark;
+            if (m_Mark != null) m_Mark.SetActive(false);
+        }
         public bool IsSelected { get; private set; }
 
         /// <summary>Raised when this slot becomes the selected one.</summary>

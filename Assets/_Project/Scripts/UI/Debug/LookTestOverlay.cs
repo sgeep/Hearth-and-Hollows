@@ -72,7 +72,8 @@ namespace Hearthdelve.UI.Debugging
 
         void OnCharacterDied(CharacterDied e)
         {
-            if (e.IsPlayer) StartCoroutine(Restart());
+            // Where the real death flow exists (the death screen), it owns what happens next.
+            if (e.IsPlayer && FindAnyObjectByType<Screens.DeathScreen>(FindObjectsInactive.Include) == null) StartCoroutine(Restart());
         }
 
         IEnumerator Restart()

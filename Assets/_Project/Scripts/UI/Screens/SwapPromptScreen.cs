@@ -78,17 +78,7 @@ namespace Hearthdelve.UI.Screens
         {
             if (m_Hint == null) return;
             m_Hint.SetActive(hint.Visible && !IsOpen);
-            if (hint.Visible && m_HintText != null) m_HintText.Set(LocKeys.HudSatchelFull, InteractBinding());
-        }
-
-        static string InteractBinding()
-        {
-            InputAction interact = InputMaps.Find(InputMaps.Dungeon, DungeonActions.Interact);
-            if (interact == null) return string.Empty;
-            // The binding for whichever device the player is using.
-            string group = Gamepad.current != null && Gamepad.current.wasUpdatedThisFrame ? "Gamepad" : "Keyboard&Mouse";
-            string shown = interact.GetBindingDisplayString(InputBinding.MaskByGroup(group));
-            return string.IsNullOrEmpty(shown) ? interact.GetBindingDisplayString() : shown;
+            if (hint.Visible && m_HintText != null) m_HintText.Set(LocKeys.HudSatchelFull, InputHints.Interact());
         }
 
         void Open(SwapPromptRequested request)
