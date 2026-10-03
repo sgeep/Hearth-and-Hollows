@@ -67,7 +67,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 Tests, all passing in batch mode with 0 compiler warnings in our code:
 
 - **276 project EditMode tests** (the run reports 277; a package adds one stub test). 33 are new in 4a: haptic envelope and mixer, the haptic library asset, sprite timing, Minifantasy import settings, `IngredientItem` identity, and the render pipeline setup.
-- **17 PlayMode tests** against the two look-test scenes: the top-down setup, Essence as the only health pool and its drain, keyboard movement, walls, the dodge roll and its i-frames, gameplay with every sprite animator switched off (the animator is presentation only), enemy contact damage with its feedback, the combo killing a slime that drops a harvest the player picks up, death at zero Essence (reported once), haptics respecting settings and doing nothing without a controller, the tavern character, the bar and both table sets blocking the player from below, furniture footprints ending at their sort point, the localized speech bubble, table preloading, and the resolution switch.
+- **18 PlayMode tests** against the two look-test scenes: the top-down setup, lit sprites and representative lighting in both scenes, Essence as the only health pool and its drain, keyboard movement, walls, the dodge roll and its i-frames, gameplay with every sprite animator switched off (the animator is presentation only), enemy contact damage with its feedback, the combo killing a slime that drops a harvest the player picks up, death at zero Essence (reported once), haptics respecting settings and doing nothing without a controller, the tavern character, the bar and both table sets blocking the player from below, furniture footprints ending at their sort point, the localized speech bubble, table preloading, and the resolution switch.
 
 **Web smoke test (2026-10-02): passed.** A development web build (`Builds/Web`, 125 MB, 0 errors), served locally and played in Chrome:
 
@@ -81,9 +81,9 @@ Tests, all passing in batch mode with 0 compiler warnings in our code:
 **Fixed after the first look-test review (2026-10-02):**
 
 - **Clipping into the bar from below.** Not movement through a collider: the bar's collider ended at the counter, 6 px above the bottom of its art (its stool row), so a player stopped below the counter was already behind the bar's sort point and drew behind it. The table sets had the same gap (their collider covered only the table, not the chairs). Each furniture piece now carries its own collision, and every footprint ends exactly at the bottom of its art. This is the rule for all solid furniture and props (CLAUDE.md, Y-sorting). The existing tavern scene was updated in place (*Hearthdelve → Generate → Update Tavern Furniture Collision*), not rebuilt.
-- **The project was not running URP.** Graphics Settings pointed at a render pipeline asset that doesn't exist: the 2026-10-02 project swap kept the old repo's `UniversalRP.asset.meta`, which gave the asset a different GUID. Unity fell back to the Built-in pipeline without any error, in the editor, the tests and every build. On the web this showed up as missing text: build-time shader stripping removed every URP-tagged shader, Super Text Mesh's included. `ProjectConfigurator` now assigns `Assets/Settings/UniversalRP.asset`, and an EditMode test guards it. The look is unchanged, because the generated sprites use the unlit default sprite material (see the open questions).
+- **The project was not running URP.** Graphics Settings pointed at a render pipeline asset that doesn't exist: the 2026-10-02 project swap kept the old repo's `UniversalRP.asset.meta`, which gave the asset a different GUID. Unity fell back to the Built-in pipeline without any error, in the editor, the tests and every build. On the web this showed up as missing text: build-time shader stripping removed every URP-tagged shader, Super Text Mesh's included. `ProjectConfigurator` now assigns `Assets/Settings/UniversalRP.asset`, and an EditMode test guards it. The look did not change at that point, because the generated sprites still used the unlit default sprite material; they are lit now (see "Decided at the end of 4a").
 
-**Before 4a sign-off:** your confirmation of the open questions below. Nothing in 4b starts, and nothing merges to `main`, until then.
+**Before 4a sign-off:** your final visual check of the lit look test. Nothing in 4b starts, and nothing merges to `main`, until then.
 
 ### Checks made for the pivot
 
@@ -114,9 +114,14 @@ Done on 2026-10-02: Web Build Support installed; the look scenes, the camera sca
 
 ### Open design questions (4a)
 
-1. **Resolution:** you reported the camera scales look good "as is". Confirm that means keeping **320×180 at 8 PPU**, and it will be locked in CLAUDE.md and the GDD.
-2. **2D lighting.** Now that URP is really active, the scenes' 2D lights (cool room light, warm torches and hearth) still don't light anything. The generated sprites and tilemaps use the unlit default sprite material, which is what you approved. Switching them to URP's lit sprite material would bring in the lighting the GDD describes (§8.1), but it changes the look you approved. Decide whether to do it in 4b. Note that the generator already asks URP for its lit sprite material, so rebuilding the look-test scenes now would switch them to lit sprites.
-3. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
+1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
+
+### Decided at the end of 4a (2026-10-02)
+
+1. **Resolution locked:** 320×180 at 8 PPU (CLAUDE.md, GDD §8.1).
+2. **URP 2D lit sprites are the visual baseline.** The look test uses URP's lit sprite material everywhere, with simple representative lighting: in the dungeon, a cool, dim ambient light and two warm torch lights; in the tavern, a warm ambient light and a warm glow over the bar. The existing scenes and prefabs were updated in place (*Hearthdelve → Generate → Update Look Test Lighting*). The values are in `LookTestBuilder` and on the scene lights, so they can be tweaked in the editor. This is not a lighting system yet.
+3. **SpriteSet animation** instead of Mecanim, presentation only (CLAUDE.md, GDD §10.1).
+4. **Frame pacing:** TDE's `GameManager` defaults to a 300 fps target, which makes a web build run its main loop on a timer instead of `requestAnimationFrame`. The look-test scenes use -1 (the platform default) instead.
 
 ### Known issues
 
