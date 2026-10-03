@@ -110,22 +110,22 @@ namespace Hearthdelve.Tests.PlayMode
             Teleport(Player, (Vector2)cook.position + new Vector2(-2f, -3.2f));
             yield return new WaitForSeconds(0.3f);
 
-            // Where the world draws the cook, in art pixels from the bottom-left of the view, against
-            // where the bubble is. While the camera scrolls, the difference must not change.
-            var drift = new List<Vector2Int>();
+            Assert.That(pixelPerfect.gridSnapping, Is.EqualTo(PixelPerfectCamera.GridSnapping.None), "smooth scrolling");
+            // Where the world draws the cook, in art pixels from the centre of the view, against where
+            // the bubble is. While the camera scrolls, the difference must not change.
+            var drift = new List<Vector2>();
             var sampler = new GameObject("FrameSampler").AddComponent<FrameSampler>();
             sampler.OnFrame = () =>
             {
                 if (!bubble.IsVisible) return;
-                Vector3 snapped = pixelPerfect.RoundToPixel(camera.transform.position);
-                Vector2 cookPx = (Vector2)(cook.position - snapped) * k_PixelsPerUnit;
+                Vector2 cookPx = (Vector2)(cook.position - camera.transform.position) * k_PixelsPerUnit;
                 // Bubble position converted back to art pixels from the centre of the view.
                 Vector2 canvasSize = ((RectTransform)bubbleRect.root).rect.size;
                 float viewHeight = 2f * camera.orthographicSize * k_PixelsPerUnit;
                 float viewWidth = viewHeight * camera.aspect;
                 Vector2 bubblePx = new((bubbleRect.anchoredPosition.x / canvasSize.x - 0.5f) * viewWidth,
                                        (bubbleRect.anchoredPosition.y / canvasSize.y - 0.5f) * viewHeight);
-                drift.Add(Vector2Int.RoundToInt(bubblePx - cookPx));
+                drift.Add(bubblePx - cookPx);
             };
             try
             {
@@ -143,8 +143,9 @@ namespace Hearthdelve.Tests.PlayMode
             }
 
             Assert.That(drift.Count, Is.GreaterThan(20), "the bubble was visible while the player walked");
-            TestContext.WriteLine($"bubble offsets from the cook: {string.Join(" ", drift.Distinct())}");
-            Assert.That(drift.Distinct().Count(), Is.EqualTo(1), $"the bubble moved against the cook: {string.Join(" ", drift.Distinct())}");
+            float spread = drift.Max(d => Vector2.Distance(d, drift[0]));
+            TestContext.WriteLine($"bubble offset from the cook {drift[0]} art px, spread {spread:F3}");
+            Assert.That(spread, Is.LessThan(0.05f), $"the bubble moved against the cook by {spread:F3} art px");
         }
 
         /// <summary>
@@ -193,11 +194,12 @@ namespace Hearthdelve.Tests.PlayMode
             {
                 Object.Destroy(sampler.gameObject);
                 ReleaseKeys();
-                overlay.SetScrollMode(LookTestOverlay.ScrollMode.PixelPerfect);
+                overlay.SetScrollMode(LookTestOverlay.ScrollMode.Smooth);
                 Application.targetFrameRate = -1;
             }
 
             Assert.That(pixelPerfect.assetsPPU, Is.EqualTo(8), "the default is restored");
+            Assert.That(pixelPerfect.gridSnapping, Is.EqualTo(PixelPerfectCamera.GridSnapping.None), "the default is restored");
             Assert.That(offsets.Count, Is.GreaterThan(20));
             float spread = offsets.Max(o => Vector2.Distance(o, offsets[0]));
             int jumpAt = offsets.FindIndex(o => Vector2.Distance(o, offsets[0]) >= 1e-3f);
@@ -226,6 +228,11 @@ namespace Hearthdelve.Tests.PlayMode
             Application.targetFrameRate = 60;
             QualitySettings.vSyncCount = 0;
 
+            // The pixel-perfect comparison mode (F4): its stepping must stay clean if it is ever chosen.
+            var overlay = Object.FindAnyObjectByType<LookTestOverlay>();
+            yield return null;
+            overlay.SetScrollMode(LookTestOverlay.ScrollMode.PixelPerfect);
+
             Camera camera = Camera.main;
             var brain = camera.GetComponent<CinemachineBrain>();
             var composer = Object.FindAnyObjectByType<CinemachinePositionComposer>();
@@ -252,7 +259,10 @@ namespace Hearthdelve.Tests.PlayMode
             var sampler = new GameObject("FrameSampler").AddComponent<FrameSampler>();
             sampler.OnFrame = () =>
             {
-                Vector3 snapped = pixelPerfect.RoundToPixel(camera.transform.position);
+                // The upscale pipeline draws from the camera rounded to its grid (RoundToPixel's grid
+                // only updates when the camera renders, which batch-mode tests never do).
+                Vector3 position = camera.transform.position;
+                var snapped = new Vector3(Mathf.Round(position.x * k_PixelsPerUnit), Mathf.Round(position.y * k_PixelsPerUnit)) / k_PixelsPerUnit;
                 // Where the player is drawn: its pixel-snapped display position.
                 Vector3 player = Player.GetComponent<PixelSnappedPresentation>().DisplayPosition;
                 cameraX.Add(Mathf.RoundToInt(snapped.x * k_PixelsPerUnit));
@@ -283,6 +293,7 @@ namespace Hearthdelve.Tests.PlayMode
             finally
             {
                 Object.Destroy(sampler.gameObject);
+                overlay.SetScrollMode(LookTestOverlay.ScrollMode.Smooth);
                 Application.targetFrameRate = -1;
             }
 

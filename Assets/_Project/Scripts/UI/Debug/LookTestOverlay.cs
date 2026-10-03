@@ -18,7 +18,7 @@ namespace Hearthdelve.UI.Debugging
     /// </summary>
     public sealed class LookTestOverlay : MonoBehaviour
     {
-        /// <summary>How the view scrolls. Pixel-perfect is the locked default; the others are for comparison.</summary>
+        /// <summary>How the view scrolls. Smooth is the locked default (CLAUDE.md, Camera); the others are kept for comparison.</summary>
         public enum ScrollMode
         {
             /// <summary>Everything on the art-pixel grid; the world moves in whole art pixels.</summary>
@@ -30,9 +30,9 @@ namespace Hearthdelve.UI.Debugging
         }
 
         static readonly Vector2Int[] k_Resolutions = { new(320, 180), new(240, 135), new(160, 90) };
-        static readonly string[] k_ModeLabels = { LocKeys.LookTestResolution, LocKeys.LookTestResolutionHalf, LocKeys.LookTestResolutionSmooth };
+        static readonly string[] k_ModeLabels = { LocKeys.LookTestResolutionPixel, LocKeys.LookTestResolutionHalf, LocKeys.LookTestResolution };
         static int s_Index;
-        static ScrollMode s_Mode;
+        static ScrollMode s_Mode = ScrollMode.Smooth;
 
         [SerializeField] PixelPerfectCamera m_Camera;
         [SerializeField] CanvasScaler m_Scaler;
@@ -58,7 +58,7 @@ namespace Hearthdelve.UI.Debugging
         static void ResetStatics()
         {
             s_Index = 0;
-            s_Mode = ScrollMode.PixelPerfect;
+            s_Mode = ScrollMode.Smooth;
         }
 
         void Start()

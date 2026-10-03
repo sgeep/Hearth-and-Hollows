@@ -5,12 +5,12 @@ using UnityEngine;
 namespace Hearthdelve.Shared.Engine
 {
     /// <summary>
-    /// Presentation-only pixel snapping for the player (CLAUDE.md, Camera and pixel-perfect). The
-    /// character's gameplay position (rigidbody, colliders) is untouched. Its model is drawn at a
-    /// display position on the art-pixel grid (see <see cref="PixelStepping"/>), and the camera
-    /// follows <see cref="Anchor"/>, which sits at that same position. The camera therefore lands
-    /// exactly on the grid, the player stays on one screen pixel, and diagonal movement scrolls the
-    /// world in clean diagonal steps.
+    /// The point the camera follows (<see cref="Anchor"/>), plus optional presentation-only pixel
+    /// snapping for the player. The game scrolls smoothly (CLAUDE.md, Camera), so snapping is off and
+    /// the anchor sits at the player's real position. The look-test comparison modes (F4) that snap
+    /// the camera to a pixel grid turn it on: the model is then drawn at a display position on that
+    /// grid (see <see cref="PixelStepping"/>) and the anchor follows it, so the player stays on one
+    /// screen pixel and diagonals scroll in clean steps. Gameplay positions are never touched.
     /// </summary>
     [DefaultExecutionOrder(-100)] // after interpolation has moved the player, before Cinemachine's LateUpdate
     public sealed class PixelSnappedPresentation : MonoBehaviour
@@ -46,10 +46,10 @@ namespace Hearthdelve.Shared.Engine
         }
 
         /// <summary>
-        /// False when the camera does not snap to a grid at all (smooth scrolling): the player is
-        /// then drawn at its real position.
+        /// Draw the player on the camera's pixel grid. Off for smooth scrolling (the game's camera);
+        /// only a camera that snaps to a grid needs it.
         /// </summary>
-        public bool Snapping { get; set; } = true;
+        public bool Snapping { get; set; }
 
         void Awake()
         {

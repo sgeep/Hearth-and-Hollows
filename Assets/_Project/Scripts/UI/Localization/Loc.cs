@@ -170,8 +170,8 @@ namespace Hearthdelve.UI.Localization
         public const string SwapCancel = "swap.cancel";
 
         public const string LookTestResolution = "looktest.resolution";
+        public const string LookTestResolutionPixel = "looktest.resolution_pixel";
         public const string LookTestResolutionHalf = "looktest.resolution_half";
-        public const string LookTestResolutionSmooth = "looktest.resolution_smooth";
         public const string LookTestHintDungeon = "looktest.hint_dungeon";
         public const string LookTestHintTavern = "looktest.hint_tavern";
         public const string LookTestGreeting = "looktest.greeting";
@@ -216,9 +216,9 @@ namespace Hearthdelve.UI.Localization
             (SwapSubtitle, "Found {0} ×{1}. Choose a slot to drop for it."),
             (SwapCancel, "Leave it"),
 
-            (LookTestResolution, "{0}×{1}  (F2)   Scrolling: pixel-perfect (F4)"),
+            (LookTestResolution, "{0}×{1}  (F2)   Scrolling: smooth (F4)"),
+            (LookTestResolutionPixel, "{0}×{1}  (F2)   Scrolling: pixel-perfect (F4)"),
             (LookTestResolutionHalf, "{0}×{1}  (F2)   Scrolling: half-pixel (F4)"),
-            (LookTestResolutionSmooth, "{0}×{1}  (F2)   Scrolling: smooth (F4)"),
             (LookTestHintDungeon, "Move: WASD / stick   Attack: left mouse / X   Dodge: Space / B   F3: tavern"),
             (LookTestHintTavern, "Move: WASD / stick   F3: dungeon"),
             (LookTestGreeting, "Welcome to the Hearth!"),

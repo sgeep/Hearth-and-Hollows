@@ -172,7 +172,7 @@ namespace Hearthdelve.Editor
             pixelPerfect.assetsPPU = MinifantasySheets.PixelsPerUnit;
             pixelPerfect.refResolutionX = ReferenceWidth;
             pixelPerfect.refResolutionY = ReferenceHeight;
-            pixelPerfect.gridSnapping = PixelPerfectCamera.GridSnapping.UpscaleRenderTexture;
+            ConfigureScrolling(pixelPerfect);
             pixelPerfect.cropFrame = PixelPerfectCamera.CropFrame.None;
             ConfigureFollow(cameraGo.AddComponent<CinemachineBrain>(), null);
 
@@ -240,8 +240,20 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
-        /// Applies the camera follow rules to the existing look test in place (no rebuild): the player
-        /// prefabs get <see cref="PixelSnappedPresentation"/>, and the scenes' brain and follow are set.
+        /// Smooth scrolling (locked after the 4b comparison, CLAUDE.md): the Pixel Perfect Camera keeps
+        /// the integer zoom for 320x180 at 8 PPU but does not snap the view to the art-pixel grid, so
+        /// the camera and characters move in screen pixels and the world scrolls on every frame.
+        /// </summary>
+        static void ConfigureScrolling(PixelPerfectCamera pixelPerfect)
+        {
+            pixelPerfect.gridSnapping = PixelPerfectCamera.GridSnapping.None;
+            EditorUtility.SetDirty(pixelPerfect);
+        }
+
+        /// <summary>
+        /// Applies the camera rules to the existing scenes in place (no rebuild): the player prefabs
+        /// get <see cref="PixelSnappedPresentation"/> (the camera's follow point), and each scene's
+        /// brain, follow and scrolling are set.
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Look Test Camera", priority = 23)]
         public static void UpdateLookTestCamera()
@@ -260,9 +272,11 @@ namespace Hearthdelve.Editor
                 }
             }
 
-            foreach (string path in new[] { EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene })
+            foreach (string path in new[] { EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene, EditorPaths.TestFloorScene })
             {
+                if (!File.Exists(path)) continue;
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                foreach (PixelPerfectCamera pixelPerfect in Object.FindObjectsByType<PixelPerfectCamera>(FindObjectsInactive.Include)) ConfigureScrolling(pixelPerfect);
                 foreach (CinemachineBrain brain in Object.FindObjectsByType<CinemachineBrain>(FindObjectsInactive.Include)) ConfigureFollow(brain, null);
                 foreach (CinemachinePositionComposer composer in Object.FindObjectsByType<CinemachinePositionComposer>(FindObjectsInactive.Include)) ConfigureFollow(null, composer);
                 EditorSceneManager.MarkSceneDirty(scene);

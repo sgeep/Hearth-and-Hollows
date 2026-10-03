@@ -166,6 +166,7 @@ namespace Hearthdelve.Tests.PlayMode
             var pixelPerfect = Camera.main.GetComponent<PixelPerfectCamera>();
             Assert.That(pixelPerfect.assetsPPU, Is.EqualTo(8));
             Assert.That(new Vector2Int(pixelPerfect.refResolutionX, pixelPerfect.refResolutionY), Is.EqualTo(new Vector2Int(320, 180)));
+            Assert.That(pixelPerfect.gridSnapping, Is.EqualTo(PixelPerfectCamera.GridSnapping.None), "smooth scrolling: no snapping to the art-pixel grid");
 
             Assert.That(InputManager.Instance, Is.InstanceOf<HearthdelveInputManager>(), "never the legacy InputManager");
             Assert.That(GameManager.Instance.TargetFrameRate, Is.EqualTo(-1), "platform frame pacing (requestAnimationFrame on the web)");
