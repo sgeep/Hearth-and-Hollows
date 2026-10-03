@@ -34,7 +34,7 @@ namespace Hearthdelve.Editor
         /// <remarks>
         /// <c>#</c> wall, <c>t</c> wall with a torch, <c>.</c> floor, <c>o</c> pillar (two rows),
         /// <c>c</c> crate, <c>b</c> barrel, <c>B</c> open barrel, <c>T</c> table (two tiles),
-        /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime,
+        /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime, <c>V</c> bat, <c>X</c> giant spider,
         /// <c>1</c>–<c>6</c> navigation test points (editor only).
         /// </remarks>
         internal static readonly string[] Map =
@@ -42,7 +42,7 @@ namespace Hearthdelve.Editor
             "############################################",
             "####t#######t###t#######t#########t#####t###",
             "#..b.c........s....#.....................s.#",
-            "#..B...............#...o......o............#",
+            "#..B...............#...o......o......V.....#",
             "#.6................#...o......o............#",
             "#..................#.......................#",
             "#.....P..................................S.#",
@@ -54,9 +54,9 @@ namespace Hearthdelve.Editor
             "########..##########################..######",
             "####t###..####t####################t..##t###",
             "#..........................................#",
-            "#..............2...........................#",
+            "#.....V........2...........................#",
             "#...........#########........c.............#",
-            "#...........#########........b.............#",
+            "#...........#########........b........X....#",
             "#...........#.......#........c.............#",
             "#...........#...1...#.....3..b...4.........#",
             "#...........#.......#........c.........S...#",
@@ -111,14 +111,14 @@ namespace Hearthdelve.Editor
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Vector2 spawn = Vector2.zero;
-            var slimes = new List<Vector2>();
+            var enemyMarkers = new List<(char kind, Vector2 feet)>();
             var testPoints = new List<(char id, Vector2 feet)>();
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
                 char c = At(x, y);
                 if (c == 'P') spawn = Feet(x, y);
-                else if (c == 'S') slimes.Add(Feet(x, y));
+                else if (EnemyFor(content, c) != null) enemyMarkers.Add((c, Feet(x, y)));
                 else if (c is >= '1' and <= '9') testPoints.Add((c, Feet(x, y)));
             }
 
@@ -160,9 +160,9 @@ namespace Hearthdelve.Editor
             }
 
             var enemies = new GameObject("Enemies").transform;
-            foreach (Vector2 position in slimes)
+            foreach (var (kind, position) in enemyMarkers)
             {
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(content.Slime, enemies);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(EnemyFor(content, kind), enemies);
                 instance.transform.position = position;
             }
 
@@ -182,6 +182,65 @@ namespace Hearthdelve.Editor
             LookTestBuilder.ApplyLighting(dungeon: true);
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorSceneManager.SaveScene(scene, EditorPaths.TestFloorScene);
+        }
+
+        static GameObject EnemyFor(LookTestBuilder.Content content, char marker) => marker switch
+        {
+            'S' => content.Slime,
+            'V' => content.Bat,
+            'X' => content.Spider,
+            _ => null,
+        };
+
+        /// <summary>
+        /// Brings an existing test floor up to 4b step 2 in place, without rebuilding it: adds the time
+        /// manager (hit-stop), and an enemy at every map marker that has none of that kind yet.
+        /// </summary>
+        [MenuItem("Hearthdelve/Generate/Update Test Floor Enemies", priority = 21)]
+        public static void UpdateTestFloor()
+        {
+            LookTestBuilder.Content content = LookTestBuilder.BuildContent();
+            if (!System.IO.File.Exists(EditorPaths.TestFloorScene))
+            {
+                BuildScene(content);
+                return;
+            }
+            var scene = EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+            if (Object.FindAnyObjectByType<MoreMountains.Feedbacks.MMTimeManager>() == null)
+                new GameObject("TimeManager").AddComponent<MoreMountains.Feedbacks.MMTimeManager>();
+            Transform enemies = GameObject.Find("Enemies")?.transform ?? new GameObject("Enemies").transform;
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                GameObject prefab = EnemyFor(content, At(x, y));
+                if (prefab == null) continue;
+                Vector2 feet = Feet(x, y);
+                bool present = false;
+                foreach (Transform child in enemies)
+                    if (PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == prefab && Vector2.Distance(child.position, feet) < 0.6f)
+                        present = true;
+                if (present) continue;
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, enemies);
+                instance.transform.position = feet;
+            }
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[Hearthdelve] Test floor enemies updated.");
+        }
+
+        /// <summary>Batch entry point for <see cref="UpdateTestFloor"/>.</summary>
+        public static void UpdateTestFloorBatch()
+        {
+            try
+            {
+                UpdateTestFloor();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
         }
 
         static void PaintFloor(Tilemap floor)

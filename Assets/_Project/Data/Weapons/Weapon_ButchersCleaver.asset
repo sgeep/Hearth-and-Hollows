@@ -35,11 +35,8 @@ MonoBehaviour:
     damage: 8
     hitboxOffset: {x: 0.85, y: 0.75}
     hitboxSize: {x: 1.4, y: 1}
-    knockback: {x: 3, y: 1.5}
+    knockbackForce: 7
     staggerTime: 0.25
-    lungeSpeed: 2.5
-    lungeStartFrame: 2
-    lungeFrames: 4
     hitStop: 0.05
     screenShake: 0.08
   - debugName: Backhand
@@ -50,11 +47,8 @@ MonoBehaviour:
     damage: 8
     hitboxOffset: {x: 0.85, y: 0.8}
     hitboxSize: {x: 1.5, y: 1.1}
-    knockback: {x: 3.5, y: 1.5}
+    knockbackForce: 7
     staggerTime: 0.25
-    lungeSpeed: 2.5
-    lungeStartFrame: 2
-    lungeFrames: 4
     hitStop: 0.05
     screenShake: 0.08
   - debugName: Cleave
@@ -65,15 +59,56 @@ MonoBehaviour:
     damage: 20
     hitboxOffset: {x: 1, y: 0.7}
     hitboxSize: {x: 1.8, y: 1.4}
-    knockback: {x: 8, y: 4}
+    knockbackForce: 7
     staggerTime: 0.5
-    lungeSpeed: 4
-    lungeStartFrame: 4
-    lungeFrames: 6
     hitStop: 0.12
     screenShake: 0.25
   inputBuffer: 0.15
   comboLinkWindow: 0.2
+  heavy:
+  - chargeTime: 0
+    attack:
+      debugName: Heavy tap
+      startupFrames: 6
+      activeFrames: 12
+      recoveryFrames: 18
+      cancelFrame: 30
+      damage: 14
+      hitboxOffset: {x: 0, y: 0}
+      hitboxSize: {x: 2.2, y: 2.2}
+      knockbackForce: 7
+      staggerTime: 0.35
+      hitStop: 0.07
+      screenShake: 0.25
+  - chargeTime: 0.45
+    attack:
+      debugName: Heavy charged
+      startupFrames: 6
+      activeFrames: 12
+      recoveryFrames: 18
+      cancelFrame: 30
+      damage: 22
+      hitboxOffset: {x: 0, y: 0}
+      hitboxSize: {x: 2.6, y: 2.6}
+      knockbackForce: 9
+      staggerTime: 0.5
+      hitStop: 0.09
+      screenShake: 0.25
+  - chargeTime: 0.9
+    attack:
+      debugName: Heavy full
+      startupFrames: 6
+      activeFrames: 12
+      recoveryFrames: 18
+      cancelFrame: 30
+      damage: 34
+      hitboxOffset: {x: 0, y: 0}
+      hitboxSize: {x: 3, y: 3}
+      knockbackForce: 11
+      staggerTime: 0.7
+      hitStop: 0.12
+      screenShake: 0.25
+  heavyChargeMoveMultiplier: 0.4
   references:
     version: 2
     RefIds: []

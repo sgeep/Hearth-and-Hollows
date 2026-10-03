@@ -235,6 +235,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 1
   m_BlendShapeWeights: []
+--- !u!1 &6917820192247074551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8067442637957910584}
+  m_Layer: 0
+  m_Name: HeavyAttachment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8067442637957910584
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6917820192247074551}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1043488307833175492}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8161577285571504875
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,10 +402,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332429305839616
-  - rid: 2696332429305839617
-  - rid: 2696332429305839618
-  - rid: 2696332429305839619
+  - rid: 2696332436244791302
+  - rid: 2696332436244791303
+  - rid: 2696332436244791304
+  - rid: 2696332436244791305
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -390,11 +421,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332429305839616
+    - rid: 2696332436244791302
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 19431850
+        UniqueID: 903599794
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -468,11 +499,11 @@ MonoBehaviour:
         Target: {fileID: 999214110843787531}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332429305839617
+    - rid: 2696332436244791303
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1776627070
+        UniqueID: -1350042957
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -544,11 +575,11 @@ MonoBehaviour:
         Owner: {fileID: 3542817586572496047}
         DebugActive: 0
         Force: 0.6
-    - rid: 2696332429305839618
+    - rid: 2696332436244791304
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 1255159168
+        UniqueID: 878381539
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -670,11 +701,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332429305839619
+    - rid: 2696332436244791305
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 427043302
+        UniqueID: 1239323592
         Label: Haptic Hit.Taken
         OriginalLabel: 
         ChannelMode: 0
@@ -766,11 +797,13 @@ GameObject:
   - component: {fileID: 2306587011340470752}
   - component: {fileID: 5561340655413831466}
   - component: {fileID: 6193567042410139327}
+  - component: {fileID: 2928372528600801868}
   - component: {fileID: 6677865968617471871}
+  - component: {fileID: 7786273432278245503}
+  - component: {fileID: 634363897211726940}
   - component: {fileID: 9216512239146828281}
   - component: {fileID: 6497250814091916748}
   - component: {fileID: 4917328070641940068}
-  - component: {fileID: 2928372528600801868}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -793,6 +826,7 @@ Transform:
   m_Children:
   - {fileID: 1838311052056437547}
   - {fileID: 1622551173989877992}
+  - {fileID: 8067442637957910584}
   - {fileID: 1512702120468410607}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1086,6 +1120,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.PlayerTuning
   m_Config: {fileID: 11400000, guid: 2dca4d67e99fd1c46a6abcd37a434929, type: 2}
+--- !u!114 &2928372528600801868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875810124745081221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 053084807b2ca954589d83a352a36e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.PixelSnappedPresentation
+  m_PixelsPerUnit: 8
 --- !u!114 &6677865968617471871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1107,7 +1154,7 @@ MonoBehaviour:
   BlockingMovementStates: 
   BlockingConditionStates: 
   BlockingWeaponStates: 
-  InitialWeapon: {fileID: 394336228955945004, guid: 3ffd292b8b94abb4184791a5e7821652, type: 3}
+  InitialWeapon: {fileID: 3343084794718985182, guid: 3ffd292b8b94abb4184791a5e7821652, type: 3}
   CanPickupWeapons: 0
   WeaponUseFeedback: {fileID: 0}
   WeaponAttachment: {fileID: 1622551173989877992}
@@ -1126,6 +1173,58 @@ MonoBehaviour:
   MaximumBufferDuration: 0.25
   RequiresPerfectTile: 0
   CurrentWeapon: {fileID: 0}
+--- !u!114 &7786273432278245503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875810124745081221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c54b7b53e26347643a7d54dd14a14b62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.TopDownEngine::MoreMountains.TopDownEngine.CharacterHandleSecondaryWeapon
+  AbilityStartSfx: {fileID: 0}
+  AbilityInProgressSfx: {fileID: 0}
+  AbilityStopSfx: {fileID: 0}
+  AbilityStartFeedbacks: {fileID: 0}
+  AbilityStopFeedbacks: {fileID: 0}
+  AbilityPermitted: 1
+  BlockingMovementStates: 
+  BlockingConditionStates: 
+  BlockingWeaponStates: 
+  InitialWeapon: {fileID: 7772246010150330190, guid: f2fa92d5b94e0414cb5b3229249d083a, type: 3}
+  CanPickupWeapons: 0
+  WeaponUseFeedback: {fileID: 0}
+  WeaponAttachment: {fileID: 8067442637957910584}
+  ProjectileSpawn: {fileID: 0}
+  AutomaticallyBindAnimator: 1
+  AmmoDisplayID: 0
+  AutoIK: 1
+  ContinuousPress: 0
+  GettingHitInterruptsAttack: 0
+  UseSecondaryAxisThresholdToShoot: 0
+  ForceWeaponAimControl: 0
+  ForcedWeaponAimControl: 1
+  ForceAlwaysShoot: 0
+  BufferInput: 0
+  NewInputExtendsBuffer: 0
+  MaximumBufferDuration: 0.25
+  RequiresPerfectTile: 0
+  CurrentWeapon: {fileID: 0}
+--- !u!114 &634363897211726940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875810124745081221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fbe3b609a38bb54981192c9ae79c03d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Combat.PlayerAttackGate
 --- !u!114 &9216512239146828281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1199,19 +1298,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Harvest.SatchelCarrier
   m_Config: {fileID: 11400000, guid: 37991d2608b3b01459da0b39254d96de, type: 2}
---- !u!114 &2928372528600801868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8875810124745081221}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 053084807b2ca954589d83a352a36e96, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.PixelSnappedPresentation
-  m_PixelsPerUnit: 8
 --- !u!1 &9185002561930039989
 GameObject:
   m_ObjectHideFlags: 0

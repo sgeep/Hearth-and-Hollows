@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
-  m_Name: Enemy_CellarShroom
+  m_Name: Enemy_GiantSpider
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
-  id: cellar_shroom
+  schema: 1
+  id: giant_spider
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
@@ -22,28 +23,56 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  maxHealth: 18
-  moveSpeed: 0
-  gravity: 40
+  maxHealth: 36
+  moveSpeed: 1.7
   aggroRange: 9
-  attackRange: 8
-  knockbackMultiplier: 0
+  knockbackMultiplier: 0.6
+  staggerMultiplier: 0.6
   superArmorWhileAttacking: 0
-  regenerates: 0
+  keepDistance: {x: 3, y: 5.5}
+  flutter: 0
+  startsAsleep: 0
+  wakeRange: 3.5
   attack:
+    debugName: Bite
+    kind: 2
+    minRange: 0
+    maxRange: 1.8
+    telegraph: 0.5
+    active: 0.15
+    recovery: 0.4
+    cooldown: 1.1
+    damage: 14
+    hitboxOffset: {x: 1, y: 0.3}
+    hitboxSize: {x: 1.1, y: 0.9}
+    knockbackForce: 7
+    animation: 2
+    releaseFrame: 4
+    travelDistance: 4
+    arcHeight: 0.8
+    projectileSpeed: 7
+    projectileRange: 8
+    projectileSpawnOffset: {x: 0.5, y: 0.3}
+  otherAttacks:
+  - debugName: Web
+    kind: 3
+    minRange: 2.5
+    maxRange: 7
     telegraph: 0.8
     active: 0.1
-    recovery: 0.4
-    cooldown: 1.8
+    recovery: 0.5
+    cooldown: 2.4
     damage: 9
-    hitboxOffset: {x: 0.6, y: 0.4}
+    hitboxOffset: {x: 0, y: 0.2}
     hitboxSize: {x: 0.9, y: 0.7}
-    knockback: {x: 6, y: 5}
-    lungeSpeed: 11
-    leapHeight: 2.5
-    leapMaxDistance: 5
-    projectileFlightTime: 0.8
-    projectileSpawnOffset: {x: 0.3, y: 1}
+    knockbackForce: 3
+    animation: 9
+    releaseFrame: 9
+    travelDistance: 4
+    arcHeight: 0.8
+    projectileSpeed: 6.5
+    projectileRange: 9
+    projectileSpawnOffset: {x: 0.6, y: 0.3}
   harvest:
   - ingredient: {fileID: 11400000, guid: a9638819317ee6f4f971a403a0c1b350, type: 2}
     baseQuality: 1
@@ -55,7 +84,7 @@ MonoBehaviour:
     dropChance: 0.4
     minCount: 1
     maxCount: 1
-  placeholderColor: {r: 0.7, g: 0.5, b: 0.8, a: 1}
+  placeholderColor: {r: 0.2, g: 0.2, b: 0.3, a: 1}
   references:
     version: 2
     RefIds: []

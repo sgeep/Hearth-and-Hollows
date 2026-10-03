@@ -15,6 +15,7 @@ using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Hud;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.World;
+using MoreMountains.Tools;
 using MoreMountains.TopDownEngine;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -64,7 +65,7 @@ namespace Hearthdelve.Editor
         {
             public InputActionAsset Actions;
             public HapticLibrary Library;
-            public GameObject Player, TavernPlayer, Slime, Pickup, Cook;
+            public GameObject Player, TavernPlayer, Slime, Bat, Spider, Pickup, Cook;
             public HarvestRulesConfig HarvestRules;
             public WeaponDefinition Cleaver;
         }
@@ -100,18 +101,20 @@ namespace Hearthdelve.Editor
             var delveConfig = LookTestContent.Load<DelveConfig>($"{EditorPaths.Config}/DelveConfig.asset");
             var harvestRules = LookTestContent.Load<HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset");
             var cleaverDefinition = LookTestContent.Load<WeaponDefinition>($"{EditorPaths.Weapons}/Weapon_ButchersCleaver.asset");
-            var slimeDefinition = LookTestContent.Load<EnemyDefinition>($"{EditorPaths.Enemies}/Enemy_GreenSlime.asset");
+            DungeonContent.BuildData(cleaverDefinition);
 
             GameObject cleaver = LookTestContent.BuildCleaver(cleaverDefinition);
-            GameObject player = LookTestContent.BuildPlayer(true, human, humanShadow, moveConfig, essenceConfig, delveConfig, cleaver);
+            GameObject heavy = DungeonContent.BuildHeavy(cleaverDefinition);
+            GameObject player = LookTestContent.BuildPlayer(true, human, humanShadow, moveConfig, essenceConfig, delveConfig, cleaver, heavy);
             GameObject tavernPlayer = LookTestContent.BuildPlayer(false, human, humanShadow, moveConfig, null, null, null);
-            GameObject slimePrefab = LookTestContent.BuildSlime(slimeDefinition, slime, slimeShadow);
+            DungeonContent.Enemies enemies = DungeonContent.BuildEnemies(slime, slimeShadow);
             GameObject pickup = LookTestContent.BuildPickup();
             GameObject cookPrefab = LookTestContent.BuildCook(cook);
             AssetDatabase.SaveAssets();
             return new Content
             {
-                Actions = actions, Library = library, Player = player, TavernPlayer = tavernPlayer, Slime = slimePrefab,
+                Actions = actions, Library = library, Player = player, TavernPlayer = tavernPlayer,
+                Slime = enemies.Slime, Bat = enemies.Bat, Spider = enemies.Spider,
                 Pickup = pickup, Cook = cookPrefab, HarvestRules = harvestRules, Cleaver = cleaverDefinition,
             };
         }
@@ -143,6 +146,8 @@ namespace Hearthdelve.Editor
             managers.AddComponent<TdeEventBridge>();
             managers.AddComponent<LocalizationBoot>();
             managers.AddComponent<HapticService>().Library = library;
+            // MMFeedbacks' time manager runs freeze frames (hit-stop).
+            new GameObject("TimeManager").AddComponent<MoreMountains.Feedbacks.MMTimeManager>();
 
             var spawnPoint = new GameObject("SpawnPoint");
             spawnPoint.transform.position = spawn;

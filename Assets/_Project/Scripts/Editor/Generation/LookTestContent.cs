@@ -88,7 +88,7 @@ namespace Hearthdelve.Editor
             return renderer;
         }
 
-        static GameObject SavePrefab(GameObject root, string path)
+        internal static GameObject SavePrefab(GameObject root, string path)
         {
             EditorPaths.Ensure(Path.GetDirectoryName(path)?.Replace('\\', '/'));
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
@@ -155,6 +155,10 @@ namespace Hearthdelve.Editor
             WriteWav("PH_Hit", 0.12f, (t, n) => Noise(n) * Mathf.Exp(-t * 38f) * 0.8f + Mathf.Sin(t * 2f * Mathf.PI * 140f) * Mathf.Exp(-t * 30f) * 0.5f);
             WriteWav("PH_Hurt", 0.2f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (220f - 500f * t)) * Mathf.Exp(-t * 14f) * 0.7f);
             WriteWav("PH_Pickup", 0.14f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (t < 0.06f ? 880f : 1320f)) * Mathf.Exp(-t * 16f) * 0.5f);
+            // An enemy winding up: a rising two-note warning.
+            WriteWav("PH_Telegraph", 0.22f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (t < 0.1f ? 520f : 780f)) * (1f - t / 0.22f) * 0.45f);
+            // The heavy spin: a filtered noise sweep.
+            WriteWav("PH_Whoosh", 0.3f, (t, n) => Noise(n) * Mathf.Sin(t / 0.3f * Mathf.PI) * 0.5f);
         }
 
         static float Noise(int n)
@@ -194,11 +198,11 @@ namespace Hearthdelve.Editor
             AssetDatabase.ImportAsset(path);
         }
 
-        static AudioClip Sfx(string name) => Load<AudioClip>($"{EditorPaths.Audio}/{name}.wav");
+        internal static AudioClip Sfx(string name) => Load<AudioClip>($"{EditorPaths.Audio}/{name}.wav");
 
         // ------------------------------------------------------------------ animation sets
 
-        static SpriteAnim Anim(CharacterAnim action, string pack, string file, int frames, int rows, float frameDuration, bool loop)
+        internal static SpriteAnim Anim(CharacterAnim action, string pack, string file, int frames, int rows, float frameDuration, bool loop)
         {
             var anim = new SpriteAnim { action = action, frameDuration = frameDuration, loop = loop };
             // Minifantasy rows: front-right, front-left, back-right, back-left. One-row sheets serve every facing.
@@ -212,7 +216,11 @@ namespace Hearthdelve.Editor
             return anim;
         }
 
-        static SpriteAnimationSet Set(string name, params SpriteAnim[] animations) =>
+        /// <summary>One row of a sheet used for every facing (rows that aren't facings, like the charged attack's stages).</summary>
+        internal static SpriteAnim AnimRow(CharacterAnim action, string pack, string file, int frames, int row, float frameDuration, bool loop) =>
+            new() { action = action, frameDuration = frameDuration, loop = loop, frontRight = MinifantasyImporter.Row(pack, file, row, frames) };
+
+        internal static SpriteAnimationSet Set(string name, params SpriteAnim[] animations) =>
             CreateOrUpdate<SpriteAnimationSet>($"{EditorPaths.Animations}/{name}.asset", set => set.animations = new List<SpriteAnim>(animations));
 
         public static void BuildAnimationSets(out SpriteAnimationSet human, out SpriteAnimationSet humanShadow,
@@ -226,22 +234,32 @@ namespace Hearthdelve.Editor
                 Anim(CharacterAnim.Attack, c, "HumanTownsfolkAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "HumanTownsfolkDmg", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Dodge, c, "HumanTownsfolkJump", 4, 1, 0.1f, false),
-                Anim(CharacterAnim.Die, c, "HumanTownsfolkSpinDie", 12, 1, 0.1f, false));
+                Anim(CharacterAnim.Die, c, "HumanTownsfolkSpinDie", 12, 1, 0.1f, false),
+                // ChargedAttack's rows are stages, not facings: wind-up, charged loop, the spin.
+                AnimRow(CharacterAnim.Charge, c, "HumanTownsfolkChargedAttack", 6, 0, 0.1f, false),
+                AnimRow(CharacterAnim.ChargeHold, c, "HumanTownsfolkChargedAttack", 6, 1, 0.1f, true),
+                AnimRow(CharacterAnim.HeavyAttack, c, "HumanTownsfolkChargedAttack", 6, 2, 0.1f, false));
             humanShadow = Set("Anim_HumanTownsfolk_Shadow",
                 Anim(CharacterAnim.Idle, c, "ShadowHumanoidIdle", 16, 4, 0.2f, true),
                 Anim(CharacterAnim.Walk, c, "ShadowHumanoidWalk", 4, 4, 0.2f, true),
                 Anim(CharacterAnim.Attack, c, "ShadowHumanoidAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "ShadowHumanoidDmg", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Dodge, c, "ShadowHumanoidJump", 4, 4, 0.1f, false),
-                Anim(CharacterAnim.Die, c, "ShadowHumanoidSpinDie", 12, 1, 0.1f, false));
+                Anim(CharacterAnim.Die, c, "ShadowHumanoidSpinDie", 12, 1, 0.1f, false),
+                AnimRow(CharacterAnim.Charge, c, "ShadowHumanoidChargedAttack", 6, 0, 0.1f, false),
+                AnimRow(CharacterAnim.ChargeHold, c, "ShadowHumanoidChargedAttack", 6, 1, 0.1f, true),
+                AnimRow(CharacterAnim.HeavyAttack, c, "ShadowHumanoidChargedAttack", 6, 2, 0.1f, false));
             slime = Set("Anim_GreenSlime",
                 Anim(CharacterAnim.Idle, c, "SlimeGreenIdle", 8, 4, 0.2f, true),
                 Anim(CharacterAnim.Walk, c, "SlimeGreenJumpAttack", 4, 4, 0.2f, true),
+                // The leap: the same jump, faster.
+                Anim(CharacterAnim.Attack, c, "SlimeGreenJumpAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "SlimeGreenDmg", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Die, c, "SlimeGreenDie", 9, 1, 0.1f, false));
             slimeShadow = Set("Anim_GreenSlime_Shadow",
                 Anim(CharacterAnim.Idle, c, "ShadowSlimeIdle", 8, 4, 0.2f, true),
                 Anim(CharacterAnim.Walk, c, "ShadowSlimeJump", 4, 4, 0.2f, true),
+                Anim(CharacterAnim.Attack, c, "ShadowSlimeJump", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "ShadowSlimeDmg", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Die, c, "ShadowSlimeDie", 9, 1, 0.1f, false));
             cook = Set("Anim_Cook",
@@ -264,7 +282,7 @@ namespace Hearthdelve.Editor
         // ------------------------------------------------------------------ feedbacks
 
         /// <summary>One MMF_Player holding a moment's visuals, sound and haptics together (CLAUDE.md, Game feel).</summary>
-        static MMF_Player Feedback(Transform parent, string name, SpriteRenderer flashTarget, float shake, AudioClip sound, HapticPattern haptic)
+        internal static MMF_Player Feedback(Transform parent, string name, SpriteRenderer flashTarget, float shake, AudioClip sound, HapticPattern haptic)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -279,7 +297,7 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ characters
 
-        static GameObject CharacterRoot(string name, string layer, Vector2 colliderSize, Vector2 colliderOffset)
+        internal static GameObject CharacterRoot(string name, string layer, Vector2 colliderSize, Vector2 colliderOffset)
         {
             var root = new GameObject(name) { layer = LayerMask.NameToLayer(layer) };
             var body = root.AddComponent<Rigidbody2D>();
@@ -305,7 +323,7 @@ namespace Hearthdelve.Editor
             return root;
         }
 
-        static CharacterSpriteAnimator AddModel(GameObject root, SpriteAnimationSet set, SpriteAnimationSet shadowSet, out SpriteRenderer body)
+        internal static CharacterSpriteAnimator AddModel(GameObject root, SpriteAnimationSet set, SpriteAnimationSet shadowSet, out SpriteRenderer body)
         {
             var model = new GameObject("Model");
             model.transform.SetParent(root.transform, false);
@@ -320,28 +338,40 @@ namespace Hearthdelve.Editor
         public static GameObject BuildCleaver(WeaponDefinition definition)
         {
             var root = new GameObject("ButchersCleaver");
-            MeleeWeapon first = null;
             int attacks = Mathf.Max(1, definition != null ? definition.combo.Count : 3);
             for (int i = 0; i < attacks; i++)
             {
-                var attack = root.AddComponent<MeleeWeapon>();
+                var attack = root.AddComponent<CombatMeleeWeapon>();
                 attack.WeaponName = $"Cleaver {i + 1}";
                 attack.TriggerMode = Weapon.TriggerModes.SemiAuto;
                 attack.DamageAreaShape = MeleeWeapon.MeleeDamageAreaShapes.Rectangle;
                 attack.TargetLayerMask = LayerMask.GetMask(Layers.Enemies);
                 attack.InvincibilityDuration = 0.1f;
-                first ??= attack;
+                attack.HitDamageableFeedback = HitStopFeedback(root.transform, $"Feedback_HitStop_{i + 1}");
             }
             var aim = root.AddComponent<WeaponAim2D>();
             aim.AimControl = WeaponAim.AimControls.Mouse;
+            // Melee goes exactly where the player aims: TDE's default eases the weapon round at one turn per second.
+            aim.WeaponRotationSpeed = 0f;
             root.AddComponent<ComboWeapon>();
             root.AddComponent<ComboWeaponTuning>().Configure(definition);
             GameObject prefab = SavePrefab(root, CleaverPrefab);
             return prefab;
         }
 
+        /// <summary>The attacker's side of a hit: the hit-stop freeze. Its duration is set per attack from AttackData.</summary>
+        internal static MMF_Player HitStopFeedback(Transform parent, string name)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            var player = go.AddComponent<MMF_Player>();
+            player.FeedbacksList ??= new List<MMF_Feedback>();
+            player.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.06f });
+            return player;
+        }
+
         public static GameObject BuildPlayer(bool dungeon, SpriteAnimationSet set, SpriteAnimationSet shadowSet, PlayerMoveConfig moveConfig,
-            EssenceConfig essenceConfig, DelveConfig delveConfig, GameObject cleaver)
+            EssenceConfig essenceConfig, DelveConfig delveConfig, GameObject cleaver, GameObject heavy = null)
         {
             GameObject root = CharacterRoot(dungeon ? "Player" : "PlayerTavern", Layers.Player, new Vector2(0.7f, 0.45f), new Vector2(0f, 0.2f));
             root.tag = "Player";
@@ -369,6 +399,18 @@ namespace Hearthdelve.Editor
                 handle.WeaponAttachment = attachment.transform;
                 handle.InitialWeapon = cleaver.GetComponent<MeleeWeapon>();
                 handle.CanPickupWeapons = false;
+                if (heavy != null)
+                {
+                    // Added after the light handle, so GetComponent<CharacterHandleWeapon> still finds the light one.
+                    var heavyAttachment = new GameObject("HeavyAttachment");
+                    heavyAttachment.transform.SetParent(root.transform, false);
+                    heavyAttachment.transform.localPosition = new Vector3(0f, 0.4f, 0f);
+                    var heavyHandle = root.AddComponent<CharacterHandleSecondaryWeapon>();
+                    heavyHandle.WeaponAttachment = heavyAttachment.transform;
+                    heavyHandle.InitialWeapon = heavy.GetComponent<ChargeWeapon>();
+                    heavyHandle.CanPickupWeapons = false;
+                    root.AddComponent<PlayerAttackGate>();
+                }
                 root.AddComponent<AimControlSwitcher>();
 
                 var health = root.AddComponent<EssenceHealth>();
@@ -387,59 +429,6 @@ namespace Hearthdelve.Editor
                 character.CharacterHealth = health;
             }
             return SavePrefab(root, dungeon ? PlayerPrefab : TavernPlayerPrefab);
-        }
-
-        public static GameObject BuildSlime(EnemyDefinition definition, SpriteAnimationSet set, SpriteAnimationSet shadowSet)
-        {
-            GameObject root = CharacterRoot("GreenSlime", Layers.Enemies, new Vector2(0.8f, 0.5f), new Vector2(0f, 0.2f));
-            AddModel(root, set, shadowSet, out SpriteRenderer body);
-
-            var character = root.AddComponent<Character>();
-            character.CharacterType = Character.CharacterTypes.AI;
-            character.CharacterDimension = Character.CharacterDimensions.Type2D;
-            character.CharacterModel = body.transform.parent.gameObject;
-            root.AddComponent<CharacterMovement>();
-
-            var health = root.AddComponent<Health>();
-            health.DestroyOnDeath = true;
-            health.DelayBeforeDestruction = 0.9f; // the 9-frame death animation
-            // The one combined hit feedback: flash, shake, sound and haptic in a single MMF_Player.
-            health.DamageMMFeedbacks = Feedback(root.transform, "Feedback_Hit", body, 0.35f, Sfx("PH_Hit"), Pattern(HapticIds.TapFirm));
-            character.CharacterHealth = health;
-            root.AddComponent<EnemyIdentity>().Configure(definition);
-
-            var idle = root.AddComponent<AIActionDoNothing>();
-            // Paths around walls and props on floors with a NavGrid; heads straight for the player elsewhere.
-            var chase = root.AddComponent<AIActionPathfindToTarget2D>();
-            var detect = root.AddComponent<AIDecisionDetectTargetRadius2D>();
-            detect.Radius = definition != null ? definition.aggroRange : 8f;
-            detect.TargetLayer = LayerMask.GetMask(Layers.Player);
-            detect.ObstacleDetection = false;
-            var brain = root.AddComponent<AIBrain>();
-            brain.States = new List<AIState>
-            {
-                new()
-                {
-                    StateName = "Idle",
-                    Actions = new AIActionsList { idle },
-                    Transitions = new AITransitionsList { new AITransition { Decision = detect, TrueState = "Chase", FalseState = "" } },
-                },
-                new() { StateName = "Chase", Actions = new AIActionsList { chase }, Transitions = new AITransitionsList() },
-            };
-            character.CharacterBrain = brain;
-
-            var contact = new GameObject("ContactDamage") { layer = root.layer };
-            contact.transform.SetParent(root.transform, false);
-            var trigger = contact.AddComponent<BoxCollider2D>();
-            trigger.isTrigger = true;
-            trigger.size = new Vector2(0.9f, 0.7f);
-            trigger.offset = new Vector2(0f, 0.25f);
-            var touch = contact.AddComponent<DamageOnTouch>();
-            touch.TargetLayerMask = LayerMask.GetMask(Layers.Player);
-            touch.Owner = root;
-            touch.InvincibilityDuration = 0.5f;
-
-            return SavePrefab(root, SlimePrefab);
         }
 
         public static GameObject BuildPickup()

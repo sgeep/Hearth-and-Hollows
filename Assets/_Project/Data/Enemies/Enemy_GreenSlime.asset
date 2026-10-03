@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
   m_Name: Enemy_GreenSlime
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
+  schema: 1
   id: green_slime
   displayName:
     m_TableReference:
@@ -24,26 +25,35 @@ MonoBehaviour:
     m_LocalVariables: []
   maxHealth: 34
   moveSpeed: 1.6
-  gravity: 40
   aggroRange: 8
-  attackRange: 4.5
-  knockbackMultiplier: 0.4
+  knockbackMultiplier: 1
+  staggerMultiplier: 1
   superArmorWhileAttacking: 1
-  regenerates: 0
+  keepDistance: {x: 0, y: 0}
+  flutter: 0
+  startsAsleep: 0
+  wakeRange: 3.5
   attack:
-    telegraph: 0.7
-    active: 0.8
-    recovery: 0.6
-    cooldown: 1.6
-    damage: 14
-    hitboxOffset: {x: 0, y: 0.3}
-    hitboxSize: {x: 2.4, y: 0.8}
-    knockback: {x: 7, y: 6}
-    lungeSpeed: 11
-    leapHeight: 2.5
-    leapMaxDistance: 5
-    projectileFlightTime: 0.8
-    projectileSpawnOffset: {x: 0.3, y: 1}
+    debugName: Leap
+    kind: 0
+    minRange: 0
+    maxRange: 3.2
+    telegraph: 0.6
+    active: 0.35
+    recovery: 0.5
+    cooldown: 1.5
+    damage: 10
+    hitboxOffset: {x: 0, y: 0.2}
+    hitboxSize: {x: 0.8, y: 0.6}
+    knockbackForce: 5
+    animation: 2
+    releaseFrame: 1
+    travelDistance: 3.5
+    arcHeight: 0.8
+    projectileSpeed: 7
+    projectileRange: 8
+    projectileSpawnOffset: {x: 0.5, y: 0.3}
+  otherAttacks: []
   harvest:
   - ingredient: {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
     baseQuality: 1

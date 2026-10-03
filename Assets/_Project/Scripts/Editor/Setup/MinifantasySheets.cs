@@ -74,6 +74,9 @@ namespace Hearthdelve.Editor
         const string k_Emotions = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Character_Emotions";
         const string k_Loot = "All_Exclusives_20261002/Icons/8x8px/Loot_Icons";
         const string k_Cooker = "Minifantasy_AMyriadOfNPCs_v.1.0/Minifantasy_NPCs_Assets/Premade_NPCs/Cooker";
+        const string k_Bat = k_Creatures + "/Beasts/Bat";
+        const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
+        const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -81,8 +84,11 @@ namespace Hearthdelve.Editor
         public const string UIOverhaul = "UIOverhaul";
         public const string LootIcons = "LootIcons";
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
+        public const string GiantSpider = "GiantSpider";
+        public const string UserInterface = "UserInterface";
 
         static readonly Vector2 k_BottomLeft = Vector2.zero;
+        static readonly Vector2 k_Centre = new(0.5f, 0.5f);
 
         public static readonly List<Sheet> All = Build();
 
@@ -91,7 +97,7 @@ namespace Hearthdelve.Editor
             var sheets = new List<Sheet>();
 
             // Player (4a look test): the Human Townsfolk from Creatures, with its shadow sheets.
-            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie" })
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
             {
                 sheets.Add(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
@@ -102,6 +108,30 @@ namespace Hearthdelve.Editor
                 sheets.Add(Character($"{k_Slime}/SlimeGreen{anim}.png", Creatures, $"SlimeGreen{anim}"));
             foreach (string anim in new[] { "Idle", "Jump", "Dmg", "Die" })
                 sheets.Add(Character($"{k_Slime}/_Shadows/ShadowSlime{anim}.png", Creatures, $"ShadowSlime{anim}"));
+
+            // Bat (Creatures, Beasts): rows are the four facings; BatSleep's rows are sleep, wake up, fall asleep.
+            foreach (string anim in new[] { "FlyIdle", "Attack", "Dmg", "Die", "Sleep" })
+                sheets.Add(Character($"{k_Bat}/Bat{anim}.png", Creatures, $"Bat{anim}"));
+            foreach (string anim in new[] { "Fly", "Attack", "Dmg", "Die", "Sleep" })
+                sheets.Add(Character($"{k_Bat}/_Shadows/ShadowBat{anim}.png", Creatures, $"ShadowBat{anim}"));
+
+            // Giant Spider (exclusive). Its web shot uses the diagonal sheet: our characters face four diagonals.
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Die", "ShotWebDiagonal" })
+                sheets.Add(Character($"{k_Spider}/Minifantasy_GiantSpider{anim}.png", GiantSpider, $"GiantSpider{anim}"));
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Die", "WebShot" })
+                sheets.Add(Character($"{k_Spider}/Shadows/Minifantasy_GiantSpider{anim}Shadow.png", GiantSpider, $"GiantSpider{anim}Shadow"));
+            // The web projectile, drawn once per direction (rectangles measured from the sheet).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_Spider}/Minifantasy_GiantSpiderWebProjectiles.png", Pack = GiantSpider, File = "GiantSpiderWeb", Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("E", 87, 46, 9, 3, k_Centre), new SheetRect("NE", 86, 9, 7, 7, k_Centre),
+                    new SheetRect("N", 43, 0, 3, 9, k_Centre), new SheetRect("NW", 3, 9, 7, 7, k_Centre),
+                    new SheetRect("W", 0, 46, 9, 3, k_Centre), new SheetRect("SW", 3, 80, 7, 7, k_Centre),
+                    new SheetRect("S", 43, 82, 3, 9, k_Centre), new SheetRect("SE", 86, 80, 7, 7, k_Centre),
+                },
+            });
 
             // Tavern NPC.
             sheets.Add(Character($"{k_Cooker}/Minifantasy_NPCsCookerIdle.png", MyriadOfNPCs, "CookerIdle"));
@@ -151,6 +181,12 @@ namespace Hearthdelve.Editor
                 },
             });
             sheets.Add(new Sheet { Source = $"{k_Loot}/LootIcons.png", Pack = LootIcons, File = "LootIcons", Mode = SliceMode.Grid, Cell = new Vector2Int(Tile, Tile) });
+            // The red "!" over an enemy winding up an attack (User Interface pack, GUI emoticons; 16 px cells).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_GuiEmoticons}/Minifantasy_GuiEmoticons.png", Pack = UserInterface, File = "GuiEmoticons", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("AlertRed", 22, 116, 5, 10) },
+            });
 
             return sheets;
         }
