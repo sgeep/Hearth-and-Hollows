@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4b step 6)_
+_Last updated: 2026-10-03 (4b step 7)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -246,7 +246,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Prompts** (satchel full, climb out) moved up to sit above the satchel row. The test floor's debug controls line fades after 6 s so it doesn't sit over the satchel.
 - **Tests (PlayMode, test floor):** the bar follows Essence, flashes on a hit, turns red and pulses when low; the satchel HUD binds to the delve's satchel, shows a part as it goes in with three dots for Fine, and its freshness bar shortens; a kill puts "Clean kill! … Bat Wing ×N" with its icon on the feed, which then fades; the feed picks the right words for clean kills, overkills and destroyed parts; the bar, its label, the satchel, the feed, the prompts and the debug label never overlap and stay on screen (checked at the test window's narrower-than-16:9 width).
 
-**Step 6 done (2026-10-03), awaiting review and playtest: the feedback and haptics pass.** Each moment has one combined `MMF_Player` (visuals, placeholder sound, named haptic pattern), all through the existing settings (screen shake scale, flash, hit-stop, vibration on/off, reduced vibration):
+**Step 6 approved (2026-10-03): the feedback and haptics pass.** Kept as built, including the cleaver's heavy at 14 / 22 / 34. Each moment has one combined `MMF_Player` (visuals, placeholder sound, named haptic pattern), all through the existing settings (screen shake scale, flash, hit-stop, vibration on/off, reduced vibration):
 
 | Moment | Feedback |
 |---|---|
@@ -266,7 +266,23 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Tests:** PlayMode `FeedbackTests`: one `Tap.Firm` per light hit, one `Hit.Heavy` per heavy hit (and the spin's damage lands once), a harder shake for the heavy; a tick per charge level past the first; `Kill.Clean` on a clean kill, `Bump.Soft` on an overkill; one buzz when the satchel first refuses a part; the telegraph cue only when aimed at the player; no haptic on a dodge. EditMode: the one-hit invincibility rule. `HapticService.PatternPlayed` reports each named pattern played (tests and debug overlays).
 - **Needs you:** controller rumble checks (strength and feel of each pattern) and the placeholder sounds' volumes.
 
-**Next: step 7,** the web build smoke test and docs. After your review and playtest of step 6.
+**Step 7 done (2026-10-03), awaiting review: web smoke test and docs.**
+
+**Web smoke test (2026-10-03): passed after one fix.** A development web build (`Builds/Web`, 125 MB, 0 errors) of `Dungeon_TestFloor`, served locally and played in Chrome:
+
+- The floor renders with its lighting; the camera follows the player; walls block movement; F2 changes the resolution.
+- The HUD: Essence bar and label, its red low-Essence fill and hit flash; the six satchel slots; localized text loads from the build's tables.
+- Combat: a three-hit light combo kills the slime; its parts pop out, the harvest feed names them with their icons ("Fine Slime Core ×1", "Standard Slime Gel ×2"), and walking over them fills a satchel slot with its count, quality dots and freshness bar. The bat wakes from its perch and swoops; the spider keeps its distance, telegraphs (red flash and "!") and bites.
+- Death: at zero Essence the death screen appears; with an empty satchel it says so, and with a haul it offers the Lockbox. Choosing slot 1 marks it and reads "Lockbox: Standard Slime Gel ×2"; the result screen then shows the saved stack and "Brought home: 2 parts. Lost: 0." Delve again restarts the floor.
+- Extraction: pressing E at the rope climbs out to "Back from the Cellars".
+- The browser console shows no errors from the game (only the web template's missing `productVersion` warning).
+- **Fixed:** the em dash in the Lockbox and satchel-full strings showed as a gap. The web build has only Unity's built-in font, with no system fallback for characters past Latin-1. Those strings (and three tavern strings) now use plain punctuation, and a test keeps every UI string within Latin-1 until a real font exists. Rebuilt and rechecked: the Lockbox line now reads correctly in the browser.
+- **Not exercised in the browser:** the satchel-full swap prompt (covered by PlayMode tests) and rumble (none on the web, by design).
+- **Observation, not changed:** fighting all three enemies at once without dodging drains a full Essence bar in a few seconds (about 5 in the playthrough; two enemies took about 10) (slime 10, bat 8, spider 14 per hit, 0.6 s of invulnerability after each). Worth a look when room encounters are designed in 4d.
+
+**Docs:** `PORT_MANIFEST.md` is current for 4b (the rows 4b replaced now name their replacements; the dungeon debug panel is recorded as not rebuilt). Known issues are updated below.
+
+**4b is complete pending your review.** Next is **4c** (reconnecting the full day loop through `GameFlow`), which starts with a plan for your approval.
 
 ### Open design questions (4a)
 
@@ -292,6 +308,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel:** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) was scheduled for 4b but not rebuilt. The look-test overlay's F2–F4 keys still work.
+- **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else.
 - **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
 
 ### Regenerating and verifying (current project)
