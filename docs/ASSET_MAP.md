@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-03 (4b step 3: satchel UI and ingredient icons)_
+_Last updated: 2026-10-03 (4b step 4: the rope out)_
 
 ## How art gets into the project
 
@@ -84,6 +84,15 @@ Cells are (column, row) from the top-left.
 
 `Shadows.png` (same layout) is not imported yet.
 
+### The rope out (Hole Entrances And Ropes, exclusive add-on → `Dungeon/`)
+
+| File | Sprite | What |
+|---|---|---|
+| `Ropes.png` (200×80) | `Ropes_Hanging` 12,8 9×27 | A rope hanging from above with its coil on the floor (the pivot): the way back up to the tavern. The rest of the sheet is a stake with a rope going down a hole, in wood and stone. |
+| `RopesShadows.png` | `RopesShadows_Hanging` 11,30 7×5 | The coil's shadow. |
+
+`HoleEntrances.png` has holes in the floor (three sizes, one with a stake, one with a ladder frame), not imported. `RopeClimbing_<race>.png` (8 frames of 32×32, back view) animates a climb, but only for the pack's bare base bodies; our player is the clothed Townsfolk, so the climb is shown by rising and fading instead.
+
 ### `Props.png` — 232×88
 
 Rectangles are x, y, width, height from the top-left.
@@ -161,3 +170,4 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No clothing or hair layers for attack animations** (A Myriad of NPCs only layers idle, walk, damage and die).
 - **No mallet or frying-pan weapon.**
 - **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
+- **No rope-climb animation for a clothed body** (only the base bodies): extraction rises and fades.

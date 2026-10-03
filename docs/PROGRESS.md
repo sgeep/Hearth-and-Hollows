@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4b step 3)_
+_Last updated: 2026-10-03 (4b step 4)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -218,7 +218,19 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
   - EditMode: the re-theme (renamed assets kept their GUIDs, new ids and categories, harvests and icons, every harvestable part known to saves, Grilled Spider Leg still uses the leg, no rat keys or names left).
   - PlayMode on the test floor: a killed bat drops Bat Wings with their icon that go into the satchel and lose freshness at the delve's rate; parts on the floor spoil too; with a full satchel the hint shows and Interact opens the prompt (paused, gameplay input off, first slot selected, its text showing the part found and the selected slot), the keyboard moves and chooses, the old stack drops at the player's feet and isn't re-collected until they step off; Cancel and "Leave it" change nothing; the mouse hovers and clicks a slot.
 
-**Next: step 4,** low Essence, death and the Lockbox, extraction, and the result screen. After your review and playtest of step 3.
+**Step 3 approved (2026-10-03).** Kept as decided: quality dots, freshness decay in the satchel and on the floor, whole-stack swaps, dropped stacks needing a step away. The Bat Wing icon stays a documented art gap; the mushroom recipes wait for 4f.
+
+**Step 4 done (2026-10-03), awaiting review and playtest: low-Essence warning, death and the Lockbox, extraction, and the result screen.**
+
+- **Low Essence.** Below the low threshold (25%) a heartbeat plays, sound and the Heartbeat.Warning haptic in one feedback, from every 1.1 s down to every 0.45 s as Essence nears zero (`HapticMath.HeartbeatInterval`; intervals in `EssenceConfig`). It stops above the threshold, at death and in god mode. The placeholder Essence bar pulses red while low (the real HUD is step 5).
+- **Death.** At zero Essence the death animation plays (1.2 s, real time), then gameplay pauses (`MenuPause`), input goes to the UI, and the **death screen** opens: why the delve ended, the six satchel slots, and the Lockbox choice. Choosing a slot outlines it (a shape as well as a colour) and moves to "Return to the surface"; "Keep nothing" gives everything up. `DeathPenalty` applies: that whole stack goes home, the rest of the haul and any run currency is lost. With an empty satchel the screen just explains and returns.
+- **Extraction.** A rope hangs from a hole in the ceiling in room C (near the spider). Standing at it shows "Press E to climb back to the tavern" (the gamepad button when using one). Climbing stops Essence drain and damage, the player rises up the rope and fades, and the whole satchel goes home.
+- **Result screen.** How the delve ended ("Back from the Cellars" or "Dragged Back to the Surface"), the parts brought home shown as slots, and how many were lost. "Delve again" restarts the floor; with the day loop (4c) the button reads "Back to the tavern" and hands the report to `GameFlow.CompleteDelve`.
+- `DelveRunController` owns the delve's end; `DelveExit` is the rope. The look-test overlay no longer restarts on death where the death screen exists (the 4a look room still restarts).
+- **Test floor** updated in place: the delve controller, the rope (`R` on the map), and the exit hint, death screen and result screen on its canvas (all generated UI, rebuilt on each update).
+- **Tests (PlayMode, test floor):** the heartbeat starts below the threshold, repeats with its haptic, speeds up as Essence falls and stops once restored, with the bar's low state following; death opens the Lockbox screen after the death animation (paused, UI input only, text showing the choice), keyboard choice keeps only that whole stack and the result says what was lost; "Keep nothing" loses the whole haul; an empty satchel still gets the screen; climbing the rope shows the hint, can't be drained or hurt, and brings the whole satchel home; each ends with "Delve again" giving a fresh floor with input and time restored.
+
+**Next: step 5,** the dungeon HUD. After your review and playtest of step 4.
 
 ### Open design questions (4a)
 
