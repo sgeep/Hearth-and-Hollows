@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 3; design direction recorded)_
+_Last updated: 2026-10-03 (4c step 4: Prep, Tavern HUD and Results)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -353,7 +353,7 @@ Decisions (2026-10-03):
 - **Layered looks** (decision 3): A Myriad of NPCs layers (body, trousers, top, beard, hair or hat) drawn by a new presentation-only `LayeredSpriteAnimator`, which picks one facing and frame for all layers with the same rules as the combat animator. Curated for readability: few layers, tops only in colours that contrast with the floor. Each customer's look comes from the evening's seed and their id, so it's fixed for the whole visit.
 - **Seats:** 6 open before upgrades; the fourth table is put away until the seat upgrade, and the walkable grid is rebuilt through the step 1 invalidation event.
 - **Pip:** a TDE character (the premade Butcher as a stand-in) who walks to the post of their job: Serving, beside the pass, by default. Working the job comes with step 3.
-- **The evening (until the prep screen in step 4):** played on its own, the scene opens straight into a debug evening (a debug-filled storeroom, the first dishes it can make). Customers order, wait and, with no serving yet, walk out.
+- **The evening (until the prep screen in step 4):** played on its own, the scene opened straight into a debug evening (a debug-filled storeroom, the first dishes it can make). Step 4 replaced this with Prep.
 - **Debug keys** (editor and development builds): **F5** ends the service now (everyone goes home), **F6** lets a customer in.
 - **Tests:**
   - EditMode: the same seed always gives the same look; looks vary and every option gets used; empty lists and beard chance.
@@ -382,7 +382,35 @@ Decisions (2026-10-03):
   - PlayMode (`TavernServiceTests`): the Grill cooks an order in its panel with the Minigame map on and walking off, the kitchen works, and the plate shows on the pass; stepping away puts the order back; carrying shows the plate, slows the keeper, and serving the right customer starts them eating; the pass takes a plate back; walking customers spill and finally drop a plate; the Stew Pot chops, simmers, shows five helpings and ladles one to the pass; Pip on Serving carries and serves; Pip at the Grill cooks while the keeper can't take over.
 - One 4a test's lit-sprite exemption now covers markers on the Above layer (the tavern player prefab carries the plate overlay); the 4a scenes are untouched.
 
-**Next: step 4,** Prep, the Tavern HUD and Results. After your review and playtest of step 3.
+**Step 3 approved (2026-10-03).** Cooking, the pass, carrying, serving and Pip kept as they are, tuning included. The station panel covering the lower room stays unless full-service playtests show it hides information that causes unavoidable failures (reduced awareness while cooking is fine).
+
+**Step 4 done (2026-10-03), awaiting review and playtest: Prep, the Tavern HUD and Results — one complete evening.**
+
+- **The evening runs Prep → Service → Results** (`TavernDirector.Phase`). Played on its own the scene starts at Prep with a debug-filled storeroom; Results offers another evening (the scene reloads). The day loop (Morning, Night, the real storeroom from delves) is step 5. During Prep and Results only the UI map is on, so the keeper stands still while you plan.
+- **Prep** (a panel over the room):
+  - the **storeroom** as satchel-style slots (icon, count, quality dots, freshness bar);
+  - a **card for each dish**: icon, name, value ("8 gold", "6 gold a bowl"), how many the storeroom makes ("13 to serve", "2 pots") and **how it's prepared** ("Grill", "Chop, then Simmer"). The step list comes from `PrepRules.Steps` and the card draws however many steps a dish has, so multi-stage dishes (GDD §5.4) won't need a new card. A dish the storeroom can't make is dimmed and can't be chosen;
+  - choosing: tap a card to put it on tonight's menu, tap again to take it off; at most three ("Tonight: 2 of 3 dishes"); chosen cards turn gold with gold corners (by shape as well as colour);
+  - **Pip's job** (a button cycling Serving, Grill, Tap, Stew Pot, off); Pip walks to that post at once, so you see the choice in the room;
+  - **Open the doors** (only when a dish on the menu can be made) and **Close for the night**. When nothing in the storeroom makes any dish, a line says so in place of the menu count, leaving closing as the honest choice. F4 (debug builds) fills the storeroom again.
+- **Tavern HUD** (only during service), in the side margins so the room stays the focus:
+  - left: a **clock bar** running down, "Last orders!" near the end, gold, tips and Renown so far, and tonight's menu as icons (a sold-out dish dims and gets a red bar);
+  - right: the **order rail**, one row per open order: dish icon, a one-word state (Waiting, Cooking, Ready, Serving, Stewing, Spare) and a thin bar for that customer's patience, green to red.
+  - Interaction hints and the carried plate's spill meter stay as in step 3 (the hint line at the bottom, the plate and meter over the keeper's head).
+- **Timing and sell-out:** service lasts its set length with last orders near the end (unchanged rules); when every dish on the menu sells out the door closes to new customers and service ends as soon as the last diners have paid ("Everything sold out, so we closed early.").
+- **Results:** dishes served, gold earned, tips, Renown, then walkouts, sell-out leaves and dropped plates, each only if it happened. Lines appear one by one with the numbers counting up, then the evening's **takings** (payments plus tips). The button finishes the reveal if pressed early, then starts another evening. Closing without opening says "We kept the doors shut tonight." Banking the takings into the save is step 5.
+- Pure logic with EditMode tests: `PrepRules` (steps, how many can be made, menu toggling up to three, whether the doors can open) and `EveningReport` (the lines, good news first, trouble only when it happened).
+- PlayMode tests (`TavernEveningTests`): the scene opens at Prep with walking off and a card per dish showing its steps; choosing caps at three and un-chooses; Pip's job is set at Prep and kept; opening shows the HUD and turns walking on; an order appears on the rail with its icon, state and patience, the clock runs down and the takings update; selling out ends service early and Results tells it, then another evening's Prep opens; closing for the night says the doors stayed shut; the HUD keeps to the margins without overlaps. The earlier tavern tests now open an evening explicitly.
+- `TavernEveningCaptures` (explicit, run by name) renders Prep, the HUD and Results to `BatchLogs/` for layout checks.
+- Strings: shorter order-rail states ("Ready", "Stewing") so they fit the 40-px margin.
+
+**Your playtest (Tavern scene, Play):**
+1. Prep: check the storeroom, choose up to three dishes (try a fourth, and un-choosing), change Pip's job and watch them walk to it, then Open the doors.
+2. During service: watch the rail and the clock; does the HUD tell you what you need without pulling your eyes from the room?
+3. Sell out on purpose (choose one dish with little stock) and check service ends once the last diners pay.
+4. Read Results, then press the button for another evening. Also try F4 at Prep, and Close for the night.
+
+**Next: step 5,** Boot, Main Menu, Morning and Night, the delve integration and saves (F8, F9). After your review and playtest of step 4.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -412,6 +440,7 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
+- **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
 - **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else. Temporary: once the game font is chosen, the test becomes a glyph-coverage check against that font.
