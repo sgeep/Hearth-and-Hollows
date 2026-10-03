@@ -20,7 +20,7 @@ Rules for working with these are in `CLAUDE.md` ("Third-party code"). The repo s
 | Nice Vibrations (Lofelt) | 4.1.2, Lofelt Studio SDK 1.3.4 | `Assets/Feel/NiceVibrations` | Unity Asset Store EULA (obtained as part of Feel), plus `3RD-PARTY-LICENSES.md` in its folder | Gamepad rumble |
 | Feel (More Mountains) | 6.1 | not imported | Unity Asset Store EULA | **Licensed, but only its `NiceVibrations` folder is imported.** Never import Feel's `MMFeedbacks`, `MMTools` or demo folders. |
 | Super Text Mesh (Kai Clavier) | version not stated in the package | `Assets/Clavian/SuperTextMesh` | Unity Asset Store EULA, plus `3rdPartyComponentLicense.txt` | All player-facing text (uGUI and world space), Ultra shader under URP |
-| Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, and the Tavern Indoor and Loot Icons exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
+| Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, Crafting And Professions II 1.0, Dwarven Kingdom 1.0, and the Tavern Indoor, Loot Icons, Giant Spider and Hole Entrances And Ropes exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
 
 ### License notes
 

@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4b step 7)_
+_Last updated: 2026-10-03 (4c step 1)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -312,6 +312,27 @@ Decisions (2026-10-03):
 4. **Debug controls:** F4 fill the storeroom, F5 end service now, F6 spawn a customer, F8 skip to the next phase, F9 +100 gold. The old F1 panel stays deferred.
 5. **Delve scene:** `Dungeon_TestFloor` in the day loop until 4d.
 6. **Main menu:** New Game and Continue; settings are 4h.
+
+### 4c status
+
+**Step 1 done (2026-10-03), awaiting review and playtest: the tavern room, art, walkable grid and interactions.**
+
+- **`Tavern` scene** (*Hearthdelve → Generate → 4c Tavern*; *Update Tavern* applies later builder changes in place). The Stage 1 inn, 28×17 tiles: the Tavern Indoor premade room stretched cell by cell, with the front door in the middle of the south wall.
+  - Back wall: the L-shaped bar with its taps and stools (the **Tap**), bottle shelves, a sign, a wall lamp, a low shelf of glasses.
+  - Kitchen corner: the stone oven and range (the **Grill**), the cauldron over a floor fire (the **Stew Pot**), and the **pass** (a long table, usable from either side).
+  - Dining: four round tables, each with a chair on either side facing it (8 seats, marked for customers in step 2). Barrels and a stool for decor.
+  - Lighting: warm ambient light, with local light from the wall lamp, the kitchen fire, the stew fire and over the bar.
+  - Every solid piece blocks movement with a footprint that ends at the bottom of its art (its sort point).
+- **Camera:** fixed, centred on the room (decision 1). Centring keeps the whole room on screen from 16:9 down to 5:4; an off-centre view lost a tile at 16:10.
+- **Walkable grid:** baked from the colliders at scene load. It can now be invalidated (`NavGrid.Invalidate`, or publishing `NavigationLayoutChanged`) and rebuilt (`Rebuild`); its `Version` goes up with each bake and path followers re-plan when it changes. Placement itself is 4f.
+- **Interactions:** the tavern player picks the nearest usable station in reach (a pure rule with EditMode tests; the current target holds until another is clearly nearer, so the highlight doesn't flicker). The target gets gold corner brackets and a bobbing marker, and the hint reads "E | Space: Grill" (the tavern's Interact keys). Interact publishes `TavernInteracted`; what each station does comes in step 3. Nothing is targeted while the Tavern map is off (panels and menus).
+- **Art imported and recorded in `ASSET_MAP.md`:** the stretched room's cells; the Tavern Indoor prop half (tables, chairs in four facings, stools, benches, long tables, shelves, taps, bottles and glasses); the Crafting And Professions II kitchen, idle and working; the Dwarven Kingdom floor and wall fires; the UI Overhaul selectors.
+- **Tests:**
+  - EditMode: the selection rule (nearest in reach, unavailable skipped, stickiness, dropping the target).
+  - PlayMode (`TavernSceneTests`): the stations, seats and grid; lit sprites; the camera holding still and fitting the room; walking up into the bar, kitchen, cauldron, pass, tables and chairs stops the player in front and sorts them in front; every station is reachable from the door and the spawn; the grid rebuilds when a table moves; the highlight, hint and Interact; nothing targeted while the Tavern map is off.
+- `LookTest_Tavern` is untouched. The shared tavern player prefab gains the interactor, which does nothing in the look scene (it has no stations).
+
+**Next: step 2,** customers and Pip. After your review and playtest of step 1.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

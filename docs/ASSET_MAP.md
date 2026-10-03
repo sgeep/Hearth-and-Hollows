@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-03 (4b step 5: the HUD)_
+_Last updated: 2026-10-03 (4c step 1: the tavern room)_
 
 ## How art gets into the project
 
@@ -125,7 +125,53 @@ Source: `All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers
 | `TavernIndoor_props` | `Shelves` 252,16 48×14; `Sign` 233,17 14×6; `Bar` 242,26 59×26; `StoolA` 235,33 5×6; `StoolB` 235,40 5×6; `TableSetA` 232,58 24×22; `TableSetB` 280,58 24×22 | Back-bar shelves, a sign, the L-shaped bar with its seven stools, two loose stools, and two round tables with three chairs each |
 | `TavernIndoor_props2` | `ShelfGoods` 252,16 48×15; `BarTop` 244,31 12×12 | Bottles and glasses on the shelves; taps and glasses on the bar |
 
-The prop-sheet half (individual tables, chairs, stools, benches, shelf units, bottle rows) is not sliced yet. It is what 4c and 4f need for free furniture placement.
+**The 4c tavern (`Tavern` scene) is the premade room stretched.** The premade room sits exactly on the 8 px grid: 11×11 cells from sheet pixel (224, 8), its door in column 5. Its interior columns and floor rows repeat exactly, so the 28×17-tile room is cut cell by cell (`Cell_column_row` on `base_building`, `wall` and `floor2`): edges from the edge cells, everything else from column 2 and floor row 5, the door from column 5. The side walls are half a tile thick. The front wall is the `base_building` stone band (row 9) and dark outside (row 10), with a 5 px door gap at x 266–270. `floor2`'s 8×8 sample at (8, 48) is *not* the room's floor tile; the room cells are.
+
+**The prop half (x < 224), measured for 4c** (sheet pixels x, y, w×h; all on `TavernIndoor_props` unless noted):
+
+| Sprite | Rect | What |
+|---|---|---|
+| `TableRoundA` / `TableRoundB` | 90,42 / 106,42, 12×12 | Big round tables (the dining tables) |
+| `TableRoundSmallA` / `B` | 88,24 / 104,24, 8×8 | Small round tables |
+| `TableSquare` | 50,25 20×23 | Square table, drawn to sit inside four benches |
+| `BenchBack`, `BenchFront` | 51,17 / 51,49, 18×7 | Benches above and below the square table |
+| `BenchLeft`, `BenchRight` | 42,26 / 73,26, 5×22 | Benches either side of it |
+| `LongTableH` | 130,40 28×8 | Long table (the pass) |
+| `LongTableV` | 169,34 6×22 | Long table, vertical |
+| `ChairFacingN` / `S` / `E` / `W` | 137,26 6×6; 145,24 / 153,24 / 161,24, 6×8 | Chairs by the way the sitter faces (N shows the backrest in front) |
+| `StoolRedA`, `StoolRedB`, `StoolPlain` | 178,25 / 185,25 5×6; 194,25 4×6 | Stools |
+| `ShelfTall`, `ShelfLow` | 44,64 16×14; 68,72 16×6 | Shelf units |
+| `SignSmall` | 185,65 14×6 | Small sign |
+| `props2`: `Taps` | 193,40 7×5 | A row of three taps (with a corner piece at 188,47 and a column at 200,47, not sliced) |
+| `props2`: `BottlesA` / `B` / `C`, `Glasses` | 93,66 / 117,66 / 141,66 13–14×5; 165,66 14×4 | Rows of bottles and glasses for shelves (a second, identical row sits 7 px lower) |
+
+Not sliced: a small red cushion (122,26 4×4).
+
+## Kitchen (Crafting And Professions II → `CraftingAndProfessions/`)
+
+| File | What |
+|---|---|
+| `Kitchen` (`KitchenProp`, 32×32) | A stone oven (1,4 11×18) behind a range with pans (12,21 16×8): the **Grill station** at rest |
+| `KitchenShadow` | Its shadow |
+| `KitchenWorking` (256×32, 8 frames of 32×32) | The same kitchen at work: fire under the oven, sizzling pans and smoke. For the Grill in use (4c step 3) |
+
+The pack's `Characters/KitchenWorking_<race>` sheets are unclothed base bodies working at the kitchen (arms raised), like Carrying Animations: they don't fit the clothed stand-in.
+
+## Fire (Dwarven Kingdom → `DwarvenKingdom/`)
+
+| File | What |
+|---|---|
+| `FloorFireplace` (128×16, 8 frames of 16×16) | A small floor fire: under the **Stew Pot** cauldron (Dungeon `Props_Cauldron`) |
+| `WallFireplace` (192×24, 8 frames of 24×24) | Despite the name, a small flame at the foot of a wall: one on the tavern's back wall, as a wall lamp |
+
+## Selectors (UI Overhaul → `UIOverhaul/Selectors`)
+
+| Sprite | Rect | What |
+|---|---|---|
+| `Brackets` | 255,95 18×18, 9-sliced (5 px) | White corner brackets, tinted gold and sized to fit: the target highlight around a station |
+| `Marker` | 84,254 8×5 | A small white down marker, tinted gold, bobbing above the target |
+
+The sheet has the same frames in black, red and green, dashed and dotted, and arrows in four directions.
 
 ### Giant Spider web (`GiantSpider/GiantSpiderWeb.png`, from `Minifantasy_GiantSpiderWebProjectiles.png`, 96×96)
 
@@ -166,7 +212,9 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No rat with an attack** (the reason the Giant Rat was replaced).
 - **No pixel font.** Text uses Unity's built-in font through Super Text Mesh. It is sharp but not pixel art.
 - **No audio of any kind.** Sounds are generated placeholders (`Assets/_Project/Audio/SFX/PH_*.wav`).
-- **No plate-carrying overlay** for the player. The exclusive "Carrying Animations" add-on (107 catalog entries) is worth checking for 4c.
+- **No clothed carrying pose.** Carrying Animations (exclusive) has carry idle, walk and damage for six races, but only as unclothed base bodies with the load as a separate layer (wood, planks, ore, ingots; no plates). 4c draws the dish icon above the player's head instead (decision 2).
+- **No sitting pose** for customers: seated customers will use their idle pose at the chair.
+- **No cauldron or cooking pot in the cooking packs.** The Stew Pot is the Dungeon pack's cauldron over a Dwarven Kingdom floor fire.
 - **No clothing or hair layers for attack animations** (A Myriad of NPCs only layers idle, walk, damage and die).
 - **No mallet or frying-pan weapon.**
 - **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
