@@ -26,8 +26,8 @@ Each is planned, approved, built and playtested separately. The web build must w
 | | Sub-milestone | Contents |
 |---|---|---|
 | **4a** | Integration and look test (**complete**, 2026-10-02) | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
-| 4b | Dungeon migration | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. |
-| 4c | Tavern and UI migration | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. |
+| 4b | Dungeon migration (**in progress**) | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. Dungeon-only: ends on a result screen with restart. |
+| 4c | Tavern and UI migration | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. **Acceptance criterion: the complete top-down day loop is restored through `GameFlow` (Tavern → Dungeon → Tavern, Morning to Night, saves).** |
 | 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
 | 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. |
 | 4f | Tavern Stage 1 content | Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement. |
@@ -128,6 +128,30 @@ Tests, all passing in batch mode with 0 compiler warnings in our code:
 Done on 2026-10-02: Web Build Support installed; the look scenes, the camera scales and controller rumble tested and reported good.
 
 - **Tuning** (changes made in Play mode apply immediately): `Data/Config/PlayerMoveConfig` (walk speed, dodge), `Data/Weapons/Weapon_ButchersCleaver` (combo damage, timing, reach), `Data/Config/EssenceConfig` (drain, post-hit invulnerability), `Data/Enemies/Enemy_GreenSlime`, and the patterns in `Data/Haptics`.
+
+### 4b plan (approved 2026-10-02)
+
+Scope: the Phase 1 and 3 dungeon rebuilt on TDE in a new **`Dungeon_TestFloor`** scene (three hand-built rooms and an extraction rope). `LookTest_Dungeon` and `LookTest_Tavern` stay untouched as the known-good visual, camera and rendering baselines through 4b.
+
+Order of work:
+
+1. Test floor scene, grid pathfinding, and the pathfinding AI action.
+2. Damage pipeline, heavy/charged attack, hit-stop (MMFeedbacks freeze-frame), simple knockback and stagger, and the three enemies with telegraphs.
+3. Harvest, satchel, freshness and the swap prompt; rat ingredients re-themed.
+4. Low Essence, death and Lockbox, extraction, and the result screen.
+5. Dungeon HUD.
+6. Feedback and haptics pass.
+7. Web build smoke test; ASSET_MAP, PROGRESS and PORT_MANIFEST updated.
+
+Decisions (2026-10-02):
+
+1. **Day loop:** 4b is dungeon-only and ends on a result screen with restart. 4c reconnects the full loop through `GameFlow` (an explicit 4c acceptance criterion).
+2. **Roster:** Green Slime, Bat and Giant Spider. Mushroom People are deferred until there is suitable attack art.
+3. **Ingredients:** the rat ingredients are re-themed to bat and spider parts. The asset files are renamed in Unity (GUIDs and references kept), and their ids and data change; recipes are updated to match. Prototype saves need not load.
+4. **Skills 1 and 2** (GDD §4.1, tools and throwables) are out of 4b. Raise them when planning 4e without widening 4e's approved scope; if the vertical slice doesn't need them, they can wait for Phase 5.
+5. **Player body:** the Human Townsfolk stays as the stand-in until character creation (4g).
+
+Adjustments: satchel quality is shown by an icon or mark as well as a tint (never colour alone); knockback and stagger stay a simple hit response, not a poise system; pathfinding tests check that the real character collider follows paths around corners and props without clipping.
 
 ### Open design questions (4a)
 
