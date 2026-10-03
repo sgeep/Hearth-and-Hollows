@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dca0dcb72c92d5641b093c7c7bdf32f8, type: 3}
+  m_Name: Appearance_dwarf
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Customers.NpcAppearancePool
+  bodies:
+  - {fileID: 11400000, guid: 80cfb22a1d21056459b90402d9714ec0, type: 2}
+  - {fileID: 11400000, guid: e2bac61364147e8468cd458ee8254f9d, type: 2}
+  - {fileID: 11400000, guid: 8c4ff70b09f1d654ca7270f8fc3c3784, type: 2}
+  tops:
+  - {fileID: 11400000, guid: e114d8e24857497408a1bf2089e762e8, type: 2}
+  - {fileID: 11400000, guid: 1162d53e01f00a64fa03bc754ddaa322, type: 2}
+  - {fileID: 11400000, guid: b6de7e4fa7621304c9a9c98dcf0fdb19, type: 2}
+  trousers:
+  - {fileID: 11400000, guid: 1df616b5d9e23d740b4e7ae645e3ede1, type: 2}
+  - {fileID: 11400000, guid: f7e796708d99afa46894db9000b710ef, type: 2}
+  heads:
+  - {fileID: 11400000, guid: fe1d4ce09f9691c42bb17d2d167b20da, type: 2}
+  - {fileID: 11400000, guid: 5fddc7d5bee693d47be7c479a2d3c6bd, type: 2}
+  - {fileID: 11400000, guid: 349679a3f78f93e4ba0b9333fef18842, type: 2}
+  - {fileID: 11400000, guid: 93fe12fe09556c44b8760bb26a1c3d43, type: 2}
+  - {fileID: 11400000, guid: d6b3a2d7ca63e1c41bceb4425e54155e, type: 2}
+  - {fileID: 11400000, guid: be5da68cb374ee84392e9345fc352215, type: 2}
+  - {fileID: 11400000, guid: 8490a44c524bcf94a9fd2828b04c3b2f, type: 2}
+  - {fileID: 11400000, guid: a2446f568a7c46d4aa73518996b454cd, type: 2}
+  - {fileID: 11400000, guid: 0d161366eb9527d43955f23bad105a69, type: 2}
+  - {fileID: 11400000, guid: 32731abe3493a9344a9b8c140ec574bd, type: 2}
+  beards:
+  - {fileID: 11400000, guid: 815da1f45a6a5ef4198d90b0bcca4a58, type: 2}
+  - {fileID: 11400000, guid: 5d6dc5fae0d47634baeb6e74d7b56fcf, type: 2}
+  - {fileID: 11400000, guid: affba569b5169fe46be899dac5615160, type: 2}
+  - {fileID: 11400000, guid: a29b90cabfe6e5f459fa209faf42a84e, type: 2}
+  - {fileID: 11400000, guid: 084fc2e133a7c41408228d92cb8ab581, type: 2}
+  beardChance: 1

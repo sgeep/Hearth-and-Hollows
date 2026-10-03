@@ -102,6 +102,42 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>
+        /// Batch entry point (run without -nographics): the tavern with customers on six seats and two in
+        /// the queue (looks from fixed seeds), and Pip at the serving post, to judge readability at 320×180.
+        /// </summary>
+        public static void CaptureTavernCustomersBatch()
+        {
+            try
+            {
+                EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                var layout = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.Tavern.Scene.TavernLayout>();
+                var content = AssetDatabase.LoadAssetAtPath<Hearthdelve.Tavern.Scene.TavernContent>(EditorPaths.Data + "/Tavern/TavernContent.asset");
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(NpcContent.CustomerPrefab);
+                void Place(Vector2 at, int seed, Hearthdelve.Core.Movement.Facing4 facing)
+                {
+                    var customer = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                    customer.transform.position = at;
+                    var pool = content.customers[seed % content.customers.Count].appearance;
+                    var look = customer.GetComponentInChildren<Hearthdelve.Shared.Animation.LayeredSpriteAnimator>();
+                    look.LockFacing(facing);
+                    look.SetAppearance(pool.Layers(pool.Pick(seed * 7919)));
+                }
+                for (int i = 0; i < 6; i++) Place(layout.Seats[i].SitPoint, i, layout.Seats[i].Facing);
+                Place(layout.QueueSpot(0), 6, Hearthdelve.Core.Movement.Facing4.FrontLeft);
+                Place(layout.QueueSpot(1), 7, Hearthdelve.Core.Movement.Facing4.BackRight);
+                var pip = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.Tavern.Scene.StaffAgent>();
+                pip.transform.position = layout.PostFor(Hearthdelve.Tavern.Staff.StaffStation.Serving);
+                Capture(EditorPaths.TavernScene, "BatchLogs/tavern_customers.png", TavernBuilder.CameraCentre, reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         public static void CaptureTestFloorBatch()
         {
             try

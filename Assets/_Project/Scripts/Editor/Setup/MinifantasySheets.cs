@@ -76,6 +76,7 @@ namespace Hearthdelve.Editor
         const string k_Emotions = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Character_Emotions";
         const string k_Loot = "All_Exclusives_20261002/Icons/8x8px/Loot_Icons";
         const string k_Cooker = "Minifantasy_AMyriadOfNPCs_v.1.0/Minifantasy_NPCs_Assets/Premade_NPCs/Cooker";
+        const string k_Npcs = "Minifantasy_AMyriadOfNPCs_v.1.0/Minifantasy_NPCs_Assets";
         const string k_Bat = k_Creatures + "/Beasts/Bat";
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
@@ -93,6 +94,47 @@ namespace Hearthdelve.Editor
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         public const string DwarvenKingdom = "DwarvenKingdom";
+
+        /// <summary>
+        /// The A Myriad of NPCs layers imported for 4c customers, curated for readability at 320×180:
+        /// tops only in colours that stand out against the tavern floor (no greens or browns), few layers.
+        /// (category, folder under Body or Head, file kind, variants). Each is imported as Idle and Walk:
+        /// <c>Npc{Idle|Walk}_{category}_{kind}_{variant}</c>.
+        /// </summary>
+        public static readonly (string category, string folder, string kind, string[] variants)[] NpcLayers =
+        {
+            ("Body", "Human", "Human", new[] { "paleskin", "whiteskin", "brownskin", "blackskin" }),
+            ("Body", "Elf", "Elf", new[] { "elfskin", "albinoskin" }),
+            ("Top", "Shirt", "Shirt", new[] { "red", "blue", "yellow", "white", "orange" }),
+            ("Top", "Doublets", "Doublet", new[] { "purple", "turquoise", "red" }),
+            ("Top", "Jacket", "Jacket", new[] { "blue", "magenta" }),
+            ("Trousers", "Trousers", "Trousers", new[] { "black", "grey", "blue" }),
+            ("Hair", "Short", "Short", new[] { "black", "brown", "blonde", "red", "white" }),
+            ("Hair", "PonyTail", "PonyTail", new[] { "black", "brown", "blonde", "red", "white" }),
+            ("Hair", "Long", "Long", new[] { "black", "brown", "blonde", "red", "white" }),
+            ("Hair", "Bold", "Bold", new[] { "black", "brown", "blonde", "red", "white" }),
+            ("Hat", "Hood", "Hood", new[] { "blue", "red", "purple" }),
+            ("Hat", "RangerHat", "RangerHat", new[] { "blackleather" }),
+            ("Beard", "LongBeard", "LongBeard", new[] { "black", "brown", "blonde", "red", "white" }),
+        };
+
+        /// <summary>The imported file name of an NPC layer.</summary>
+        public static string NpcFile(string anim, string category, string kind, string variant) => $"Npc{anim}_{category}_{kind}_{variant}";
+
+        static string NpcSource(string anim, string category, string folder, string kind, string variant)
+        {
+            string a = $"{k_Npcs}/Generic_NPCs/{anim}";
+            string prefix = $"Minifantasy_NPCs{anim}";
+            return category switch
+            {
+                "Body" => $"{a}/_Characters/{folder}/{prefix}_{kind}_{variant}.png",
+                "Top" or "Trousers" => $"{a}/Body/{folder}/{prefix}_{kind}_{variant}.png",
+                // The pack's "Short" hairstyle files have a space before the colour.
+                "Hair" => $"{a}/Head/Hairstyles/{folder}/{prefix}_HumanHair_{kind}{(kind == "Short" ? " " : "")}_{variant}.png",
+                "Hat" => $"{a}/Head/Hats/{folder}/{prefix}_Hat_{kind}_{variant}.png",
+                _ => $"{a}/Head/Facial_Hair/{folder}/{prefix}_FacialHair_{kind}_{variant}.png",
+            };
+        }
 
         /// <summary>The premade Tavern Indoor room is an 11×11 grid of 8 px cells starting at this sheet pixel.</summary>
         public static readonly Vector2Int TavernRoomOrigin = new(224, 8);
@@ -156,6 +198,23 @@ namespace Hearthdelve.Editor
 
             // Tavern NPC.
             sheets.Add(Character($"{k_Cooker}/Minifantasy_NPCsCookerIdle.png", MyriadOfNPCs, "CookerIdle"));
+
+            // 4c customers: the curated layers, idle and walking, and the NPC shadow.
+            foreach (string anim in new[] { "Idle", "Walk" })
+            {
+                foreach (var (category, folder, kind, variants) in NpcLayers)
+                foreach (string variant in variants)
+                    sheets.Add(Character(NpcSource(anim, category, folder, kind, variant), MyriadOfNPCs, NpcFile(anim, category, kind, variant)));
+                sheets.Add(Character($"{k_Npcs}/Shadows/Minifantasy_NPCsShadowHumanoid{anim}.png", MyriadOfNPCs, $"NpcShadow{anim}"));
+                // Pip's stand-in until 4f: the premade Butcher (apron, bright blonde hair).
+                sheets.Add(Character($"{k_Npcs}/Premade_NPCs/Butcher/Minifantasy_NPCsButcher{anim}.png", MyriadOfNPCs, $"Butcher{anim}"));
+            }
+            // Emotes for speech bubbles (8×8 faces on a 16 px grid): reading the menu, and walking out.
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_Emotions}/_Emotions.png", Pack = UIOverhaul, File = "Emotions", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("Thinking", 136, 88, 8, 8, k_Centre), new SheetRect("Angry", 72, 40, 8, 8, k_Centre) },
+            });
 
             // Dungeon room.
             sheets.Add(new Sheet { Source = $"{k_Dungeon}/Tileset/Tileset.png", Pack = Dungeon, File = "Tileset", Mode = SliceMode.Grid, Cell = new Vector2Int(Tile, Tile) });

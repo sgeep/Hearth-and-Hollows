@@ -66,12 +66,16 @@ namespace Hearthdelve.Editor
         /// <summary>
         /// Applies builder changes to the existing tavern scene in place, without rebuilding it: the
         /// camera's resting point; the kitchen and stew pot blocking back to the wall, the whole kitchen
-        /// being the Grill, and highlights drawn from corner sprites (step 1 playtest).
+        /// being the Grill, and highlights drawn from corner sprites (step 1 playtest); the service
+        /// (customers, seats, the queue, Pip; step 2), rebuilt each time.
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Tavern", priority = 3)]
         public static void UpdateTavern()
         {
+            ProjectConfigurator.ConfigureAll();
             MinifantasyImporter.ImportAll();
+            LocalizationBuilder.Build();
+            NpcContent.Built npcs = NpcContent.Build();
             var scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
             var tavernCamera = GameObject.Find("Tavern Camera");
             if (tavernCamera == null) throw new InvalidOperationException("The tavern scene has no Tavern Camera.");
@@ -81,6 +85,7 @@ namespace Hearthdelve.Editor
             SetUpPass(GameObject.Find("Pass").GetComponent<SpriteRenderer>());
             SetUpKitchen(GameObject.Find("Kitchen").GetComponent<SpriteRenderer>());
             SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
+            AddService(npcs);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -122,13 +127,14 @@ namespace Hearthdelve.Editor
         public static void Generate(bool rebuildSceneApproved)
         {
             LookTestBuilder.Content content = LookTestBuilder.BuildContent();
-            if (LookTestBuilder.MayWrite(EditorPaths.TavernScene, rebuildSceneApproved)) BuildScene(content);
+            NpcContent.Built npcs = NpcContent.Build();
+            if (LookTestBuilder.MayWrite(EditorPaths.TavernScene, rebuildSceneApproved)) BuildScene(content, npcs);
             ProjectConfigurator.SetBuildOrder(EditorPaths.TestFloorScene, EditorPaths.TavernScene, EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
             AssetDatabase.SaveAssets();
             Debug.Log("[Hearthdelve] 4c tavern generated.");
         }
 
-        static void BuildScene(LookTestBuilder.Content content)
+        static void BuildScene(LookTestBuilder.Content content, NpcContent.Built npcs)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             GameObject managers = LookTestBuilder.Managers(HearthdelveInputManager.GameplayMap.Tavern, content.Library, content.TavernPlayer, Spawn);
@@ -139,6 +145,7 @@ namespace Hearthdelve.Editor
             BuildRoom();
             BuildFurniture();
             BuildLights();
+            AddService(npcs);
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
@@ -378,6 +385,65 @@ namespace Hearthdelve.Editor
 
             piece.gameObject.AddComponent<TavernInteractable>().Configure(kind, nameKey, useOffset, reach, highlight.gameObject);
             highlight.gameObject.SetActive(false);
+        }
+
+        // ------------------------------------------------------------------ service (step 2)
+
+        const string k_ContentPath = EditorPaths.Data + "/Tavern/TavernContent.asset";
+        public const int QueueSpots = 6;
+
+        /// <summary>
+        /// The evening: the door, the queue (inside the door, running west along the front wall), the seats
+        /// (each chair, with a spot below it to step onto it from, facing its table), staff posts, the
+        /// director that runs the service, Pip, and the debug keys. Replaces any it had.
+        /// </summary>
+        static void AddService(NpcContent.Built npcs)
+        {
+            GameObject old = GameObject.Find("Service");
+            if (old != null) Object.DestroyImmediate(old);
+            var root = new GameObject("Service").transform;
+
+            Transform Point(string name, Vector2 at)
+            {
+                var point = new GameObject(name).transform;
+                point.SetParent(root, false);
+                point.position = at;
+                return point;
+            }
+
+            Transform door = Point("Door", new Vector2(DoorColumn + 0.5f, FloorBottom + 0.4f));
+            var queue = new Transform[QueueSpots];
+            for (int i = 0; i < QueueSpots; i++) queue[i] = Point($"Queue{i + 1}", new Vector2(DoorColumn - 0.75f - i, FloorBottom + 0.6f));
+
+            Transform seatRoot = GameObject.Find("Seats").transform;
+            var seats = new List<TavernSeat>();
+            for (int t = 0; t < Tables.Length; t++)
+            foreach (int side in new[] { -1, 1 })
+            {
+                Transform marker = seatRoot.Find($"Seat{t * 2 + (side < 0 ? 1 : 2)}");
+                TavernSeat seat = marker.GetComponent<TavernSeat>() ?? marker.gameObject.AddComponent<TavernSeat>();
+                // The west chair faces east (towards the table), the east chair west; both face the room.
+                seat.Configure(new Vector2(0f, -0.9f), side < 0 ? Hearthdelve.Core.Movement.Facing4.FrontRight : Hearthdelve.Core.Movement.Facing4.FrontLeft,
+                    new[] { GameObject.Find($"Table{t + 1}"), GameObject.Find($"Chair{t + 1}W"), GameObject.Find($"Chair{t + 1}E") });
+                seats.Add(seat);
+            }
+
+            Vector2 UseOf(string piece) => GameObject.Find(piece).GetComponent<TavernInteractable>().UsePoint;
+            var layout = root.gameObject.AddComponent<TavernLayout>();
+            layout.Configure(door, queue, seats.ToArray(),
+                Point("Post Serving", new Vector2(21.5f, 7.6f)), Point("Post Grill", UseOf("Kitchen")), Point("Post Tap", UseOf("Bar")),
+                Point("Post StewPot", UseOf("Cauldron")), Point("Post Rest", new Vector2(25.5f, 5.5f)));
+
+            var pip = (GameObject)PrefabUtility.InstantiatePrefab(npcs.Pip);
+            pip.transform.position = new Vector3(25.5f, 5.5f, 0f);
+
+            var director = root.gameObject.AddComponent<TavernDirector>();
+            director.Configure(AssetDatabase.LoadAssetAtPath<TavernContent>(k_ContentPath), layout, npcs.Customer.GetComponent<CustomerAgent>(), pip.GetComponent<StaffAgent>());
+            root.gameObject.AddComponent<TavernDebugKeys>();
+
+            // Pip from an earlier run of this updater.
+            foreach (StaffAgent extra in Object.FindObjectsByType<StaffAgent>(FindObjectsInactive.Include))
+                if (extra.gameObject != pip) Object.DestroyImmediate(extra.gameObject);
         }
 
         // ------------------------------------------------------------------ lights
