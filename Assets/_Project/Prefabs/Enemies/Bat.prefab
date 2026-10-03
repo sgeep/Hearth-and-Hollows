@@ -81,7 +81,7 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 904562949, guid: e9833ef7a179c7f4fb024e30899bcd93, type: 3}
+  m_Sprite: {fileID: -634165345, guid: 662022668ee26504f87c11401816d035, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -320,10 +320,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332436244791312
-  - rid: 2696332436244791313
-  - rid: 2696332436244791314
-  - rid: 2696332436244791315
+  - rid: 2696332436527644688
+  - rid: 2696332436527644689
+  - rid: 2696332436527644690
+  - rid: 2696332436527644691
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -339,11 +339,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332436244791312
+    - rid: 2696332436527644688
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 13600257
+        UniqueID: -1346895869
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -417,11 +417,11 @@ MonoBehaviour:
         Target: {fileID: 3037624665980123181}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332436244791313
+    - rid: 2696332436527644689
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1538664136
+        UniqueID: -2027452728
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -493,11 +493,11 @@ MonoBehaviour:
         Owner: {fileID: 6518424322766146128}
         DebugActive: 0
         Force: 0.35
-    - rid: 2696332436244791314
+    - rid: 2696332436527644690
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -525686252
+        UniqueID: 334599686
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -619,11 +619,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332436244791315
+    - rid: 2696332436527644691
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -184170737
+        UniqueID: 1577987437
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
@@ -1013,8 +1013,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332436244791316
-  - rid: 2696332436244791317
+  - rid: 2696332436527644692
+  - rid: 2696332436527644693
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1030,11 +1030,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332436244791316
+    - rid: 2696332436527644692
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1125527940
+        UniqueID: 1220124297
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -1108,11 +1108,11 @@ MonoBehaviour:
         Target: {fileID: 3037624665980123181}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332436244791317
+    - rid: 2696332436527644693
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -887013057
+        UniqueID: -2040079894
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1250,7 +1250,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4940054669166266890
 Transform:
   m_ObjectHideFlags: 0
@@ -1344,12 +1344,15 @@ GameObject:
   - component: {fileID: 3905405065637723519}
   - component: {fileID: 375415108566636358}
   - component: {fileID: 9058663739354218337}
+  - component: {fileID: 3456419800977789882}
   - component: {fileID: 4253208699224611078}
   - component: {fileID: 6904580383996366824}
   - component: {fileID: 255207116073791131}
   - component: {fileID: 949346963534559261}
   - component: {fileID: 4945736750843701606}
   - component: {fileID: 7058713709704648907}
+  - component: {fileID: 7186494189761454704}
+  - component: {fileID: 4836038557146935595}
   - component: {fileID: 2309491022348442980}
   - component: {fileID: 8030971520457013381}
   - component: {fileID: 106942499479970196}
@@ -1641,6 +1644,20 @@ MonoBehaviour:
   m_TelegraphFeedback: {fileID: 1927598867057274129}
   m_Projectile: {fileID: 0}
   m_Body: {fileID: 1117623397545738610}
+--- !u!114 &3456419800977789882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9040731678127089465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5161a72938f05404880702a90737915a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyPerch
+  m_ProbeHeight: 0.7
+  m_Shadow: {fileID: 8961984580921895340}
 --- !u!114 &4253208699224611078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1742,6 +1759,35 @@ MonoBehaviour:
   KeepDistance: {x: 0, y: 0}
   Flutter: 0.55
   FlutterFrequency: 1.6
+--- !u!114 &7186494189761454704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9040731678127089465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e8bcea55f69a24d80316fac1ed9ace, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.AIActionWake
+  InitializationMode: 0
+  Label: 
+--- !u!114 &4836038557146935595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9040731678127089465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a21818f4def5bf646bec3d25770336cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.TopDownEngine::MoreMountains.TopDownEngine.AIDecisionTimeInState
+  Label: 
+  AfterTimeMin: 0.5
+  AfterTimeMax: 0.5
 --- !u!114 &2309491022348442980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1806,11 +1852,11 @@ MonoBehaviour:
     Transitions:
       array:
       - Decision: {fileID: 255207116073791131}
-        TrueState: Chase
+        TrueState: Wake
         FalseState: 
         LastDecisionEvaluation: 0
       - Decision: {fileID: 949346963534559261}
-        TrueState: Chase
+        TrueState: Wake
         FalseState: 
         LastDecisionEvaluation: 0
   - StateName: Chase
@@ -1822,6 +1868,16 @@ MonoBehaviour:
       array:
       - Decision: {fileID: 2309491022348442980}
         TrueState: Attack Swoop
+        FalseState: 
+        LastDecisionEvaluation: 0
+  - StateName: Wake
+    Actions:
+      array:
+      - {fileID: 7186494189761454704}
+    Transitions:
+      array:
+      - Decision: {fileID: 4836038557146935595}
+        TrueState: Chase
         FalseState: 
         LastDecisionEvaluation: 0
   - StateName: Attack Swoop

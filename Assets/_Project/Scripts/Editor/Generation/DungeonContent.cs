@@ -318,9 +318,27 @@ namespace Hearthdelve.Editor
                 attack.Configure(i, hitbox, alert.gameObject, telegraph, settings[i].kind == EnemyAttackKind.Spit ? web : null, body.transform);
                 attacks.Add(attack);
             }
+            if (definition != null && definition.startsAsleep)
+            {
+                // Shown hanging in the editor too, so level layouts read as they will in play.
+                GameObject shadow = body.transform.parent.Find("Shadow")?.gameObject;
+                SpriteAnim sleep = set.Find(CharacterAnim.Sleep);
+                if (sleep != null && sleep.frontRight.Length > 0) body.sprite = sleep.frontRight[0];
+                if (shadow != null) shadow.SetActive(false);
+                root.AddComponent<EnemyPerch>().Configure(shadow);
+            }
             root.AddComponent<HitReaction>();
             character.CharacterBrain = Brain(root, definition, attacks, settings.Select(a => a.debugName).ToList());
             return LookTestContent.SavePrefab(root, path);
+        }
+
+        /// <summary>How long the wake animation plays, so the bat unfolds fully before it flies.</summary>
+        static float WakeDuration(GameObject root)
+        {
+            var animator = root.GetComponentInChildren<CharacterSpriteAnimator>();
+            var set = animator != null ? (SpriteAnimationSet)new SerializedObject(animator).FindProperty("m_Set").objectReferenceValue : null;
+            SpriteAnim wake = set != null ? set.Find(CharacterAnim.Wake) : null;
+            return wake != null ? wake.frameDuration * wake.frontRight.Length : 0.5f;
         }
 
         static GameObject Hitbox(GameObject root, string name)
@@ -348,11 +366,11 @@ namespace Hearthdelve.Editor
             detect.Radius = definition == null ? 8f : asleep ? definition.wakeRange : definition.aggroRange;
             detect.TargetLayer = LayerMask.GetMask(Layers.Player);
             detect.ObstacleDetection = false;
-            var startTransitions = new AITransitionsList { new AITransition { Decision = detect, TrueState = "Chase", FalseState = "" } };
+            var startTransitions = new AITransitionsList { new AITransition { Decision = detect, TrueState = asleep ? "Wake" : "Chase", FalseState = "" } };
             if (asleep)
             {
                 // A hit wakes it too.
-                startTransitions.Add(new AITransition { Decision = root.AddComponent<AIDecisionHit>(), TrueState = "Chase", FalseState = "" });
+                startTransitions.Add(new AITransition { Decision = root.AddComponent<AIDecisionHit>(), TrueState = "Wake", FalseState = "" });
             }
 
             var target = root.AddComponent<AIActionSetPlayerAsTarget>();
@@ -368,6 +386,19 @@ namespace Hearthdelve.Editor
                 new() { StateName = asleep ? "Sleep" : "Idle", Actions = new AIActionsList { idle }, Transitions = startTransitions },
                 new() { StateName = "Chase", Actions = new AIActionsList { target, chase }, Transitions = chaseTransitions },
             };
+            if (asleep)
+            {
+                // Waking: let go of the wall and unfold in place, then give chase.
+                var wake = root.AddComponent<AIActionWake>();
+                var awake = root.AddComponent<AIDecisionTimeInState>();
+                awake.AfterTimeMin = awake.AfterTimeMax = WakeDuration(root);
+                states.Add(new AIState
+                {
+                    StateName = "Wake",
+                    Actions = new AIActionsList { wake },
+                    Transitions = new AITransitionsList { new AITransition { Decision = awake, TrueState = "Chase", FalseState = "" } },
+                });
+            }
             for (int i = 0; i < attacks.Count; i++)
             {
                 string stateName = $"Attack {names[i]}";

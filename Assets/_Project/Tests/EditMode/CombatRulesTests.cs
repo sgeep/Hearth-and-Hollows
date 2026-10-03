@@ -214,6 +214,10 @@ namespace Hearthdelve.Tests
             Assert.That(slime.superArmorWhileAttacking, "the slime's leap can't be interrupted");
             Assert.That(bat.attack.kind, Is.EqualTo(EnemyAttackKind.Swoop));
             Assert.That(bat.startsAsleep);
+            var batPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(k_Roster[1].prefab);
+            var perch = batPrefab.GetComponent<EnemyPerch>();
+            Assert.That(perch, Is.Not.Null, "a sleeping bat hangs from a wall");
+            Assert.That(new SerializedObject(perch).FindProperty("m_Shadow").objectReferenceValue, Is.Not.Null, "and hides its ground shadow while hanging");
             Assert.That(spider.AllAttacks.Select(a => a.kind), Is.EquivalentTo(new[] { EnemyAttackKind.Bite, EnemyAttackKind.Spit }));
             Assert.That(spider.keepDistance.x, Is.GreaterThan(spider.attack.maxRange), "the spider backs off past its bite range");
         }

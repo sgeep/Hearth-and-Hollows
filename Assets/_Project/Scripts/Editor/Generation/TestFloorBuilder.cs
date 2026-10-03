@@ -34,15 +34,16 @@ namespace Hearthdelve.Editor
         /// <remarks>
         /// <c>#</c> wall, <c>t</c> wall with a torch, <c>.</c> floor, <c>o</c> pillar (two rows),
         /// <c>c</c> crate, <c>b</c> barrel, <c>B</c> open barrel, <c>T</c> table (two tiles),
-        /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime, <c>V</c> bat, <c>X</c> giant spider,
+        /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime, <c>V</c> bat (hanging asleep: must be
+        /// directly under a wall), <c>X</c> giant spider,
         /// <c>1</c>–<c>6</c> navigation test points (editor only).
         /// </remarks>
         internal static readonly string[] Map =
         {
             "############################################",
             "####t#######t###t#######t#########t#####t###",
-            "#..b.c........s....#.....................s.#",
-            "#..B...............#...o......o......V.....#",
+            "#..b.c........s....#.................V...s.#",
+            "#..B...............#...o......o............#",
             "#.6................#...o......o............#",
             "#..................#.......................#",
             "#.....P..................................S.#",
@@ -53,8 +54,8 @@ namespace Hearthdelve.Editor
             "#.................u#.......................#",
             "########..##########################..######",
             "####t###..####t####################t..##t###",
-            "#..........................................#",
-            "#.....V........2...........................#",
+            "#.....V....................................#",
+            "#..............2...........................#",
             "#...........#########........c.............#",
             "#...........#########........b........X....#",
             "#...........#.......#........c.............#",
@@ -107,8 +108,24 @@ namespace Hearthdelve.Editor
         /// <summary>Feet position for something standing in a tile.</summary>
         static Vector2 Feet(int x, int y) => new(x + 0.5f, y + 0.3f);
 
+        /// <summary>
+        /// Where an enemy marker puts the enemy. A bat hangs at the top of its tile, so its sleep pose
+        /// is drawn on the brick face of the wall above it.
+        /// </summary>
+        static Vector2 EnemyFeet(char marker, int x, int y) => marker == 'V' ? new Vector2(x + 0.5f, y + 0.55f) : Feet(x, y);
+
+        /// <summary>Warns about bat markers with no wall directly above them (they would hover instead of hanging).</summary>
+        static void ValidatePerches()
+        {
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                if (At(x, y) == 'V' && !IsWall(At(x, y + 1)))
+                    Debug.LogWarning($"[Hearthdelve] Test floor: the bat at tile ({x}, {y}) has no wall above it to hang from.");
+        }
+
         static void BuildScene(LookTestBuilder.Content content)
         {
+            ValidatePerches();
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             Vector2 spawn = Vector2.zero;
             var enemyMarkers = new List<(char kind, Vector2 feet)>();
@@ -118,7 +135,7 @@ namespace Hearthdelve.Editor
             {
                 char c = At(x, y);
                 if (c == 'P') spawn = Feet(x, y);
-                else if (EnemyFor(content, c) != null) enemyMarkers.Add((c, Feet(x, y)));
+                else if (EnemyFor(content, c) != null) enemyMarkers.Add((c, EnemyFeet(c, x, y)));
                 else if (c is >= '1' and <= '9') testPoints.Add((c, Feet(x, y)));
             }
 
@@ -209,23 +226,42 @@ namespace Hearthdelve.Editor
             if (Object.FindAnyObjectByType<MoreMountains.Feedbacks.MMTimeManager>() == null)
                 new GameObject("TimeManager").AddComponent<MoreMountains.Feedbacks.MMTimeManager>();
             Transform enemies = GameObject.Find("Enemies")?.transform ?? new GameObject("Enemies").transform;
+            ValidatePerches();
+            var placed = new System.Collections.Generic.HashSet<Transform>();
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
-                GameObject prefab = EnemyFor(content, At(x, y));
+                char marker = At(x, y);
+                GameObject prefab = EnemyFor(content, marker);
                 if (prefab == null) continue;
-                Vector2 feet = Feet(x, y);
-                bool present = false;
+                Vector2 feet = EnemyFeet(marker, x, y);
+                Transform match = null;
                 foreach (Transform child in enemies)
-                    if (PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == prefab && Vector2.Distance(child.position, feet) < 0.6f)
-                        present = true;
-                if (present) continue;
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, enemies);
-                instance.transform.position = feet;
+                    if (!placed.Contains(child) && PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == prefab && Vector2.Distance(child.position, feet) < 0.6f)
+                        match = child;
+                if (match == null && marker == 'V')
+                {
+                    // A bat from before perches existed: move it onto this perch.
+                    foreach (Transform child in enemies)
+                        if (!placed.Contains(child) && PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == prefab && !OnMarker(child.position, 'V'))
+                            match = child;
+                }
+                if (match == null) match = ((GameObject)PrefabUtility.InstantiatePrefab(prefab, enemies)).transform;
+                match.position = feet;
+                placed.Add(match);
             }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Test floor enemies updated.");
+        }
+
+        static bool OnMarker(Vector2 position, char marker)
+        {
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                if (At(x, y) == marker && Vector2.Distance(EnemyFeet(marker, x, y), position) < 0.6f)
+                    return true;
+            return false;
         }
 
         /// <summary>Batch entry point for <see cref="UpdateTestFloor"/>.</summary>

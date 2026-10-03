@@ -23,6 +23,7 @@ namespace Hearthdelve.Dungeon.Enemies
         CharacterMovement m_Movement;
         CharacterSpriteAnimator m_Animator;
         EnemyAttack[] m_Attacks;
+        EnemyPerch m_Perch;
         float m_StaggerUntil;
         bool m_Staggered;
         Vector2 m_KnockDirection;
@@ -41,6 +42,7 @@ namespace Hearthdelve.Dungeon.Enemies
             m_Movement = GetComponent<CharacterMovement>();
             m_Animator = GetComponentInChildren<CharacterSpriteAnimator>();
             m_Attacks = GetComponents<EnemyAttack>();
+            m_Perch = GetComponent<EnemyPerch>();
             var character = GetComponent<Character>();
             m_Brain = character != null ? character.CharacterBrain : null;
         }
@@ -55,7 +57,9 @@ namespace Hearthdelve.Dungeon.Enemies
             if (definition == null || StaggerRules.IgnoresHit(definition.superArmorWhileAttacking, attacking)) return;
 
             foreach (EnemyAttack attack in m_Attacks) attack.Interrupt();
-            StartKnockback(hit, definition.knockbackMultiplier);
+            // A hanging bat lets go of its wall when hit, rather than sliding along it.
+            if (m_Perch != null && m_Perch.IsPerched) m_Perch.Detach();
+            else StartKnockback(hit, definition.knockbackMultiplier);
             m_StaggerUntil = StaggerRules.StaggerUntil(m_StaggerUntil, Time.time, hit.Attack != null ? hit.Attack.staggerTime : 0f, definition.staggerMultiplier);
             if (m_StaggerUntil <= Time.time) return;
             m_Staggered = true;

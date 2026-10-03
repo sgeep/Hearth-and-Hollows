@@ -47,6 +47,8 @@ namespace Hearthdelve.Tests.PlayMode
             }
             Assert.That(keep, Is.Not.Null, $"the test floor has a {enemyId}");
             Enemy = keep;
+            // A bat in these tests is already awake and flying, not hanging from its wall.
+            Enemy.GetComponent<EnemyPerch>()?.Detach();
             Freeze(Enemy);
             Teleport(Player, k_Arena);
             Teleport(Enemy, k_Arena + offset);
@@ -261,22 +263,59 @@ namespace Hearthdelve.Tests.PlayMode
                 $"the dodge avoided the leap (player ended at {(Vector2)Player.transform.position}, slime at {(Vector2)Enemy.transform.position})");
         }
 
+        /// <summary>
+        /// Sleeping bats hang from walls, never in open air: each bat on the floor starts on a perch
+        /// (a wall right above it, the hanging pose, no ground shadow). When the player comes near it
+        /// lets go, unfolds in place, then flies (shadow back) and gives chase.
+        /// </summary>
         [UnityTest]
-        public IEnumerator Bat_SleepsUntilThePlayerComesNear_ThenGivesChase()
+        public IEnumerator Bats_HangFromWalls_UntilWoken_ThenUnfoldAndGiveChase()
         {
-            yield return Setup("bat", new Vector2(6f, 0f));
+            yield return Load(TestFloorScene);
             Essence.GodMode = true;
-            AIBrain brain = Enemy.GetComponent<Character>().CharacterBrain;
-            brain.BrainActive = true;
-            yield return new WaitForSeconds(0.8f);
-            Assert.That(brain.CurrentState.StateName, Is.EqualTo("Sleep"), "out of wake range: still asleep");
-            Vector2 asleepAt = Enemy.transform.position;
-            Assert.That(Enemy.GetComponentInChildren<CharacterSpriteAnimator>().Current, Is.EqualTo(CharacterAnim.Sleep));
+            EnemyPerch[] bats = Object.FindObjectsByType<EnemyPerch>();
+            Assert.That(bats.Length, Is.GreaterThanOrEqualTo(2), "the floor has its bats");
+            foreach (EnemyPerch perch in bats)
+            {
+                Assert.That(perch.IsPerched, $"{perch.name} at {(Vector2)perch.transform.position} hangs from a wall");
+                Assert.That(EnemyPerch.WallAbove(perch.transform.position, 0.7f), $"{perch.name}: a wall right above it");
+                Assert.That(perch.GetComponentInChildren<CharacterSpriteAnimator>().Current, Is.EqualTo(CharacterAnim.Sleep), $"{perch.name}: the hanging pose");
+                Assert.That(perch.transform.Find("Model/Shadow").gameObject.activeSelf, Is.False, $"{perch.name}: no ground shadow while hanging");
+            }
 
-            Teleport(Player, (Vector2)Enemy.transform.position + new Vector2(-3f, 0f));
-            yield return WaitUntil(() => brain.CurrentState.StateName != "Sleep", 1f, "the bat to wake");
-            yield return new WaitForSeconds(0.6f);
-            Assert.That(Vector2.Distance(Enemy.transform.position, asleepAt), Is.GreaterThan(0.2f), "it flies after the player");
+            EnemyPerch bat = bats.OrderBy(b => b.transform.position.x).First();
+            AIBrain brain = bat.GetComponent<Character>().CharacterBrain;
+            var animator = bat.GetComponentInChildren<CharacterSpriteAnimator>();
+            Vector2 perchedAt = bat.transform.position;
+            // Within its wake range, but outside its swoop range, so it has to fly closer first.
+            Teleport(Player, perchedAt + new Vector2(0f, -3.8f));
+            yield return WaitUntil(() => brain.CurrentState.StateName == "Wake", 1f, "the bat to wake");
+            yield return null;
+            Assert.That(bat.IsPerched, Is.False, "it let go of the wall");
+            Assert.That(animator.Current, Is.EqualTo(CharacterAnim.Wake), "unfolding");
+            Assert.That(Vector2.Distance(bat.transform.position, perchedAt), Is.LessThan(0.05f), "in place, before it flies");
+            yield return WaitUntil(() => brain.CurrentState.StateName == "Chase", 1f, "the chase");
+            Assert.That(bat.transform.Find("Model/Shadow").gameObject.activeSelf, "flying: its shadow is back");
+            yield return new WaitForSeconds(0.5f);
+            Assert.That(animator.Current, Is.Not.EqualTo(CharacterAnim.Sleep).And.Not.EqualTo(CharacterAnim.Wake), "flying");
+            Assert.That(Vector2.Distance(bat.transform.position, perchedAt), Is.GreaterThan(0.2f), "it flies after the player");
+        }
+
+        /// <summary>A bat placed away from any wall hovers in its flying idle (and says so), rather than hanging in mid-air.</summary>
+        [UnityTest]
+        public IEnumerator ABatWithoutAWall_HoversInsteadOfHanging_AndWarns()
+        {
+            yield return Load(TestFloorScene);
+            Essence.GodMode = true;
+            EnemyPerch original = Object.FindAnyObjectByType<EnemyPerch>();
+            LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex("has no wall above it to hang from"));
+            EnemyPerch stray = Object.Instantiate(original, (Vector3)(k_Arena + new Vector2(3f, 1f)), Quaternion.identity);
+            yield return null;
+            yield return null;
+            Assert.That(stray.HasPerch, Is.False);
+            Assert.That(stray.IsPerched, Is.False);
+            Assert.That(stray.GetComponentInChildren<CharacterSpriteAnimator>().Current, Is.Not.EqualTo(CharacterAnim.Sleep), "never the hanging pose in open air");
+            Assert.That(stray.transform.Find("Model/Shadow").gameObject.activeSelf, "a hovering bat keeps its shadow");
         }
 
         [UnityTest]
