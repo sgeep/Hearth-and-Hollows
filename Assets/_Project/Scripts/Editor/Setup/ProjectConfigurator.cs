@@ -101,7 +101,27 @@ namespace Hearthdelve.Editor
         {
             var physics = LoadSettings("ProjectSettings/Physics2DSettings.asset");
             physics.FindProperty("m_Gravity").vector2Value = Vector2.zero;
+            // Customers and staff (Npcs) never shove or block anyone: they only collide with walls and furniture.
+            var matrix = physics.FindProperty("m_LayerCollisionMatrix");
+            int npcs = LayerMask.NameToLayer(Layers.Npcs);
+            if (npcs >= 0 && matrix != null && matrix.arraySize == 32)
+            {
+                for (int other = 0; other < 32; other++)
+                {
+                    bool collide = other == LayerMask.NameToLayer(Layers.Obstacles);
+                    SetCollision(matrix, npcs, other, collide);
+                    SetCollision(matrix, other, npcs, collide);
+                }
+            }
             physics.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        static void SetCollision(SerializedProperty matrix, int layer, int other, bool collide)
+        {
+            SerializedProperty row = matrix.GetArrayElementAtIndex(layer);
+            uint bits = row.uintValue;
+            bits = collide ? bits | (1u << other) : bits & ~(1u << other);
+            row.uintValue = bits;
         }
 
         /// <summary>Y-sorting: custom transparency sort axis (0, 1, 0) on every 2D renderer and in Graphics settings.</summary>

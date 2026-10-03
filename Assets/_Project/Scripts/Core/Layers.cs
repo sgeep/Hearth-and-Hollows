@@ -19,11 +19,14 @@ namespace Hearthdelve.Core
 
         // Ours.
         public const string Pickup = "Pickup";
+        /// <summary>Tavern customers and staff: they collide with walls and furniture, not with the player or each other.</summary>
+        public const string Npcs = "Npcs";
 
         /// <summary>Index each layer is assigned to in the TagManager.</summary>
         public static readonly (string name, int index)[] All =
         {
             (Pickup, 6),
+            (Npcs, 7),
             (Obstacles, 8),
             (Ground, 9),
             (Player, 10),
