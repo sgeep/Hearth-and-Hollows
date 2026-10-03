@@ -142,6 +142,9 @@ namespace Hearthdelve.UI.Localization
         public const string HarvestDestroyed = "harvest.destroyed";
         public const string HarvestFinisher = "harvest.finisher";
         public const string HarvestGot = "harvest.got";
+        public const string HarvestGotClean = "harvest.got_clean";
+        public const string HarvestGotOverkill = "harvest.got_overkill";
+        public const string HarvestGotFinisher = "harvest.got_finisher";
 
         public const string QualityPoor = "quality.poor";
         public const string QualityStandard = "quality.standard";
@@ -198,6 +201,9 @@ namespace Hearthdelve.UI.Localization
             (HarvestDestroyed, "{0} was destroyed"),
             (HarvestFinisher, "Finisher!"),
             (HarvestGot, "{0} ×{1}"),
+            (HarvestGotClean, "Clean kill! {0} ×{1}"),
+            (HarvestGotOverkill, "Overkill! {0} ×{1}"),
+            (HarvestGotFinisher, "Finisher! {0} ×{1}"),
 
             (QualityPoor, "Poor"),
             (QualityStandard, "Standard"),
