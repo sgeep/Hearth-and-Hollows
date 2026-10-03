@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-02 (4b step 2: enemies and heavy attack)_
+_Last updated: 2026-10-03 (4b step 3: satchel UI and ingredient icons)_
 
 ## How art gets into the project
 
@@ -127,6 +127,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | File | Sprites | What |
 |---|---|---|
 | `UIOverhaul/Bubble.png` (UI Overhaul, `Character_Emotions/Bubble_Only.png`, 280×72) | `Bubble_Body` 31,7 10×10 (9-sliced, 3 px border); `Bubble_Tail` 33,17 4×3 | Speech bubble. The sheet holds the same bubble with its tail on each side, in two sizes. `_Emotions.png` holds faces only (no "!"); not imported. |
+| `UIOverhaul/ClassicUI.png` (UI Overhaul, `Classic_Minifantasy_UI/_Classic_UI.png`, 1872×848; built from 16 px pieces) | `ClassicUI_Panel` 64,48 48×48 (9-sliced, 8 px); `ClassicUI_Bar` 64,16 48×16 (9-sliced, 6 px); `ClassicUI_Slot` 561,30 14×17; `ClassicUI_SlotSelected` 593,30 14×17 | Parchment panel with a red inner border (the swap prompt), a pill bar (its button), and a 14×14 slot, plus the same slot with a ▼ marker tab above it for the selected one (selection that doesn't rely on colour). The sheet also has Grim and Stylized versions, scroll and book panels, bars and frames. |
 | `UserInterface/GuiEmoticons.png` (User Interface pack, `Miscellany/Emoticons/Minifantasy_GuiEmoticons.png`, 176×160, 16 px cells) | `GuiEmoticons_AlertRed` 22,116 5×10 | The red "!" shown over an enemy winding up an attack. Rows 7 and 8 (from 0) hold "!", "?" and "X" marks in six colours. The rest of the sheet is faces. Drawn with the **unlit** sprite material so it reads in the dark. |
 
 ## Icons
@@ -139,7 +140,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | (7,11) (8,11) | Blue slime blob, large and small | (7,11) is the **Slime Core** icon (placeholder) |
 | Column 1 | Orc, goblin, elf, human, dwarf, halfling ears and fingers | — |
 | Column 2 | Troll, cyclops, minotaur, yeti, warg parts; slimes in the last row | — |
-| Column 3 | Giant spider, bear, snake, wraith, vampire, beholder parts | Giant Spider parts for Biome 1 |
+| Column 3 | Giant spider, bear, snake, wraith, vampire, beholder parts | (13,1) **Spider Leg**, (16,1) **Venom Sac** (the spider's poison); (14,1) fangs and (15,1) eyes unused. (14,9) the vampire's cape stands in for the **Bat Wing**. |
 
 ## Biome 1 roster (decided for the pivot; art still to import)
 
@@ -159,3 +160,4 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No plate-carrying overlay** for the player. The exclusive "Carrying Animations" add-on (107 catalog entries) is worth checking for 4c.
 - **No clothing or hair layers for attack animations** (A Myriad of NPCs only layers idle, walk, damage and die).
 - **No mallet or frying-pan weapon.**
+- **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
