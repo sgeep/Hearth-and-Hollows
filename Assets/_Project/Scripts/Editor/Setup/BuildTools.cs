@@ -143,6 +143,61 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
+        /// Batch entry point (run without -nographics): the death screen (one slot in the Lockbox) and the
+        /// delve result over sample contents, one capture each, to check their layout.
+        /// </summary>
+        public static void CaptureEndScreensBatch()
+        {
+            try
+            {
+                foreach (bool death in new[] { true, false })
+                {
+                    EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+                    var satchel = SampleSatchel();
+                    Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
+                    if (death)
+                    {
+                        var screen = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Screens.DeathScreen>(FindObjectsInactive.Include);
+                        Invoke(screen, "Open", new Hearthdelve.Shared.Run.DeathScreenRequested(satchel, Hearthdelve.Shared.Run.DefeatReason.EssenceDepleted, _ => { }));
+                        screen.Mark(1);
+                    }
+                    else
+                    {
+                        var screen = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Screens.DelveResultScreen>(FindObjectsInactive.Include);
+                        Invoke(screen, "Open", new Hearthdelve.Shared.Run.DelveResultRequested(Hearthdelve.Shared.Game.DelveReport.Extraction(satchel), false, () => { }));
+                    }
+                    canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                    canvas.worldCamera = Camera.main;
+                    canvas.planeDistance = 1f;
+                    canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
+                    canvas.sortingOrder = 100;
+                    Capture(EditorPaths.TestFloorScene, death ? "BatchLogs/death_screen.png" : "BatchLogs/result_screen.png", reopen: false);
+                }
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        static void Invoke(object target, string method, object argument) =>
+            target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.Invoke(target, new[] { argument });
+
+        static Hearthdelve.Shared.Inventory.Satchel SampleSatchel()
+        {
+            Hearthdelve.Shared.Ingredients.IngredientDefinition Load(string name) =>
+                AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/{name}.asset");
+            var satchel = new Hearthdelve.Shared.Inventory.Satchel(6, 3);
+            satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(Load("Ingredient_BatWing"), Hearthdelve.Shared.Ingredients.Quality.Standard), 2, 0.9f);
+            satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(Load("Ingredient_SpiderLeg"), Hearthdelve.Shared.Ingredients.Quality.Fine), 3, 0.6f);
+            satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(Load("Ingredient_SlimeGel"), Hearthdelve.Shared.Ingredients.Quality.Poor), 1, 0.3f);
+            satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(Load("Ingredient_VenomSac"), Hearthdelve.Shared.Ingredients.Quality.Premium), 1, 1f);
+            return satchel;
+        }
+
+        /// <summary>
         /// Batch entry point (run without -nographics): one of each harvest part lying on the test floor
         /// near the spawn, at 320×180 with the scene's lighting, to check drops read on the floor.
         /// </summary>

@@ -66,7 +66,7 @@ namespace Hearthdelve.Editor
         {
             public InputActionAsset Actions;
             public HapticLibrary Library;
-            public GameObject Player, TavernPlayer, Slime, Bat, Spider, Pickup, Cook;
+            public GameObject Player, TavernPlayer, Slime, Bat, Spider, Pickup, Cook, RopeExit;
             public HarvestRulesConfig HarvestRules;
             public FreshnessConfig Freshness;
             public WeaponDefinition Cleaver;
@@ -112,13 +112,14 @@ namespace Hearthdelve.Editor
             GameObject player = LookTestContent.BuildPlayer(true, human, humanShadow, moveConfig, essenceConfig, delveConfig, cleaver, heavy);
             GameObject tavernPlayer = LookTestContent.BuildPlayer(false, human, humanShadow, moveConfig, null, null, null);
             DungeonContent.Enemies enemies = DungeonContent.BuildEnemies(slime, slimeShadow);
+            GameObject ropeExit = DungeonContent.BuildRopeExit();
             GameObject pickup = LookTestContent.BuildPickup();
             GameObject cookPrefab = LookTestContent.BuildCook(cook);
             AssetDatabase.SaveAssets();
             return new Content
             {
                 Actions = actions, Library = library, Player = player, TavernPlayer = tavernPlayer,
-                Slime = enemies.Slime, Bat = enemies.Bat, Spider = enemies.Spider,
+                Slime = enemies.Slime, Bat = enemies.Bat, Spider = enemies.Spider, RopeExit = ropeExit,
                 Pickup = pickup, Cook = cookPrefab, HarvestRules = harvestRules, Cleaver = cleaverDefinition, Freshness = freshness,
             };
         }

@@ -71,6 +71,7 @@ namespace Hearthdelve.Editor
         const string k_Slime = k_Creatures + "/Slimes/Green_Slime";
         const string k_Dungeon = "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets";
         const string k_Tavern = "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers";
+        const string k_Ropes = "All_Exclusives_20261002/Addons/_Miscellany/Hole_Entrances_And_Ropes";
         const string k_ClassicUI = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/Classic_Minifantasy_UI";
         const string k_Emotions = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Character_Emotions";
         const string k_Loot = "All_Exclusives_20261002/Icons/8x8px/Loot_Icons";
@@ -133,6 +134,10 @@ namespace Hearthdelve.Editor
                     new SheetRect("S", 43, 82, 3, 9, k_Centre), new SheetRect("SE", 86, 80, 7, 7, k_Centre),
                 },
             });
+
+            // The way out: a rope hanging from a hole in the ceiling, with its coil's shadow (Hole Entrances And Ropes).
+            sheets.Add(new Sheet { Source = $"{k_Ropes}/Ropes.png", Pack = Dungeon, File = "Ropes", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Hanging", 12, 8, 9, 27) } });
+            sheets.Add(new Sheet { Source = $"{k_Ropes}/RopesShadows.png", Pack = Dungeon, File = "RopesShadows", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Hanging", 11, 30, 7, 5) } });
 
             // Tavern NPC.
             sheets.Add(Character($"{k_Cooker}/Minifantasy_NPCsCookerIdle.png", MyriadOfNPCs, "CookerIdle"));

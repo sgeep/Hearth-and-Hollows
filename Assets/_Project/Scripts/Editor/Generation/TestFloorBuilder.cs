@@ -35,7 +35,7 @@ namespace Hearthdelve.Editor
         /// <c>#</c> wall, <c>t</c> wall with a torch, <c>.</c> floor, <c>o</c> pillar (two rows),
         /// <c>c</c> crate, <c>b</c> barrel, <c>B</c> open barrel, <c>T</c> table (two tiles),
         /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime, <c>V</c> bat (hanging asleep: must be
-        /// directly under a wall), <c>X</c> giant spider,
+        /// directly under a wall), <c>X</c> giant spider, <c>R</c> the rope out (extraction),
         /// <c>1</c>–<c>6</c> navigation test points (editor only).
         /// </remarks>
         internal static readonly string[] Map =
@@ -55,7 +55,7 @@ namespace Hearthdelve.Editor
             "########..##########################..######",
             "####t###..####t####################t..##t###",
             "#.....V....................................#",
-            "#..............2...........................#",
+            "#..............2........................R..#",
             "#...........#########........c.............#",
             "#...........#########........b........X....#",
             "#...........#.......#........c.............#",
@@ -142,6 +142,7 @@ namespace Hearthdelve.Editor
             GameObject managers = LookTestBuilder.Managers(HearthdelveInputManager.GameplayMap.Dungeon, content.Library, content.Player, spawn);
             managers.AddComponent<HarvestSystem>().Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
             managers.AddComponent<NavGrid>().Configure(new RectInt(0, 0, Width, Height), LayerMask.GetMask(Layers.Obstacles));
+            managers.AddComponent<Hearthdelve.Dungeon.Run.DelveRunController>();
             PixelPerfectCamera camera = LookTestBuilder.Cameras(new Color(0.05f, 0.05f, 0.07f));
             LookTestBuilder.Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global);
 
@@ -167,6 +168,10 @@ namespace Hearthdelve.Editor
                     case 'u': LookTestBuilder.Prop(props, "Cauldron", foot); break;
                     case 's': LookTestBuilder.Prop(props, "Statue", foot); break;
                     case 'T': LookTestBuilder.Prop(props, "Table", foot + new Vector2(0.5f, 0f)); break;
+                    case 'R':
+                        var rope = (GameObject)PrefabUtility.InstantiatePrefab(content.RopeExit, props);
+                        rope.transform.position = Feet(x, y);
+                        break;
                     case 't':
                         // On the brick face, like the look test's torches; lit from just above.
                         SpriteRenderer torch = LookTestContent.AddSprite(props, "Torch", torchFrames[0], SortingLayers.Floor, 2, new Vector3(x + 0.5f, y - 1.4f, 0f));
@@ -194,7 +199,7 @@ namespace Hearthdelve.Editor
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out CanvasScaler scaler);
             LookTestBuilder.AddEssenceBar(canvas);
-            DungeonUI.BuildSwapPrompt(canvas);
+            DungeonUI.RebuildScreens(canvas);
             LookTestBuilder.Overlay(canvas, scaler, camera, LocKeys.TestFloorHint, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
 
             LookTestBuilder.ApplyLighting(dungeon: true);
@@ -238,12 +243,21 @@ namespace Hearthdelve.Editor
                 EditorUtility.SetDirty(harvest);
             }
             Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).FirstOrDefault(c => c.name == "UI");
-            if (canvas != null)
+            // Generated UI: rebuilt each time, so layout changes reach the existing scene.
+            if (canvas != null) DungeonUI.RebuildScreens(canvas);
+            // Step 4: how the delve ends, and the rope out.
+            if (Object.FindAnyObjectByType<Hearthdelve.Dungeon.Run.DelveRunController>() == null && harvest != null)
+                harvest.gameObject.AddComponent<Hearthdelve.Dungeon.Run.DelveRunController>();
+            if (Object.FindAnyObjectByType<Hearthdelve.Dungeon.Run.DelveExit>() == null)
             {
-                // Generated UI: rebuilt each time, so layout changes reach the existing scene.
-                var old = Object.FindAnyObjectByType<Hearthdelve.UI.Screens.SwapPromptScreen>(FindObjectsInactive.Include);
-                if (old != null) Object.DestroyImmediate(old.gameObject);
-                DungeonUI.BuildSwapPrompt(canvas);
+                Transform props = GameObject.Find("Props")?.transform;
+                for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                {
+                    if (At(x, y) != 'R') continue;
+                    var rope = (GameObject)PrefabUtility.InstantiatePrefab(content.RopeExit, props);
+                    rope.transform.position = Feet(x, y);
+                }
             }
             var placed = new System.Collections.Generic.HashSet<Transform>();
             for (int y = 0; y < Height; y++)

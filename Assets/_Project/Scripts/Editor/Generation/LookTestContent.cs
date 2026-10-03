@@ -157,6 +157,10 @@ namespace Hearthdelve.Editor
             WriteWav("PH_Pickup", 0.14f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (t < 0.06f ? 880f : 1320f)) * Mathf.Exp(-t * 16f) * 0.5f);
             // An enemy winding up: a rising two-note warning.
             WriteWav("PH_Telegraph", 0.22f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (t < 0.1f ? 520f : 780f)) * (1f - t / 0.22f) * 0.45f);
+            // Low Essence: two soft low thumps.
+            WriteWav("PH_Heartbeat", 0.35f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * 55f) * (Mathf.Exp(-t * 30f) + (t > 0.16f ? Mathf.Exp(-(t - 0.16f) * 30f) * 0.7f : 0f)) * 0.8f);
+            // Climbing out: a rising chime.
+            WriteWav("PH_Climb", 0.5f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (440f + 880f * t)) * (1f - t / 0.5f) * 0.4f);
             // The heavy spin: a filtered noise sweep.
             WriteWav("PH_Whoosh", 0.3f, (t, n) => Noise(n) * Mathf.Sin(t / 0.3f * Mathf.PI) * 0.5f);
         }
@@ -419,6 +423,8 @@ namespace Hearthdelve.Editor
                 health.DelayBeforeDestruction = 1.2f;
                 health.DamageMMFeedbacks = Feedback(root.transform, "Feedback_HitTaken", body, 0.6f, Sfx("PH_Hurt"), Pattern(HapticIds.HitTaken));
                 character.CharacterHealth = health;
+                // Low Essence: a heartbeat, sound and haptic in one feedback, faster as Essence falls.
+                root.AddComponent<LowEssenceWarning>().Configure(Feedback(root.transform, "Feedback_Heartbeat", null, 0f, Sfx("PH_Heartbeat"), Pattern(HapticIds.HeartbeatWarning)));
                 root.AddComponent<SatchelCarrier>().Configure(delveConfig);
             }
             else

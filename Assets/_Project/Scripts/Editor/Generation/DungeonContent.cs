@@ -27,6 +27,7 @@ namespace Hearthdelve.Editor
         public const string BatPrefab = EditorPaths.Prefabs + "/Enemies/Bat.prefab";
         public const string SpiderPrefab = EditorPaths.Prefabs + "/Enemies/GiantSpider.prefab";
         public const string WebPrefab = EditorPaths.Prefabs + "/Enemies/GiantSpiderWeb.prefab";
+        public const string RopeExitPrefab = EditorPaths.Prefabs + "/Dungeon/RopeExit.prefab";
         public const string SlimeDefinitionPath = EditorPaths.Enemies + "/Enemy_GreenSlime.asset";
         public const string BatDefinitionPath = EditorPaths.Enemies + "/Enemy_Bat.asset";
         public const string SpiderDefinitionPath = EditorPaths.Enemies + "/Enemy_GiantSpider.asset";
@@ -260,6 +261,26 @@ namespace Hearthdelve.Editor
             damage.DamageCausedKnockbackType = DamageOnTouch.KnockbackStyles.NoKnockback;
             root.AddComponent<WebProjectile>().Configure(sprites, renderer, damage);
             return LookTestContent.SavePrefab(root, WebPrefab);
+        }
+
+        // ------------------------------------------------------------------ the way out
+
+        /// <summary>
+        /// The rope back to the tavern: hanging from a hole in the ceiling, its coil on the floor at the
+        /// pivot. Standing in the trigger around the coil shows the hint; Interact climbs out.
+        /// </summary>
+        public static GameObject BuildRopeExit()
+        {
+            var root = new GameObject("RopeExit") { layer = LayerMask.NameToLayer(Layers.Pickup) };
+            var trigger = root.AddComponent<BoxCollider2D>();
+            trigger.isTrigger = true;
+            trigger.size = new Vector2(1.4f, 1f);
+            trigger.offset = new Vector2(0f, 0.3f);
+            LookTestContent.AddSprite(root.transform, "Shadow", MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "RopesShadows", "Hanging"), SortingLayers.YSorted, -1, Vector3.zero);
+            LookTestContent.AddSprite(root.transform, "Rope", MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Ropes", "Hanging"), SortingLayers.YSorted, 0, Vector3.zero);
+            MMF_Player climb = LookTestContent.Feedback(root.transform, "Feedback_Climb", null, 0f, LookTestContent.Sfx("PH_Climb"), LookTestContent.Pattern(HapticIds.PulseSuccess));
+            root.AddComponent<Hearthdelve.Dungeon.Run.DelveExit>().Configure(climb);
+            return LookTestContent.SavePrefab(root, RopeExitPrefab);
         }
 
         // ------------------------------------------------------------------ enemies
