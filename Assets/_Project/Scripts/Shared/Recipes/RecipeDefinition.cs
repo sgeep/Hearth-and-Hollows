@@ -17,7 +17,7 @@ namespace Hearthdelve.Shared.Recipes
 
     public enum SlotMatch
     {
-        /// <summary>A specific ingredient (e.g. Rat Haunch).</summary>
+        /// <summary>A specific ingredient (e.g. Spider Leg).</summary>
         Ingredient,
         /// <summary>Any ingredient in these categories (e.g. any Meat or Offal).</summary>
         Category,

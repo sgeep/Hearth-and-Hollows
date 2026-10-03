@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80a67adb9a1230429f4a356b2333340, type: 3}
-  m_Name: Ingredient_RatHaunch
+  m_Name: Ingredient_VenomSac
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Ingredients.IngredientDefinition
-  id: rat_haunch
+  id: venom_sac
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: ingredient.rat_haunch
+      m_Key: ingredient.venom_sac
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  category: 1
-  flavors: 1
+  category: 2
+  flavors: 17
   rarity: 0
-  baseValue: 6
-  icon: {fileID: 0}
-  placeholderColor: {r: 0.78, g: 0.45, b: 0.38, a: 1}
+  baseValue: 5
+  icon: {fileID: -685633522, guid: 5cf04ff3b466e864b895005363e64277, type: 3}
+  placeholderColor: {r: 0.55, g: 0.2, b: 0.28, a: 1}
   references:
     version: 2
     RefIds: []

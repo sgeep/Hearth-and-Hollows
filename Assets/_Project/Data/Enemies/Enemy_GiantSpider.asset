@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
   m_Name: Enemy_GiantSpider
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
-  schema: 1
+  schema: 2
   id: giant_spider
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: enemy.cellar_shroom
+      m_Key: enemy.giant_spider
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -45,7 +45,6 @@ MonoBehaviour:
     damage: 14
     hitboxOffset: {x: 1, y: 0.3}
     hitboxSize: {x: 1.1, y: 0.9}
-    knockbackForce: 7
     animation: 2
     releaseFrame: 4
     travelDistance: 4
@@ -65,7 +64,6 @@ MonoBehaviour:
     damage: 9
     hitboxOffset: {x: 0, y: 0.2}
     hitboxSize: {x: 0.9, y: 0.7}
-    knockbackForce: 3
     animation: 9
     releaseFrame: 9
     travelDistance: 4
@@ -74,14 +72,14 @@ MonoBehaviour:
     projectileRange: 9
     projectileSpawnOffset: {x: 0.6, y: 0.3}
   harvest:
-  - ingredient: {fileID: 11400000, guid: a9638819317ee6f4f971a403a0c1b350, type: 2}
+  - ingredient: {fileID: 11400000, guid: 98c7efdca280afb42a749aa85b5f9eef, type: 2}
     baseQuality: 1
     dropChance: 1
     minCount: 1
     maxCount: 2
-  - ingredient: {fileID: 11400000, guid: 043e0099fdffbae4d85cd360d8627bd1, type: 2}
+  - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
     baseQuality: 2
-    dropChance: 0.4
+    dropChance: 0.6
     minCount: 1
     maxCount: 1
   placeholderColor: {r: 0.2, g: 0.2, b: 0.3, a: 1}

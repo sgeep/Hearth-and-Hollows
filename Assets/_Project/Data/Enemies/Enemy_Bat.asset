@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
   m_Name: Enemy_Bat
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
-  schema: 1
+  schema: 2
   id: bat
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: enemy.giant_rat
+      m_Key: enemy.bat
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -45,7 +45,6 @@ MonoBehaviour:
     damage: 8
     hitboxOffset: {x: 0, y: 0.3}
     hitboxSize: {x: 0.7, y: 0.6}
-    knockbackForce: 5
     animation: 2
     releaseFrame: 2
     travelDistance: 4
@@ -55,16 +54,11 @@ MonoBehaviour:
     projectileSpawnOffset: {x: 0.5, y: 0.3}
   otherAttacks: []
   harvest:
-  - ingredient: {fileID: 11400000, guid: 98c7efdca280afb42a749aa85b5f9eef, type: 2}
+  - ingredient: {fileID: 11400000, guid: 344c2706f235a2141b4b9e5b7a0f5ef6, type: 2}
     baseQuality: 1
     dropChance: 1
     minCount: 1
     maxCount: 2
-  - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
-    baseQuality: 1
-    dropChance: 0.35
-    minCount: 1
-    maxCount: 1
   placeholderColor: {r: 0.45, g: 0.3, b: 0.45, a: 1}
   references:
     version: 2

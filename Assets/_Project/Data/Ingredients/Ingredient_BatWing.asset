@@ -10,24 +10,24 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b80a67adb9a1230429f4a356b2333340, type: 3}
-  m_Name: Ingredient_RatLiver
+  m_Name: Ingredient_BatWing
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Ingredients.IngredientDefinition
-  id: rat_liver
+  id: bat_wing
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: ingredient.rat_liver
+      m_Key: ingredient.bat_wing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  category: 2
-  flavors: 17
+  category: 1
+  flavors: 1
   rarity: 0
   baseValue: 5
-  icon: {fileID: 0}
-  placeholderColor: {r: 0.55, g: 0.2, b: 0.28, a: 1}
+  icon: {fileID: 1116164551, guid: 5cf04ff3b466e864b895005363e64277, type: 3}
+  placeholderColor: {r: 0.4, g: 0.25, b: 0.35, a: 1}
   references:
     version: 2
     RefIds: []

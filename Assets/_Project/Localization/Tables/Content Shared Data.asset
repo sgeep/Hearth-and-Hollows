@@ -16,11 +16,11 @@ MonoBehaviour:
   m_TableCollectionNameGuidString: b385084471d7fe54f9ab711818ebc11b
   m_Entries:
   - m_Id: 462774272
-    m_Key: ingredient.rat_haunch
+    m_Key: ingredient.spider_leg
     m_Metadata:
       m_Items: []
   - m_Id: 508911616
-    m_Key: ingredient.rat_liver
+    m_Key: ingredient.venom_sac
     m_Metadata:
       m_Items: []
   - m_Id: 508911617
@@ -44,7 +44,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 508911622
-    m_Key: enemy.giant_rat
+    m_Key: enemy.bat
     m_Metadata:
       m_Items: []
   - m_Id: 508911623
@@ -52,7 +52,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 508911624
-    m_Key: enemy.cellar_shroom
+    m_Key: enemy.giant_spider
     m_Metadata:
       m_Items: []
   - m_Id: 508911625
@@ -60,7 +60,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21819613863936
-    m_Key: recipe.grilled_haunch
+    m_Key: recipe.grilled_spider_leg
     m_Metadata:
       m_Items: []
   - m_Id: 21819655806976
@@ -113,6 +113,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 88768951627777
     m_Key: upgrade.tavern_seats
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1223199997308928
+    m_Key: ingredient.bat_wing
     m_Metadata:
       m_Items: []
   m_Metadata:

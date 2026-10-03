@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ddf01a49ab9b58942a03aa8e95376fd7, type: 3}
-  m_Name: Recipe_GrilledHaunch
+  m_Name: Recipe_GrilledSpiderLeg
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Recipes.RecipeDefinition
-  id: grilled_haunch
+  id: grilled_spider_leg
   displayName:
     m_TableReference:
       m_TableCollectionName: Content
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: recipe.grilled_haunch
+      m_Key: recipe.grilled_spider_leg
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
