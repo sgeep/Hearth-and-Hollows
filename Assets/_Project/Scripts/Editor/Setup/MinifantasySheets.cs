@@ -198,6 +198,10 @@ namespace Hearthdelve.Editor
                     // A 14×14 slot, and the same slot with a marker tab on top for the selected one.
                     new SheetRect("Slot", 561, 30, 14, 17),
                     new SheetRect("SlotSelected", 593, 30, 14, 17),
+                    // A bar's dark trough, and the fill that sits inside it (blue, and red for low).
+                    new SheetRect("BarTrough", 208, 562, 48, 12, k_Centre),
+                    new SheetRect("BarFillBlue", 596, 709, 40, 6, k_Centre),
+                    new SheetRect("BarFillRed", 340, 709, 40, 6, k_Centre),
                 },
             });
             // The red "!" over an enemy winding up an attack (User Interface pack, GUI emoticons; 16 px cells).

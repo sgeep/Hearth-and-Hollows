@@ -198,7 +198,6 @@ namespace Hearthdelve.Editor
             }
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out CanvasScaler scaler);
-            LookTestBuilder.AddEssenceBar(canvas);
             DungeonUI.RebuildScreens(canvas);
             LookTestBuilder.Overlay(canvas, scaler, camera, LocKeys.TestFloorHint, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
 

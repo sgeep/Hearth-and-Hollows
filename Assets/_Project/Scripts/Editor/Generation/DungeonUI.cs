@@ -18,15 +18,76 @@ namespace Hearthdelve.Editor
         static readonly Color k_Ink = new(0.25f, 0.16f, 0.1f);
         static readonly Color k_Light = new(0.95f, 0.92f, 0.85f);
         static readonly Color k_Mark = new(1f, 0.82f, 0.3f);
+        /// <summary>Prompts sit above the satchel row.</summary>
+        const float k_HintY = 34f;
 
-        /// <summary>Removes any dungeon screens from <paramref name="canvas"/> and builds them again.</summary>
+        /// <summary>
+        /// The dungeon HUD: Essence top left (Minifantasy bar, red and pulsing when low, flashing on a hit),
+        /// the satchel bottom left (the same slots as the swap prompt), the harvest feed top right.
+        /// Below every screen.
+        /// </summary>
+        public static void BuildHud(Canvas canvas)
+        {
+            RectTransform root = FullScreen(canvas, "Hud");
+            root.SetAsFirstSibling();
+
+            RectTransform trough = LookTestBuilder.UIRect(root, "Essence", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -4f), new Vector2(48f, 12f));
+            AddImage(trough, UISprite("BarTrough"), Color.white);
+            RectTransform fillRect = LookTestBuilder.UIRect(trough, "Fill", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(40f, 6f));
+            Image fill = AddImage(fillRect, UISprite("BarFillBlue"), Color.white, Image.Type.Filled);
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            RectTransform flashRect = LookTestBuilder.UIRect(trough, "Flash", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(40f, 6f));
+            Image flash = AddImage(flashRect, Pixel(), new Color(1f, 1f, 1f, 0.8f));
+            flash.enabled = false;
+            var bar = trough.gameObject.AddComponent<Hearthdelve.UI.Hud.EssenceBar>();
+            bar.Configure(fill);
+            bar.ConfigureArt(UISprite("BarFillBlue"), UISprite("BarFillRed"), flash);
+            LookTestBuilder.Text(root, "EssenceLabel", LocKeys.HudEssence, 6f, k_Light, TextAnchor.UpperLeft,
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -17f), new Vector2(46f, 8f));
+
+            RectTransform satchel = LookTestBuilder.UIRect(root, "Satchel", Vector2.zero, Vector2.zero, new Vector2(4f, 8f), new Vector2(94f, 17f));
+            var slots = new SatchelSlotView[6];
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i] = Slot(satchel, i, new Vector2(-40f + i * 16f, -8.5f), false, out Button button);
+                // Display only.
+                Object.DestroyImmediate(button);
+                slots[i].GetComponent<Image>().raycastTarget = false;
+            }
+            satchel.gameObject.AddComponent<Hearthdelve.UI.Hud.SatchelHud>().Configure(slots);
+
+            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(130f, 36f));
+            var lines = new Hearthdelve.UI.Hud.HarvestFeedLine[4];
+            for (int i = 0; i < lines.Length; i++)
+            {
+                RectTransform line = LookTestBuilder.UIRect(feed, $"Line{i}", Vector2.one, Vector2.one, new Vector2(0f, -i * 9f), new Vector2(130f, 8f));
+                var group = line.gameObject.AddComponent<CanvasGroup>();
+                group.alpha = 0f;
+                group.blocksRaycasts = false;
+                RectTransform iconRect = LookTestBuilder.UIRect(line, "Icon", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
+                LocalizedSuperText text = LookTestBuilder.Text(line, "Text", LocKeys.HarvestGot, 6f, k_Light, TextAnchor.MiddleRight,
+                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(118f, 8f));
+                lines[i] = new Hearthdelve.UI.Hud.HarvestFeedLine { group = group, icon = AddImage(iconRect, null, Color.white), text = text };
+            }
+            feed.gameObject.AddComponent<Hearthdelve.UI.Hud.HarvestFeed>().Configure(lines);
+        }
+
+        /// <summary>
+        /// Removes the dungeon HUD and screens from <paramref name="canvas"/> (and the look test's placeholder
+        /// Essence bar) and builds them again.
+        /// </summary>
         public static void RebuildScreens(Canvas canvas)
         {
-            foreach (string name in new[] { "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult" })
+            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult", "PH_EssenceBar", "EssenceLabel" })
             {
                 Transform old = canvas.transform.Find(name);
                 if (old != null) Object.DestroyImmediate(old.gameObject);
             }
+            // The look test's controls line fades so it doesn't sit over the satchel.
+            Transform controls = canvas.transform.Find("Hint");
+            if (controls != null && controls.GetComponent<Hearthdelve.UI.Debugging.FadeOutAfter>() == null)
+                controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
+            BuildHud(canvas);
             BuildSwapPrompt(canvas);
             BuildExitHint(canvas);
             BuildDeathScreen(canvas);
@@ -198,7 +259,7 @@ namespace Hearthdelve.Editor
         public static SwapPromptScreen BuildSwapPrompt(Canvas canvas)
         {
             RectTransform root = FullScreen(canvas, "SwapPrompt");
-            GameObject hint = Hint(root, LocKeys.HudSatchelFull, 14f, out LocalizedSuperText hintText);
+            GameObject hint = Hint(root, LocKeys.HudSatchelFull, k_HintY, out LocalizedSuperText hintText);
 
             RectTransform panel = Panel(root, new Vector2(184f, 92f), new Vector2(0f, 6f));
             Title(panel, LocKeys.SwapTitle);
@@ -223,7 +284,7 @@ namespace Hearthdelve.Editor
         public static ExitHintView BuildExitHint(Canvas canvas)
         {
             RectTransform root = FullScreen(canvas, "ExitHint");
-            GameObject hint = Hint(root, LoopLocKeys.HudExit, 14f, out LocalizedSuperText text);
+            GameObject hint = Hint(root, LoopLocKeys.HudExit, k_HintY, out LocalizedSuperText text);
             var view = root.gameObject.AddComponent<ExitHintView>();
             view.Configure(hint, text);
             hint.SetActive(false);

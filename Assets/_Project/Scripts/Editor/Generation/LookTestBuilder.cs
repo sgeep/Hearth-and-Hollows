@@ -450,9 +450,12 @@ namespace Hearthdelve.Editor
             text.size = size;
             text.color = color;
             text.anchor = anchor;
-            text.alignment = anchor is TextAnchor.UpperCenter or TextAnchor.MiddleCenter or TextAnchor.LowerCenter
-                ? SuperTextMesh.Alignment.Center
-                : SuperTextMesh.Alignment.Left;
+            text.alignment = anchor switch
+            {
+                TextAnchor.UpperCenter or TextAnchor.MiddleCenter or TextAnchor.LowerCenter => SuperTextMesh.Alignment.Center,
+                TextAnchor.UpperRight or TextAnchor.MiddleRight or TextAnchor.LowerRight => SuperTextMesh.Alignment.Right,
+                _ => SuperTextMesh.Alignment.Left,
+            };
             text.autoWrap = rect.rect.width;
             Material material = TextMaterial();
             if (material != null) text.textMaterial = material;

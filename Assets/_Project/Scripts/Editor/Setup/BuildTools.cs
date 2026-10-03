@@ -182,6 +182,39 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>
+        /// Batch entry point (run without -nographics): the dungeon HUD over the test floor with sample
+        /// contents (low Essence, a part-full satchel, three feed lines, the satchel-full hint), to check
+        /// its layout.
+        /// </summary>
+        public static void CaptureHudBatch()
+        {
+            try
+            {
+                EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+                Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
+                var satchel = SampleSatchel();
+                Invoke(UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Hud.SatchelHud>(FindObjectsInactive.Include), "Bind", new Hearthdelve.Shared.Run.SatchelBound(satchel));
+                Invoke(UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Hud.EssenceBar>(FindObjectsInactive.Include), "OnChanged", new Hearthdelve.Shared.Run.EssenceChanged(20f, 100f, true, false));
+                var feed = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Hud.HarvestFeed>(FindObjectsInactive.Include);
+                foreach (var stack in satchel.Slots.Where(x => !x.IsEmpty).Take(3))
+                    Invoke(feed, "Push", new Hearthdelve.Shared.Run.HarvestFeedback(stack.Item, stack.Count, Hearthdelve.Shared.Run.HarvestFlags.CleanKill));
+                Invoke(UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Screens.SwapPromptScreen>(FindObjectsInactive.Include), "OnHint", new Hearthdelve.Shared.Run.SatchelFullHint(true));
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = Camera.main;
+                canvas.planeDistance = 1f;
+                canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
+                canvas.sortingOrder = 100;
+                Capture(EditorPaths.TestFloorScene, "BatchLogs/hud.png", reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         static void Invoke(object target, string method, object argument) =>
             target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.Invoke(target, new[] { argument });
 

@@ -238,6 +238,72 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: ClassicUI_BarTrough
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 274
+        width: 48
+        height: 12
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55d0d7a42b397c03cd39daa282863422
+      internalID: -1465120713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ClassicUI_BarFillBlue
+      rect:
+        serializedVersion: 2
+        x: 596
+        y: 133
+        width: 40
+        height: 6
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a62b8456ff85769f3ace8fd045ae973
+      internalID: 748142490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ClassicUI_BarFillRed
+      rect:
+        serializedVersion: 2
+        x: 340
+        y: 133
+        width: 40
+        height: 6
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 020a2899b5ae4d0c2ffc288349fa01d2
+      internalID: -627301507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -253,6 +319,9 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       ClassicUI_Bar: 1178110445
+      ClassicUI_BarFillBlue: 748142490
+      ClassicUI_BarFillRed: -627301507
+      ClassicUI_BarTrough: -1465120713
       ClassicUI_Panel: -661173402
       ClassicUI_Slot: 342386630
       ClassicUI_SlotSelected: -1772143184
