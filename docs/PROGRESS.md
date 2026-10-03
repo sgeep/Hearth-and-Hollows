@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4b step 5)_
+_Last updated: 2026-10-03 (4b step 6)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -238,7 +238,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 
 **Step 4 approved (2026-10-03).** Kept as they are: the heartbeat threshold and pacing, the death-screen dimming, the Lockbox flow, and the rise-and-fade climb (until clothed climb art exists).
 
-**Step 5 done (2026-10-03), awaiting review and playtest: the dungeon HUD.**
+**Step 5 approved (2026-10-03): the dungeon HUD.** Kept as built.
 
 - **Essence**, top left: the UI Overhaul's Classic bar (a dark trough with a blue fill). When low it switches to the red fill and pulses (two cues, not just a colour); a hit flashes it. "Essence" sits under it. Replaces the look test's placeholder bar on the test floor (the 4a look room keeps its placeholder).
 - **Satchel**, bottom left: the six slots, the same view as the swap prompt (icon, count, quality dots, freshness bar), live: parts appear as they go in, and freshness bars shorten as they spoil.
@@ -246,7 +246,27 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Prompts** (satchel full, climb out) moved up to sit above the satchel row. The test floor's debug controls line fades after 6 s so it doesn't sit over the satchel.
 - **Tests (PlayMode, test floor):** the bar follows Essence, flashes on a hit, turns red and pulses when low; the satchel HUD binds to the delve's satchel, shows a part as it goes in with three dots for Fine, and its freshness bar shortens; a kill puts "Clean kill! … Bat Wing ×N" with its icon on the feed, which then fades; the feed picks the right words for clean kills, overkills and destroyed parts; the bar, its label, the satchel, the feed, the prompts and the debug label never overlap and stay on screen (checked at the test window's narrower-than-16:9 width).
 
-**Next: step 6,** the feedback and haptics pass. After your review and playtest of step 5.
+**Step 6 done (2026-10-03), awaiting review and playtest: the feedback and haptics pass.** Each moment has one combined `MMF_Player` (visuals, placeholder sound, named haptic pattern), all through the existing settings (screen shake scale, flash, hit-stop, vibration on/off, reduced vibration):
+
+| Moment | Feedback |
+|---|---|
+| Light hit | hit-stop and shake sized from its AttackData, `PH_Hit`, `Tap.Firm` |
+| Heavy hit | longer hit-stop, bigger shake, `PH_HitHeavy`, `Hit.Heavy` |
+| Heavy charge reaching level 2 / 3 | `PH_ChargeTick`, `Cue.Threshold` (lighter at level 2, full at 3) |
+| Clean kill | `PH_KillClean`, `Kill.Clean` |
+| Overkill or a part destroyed | `PH_Thud`, `Bump.Soft` |
+| Satchel full | `PH_SatchelFull`, `Buzz.Failure`, once when it first refuses a part |
+| Enemy telegraph | flash and `PH_Telegraph` as before; `Cue.Threshold` at half strength only when the attack is aimed at the player and within 6 tiles |
+| Dodge | `PH_Dodge` only, no haptic (frequent; it would numb the hits) |
+| Taking damage, low Essence, pickup, climbing out | unchanged |
+
+- **The hit's feedback moved to the weapon.** The enemy's hit feedback is now only its flash; the weapon carries hit-stop, shake, sound and haptic, so light and heavy hits feel different and nothing plays twice.
+- **Fixed: the heavy spin hit the same enemy twice.** Its hitbox is open for 12 frames, but a struck enemy was only invincible for 0.1 s, so a tapped heavy did 28 instead of 14 (and a full charge 68 instead of 34). A swing now hits each target once (`FrameData.OneHitInvincibility`: past the end of its active window by a frame). Heavy damage now matches its data; the heavy will feel weaker than in your earlier playtests.
+- **Fixed: a stagger switched an enemy's AI back on when it ended,** even if something else had switched it off first. It now only restores what it paused.
+- **Tests:** PlayMode `FeedbackTests`: one `Tap.Firm` per light hit, one `Hit.Heavy` per heavy hit (and the spin's damage lands once), a harder shake for the heavy; a tick per charge level past the first; `Kill.Clean` on a clean kill, `Bump.Soft` on an overkill; one buzz when the satchel first refuses a part; the telegraph cue only when aimed at the player; no haptic on a dodge. EditMode: the one-hit invincibility rule. `HapticService.PatternPlayed` reports each named pattern played (tests and debug overlays).
+- **Needs you:** controller rumble checks (strength and feel of each pattern) and the placeholder sounds' volumes.
+
+**Next: step 7,** the web build smoke test and docs. After your review and playtest of step 6.
 
 ### Open design questions (4a)
 
