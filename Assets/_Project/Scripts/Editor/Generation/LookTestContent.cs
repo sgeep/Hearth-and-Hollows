@@ -357,6 +357,8 @@ namespace Hearthdelve.Editor
             root.AddComponent<CharacterMovement>();
             root.AddComponent<CharacterDash2D>().DashMode = CharacterDash2D.DashModes.MainMovement;
             root.AddComponent<PlayerTuning>().Configure(moveConfig);
+            // Drawn on the art-pixel grid, with the camera following the drawn position (CLAUDE.md, Camera and pixel-perfect).
+            root.AddComponent<PixelSnappedPresentation>();
 
             if (dungeon)
             {

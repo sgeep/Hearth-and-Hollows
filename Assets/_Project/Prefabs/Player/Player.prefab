@@ -770,6 +770,7 @@ GameObject:
   - component: {fileID: 9216512239146828281}
   - component: {fileID: 6497250814091916748}
   - component: {fileID: 4917328070641940068}
+  - component: {fileID: 2928372528600801868}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -1198,6 +1199,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Harvest.SatchelCarrier
   m_Config: {fileID: 11400000, guid: 37991d2608b3b01459da0b39254d96de, type: 2}
+--- !u!114 &2928372528600801868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875810124745081221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 053084807b2ca954589d83a352a36e96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.PixelSnappedPresentation
+  m_PixelsPerUnit: 8
 --- !u!1 &9185002561930039989
 GameObject:
   m_ObjectHideFlags: 0

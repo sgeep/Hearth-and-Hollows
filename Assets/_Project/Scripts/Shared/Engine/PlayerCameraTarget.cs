@@ -23,8 +23,11 @@ namespace Hearthdelve.Shared.Engine
             if (!LevelManager.HasInstance || LevelManager.Instance.Players == null || LevelManager.Instance.Players.Count == 0) return;
             Character player = LevelManager.Instance.Players[0];
             if (player == null) return;
-            m_Camera.Follow = player.transform;
-            m_Camera.ForceCameraPosition(new Vector3(player.transform.position.x, player.transform.position.y, transform.position.z), Quaternion.identity);
+            // Follow the pixel-snapped display position when the player has one (CLAUDE.md, Camera and pixel-perfect).
+            var snapped = player.GetComponent<PixelSnappedPresentation>();
+            Transform target = snapped != null && snapped.Anchor != null ? snapped.Anchor : player.transform;
+            m_Camera.Follow = target;
+            m_Camera.ForceCameraPosition(new Vector3(target.position.x, target.position.y, transform.position.z), Quaternion.identity);
         }
     }
 }

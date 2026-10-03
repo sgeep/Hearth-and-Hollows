@@ -219,10 +219,27 @@ namespace Hearthdelve.Editor
             }
         }
 
-        /// <summary>Applies the camera follow rules to the existing look-test scenes in place (no rebuild).</summary>
+        /// <summary>
+        /// Applies the camera follow rules to the existing look test in place (no rebuild): the player
+        /// prefabs get <see cref="PixelSnappedPresentation"/>, and the scenes' brain and follow are set.
+        /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Look Test Camera", priority = 23)]
         public static void UpdateLookTestCamera()
         {
+            foreach (string path in new[] { LookTestContent.PlayerPrefab, LookTestContent.TavernPlayerPrefab })
+            {
+                GameObject contents = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    if (contents.GetComponent<PixelSnappedPresentation>() == null) contents.AddComponent<PixelSnappedPresentation>();
+                    PrefabUtility.SaveAsPrefabAsset(contents, path);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(contents);
+                }
+            }
+
             foreach (string path in new[] { EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene })
             {
                 var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
