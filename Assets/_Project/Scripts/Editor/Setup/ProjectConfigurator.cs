@@ -22,6 +22,7 @@ namespace Hearthdelve.Editor
         public static void ConfigureAll()
         {
             ConfigureRenderPipeline();
+            ConfigureVSync();
             ConfigureLayers();
             ConfigurePhysics2D();
             ConfigureSorting();
@@ -60,6 +61,20 @@ namespace Hearthdelve.Editor
             if (GraphicsSettings.defaultRenderPipeline == asset) return;
             GraphicsSettings.defaultRenderPipeline = asset;
             Debug.Log($"[Hearthdelve] Default render pipeline set to {RenderPipelineAssetPath}.");
+        }
+
+        /// <summary>
+        /// VSync on every quality level. The world scrolls in whole art pixels; rendered uncapped and
+        /// out of step with the display, those steps land unevenly and look like jitter. (Web builds
+        /// ignore this and pace frames with requestAnimationFrame.)
+        /// </summary>
+        public static void ConfigureVSync()
+        {
+            var quality = LoadSettings("ProjectSettings/QualitySettings.asset");
+            var levels = quality.FindProperty("m_QualitySettings");
+            for (int i = 0; i < levels.arraySize; i++)
+                levels.GetArrayElementAtIndex(i).FindPropertyRelative("vSyncCount").intValue = 1;
+            quality.ApplyModifiedPropertiesWithoutUndo();
         }
 
         /// <summary>Names our layers. TDE's layers keep TDE's indices; a clash is reported, not overwritten.</summary>

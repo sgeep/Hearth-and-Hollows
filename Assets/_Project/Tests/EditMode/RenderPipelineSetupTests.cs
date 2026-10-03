@@ -33,6 +33,25 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
+        public void EveryQualityLevel_UsesVSync()
+        {
+            // Whole-pixel scrolling looks uneven when frames are not paced to the display.
+            int current = QualitySettings.GetQualityLevel();
+            try
+            {
+                for (int i = 0; i < QualitySettings.count; i++)
+                {
+                    QualitySettings.SetQualityLevel(i, false);
+                    Assert.That(QualitySettings.vSyncCount, Is.EqualTo(1), $"quality level {QualitySettings.names[i]}");
+                }
+            }
+            finally
+            {
+                QualitySettings.SetQualityLevel(current, false);
+            }
+        }
+
+        [Test]
         public void Urp2DRenderer_SortsByY()
         {
             var renderer = AssetDatabase.LoadAssetAtPath<Renderer2DData>("Assets/Settings/Renderer2D.asset");
