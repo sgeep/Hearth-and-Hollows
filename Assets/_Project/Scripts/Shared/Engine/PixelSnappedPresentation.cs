@@ -30,9 +30,26 @@ namespace Hearthdelve.Shared.Engine
         public Transform Anchor => m_Anchor;
 
         /// <summary>Where the player is drawn, in world units.</summary>
-        public Vector2 DisplayPosition => (Vector2)m_Display / m_PixelsPerUnit;
+        public Vector2 DisplayPosition => Snapping ? (Vector2)m_Display / m_PixelsPerUnit : (Vector2)transform.position;
 
-        public int PixelsPerUnit => m_PixelsPerUnit;
+        /// <summary>The grid the player is drawn on, in grid steps per world unit (follows the camera's pixel grid).</summary>
+        public int PixelsPerUnit
+        {
+            get => m_PixelsPerUnit;
+            set
+            {
+                value = Mathf.Max(1, value);
+                if (value == m_PixelsPerUnit) return;
+                m_PixelsPerUnit = value;
+                m_HasDisplay = false;
+            }
+        }
+
+        /// <summary>
+        /// False when the camera does not snap to a grid at all (smooth scrolling): the player is
+        /// then drawn at its real position.
+        /// </summary>
+        public bool Snapping { get; set; } = true;
 
         void Awake()
         {
@@ -50,6 +67,14 @@ namespace Hearthdelve.Shared.Engine
 
         void LateUpdate()
         {
+            if (!Snapping)
+            {
+                m_HasDisplay = false;
+                if (m_Model != null) m_Model.localPosition = m_ModelRest;
+                m_Anchor.localPosition = Vector3.zero;
+                return;
+            }
+
             Vector2 target = (Vector2)transform.position * m_PixelsPerUnit;
             if (m_HasDisplay) m_Display = PixelStepping.Step(m_Display, target, target - m_LastTarget, ref m_Stepping);
             else

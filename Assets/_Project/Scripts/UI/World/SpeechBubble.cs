@@ -74,9 +74,11 @@ namespace Hearthdelve.UI.World
             }
 
             int pixelsPerUnit = m_PixelPerfect.assetsPPU;
-            Vector3 camera = m_PixelPerfect.RoundToPixel(m_Camera.transform.position);
+            // Without grid snapping the world is drawn from the camera's real position, unrounded.
+            bool snapping = m_PixelPerfect.gridSnapping != PixelPerfectCamera.GridSnapping.None;
+            Vector3 camera = snapping ? m_PixelPerfect.RoundToPixel(m_Camera.transform.position) : m_Camera.transform.position;
             Vector2 fromCentre = (Vector2)(world - camera) * pixelsPerUnit;
-            fromCentre = new Vector2(Mathf.Round(fromCentre.x), Mathf.Round(fromCentre.y));
+            if (snapping) fromCentre = new Vector2(Mathf.Round(fromCentre.x), Mathf.Round(fromCentre.y));
             float viewHeight = 2f * m_Camera.orthographicSize * pixelsPerUnit;
             float viewWidth = viewHeight * m_Camera.aspect;
             return new Vector2((0.5f + fromCentre.x / viewWidth) * size.x, (0.5f + fromCentre.y / viewHeight) * size.y);

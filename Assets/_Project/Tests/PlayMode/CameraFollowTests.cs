@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.World;
 using NUnit.Framework;
@@ -144,6 +145,76 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(drift.Count, Is.GreaterThan(20), "the bubble was visible while the player walked");
             TestContext.WriteLine($"bubble offsets from the cook: {string.Join(" ", drift.Distinct())}");
             Assert.That(drift.Distinct().Count(), Is.EqualTo(1), $"the bubble moved against the cook: {string.Join(" ", drift.Distinct())}");
+        }
+
+        /// <summary>
+        /// Each look-test scroll mode (F4) keeps the player fixed on screen while the world scrolls,
+        /// and the finer modes move the world on more frames. The default is restored afterwards.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ScrollModes_KeepThePlayerFixedOnScreen_WhileWalkingDiagonally([Values] LookTestOverlay.ScrollMode mode)
+        {
+            yield return Load(DungeonScene);
+            FreezeEnemies();
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+            var overlay = Object.FindAnyObjectByType<LookTestOverlay>();
+            yield return null;
+            overlay.SetScrollMode(mode);
+            Camera camera = Camera.main;
+            var pixelPerfect = camera.GetComponent<PixelPerfectCamera>();
+            var presentation = Player.GetComponent<PixelSnappedPresentation>();
+            Teleport(Player, new Vector2(-8f, -4f));
+            yield return new WaitForSeconds(0.3f);
+
+            bool snapping = mode != LookTestOverlay.ScrollMode.Smooth;
+            var offsets = new List<Vector2>();
+            var drawnFrom = new List<Vector2>();
+            var sampler = new GameObject("FrameSampler").AddComponent<FrameSampler>();
+            sampler.OnFrame = () =>
+            {
+                // The upscale pipeline draws from the camera rounded to its grid. (RoundToPixel would do it,
+                // but its grid only updates when the camera renders, which batch-mode tests never do.)
+                float grid = pixelPerfect.assetsPPU;
+                Vector2 position = camera.transform.position;
+                Vector2 view = snapping ? new Vector2(Mathf.Round(position.x * grid), Mathf.Round(position.y * grid)) / grid : position;
+                drawnFrom.Add(view);
+                offsets.Add(presentation.DisplayPosition - view);
+            };
+            try
+            {
+                Hold(Key.D, Key.W);
+                yield return new WaitForSeconds(0.2f);
+                offsets.Clear();
+                drawnFrom.Clear();
+                yield return new WaitForSeconds(0.6f);
+            }
+            finally
+            {
+                Object.Destroy(sampler.gameObject);
+                ReleaseKeys();
+                overlay.SetScrollMode(LookTestOverlay.ScrollMode.PixelPerfect);
+                Application.targetFrameRate = -1;
+            }
+
+            Assert.That(pixelPerfect.assetsPPU, Is.EqualTo(8), "the default is restored");
+            Assert.That(offsets.Count, Is.GreaterThan(20));
+            float spread = offsets.Max(o => Vector2.Distance(o, offsets[0]));
+            int jumpAt = offsets.FindIndex(o => Vector2.Distance(o, offsets[0]) >= 1e-3f);
+            Assert.That(spread, Is.LessThan(1e-3f), $"{mode}: the player moved on screen by {spread * 8f:F3} art px, first at sample {jumpAt} of {offsets.Count}; " +
+                                                     $"offsets in art px: {string.Join(" ", offsets.Select(o => (Vector2Int.RoundToInt(o * 16f))).Distinct())} (sixteenths of a tile)");
+
+            int moved = 0;
+            for (int i = 1; i < drawnFrom.Count; i++)
+                if (drawnFrom[i] != drawnFrom[i - 1]) moved++;
+            float share = moved / (float)(drawnFrom.Count - 1);
+            TestContext.WriteLine($"{mode}: the world moved on {share:P0} of frames while walking diagonally");
+            Assert.That(share, Is.GreaterThan(mode switch
+            {
+                LookTestOverlay.ScrollMode.PixelPerfect => 0.4f,
+                LookTestOverlay.ScrollMode.HalfPixel => 0.8f,
+                _ => 0.95f,
+            }), $"{mode}: the world moved on only {share:P0} of frames");
         }
 
         [UnityTest]
