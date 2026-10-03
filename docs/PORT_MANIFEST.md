@@ -8,7 +8,7 @@ What happens to every file of the side-scroller prototype (tag `v0-sidescroller-
 
 The **Ported** column shows whether the file is already in this project. "Adapt" files marked as ported were copied unchanged so the tests could pass first; their changes happen in the sub-milestone named in the reason. Files are copied together with their `.meta` files so asset references survive.
 
-Totals for `Assets/_Project`: **93 Keep, 72 Adapt, 106 Drop** (271 files). The **Ported** column is current as of 4a.
+Totals for `Assets/_Project`: **93 Keep, 72 Adapt, 106 Drop** (271 files). The **Ported** column is current as of 4b (2026-10-03).
 
 Paths are relative to `Assets/_Project/`.
 
@@ -17,14 +17,14 @@ Paths are relative to `Assets/_Project/`.
 
 | File | Status | Ported | Reason |
 |---|---|---|---|
-| `Events/CoreEvents.cs` | Adapt | yes | Ported as-is; `HitStopRequested` goes in 4b when MMFeedbacks freeze-frame replaces hit-stop |
+| `Events/CoreEvents.cs` | Adapt | yes | Done in 4b: `HitStopRequested` removed (hit-stop is MMFeedbacks freeze-frame, `MMF_HitStop`) |
 | `Events/EventBus.cs` | Keep | yes | Event bus is engine-agnostic; TDE events get bridged onto it |
 | `Hearthdelve.Core.asmdef` | Keep | yes | Assembly unchanged |
 | `Input/InputMaps.cs` | Adapt | yes | Done in 4a: Dungeon actions are top-down (`AimPoint`, `Heavy`; no jump); maps feed TDE through `HearthdelveInputManager` |
 | `Layers.cs` | Adapt | yes | Done in 4a: TDE layers keep their indices; ours (`Pickup`) use free slots; sorting layers follow TDE |
 | `Minigames/IMinigame.cs` | Keep | yes | Minigame contract is unchanged |
 | `Random/IRandom.cs` | Keep | yes | Seedable random used by pure logic and tests |
-| `Services/GamePause.cs` | Adapt | yes | Ported as-is; hit-stop flag goes in 4b, and pause must cooperate with TDE's pause |
+| `Services/GamePause.cs` | Adapt | removed | Removed in 4b: replaced by `Shared/Engine/MenuPause.cs`, which pauses through TDE/MMTools' time scale; hit-stop is `MMF_HitStop` |
 | `Services/GameSettings.cs` | Adapt | yes | Vibration settings and the flash option added |
 | `Services/HitStop.cs` | Drop | no | Replaced by MMFeedbacks freeze-frame inside the combined hit feedback |
 | `Services/HitStopDriver.cs` | Drop | no | Replaced by MMFeedbacks freeze-frame inside the combined hit feedback |
@@ -66,10 +66,10 @@ Paths are relative to `Assets/_Project/`.
 | `Cameras/ScreenShaker.cs` | Drop | no | Replaced by MMFeedbacks camera shake / Cinemachine impulse |
 | `Combat/AttackData.cs` | Adapt | yes | Ported as-is; hitbox offsets become 4-direction, frame data maps to TDE weapon timings |
 | `Combat/ComboLogic.cs` | Keep | yes | Pure combo state machine; drives the TDE combo weapon timing |
-| `Combat/Damage.cs` | Adapt | yes | Ported as-is; damage pipeline will sit behind TDE `Health`/`DamageOnTouch` in 4b |
+| `Combat/Damage.cs` | Adapt | yes | 4b damage goes through TDE `Health` with amounts from `AttackData` (`CombatMeleeWeapon`, `EnemyAttack`). `DamageCalculator` (elements, resistances) is unused in gameplay and kept, with its EditMode tests, for when elements return |
 | `Combat/MeleeHitbox.cs` | Drop | no | Replaced by TDE `MeleeWeapon` damage areas |
 | `Combat/WeaponDefinition.cs` | Adapt | yes | Ported as-is; gains references to the TDE weapon prefab and Minifantasy weapon layers |
-| `Debug/DungeonDebugOverlay.cs` | Adapt | no | Rebuilt in 4b against the TDE player (same debug keys) |
+| `Debug/DungeonDebugOverlay.cs` | Adapt | no | **Not rebuilt in 4b** (scheduled there; missed). Its F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart; element override) is still to rebuild against the TDE player |
 | `DungeonEvents.cs` | Keep | yes | Event payloads are perspective-neutral |
 | `Enemies/AttackCycle.cs` | Keep | yes | Pure telegraph/attack/recover timing, reused by TDE AI actions |
 | `Enemies/DummyBehaviour.cs` | Adapt | no | Behaviour rewritten as TDE AI actions/decisions; the rat is replaced (no rat art with an attack) |
@@ -86,8 +86,8 @@ Paths are relative to `Assets/_Project/`.
 | `Harvest/HarvestRules.cs` | Keep | yes | Pure harvest rules and their tuning are unchanged |
 | `Harvest/HarvestRulesConfig.cs` | Keep | yes | Pure harvest rules and their tuning are unchanged |
 | `Harvest/HarvestSystem.cs` | Adapt | yes | Ported in 4a: listens to the bridged `CharacterDied` event |
-| `Harvest/IngredientPickup.cs` | Adapt | yes | Ported in 4a as a top-down trigger pickup; the swap prompt follows in 4b |
-| `Harvest/PlayerPickupCollector.cs` | Adapt | yes | Ported in 4a as `SatchelCarrier` (holds the satchel); swap logic follows in 4b |
+| `Harvest/IngredientPickup.cs` | Adapt | yes | Done in 4a/4b: top-down trigger pickup; pop-out landing, floor freshness decay and the step-away rule in 4b |
+| `Harvest/PlayerPickupCollector.cs` | Adapt | yes | Done: ported in 4a as `SatchelCarrier`; satchel decay, the full hint and whole-stack swaps in 4b |
 | `Hearthdelve.Dungeon.asmdef` | Adapt | yes | References the TDE and MMTools assemblies |
 | `Player/KinematicMover2D.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
 | `Player/MovementSettings.cs` | Drop | no | Side-scroller movement; replaced by TDE `TopDownController2D` and abilities |
@@ -144,15 +144,15 @@ Paths are relative to `Assets/_Project/`.
 |---|---|---|---|
 | `Debug/GameFlowDebugOverlay.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
 | `Hearthdelve.UI.asmdef` | Adapt | yes | References Super Text Mesh and uGUI |
-| `Hud/DungeonHud.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Hud/DungeonHud.cs` | Drop | no | Rebuilt in 4b: `UI/Hud` (`EssenceBar`, `SatchelHud`, `HarvestFeed`) |
 | `Localization/Loc.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Localization/LoopLocKeys.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Localization/TavernLocKeys.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
-| `Screens/DeathScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Screens/DeathScreen.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/DeathScreen.cs` (with the Lockbox choice) and `DelveResultScreen.cs` |
 | `Screens/MainMenuScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Screens/SlotPickerScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Screens/SlotView.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Screens/SwapPrompt.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Screens/SlotPickerScreen.cs` | Drop | no | Rebuilt in 4b as the death screen's Lockbox slot choice |
+| `Screens/SlotView.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/SatchelSlotView.cs` (icon, count, quality dots, freshness) |
+| `Screens/SwapPrompt.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/SwapPromptScreen.cs` |
 | `Tavern/StationMinigamePanel.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
 | `Tavern/TavernHud.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
 | `Tavern/TavernMorningScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |

@@ -282,18 +282,17 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 ### Known issues
 
 - **Character size:** at 320×180 a character is about 4% of screen height. This is the main thing to judge in the look test.
-- **The look-test UI is placeholder:** the Essence bar is a plain bar, and text uses Unity's built-in font through Super Text Mesh (no pixel font exists).
-- **Look-test death:** at zero Essence the room restarts after 2.5 s. The real death screen and Lockbox flow are 4b.
-- **Heavy / charged attack** is bound (`Dungeon/Heavy`) but not built; it is 4b with the rest of combat.
+- **Placeholder UI in the look scenes:** the 4a look scenes keep their plain Essence bar (the test floor has the real HUD). All text uses Unity's built-in font through Super Text Mesh (no pixel font exists).
+- **Look-scene death:** at zero Essence the 4a look rooms still just restart after 2.5 s; the death screen, Lockbox and result screen are on the test floor.
 - **Enemy hits don't push the player back** (enemy knockback on the player was left out of 4b's simple stagger; the player's own knockback would need care not to fight input).
 - **Shroom Cap and Spore Sac drop from nothing** now (they were the Cellar Shroom's, which became the spider). They wait for the Mushroom People; until then Shroom Skewer, Cellar Kebab, Cellar Stew and Offal Pottage can't be cooked from a delve. The recipe rework is 4f.
 - **Enemies only hurt with telegraphed attacks**, so standing in a slime is harmless. A deliberate fairness choice (GDD §4.1); say if you want light contact damage back.
 - **Hit-stop needs an `MMTimeManager`:** the test floor and newly generated scenes have one; the 4a look scenes (kept as baselines) don't, so hits there don't freeze.
 - **Pathfinding ignores other enemies:** enemies path around walls and props only, and can bunch up on the way to the player.
-- **No swap prompt:** a pickup that doesn't fit in the satchel stays on the floor (4b).
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
-- **Leftovers to remove in 4b:** `GamePause`'s hit-stop flag and the `HitStopRequested` event (hit-stop moves to MMFeedbacks).
-- **Data assets** for enemies, ingredients and recipes still describe the old roster; only the slime's two parts have icons.
+- **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
+- **No dungeon debug panel:** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) was scheduled for 4b but not rebuilt. The look-test overlay's F2–F4 keys still work.
+- **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
 
 ### Regenerating and verifying (current project)
 
