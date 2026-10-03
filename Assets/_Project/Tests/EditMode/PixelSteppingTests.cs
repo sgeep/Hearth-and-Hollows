@@ -73,6 +73,46 @@ namespace Hearthdelve.Tests
             }
         }
 
+        /// <summary>
+        /// The case that slipped through at first: a 45° walk that accelerates from rest, as TDE's
+        /// movement does, with its speed wobbling on both axes together. Measured on the frame, the
+        /// follow axis passed its test on some lead steps and failed it on others, so about one walk
+        /// in ten stepped a single axis after the axes had lined up. Measured where the lead axis
+        /// crossed, at most one alignment step comes first, and then every step moves both axes.
+        /// </summary>
+        [Test]
+        public void AcceleratingDiagonal_AlignsOnceAtTheStart_ThenStaysInLockstep()
+        {
+            var random = new System.Random(11);
+            for (int walk = 0; walk < 500; walk++)
+            {
+                var state = new PixelStepping.State();
+                var target = new Vector2(10f + (float)random.NextDouble(), 20f + (float)random.NextDouble());
+                Vector2Int display = Vector2Int.RoundToInt(target);
+                float speed = 0f;
+                int singles = 0;
+                bool aligned = false;
+                for (int frame = 0; frame < 150; frame++)
+                {
+                    speed += (0.566f - speed) / 6f;
+                    float wobble = 1f + (float)(random.NextDouble() - 0.5) * 0.006f;
+                    var movement = new Vector2(speed * wobble, speed * wobble);
+                    target += movement;
+                    Vector2Int step = PixelStepping.Step(display, target, movement, ref state) - display;
+                    display += step;
+                    Assert.That(Mathf.Abs(target.x - display.x), Is.LessThanOrEqualTo(PixelStepping.FollowAlone + 1e-4f));
+                    Assert.That(Mathf.Abs(target.y - display.y), Is.LessThanOrEqualTo(PixelStepping.FollowAlone + 1e-4f));
+                    if (step.x != 0 && step.y != 0) aligned = true;
+                    else if (step.x != 0 || step.y != 0)
+                    {
+                        singles++;
+                        Assert.That(aligned, Is.False, $"walk {walk}, frame {frame}: a single-axis step after the axes lined up");
+                    }
+                }
+                Assert.That(singles, Is.LessThanOrEqualTo(1), $"walk {walk}: more than one alignment step");
+            }
+        }
+
         [Test]
         public void Straight_NeverStepsTheOtherAxis()
         {

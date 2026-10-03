@@ -10,22 +10,31 @@ namespace Hearthdelve.Core.Movement
     /// - Moving along one axis (or standing still): each axis steps once it is half a pixel behind;
     ///   whole pixels are always taken.
     /// - Moving diagonally: the faster (lead) axis steps the same way, and the other (follow) axis
-    ///   only steps on the lead axis's frames, once it is a quarter of a pixel behind in the direction
-    ///   it is moving, and never by more than the lead axis. Both axes then step together, so the
-    ///   world scrolls in clean diagonal steps instead of a zig-zag, whatever sub-pixel phase the
-    ///   movement started at. The follow axis only steps on its own once 1.25 px behind.
+    ///   only steps on the lead axis's frames, never by more than the lead axis. It steps when it was
+    ///   a quarter of a pixel behind (in the direction it is moving) at the moment the lead axis
+    ///   crossed its half pixel, measured back along the line of movement, like Bresenham's line.
+    ///   Measuring it on the frame instead would depend on how far into the frame the lead axis
+    ///   crossed, so a steady diagonal would pass the test on one step and fail it on the next: an
+    ///   occasional one-axis step. Measured at the crossing, a steady direction gives the same answer
+    ///   every step, so both axes step together and the world scrolls in clean diagonal steps.
+    /// - Alignment: whatever sub-pixel phase a walk starts at, at most one single-axis step brings
+    ///   the axes into line, and it comes first. If the follow axis would be 1.5 px behind by the
+    ///   lead axis's next step, it takes its step now (once its own position rounds that way); if
+    ///   it would be too far ahead, the lead axis steps alone once. The window between those two
+    ///   cases is wider than a pixel, so slight float noise cannot flip a walk back and forth.
     /// - A fractional step back against an axis's last step needs 0.75 px, so a slow axis never
     ///   steps back and forth.
     /// - The lead axis only changes when the other axis is clearly faster (10%), so movement at
     ///   exactly 45 degrees does not flip the lead on float noise and break the lockstep.
-    /// The display stays within 1.25 px of the target (within 0.75 px when not moving diagonally).
+    /// The display stays within 1.5 px of the target (within 0.75 px when not moving diagonally).
     /// </summary>
     public static class PixelStepping
     {
         public const float MustStep = 0.5f;
         public const float FollowStep = 0.25f;
         public const float ReverseStep = 0.75f;
-        public const float FollowAlone = 1.25f;
+        /// <summary>The follow axis steps on its own once it is (or, at the lead's next step, would be) this far behind.</summary>
+        public const float FollowAlone = 1.5f;
         /// <summary>How much faster the other axis must move to take the lead.</summary>
         public const float LeadSwitch = 1.1f;
         /// <summary>Per-frame movement below this many pixels counts as not moving on that axis.</summary>
@@ -68,12 +77,28 @@ namespace Hearthdelve.Core.Movement
                 state.Lead = xLeads ? 1 : 2;
 
                 float leadDelta = xLeads ? delta.x : delta.y, followDelta = xLeads ? delta.y : delta.x;
-                float followMovement = xLeads ? movement.y : movement.x;
+                float leadMovement = xLeads ? movement.x : movement.y, followMovement = xLeads ? movement.y : movement.x;
+                // Follow-axis pixels per lead-axis pixel along the line of movement.
+                float slope = Math.Abs(followMovement) / Math.Abs(leadMovement);
 
                 int lead = AxisStep(leadDelta, xLeads ? state.LastStep.x : state.LastStep.y);
-                int follow = lead != 0
-                    ? FollowAxisStep(followDelta, followMovement, Math.Abs(lead))
-                    : Math.Abs(followDelta) >= FollowAlone ? Math.Sign(followDelta) : 0;
+                int follow;
+                if (lead != 0)
+                {
+                    // How far past its crossing point the lead axis got this frame, and where the follow axis was then.
+                    float overshoot = Math.Max(0f, Math.Abs(leadDelta) - (Math.Abs(lead) - MustStep));
+                    float followAtCrossing = followDelta - Math.Sign(followMovement) * overshoot * slope;
+                    follow = FollowAxisStep(followAtCrossing, followMovement, Math.Abs(lead));
+                }
+                else
+                {
+                    // Behind in its direction of movement, now and at the lead axis's next crossing.
+                    float behind = followDelta * Math.Sign(followMovement);
+                    float leadBehind = leadDelta * Math.Sign(leadMovement);
+                    float behindAtNextCrossing = behind + Math.Max(0f, MustStep - leadBehind) * slope;
+                    if (behind >= MustStep && behindAtNextCrossing >= FollowAlone) follow = Math.Sign(followMovement);
+                    else follow = Math.Abs(followDelta) >= FollowAlone ? Math.Sign(followDelta) : 0;
+                }
 
                 stepX = xLeads ? lead : follow;
                 stepY = xLeads ? follow : lead;
