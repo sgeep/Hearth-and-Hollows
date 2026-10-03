@@ -37,6 +37,8 @@ namespace Hearthdelve.Shared.Engine
         Collider2D m_Body;
         float m_NextRepath;
         float m_FlutterPhase;
+        // The grid version the current path was planned on: a rebuilt grid (moved furniture) re-plans at once.
+        int m_PlannedOn = -1;
 
         /// <summary>True while following a planned path rather than heading straight for the target.</summary>
         public bool IsFollowingPath { get; private set; }
@@ -105,7 +107,7 @@ namespace Hearthdelve.Shared.Engine
             IsFollowingPath = false;
             if (grid != null && !GridSweep.IsClear(grid.Map, grid.Space, body, goal, half))
             {
-                if (!m_Follower.HasPath || Time.time >= m_NextRepath) Replan(grid, body, goal);
+                if (!m_Follower.HasPath || Time.time >= m_NextRepath || m_PlannedOn != grid.Version) Replan(grid, body, goal);
                 if (m_Follower.TrySteer(grid.Map, grid.Space, body, half, out Vector2 waypoint))
                 {
                     aim = waypoint;
@@ -146,6 +148,7 @@ namespace Hearthdelve.Shared.Engine
         {
             m_NextRepath = Time.time + RepathInterval;
             GridMap map = grid.Map;
+            m_PlannedOn = grid.Version;
             GridSpace space = grid.Space;
             if (map.TryFindNearestWalkable(space.ToCell(body), NearestOpenCellRadius, out GridCell start) &&
                 map.TryFindNearestWalkable(space.ToCell(goal), NearestOpenCellRadius, out GridCell end) &&

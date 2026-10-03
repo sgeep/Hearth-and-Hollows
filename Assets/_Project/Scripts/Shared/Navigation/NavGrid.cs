@@ -1,13 +1,24 @@
+using System;
 using System.Collections.Generic;
+using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Pathfinding;
 using UnityEngine;
 
 namespace Hearthdelve.Shared.Navigation
 {
     /// <summary>
-    /// The walkable grid of the loaded floor, baked from its colliders on first use: a cell is
-    /// blocked when any solid collider on the obstacle layers overlaps it, even partly. Pathing
-    /// logic stays in <see cref="GridPathfinder"/>; this only reads the scene.
+    /// Published when obstacles move (furniture placed, moved or removed): the grid is invalidated
+    /// and rebakes on next use, and path followers re-plan.
+    /// </summary>
+    public readonly struct NavigationLayoutChanged : IEvent { }
+
+    /// <summary>
+    /// The walkable grid of the loaded floor or room, baked from its colliders on first use: a cell
+    /// is blocked when any solid collider on the obstacle layers overlaps it, even partly. The
+    /// layout is not assumed fixed: <see cref="Invalidate"/> (or a <see cref="NavigationLayoutChanged"/>
+    /// event) drops the grid and the next use rebakes it, and <see cref="Version"/> tells path
+    /// followers to re-plan. Pathing logic stays in <see cref="GridPathfinder"/>; this only reads
+    /// the scene.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class NavGrid : MonoBehaviour
@@ -25,9 +36,19 @@ namespace Hearthdelve.Shared.Navigation
         LayerMask m_Obstacles;
 
         GridMap m_Map;
+        int m_Version;
 
         /// <summary>The grid of the active floor, if it has one.</summary>
         public static NavGrid Current { get; private set; }
+
+        /// <summary>Raised after each bake, with the new grid.</summary>
+        public event Action<NavGrid> Rebuilt;
+
+        /// <summary>Goes up with every bake. Paths planned on an older version are stale.</summary>
+        public int Version => m_Version;
+
+        /// <summary>True while a baked grid is current (false after <see cref="Invalidate"/> until the next use).</summary>
+        public bool IsBaked => m_Map != null;
 
         public RectInt Bounds => m_Bounds;
         public GridSpace Space => new(m_Bounds.position);
@@ -48,14 +69,27 @@ namespace Hearthdelve.Shared.Navigation
             m_Map = null;
         }
 
-        void OnEnable() => Current = this;
+        void OnEnable()
+        {
+            Current = this;
+            EventBus<NavigationLayoutChanged>.Subscribe(OnLayoutChanged);
+        }
 
         void OnDisable()
         {
+            EventBus<NavigationLayoutChanged>.Unsubscribe(OnLayoutChanged);
             if (Current == this) Current = null;
         }
 
-        /// <summary>Reads the colliders now. Call again if obstacles move.</summary>
+        void OnLayoutChanged(NavigationLayoutChanged _) => Invalidate();
+
+        /// <summary>Drops the grid: the next use reads the colliders again. Cheap; call whenever obstacles change.</summary>
+        public void Invalidate() => m_Map = null;
+
+        /// <summary>Reads the colliders now (same as <see cref="Bake"/>).</summary>
+        public void Rebuild() => Bake();
+
+        /// <summary>Reads the colliders now.</summary>
         public void Bake()
         {
             Physics2D.SyncTransforms();
@@ -71,6 +105,8 @@ namespace Hearthdelve.Shared.Navigation
                     map.SetBlocked(cell, true);
             }
             m_Map = map;
+            m_Version++;
+            Rebuilt?.Invoke(this);
         }
 
         void OnDrawGizmosSelected()
