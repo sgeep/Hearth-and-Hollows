@@ -5,6 +5,7 @@ using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Run;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Harvest
@@ -19,6 +20,8 @@ namespace Hearthdelve.Dungeon.Harvest
     public sealed class SatchelCarrier : MonoBehaviour
     {
         [SerializeField] DelveConfig m_Config;
+        [SerializeField, Tooltip("When a part first won't fit: a buzz and the Buzz.Failure haptic.")]
+        MMF_Player m_FullFeedback;
 
         IngredientPickup m_Blocked;
         bool m_HintVisible;
@@ -30,6 +33,8 @@ namespace Hearthdelve.Dungeon.Harvest
         public IngredientPickup Blocked => m_Blocked;
 
         public void Configure(DelveConfig config) => m_Config = config;
+
+        public void ConfigureFeedback(MMF_Player satchelFull) => m_FullFeedback = satchelFull;
 
         FreshnessSettings Freshness => m_Config != null && m_Config.freshness != null ? m_Config.freshness.freshness : FreshnessSettings.Default;
 
@@ -112,6 +117,8 @@ namespace Hearthdelve.Dungeon.Harvest
         {
             if (m_HintVisible == visible) return;
             m_HintVisible = visible;
+            // Once when the satchel first refuses a part, not every frame the player stands on it.
+            if (visible) m_FullFeedback?.PlayFeedbacks(transform.position);
             EventBus<SatchelFullHint>.Publish(new SatchelFullHint(visible));
         }
     }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using MoreMountains.Feedbacks;
 using MoreMountains.TopDownEngine;
 using UnityEngine;
 
@@ -15,10 +16,14 @@ namespace Hearthdelve.Dungeon.Combat
     public sealed class HeavyWeaponTuning : MonoBehaviour
     {
         [SerializeField] WeaponDefinition m_Definition;
+        [SerializeField, Tooltip("Played when the charge reaches each stronger level: element 0 is level 2, and so on.")]
+        MMF_Player[] m_LevelFeedbacks = System.Array.Empty<MMF_Player>();
 
         public WeaponDefinition Definition => m_Definition;
 
         public void Configure(WeaponDefinition definition) => m_Definition = definition;
+
+        public void ConfigureLevelFeedbacks(MMF_Player[] levels) => m_LevelFeedbacks = levels;
 
         void Awake() => Apply();
 
@@ -42,6 +47,8 @@ namespace Hearthdelve.Dungeon.Combat
                 step.ChargeDuration = durations[i];
                 // Releasing part-way through a step still gives that step: it was reached.
                 step.TriggerIfChargeInterrupted = true;
+                // TDE completes step i exactly when the charge moves on to step i + 1: a stronger level.
+                step.ChargeCompleteFeedbacks = i < m_LevelFeedbacks.Length ? m_LevelFeedbacks[i] : null;
             }
             charge.ReleaseMode = ChargeWeapon.ReleaseModes.OnInputRelease;
             charge.AllowInitialShot = false;

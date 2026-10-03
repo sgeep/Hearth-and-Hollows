@@ -33,6 +33,10 @@ namespace Hearthdelve.Dungeon.Enemies
         WebProjectile m_Projectile;
         [SerializeField, Tooltip("The body sprite, raised along an arc during a leap (the shadow stays down).")]
         Transform m_Body;
+        [SerializeField, Tooltip("A light haptic cue at the telegraph, only when the attack is aimed at the player and close.")]
+        MMF_Player m_TelegraphCue;
+        [SerializeField, Min(0f), Tooltip("The cue only plays within this distance of the player, in tiles.")]
+        float m_CueRange = 6f;
 
         EnemyAttack[] m_Siblings;
         Character m_Character;
@@ -48,6 +52,7 @@ namespace Hearthdelve.Dungeon.Enemies
         bool m_Dashing;
         float m_SavedAcceleration, m_SavedDeceleration, m_SavedSpeed;
         bool m_SavedKnockbackImmunity;
+        bool m_TargetIsPlayer;
 
         public EnemyAttackSettings Settings { get; private set; }
         public AttackCycle Cycle { get; private set; }
@@ -58,8 +63,9 @@ namespace Hearthdelve.Dungeon.Enemies
         public Vector2 Direction => m_Direction;
         public event Action<EnemyAttackPhase> PhaseChanged;
 
-        public void Configure(int attackIndex, GameObject hitbox, GameObject alert, MMF_Player telegraphFeedback, WebProjectile projectile, Transform body)
+        public void Configure(int attackIndex, GameObject hitbox, GameObject alert, MMF_Player telegraphFeedback, WebProjectile projectile, Transform body, MMF_Player telegraphCue = null)
         {
+            m_TelegraphCue = telegraphCue;
             m_AttackIndex = attackIndex;
             m_Hitbox = hitbox;
             m_Alert = alert;
@@ -146,6 +152,7 @@ namespace Hearthdelve.Dungeon.Enemies
         {
             if (!CanStart(target)) return false;
             m_TargetPoint = target.position;
+            m_TargetIsPlayer = target.CompareTag("Player");
             Vector2 toTarget = m_TargetPoint - (Vector2)transform.position;
             m_Direction = toTarget.sqrMagnitude > 1e-6f ? toTarget.normalized : Vector2.right;
             return Cycle.TryStart();
@@ -175,6 +182,8 @@ namespace Hearthdelve.Dungeon.Enemies
                     m_Animator?.PlayTelegraphed(Settings.animation, Settings.telegraph, Settings.releaseFrame, m_Direction);
                     if (m_Alert != null) m_Alert.SetActive(true);
                     m_TelegraphFeedback?.PlayFeedbacks(transform.position);
+                    // Felt only when it's coming for the player: a room full of enemies shouldn't buzz constantly.
+                    if (m_TargetIsPlayer && Vector2.Distance(transform.position, m_TargetPoint) <= m_CueRange) m_TelegraphCue?.PlayFeedbacks(transform.position);
                     if (m_Health != null && GetComponent<EnemyIdentity>().Definition is { superArmorWhileAttacking: true })
                     {
                         m_SavedKnockbackImmunity = m_Health.ImmuneToKnockback;

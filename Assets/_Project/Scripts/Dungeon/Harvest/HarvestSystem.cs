@@ -7,6 +7,7 @@ using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Run;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Harvest
@@ -27,6 +28,10 @@ namespace Hearthdelve.Dungeon.Harvest
         float m_PopTime = 0.35f;
         [SerializeField, Tooltip("How fast parts spoil on the floor (the delve's freshness settings).")]
         FreshnessConfig m_Freshness;
+        [SerializeField, Tooltip("A clean kill: sound and the Kill.Clean haptic.")]
+        MMF_Player m_CleanKillFeedback;
+        [SerializeField, Tooltip("An overkill, or a part destroyed: a muted thud.")]
+        MMF_Player m_OverkillFeedback;
 
         IRandom m_Random = new SeededRandom();
 
@@ -34,6 +39,13 @@ namespace Hearthdelve.Dungeon.Harvest
         {
             get => m_Scatter;
             set => m_Scatter = Mathf.Max(0f, value);
+        }
+
+        /// <summary>The kill moments' feedbacks: a clean kill, and an overkill or destroyed part.</summary>
+        public void ConfigureFeedback(MMF_Player cleanKill, MMF_Player overkill)
+        {
+            m_CleanKillFeedback = cleanKill;
+            m_OverkillFeedback = overkill;
         }
 
         /// <summary>The scene's harvest system, if it has one.</summary>
@@ -128,6 +140,10 @@ namespace Hearthdelve.Dungeon.Harvest
 
             HarvestRuleSettings settings = m_Rules != null ? m_Rules.rules : HarvestRuleSettings.Default;
             List<HarvestDrop> drops = HarvestRules.Resolve(definition.harvest, kill, settings, m_Random);
+            // The kill's own moment: a ruined harvest thuds; a clean one rings. A plain kill has the hit's feedback.
+            if (drops.Any(d => (d.Flags & (HarvestFlags.Overkill | HarvestFlags.Destroyed)) != 0)) m_OverkillFeedback?.PlayFeedbacks(e.Position);
+            else if (drops.Any(d => (d.Flags & HarvestFlags.CleanKill) != 0)) m_CleanKillFeedback?.PlayFeedbacks(e.Position);
+
             int landed = drops.Count(d => !d.Destroyed && d.Count > 0);
             int index = 0;
             foreach (HarvestDrop drop in drops)

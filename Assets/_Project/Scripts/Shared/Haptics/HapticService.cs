@@ -49,10 +49,14 @@ namespace Hearthdelve.Shared.Haptics
             Play(s_Instance.m_Library.Find(patternId), scale);
         }
 
+        /// <summary>Raised with a pattern's id whenever one is played (debug overlays and tests).</summary>
+        public static event System.Action<string> PatternPlayed;
+
         public static void Play(HapticPattern pattern, float scale = 1f)
         {
             if (s_Instance == null || pattern == null) return;
             s_Instance.m_Mixer.Play(pattern.keys, scale);
+            PatternPlayed?.Invoke(pattern.id);
         }
 
         /// <summary>Sets a continuous rumble level (0–1 per motor) that holds until set again.</summary>
