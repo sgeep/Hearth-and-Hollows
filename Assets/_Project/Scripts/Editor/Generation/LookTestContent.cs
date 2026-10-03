@@ -409,8 +409,8 @@ namespace Hearthdelve.Editor
             root.AddComponent<EnemyIdentity>().Configure(definition);
 
             var idle = root.AddComponent<AIActionDoNothing>();
-            var chase = root.AddComponent<AIActionMoveTowardsTarget2D>();
-            chase.MinimumXDistance = 0.2f;
+            // Paths around walls and props on floors with a NavGrid; heads straight for the player elsewhere.
+            var chase = root.AddComponent<AIActionPathfindToTarget2D>();
             var detect = root.AddComponent<AIDecisionDetectTargetRadius2D>();
             detect.Radius = definition != null ? definition.aggroRange : 8f;
             detect.TargetLayer = LayerMask.GetMask(Layers.Player);

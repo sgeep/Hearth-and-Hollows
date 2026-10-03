@@ -228,10 +228,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332429305839620
-  - rid: 2696332429305839621
-  - rid: 2696332429305839622
-  - rid: 2696332429305839623
+  - rid: 2696332434222874628
+  - rid: 2696332434222874629
+  - rid: 2696332434222874630
+  - rid: 2696332434222874631
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -247,11 +247,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332429305839620
+    - rid: 2696332434222874628
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 159647511
+        UniqueID: 972425519
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -325,11 +325,11 @@ MonoBehaviour:
         Target: {fileID: 1311485745654185247}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332429305839621
+    - rid: 2696332434222874629
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -514554323
+        UniqueID: 871308443
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -401,11 +401,11 @@ MonoBehaviour:
         Owner: {fileID: 8711654767875629837}
         DebugActive: 0
         Force: 0.35
-    - rid: 2696332429305839622
+    - rid: 2696332434222874630
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 1150661958
+        UniqueID: 321885960
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -527,11 +527,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332429305839623
+    - rid: 2696332434222874631
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1350530635
+        UniqueID: -1498672537
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
@@ -766,7 +766,7 @@ GameObject:
   - component: {fileID: 4307675759958823023}
   - component: {fileID: 8772929805293403947}
   - component: {fileID: 5742859023457104171}
-  - component: {fileID: 6691330703319369477}
+  - component: {fileID: 4378998712159237805}
   - component: {fileID: 6102959639146018080}
   - component: {fileID: 5094988693457277636}
   m_Layer: 13
@@ -1050,7 +1050,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: MoreMountains.TopDownEngine::MoreMountains.TopDownEngine.AIActionDoNothing
   InitializationMode: 0
   Label: 
---- !u!114 &6691330703319369477
+--- !u!114 &4378998712159237805
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1059,13 +1059,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 5135240155563862973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47557c9dd44293a41bc6710b083332de, type: 3}
+  m_Script: {fileID: 11500000, guid: 65464e80c47e4604fa5f62106e7508f1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MoreMountains.TopDownEngine::MoreMountains.TopDownEngine.AIActionMoveTowardsTarget2D
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.AIActionPathfindToTarget2D
   InitializationMode: 0
   Label: 
-  UseMinimumXDistance: 1
-  MinimumXDistance: 0.2
+  RepathInterval: 0.25
+  StopDistance: 0.1
+  NearestOpenCellRadius: 3
 --- !u!114 &6102959639146018080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1119,7 +1120,7 @@ MonoBehaviour:
   - StateName: Chase
     Actions:
       array:
-      - {fileID: 6691330703319369477}
+      - {fileID: 4378998712159237805}
     Transitions:
       array: []
   TimeInThisState: 0
