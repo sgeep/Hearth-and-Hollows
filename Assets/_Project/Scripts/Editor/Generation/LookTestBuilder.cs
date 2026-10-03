@@ -507,7 +507,7 @@ namespace Hearthdelve.Editor
             canvas.gameObject.AddComponent<LookTestOverlay>().Configure(camera, scaler, label, otherScene);
         }
 
-        static void Solid(Transform parent, string name, Vector2 center, Vector2 size)
+        internal static void Solid(Transform parent, string name, Vector2 center, Vector2 size)
         {
             var go = new GameObject(name) { layer = LayerMask.NameToLayer(Layers.Obstacles) };
             go.transform.SetParent(parent, false);

@@ -228,7 +228,7 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728549
+  - rid: 2696332451924410405
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -244,11 +244,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728549
+    - rid: 2696332451924410405
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -2021441385
+        UniqueID: 486968515
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -390,6 +390,7 @@ GameObject:
   - component: {fileID: 5940576763729150673}
   - component: {fileID: 8784005781864115089}
   - component: {fileID: 6656547780219354980}
+  - component: {fileID: 6711664524163194583}
   m_Layer: 10
   m_Name: PlayerTavern
   m_TagString: Player
@@ -764,6 +765,18 @@ MonoBehaviour:
   TargetDamageResistanceProcessor: {fileID: 0}
   TargetAnimator: {fileID: 0}
   DisableAnimatorLogs: 1
+--- !u!114 &6711664524163194583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7072573877775022171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13fdcf351602f4846a5935eced283909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Scene.TavernInteractor
 --- !u!1 &7119462923639764677
 GameObject:
   m_ObjectHideFlags: 0

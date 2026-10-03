@@ -79,6 +79,9 @@ namespace Hearthdelve.Editor
         const string k_Bat = k_Creatures + "/Beasts/Bat";
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
+        const string k_Cooking = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Cooking";
+        const string k_Fireplaces = "Minifantasy_DwarvenKingdom_v1.0/Minifantasy_DwarvenKingdom_Assets/Props/Ilumination";
+        const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -88,6 +91,18 @@ namespace Hearthdelve.Editor
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
         public const string GiantSpider = "GiantSpider";
         public const string UserInterface = "UserInterface";
+        public const string CraftingAndProfessions = "CraftingAndProfessions";
+        public const string DwarvenKingdom = "DwarvenKingdom";
+
+        /// <summary>The premade Tavern Indoor room is an 11×11 grid of 8 px cells starting at this sheet pixel.</summary>
+        public static readonly Vector2Int TavernRoomOrigin = new(224, 8);
+        /// <summary>Premade-room cells the 4c tavern is stretched from, per layer: (columns, rows). Named <c>Cell_column_row</c>.</summary>
+        public static readonly (string layer, int[] columns, int[] rows)[] TavernRoomCells =
+        {
+            ("base_building", new[] { 0, 2, 5, 10 }, new[] { 0, 1, 2, 5, 9, 10 }),
+            ("wall", new[] { 0, 2, 10 }, new[] { 0, 1, 2 }),
+            ("floor2", new[] { 0, 2, 10 }, new[] { 5 }),
+        };
 
         static readonly Vector2 k_BottomLeft = Vector2.zero;
         static readonly Vector2 k_Centre = new(0.5f, 0.5f);
@@ -160,21 +175,72 @@ namespace Hearthdelve.Editor
             sheets.Add(new Sheet { Source = $"{k_Dungeon}/Props/Animated_Props/Torch.png", Pack = Dungeon, File = "Torch", Mode = SliceMode.Grid, Cell = new Vector2Int(16, 24), Pivot = new Vector2(0.5f, 0f) });
 
             // Tavern corner: the premade room from the Tavern Indoor add-on, layer by layer.
-            sheets.Add(Tavern("base_building", new SheetRect("Room", 224, 8, 88, 88, k_BottomLeft)));
-            sheets.Add(Tavern("floor2", new SheetRect("Floor", 228, 32, 80, 64, k_BottomLeft)));
-            sheets.Add(Tavern("wall", new SheetRect("Wall", 228, 12, 80, 20, k_BottomLeft)));
-            sheets.Add(Tavern("shadows", new SheetRect("Shadows", 224, 8, 88, 88, k_BottomLeft)));
-            sheets.Add(Tavern("props",
+            sheets.Add(Tavern("base_building", WithRoomCells("base_building", new SheetRect("Room", 224, 8, 88, 88, k_BottomLeft))));
+            sheets.Add(Tavern("floor2", WithRoomCells("floor2", new SheetRect("Floor", 228, 32, 80, 64, k_BottomLeft))));
+            sheets.Add(Tavern("wall", WithRoomCells("wall", new SheetRect("Wall", 228, 12, 80, 20, k_BottomLeft))));
+            sheets.Add(Tavern("shadows", new[] { new SheetRect("Shadows", 224, 8, 88, 88, k_BottomLeft) }));
+            sheets.Add(Tavern("props", new[]
+            {
                 new SheetRect("Shelves", 252, 16, 48, 14, k_BottomLeft),
                 new SheetRect("Sign", 233, 17, 14, 6, k_BottomLeft),
                 new SheetRect("Bar", 242, 26, 59, 26, k_BottomLeft),
                 new SheetRect("StoolA", 235, 33, 5, 6, k_BottomLeft),
                 new SheetRect("StoolB", 235, 40, 5, 6, k_BottomLeft),
                 new SheetRect("TableSetA", 232, 58, 24, 22, k_BottomLeft),
-                new SheetRect("TableSetB", 280, 58, 24, 22, k_BottomLeft)));
-            sheets.Add(Tavern("props2",
+                new SheetRect("TableSetB", 280, 58, 24, 22, k_BottomLeft),
+                // 4c: the separate furniture on the left half of the sheet (measured; docs/ASSET_MAP.md).
+                new SheetRect("TableRoundA", 90, 42, 12, 12),
+                new SheetRect("TableRoundB", 106, 42, 12, 12),
+                new SheetRect("TableRoundSmallA", 88, 24, 8, 8),
+                new SheetRect("TableRoundSmallB", 104, 24, 8, 8),
+                new SheetRect("TableSquare", 50, 25, 20, 23),
+                new SheetRect("LongTableH", 130, 40, 28, 8),
+                new SheetRect("LongTableV", 169, 34, 6, 22),
+                new SheetRect("BenchBack", 51, 17, 18, 7),
+                new SheetRect("BenchFront", 51, 49, 18, 7),
+                new SheetRect("BenchLeft", 42, 26, 5, 22),
+                new SheetRect("BenchRight", 73, 26, 5, 22),
+                // Chairs by the way a sitter faces: N shows the backrest in front, S the seat, E and W in profile.
+                new SheetRect("ChairFacingN", 137, 26, 6, 6),
+                new SheetRect("ChairFacingS", 145, 24, 6, 8),
+                new SheetRect("ChairFacingE", 153, 24, 6, 8),
+                new SheetRect("ChairFacingW", 161, 24, 6, 8),
+                new SheetRect("StoolRedA", 178, 25, 5, 6),
+                new SheetRect("StoolRedB", 185, 25, 5, 6),
+                new SheetRect("StoolPlain", 194, 25, 4, 6),
+                new SheetRect("ShelfTall", 44, 64, 16, 14, k_BottomLeft),
+                new SheetRect("ShelfLow", 68, 72, 16, 6, k_BottomLeft),
+                new SheetRect("SignSmall", 185, 65, 14, 6, k_BottomLeft),
+            }));
+            sheets.Add(Tavern("props2", new[]
+            {
                 new SheetRect("ShelfGoods", 252, 16, 48, 15, k_BottomLeft),
-                new SheetRect("BarTop", 244, 31, 12, 12, k_BottomLeft)));
+                new SheetRect("BarTop", 244, 31, 12, 12, k_BottomLeft),
+                new SheetRect("Taps", 193, 40, 7, 5),
+                new SheetRect("BottlesA", 93, 66, 13, 5, k_BottomLeft),
+                new SheetRect("BottlesB", 117, 66, 14, 5, k_BottomLeft),
+                new SheetRect("BottlesC", 141, 66, 13, 5, k_BottomLeft),
+                new SheetRect("Glasses", 165, 66, 14, 4, k_BottomLeft),
+            }));
+
+            // 4c kitchen (Crafting And Professions II): a stone oven and a range with pans, one 32×32 frame.
+            // The idle prop, and the 8-frame working loop (fire, sizzling pans, smoke) for the Grill in use.
+            sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenProp.png", Pack = CraftingAndProfessions, File = "Kitchen", Pivot = k_BottomLeft });
+            sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenPropShadow.png", Pack = CraftingAndProfessions, File = "KitchenShadow", Pivot = k_BottomLeft });
+            sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenWorking.png", Pack = CraftingAndProfessions, File = "KitchenWorking", Mode = SliceMode.Grid, Cell = new Vector2Int(32, 32), Pivot = k_BottomLeft });
+            // Fire (Dwarven Kingdom): a floor fire under the stew cauldron, and a wall fireplace.
+            sheets.Add(new Sheet { Source = $"{k_Fireplaces}/FloorFireplace/FloorFireplace.png", Pack = DwarvenKingdom, File = "FloorFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(16, 16), Pivot = new Vector2(0.5f, 0f) });
+            sheets.Add(new Sheet { Source = $"{k_Fireplaces}/WallFireplace/WallFireplace.png", Pack = DwarvenKingdom, File = "WallFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(24, 24), Pivot = new Vector2(0.5f, 0f) });
+            // The target highlight (UI Overhaul selectors): a corner-bracket frame, 9-sliced to fit, and a small down marker.
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_Selectors}/_Selectors.png", Pack = UIOverhaul, File = "Selectors", Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("Brackets", 255, 95, 18, 18, k_Centre, new Vector4(5, 5, 5, 5)),
+                    new SheetRect("Marker", 84, 254, 8, 5, new Vector2(0.5f, 0f)),
+                },
+            });
 
             // UI and icons.
             sheets.Add(new Sheet
@@ -214,10 +280,24 @@ namespace Hearthdelve.Editor
             return sheets;
         }
 
+        /// <summary>Adds the premade room's cells used by the 4c tavern to a Tavern Indoor layer's rects.</summary>
+        static SheetRect[] WithRoomCells(string layer, params SheetRect[] rects)
+        {
+            var all = new List<SheetRect>(rects);
+            foreach (var (cellLayer, columns, rows) in TavernRoomCells)
+            {
+                if (cellLayer != layer) continue;
+                foreach (int c in columns)
+                foreach (int r in rows)
+                    all.Add(new SheetRect($"Cell_{c}_{r}", TavernRoomOrigin.x + c * Tile, TavernRoomOrigin.y + r * Tile, Tile, Tile, k_Centre));
+            }
+            return all.ToArray();
+        }
+
         static Sheet Character(string source, string pack, string file) =>
             new() { Source = source, Pack = pack, File = file, Mode = SliceMode.Grid, Cell = new Vector2Int(CharacterFrame, CharacterFrame), Pivot = FeetPivot };
 
-        static Sheet Tavern(string layer, params SheetRect[] rects) =>
+        static Sheet Tavern(string layer, SheetRect[] rects) =>
             new() { Source = $"{k_Tavern}/TavernIndoor_{layer}.png", Pack = TavernIndoor, File = $"TavernIndoor_{layer}", Mode = SliceMode.Rects, Rects = rects };
 
         public static Sheet Find(string assetPath)

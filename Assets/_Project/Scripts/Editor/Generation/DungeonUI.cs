@@ -128,7 +128,7 @@ namespace Hearthdelve.Editor
             return image;
         }
 
-        static RectTransform FullScreen(Canvas canvas, string name)
+        internal static RectTransform FullScreen(Canvas canvas, string name)
         {
             RectTransform root = LookTestBuilder.UIRect(canvas.transform, name, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             root.anchorMin = Vector2.zero;
@@ -247,7 +247,7 @@ namespace Hearthdelve.Editor
             }
         }
 
-        static GameObject Hint(RectTransform root, string key, float y, out LocalizedSuperText text)
+        internal static GameObject Hint(RectTransform root, string key, float y, out LocalizedSuperText text)
         {
             RectTransform hint = LookTestBuilder.UIRect(root, "Hint", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, y), new Vector2(150f, 10f));
             AddImage(hint, Pixel(), new Color(0.05f, 0.04f, 0.06f, 0.75f));

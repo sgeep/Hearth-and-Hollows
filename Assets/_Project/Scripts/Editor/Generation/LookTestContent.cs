@@ -456,6 +456,8 @@ namespace Hearthdelve.Editor
                 var health = root.AddComponent<Health>();
                 health.ImmuneToDamage = true;
                 character.CharacterHealth = health;
+                // Uses stations, the pass and seats (4c).
+                root.AddComponent<Hearthdelve.Tavern.Scene.TavernInteractor>();
             }
             return SavePrefab(root, dungeon ? PlayerPrefab : TavernPlayerPrefab);
         }

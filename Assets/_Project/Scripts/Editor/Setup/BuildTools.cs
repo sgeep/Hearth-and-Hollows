@@ -84,6 +84,24 @@ namespace Hearthdelve.Editor
         /// Batch entry point (run without -nographics): the 4b test floor, once at the reference
         /// resolution at the spawn and once as an overview of the whole floor at 8 px per tile.
         /// </summary>
+        public static void CaptureTavernBatch()
+        {
+            try
+            {
+                // The fixed one-screen view, with the Grill highlighted as when the player is in reach.
+                EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                foreach (var station in UnityEngine.Object.FindObjectsByType<Hearthdelve.Tavern.Scene.TavernInteractable>())
+                    if (station.Kind == Hearthdelve.Tavern.Scene.TavernInteractableKind.Grill) station.SetHighlighted(true);
+                Capture(EditorPaths.TavernScene, "BatchLogs/tavern.png", TavernBuilder.CameraCentre, reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         public static void CaptureTestFloorBatch()
         {
             try
