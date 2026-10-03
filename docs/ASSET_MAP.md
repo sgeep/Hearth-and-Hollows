@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-03 (4c step 1: the tavern room)_
+_Last updated: 2026-10-03 (4c step 2: customers and Pip)_
 
 ## How art gets into the project
 
@@ -38,6 +38,31 @@ Shadows are separate sheets with the same layout, drawn under the body.
 | Bat | Creatures (Beasts) → `Creatures/` | `Bat` FlyIdle, Attack, Dmg, Die, Sleep; `ShadowBat` Fly, Attack, Dmg, Die, Sleep | 2, 4, 4, 9, 8 | FlyIdle (64×128) is both idle and flight. **BatSleep's three rows are stages:** hanging asleep (8 frames), waking (5), falling asleep (5). The swoop lands on Attack frame 2. **The sleep pose hangs from a wall:** place a sleeping bat at the top of the floor tile directly under a wall (feet 0.55 tiles up the tile) and the pose sits on the brick face. |
 | Giant Spider | Exclusive `Creatures/Giant_Spider` → `GiantSpider/` | `GiantSpider` Idle, Walk, Attack, Dmg, Die, ShotWebDiagonal; shadows Idle, Walk, Attack, Dmg, Die, WebShot | 17, 6, 7, 4, 33, 14 | No frame-timing notes in the pack: 100 ms throughout. The body is about 20 px wide (legs spread wider), so its collider is the body only (0.9×0.5 tiles) and it fits through doorways. The bite lands on Attack frame 4; the web leaves on ShotWebDiagonal frame 9. `ShotWebOrthogonal` exists for the four straight directions; we only draw four diagonal facings, so it is not imported. |
 | Tavern cook (NPC) | A Myriad of NPCs → `AMyriadOfNPCs/` | `CookerIdle` | 16 | Premade NPC. Walk, Dmg, Die and Working (8 frames × 1 row) exist but are not imported. |
+
+### Tavern customers (A Myriad of NPCs, layered → `AMyriadOfNPCs/`)
+
+`Generic_NPCs/{Idle,Walk}` hold one sheet per layer variant: idle is 16 frames, walk 4, both 32×32 with the four facings as rows (the same layout as the player). Layers: `_Characters/{Human,Elf,Orc}` (bodies, by skin), `Body/` (Blouses, Doublets, Gloves, Jacket, Shirt, Shoes, ShoulderPads, Togas, Trousers, each in 15 colours), and `Head/` (Facial_Hair: 5 styles; Hairstyles: 8, drawn once as `HumanHair` for every race; Hats: 8). Only idle, walk, damage and die exist: **no sitting pose**. The "Short" hairstyle's file names have a space before the colour.
+
+Imported for 4c, curated for readability at 320×180 (`MinifantasySheets.NpcLayers`, as `Npc{Idle|Walk}_{category}_{kind}_{variant}`):
+
+| Layer | Variants |
+|---|---|
+| Body | Human pale, white, brown, black skin; Elf elfskin, albino |
+| Top | Shirt red, blue, yellow, white, orange; Doublet purple, turquoise, red; Jacket blue, magenta (no greens or browns: they vanish on the tavern floor) |
+| Trousers | black, grey, blue |
+| Hair | Short, PonyTail, Long, Bold in black, brown, blonde, red, white |
+| Hat | Hood blue, red, purple; RangerHat blackleather |
+| Beard | LongBeard in black, brown, blonde, red, white |
+
+Orc bodies (green skins) aren't used: they read poorly on the green floor. Drawn back to front: body, trousers, top, beard, head. Plus `NpcShadow{Idle,Walk}` (`Shadows/ShadowHumanoid…`).
+
+**Appearance pools** (`Data/Customers/Appearance_*`): villagers wear shirts and hair, adventurers jackets, doublets, hoods and hats, dwarves always have a long beard. **There is no dwarf body** in the pack: dwarves are humans in stocky colours with a beard.
+
+**Pip's stand-in:** the premade `Butcher` (`Premade_NPCs/Butcher`, idle and walk; apron, bright blonde hair), until Pip's own look in 4f. The other premades are Alchemist, Blacksmith, Carpenter, Cooker (the 4a cook), Dyer, Furrier, Jeweller and Tailor, each with idle, walk, damage, die and a working loop.
+
+### Emotes (UI Overhaul → `UIOverhaul/Emotions`)
+
+`_Emotions.png` (152×104) is a 16 px grid of 8×8 faces (a cell's face at its +8,+8), made to sit inside the speech bubble (`Bubble_Body`). Used: `Thinking` (136,88: "…", reading the menu) and `Angry` (72,40: walking out). Others include laughing, crying, a heart and a music note.
 
 **Player body: placeholder choice.** The Human Townsfolk is a clothed body with a full attack set, picked so the look test shows a dressed character. The Dungeon pack's "Human" is an unclothed base body. The final protagonist (a pre-clothed body with palette swaps) is still to be chosen; True Heroes and the Weapons pack are the candidates.
 

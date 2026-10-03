@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 1)_
+_Last updated: 2026-10-03 (4c step 2)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -339,7 +339,26 @@ Decisions (2026-10-03):
 - **Highlights lost their top and right edges:** a 9-sliced SpriteRenderer dropped the frame's top row and right column of pixels. The highlight is now four separate corner sprites cut from the same selector.
 - Applied to the existing scene by *Update Tavern* (no rebuild). New test: nothing is walkable behind the kitchen or cauldron, walking up to the oven targets the Grill, and all four highlight corners draw.
 
-**Next: step 2,** customers and Pip. After your review and playtest of step 1.
+**Step 1 approved (2026-10-03).** Layout and camera kept as they are.
+
+**Step 2 done (2026-10-03), awaiting review and playtest: customers and Pip.**
+
+- **Customers** are TDE characters that walk the walkable grid through the same thin pathfinding AI action as the enemies. The ported, tested `ServiceSession` and `CustomerLogic` decide everything; the new `CustomerAgent` only moves the body and shows its state.
+  - They come in at the door. With a seat free they walk to the spot below it, step onto the chair and sit facing their table; with none free they queue inside the door, along the front wall, and move up as seats free.
+  - **Patience:** a small bar over the head while queueing or waiting for food, green to red, shortening pixel by pixel. A "…" bubble while they read the menu; their dish's icon while they wait (once dishes have icons, step 3).
+  - **Walkouts:** when patience runs out they get up and leave by the door with an angry face (the ledger counts it).
+  - Customers and Pip are on their own physics layer (`Npcs`): they collide with walls and furniture but not with the player or each other, so they never shove anyone.
+- **Layered looks** (decision 3): A Myriad of NPCs layers (body, trousers, top, beard, hair or hat) drawn by a new presentation-only `LayeredSpriteAnimator`, which picks one facing and frame for all layers with the same rules as the combat animator. Curated for readability: few layers, tops only in colours that contrast with the floor. Each customer's look comes from the evening's seed and their id, so it's fixed for the whole visit.
+- **Seats:** 6 open before upgrades; the fourth table is put away until the seat upgrade, and the walkable grid is rebuilt through the step 1 invalidation event.
+- **Pip:** a TDE character (the premade Butcher as a stand-in) who walks to the post of their job: Serving, beside the pass, by default. Working the job comes with step 3.
+- **The evening (until the prep screen in step 4):** played on its own, the scene opens straight into a debug evening (a debug-filled storeroom, the first dishes it can make). Customers order, wait and, with no serving yet, walk out.
+- **Debug keys** (editor and development builds): **F5** ends the service now (everyone goes home), **F6** lets a customer in.
+- **Tests:**
+  - EditMode: the same seed always gives the same look; looks vary and every option gets used; empty lists and beard chance.
+  - PlayMode (`TavernCustomerTests`): a customer walks from the door to a seat without ever clipping furniture, sits on it facing the table and stays put; with every seat taken they queue at the right spots, show patience, then take freed seats; patience running out makes them walk out upset and leave by the door; they walk through the player without moving them; the layered look stays in step (same animation and frame on every layer) and never changes; Pip reaches the serving post; the fourth table is put away and its floor becomes walkable; ending service sends everyone home.
+- Applied to the existing scene by *Update Tavern* (no rebuild).
+
+**Next: step 3,** stations and serving. After your review and playtest of step 2.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -367,6 +386,8 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
+- **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
+- **No sitting pose:** seated customers use their idle pose on the chair.
 - **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else. Temporary: once the game font is chosen, the test becomes a glyph-coverage check against that font.
 - **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
 
