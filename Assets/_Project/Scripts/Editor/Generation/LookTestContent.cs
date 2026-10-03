@@ -163,6 +163,18 @@ namespace Hearthdelve.Editor
             WriteWav("PH_Climb", 0.5f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (440f + 880f * t)) * (1f - t / 0.5f) * 0.4f);
             // The heavy spin: a filtered noise sweep.
             WriteWav("PH_Whoosh", 0.3f, (t, n) => Noise(n) * Mathf.Sin(t / 0.3f * Mathf.PI) * 0.5f);
+            // A heavy landing: lower and longer than PH_Hit.
+            WriteWav("PH_HitHeavy", 0.22f, (t, n) => Noise(n) * Mathf.Exp(-t * 22f) * 0.7f + Mathf.Sin(t * 2f * Mathf.PI * (90f - 120f * t)) * Mathf.Exp(-t * 12f) * 0.8f);
+            // A clean kill: a bright two-note ring.
+            WriteWav("PH_KillClean", 0.3f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * (t < 0.1f ? 660f : 990f)) * Mathf.Exp(-t * 9f) * 0.45f);
+            // An overkill or a destroyed part: a dull, muffled thud.
+            WriteWav("PH_Thud", 0.18f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * 70f) * Mathf.Exp(-t * 20f) * 0.8f + Noise(n) * Mathf.Exp(-t * 60f) * 0.2f);
+            // The satchel refusing a part: a low buzz.
+            WriteWav("PH_SatchelFull", 0.25f, (t, n) => Mathf.Sign(Mathf.Sin(t * 2f * Mathf.PI * 110f)) * (1f - t / 0.25f) * 0.25f);
+            // The dodge roll: a short airy swish.
+            WriteWav("PH_Dodge", 0.14f, (t, n) => Noise(n) * Mathf.Sin(t / 0.14f * Mathf.PI) * 0.35f);
+            // The heavy reaching a stronger level: a short high tick.
+            WriteWav("PH_ChargeTick", 0.06f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * 1500f) * Mathf.Exp(-t * 60f) * 0.45f);
         }
 
         static float Noise(int n)
@@ -351,7 +363,7 @@ namespace Hearthdelve.Editor
                 attack.DamageAreaShape = MeleeWeapon.MeleeDamageAreaShapes.Rectangle;
                 attack.TargetLayerMask = LayerMask.GetMask(Layers.Enemies);
                 attack.InvincibilityDuration = 0.1f;
-                attack.HitDamageableFeedback = HitStopFeedback(root.transform, $"Feedback_HitStop_{i + 1}");
+                attack.HitDamageableFeedback = HitFeedback(root.transform, $"Feedback_Hit_{i + 1}", Sfx("PH_Hit"), Pattern(HapticIds.TapFirm));
             }
             var aim = root.AddComponent<WeaponAim2D>();
             aim.AimControl = WeaponAim.AimControls.Mouse;
@@ -363,14 +375,20 @@ namespace Hearthdelve.Editor
             return prefab;
         }
 
-        /// <summary>The attacker's side of a hit: the hit-stop freeze. Its duration is set per attack from AttackData.</summary>
-        internal static MMF_Player HitStopFeedback(Transform parent, string name)
+        /// <summary>
+        /// A landed hit's one combined feedback, played by the weapon: hit-stop, screen shake, sound and haptic.
+        /// Hit-stop duration and shake force are set per attack from AttackData. (The enemy only flashes.)
+        /// </summary>
+        internal static MMF_Player HitFeedback(Transform parent, string name, AudioClip sound, HapticPattern haptic)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             var player = go.AddComponent<MMF_Player>();
             player.FeedbacksList ??= new List<MMF_Feedback>();
             player.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.06f });
+            player.AddFeedback(new MMF_ScreenShake { Label = "Screen Shake", Force = 0.15f });
+            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached });
+            if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
             return player;
         }
 
@@ -389,7 +407,10 @@ namespace Hearthdelve.Editor
 
             root.AddComponent<CharacterOrientation2D>();
             root.AddComponent<CharacterMovement>();
-            root.AddComponent<CharacterDash2D>().DashMode = CharacterDash2D.DashModes.MainMovement;
+            var dash = root.AddComponent<CharacterDash2D>();
+            dash.DashMode = CharacterDash2D.DashModes.MainMovement;
+            // Sound only: the roll is frequent, and a buzz on every one would numb the hits.
+            dash.AbilityStartFeedbacks = Feedback(root.transform, "Feedback_Dodge", null, 0f, Sfx("PH_Dodge"), null);
             root.AddComponent<PlayerTuning>().Configure(moveConfig);
             // Drawn on the art-pixel grid, with the camera following the drawn position (CLAUDE.md, Camera and pixel-perfect).
             root.AddComponent<PixelSnappedPresentation>();
@@ -425,7 +446,9 @@ namespace Hearthdelve.Editor
                 character.CharacterHealth = health;
                 // Low Essence: a heartbeat, sound and haptic in one feedback, faster as Essence falls.
                 root.AddComponent<LowEssenceWarning>().Configure(Feedback(root.transform, "Feedback_Heartbeat", null, 0f, Sfx("PH_Heartbeat"), Pattern(HapticIds.HeartbeatWarning)));
-                root.AddComponent<SatchelCarrier>().Configure(delveConfig);
+                var carrier = root.AddComponent<SatchelCarrier>();
+                carrier.Configure(delveConfig);
+                carrier.ConfigureFeedback(Feedback(root.transform, "Feedback_SatchelFull", null, 0f, Sfx("PH_SatchelFull"), Pattern(HapticIds.BuzzFailure)));
             }
             else
             {

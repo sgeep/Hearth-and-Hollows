@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Hearthdelve.Core;
+using Hearthdelve.Core.Haptics;
 using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
@@ -140,7 +141,9 @@ namespace Hearthdelve.Editor
             }
 
             GameObject managers = LookTestBuilder.Managers(HearthdelveInputManager.GameplayMap.Dungeon, content.Library, content.Player, spawn);
-            managers.AddComponent<HarvestSystem>().Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
+            HarvestSystem newHarvest = managers.AddComponent<HarvestSystem>();
+            newHarvest.Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
+            HarvestFeedbacks(newHarvest);
             managers.AddComponent<NavGrid>().Configure(new RectInt(0, 0, Width, Height), LayerMask.GetMask(Layers.Obstacles));
             managers.AddComponent<Hearthdelve.Dungeon.Run.DelveRunController>();
             PixelPerfectCamera camera = LookTestBuilder.Cameras(new Color(0.05f, 0.05f, 0.07f));
@@ -239,6 +242,8 @@ namespace Hearthdelve.Editor
                 harvest.Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
                 // Drops pop out in front of the body (step 3 fix): the distance that keeps them out of reach of a kill at your feet.
                 harvest.Scatter = 1.1f;
+                // Step 6: the kill moments' feedbacks.
+                HarvestFeedbacks(harvest);
                 EditorUtility.SetDirty(harvest);
             }
             Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).FirstOrDefault(c => c.name == "UI");
@@ -397,5 +402,18 @@ namespace Hearthdelve.Editor
             Face.BottomBricks => 12,
             _ => 5,
         };
+
+        /// <summary>A clean kill rings (Kill.Clean); an overkill or destroyed part thuds (Bump.Soft). Rebuilt each run.</summary>
+        static void HarvestFeedbacks(HarvestSystem harvest)
+        {
+            foreach (string name in new[] { "Feedback_CleanKill", "Feedback_Overkill" })
+            {
+                Transform old = harvest.transform.Find(name);
+                if (old != null) Object.DestroyImmediate(old.gameObject);
+            }
+            harvest.ConfigureFeedback(
+                LookTestContent.Feedback(harvest.transform, "Feedback_CleanKill", null, 0f, LookTestContent.Sfx("PH_KillClean"), LookTestContent.Pattern(HapticIds.KillClean)),
+                LookTestContent.Feedback(harvest.transform, "Feedback_Overkill", null, 0f, LookTestContent.Sfx("PH_Thud"), LookTestContent.Pattern(HapticIds.BumpSoft)));
+        }
     }
 }

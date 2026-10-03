@@ -7,6 +7,7 @@ using Hearthdelve.Dungeon.Combat;
 using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Haptics;
 using MoreMountains.Feedbacks;
 using MoreMountains.Tools;
 using MoreMountains.TopDownEngine;
@@ -252,9 +253,18 @@ namespace Hearthdelve.Editor
                 step.DamageAreaShape = MeleeWeapon.MeleeDamageAreaShapes.Circle;
                 step.TargetLayerMask = LayerMask.GetMask(Layers.Enemies);
                 step.InvincibilityDuration = 0.1f;
-                step.HitDamageableFeedback = LookTestContent.HitStopFeedback(root.transform, $"Feedback_HitStop_Heavy_{i + 1}");
+                step.HitDamageableFeedback = LookTestContent.HitFeedback(root.transform, $"Feedback_Hit_Heavy_{i + 1}", LookTestContent.Sfx("PH_HitHeavy"), LookTestContent.Pattern(HapticIds.HitHeavy));
             }
-            root.AddComponent<HeavyWeaponTuning>().Configure(definition);
+            // A tick each time the charge reaches a stronger level, felt more strongly at the top level.
+            var levels = new MMF_Player[Mathf.Max(0, steps - 1)];
+            for (int i = 0; i < levels.Length; i++)
+            {
+                levels[i] = LookTestContent.Feedback(root.transform, $"Feedback_ChargeLevel_{i + 2}", null, 0f, LookTestContent.Sfx("PH_ChargeTick"), LookTestContent.Pattern(HapticIds.CueThreshold));
+                levels[i].GetFeedbackOfType<MMF_HapticPattern>().Scale = i == levels.Length - 1 ? 1f : 0.6f;
+            }
+            var tuning = root.AddComponent<HeavyWeaponTuning>();
+            tuning.Configure(definition);
+            tuning.ConfigureLevelFeedbacks(levels);
             return LookTestContent.SavePrefab(root, HeavyPrefab);
         }
 
@@ -334,8 +344,9 @@ namespace Hearthdelve.Editor
             health.DestroyOnDeath = true;
             SpriteAnim die = set.Find(CharacterAnim.Die);
             health.DelayBeforeDestruction = die != null ? die.frameDuration * die.frontRight.Length : 0.9f;
-            // The one combined hit feedback: flash, shake, sound and haptic in a single MMF_Player.
-            health.DamageMMFeedbacks = LookTestContent.Feedback(root.transform, "Feedback_Hit", body, 0.35f, LookTestContent.Sfx("PH_Hit"), LookTestContent.Pattern(HapticIds.TapFirm));
+            // The enemy's side of a hit is only its flash: the weapon's feedback carries the hit-stop, shake, sound
+            // and haptic, so a light and a heavy hit feel different and nothing plays twice.
+            health.DamageMMFeedbacks = LookTestContent.Feedback(root.transform, "Feedback_Hit", body, 0f, null, null);
             character.CharacterHealth = health;
             root.AddComponent<EnemyIdentity>().Configure(definition);
 
@@ -346,6 +357,9 @@ namespace Hearthdelve.Editor
             if (unlit != null) alert.sharedMaterial = unlit;
             alert.gameObject.SetActive(false);
             MMF_Player telegraph = LookTestContent.Feedback(root.transform, "Feedback_Telegraph", body, 0f, LookTestContent.Sfx("PH_Telegraph"), null);
+            // Felt only when the attack is aimed at the player and near (EnemyAttack decides), and lightly.
+            MMF_Player cue = LookTestContent.Feedback(root.transform, "Feedback_TelegraphCue", null, 0f, null, LookTestContent.Pattern(HapticIds.CueThreshold));
+            cue.GetFeedbackOfType<MMF_HapticPattern>().Scale = 0.5f;
 
             var attacks = new List<EnemyAttack>();
             List<EnemyAttackSettings> settings = definition != null ? definition.AllAttacks.ToList() : new List<EnemyAttackSettings> { new() };
@@ -353,7 +367,7 @@ namespace Hearthdelve.Editor
             {
                 GameObject hitbox = settings[i].kind == EnemyAttackKind.Spit ? null : Hitbox(root, $"Hitbox_{settings[i].debugName}");
                 var attack = root.AddComponent<EnemyAttack>();
-                attack.Configure(i, hitbox, alert.gameObject, telegraph, settings[i].kind == EnemyAttackKind.Spit ? web : null, body.transform);
+                attack.Configure(i, hitbox, alert.gameObject, telegraph, settings[i].kind == EnemyAttackKind.Spit ? web : null, body.transform, cue);
                 attacks.Add(attack);
             }
             if (definition != null && definition.startsAsleep)
