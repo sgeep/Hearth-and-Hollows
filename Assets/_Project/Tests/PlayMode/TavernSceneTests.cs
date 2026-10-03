@@ -1,0 +1,208 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Hearthdelve.Core;
+using Hearthdelve.Core.Events;
+using Hearthdelve.Core.Input;
+using Hearthdelve.Core.Pathfinding;
+using Hearthdelve.Shared.Navigation;
+using Hearthdelve.Tavern.Scene;
+using Hearthdelve.UI.Tavern;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using UnityEngine.TestTools;
+using Object = UnityEngine.Object;
+
+namespace Hearthdelve.Tests.PlayMode
+{
+    /// <summary>
+    /// 4c step 1: the <c>Tavern</c> scene. The room and its furniture, the fixed camera, the walkable
+    /// grid (and rebuilding it when furniture moves), and the player's interactions with stations.
+    /// </summary>
+    public class TavernSceneTests : LookTestFixture
+    {
+        const string Scene = "Tavern";
+
+        static TavernInteractable Station(TavernInteractableKind kind) =>
+            Object.FindObjectsByType<TavernInteractable>().First(s => s.Kind == kind);
+
+        [UnityTest]
+        public IEnumerator Room_HasItsStations_SeatsAndGrid()
+        {
+            yield return Load(Scene);
+            var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).ToList();
+            Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.Pass }));
+            Assert.That(GameObject.Find("Seats").transform.childCount, Is.EqualTo(8), "4 tables of 2 seats");
+            Assert.That(NavGrid.Current, Is.Not.Null);
+            Assert.That(NavGrid.Current.Bounds, Is.EqualTo(new RectInt(0, 0, 28, 17)));
+            foreach (SpriteRenderer sprite in Object.FindObjectsByType<SpriteRenderer>().Where(r => r.gameObject.layer != LayerMask.NameToLayer("UI")))
+            {
+                if (sprite.transform.parent != null && sprite.transform.parent.name == "Highlight") continue;
+                Assert.That(sprite.sharedMaterial.name, Does.StartWith("Sprite-Lit"), $"{sprite.name} uses the lit sprite material");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Camera_HoldsStill_WithTheWholeRoomOnScreen()
+        {
+            yield return Load(Scene);
+            Camera camera = Camera.main;
+            Vector3 before = camera.transform.position;
+            Hold(Key.D, Key.S);
+            yield return new WaitForSeconds(0.8f);
+            ReleaseKeys();
+            yield return null;
+            Assert.That(Player.transform.position.x, Is.GreaterThan(14f), "the player moved");
+            Assert.That(Vector3.Distance(camera.transform.position, before), Is.LessThan(0.001f), "the camera stays put");
+            // Centred on the room, which fits the 180 px reference height at every common screen shape. (The batch
+            // test window is narrower than any real screen, so the check is on the view, not on that window.)
+            Assert.That((Vector2)camera.transform.position, Is.EqualTo(new Vector2(14f, 8.5f)), "centred on the room");
+            const float viewHeight = 180f / 8f;
+            Assert.That(viewHeight, Is.GreaterThanOrEqualTo(17f), "the room's height fits");
+            foreach (float aspect in new[] { 16f / 9f, 16f / 10f, 5f / 4f })
+                Assert.That(viewHeight * aspect, Is.GreaterThanOrEqualTo(28f), $"the room's width fits at aspect {aspect:0.00}");
+        }
+
+        /// <summary>Walking up into each piece from below stops the player in front of it, drawn in front (footprints end at the sort point).</summary>
+        [UnityTest]
+        public IEnumerator Furniture_StopsThePlayerInFront_AndDrawsBehindThem()
+        {
+            yield return Load(Scene);
+            string[] pieces = { "Bar", "Kitchen", "Cauldron", "Pass", "Table1", "Table3", "Chair1W", "Chair4E" };
+            foreach (string name in pieces)
+            {
+                GameObject piece = GameObject.Find(name);
+                Assert.That(piece, Is.Not.Null, name);
+                Collider2D footprint = piece.GetComponents<Collider2D>().OrderBy(c => c.bounds.min.y).First();
+                Vector2 start = new(footprint.bounds.center.x, footprint.bounds.min.y - 1.2f);
+                Teleport(Player, start);
+                yield return new WaitForFixedUpdate();
+                Hold(Key.W);
+                yield return new WaitForSeconds(0.6f);
+                ReleaseKeys();
+                yield return new WaitForFixedUpdate();
+                float feet = Player.transform.position.y;
+                Assert.That(feet, Is.LessThan(footprint.bounds.min.y), $"{name} blocks the player");
+                Assert.That(feet, Is.GreaterThan(footprint.bounds.min.y - 0.6f), $"the player walked right up to {name}");
+                Transform sortRoot = piece.GetComponentInParent<SortingGroup>()?.transform ?? piece.transform;
+                Assert.That(feet, Is.LessThan(sortRoot.position.y), $"the player sorts in front of {name}");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator Grid_ReachesEveryStation_FromTheDoorAndTheSpawn()
+        {
+            yield return Load(Scene);
+            NavGrid grid = NavGrid.Current;
+            var path = new List<GridCell>();
+            GridCell door = grid.Space.ToCell(new Vector2(13.5f, 2.5f));
+            GridCell spawn = grid.Space.ToCell(Player.transform.position);
+            Assert.That(grid.Map.IsWalkable(door), "inside the door is walkable");
+            foreach (TavernInteractable station in Object.FindObjectsByType<TavernInteractable>())
+            {
+                // Somewhere to stand within reach (the pass is used from either side of its table).
+                var standing = new List<GridCell>();
+                for (int y = 0; y < grid.Map.Height; y++)
+                for (int x = 0; x < grid.Map.Width; x++)
+                {
+                    var cell = new GridCell(x, y);
+                    if (grid.Map.IsWalkable(cell) && Vector2.Distance(grid.Space.CellCentre(cell), station.UsePoint) <= station.Reach) standing.Add(cell);
+                }
+                Assert.That(standing, Is.Not.Empty, $"{station.Kind}: there is somewhere to stand within reach");
+                Assert.That(standing.Any(c => GridPathfinder.TryFindPath(grid.Map, door, c, path)), $"{station.Kind} is reachable from the door");
+                Assert.That(standing.Any(c => GridPathfinder.TryFindPath(grid.Map, spawn, c, path)), $"{station.Kind} is reachable from the spawn");
+            }
+        }
+
+        /// <summary>Furniture can move (4f): the grid is invalidated and rebuilt, and its version tells path followers to re-plan.</summary>
+        [UnityTest]
+        public IEnumerator Grid_IsRebuilt_WhenTheFurnitureLayoutChanges()
+        {
+            yield return Load(Scene);
+            NavGrid grid = NavGrid.Current;
+            GameObject table = GameObject.Find("Table1");
+            GridCell under = grid.Space.ToCell(table.GetComponent<Collider2D>().bounds.center);
+            Assert.That(grid.Map.IsWalkable(under), Is.False, "the table blocks its cell");
+            int version = grid.Version;
+            int rebuilt = 0;
+            grid.Rebuilt += _ => rebuilt++;
+
+            table.transform.position += new Vector3(0f, -30f, 0f);
+            EventBus<NavigationLayoutChanged>.Publish(new NavigationLayoutChanged());
+            Assert.That(grid.IsBaked, Is.False, "the layout change invalidates the grid");
+            Assert.That(grid.Map.IsWalkable(under), "and the next use rebakes it without the table");
+            Assert.That(grid.Version, Is.GreaterThan(version));
+            Assert.That(rebuilt, Is.EqualTo(1));
+
+            table.transform.position += new Vector3(0f, 30f, 0f);
+            grid.Rebuild();
+            Assert.That(grid.Map.IsWalkable(under), Is.False, "an explicit rebuild sees it back");
+        }
+
+        [UnityTest]
+        public IEnumerator Interaction_HighlightsTheNearestStation_HintsAndUsesIt()
+        {
+            var used = new List<TavernInteracted>();
+            EventBus<TavernInteracted>.Subscribe(used.Add);
+            yield return Load(Scene);
+            yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
+            var hint = Object.FindAnyObjectByType<TavernHintView>();
+            TavernInteractable grill = Station(TavernInteractableKind.Grill), pass = Station(TavernInteractableKind.Pass);
+            var interactor = Player.GetComponent<TavernInteractor>();
+
+            Assert.That(interactor.Target, Is.Null, "nothing in reach at the spawn");
+            Assert.That(hint.IsShown, Is.False);
+
+            Teleport(Player, grill.UsePoint);
+            yield return WaitUntil(() => interactor.Target == grill, 1f, "the grill to become the target");
+            yield return null;
+            Assert.That(grill.IsHighlighted);
+            Assert.That(hint.IsShown);
+            string key = Hearthdelve.UI.Screens.InputHints.TavernInteract();
+            Assert.That(key, Does.StartWith("E"), "the hint names the Interact key");
+            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: Grill"));
+
+            Hold(Key.E);
+            yield return null;
+            yield return null;
+            ReleaseKeys();
+            yield return null;
+            Assert.That(used.Count, Is.EqualTo(1));
+            Assert.That(used[0].Kind, Is.EqualTo(TavernInteractableKind.Grill));
+
+            Teleport(Player, pass.UsePoint + new Vector2(0f, -1f));
+            yield return WaitUntil(() => interactor.Target == pass, 1f, "the pass to take over");
+            yield return null;
+            Assert.That(grill.IsHighlighted, Is.False, "one highlight at a time");
+            Assert.That(pass.IsHighlighted);
+            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: The pass"));
+
+            Teleport(Player, new Vector2(13.5f, 5.5f));
+            yield return WaitUntil(() => interactor.Target == null, 1f, "walking away to clear the target");
+            yield return null;
+            Assert.That(pass.IsHighlighted, Is.False);
+            Assert.That(hint.IsShown, Is.False);
+            EventBus<TavernInteracted>.Unsubscribe(used.Add);
+        }
+
+        [UnityTest]
+        public IEnumerator Interaction_IsOff_WhileTheTavernMapIsOff()
+        {
+            yield return Load(Scene);
+            TavernInteractable tap = Station(TavernInteractableKind.Tap);
+            var interactor = Player.GetComponent<TavernInteractor>();
+            Teleport(Player, tap.UsePoint);
+            yield return WaitUntil(() => interactor.Target == tap, 1f, "the tap to become the target");
+
+            InputMaps.ActivateUIOnly();
+            yield return null;
+            Assert.That(interactor.Target, Is.Null, "a panel or menu is open: nothing to use");
+            Assert.That(tap.IsHighlighted, Is.False);
+            InputMaps.Activate(InputMaps.Tavern);
+            yield return null;
+            Assert.That(interactor.Target, Is.EqualTo(tap));
+        }
+    }
+}
