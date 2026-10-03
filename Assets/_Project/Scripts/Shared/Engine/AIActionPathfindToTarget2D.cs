@@ -24,12 +24,19 @@ namespace Hearthdelve.Shared.Engine
         public float StopDistance = 0.1f;
         [Tooltip("How far to look for an open cell when the character or target stands in a partly blocked one, in tiles.")]
         public int NearestOpenCellRadius = 3;
+        [Tooltip("Keep between these distances from the target (min, max), backing off when closer than min. Zero: close in.")]
+        public Vector2 KeepDistance;
+        [Range(0f, 1f), Tooltip("Erratic side-to-side wobble added to the heading (a bat's flight).")]
+        public float Flutter;
+        [Min(0f), Tooltip("How fast the flutter wobbles, in cycles per second.")]
+        public float FlutterFrequency = 1.6f;
 
         readonly List<GridCell> m_Cells = new();
         readonly PathFollower m_Follower = new();
         CharacterMovement m_Movement;
         Collider2D m_Body;
         float m_NextRepath;
+        float m_FlutterPhase;
 
         /// <summary>True while following a planned path rather than heading straight for the target.</summary>
         public bool IsFollowingPath { get; private set; }
@@ -49,8 +56,9 @@ namespace Hearthdelve.Shared.Engine
         {
             base.OnEnterState();
             m_Follower.Clear();
-            // Spread re-planning across enemies that start chasing on the same frame.
+            // Spread re-planning (and flutter) across enemies that start chasing on the same frame.
             m_NextRepath = Time.time + Random.value * RepathInterval;
+            m_FlutterPhase = Random.value * 2f * Mathf.PI;
         }
 
         public override void OnExitState()
@@ -76,9 +84,19 @@ namespace Hearthdelve.Shared.Engine
             // Where this body's centre would be with its feet on the target's feet.
             Vector2 goal = (Vector2)_brain.Target.position + (body - feet);
 
-            if (Vector2.Distance(body, goal) <= StopDistance)
+            float distance = Vector2.Distance(body, goal);
+            if (distance <= StopDistance)
             {
                 m_Movement.SetMovement(Vector2.zero);
+                return;
+            }
+            if (KeepDistance.y > 0f && distance <= KeepDistance.y &&
+                (NavGrid.Current == null || GridSweep.IsClear(NavGrid.Current.Map, NavGrid.Current.Space, body, goal, Vector2.one * 0.15f)))
+            {
+                // In the band: hold. Too close: back away, if there is room.
+                IsFollowingPath = false;
+                m_Follower.Clear();
+                m_Movement.SetMovement(distance < KeepDistance.x ? Retreat(body, goal, half) : Vector2.zero);
                 return;
             }
 
@@ -100,7 +118,28 @@ namespace Hearthdelve.Shared.Engine
             }
 
             Vector2 direction = aim - body;
-            m_Movement.SetMovement(direction.sqrMagnitude > 1e-6f ? direction.normalized : Vector2.zero);
+            direction = direction.sqrMagnitude > 1e-6f ? direction.normalized : Vector2.zero;
+            if (Flutter > 0f && direction != Vector2.zero)
+            {
+                // Sideways only when the wobble stays clear of walls, so flying never clips.
+                Vector2 side = new Vector2(-direction.y, direction.x) * (Mathf.Sin(Time.time * FlutterFrequency * 2f * Mathf.PI + m_FlutterPhase) * Flutter);
+                Vector2 wobbled = (direction + side).normalized;
+                if (grid == null || GridSweep.IsClear(grid.Map, grid.Space, body, body + wobbled * 0.5f, half)) direction = wobbled;
+            }
+            m_Movement.SetMovement(direction);
+        }
+
+        /// <summary>Away from the goal, or along a side if the way back is blocked; still if both are.</summary>
+        Vector2 Retreat(Vector2 body, Vector2 goal, Vector2 half)
+        {
+            Vector2 away = (body - goal).sqrMagnitude > 1e-6f ? (body - goal).normalized : Vector2.right;
+            NavGrid grid = NavGrid.Current;
+            if (grid == null) return away;
+            Vector2 left = new(-away.y, away.x);
+            foreach (Vector2 option in new[] { away, (away + left).normalized, (away - left).normalized, left, -left })
+                if (GridSweep.IsClear(grid.Map, grid.Space, body, body + option * 0.6f, half))
+                    return option;
+            return Vector2.zero;
         }
 
         void Replan(NavGrid grid, Vector2 body, Vector2 goal)

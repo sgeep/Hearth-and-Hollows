@@ -48,10 +48,14 @@ namespace Hearthdelve.Dungeon.Harvest
             EnemyDefinition definition = identity.Definition;
             if (definition == null) return;
 
+            // The weapon that landed the killing hit; the scene's default weapon if none is known.
+            WeaponDefinition weapon = e.Target.TryGetComponent(out HitReaction reaction) && reaction.LastHit is { Weapon: { } hitWeapon }
+                ? hitWeapon
+                : m_Weapon;
             var kill = new KillContext
             {
-                Element = m_Weapon != null ? m_Weapon.element : default,
-                CleanKillCategories = m_Weapon != null ? m_Weapon.cleanKillCategories : default,
+                Element = weapon != null ? weapon.element : default,
+                CleanKillCategories = weapon != null ? weapon.cleanKillCategories : default,
                 Overkill = e.Overkill,
                 MaxHealth = e.MaxHealth,
                 IsFinisher = false,
