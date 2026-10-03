@@ -136,8 +136,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332429305839624
-  - rid: 2696332429305839625
+  - rid: 2696332437304115228
+  - rid: 2696332437304115229
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -153,11 +153,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332429305839624
+    - rid: 2696332437304115228
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -917132694
+        UniqueID: 1281249622
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -279,11 +279,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332429305839625
+    - rid: 2696332437304115229
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1722758181
+        UniqueID: 1877874395
         Label: Haptic Tap.Light
         OriginalLabel: 
         ChannelMode: 0
@@ -415,7 +415,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

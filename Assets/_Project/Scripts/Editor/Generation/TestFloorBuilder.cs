@@ -233,6 +233,8 @@ namespace Hearthdelve.Editor
             if (harvest != null)
             {
                 harvest.Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
+                // Drops pop out in front of the body (step 3 fix): the distance that keeps them out of reach of a kill at your feet.
+                harvest.Scatter = 1.1f;
                 EditorUtility.SetDirty(harvest);
             }
             Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).FirstOrDefault(c => c.name == "UI");

@@ -439,6 +439,9 @@ namespace Hearthdelve.Editor
             trigger.radius = 0.6f;
             trigger.offset = new Vector2(0f, 0.3f);
             SpriteRenderer icon = AddSprite(root.transform, "Icon", null, SortingLayers.YSorted, 0, new Vector3(0f, 0.1f, 0f));
+            // Unlit, like the enemy alert: a dark part must still read on a dim floor (CLAUDE.md, Lighting).
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            if (unlit != null) icon.sharedMaterial = unlit;
             MMF_Player picked = Feedback(root.transform, "Feedback_PickedUp", null, 0f, Sfx("PH_Pickup"), Pattern(HapticIds.TapLight));
             root.AddComponent<IngredientPickup>().Configure(icon, picked);
             return SavePrefab(root, PickupPrefab);

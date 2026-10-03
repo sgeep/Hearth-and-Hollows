@@ -107,6 +107,46 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(perMinute, Is.EqualTo(FreshnessSettings.Default.dungeonLossPerMinute).Within(0.02f), "loses freshness at the delve's rate while carried");
         }
 
+        /// <summary>
+        /// The bug found in step 3's playtest: a bat or spider killed right next to the player dropped its
+        /// parts within reach, and they went straight into the satchel, so nothing seemed to drop. Now a
+        /// harvest pops out in front of the body and can't be picked up until it has landed.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AKillAtYourFeet_PopsItsDropsOutWhereYouSeeThem_BeforeTheyCanBePickedUp()
+        {
+            yield return LoadFloor();
+            EnemyIdentity bat = Enemy("bat");
+            bat.GetComponent<EnemyPerch>()?.Detach();
+            // Open floor in room C, clear of walls and props in every direction.
+            var open = new Vector2(35.5f, 6.3f);
+            Teleport(bat, open + new Vector2(0f, 0.6f));
+            Teleport(Player, open);
+            yield return new WaitForFixedUpdate();
+            Vector2 died = bat.transform.position;
+            Health health = bat.GetComponent<Health>();
+            health.Damage(health.CurrentHealth, Player.gameObject, 0f, 0f, Vector3.zero);
+            yield return null;
+
+            IngredientPickup[] drops = Object.FindObjectsByType<IngredientPickup>().Where(p => p.Count > 0).ToArray();
+            Assert.That(drops, Is.Not.Empty, "the bat dropped its wings");
+            Assert.That(drops.All(d => !d.IsCollectable), "in the air");
+            Assert.That(drops.All(d => d.GetComponentInChildren<SpriteRenderer>().sharedMaterial.shader.name.Contains("Unlit")), "drawn unlit, so they read on a dark floor");
+            float until = Time.time + 0.25f;
+            while (Time.time < until)
+            {
+                Assert.That(Satchel.IsEmpty, "nothing is picked up while it is in the air");
+                yield return null;
+            }
+            yield return WaitUntil(() => drops.All(d => d == null || d.IsCollectable), 1f, "the drops to land");
+            foreach (IngredientPickup drop in drops.Where(d => d != null))
+            {
+                Vector2 landed = drop.transform.position;
+                Assert.That(Vector2.Distance(landed, died), Is.InRange(0.5f, 1.2f), "hopped clear of the body");
+                Assert.That(landed.y, Is.LessThanOrEqualTo(died.y + 0.01f), "in front of it, where a corpse can't hide it");
+            }
+        }
+
         [UnityTest]
         public IEnumerator PartsOnTheFloor_SpoilToo()
         {

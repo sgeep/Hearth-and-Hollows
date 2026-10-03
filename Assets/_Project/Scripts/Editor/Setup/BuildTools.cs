@@ -142,6 +142,36 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>
+        /// Batch entry point (run without -nographics): one of each harvest part lying on the test floor
+        /// near the spawn, at 320×180 with the scene's lighting, to check drops read on the floor.
+        /// </summary>
+        public static void CaptureDropsBatch()
+        {
+            try
+            {
+                EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+                var level = UnityEngine.Object.FindAnyObjectByType<MoreMountains.TopDownEngine.LevelManager>();
+                Vector2 spawn = level.InitialSpawnPoint.transform.position;
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(LookTestContent.PickupPrefab);
+                string[] parts = { "Ingredient_SlimeGel", "Ingredient_BatWing", "Ingredient_SpiderLeg", "Ingredient_VenomSac" };
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    var definition = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/{parts[i]}.asset");
+                    var pickup = UnityEngine.Object.Instantiate(prefab, spawn + new Vector2(1.5f + i * 1.2f, -0.5f), Quaternion.identity)
+                        .GetComponent<Hearthdelve.Dungeon.Harvest.IngredientPickup>();
+                    pickup.Initialize(new Hearthdelve.Shared.Ingredients.IngredientItem(definition, Hearthdelve.Shared.Ingredients.Quality.Standard), 1);
+                }
+                Capture(EditorPaths.TestFloorScene, "BatchLogs/drops.png", reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         /// <summary>Renders the scene's camera to a PNG: at the spawn point by default, or over a given area at 8 px per tile.</summary>
         static void Capture(string scenePath, string output, Vector2? centre = null, int width = 0, int height = 0, bool reopen = true)
         {

@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Random;
@@ -20,8 +21,10 @@ namespace Hearthdelve.Dungeon.Harvest
         [SerializeField] HarvestRulesConfig m_Rules;
         [SerializeField] WeaponDefinition m_Weapon;
         [SerializeField] IngredientPickup m_PickupPrefab;
-        [SerializeField, Min(0f), Tooltip("How far drops scatter from where the enemy died, in tiles.")]
-        float m_Scatter = 0.75f;
+        [SerializeField, Min(0f), Tooltip("How far drops pop out from where the enemy died, in tiles (the furthest; the nearest is 60% of it).")]
+        float m_Scatter = 1.1f;
+        [SerializeField, Min(0f), Tooltip("How long a drop's hop takes, in seconds. It can't be picked up until it lands.")]
+        float m_PopTime = 0.35f;
         [SerializeField, Tooltip("How fast parts spoil on the floor (the delve's freshness settings).")]
         FreshnessConfig m_Freshness;
 
@@ -63,6 +66,32 @@ namespace Hearthdelve.Dungeon.Harvest
             return pickup;
         }
 
+        /// <summary>
+        /// Where drop <paramref name="index"/> of <paramref name="count"/> lands: spread across the half
+        /// circle in front of the body (towards the camera), so a large corpse can't hide it, and away from
+        /// walls and props. Against a wall it tries the sides and behind at full distance before landing
+        /// closer; with no room at all it lands where the enemy died.
+        /// </summary>
+        Vector2 LandingSpot(Vector2 origin, int index, int count)
+        {
+            if (m_Scatter <= 0f) return origin;
+            int obstacles = LayerMask.GetMask(Hearthdelve.Core.Layers.Obstacles);
+            float spread = count <= 1 ? 0.5f : index / (float)(count - 1);
+            float angle = Mathf.Lerp(200f, 340f, spread) + (m_Random.Value() - 0.5f) * 30f;
+            float reach = Mathf.Lerp(0.6f, 1f, m_Random.Value()) * m_Scatter;
+            for (float distance = reach; distance > 0.2f; distance -= 0.25f)
+            {
+                // In front first, then turning towards the sides, then behind.
+                foreach (float turn in new[] { 0f, 50f, -50f, 100f, -100f, 180f })
+                {
+                    float a = (angle + turn) * Mathf.Deg2Rad;
+                    Vector2 spot = origin + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * distance;
+                    if (Physics2D.OverlapCircle(spot, 0.3f, obstacles) == null && Physics2D.Linecast(origin, spot, obstacles).collider == null) return spot;
+                }
+            }
+            return origin;
+        }
+
         IngredientPickup Spawn(IngredientItem item, int count, float freshness, Vector2 position)
         {
             IngredientPickup pickup = Instantiate(m_PickupPrefab, position, Quaternion.identity);
@@ -99,13 +128,14 @@ namespace Hearthdelve.Dungeon.Harvest
 
             HarvestRuleSettings settings = m_Rules != null ? m_Rules.rules : HarvestRuleSettings.Default;
             List<HarvestDrop> drops = HarvestRules.Resolve(definition.harvest, kill, settings, m_Random);
+            int landed = drops.Count(d => !d.Destroyed && d.Count > 0);
+            int index = 0;
             foreach (HarvestDrop drop in drops)
             {
                 EventBus<HarvestFeedback>.Publish(new HarvestFeedback(drop.Item, drop.Count, drop.Flags));
                 if (drop.Destroyed || drop.Count <= 0 || m_PickupPrefab == null) continue;
-
-                Vector2 offset = new Vector2(m_Random.Value() - 0.5f, m_Random.Value() - 0.5f) * (2f * m_Scatter);
-                Spawn(drop.Item, drop.Count, Freshness.Max, e.Position + offset);
+                IngredientPickup pickup = Spawn(drop.Item, drop.Count, Freshness.Max, e.Position);
+                pickup.PopTo(LandingSpot(e.Position, index++, landed), m_PopTime);
             }
         }
     }
