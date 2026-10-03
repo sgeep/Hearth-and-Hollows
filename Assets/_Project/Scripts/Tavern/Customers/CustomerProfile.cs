@@ -47,6 +47,8 @@ namespace Hearthdelve.Tavern.Customers
         [Min(0), Tooltip("Relative chance this type walks in.")]
         public float spawnWeight = 1f;
         public Sprite sprite;
+        [Tooltip("What this kind of customer can look like (layered NPC art). Each customer's look is picked once and kept.")]
+        public NpcAppearancePool appearance;
         [Tooltip("Tint for placeholder art until real sprites exist.")]
         public Color placeholderColor = Color.white;
     }
