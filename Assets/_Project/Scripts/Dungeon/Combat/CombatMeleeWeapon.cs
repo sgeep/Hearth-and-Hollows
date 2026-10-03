@@ -1,4 +1,5 @@
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Haptics;
 using MoreMountains.Feedbacks;
 using MoreMountains.TopDownEngine;
 using UnityEngine;
@@ -58,6 +59,9 @@ namespace Hearthdelve.Dungeon.Combat
             MaxDamageCaused = attack.damage;
             InitialDelay = FrameData.ToSeconds(attack.startupFrames);
             ActiveDuration = FrameData.ToSeconds(attack.activeFrames);
+            // One hit per target per swing: the target stays invincible to this swing until its hitbox closes
+            // (a shorter window let the heavy's 12-frame spin land twice).
+            InvincibilityDuration = FrameData.OneHitInvincibility(ActiveDuration);
             TimeBetweenUses = FrameData.ToSeconds(Mathf.Clamp(attack.cancelFrame, 1, attack.TotalFrames));
             if (isHeavy)
             {
@@ -75,10 +79,13 @@ namespace Hearthdelve.Dungeon.Combat
             // Knockback is the target's HitReaction slide: TDE's force knockback doesn't move our 2D characters.
             Knockback = DamageOnTouch.KnockbackStyles.NoKnockback;
 
+            // The hit's one combined feedback (hit-stop, shake, sound, haptic) takes its sizes from the data.
             if (HitDamageableFeedback is MMF_Player player)
             {
                 MMF_HitStop hitStop = player.GetFeedbackOfType<MMF_HitStop>();
                 if (hitStop != null) hitStop.FreezeFrameDuration = attack.hitStop;
+                MMF_ScreenShake shake = player.GetFeedbackOfType<MMF_ScreenShake>();
+                if (shake != null) shake.Force = attack.screenShake;
             }
         }
 

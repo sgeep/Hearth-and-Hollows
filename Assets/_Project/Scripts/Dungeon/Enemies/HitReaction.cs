@@ -20,6 +20,8 @@ namespace Hearthdelve.Dungeon.Enemies
         EnemyIdentity m_Identity;
         Health m_Health;
         AIBrain m_Brain;
+        // Whether this stagger switched the brain off (it leaves a brain someone else switched off alone).
+        bool m_PausedBrain;
         CharacterMovement m_Movement;
         CharacterSpriteAnimator m_Animator;
         EnemyAttack[] m_Attacks;
@@ -63,7 +65,11 @@ namespace Hearthdelve.Dungeon.Enemies
             m_StaggerUntil = StaggerRules.StaggerUntil(m_StaggerUntil, Time.time, hit.Attack != null ? hit.Attack.staggerTime : 0f, definition.staggerMultiplier);
             if (m_StaggerUntil <= Time.time) return;
             m_Staggered = true;
-            if (m_Brain != null) m_Brain.BrainActive = false;
+            if (m_Brain != null && m_Brain.BrainActive)
+            {
+                m_Brain.BrainActive = false;
+                m_PausedBrain = true;
+            }
             m_Movement?.SetMovement(Vector2.zero);
             m_Animator?.Release();
             m_Animator?.PlayOneShot(CharacterAnim.Hurt);
@@ -108,7 +114,8 @@ namespace Hearthdelve.Dungeon.Enemies
             }
             if (!m_Staggered || Time.time < m_StaggerUntil) return;
             m_Staggered = false;
-            if (m_Brain != null && m_Health != null && m_Health.CurrentHealth > 0f) m_Brain.BrainActive = true;
+            if (m_PausedBrain && m_Brain != null && m_Health != null && m_Health.CurrentHealth > 0f) m_Brain.BrainActive = true;
+            m_PausedBrain = false;
         }
     }
 }

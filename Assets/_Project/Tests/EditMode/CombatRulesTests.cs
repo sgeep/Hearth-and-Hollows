@@ -221,5 +221,13 @@ namespace Hearthdelve.Tests
             Assert.That(spider.AllAttacks.Select(a => a.kind), Is.EquivalentTo(new[] { EnemyAttackKind.Bite, EnemyAttackKind.Spit }));
             Assert.That(spider.keepDistance.x, Is.GreaterThan(spider.attack.maxRange), "the spider backs off past its bite range");
         }
+
+        [Test]
+        public void ASwing_HitsEachTargetOnce_ItsInvincibilityOutlastsTheActiveWindow()
+        {
+            float spin = FrameData.ToSeconds(12);
+            Assert.That(FrameData.OneHitInvincibility(spin), Is.GreaterThan(spin), "a 12-frame spin can't land twice");
+            Assert.That(FrameData.OneHitInvincibility(FrameData.ToSeconds(3)), Is.EqualTo(0.1f), "short swings keep the old minimum");
+        }
     }
 }

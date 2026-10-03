@@ -43,5 +43,8 @@ namespace Hearthdelve.Dungeon.Combat
         public const float FramesPerSecond = 60f;
 
         public static float ToSeconds(int frames) => frames / FramesPerSecond;
+
+        /// <summary>How long a struck target ignores a swing: past the end of its active window, by a frame, so it hits once.</summary>
+        public static float OneHitInvincibility(float activeDuration) => System.Math.Max(0.1f, activeDuration + ToSeconds(1));
     }
 }
