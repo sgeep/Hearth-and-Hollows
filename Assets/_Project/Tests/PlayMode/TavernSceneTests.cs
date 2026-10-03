@@ -39,7 +39,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(NavGrid.Current.Bounds, Is.EqualTo(new RectInt(0, 0, 28, 17)));
             foreach (SpriteRenderer sprite in Object.FindObjectsByType<SpriteRenderer>().Where(r => r.gameObject.layer != LayerMask.NameToLayer("UI")))
             {
-                if (sprite.transform.parent != null && sprite.transform.parent.name == "Highlight") continue;
+                // Overlays (highlights, patience bars, speech bubbles) sit on the Above layer and are unlit on purpose.
+                if (sprite.sortingLayerName == Hearthdelve.Core.SortingLayers.Above) continue;
                 Assert.That(sprite.sharedMaterial.name, Does.StartWith("Sprite-Lit"), $"{sprite.name} uses the lit sprite material");
             }
         }
@@ -70,7 +71,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Furniture_StopsThePlayerInFront_AndDrawsBehindThem()
         {
             yield return Load(Scene);
-            string[] pieces = { "Bar", "Kitchen", "Cauldron", "Pass", "Table1", "Table3", "Chair1W", "Chair4E" };
+            string[] pieces = { "Bar", "Kitchen", "Cauldron", "Pass", "Table1", "Table3", "Chair1W", "Chair3E" };
             foreach (string name in pieces)
             {
                 GameObject piece = GameObject.Find(name);
