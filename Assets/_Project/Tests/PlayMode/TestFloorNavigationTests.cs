@@ -86,10 +86,11 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Load(TestFloorScene);
             Player.CharacterHealth.DamageDisabled();
 
-            var slimes = new List<EnemyIdentity>(Object.FindObjectsByType<EnemyIdentity>());
-            Assert.That(slimes, Is.Not.Empty);
-            EnemyIdentity slime = slimes[0];
-            for (int i = 1; i < slimes.Count; i++) Object.Destroy(slimes[i].gameObject);
+            var enemies = new List<EnemyIdentity>(Object.FindObjectsByType<EnemyIdentity>());
+            EnemyIdentity slime = enemies.Find(e => e.GetComponent<EnemyAttack>().Settings.kind == EnemyAttackKind.Leap);
+            Assert.That(slime, Is.Not.Null, "the test floor has a slime");
+            foreach (EnemyIdentity other in enemies)
+                if (other != slime) Object.Destroy(other.gameObject);
 
             Teleport(Player, Point(to));
             Teleport(slime, Point(from));
@@ -102,6 +103,8 @@ namespace Hearthdelve.Tests.PlayMode
             AIBrain brain = character.CharacterBrain;
             brain.Target = Player.transform;
             brain.TransitionToState("Chase");
+            // Only the chase is under test: no leaping at the end of it.
+            foreach (EnemyAttack attack in slime.GetComponents<EnemyAttack>()) attack.enabled = false;
             var action = slime.GetComponent<AIActionPathfindToTarget2D>();
             Assert.That(action, Is.Not.Null, "the slime chases with the pathfinding action");
 

@@ -295,8 +295,9 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator EnemyContact_DrainsEssence_WithOneCombinedFeedback()
+        public IEnumerator EnemyAttack_DrainsEssence_WithOneCombinedFeedback()
         {
+            // Enemies hurt only with telegraphed attacks (4b); touching one is harmless.
             var damaged = new List<CharacterDamaged>();
             EventBus<CharacterDamaged>.Subscribe(damaged.Add);
             yield return Load(DungeonScene);
@@ -305,8 +306,12 @@ namespace Hearthdelve.Tests.PlayMode
 
             float before = Essence.CurrentHealth;
             EnemyIdentity slime = Object.FindAnyObjectByType<EnemyIdentity>();
-            Teleport(slime, Player.transform.position);
-            yield return WaitUntil(() => damaged.Any(d => d.TargetIsPlayer), 1.5f, "the slime to hurt the player");
+            Teleport(slime, (Vector2)Player.transform.position + new Vector2(1.5f, 0f));
+            yield return new WaitForSeconds(0.3f);
+            Assert.That(damaged.Any(d => d.TargetIsPlayer), Is.False, "standing next to a slime is harmless");
+            var leap = slime.GetComponent<EnemyAttack>();
+            Assert.That(leap.Begin(Player.transform), "the slime leaps at the player");
+            yield return WaitUntil(() => damaged.Any(d => d.TargetIsPlayer), 2f, "the slime's leap to hurt the player");
 
             CharacterDamaged hit = damaged.First(d => d.TargetIsPlayer);
             Assert.That(hit.Target, Is.SameAs(Player.gameObject));
@@ -583,7 +588,8 @@ namespace Hearthdelve.Tests.PlayMode
                 Renderer[] renderers = Object.FindObjectsByType<Renderer>(FindObjectsInactive.Include)
                     .Where(r => r is SpriteRenderer || r is UnityEngine.Tilemaps.TilemapRenderer).ToArray();
                 Assert.That(renderers, Is.Not.Empty, scene);
-                foreach (Renderer renderer in renderers)
+                // The one exception: an enemy's "!" telegraph is unlit, so it reads in the dark (CLAUDE.md, Lighting).
+                foreach (Renderer renderer in renderers.Where(r => r.name != "Alert"))
                     Assert.That(renderer.sharedMaterial != null ? renderer.sharedMaterial.shader.name : "none", Is.EqualTo(litShader), $"{scene}/{renderer.name}");
 
                 Light2D[] lights = Object.FindObjectsByType<Light2D>();
