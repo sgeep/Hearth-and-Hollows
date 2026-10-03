@@ -19,6 +19,7 @@ namespace Hearthdelve.UI.Localization
         public const string StationTap = "station.tap";
         public const string StationServing = "station.serving";
         public const string StationStewPot = "station.stew_pot";
+        public const string StationPass = "station.pass";
 
         public const string HudTime = "tavern.hud.time";
         public const string HudGold = "tavern.hud.gold";
@@ -36,6 +37,8 @@ namespace Hearthdelve.UI.Localization
         public const string TicketStewWaiting = "ticket.stew_waiting";
 
         public const string HintCook = "tavern.hint.cook";
+        public const string HintUse = "tavern.hint.use";
+        public const string TavernControls = "tavern.controls";
         public const string HintPickUp = "tavern.hint.pick_up";
         public const string HintServe = "tavern.hint.serve";
         public const string HintPutBack = "tavern.hint.put_back";
@@ -80,6 +83,7 @@ namespace Hearthdelve.UI.Localization
             (PrepOpen, "Open the doors"),
 
             (StationGrill, "Grill"),
+            (StationPass, "The pass"),
             (StationTap, "Tap"),
             (StationServing, "Serving"),
             (StationStewPot, "Stew Pot"),
@@ -100,6 +104,8 @@ namespace Hearthdelve.UI.Localization
             (TicketStewWaiting, "Waiting on the pot"),
 
             (HintCook, "{0}: cook {1}"),
+            (HintUse, "{0}: {1}"),
+            (TavernControls, "Move: WASD / stick   Use: E / A"),
             (HintPickUp, "{0}: pick up {1}"),
             (HintServe, "{0}: serve {1}"),
             (HintPutBack, "{0}: put {1} back on the pass"),

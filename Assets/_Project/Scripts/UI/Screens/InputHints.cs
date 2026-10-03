@@ -16,5 +16,8 @@ namespace Hearthdelve.UI.Screens
         }
 
         public static string Interact() => Binding(InputMaps.Dungeon, DungeonActions.Interact);
+
+        /// <summary>The tavern's Interact key or button, as shown in hints.</summary>
+        public static string TavernInteract() => Binding(InputMaps.Tavern, TavernActions.Interact);
     }
 }
