@@ -3,6 +3,8 @@ using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Dungeon.Combat;
 using Hearthdelve.Dungeon.Enemies;
+using Hearthdelve.Shared.Inventory;
+using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Run;
 using UnityEngine;
 
@@ -20,6 +22,8 @@ namespace Hearthdelve.Dungeon.Harvest
         [SerializeField] IngredientPickup m_PickupPrefab;
         [SerializeField, Min(0f), Tooltip("How far drops scatter from where the enemy died, in tiles.")]
         float m_Scatter = 0.75f;
+        [SerializeField, Tooltip("How fast parts spoil on the floor (the delve's freshness settings).")]
+        FreshnessConfig m_Freshness;
 
         IRandom m_Random = new SeededRandom();
 
@@ -29,11 +33,42 @@ namespace Hearthdelve.Dungeon.Harvest
             set => m_Scatter = Mathf.Max(0f, value);
         }
 
-        public void Configure(HarvestRulesConfig rules, WeaponDefinition weapon, IngredientPickup pickupPrefab)
+        /// <summary>The scene's harvest system, if it has one.</summary>
+        public static HarvestSystem Instance { get; private set; }
+
+        public void Configure(HarvestRulesConfig rules, WeaponDefinition weapon, IngredientPickup pickupPrefab, FreshnessConfig freshness = null)
         {
             m_Rules = rules;
             m_Weapon = weapon;
             m_PickupPrefab = pickupPrefab;
+            m_Freshness = freshness;
+        }
+
+        void Awake() => Instance = this;
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
+        /// <summary>
+        /// Puts a stack on the floor at <paramref name="position"/> (a part swapped out of the satchel).
+        /// <paramref name="droppedBy"/> won't pick it straight back up until they step off it.
+        /// </summary>
+        public IngredientPickup Drop(IngredientStack stack, Vector2 position, SatchelCarrier droppedBy)
+        {
+            if (stack.IsEmpty || m_PickupPrefab == null) return null;
+            IngredientPickup pickup = Spawn(stack.Item, stack.Count, stack.Freshness, position);
+            if (droppedBy != null) pickup.IgnoreUntilLeft(droppedBy);
+            return pickup;
+        }
+
+        IngredientPickup Spawn(IngredientItem item, int count, float freshness, Vector2 position)
+        {
+            IngredientPickup pickup = Instantiate(m_PickupPrefab, position, Quaternion.identity);
+            pickup.Initialize(item, count, freshness);
+            pickup.SetFreshnessRules(m_Freshness != null ? m_Freshness.freshness : FreshnessSettings.Default);
+            return pickup;
         }
 
         /// <summary>Tests pass a seeded random for repeatable drops.</summary>
@@ -70,8 +105,7 @@ namespace Hearthdelve.Dungeon.Harvest
                 if (drop.Destroyed || drop.Count <= 0 || m_PickupPrefab == null) continue;
 
                 Vector2 offset = new Vector2(m_Random.Value() - 0.5f, m_Random.Value() - 0.5f) * (2f * m_Scatter);
-                IngredientPickup pickup = Instantiate(m_PickupPrefab, e.Position + offset, Quaternion.identity);
-                pickup.Initialize(drop.Item, drop.Count);
+                Spawn(drop.Item, drop.Count, Freshness.Max, e.Position + offset);
             }
         }
     }
