@@ -194,7 +194,7 @@ namespace Hearthdelve.UI.Localization
         {
             (HudEssence, "Essence"),
             (HudSatchel, "Satchel"),
-            (HudSatchelFull, "Satchel full — press {0} to swap"),
+            (HudSatchelFull, "Satchel full: press {0} to swap"),
 
             (HarvestCleanKill, "Clean kill!"),
             (HarvestOverkill, "Overkill!"),
@@ -220,7 +220,7 @@ namespace Hearthdelve.UI.Localization
             (SlotCount, "×{0}"),
 
             (DeathTitle, "Your Essence Fades"),
-            (DeathSubtitle, "The dungeon casts you back to the surface. Choose one slot to save in your Lockbox — its whole stack is kept, the rest of the haul is lost."),
+            (DeathSubtitle, "The dungeon casts you back to the surface. Choose one slot to save in your Lockbox. Its whole stack is kept; the rest of the haul is lost."),
             (DeathSubtitleEmpty, "The dungeon casts you back to the surface. Your satchel is empty."),
             (DeathSelected, "Lockbox: {0} ×{1}"),
             (DeathSelectedNone, "Lockbox: nothing"),

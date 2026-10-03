@@ -116,6 +116,20 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.Destroyed | Hearthdelve.Shared.Run.HarvestFlags.Overkill), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestDestroyed));
         }
 
+        /// <summary>
+        /// The web build has only Unity's built-in font (no system fallback), which lacks glyphs past Latin-1:
+        /// an em dash showed as a gap there. Until a real font exists, UI strings stay within Latin-1.
+        /// </summary>
+        [Test]
+        public void EveryUiString_UsesOnlyCharactersTheWebBuildCanDraw()
+        {
+            var all = Hearthdelve.UI.Localization.LocKeys.English
+                .Concat(Hearthdelve.UI.Localization.TavernLocKeys.English)
+                .Concat(Hearthdelve.UI.Localization.LoopLocKeys.English);
+            foreach (var (key, english) in all)
+                Assert.That(english.Where(c => c > 'ÿ'), Is.Empty, $"{key}: \"{english}\"");
+        }
+
         /// <summary>Nothing on the HUD covers anything else at 320×180: bar, label, satchel, feed, prompts, the debug label.</summary>
         [UnityTest]
         public IEnumerator HudAndPrompts_NeverOverlap()

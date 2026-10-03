@@ -71,7 +71,7 @@ namespace Hearthdelve.UI.Localization
             (MorningBreakfastRow, "{0} · {1}"),
             (MorningNoBreakfast, "Nothing in the storeroom makes a breakfast."),
             (MorningAte, "Ate {0}: {1}"),
-            (MorningCooking, "Cooking breakfast…"),
+            (MorningCooking, "Cooking breakfast..."),
             (MorningLoadout, "Today's delve bonuses: +{0} satchel slots · +{1} max Essence · Essence drain {2}%"),
             (MorningDescend, "Descend into the dungeon"),
 
