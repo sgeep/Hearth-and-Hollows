@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-03 (4c step 2: customers and Pip)_
+_Last updated: 2026-10-03 (4c step 3: dish icons)_
 
 ## How art gets into the project
 
@@ -181,6 +181,22 @@ Not sliced: a small red cushion (122,26 4×4).
 | `KitchenWorking` (256×32, 8 frames of 32×32) | The same kitchen at work: fire under the oven, sizzling pans and smoke. For the Grill in use (4c step 3) |
 
 The pack's `Characters/KitchenWorking_<race>` sheets are unclothed base bodies working at the kitchen (arms raised), like Carrying Animations: they don't fit the clothed stand-in.
+
+## Dish icons (→ `CraftingAndProfessions/DishIcons`, `PotionIcons`)
+
+8×8 icons on an 8 px grid, shown on the pass, over a carrier's head and in a waiting customer's bubble.
+
+| Recipe | Icon | Source |
+|---|---|---|
+| Cellar Kebab | `MeatSkewer` 64,8 | Crafting And Professions II `Craftable_Item_Icons/…Recipes.png` (160×80): row 1 is skewers and roasts, row 2 braised plates, row 3 sushi, rows 5–7 bread, burgers, pies and the like, row 8 seven soup bowls |
+| Shroom Skewer | `GreenSkewer` 96,8 | same |
+| Grilled Spider Leg | `Drumstick` 136,8 | same |
+| Cellar Stew | `BrownStew` 40,64 | same |
+| Offal Pottage | `RedStew` 64,64 | same |
+| Core Tonic | `BlueFlask` 72,40 | Crafting And Professions I `Craftable_Item_Icons/…PotionIcons.png` (216×152): vials, round flasks and gems in many colours |
+| Gelbrew | `GreenFlask` 72,56 | same |
+
+**No tankards or ale glasses** on any icon sheet: the Tap's drinks are potion flasks for now. (The Tavern Indoor `Glasses` row is decor, not an icon.) *More Food Recipes* (exclusive, 104×72) has more skewers, sushi and dishes.
 
 ## Fire (Dwarven Kingdom → `DwarvenKingdom/`)
 

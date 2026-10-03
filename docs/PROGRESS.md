@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 2)_
+_Last updated: 2026-10-03 (4c step 3)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -364,7 +364,23 @@ Decisions (2026-10-03):
 - **Walking behind the Grill and Stew Pot,** for immersion: this reverses the step 1 change that walled them off. There's a tile of floor behind the range again (reached round its east end), and the cauldron moved half a tile forward so a full tile is clear behind it. Stations can now be used from more than one spot: both highlight and work from the front or from behind, where the player is drawn behind them, like a cook at the stove. Staff still work from the front.
 - Tests: Pip stands still, idle and without turning at the post; queueing customers stand still; the Grill and Stew Pot each have a walkable, reachable spot behind them that targets and highlights them.
 
-**Next: step 3,** stations and serving. After your review and playtest of step 2.
+**Step 2 approved (2026-10-03).** Layered looks and deterministic appearance kept as they are; aisle overlap, the idle pose when seated and Pip's stand-in accepted for now.
+
+**Step 3 done (2026-10-03), awaiting review and playtest: stations, the pass, serving and Pip's jobs.**
+
+- **Cooking** (the prototype's rules, top-down): using the Grill or Tap cooks the next order there in its **panel** over the room (uGUI and Super Text Mesh); using the empty **Stew Pot** puts a batch on and opens the **chop** board; the pot then simmers on its own and ladles helpings onto the pass. While a panel is open the Minigame input map is on and walking is off; Esc steps away and the order (or the stew's ingredients) goes back. The kitchen plays its working animation while anyone cooks at the Grill. The stew pot shows a bar while it simmers and a pip per helping.
+- **Hints say what Interact will do:** "E: cook Kebab", "E: pick up Gelbrew", "E: serve Kebab", "They ordered Cellar Stew", "Cellar Stew is simmering", "Pip is working here".
+- **The pass** shows up to four waiting plates. Using it picks up the next one (or puts the carried one back).
+- **Serving in 2D** (decision 2): the dish's icon shows in a bubble over the keeper's head, with a spill meter above it once anything spills. The keeper walks at the carry speed (4 tiles/s; 6 without a plate). Customers walking across the floor bump the plate: the faster you close on each other the more it spills, and a full meter drops it (the order goes back to the kitchen if the stock allows). Seated customers become targets while you carry a plate: gold corners round them, "serve" if it's their dish, otherwise what they ordered. The score compares your time with par for the **shortest walkable path** from where you picked the plate up to where you served it, so wandering costs quality. `ServingMinigame` was rewritten for 2D (positions belong to the world now) with new EditMode tests; the tuning was redone for the top-down room (`ServingConfig`).
+- **Pip** does their job: at the Grill, Tap or Stew Pot they stand at it and cook through the ported staff logic (lower quality, capped); the keeper can't use a station Pip is working. On Serving they take plates someone is waiting for from the pass and walk them over at a speed set by their skill (bumps count for them too), and take a plate back if its customer leaves or is served first.
+- **Dish icons** for all seven recipes (`ASSET_MAP.md`); waiting customers now show their order in their bubble.
+- **Readability with several people moving:** the carried plate sits in its bubble at the same height as customers' bubbles, clear of the head, with its spill meter above; patience bars sit lower. In captures with five customers and the keeper carrying, plates, bubbles and patience bars stay distinct. The open panel covers the lower part of the room (customers there are hidden while you cook); worth your eye in the playtest.
+- **Tests:**
+  - EditMode: 2D serving (the shortest way scores 1, wandering scores less, par comes from the shortest path to where it was served, bumps spill, harder bumps spill more, a full meter drops, the cooldown), staff serving slower at lower skill.
+  - PlayMode (`TavernServiceTests`): the Grill cooks an order in its panel with the Minigame map on and walking off, the kitchen works, and the plate shows on the pass; stepping away puts the order back; carrying shows the plate, slows the keeper, and serving the right customer starts them eating; the pass takes a plate back; walking customers spill and finally drop a plate; the Stew Pot chops, simmers, shows five helpings and ladles one to the pass; Pip on Serving carries and serves; Pip at the Grill cooks while the keeper can't take over.
+- One 4a test's lit-sprite exemption now covers markers on the Above layer (the tavern player prefab carries the plate overlay); the 4a scenes are untouched.
+
+**Next: step 4,** Prep, the Tavern HUD and Results. After your review and playtest of step 3.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
