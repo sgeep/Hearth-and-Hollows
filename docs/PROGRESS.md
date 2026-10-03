@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 3)_
+_Last updated: 2026-10-03 (4c step 3; design direction recorded)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -31,8 +31,10 @@ Each is planned, approved, built and playtested separately. The web build must w
 | 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
 | 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. |
 | 4f | Tavern Stage 1 content | Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement. |
-| 4g | Story, quests and character creation | Dialogue System for Unity and Quest Machine with a Super Text Mesh presenter, Minifantasy Portrait Generator portraits, architecture and hooks for Love/Hate later; the Act I opening, onboarding, character creation. (Locked 2026-10-03; replaces Yarn Spinner.) |
+| 4g | Story, quests and character creation | Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is decided when 4g is planned (in 4g or later, depending on whether it has been bought and suits the slice). (Locked 2026-10-03; Dialogue System replaces Yarn Spinner entirely.) |
 | 4h | Menus, options and polish | Settings (screen shake, flash and vibration intensity), accessibility per GDD 12, audio system, web build. |
+
+**Design direction recorded (2026-10-03, documentation only).** `CLAUDE.md` and the GDD (v0.3) now record the design philosophy (GDD §1.5), tavern immersion as a pillar (§6.5), preparation depth for rare dishes (§5.4), persistent quests (§2.6), relationships and recurring patrons (§2.7), the Pixel Crushers ownership boundary and save authority (§10.3, §10.6), and Portrait Generator portraits (§8.1). Roadmap consequences: 4g's scope is spelled out above. **4c's approved scope is unchanged:** the Grill, Tap, Stew Pot and serving work continues as planned, and nothing from Dialogue System, Quest Machine, Love/Hate or the Portrait Generator is imported or built before 4g. Multi-stage dishes are long-term direction, considered when 4f or a later milestone is planned.
 
 ### 4a status: complete
 
@@ -384,9 +386,11 @@ Decisions (2026-10-03):
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
-### Open design questions (4a)
+### Open design questions (Phase 4)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
+2. **Patron requests in 4f versus quests in 4g** (raised 2026-10-03): 4f lists "customer requests", but persistent requests for parts or ingredients are now quests owned by Quest Machine (GDD §2.6), which arrives in 4g. Either 4f's requests stay within one evening (special orders owned by the tavern), with persistent requests moving to 4g, or 4f builds them behind a Hearthdelve interface that Quest Machine takes over in 4g. To decide before 4f is planned.
+3. **Love/Hate timing:** in 4g or later, decided when 4g is planned.
 
 ### Decided at the end of 4a (2026-10-02)
 

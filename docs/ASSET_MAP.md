@@ -261,3 +261,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No mallet or frying-pan weapon.**
 - **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
 - **No rope-climb animation for a clothed body** (only the base bodies): extraction rises and fades.
+
+## Portraits (planned for 4g; not yet inspected)
+
+NPC dialogue portraits will come from the **Minifantasy Portrait Generator** (GDD §8.1). When 4g begins, find it through the catalog, inspect it, and record here the workflow for producing a portrait and every portrait imported, as for any other sheet. Nothing is imported yet.

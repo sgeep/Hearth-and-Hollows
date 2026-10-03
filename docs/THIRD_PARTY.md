@@ -22,6 +22,17 @@ Rules for working with these are in `CLAUDE.md` ("Third-party code"). The repo s
 | Super Text Mesh (Kai Clavier) | version not stated in the package | `Assets/Clavian/SuperTextMesh` | Unity Asset Store EULA, plus `3rdPartyComponentLicense.txt` | All player-facing text (uGUI and world space), Ultra shader under URP |
 | Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, Crafting And Professions II 1.0, Dwarven Kingdom 1.0, and the Tavern Indoor, Loot Icons, Giant Spider and Hole Entrances And Ropes exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
 
+### Licensed or planned, not imported
+
+Listed so nobody mistakes them for missing installs. Versions and license notes are added to the table above when each is actually imported.
+
+| Asset | Status | When |
+|---|---|---|
+| Dialogue System for Unity (Pixel Crushers) | Licensed, not imported | 4g. Replaces Yarn Spinner, which is not used. |
+| Quest Machine (Pixel Crushers) | Licensed, not imported | 4g |
+| Love/Hate (Pixel Crushers) | Planned, not purchased | Decided when 4g is planned |
+| Minifantasy Portrait Generator (Krishna Palacio) | Planned, not imported | 4g; recorded in `docs/ASSET_MAP.md` when inspected |
+
 ### License notes
 
 - **TopDown Engine:** code and visual assets may be used in our game; nothing may be redistributed. Its music is demo-only and must not be reused. The license does not grant reuse of its sound effects either, so we don't ship any TDE audio.
