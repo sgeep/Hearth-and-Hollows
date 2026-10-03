@@ -100,10 +100,52 @@ namespace Hearthdelve.Editor
             }
         }
 
-        /// <summary>Renders the scene's camera to a PNG: at the spawn point by default, or over a given area at 8 px per tile.</summary>
-        static void Capture(string scenePath, string output, Vector2? centre = null, int width = 0, int height = 0)
+        /// <summary>
+        /// Batch entry point (run without -nographics): the test floor with the swap prompt open over
+        /// sample satchel contents, so its layout can be checked without the editor.
+        /// </summary>
+        public static void CaptureSwapPromptBatch()
         {
-            EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            try
+            {
+                EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+                var screen = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Screens.SwapPromptScreen>(FindObjectsInactive.Include);
+                var leg = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>(EditorPaths.Ingredients + "/Ingredient_SpiderLeg.asset");
+                var wing = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>(EditorPaths.Ingredients + "/Ingredient_BatWing.asset");
+                var sac = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>(EditorPaths.Ingredients + "/Ingredient_VenomSac.asset");
+                var gel = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>(EditorPaths.Ingredients + "/Ingredient_SlimeGel.asset");
+                var satchel = new Hearthdelve.Shared.Inventory.Satchel(6, 3);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(wing, Hearthdelve.Shared.Ingredients.Quality.Standard), 2, 0.9f);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(leg, Hearthdelve.Shared.Ingredients.Quality.Fine), 3, 0.6f);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(gel, Hearthdelve.Shared.Ingredients.Quality.Poor), 1, 0.3f);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(sac, Hearthdelve.Shared.Ingredients.Quality.Premium), 1, 1f);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(wing, Hearthdelve.Shared.Ingredients.Quality.Fine), 1, 0.8f);
+                satchel.Add(new Hearthdelve.Shared.Ingredients.IngredientItem(leg, Hearthdelve.Shared.Ingredients.Quality.Standard), 2, 0.95f);
+                var incoming = new Hearthdelve.Shared.Inventory.IngredientStack(new Hearthdelve.Shared.Ingredients.IngredientItem(sac, Hearthdelve.Shared.Ingredients.Quality.Fine), 1, 1f);
+                typeof(Hearthdelve.UI.Screens.SwapPromptScreen).GetMethod("Open", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.Invoke(screen, new object[] { new Hearthdelve.Shared.Run.SwapPromptRequested(satchel, incoming, _ => { }) });
+                screen.Slots[1].OnSelect(null);
+                Canvas canvas = screen.GetComponentInParent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = Camera.main;
+                canvas.planeDistance = 1f;
+                canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
+                canvas.sortingOrder = 100;
+                foreach (var text in canvas.GetComponentsInChildren<SuperTextMesh>(true)) text.Rebuild();
+                Capture(EditorPaths.TestFloorScene, "BatchLogs/swap_prompt.png", reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        /// <summary>Renders the scene's camera to a PNG: at the spawn point by default, or over a given area at 8 px per tile.</summary>
+        static void Capture(string scenePath, string output, Vector2? centre = null, int width = 0, int height = 0, bool reopen = true)
+        {
+            if (reopen) EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
             var level = UnityEngine.Object.FindAnyObjectByType<LevelManager>();
             GameObject player = null;
             if (level != null && level.PlayerPrefabs.Length > 0 && level.InitialSpawnPoint != null)
@@ -134,6 +176,10 @@ namespace Hearthdelve.Editor
             if (centre.HasValue) camera.transform.position = new Vector3(centre.Value.x, centre.Value.y, -10f);
             var target = new RenderTexture(width, height, 24) { filterMode = FilterMode.Point };
             camera.targetTexture = target;
+            // Canvases drawn through the camera lay out for its target, not the batch "screen".
+            foreach (var scaler in UnityEngine.Object.FindObjectsByType<UnityEngine.UI.CanvasScaler>())
+                typeof(UnityEngine.UI.CanvasScaler).GetMethod("Handle", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(scaler, null);
+            Canvas.ForceUpdateCanvases();
             camera.Render();
             RenderTexture.active = target;
             var image = new Texture2D(target.width, target.height, TextureFormat.RGBA32, false);

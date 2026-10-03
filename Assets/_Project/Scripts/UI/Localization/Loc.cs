@@ -117,7 +117,7 @@ namespace Hearthdelve.UI.Localization
             _ => string.Empty,
         };
 
-        /// <summary>"Fine Rat Haunch" / "Fine Rat Haunch (Seared)".</summary>
+        /// <summary>"Fine Spider Leg" / "Fine Spider Leg (Seared)".</summary>
         public static string ItemName(IngredientItem item)
         {
             if (!item.IsValid) return string.Empty;
@@ -168,6 +168,7 @@ namespace Hearthdelve.UI.Localization
         public const string SwapTitle = "swap.title";
         public const string SwapSubtitle = "swap.subtitle";
         public const string SwapCancel = "swap.cancel";
+        public const string SwapSlotDetail = "swap.slot_detail";
 
         public const string LookTestResolution = "looktest.resolution";
         public const string LookTestResolutionPixel = "looktest.resolution_pixel";
@@ -215,6 +216,7 @@ namespace Hearthdelve.UI.Localization
             (SwapTitle, "Satchel Full"),
             (SwapSubtitle, "Found {0} ×{1}. Choose a slot to drop for it."),
             (SwapCancel, "Leave it"),
+            (SwapSlotDetail, "{0} ×{1}, {2}% fresh"),
 
             (LookTestResolution, "{0}×{1}  (F2)   Scrolling: smooth (F4)"),
             (LookTestResolutionPixel, "{0}×{1}  (F2)   Scrolling: pixel-perfect (F4)"),

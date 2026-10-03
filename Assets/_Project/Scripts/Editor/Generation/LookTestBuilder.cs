@@ -11,6 +11,7 @@ using Hearthdelve.Dungeon.Run;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Haptics;
+using Hearthdelve.Shared.Inventory;
 using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Hud;
 using Hearthdelve.UI.Localization;
@@ -67,6 +68,7 @@ namespace Hearthdelve.Editor
             public HapticLibrary Library;
             public GameObject Player, TavernPlayer, Slime, Bat, Spider, Pickup, Cook;
             public HarvestRulesConfig HarvestRules;
+            public FreshnessConfig Freshness;
             public WeaponDefinition Cleaver;
         }
 
@@ -102,6 +104,8 @@ namespace Hearthdelve.Editor
             var harvestRules = LookTestContent.Load<HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset");
             var cleaverDefinition = LookTestContent.Load<WeaponDefinition>($"{EditorPaths.Weapons}/Weapon_ButchersCleaver.asset");
             DungeonContent.BuildData(cleaverDefinition);
+            IngredientContent.Build();
+            var freshness = LookTestContent.Load<FreshnessConfig>($"{EditorPaths.Config}/FreshnessConfig.asset");
 
             GameObject cleaver = LookTestContent.BuildCleaver(cleaverDefinition);
             GameObject heavy = DungeonContent.BuildHeavy(cleaverDefinition);
@@ -115,7 +119,7 @@ namespace Hearthdelve.Editor
             {
                 Actions = actions, Library = library, Player = player, TavernPlayer = tavernPlayer,
                 Slime = enemies.Slime, Bat = enemies.Bat, Spider = enemies.Spider,
-                Pickup = pickup, Cook = cookPrefab, HarvestRules = harvestRules, Cleaver = cleaverDefinition,
+                Pickup = pickup, Cook = cookPrefab, HarvestRules = harvestRules, Cleaver = cleaverDefinition, Freshness = freshness,
             };
         }
 
@@ -426,7 +430,7 @@ namespace Hearthdelve.Editor
             return material;
         }
 
-        internal static LocalizedSuperText Text(Transform parent, string name, string key, float size, Color color, TextAnchor anchor,
+        public static LocalizedSuperText Text(Transform parent, string name, string key, float size, Color color, TextAnchor anchor,
             Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 sizeDelta)
         {
             var prefab = Resources.Load<GameObject>("STMPrefabs/Super Text");
@@ -456,7 +460,7 @@ namespace Hearthdelve.Editor
             return localized;
         }
 
-        internal static RectTransform UIRect(Transform parent, string name, Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 size)
+        public static RectTransform UIRect(Transform parent, string name, Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 size)
         {
             var go = new GameObject(name, typeof(RectTransform));
             var rect = (RectTransform)go.transform;

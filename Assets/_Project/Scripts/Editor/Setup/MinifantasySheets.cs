@@ -71,6 +71,7 @@ namespace Hearthdelve.Editor
         const string k_Slime = k_Creatures + "/Slimes/Green_Slime";
         const string k_Dungeon = "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets";
         const string k_Tavern = "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers";
+        const string k_ClassicUI = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/Classic_Minifantasy_UI";
         const string k_Emotions = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Character_Emotions";
         const string k_Loot = "All_Exclusives_20261002/Icons/8x8px/Loot_Icons";
         const string k_Cooker = "Minifantasy_AMyriadOfNPCs_v.1.0/Minifantasy_NPCs_Assets/Premade_NPCs/Cooker";
@@ -181,6 +182,19 @@ namespace Hearthdelve.Editor
                 },
             });
             sheets.Add(new Sheet { Source = $"{k_Loot}/LootIcons.png", Pack = LootIcons, File = "LootIcons", Mode = SliceMode.Grid, Cell = new Vector2Int(Tile, Tile) });
+            // Panels and slots (UI Overhaul, Classic style): the swap prompt, and later the HUD and death screen.
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_ClassicUI}/_Classic_UI.png", Pack = UIOverhaul, File = "ClassicUI", Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("Panel", 64, 48, 48, 48, k_Centre, new Vector4(8, 8, 8, 8)),
+                    new SheetRect("Bar", 64, 16, 48, 16, k_Centre, new Vector4(6, 6, 6, 6)),
+                    // A 14×14 slot, and the same slot with a marker tab on top for the selected one.
+                    new SheetRect("Slot", 561, 30, 14, 17),
+                    new SheetRect("SlotSelected", 593, 30, 14, 17),
+                },
+            });
             // The red "!" over an enemy winding up an attack (User Interface pack, GUI emoticons; 16 px cells).
             sheets.Add(new Sheet
             {

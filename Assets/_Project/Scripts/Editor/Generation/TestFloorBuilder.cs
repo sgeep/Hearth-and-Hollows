@@ -140,7 +140,7 @@ namespace Hearthdelve.Editor
             }
 
             GameObject managers = LookTestBuilder.Managers(HearthdelveInputManager.GameplayMap.Dungeon, content.Library, content.Player, spawn);
-            managers.AddComponent<HarvestSystem>().Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>());
+            managers.AddComponent<HarvestSystem>().Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
             managers.AddComponent<NavGrid>().Configure(new RectInt(0, 0, Width, Height), LayerMask.GetMask(Layers.Obstacles));
             PixelPerfectCamera camera = LookTestBuilder.Cameras(new Color(0.05f, 0.05f, 0.07f));
             LookTestBuilder.Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global);
@@ -194,6 +194,7 @@ namespace Hearthdelve.Editor
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out CanvasScaler scaler);
             LookTestBuilder.AddEssenceBar(canvas);
+            DungeonUI.BuildSwapPrompt(canvas);
             LookTestBuilder.Overlay(canvas, scaler, camera, LocKeys.TestFloorHint, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
 
             LookTestBuilder.ApplyLighting(dungeon: true);
@@ -227,6 +228,21 @@ namespace Hearthdelve.Editor
                 new GameObject("TimeManager").AddComponent<MoreMountains.Feedbacks.MMTimeManager>();
             Transform enemies = GameObject.Find("Enemies")?.transform ?? new GameObject("Enemies").transform;
             ValidatePerches();
+            // Step 3: parts spoil on the floor, and the satchel-full hint and swap prompt.
+            HarvestSystem harvest = Object.FindAnyObjectByType<HarvestSystem>();
+            if (harvest != null)
+            {
+                harvest.Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>(), content.Freshness);
+                EditorUtility.SetDirty(harvest);
+            }
+            Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).FirstOrDefault(c => c.name == "UI");
+            if (canvas != null)
+            {
+                // Generated UI: rebuilt each time, so layout changes reach the existing scene.
+                var old = Object.FindAnyObjectByType<Hearthdelve.UI.Screens.SwapPromptScreen>(FindObjectsInactive.Include);
+                if (old != null) Object.DestroyImmediate(old.gameObject);
+                DungeonUI.BuildSwapPrompt(canvas);
+            }
             var placed = new System.Collections.Generic.HashSet<Transform>();
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
