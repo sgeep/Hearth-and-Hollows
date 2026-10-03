@@ -86,7 +86,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 ## Workflow rules
 
 - Work one milestone at a time. Phase 4 is split into sub-milestones 4a–4h (see `docs/PROGRESS.md`); each is planned, approved, built and playtested separately. At the start of each, propose a plan (systems, files, tests, what I'll need to do in the editor) and wait for approval.
-- The pivot lives on the branch `pivot/top-down`. **Merge to `main` only after I approve the 4a look test.** Until then, push `pivot/top-down` to the private GitHub repo (`origin`) at the end of each work session; after the merge, push `main`.
+- The pivot branch `pivot/top-down` was merged into `main` on 2026-10-02, after the 4a look test was approved. Work now happens on `main`; push `main` to the private GitHub repo (`origin`) at the end of each work session. Keep `pivot/top-down` and the `v0-sidescroller-prototype` tag; do not delete or move them.
 - Commit in small, logical steps with clear messages. The repo uses Git with Unity's standard `.gitignore` and Git LFS for art and audio.
 - Keep `docs/PROGRESS.md` updated: what's done, what's next, known issues, and any open design questions.
 - If a GDD detail is ambiguous or a design choice would be expensive to reverse, ask me rather than guessing.

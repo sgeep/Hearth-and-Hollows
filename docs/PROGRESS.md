@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-02 (4a final checks)_
+_Last updated: 2026-10-02 (4a complete)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -16,7 +16,7 @@ Before Phase 4 the game changed from a side-scroller to a **top-down action rogu
 The core loop, Harvest system, Essence, ingredients, recipes, tavern minigames, economy and story are unchanged. Design details are in `docs/GDD.md` (v0.2); working rules are in `CLAUDE.md`.
 
 - The side-scroller prototype (Phases 1–3) is preserved at the tag **`v0-sidescroller-prototype`** and checked out read-only at `C:\Dev\Hearthdelve-v0`.
-- The pivot is on the branch **`pivot/top-down`**. It merges to `main` only after the 4a look test is approved.
+- The pivot was built on the branch **`pivot/top-down`** and merged into `main` on 2026-10-02, after the 4a look test was approved. Work continues on `main`.
 - Everything below the "Phase 1–3 history" heading describes the prototype at that tag, not the current project.
 
 ### Sub-milestones
@@ -25,7 +25,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 
 | | Sub-milestone | Contents |
 |---|---|---|
-| **4a** | Integration and look test | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
+| **4a** | Integration and look test (**complete**, 2026-10-02) | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
 | 4b | Dungeon migration | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. |
 | 4c | Tavern and UI migration | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. |
 | 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
@@ -34,7 +34,10 @@ Each is planned, approved, built and playtested separately. The web build must w
 | 4g | Story and character creation | Yarn Spinner with an STM dialogue presenter, the Act I opening, onboarding. |
 | 4h | Menus, options and polish | Settings (screen shake, flash and vibration intensity), accessibility per GDD 12, audio system, web build. |
 
-### 4a status
+### 4a status: complete
+
+**Approved on 2026-10-02** and merged into `main`. Locked by the approval: **320×180 at 8 PPU**, and **URP 2D lit sprites** as the visual baseline (CLAUDE.md, GDD §8.1). Next: the 4b plan, awaiting approval.
+
 
 **Done:**
 
@@ -97,7 +100,7 @@ Tests, all passing in batch mode with 0 compiler warnings in our code:
 - **Clipping into the bar from below.** Not movement through a collider: the bar's collider ended at the counter, 6 px above the bottom of its art (its stool row), so a player stopped below the counter was already behind the bar's sort point and drew behind it. The table sets had the same gap (their collider covered only the table, not the chairs). Each furniture piece now carries its own collision, and every footprint ends exactly at the bottom of its art. This is the rule for all solid furniture and props (CLAUDE.md, Y-sorting). The existing tavern scene was updated in place (*Hearthdelve → Generate → Update Tavern Furniture Collision*), not rebuilt.
 - **The project was not running URP.** Graphics Settings pointed at a render pipeline asset that doesn't exist: the 2026-10-02 project swap kept the old repo's `UniversalRP.asset.meta`, which gave the asset a different GUID. Unity fell back to the Built-in pipeline without any error, in the editor, the tests and every build. On the web this showed up as missing text: build-time shader stripping removed every URP-tagged shader, Super Text Mesh's included. `ProjectConfigurator` now assigns `Assets/Settings/UniversalRP.asset`, and an EditMode test guards it. The look did not change at that point, because the generated sprites still used the unlit default sprite material; they are lit now (see "Decided at the end of 4a").
 
-**Before 4a sign-off:** your final visual check of the lit look test. Nothing in 4b starts, and nothing merges to `main`, until then.
+**4a sign-off:** the lit look test was approved on 2026-10-02 after the final visual check.
 
 ### Checks made for the pivot
 
