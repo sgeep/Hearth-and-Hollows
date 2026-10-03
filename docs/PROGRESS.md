@@ -230,6 +230,12 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Test floor** updated in place: the delve controller, the rope (`R` on the map), and the exit hint, death screen and result screen on its canvas (all generated UI, rebuilt on each update).
 - **Tests (PlayMode, test floor):** the heartbeat starts below the threshold, repeats with its haptic, speeds up as Essence falls and stops once restored, with the bar's low state following; death opens the Lockbox screen after the death animation (paused, UI input only, text showing the choice), keyboard choice keeps only that whole stack and the result says what was lost; "Keep nothing" loses the whole haul; an empty satchel still gets the screen; climbing the rope shows the hint, can't be drained or hurt, and brings the whole satchel home; each ends with "Delve again" giving a fresh floor with input and time restored.
 
+**Step 4 playtest fixes (2026-10-03):**
+
+- **Freeze at the rope.** Being pushed in and out of the rope's trigger (by the slime and spider nearby) hid and showed the exit hint inside physics callbacks; Super Text Mesh rebuilt its text there, which Unity forbids, and logged an error every physics step until the editor bogged down. Hints are now raised only from `Update` (the rope and the satchel-full hint), and hint views fade a `CanvasGroup` instead of switching the text off.
+- **Slime and bat pushing the player.** They chased right into the player and shoved them; the bat was then always inside its swoop's minimum range and only attacked if the player moved. They now keep a stand-off from their data like the spider (`keepDistance`: slime holds at 1.2 tiles, bat hovers 1.4–2.6 and backs off if crowded), applied at runtime from the definition. Attacks now need only line of sight: the old body-sized check refused leaps near walls and props, which is why the slime only attacked "after a while".
+- Regression tests: a still player is attacked by the slime and the bat without being shoved; being pushed in and out of the rope's trigger logs nothing and the hint still follows.
+
 **Next: step 5,** the dungeon HUD. After your review and playtest of step 4.
 
 ### Open design questions (4a)

@@ -26,6 +26,12 @@ namespace Hearthdelve.Dungeon.Enemies
                 health.InitializeCurrentHealth();
             }
             if (TryGetComponent(out CharacterMovement movement)) movement.WalkSpeed = m_Definition.moveSpeed;
+            // How it closes in: from the data, so tuning the definition changes the chase.
+            if (TryGetComponent(out Hearthdelve.Shared.Engine.AIActionPathfindToTarget2D chase))
+            {
+                chase.KeepDistance = m_Definition.keepDistance;
+                chase.Flutter = m_Definition.flutter;
+            }
         }
     }
 }

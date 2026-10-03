@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
   m_Name: Enemy_Bat
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
-  schema: 2
+  schema: 3
   id: bat
   displayName:
     m_TableReference:
@@ -29,7 +29,7 @@ MonoBehaviour:
   knockbackMultiplier: 1.3
   staggerMultiplier: 1.2
   superArmorWhileAttacking: 0
-  keepDistance: {x: 0, y: 0}
+  keepDistance: {x: 1.4, y: 2.6}
   flutter: 0.55
   startsAsleep: 1
   wakeRange: 4

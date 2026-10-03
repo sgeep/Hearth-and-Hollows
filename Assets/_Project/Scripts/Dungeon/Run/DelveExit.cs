@@ -37,27 +37,27 @@ namespace Hearthdelve.Dungeon.Run
         void OnTriggerEnter2D(Collider2D other) => Enter(other);
         void OnTriggerStay2D(Collider2D other) => Enter(other);
 
+        // Physics callbacks only note who is here; the hint changes in Update. Raising it from here made the
+        // UI rebuild text during a physics callback, which Unity forbids, every step the player was pushed
+        // in and out of the trigger.
         void Enter(Collider2D other)
         {
-            if (IsClimbing || !other.TryGetComponent(out SatchelCarrier carrier)) return;
-            m_Inside = carrier;
-            SetHint(true);
+            if (!IsClimbing && other.TryGetComponent(out SatchelCarrier carrier)) m_Inside = carrier;
         }
 
         void OnTriggerExit2D(Collider2D other)
         {
-            if (!other.TryGetComponent(out SatchelCarrier carrier) || carrier != m_Inside) return;
-            m_Inside = null;
-            SetHint(false);
+            if (other.TryGetComponent(out SatchelCarrier carrier) && carrier == m_Inside) m_Inside = null;
         }
 
         void OnDisable() => SetHint(false);
 
         void Update()
         {
-            if (m_Inside == null || IsClimbing || m_Inside.IsPrompting) return;
             DelveRunController run = DelveRunController.Active;
-            if (run == null || run.IsEnding) return;
+            bool canClimb = m_Inside != null && !IsClimbing && !m_Inside.IsPrompting && run != null && !run.IsEnding;
+            SetHint(canClimb);
+            if (!canClimb) return;
             var health = m_Inside.GetComponent<Health>();
             if (health != null && health.CurrentHealth <= 0f) return;
             var interact = InputMaps.Find(InputMaps.Dungeon, DungeonActions.Interact);

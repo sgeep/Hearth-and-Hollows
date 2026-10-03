@@ -59,7 +59,7 @@ namespace Hearthdelve.UI.Screens
             }
             if (m_LeaveIt != null) m_LeaveIt.onClick.AddListener(() => Choose(-1));
             if (m_Panel != null) m_Panel.SetActive(false);
-            if (m_Hint != null) m_Hint.SetActive(false);
+            HintVisibility.Init(m_Hint);
         }
 
         void OnEnable()
@@ -77,7 +77,7 @@ namespace Hearthdelve.UI.Screens
         void OnHint(SatchelFullHint hint)
         {
             if (m_Hint == null) return;
-            m_Hint.SetActive(hint.Visible && !IsOpen);
+            HintVisibility.Set(m_Hint, hint.Visible && !IsOpen);
             if (hint.Visible && m_HintText != null) m_HintText.Set(LocKeys.HudSatchelFull, InputHints.Interact());
         }
 
@@ -85,7 +85,7 @@ namespace Hearthdelve.UI.Screens
         {
             m_Satchel = request.Satchel;
             m_OnChosen = request.OnChosen;
-            if (m_Hint != null) m_Hint.SetActive(false);
+            HintVisibility.Set(m_Hint, false);
             IngredientStack incoming = request.Incoming;
             if (m_Subtitle != null) m_Subtitle.Set(LocKeys.SwapSubtitle, Loc.ItemName(incoming.Item), incoming.Count);
             if (m_IncomingIcon != null)

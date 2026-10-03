@@ -60,6 +60,23 @@ namespace Hearthdelve.Editor
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>
+        /// Stand-off distances for the slime and the bat (schema 3, after the step 4 playtest): closing
+        /// right in, they pushed the player around, and the bat was always too close to swoop.
+        /// </summary>
+        public static void BuildStandOff()
+        {
+            foreach (var (path, standOff) in new[] { (SlimeDefinitionPath, new Vector2(0f, 1.2f)), (BatDefinitionPath, new Vector2(1.4f, 2.6f)) })
+            {
+                var definition = AssetDatabase.LoadAssetAtPath<EnemyDefinition>(path);
+                if (definition == null || definition.schema >= 3) continue;
+                if (definition.keepDistance == Vector2.zero) definition.keepDistance = standOff;
+                definition.schema = 3;
+                EditorUtility.SetDirty(definition);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         static HeavyChargeStep Heavy(float chargeTime, string name, float damage, float diameter, float knockback, float stagger, float hitStop) => new()
         {
             chargeTime = chargeTime,

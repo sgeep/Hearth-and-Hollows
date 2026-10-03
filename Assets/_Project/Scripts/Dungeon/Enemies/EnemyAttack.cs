@@ -129,17 +129,16 @@ namespace Hearthdelve.Dungeon.Enemies
             return Settings.kind == EnemyAttackKind.Bite || ClearLine(target.position);
         }
 
-        // Leaps, swoops and webs need a clear straight line: no jumping through walls or round corners.
+        // Leaps, swoops and webs need line of sight: no telegraphing an attack through a wall or round a
+        // corner. Only the line, not the whole body: walls stop a leap anyway, and a body-sized check refused
+        // attacks whenever the player stood near a wall or prop.
         bool ClearLine(Vector2 targetFeet)
         {
             NavGrid grid = NavGrid.Current;
             if (grid == null) return true;
             Vector2 feet = transform.position;
             Vector2 body = m_Collider != null ? (Vector2)m_Collider.bounds.center : feet;
-            Vector2 half = Settings.kind == EnemyAttackKind.Spit
-                ? Vector2.one * 0.15f
-                : m_Collider != null ? (Vector2)m_Collider.bounds.extents : Vector2.zero;
-            return GridSweep.IsClear(grid.Map, grid.Space, body, targetFeet + (body - feet), half);
+            return GridSweep.IsClear(grid.Map, grid.Space, body, targetFeet + (body - feet), Vector2.one * 0.15f);
         }
 
         /// <summary>Starts the telegraph against <paramref name="target"/>. False if the attack can't start.</summary>

@@ -318,6 +318,37 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(stray.transform.Find("Model/Shadow").gameObject.activeSelf, "a hovering bat keeps its shadow");
         }
 
+        /// <summary>
+        /// The step 4 playtest: the slime and bat chased right into the player and shoved them around,
+        /// and the bat was then too close to ever swoop. Now they hold off at their stand-off distance and
+        /// attack a player who doesn't move at all.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator SlimeAndBat_HoldOffInsteadOfPushing_AndAttackAStillPlayer([Values("green_slime", "bat")] string enemyId)
+        {
+            yield return Setup(enemyId, new Vector2(5f, 0f));
+            Essence.GodMode = true;
+            Vector2 standing = Player.transform.position;
+            EnemyAttack attack = Enemy.GetComponent<EnemyAttack>();
+            bool telegraphed = false;
+            attack.PhaseChanged += phase => telegraphed |= phase == EnemyAttackPhase.Telegraph;
+            AIBrain brain = Enemy.GetComponent<Character>().CharacterBrain;
+            brain.Target = Player.transform;
+            brain.BrainActive = true;
+            brain.TransitionToState("Chase");
+
+            float closest = float.MaxValue;
+            float until = Time.time + 6f;
+            while (!telegraphed && Time.time < until)
+            {
+                closest = Mathf.Min(closest, Vector2.Distance(Enemy.transform.position, Player.transform.position));
+                yield return null;
+            }
+            Assert.That(telegraphed, $"the {enemyId} attacked a player who stood still");
+            Assert.That(Vector2.Distance(Player.transform.position, standing), Is.LessThan(0.1f), $"the {enemyId} didn't shove the player while closing in");
+            Assert.That(closest, Is.GreaterThanOrEqualTo(Enemy.Definition.keepDistance.x * 0.8f), "it kept its stand-off");
+        }
+
         [UnityTest]
         public IEnumerator Spider_BacksOffToKeepItsDistance()
         {

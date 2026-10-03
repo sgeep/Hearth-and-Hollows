@@ -105,6 +105,7 @@ namespace Hearthdelve.Editor
             var cleaverDefinition = LookTestContent.Load<WeaponDefinition>($"{EditorPaths.Weapons}/Weapon_ButchersCleaver.asset");
             DungeonContent.BuildData(cleaverDefinition);
             IngredientContent.Build();
+            DungeonContent.BuildStandOff();
             var freshness = LookTestContent.Load<FreshnessConfig>($"{EditorPaths.Config}/FreshnessConfig.asset");
 
             GameObject cleaver = LookTestContent.BuildCleaver(cleaverDefinition);

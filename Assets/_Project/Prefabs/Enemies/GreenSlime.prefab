@@ -228,10 +228,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332436244791306
-  - rid: 2696332436244791307
-  - rid: 2696332436244791308
-  - rid: 2696332436244791309
+  - rid: 2696332443401584652
+  - rid: 2696332443401584653
+  - rid: 2696332443401584654
+  - rid: 2696332443401584655
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -247,11 +247,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332436244791306
+    - rid: 2696332443401584652
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 292012683
+        UniqueID: -837411943
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -325,11 +325,11 @@ MonoBehaviour:
         Target: {fileID: 1311485745654185247}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332436244791307
+    - rid: 2696332443401584653
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -17003454
+        UniqueID: -1449914995
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -401,11 +401,11 @@ MonoBehaviour:
         Owner: {fileID: 8711654767875629837}
         DebugActive: 0
         Force: 0.35
-    - rid: 2696332436244791308
+    - rid: 2696332443401584654
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 758058199
+        UniqueID: 1417989880
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -527,11 +527,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332436244791309
+    - rid: 2696332443401584655
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -1993291078
+        UniqueID: -1875851318
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
@@ -1275,7 +1275,7 @@ MonoBehaviour:
   RepathInterval: 0.25
   StopDistance: 0.1
   NearestOpenCellRadius: 3
-  KeepDistance: {x: 0, y: 0}
+  KeepDistance: {x: 0, y: 1.2}
   Flutter: 0
   FlutterFrequency: 1.6
 --- !u!114 &2466344065302073249
@@ -1513,8 +1513,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332436244791310
-  - rid: 2696332436244791311
+  - rid: 2696332443401584656
+  - rid: 2696332443401584657
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1530,11 +1530,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332436244791310
+    - rid: 2696332443401584656
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 533568223
+        UniqueID: 134299312
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -1608,11 +1608,11 @@ MonoBehaviour:
         Target: {fileID: 1311485745654185247}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332436244791311
+    - rid: 2696332443401584657
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1539446094
+        UniqueID: -1960767991
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0

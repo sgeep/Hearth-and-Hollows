@@ -203,6 +203,30 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExpectFreshFloor(result);
         }
 
+        /// <summary>
+        /// The step 4 playtest freeze: pushed in and out of the rope's trigger by enemies, the exit hint was
+        /// toggled inside physics callbacks, and Super Text Mesh logged an error (rebuilding text there is
+        /// forbidden) every physics step. Any error fails this test.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator BeingPushedInAndOutOfTheRope_LogsNothing_AndTheHintFollows()
+        {
+            yield return LoadFloor();
+            var exit = Object.FindAnyObjectByType<DelveExit>();
+            var hint = Object.FindAnyObjectByType<ExitHintView>(FindObjectsInactive.Include);
+            Vector2 at = exit.transform.position;
+            for (int i = 0; i < 40; i++)
+            {
+                Teleport(Player, i % 2 == 0 ? at : at + new Vector2(2f, 0f));
+                yield return new WaitForFixedUpdate();
+            }
+            Teleport(Player, at);
+            yield return WaitUntil(() => hint.IsShown, 1f, "the hint at the rope");
+            Assert.That(hint.gameObject.activeInHierarchy, "the hint view is never switched off, only faded");
+            Teleport(Player, at + new Vector2(3f, 0f));
+            yield return WaitUntil(() => !hint.IsShown, 1f, "the hint to go when stepping away");
+        }
+
         [UnityTest]
         public IEnumerator Extraction_UpTheRope_TakesTheWholeSatchelHome()
         {

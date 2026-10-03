@@ -90,7 +90,7 @@ namespace Hearthdelve.Dungeon.Enemies
         public bool superArmorWhileAttacking;
 
         [Header("Movement")]
-        [Tooltip("Keeps between these distances from the player (min, max). Zero: closes in.")]
+        [Tooltip("Stand-off from the player, centre to centre (min, max): closes in to max, holds there while it can see the player, backs off inside min. Zero closes right in (and pushes the player).")]
         public Vector2 keepDistance;
         [Range(0f, 1f), Tooltip("Erratic side-to-side wobble while chasing (the bat).")]
         public float flutter;

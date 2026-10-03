@@ -53,7 +53,7 @@ namespace Hearthdelve.Dungeon.Harvest
             FreshnessSettings freshness = Freshness;
             Satchel.Decay(freshness, freshness.dungeonLossPerMinute * Time.deltaTime / 60f);
 
-            if (m_Blocked == null) SetHint(false);
+            SetHint(m_Blocked != null && !IsPrompting);
             if (IsPrompting || m_Blocked == null) return;
             var interact = InputMaps.Find(InputMaps.Dungeon, DungeonActions.Interact);
             if (interact != null && interact.WasPressedThisFrame()) OpenSwapPrompt();
@@ -65,11 +65,8 @@ namespace Hearthdelve.Dungeon.Harvest
             if (IsPrompting || pickup == null) return 0;
             int left = Satchel.Add(pickup.Item, pickup.Count, pickup.Freshness);
             int taken = pickup.Count - left;
-            if (left > 0)
-            {
-                m_Blocked = pickup;
-                SetHint(true);
-            }
+            // The hint follows in Update: this runs inside a physics callback.
+            if (left > 0) m_Blocked = pickup;
             else if (m_Blocked == pickup)
             {
                 m_Blocked = null;

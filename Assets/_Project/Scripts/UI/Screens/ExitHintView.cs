@@ -11,7 +11,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] GameObject m_Hint;
         [SerializeField] LocalizedSuperText m_Text;
 
-        public bool IsShown => m_Hint != null && m_Hint.activeSelf;
+        public bool IsShown => HintVisibility.IsShown(m_Hint);
 
         public void Configure(GameObject hint, LocalizedSuperText text)
         {
@@ -19,10 +19,7 @@ namespace Hearthdelve.UI.Screens
             m_Text = text;
         }
 
-        void Awake()
-        {
-            if (m_Hint != null) m_Hint.SetActive(false);
-        }
+        void Awake() => HintVisibility.Init(m_Hint);
 
         void OnEnable() => EventBus<DelveExitHint>.Subscribe(OnHint);
         void OnDisable() => EventBus<DelveExitHint>.Unsubscribe(OnHint);
@@ -30,7 +27,7 @@ namespace Hearthdelve.UI.Screens
         void OnHint(DelveExitHint hint)
         {
             if (m_Hint == null) return;
-            m_Hint.SetActive(hint.Visible);
+            HintVisibility.Set(m_Hint, hint.Visible);
             if (hint.Visible) m_Text?.Set(LoopLocKeys.HudExit, InputHints.Interact());
         }
     }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
   m_Name: Enemy_GreenSlime
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
-  schema: 1
+  schema: 3
   id: green_slime
   displayName:
     m_TableReference:
@@ -29,7 +29,7 @@ MonoBehaviour:
   knockbackMultiplier: 1
   staggerMultiplier: 1
   superArmorWhileAttacking: 1
-  keepDistance: {x: 0, y: 0}
+  keepDistance: {x: 0, y: 1.2}
   flutter: 0
   startsAsleep: 0
   wakeRange: 3.5
@@ -45,7 +45,6 @@ MonoBehaviour:
     damage: 10
     hitboxOffset: {x: 0, y: 0.2}
     hitboxSize: {x: 0.8, y: 0.6}
-    knockbackForce: 5
     animation: 2
     releaseFrame: 1
     travelDistance: 3.5
