@@ -29,7 +29,23 @@ namespace Hearthdelve.UI.Tavern
         {
             if (m_Hint == null) return;
             HintVisibility.Set(m_Hint, hint.Visible);
-            if (hint.Visible) m_Text?.Set(TavernLocKeys.HintUse, InputHints.TavernInteract(), Loc.UI(hint.NameKey));
+            if (!hint.Visible || m_Text == null) return;
+            TavernHint h = hint.Hint;
+            string key = InputHints.TavernInteract();
+            string dish = h.Dish != null ? Loc.Get(h.Dish.displayName) : string.Empty;
+            switch (h.Kind)
+            {
+                case TavernHintKind.Cook: m_Text.Set(TavernLocKeys.HintCook, key, dish); break;
+                case TavernHintKind.PickUp: m_Text.Set(TavernLocKeys.HintPickUp, key, dish); break;
+                case TavernHintKind.Serve: m_Text.Set(TavernLocKeys.HintServe, key, dish); break;
+                case TavernHintKind.PutBack: m_Text.Set(TavernLocKeys.HintPutBack, key, dish); break;
+                case TavernHintKind.WrongDish: m_Text.Set(TavernLocKeys.HintWrongDish, dish); break;
+                case TavernHintKind.StartStew: m_Text.Set(TavernLocKeys.HintStartStew, key, dish); break;
+                case TavernHintKind.Simmering: m_Text.Set(TavernLocKeys.HintSimmering, dish); break;
+                case TavernHintKind.StewReady: m_Text.Set(TavernLocKeys.HintStewReady, dish, h.Count); break;
+                case TavernHintKind.Staffed: m_Text.Set(TavernLocKeys.HintStaffed, h.Staff != null ? Loc.Get(h.Staff.displayName) : string.Empty); break;
+                default: m_Text.Set(TavernLocKeys.HintUse, key, Loc.UI(h.NameKey)); break;
+            }
         }
     }
 }

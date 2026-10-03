@@ -16,6 +16,7 @@ namespace Hearthdelve.Tavern.Scene
         readonly List<TavernInteractable> m_Targets = new();
         TavernInteractable m_Target;
         bool m_HintShown;
+        TavernHint m_ShownHint;
 
         /// <summary>What Interact would use now, if anything.</summary>
         public TavernInteractable Target => m_Target;
@@ -54,20 +55,22 @@ namespace Hearthdelve.Tavern.Scene
                 if (m_Target != null) m_Target.SetHighlighted(true);
                 PublishHint();
             }
-            else if (!m_HintShown && m_Target != null) PublishHint();
+            // The same target can say something new (a plate reached the pass): publish when the words change.
+            else if (m_Target != null && (!m_HintShown || !m_Target.Hint.Equals(m_ShownHint))) PublishHint();
         }
 
         void PublishHint()
         {
             m_HintShown = m_Target != null;
-            EventBus<TavernInteractHint>.Publish(new TavernInteractHint(m_HintShown, m_Target != null ? m_Target.NameKey : null));
+            m_ShownHint = m_Target != null ? m_Target.Hint : default;
+            EventBus<TavernInteractHint>.Publish(new TavernInteractHint(m_HintShown, m_ShownHint));
         }
 
         void OnDisable()
         {
             if (m_Target != null) m_Target.SetHighlighted(false);
             m_Target = null;
-            if (m_HintShown) EventBus<TavernInteractHint>.Publish(new TavernInteractHint(false, null));
+            if (m_HintShown) EventBus<TavernInteractHint>.Publish(new TavernInteractHint(false, default));
             m_HintShown = false;
         }
     }

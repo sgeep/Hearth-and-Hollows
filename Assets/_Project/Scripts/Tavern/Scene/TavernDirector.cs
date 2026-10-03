@@ -5,6 +5,7 @@ using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
+using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
 using UnityEngine;
@@ -50,6 +51,8 @@ namespace Hearthdelve.Tavern.Scene
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
         public StaffDefinition StaffMember => m_Content != null && m_Content.staff.Count > 0 ? m_Content.staff[0] : null;
         public bool IsServing => Session != null && !Session.IsOver;
+        /// <summary>Makes the station minigames (and serving) from the tavern's tuning.</summary>
+        public MinigameFactory Minigames { get; private set; }
         /// <summary>Stops scheduled arrivals (tests, debugging); customers can still be let in with <see cref="SpawnCustomer"/>.</summary>
         public bool ArrivalsPaused { get; set; }
 
@@ -72,13 +75,15 @@ namespace Hearthdelve.Tavern.Scene
             m_Layout.SetActiveSeats(ActiveSeats);
             m_EveningSeed = m_Seed != 0 ? m_Seed : Environment.TickCount;
             m_Random = new SeededRandom(m_EveningSeed);
+            Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving,
+                m_Content.stew != null ? m_Content.stew.chop : ChopSettings.Default);
             // Pip starts the evening carrying plates (the prototype's playtest: most useful there).
             StaffAssignment = StaffMember != null ? StaffStation.Serving : StaffStation.None;
         }
 
         void Start()
         {
-            if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, m_Layout);
+            if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
             if (m_AutoOpen) OpenDebugEvening();
         }
 
@@ -96,6 +101,22 @@ namespace Hearthdelve.Tavern.Scene
                 if (recipe != null && m_Menu.Count < m_Content.service.service.maxMenuSize && RecipeMatcher.CanCook(recipe, Storeroom))
                     m_Menu.Add(recipe);
             OpenService();
+        }
+
+        /// <summary>Sets tonight's menu (up to the menu size) while the doors are closed (the prep screen, step 4; tests).</summary>
+        public void SetMenu(IEnumerable<RecipeDefinition> recipes)
+        {
+            if (IsServing) return;
+            m_Menu.Clear();
+            foreach (RecipeDefinition recipe in recipes)
+                if (recipe != null && !m_Menu.Contains(recipe) && m_Menu.Count < m_Content.service.service.maxMenuSize) m_Menu.Add(recipe);
+        }
+
+        /// <summary>Puts Pip on a job (the prep screen, step 4; tests). They walk to its post and start at once.</summary>
+        public void AssignStaff(StaffStation station)
+        {
+            StaffAssignment = StaffMember != null ? station : StaffStation.None;
+            if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
         }
 
         public void OpenService()

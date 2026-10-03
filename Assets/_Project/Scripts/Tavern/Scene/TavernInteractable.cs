@@ -49,6 +49,14 @@ namespace Hearthdelve.Tavern.Scene
         public bool IsAvailable => m_Available && isActiveAndEnabled;
         public bool IsHighlighted => m_Highlight != null && m_Highlight.activeSelf;
 
+        /// <summary>
+        /// What the hint says while this is the target. Set by the service (the station's state decides);
+        /// unset, it's a plain "use" hint with the name.
+        /// </summary>
+        public Func<TavernHint> Describe { get; set; }
+
+        public TavernHint Hint => Describe != null ? Describe() : TavernHint.Use(m_NameKey);
+
         /// <summary>Raised when the player uses it.</summary>
         public event Action<TavernInteractable> Used;
 

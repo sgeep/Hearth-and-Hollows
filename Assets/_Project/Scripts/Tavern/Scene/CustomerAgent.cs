@@ -45,6 +45,8 @@ namespace Hearthdelve.Tavern.Scene
         public AppearanceChoice Appearance { get; private set; }
         /// <summary>Walking across the floor (for serving bumps, step 3).</summary>
         public bool IsWalking => !IsSeated && m_Controller != null && m_Controller.CurrentMovement.sqrMagnitude > 0.01f;
+        /// <summary>Walking velocity (tiles per second); zero when seated or standing.</summary>
+        public Vector2 Velocity => IsWalking ? (Vector2)m_Controller.CurrentMovement : Vector2.zero;
         public Vector2 Goal => m_Goal != null ? (Vector2)m_Goal.position : (Vector2)transform.position;
         public LayeredSpriteAnimator Look => m_Look;
         public bool ShowsPatience => m_PatienceFill != null && m_PatienceFill.enabled;
