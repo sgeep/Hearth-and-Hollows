@@ -174,12 +174,13 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
   3. **Smooth:** rendered at screen resolution; the camera and characters move in screen pixels on every frame. Art stays crisp, but nothing is held on the art grid, and 2D lighting is rendered at full resolution (softer).
   `CameraFollowTests` checks that every mode keeps the player fixed on screen and measures how often the world moves.
 
+  **Decision (2026-10-02): smooth scrolling.** After comparing the three modes, smooth fixed the diagonal judder completely and is now the locked default (CLAUDE.md, GDD §8.1). All three scenes were switched in place (*Hearthdelve → Generate → Update Look Test Camera*), and the generators build it. The player's pixel snapping is off by default; F4 keeps the pixel-perfect and half-pixel modes for comparison only, and the pixel-perfect mode keeps its stepping regression test.
+
 **Next: step 2,** the damage pipeline, heavy attack, hit-stop, simple knockback and stagger, and the three enemies with telegraphs.
 
 ### Open design questions (4a)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
-2. **Scroll mode** (raised in 4b): keep pixel-perfect scrolling, or move to half-pixel or smooth scrolling (F4 to compare). Changing it changes the locked camera rules in CLAUDE.md, so it waits for a decision after playtesting.
 
 ### Decided at the end of 4a (2026-10-02)
 

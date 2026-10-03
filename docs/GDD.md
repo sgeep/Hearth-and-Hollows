@@ -345,7 +345,7 @@ The inn plays the role the cult plays in *Cult of the Lamb*. It grows across the
 
 All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×8 grid.
 
-- **Resolution:** 320×180 reference at 8 pixels per unit; 1 world unit = 1 tile = 8 px. Pixel Perfect Camera. Locked after the 4a look test (2026-10-02).
+- **Resolution:** 320×180 reference at 8 pixels per unit; 1 world unit = 1 tile = 8 px. Pixel Perfect Camera with integer zoom and smooth scrolling (the view is not snapped to the art-pixel grid, so the camera and characters move in screen pixels). Resolution locked after the 4a look test; smooth scrolling chosen in 4b (2026-10-02).
 - **Characters:** 32×32 frames with a body of about 8×8, four diagonal facings.
 - **Sorting:** sprites sort by Y position, with pivots at the feet.
 - **Palette and lighting:** warm, saturated tavern (amber candlelight, wood, hearth) against cool, eerie dungeons (teal, violet, bioluminescence). Sprites are lit with URP 2D lights: this is the visual baseline. Each environment has an ambient light plus local lights (hearth and candles in the tavern; torches, and later bioluminescence, in the dungeon), always keeping characters, enemies and pickups readable.
@@ -443,7 +443,7 @@ Unity 6.6 now, moving to 6.7 LTS when it is released and staying there through l
 
 ### 10.1 Engine Configuration and Third-Party Assets
 
-- **Render Pipeline:** URP with the 2D Renderer and 2D lights; sprites and tilemaps use the lit sprite material. Pixel Perfect Camera at 320×180, 8 PPU. Custom transparency sort axis (0, 1, 0).
+- **Render Pipeline:** URP with the 2D Renderer and 2D lights; sprites and tilemaps use the lit sprite material. Pixel Perfect Camera at 320×180, 8 PPU, smooth scrolling (no grid snapping). Custom transparency sort axis (0, 1, 0).
 - **TopDown Engine 5.0 (TDE):** character controller, abilities (movement, dash, weapons), combat, enemy AI, camera and rooms. It replaces the custom kinematic controller.
 - **MMFeedbacks / MMTools** (bundled with TDE): all game feel. There is only one copy; Feel's copies are never imported.
 - **Nice Vibrations** (from Feel): haptics.
