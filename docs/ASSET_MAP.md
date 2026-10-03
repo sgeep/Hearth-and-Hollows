@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-02 (4b test floor)_
+_Last updated: 2026-10-02 (4b step 2: enemies and heavy attack)_
 
 ## How art gets into the project
 
@@ -33,8 +33,10 @@ Shadows are separate sheets with the same layout, drawn under the body.
 
 | Use | Pack (folder) | Sheets | Frames per row | Notes |
 |---|---|---|---|---|
-| Player (look test) | Creatures → `Creatures/` | `HumanTownsfolk` Idle, Walk, Attack, Dmg, Jump, SpinDie; `ShadowHumanoid…` | 16, 4, 4, 4, 4, 12 | Jump is used for the dodge roll and has **one row** (its shadow sheet has four). ChargedAttack (6 frames × 3 rows) is not imported yet. |
-| Green Slime | Creatures → `Creatures/` | `SlimeGreen` Idle, JumpAttack, Dmg, Die; `ShadowSlime…` | 8, 4, 4, 9 | JumpAttack doubles as its movement animation. |
+| Player | Creatures → `Creatures/` | `HumanTownsfolk` Idle, Walk, Attack, Dmg, Jump, SpinDie, ChargedAttack; `ShadowHumanoid…` | 16, 4, 4, 4, 4, 12, 6 | Jump is used for the dodge roll and has **one row** (its shadow sheet has four). **ChargedAttack's three rows are stages, not facings:** wind-up, the charged loop (sparkles), and a 360° spin release, the same for every facing. It is the heavy attack. |
+| Green Slime | Creatures → `Creatures/` | `SlimeGreen` Idle, JumpAttack, Dmg, Die; `ShadowSlime…` | 8, 4, 4, 9 | JumpAttack is its movement (200 ms) and, faster (100 ms), its leap attack. |
+| Bat | Creatures (Beasts) → `Creatures/` | `Bat` FlyIdle, Attack, Dmg, Die, Sleep; `ShadowBat` Fly, Attack, Dmg, Die, Sleep | 2, 4, 4, 9, 8 | FlyIdle (64×128) is both idle and flight. **BatSleep's three rows are stages:** hanging asleep (8 frames), waking (5), falling asleep (5). The swoop lands on Attack frame 2. |
+| Giant Spider | Exclusive `Creatures/Giant_Spider` → `GiantSpider/` | `GiantSpider` Idle, Walk, Attack, Dmg, Die, ShotWebDiagonal; shadows Idle, Walk, Attack, Dmg, Die, WebShot | 17, 6, 7, 4, 33, 14 | No frame-timing notes in the pack: 100 ms throughout. The body is about 20 px wide (legs spread wider), so its collider is the body only (0.9×0.5 tiles) and it fits through doorways. The bite lands on Attack frame 4; the web leaves on ShotWebDiagonal frame 9. `ShotWebOrthogonal` exists for the four straight directions; we only draw four diagonal facings, so it is not imported. |
 | Tavern cook (NPC) | A Myriad of NPCs → `AMyriadOfNPCs/` | `CookerIdle` | 16 | Premade NPC. Walk, Dmg, Die and Working (8 frames × 1 row) exist but are not imported. |
 
 **Player body: placeholder choice.** The Human Townsfolk is a clothed body with a full attack set, picked so the look test shows a dressed character. The Dungeon pack's "Human" is an unclothed base body. The final protagonist (a pre-clothed body with palette swaps) is still to be chosen; True Heroes and the Weapons pack are the candidates.
@@ -116,11 +118,16 @@ Source: `All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers
 
 The prop-sheet half (individual tables, chairs, stools, benches, shelf units, bottle rows) is not sliced yet. It is what 4c and 4f need for free furniture placement.
 
+### Giant Spider web (`GiantSpider/GiantSpiderWeb.png`, from `Minifantasy_GiantSpiderWebProjectiles.png`, 96×96)
+
+One small sprite per direction, cut by measured rectangles (x, y, w, h from the top-left): E 87,46 9×3; NE 86,9 7×7; N 43,0 3×9; NW 3,9 7×7; W 0,46 9×3; SW 3,80 7×7; S 43,82 3×9; SE 86,80 7×7. N and S each have a second, slightly offset copy (50,0 and 50,82), not used.
+
 ## UI
 
 | File | Sprites | What |
 |---|---|---|
-| `UIOverhaul/Bubble.png` (UI Overhaul, `Character_Emotions/Bubble_Only.png`, 280×72) | `Bubble_Body` 31,7 10×10 (9-sliced, 3 px border); `Bubble_Tail` 33,17 4×3 | Speech bubble. The sheet holds the same bubble with its tail on each side, in two sizes. `_Emotions.png` (8×8 emotion icons) is not imported yet. |
+| `UIOverhaul/Bubble.png` (UI Overhaul, `Character_Emotions/Bubble_Only.png`, 280×72) | `Bubble_Body` 31,7 10×10 (9-sliced, 3 px border); `Bubble_Tail` 33,17 4×3 | Speech bubble. The sheet holds the same bubble with its tail on each side, in two sizes. `_Emotions.png` holds faces only (no "!"); not imported. |
+| `UserInterface/GuiEmoticons.png` (User Interface pack, `Miscellany/Emoticons/Minifantasy_GuiEmoticons.png`, 176×160, 16 px cells) | `GuiEmoticons_AlertRed` 22,116 5×10 | The red "!" shown over an enemy winding up an attack. Rows 7 and 8 (from 0) hold "!", "?" and "X" marks in six colours. The rest of the sheet is faces. Drawn with the **unlit** sprite material so it reads in the dark. |
 
 ## Icons
 
@@ -138,11 +145,11 @@ The prop-sheet half (individual tables, chairs, stools, benches, shelf units, bo
 
 | Enemy | Pack | Status |
 |---|---|---|
-| Green Slime | Creatures | Imported; in the look test |
-| Bat | Creatures (Beasts) | Attack, die, dmg, plus separate fly and sleep sheets. Not imported. |
-| Giant Spider | to locate in the catalog | Not imported |
+| Green Slime | Creatures | Imported; leap attack (4b) |
+| Bat | Creatures (Beasts) | Imported; sleeps, wakes, swoops (4b) |
+| Giant Spider | Exclusive (`Giant_Spider`) | Imported; bite and web (4b). Huntsman Spider and Spider Queen exist too (same sheet set). |
 | Mother Slime (boss) | Creatures (Slimes, green and blue) | Not imported |
-| Cellar Shroom | — | **Gap:** no mushroom enemy found yet. The exclusive "Glowing Mushrooms" collection has not been inspected and may only be scenery; check before 4b. |
+| Mushroom People | Creatures (exclusive) | Deferred (4b decision): it has idle, jump, damage and die, but **no attack animation**. |
 
 ## Known gaps
 
