@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using MoreMountains.TopDownEngine;
 using UnityEditor;
 using UnityEditor.AddressableAssets.Settings;
@@ -86,6 +87,14 @@ namespace Hearthdelve.Editor
             GameObject player = null;
             if (level != null && level.PlayerPrefabs.Length > 0 && level.InitialSpawnPoint != null)
                 player = UnityEngine.Object.Instantiate(level.PlayerPrefabs[0].gameObject, level.InitialSpawnPoint.transform.position, Quaternion.identity);
+
+            // Local 2D lights build their mesh in LateUpdate, which a batch-mode capture never runs.
+            foreach (var light in UnityEngine.Object.FindObjectsByType<UnityEngine.Rendering.Universal.Light2D>())
+            {
+                const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+                typeof(UnityEngine.Rendering.Universal.Light2D).GetMethod("UpdateMesh", flags)?.Invoke(light, new object[] { true });
+                typeof(UnityEngine.Rendering.Universal.Light2D).GetMethod("UpdateBoundingSphere", flags)?.Invoke(light, null);
+            }
 
             Camera camera = Camera.main;
             var target = new RenderTexture(LookTestBuilder.ReferenceWidth, LookTestBuilder.ReferenceHeight, 24) { filterMode = FilterMode.Point };

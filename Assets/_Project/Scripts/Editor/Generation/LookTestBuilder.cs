@@ -115,7 +115,9 @@ namespace Hearthdelve.Editor
         {
             // TDE's GameManager is a persistent singleton: it keeps its whole GameObject alive across
             // scene loads and destroys later copies, so it must not share an object with scene managers.
-            new GameObject("GameManager").AddComponent<GameManager>();
+            var gameManager = new GameObject("GameManager").AddComponent<GameManager>();
+            // -1 = platform default: the web then runs on requestAnimationFrame and desktop on vsync.
+            gameManager.TargetFrameRate = -1;
             var managers = new GameObject("Managers");
             managers.AddComponent<HearthdelveInputManager>().Map = map;
             managers.AddComponent<TdeEventBridge>();
@@ -175,18 +177,127 @@ namespace Hearthdelve.Editor
             return pixelPerfect;
         }
 
-        static void Light(string name, Vector3 position, Light2D.LightType type, Color color, float intensity, float radius = 0f)
+        // ------------------------------------------------------------------ lighting
+
+        // The approved visual baseline: URP 2D lit sprites (GDD §8.1). The look test only needs
+        // representative lighting: an ambient (global) light per environment plus a warm local
+        // light. Kept deliberately simple; this is not a lighting system.
+        static readonly Color k_DungeonAmbient = new(0.52f, 0.6f, 0.86f);
+        const float k_DungeonAmbientIntensity = 0.62f;
+        static readonly Color k_TorchColor = new(1f, 0.56f, 0.26f);
+        const float k_TorchIntensity = 1.25f;
+        const float k_TorchRadius = 6.5f;
+
+        static readonly Color k_TavernAmbient = new(1f, 0.86f, 0.68f);
+        const float k_TavernAmbientIntensity = 0.78f;
+        static readonly Color k_HearthColor = new(1f, 0.68f, 0.38f);
+        const float k_HearthIntensity = 0.9f;
+        const float k_HearthRadius = 7f;
+
+        static Light2D Light(string name, Vector3 position, Light2D.LightType type)
         {
             var go = new GameObject(name);
             go.transform.position = position;
             var light = go.AddComponent<Light2D>();
             light.lightType = type;
+            return light;
+        }
+
+        static void Configure(Light2D light, Color color, float intensity, float radius = 0f)
+        {
             light.color = color;
             light.intensity = intensity;
-            if (type == Light2D.LightType.Point)
+            if (light.lightType == Light2D.LightType.Point)
             {
                 light.pointLightInnerRadius = radius * 0.2f;
                 light.pointLightOuterRadius = radius;
+                light.falloffIntensity = 0.6f;
+            }
+            // Light every sorting layer: floor, Y-sorted characters and props, and anything above.
+            light.targetSortingLayers = SortingLayer.layers.Select(l => l.id).ToArray();
+            EditorUtility.SetDirty(light);
+        }
+
+        /// <summary>Applies the look-test lighting to the open scene: ambient by light type, local lights by name.</summary>
+        static void ApplyLighting(bool dungeon)
+        {
+            foreach (Light2D light in Object.FindObjectsByType<Light2D>(FindObjectsInactive.Include))
+            {
+                if (light.lightType == Light2D.LightType.Global)
+                    Configure(light, dungeon ? k_DungeonAmbient : k_TavernAmbient, dungeon ? k_DungeonAmbientIntensity : k_TavernAmbientIntensity);
+                else if (dungeon && light.name == "Torch Light")
+                    Configure(light, k_TorchColor, k_TorchIntensity, k_TorchRadius);
+                else if (!dungeon && light.name == "Hearth Glow")
+                    Configure(light, k_HearthColor, k_HearthIntensity, k_HearthRadius);
+            }
+        }
+
+        static void UseLitMaterial(Renderer renderer)
+        {
+            Material lit = LookTestContent.LitSpriteMaterial;
+            if (lit == null || renderer.sharedMaterial == lit) return;
+            renderer.sharedMaterial = lit;
+            EditorUtility.SetDirty(renderer);
+        }
+
+        static void UseLitMaterials(GameObject root)
+        {
+            foreach (SpriteRenderer sprite in root.GetComponentsInChildren<SpriteRenderer>(true)) UseLitMaterial(sprite);
+            foreach (TilemapRenderer tiles in root.GetComponentsInChildren<TilemapRenderer>(true)) UseLitMaterial(tiles);
+        }
+
+        /// <summary>
+        /// Moves the existing look test to the approved lit baseline in place, without rebuilding
+        /// scenes or prefabs: every sprite and tilemap gets URP's lit sprite material, and the lights
+        /// get their look-test settings.
+        /// </summary>
+        [MenuItem("Hearthdelve/Generate/Update Look Test Lighting", priority = 22)]
+        public static void UpdateLookTestLighting()
+        {
+            if (LookTestContent.LitSpriteMaterial == null)
+                throw new InvalidOperationException("URP has no default 2D material; is the URP 2D asset the default render pipeline?");
+
+            foreach (string path in new[] { LookTestContent.PlayerPrefab, LookTestContent.TavernPlayerPrefab, LookTestContent.SlimePrefab, LookTestContent.PickupPrefab, LookTestContent.CookPrefab })
+            {
+                GameObject contents = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    UseLitMaterials(contents);
+                    PrefabUtility.SaveAsPrefabAsset(contents, path);
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(contents);
+                }
+            }
+
+            foreach (var (path, dungeon) in new[] { (EditorPaths.LookTestDungeonScene, true), (EditorPaths.LookTestTavernScene, false) })
+            {
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                // Prefab instances take the material from their prefab; only the scene's own renderers change here.
+                foreach (Renderer renderer in Object.FindObjectsByType<Renderer>(FindObjectsInactive.Include))
+                    if ((renderer is SpriteRenderer || renderer is TilemapRenderer) && !PrefabUtility.IsPartOfPrefabInstance(renderer))
+                        UseLitMaterial(renderer);
+                ApplyLighting(dungeon);
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Hearthdelve] Look test moved to lit sprites and lighting updated.");
+        }
+
+        /// <summary>Batch entry point for <see cref="UpdateLookTestLighting"/>.</summary>
+        public static void UpdateLookTestLightingBatch()
+        {
+            try
+            {
+                UpdateLookTestLighting();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
             }
         }
 
@@ -299,7 +410,7 @@ namespace Hearthdelve.Editor
             PixelPerfectCamera camera = Cameras(new Color(0.05f, 0.05f, 0.07f));
 
             // Cool, dim room light with warm torches (GDD §8.1).
-            Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global, new Color(0.62f, 0.68f, 0.85f), 0.85f);
+            Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global);
 
             var grid = new GameObject("Grid").AddComponent<Grid>();
             Tilemap floor = Layer(grid, "Floor", SortingLayers.Floor, 0, false);
@@ -364,7 +475,7 @@ namespace Hearthdelve.Editor
             {
                 SpriteRenderer torch = LookTestContent.AddSprite(props, "Torch", torchFrames[0], SortingLayers.Floor, 2, new Vector3(x, k_Top - 0.4f, 0f));
                 torch.gameObject.AddComponent<SpriteLoop>().Configure(torchFrames, 0.2f);
-                Light("Torch Light", new Vector3(x, k_Top + 1.5f, 0f), Light2D.LightType.Point, new Color(1f, 0.72f, 0.4f), 0.9f, 7f);
+                Light("Torch Light", new Vector3(x, k_Top + 1.5f, 0f), Light2D.LightType.Point);
             }
 
             var enemies = new GameObject("Enemies").transform;
@@ -389,6 +500,7 @@ namespace Hearthdelve.Editor
                 new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -10f), new Vector2(80f, 10f));
             Overlay(canvas, scaler, camera, LocKeys.LookTestHintDungeon, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
 
+            ApplyLighting(dungeon: true);
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorSceneManager.SaveScene(scene, EditorPaths.LookTestDungeonScene);
         }
@@ -535,8 +647,8 @@ namespace Hearthdelve.Editor
             PixelPerfectCamera camera = Cameras(new Color(0.07f, 0.05f, 0.05f));
 
             // Warm candlelight (GDD §8.1).
-            Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global, new Color(1f, 0.9f, 0.76f), 0.95f);
-            Light("Hearth Glow", TavernPoint(268f, 40f), Light2D.LightType.Point, new Color(1f, 0.7f, 0.4f), 0.5f, 9f);
+            Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global);
+            Light("Hearth Glow", TavernPoint(268f, 40f), Light2D.LightType.Point);
 
             var room = new GameObject("Room").transform;
             TavernSprite(room, "base_building", "Room", SortingLayers.Background, 0);
@@ -581,6 +693,7 @@ namespace Hearthdelve.Editor
             bubbleRoot.gameObject.AddComponent<SpeechBubble>().Configure(cookInstance.transform, visual.gameObject, new Vector2(0f, 1.4f), 5f);
             Overlay(canvas, scaler, camera, LocKeys.LookTestHintTavern, Path.GetFileNameWithoutExtension(EditorPaths.LookTestDungeonScene));
 
+            ApplyLighting(dungeon: false);
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorSceneManager.SaveScene(scene, EditorPaths.LookTestTavernScene);
         }

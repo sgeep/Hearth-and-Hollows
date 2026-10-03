@@ -168,6 +168,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(new Vector2Int(pixelPerfect.refResolutionX, pixelPerfect.refResolutionY), Is.EqualTo(new Vector2Int(320, 180)));
 
             Assert.That(InputManager.Instance, Is.InstanceOf<HearthdelveInputManager>(), "never the legacy InputManager");
+            Assert.That(GameManager.Instance.TargetFrameRate, Is.EqualTo(-1), "platform frame pacing (requestAnimationFrame on the web)");
             Assert.That(InputMaps.Find(InputMaps.Dungeon, DungeonActions.Move).enabled);
             Assert.That(InputSystem.actions.FindActionMap(InputMaps.Tavern).enabled, Is.False, "exactly one gameplay map is active");
 
@@ -563,6 +564,34 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(text.text, Is.EqualTo(Loc.UI(LocKeys.LookTestGreeting)));
             Assert.That(text.text, Does.Not.StartWith("#"), "a real string from the table, not a missing key");
             Assert.That(text.text, Is.Not.Empty);
+        }
+
+        /// <summary>
+        /// The visual baseline is URP 2D lit sprites (CLAUDE.md): everything drawn in the world uses
+        /// the lit sprite shader, and each environment has an ambient light plus a local light
+        /// that reach every sorting layer.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator BothScenes_UseLitSprites_AndRepresentativeLighting()
+        {
+            const string litShader = "Universal Render Pipeline/2D/Sprite-Lit-Default";
+            foreach (string scene in new[] { DungeonScene, TavernScene })
+            {
+                yield return Load(scene);
+
+                Renderer[] renderers = Object.FindObjectsByType<Renderer>(FindObjectsInactive.Include)
+                    .Where(r => r is SpriteRenderer || r is UnityEngine.Tilemaps.TilemapRenderer).ToArray();
+                Assert.That(renderers, Is.Not.Empty, scene);
+                foreach (Renderer renderer in renderers)
+                    Assert.That(renderer.sharedMaterial != null ? renderer.sharedMaterial.shader.name : "none", Is.EqualTo(litShader), $"{scene}/{renderer.name}");
+
+                Light2D[] lights = Object.FindObjectsByType<Light2D>();
+                Assert.That(lights.Count(l => l.lightType == Light2D.LightType.Global), Is.EqualTo(1), $"{scene}: one ambient light");
+                Assert.That(lights.Count(l => l.lightType == Light2D.LightType.Point), Is.GreaterThanOrEqualTo(1), $"{scene}: a local light");
+                int[] allLayers = SortingLayer.layers.Select(l => l.id).ToArray();
+                foreach (Light2D light in lights)
+                    Assert.That(light.targetSortingLayers, Is.EquivalentTo(allLayers), $"{scene}/{light.name} must light every sorting layer");
+            }
         }
 
         [UnityTest]
