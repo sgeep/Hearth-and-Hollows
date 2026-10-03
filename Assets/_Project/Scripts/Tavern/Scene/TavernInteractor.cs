@@ -33,11 +33,13 @@ namespace Hearthdelve.Tavern.Scene
             m_Candidates.Clear();
             m_Targets.Clear();
             int current = -1;
+            // One candidate per spot a thing can be used from (the stove from the front or from behind).
             foreach (TavernInteractable t in TavernInteractable.All)
+            foreach (Vector2 point in t.UsePoints)
             {
-                if (t == m_Target) current = m_Targets.Count;
+                if (t == m_Target && current < 0) current = m_Targets.Count;
                 m_Targets.Add(t);
-                m_Candidates.Add(new InteractionCandidate(t.UsePoint, t.Reach, t.IsAvailable));
+                m_Candidates.Add(new InteractionCandidate(point, t.Reach, t.IsAvailable));
             }
             int pick = InteractionRules.Pick(transform.position, m_Candidates, current);
             return pick >= 0 ? m_Targets[pick] : null;

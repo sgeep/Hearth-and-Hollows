@@ -93,6 +93,15 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Vector2.Distance(first.transform.position, Director.Layout.QueueSpot(0)), Is.LessThan(0.3f), "first in line at the front spot");
             Assert.That(Vector2.Distance(second.transform.position, Director.Layout.QueueSpot(1)), Is.LessThan(0.3f), "second behind them");
             Assert.That(first.ShowsPatience, "queueing customers show their patience");
+            // Queueing customers stand still at their spot (no walking on the spot).
+            Vector2 queued = first.transform.position;
+            for (int i = 0; i < 30; i++)
+            {
+                yield return null;
+                if (first.Logic.State != CustomerState.Queueing) break;
+                Assert.That(Vector2.Distance(first.transform.position, queued), Is.LessThan(0.01f), "standing still in the queue");
+                Assert.That(first.Look.Current, Is.EqualTo(Hearthdelve.Shared.Animation.CharacterAnim.Idle));
+            }
 
             yield return WaitUntil(() => first.IsSeated && second.IsSeated, 20f, "the queue to take the seats the impatient diners left");
             Assert.That(diners.Count(d => d == null) + diners.Count(d => d != null && d.Logic.State == CustomerState.Leaving), Is.GreaterThanOrEqualTo(2));
@@ -165,6 +174,19 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(pip.Assignment, Is.EqualTo(StaffStation.Serving), "Pip starts on serving");
             yield return WaitUntil(() => pip.AtPost, 10f, "Pip to reach the serving post");
             Assert.That(Vector2.Distance(pip.transform.position, Director.Layout.PostFor(StaffStation.Serving)), Is.LessThan(0.25f));
+            // Step 2 playtest: Pip "vibrated" at the pass, overshooting the post and turning back every frame.
+            var look = pip.GetComponentInChildren<Hearthdelve.Shared.Animation.LayeredSpriteAnimator>();
+            // The interpolated sprite catches up with the stopped body within a physics step or two.
+            yield return new WaitForSeconds(0.2f);
+            Vector2 standing = pip.transform.position;
+            Facing4 facing = look.Facing;
+            for (int i = 0; i < 90; i++)
+            {
+                yield return null;
+                Assert.That(Vector2.Distance(pip.transform.position, standing), Is.LessThan(0.01f), "Pip stands still at the post");
+                Assert.That(look.Facing, Is.EqualTo(facing), "without turning back and forth");
+                Assert.That(look.Current, Is.EqualTo(Hearthdelve.Shared.Animation.CharacterAnim.Idle), "idle, not walking on the spot");
+            }
             Assert.That(pip.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer(Layers.Npcs)));
         }
 

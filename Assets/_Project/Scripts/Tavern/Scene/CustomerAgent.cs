@@ -16,6 +16,8 @@ namespace Hearthdelve.Tavern.Scene
     public sealed class CustomerAgent : MonoBehaviour
     {
         const float k_Arrive = 0.2f;
+        /// <summary>Standing still until the goal is this far away again (no flip-flopping at the edge of arriving).</summary>
+        const float k_Resume = 0.35f;
         const float k_UpsetSeconds = 2f;
 
         [SerializeField] LayeredSpriteAnimator m_Look;
@@ -126,10 +128,27 @@ namespace Hearthdelve.Tavern.Scene
                     }
                     break;
             }
+            if (!IsSeated) HoldWhenThere();
             UpdateVisuals();
         }
 
         bool Arrived() => Vector2.Distance(transform.position, m_Goal.position) <= k_Arrive;
+
+        /// <summary>
+        /// Once there (a queue spot), stand still with the AI off: the walk action would otherwise overshoot
+        /// the point, turn back, and overshoot again every frame. It walks again once the goal moves away.
+        /// </summary>
+        void HoldWhenThere()
+        {
+            if (m_Brain == null) return;
+            float distance = Vector2.Distance(transform.position, m_Goal.position);
+            if (m_Brain.BrainActive && distance <= k_Arrive)
+            {
+                m_Brain.BrainActive = false;
+                m_Movement?.SetMovement(Vector2.zero);
+            }
+            else if (!m_Brain.BrainActive && distance > k_Resume) m_Brain.BrainActive = true;
+        }
 
         void SitDown()
         {

@@ -51,7 +51,7 @@ namespace Hearthdelve.Editor
         // Positions (room tiles, origin at the room's bottom-left corner).
         static readonly Vector2 k_Bar = new(1.5f, 11f);           // bottom-left of the L-shaped bar
         static readonly Vector2 k_Kitchen = new(19f, 11.625f);    // bottom-left of the 32×32 kitchen frame
-        static readonly Vector2 k_StewPot = new(24.75f, 12f);     // bottom-centre of the cauldron
+        static readonly Vector2 k_StewPot = new(24.75f, 11.5f);   // bottom-centre of the cauldron (a tile clear of the wall, to walk behind)
         static readonly Vector2 k_Pass = new(19.75f, 8.5f);       // bottom-left of the pass (a long table)
         static readonly Vector2 k_Hearth = new(15.5f, 14f);       // bottom-centre of the wall fireplace
         /// <summary>Table groups (bottom-centre of each round table): a chair on each side, facing it.</summary>
@@ -67,7 +67,8 @@ namespace Hearthdelve.Editor
         /// Applies builder changes to the existing tavern scene in place, without rebuilding it: the
         /// camera's resting point; the kitchen and stew pot blocking back to the wall, the whole kitchen
         /// being the Grill, and highlights drawn from corner sprites (step 1 playtest); the service
-        /// (customers, seats, the queue, Pip; step 2), rebuilt each time.
+        /// (customers, seats, the queue, Pip; step 2), rebuilt each time; the Grill and Stew Pot usable
+        /// from behind, with the pot moved off the wall (step 2 playtest).
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Tavern", priority = 3)]
         public static void UpdateTavern()
@@ -84,6 +85,9 @@ namespace Hearthdelve.Editor
             SetUpBar(GameObject.Find("Bar").GetComponent<SpriteRenderer>());
             SetUpPass(GameObject.Find("Pass").GetComponent<SpriteRenderer>());
             SetUpKitchen(GameObject.Find("Kitchen").GetComponent<SpriteRenderer>());
+            // Step 2 playtest: the stew pot moves half a tile off the wall, so it can be walked behind.
+            GameObject.Find("StewPot").transform.position = k_StewPot;
+            GameObject.Find("Stew Fire").transform.position = k_StewPot + new Vector2(0f, 0.25f);
             SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
             AddService(npcs);
             EditorSceneManager.MarkSceneDirty(scene);
@@ -324,25 +328,26 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
-        /// The whole kitchen is the Grill: the range in front and the oven behind it, used from in front of
-        /// either. Both block back to the wall, so the stove can't be walked round and used from behind.
+        /// The whole kitchen is the Grill: the range in front and the oven beside it against the wall. There's
+        /// a tile of floor behind the range (in round its east end), and the Grill can be used from there too,
+        /// like a cook behind the stove (step 2 playtest: for immersion).
         /// </summary>
         static void SetUpKitchen(SpriteRenderer kitchen)
         {
             ClearStation(kitchen);
-            float toWall = (FloorTop - kitchen.transform.position.y) * MinifantasySheets.PixelsPerUnit;
-            Footprint(kitchen, 12f, 16f, toWall - 3f, 3f);
+            Footprint(kitchen, 12f, 16f, 8f, 3f);
             Footprint(kitchen, 1f, 11f, 18f, 10f);
-            Station(kitchen, TavernInteractableKind.Grill, TavernLocKeys.StationGrill, new Vector2(1.8125f, -0.2f), 1.5f, new Rect(0.125f, 0.375f, 3.375f, 3.125f));
+            Station(kitchen, TavernInteractableKind.Grill, TavernLocKeys.StationGrill, new Vector2(1.8125f, -0.2f), 1.5f, new Rect(0.125f, 0.375f, 3.375f, 3.125f),
+                new[] { new Vector2(2.5f, 1.875f) });
         }
 
-        /// <summary>The cauldron, used from the front; it blocks back to the wall, so it can't be used from behind.</summary>
+        /// <summary>The cauldron, a tile clear of the wall: used from the front or from behind (step 2 playtest).</summary>
         static void SetUpStewPot(SpriteRenderer cauldron)
         {
             ClearStation(cauldron);
-            float toWall = (FloorTop - cauldron.transform.position.y) * MinifantasySheets.PixelsPerUnit;
-            Footprint(cauldron, 0f, 12f, toWall);
-            Station(cauldron, TavernInteractableKind.StewPot, TavernLocKeys.StationStewPot, new Vector2(0f, -0.6f), 1.0f, new Rect(-0.75f, 0f, 1.5f, 1.4f));
+            FullFootprint(cauldron);
+            Station(cauldron, TavernInteractableKind.StewPot, TavernLocKeys.StationStewPot, new Vector2(0f, -0.6f), 1.0f, new Rect(-0.75f, 0f, 1.5f, 1.4f),
+                new[] { new Vector2(0f, 1.95f) });
         }
 
         /// <summary>Removes a piece's footprints, interaction and highlight, so it can be set up again.</summary>
@@ -358,7 +363,8 @@ namespace Hearthdelve.Editor
         /// Makes a piece usable: where the player stands (relative to its pivot) and how near, plus its
         /// highlight: gold corners around <paramref name="frame"/> (pivot-relative) and a bobbing marker above.
         /// </summary>
-        static void Station(SpriteRenderer piece, TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, Rect frame)
+        static void Station(SpriteRenderer piece, TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, Rect frame,
+            Vector2[] alsoFrom = null)
         {
             var unlit = AssetDatabase.LoadAssetAtPath<Material>(k_UnlitSprite);
             var highlight = new GameObject("Highlight").transform;
@@ -383,7 +389,7 @@ namespace Hearthdelve.Editor
             if (unlit != null)
                 foreach (SpriteRenderer r in corners.Append(marker)) r.sharedMaterial = unlit;
 
-            piece.gameObject.AddComponent<TavernInteractable>().Configure(kind, nameKey, useOffset, reach, highlight.gameObject);
+            piece.gameObject.AddComponent<TavernInteractable>().Configure(kind, nameKey, useOffset, reach, highlight.gameObject, alsoFrom);
             highlight.gameObject.SetActive(false);
         }
 

@@ -122,9 +122,14 @@ namespace Hearthdelve.Editor
             var character = root.AddComponent<Character>();
             character.CharacterType = Character.CharacterTypes.AI;
             character.CharacterDimension = Character.CharacterDimensions.Type2D;
-            root.AddComponent<CharacterMovement>();
+            // Start and stop at once: TDE's easing let them drift past a spot and turn back (Pip "vibrating" at the
+            // pass, step 2 playtest), and kept them looking like they walk for a moment after stopping.
+            var movement = root.AddComponent<CharacterMovement>();
+            movement.Acceleration = 0f;
+            movement.Deceleration = 0f;
             var walk = root.AddComponent<AIActionPathfindToTarget2D>();
-            walk.StopDistance = 0.05f;
+            // The agents stop the walk themselves on arrival; this only keeps the action from chasing the last few pixels.
+            walk.StopDistance = 0.1f;
             var brain = root.AddComponent<AIBrain>();
             brain.States = new List<AIState> { new() { StateName = "Walk", Actions = new AIActionsList { walk }, Transitions = new AITransitionsList() } };
             return root;

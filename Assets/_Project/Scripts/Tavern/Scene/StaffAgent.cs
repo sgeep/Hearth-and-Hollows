@@ -15,6 +15,7 @@ namespace Hearthdelve.Tavern.Scene
     public sealed class StaffAgent : MonoBehaviour
     {
         const float k_Arrive = 0.2f;
+        const float k_Resume = 0.35f;
 
         AIBrain m_Brain;
         CharacterMovement m_Movement;
@@ -48,14 +49,27 @@ namespace Hearthdelve.Tavern.Scene
             Assignment = member != null ? assignment : StaffStation.None;
             m_Layout = layout;
             AtPost = false;
+            if (m_Brain != null) m_Brain.BrainActive = true;
         }
 
         void Update()
         {
             if (m_Layout == null) return;
             m_Goal.position = Post;
-            AtPost = Vector2.Distance(transform.position, m_Goal.position) <= k_Arrive;
-            if (AtPost) m_Movement?.SetMovement(Vector2.zero);
+            float distance = Vector2.Distance(transform.position, m_Goal.position);
+            // At the post: stand still with the AI off. The walk action alone overshoots a point, turns back and
+            // overshoots again each frame (Pip "vibrating" at the pass, step 2 playtest). Walk again once the post moves away.
+            if (!AtPost && distance <= k_Arrive)
+            {
+                AtPost = true;
+                if (m_Brain != null) m_Brain.BrainActive = false;
+                m_Movement?.SetMovement(Vector2.zero);
+            }
+            else if (AtPost && distance > k_Resume)
+            {
+                AtPost = false;
+                if (m_Brain != null) m_Brain.BrainActive = true;
+            }
         }
     }
 }

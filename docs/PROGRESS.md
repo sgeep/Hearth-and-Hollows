@@ -334,7 +334,7 @@ Decisions (2026-10-03):
 
 **Step 1 playtest fixes (2026-10-03):**
 
-- **The Grill and Stew Pot could be approached from behind,** where nothing reached them: there was a tile of floor between the kitchen and the back wall, and a narrower gap behind the cauldron. Both now block back to the wall (their footprints still start at the bottom of the art), so stations are only used from the front.
+- **The Grill and Stew Pot could be approached from behind,** where nothing reached them. Walled off in step 1; *superseded in the step 2 playtest*, which made both usable from behind instead (below).
 - **The oven left of the range didn't highlight.** It's part of the same kitchen art; now the whole kitchen is the Grill, framed as one, usable from in front of either part. (The GDD's separate Oven station isn't in 4c.)
 - **Highlights lost their top and right edges:** a 9-sliced SpriteRenderer dropped the frame's top row and right column of pixels. The highlight is now four separate corner sprites cut from the same selector.
 - Applied to the existing scene by *Update Tavern* (no rebuild). New test: nothing is walkable behind the kitchen or cauldron, walking up to the oven targets the Grill, and all four highlight corners draw.
@@ -357,6 +357,12 @@ Decisions (2026-10-03):
   - EditMode: the same seed always gives the same look; looks vary and every option gets used; empty lists and beard chance.
   - PlayMode (`TavernCustomerTests`): a customer walks from the door to a seat without ever clipping furniture, sits on it facing the table and stays put; with every seat taken they queue at the right spots, show patience, then take freed seats; patience running out makes them walk out upset and leave by the door; they walk through the player without moving them; the layered look stays in step (same animation and frame on every layer) and never changes; Pip reaches the serving post; the fourth table is put away and its floor becomes walkable; ending service sends everyone home.
 - Applied to the existing scene by *Update Tavern* (no rebuild).
+
+**Step 2 playtest fixes (2026-10-03):**
+
+- **Pip "vibrated" at the pass.** Two causes. TDE eases characters to a stop, so Pip drifted past the post, turned back and overshot again each frame, flipping his facing. And the walk action and the staff agent were both steering. Now NPCs start and stop at once (no easing), and on arrival the agent switches the AI off and stands still, walking again only once the goal is clearly away (a little hysteresis). Queueing customers get the same, so they stand still in line instead of walking on the spot.
+- **Walking behind the Grill and Stew Pot,** for immersion: this reverses the step 1 change that walled them off. There's a tile of floor behind the range again (reached round its east end), and the cauldron moved half a tile forward so a full tile is clear behind it. Stations can now be used from more than one spot: both highlight and work from the front or from behind, where the player is drawn behind them, like a cook at the stove. Staff still work from the front.
+- Tests: Pip stands still, idle and without turning at the post; queueing customers stand still; the Grill and Stew Pot each have a walkable, reachable spot behind them that targets and highlights them.
 
 **Next: step 3,** stations and serving. After your review and playtest of step 2.
 

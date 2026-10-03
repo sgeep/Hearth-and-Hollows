@@ -217,8 +217,8 @@ MonoBehaviour:
   WalkSpeed: 3.2
   ShouldSetMovement: 1
   IdleThreshold: 0.05
-  Acceleration: 10
-  Deceleration: 10
+  Acceleration: 0
+  Deceleration: 0
   InterpolateMovementSpeed: 0
   WalkParticles: []
   TouchTheGroundParticles: []
@@ -238,7 +238,7 @@ MonoBehaviour:
   InitializationMode: 0
   Label: 
   RepathInterval: 0.25
-  StopDistance: 0.05
+  StopDistance: 0.1
   NearestOpenCellRadius: 3
   KeepDistance: {x: 0, y: 0}
   Flutter: 0

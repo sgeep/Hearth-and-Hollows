@@ -18,8 +18,10 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] TavernInteractableKind m_Kind;
         [SerializeField, Tooltip("Localization key (UI table) of the name shown in the hint.")]
         string m_NameKey;
-        [SerializeField, Tooltip("Where the player stands to use it, relative to this object.")]
+        [SerializeField, Tooltip("Where the player stands to use it, relative to this object (the main spot: staff work from here).")]
         Vector2 m_UseOffset;
+        [SerializeField, Tooltip("Other spots it can be used from (behind the stove, for example), relative to this object.")]
+        Vector2[] m_OtherUseOffsets = System.Array.Empty<Vector2>();
         [SerializeField, Min(0.1f), Tooltip("How near the player's feet must be to the use point, in tiles.")]
         float m_Reach = 1.1f;
         [SerializeField, Tooltip("Shown while this is the player's target.")]
@@ -32,15 +34,27 @@ namespace Hearthdelve.Tavern.Scene
         public TavernInteractableKind Kind => m_Kind;
         public string NameKey => m_NameKey;
         public float Reach => m_Reach;
+        /// <summary>The main spot to use it from (staff work from here).</summary>
         public Vector2 UsePoint => (Vector2)transform.position + m_UseOffset;
+
+        /// <summary>Every spot it can be used from, the main one first.</summary>
+        public IEnumerable<Vector2> UsePoints
+        {
+            get
+            {
+                yield return UsePoint;
+                foreach (Vector2 offset in m_OtherUseOffsets) yield return (Vector2)transform.position + offset;
+            }
+        }
         public bool IsAvailable => m_Available && isActiveAndEnabled;
         public bool IsHighlighted => m_Highlight != null && m_Highlight.activeSelf;
 
         /// <summary>Raised when the player uses it.</summary>
         public event Action<TavernInteractable> Used;
 
-        public void Configure(TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, GameObject highlight)
+        public void Configure(TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, GameObject highlight, Vector2[] otherUseOffsets = null)
         {
+            m_OtherUseOffsets = otherUseOffsets ?? System.Array.Empty<Vector2>();
             m_Kind = kind;
             m_NameKey = nameKey;
             m_UseOffset = useOffset;
@@ -74,7 +88,7 @@ namespace Hearthdelve.Tavern.Scene
         void OnDrawGizmosSelected()
         {
             Gizmos.color = new Color(1f, 0.8f, 0.2f);
-            Gizmos.DrawWireSphere(UsePoint, m_Reach);
+            foreach (Vector2 point in UsePoints) Gizmos.DrawWireSphere(point, m_Reach);
         }
     }
 }

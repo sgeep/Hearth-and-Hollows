@@ -119,24 +119,34 @@ namespace Hearthdelve.Tests.PlayMode
 
         /// <summary>Furniture can move (4f): the grid is invalidated and rebuilt, and its version tells path followers to re-plan.</summary>
         /// <summary>
-        /// Step 1 playtest: the stove and cauldron could be walked round and approached from behind, where
-        /// nothing reached. They block back to the wall now, and the whole kitchen (oven and range) is the Grill.
+        /// Step 1 and 2 playtests: the whole kitchen (oven and range) is the Grill, and the Grill and the Stew Pot
+        /// can be used from behind as well as from the front: there's a walkable tile behind each, reached by walking round.
         /// </summary>
         [UnityTest]
-        public IEnumerator Stations_AreUsedFromTheFront_AndTheWholeKitchenIsTheGrill()
+        public IEnumerator TheGrillAndStewPot_AreUsableFromBehind_AndTheWholeKitchenIsTheGrill()
         {
             yield return Load(Scene);
             NavGrid grid = NavGrid.Current;
-            foreach (string name in new[] { "Kitchen", "Cauldron" })
+            var path = new List<GridCell>();
+            GridCell spawn = grid.Space.ToCell(Player.transform.position);
+            var interactor = Player.GetComponent<TavernInteractor>();
+            foreach (TavernInteractableKind kind in new[] { TavernInteractableKind.Grill, TavernInteractableKind.StewPot })
             {
-                Bounds piece = GameObject.Find(name).GetComponents<Collider2D>().Select(c => c.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
-                for (float x = piece.min.x + 0.5f; x < piece.max.x; x += 1f)
-                    Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(new Vector2(x, 13.5f))), Is.False, $"no way behind the {name} at x {x}");
-                Assert.That(piece.max.y, Is.GreaterThanOrEqualTo(14f - 0.01f), $"the {name} blocks back to the wall");
+                TavernInteractable station = Station(kind);
+                Vector2 behind = station.UsePoints.Skip(1).Single();
+                Assert.That(behind.y, Is.GreaterThan(station.UsePoint.y + 1.5f), $"{kind}: the second spot is behind it");
+                GridCell cell = grid.Space.ToCell(behind);
+                Assert.That(grid.Map.IsWalkable(cell), $"{kind}: the floor behind it is walkable");
+                Assert.That(GridPathfinder.TryFindPath(grid.Map, spawn, cell, path), $"{kind}: and reachable by walking round");
+
+                Teleport(Player, behind);
+                yield return WaitUntil(() => interactor.Target == station, 1f, $"{kind} to be the target from behind");
+                yield return null;
+                Assert.That(station.IsHighlighted, $"{kind} highlights from behind");
+                Assert.That(Player.transform.position.y, Is.GreaterThan(station.transform.position.y), $"{kind}: the player is behind it (drawn behind it)");
             }
 
             TavernInteractable grill = Station(TavernInteractableKind.Grill);
-            var interactor = Player.GetComponent<TavernInteractor>();
             Bounds oven = GameObject.Find("Kitchen").GetComponents<Collider2D>().OrderByDescending(c => c.bounds.min.y).First().bounds;
             // Walk up to the oven, left of the range.
             Teleport(Player, new Vector2(oven.center.x, oven.min.y - 1.2f));
