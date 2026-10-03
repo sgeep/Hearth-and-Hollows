@@ -15,9 +15,9 @@ namespace Hearthdelve.Editor
     public static class DungeonUI
     {
         const string k_PixelPath = EditorPaths.Art + "/UI/Pixel.png";
-        static readonly Color k_Ink = new(0.25f, 0.16f, 0.1f);
-        static readonly Color k_Light = new(0.95f, 0.92f, 0.85f);
-        static readonly Color k_Mark = new(1f, 0.82f, 0.3f);
+        internal static readonly Color k_Ink = new(0.25f, 0.16f, 0.1f);
+        internal static readonly Color k_Light = new(0.95f, 0.92f, 0.85f);
+        internal static readonly Color k_Mark = new(1f, 0.82f, 0.3f);
         /// <summary>Prompts sit above the satchel row.</summary>
         const float k_HintY = 34f;
 
@@ -116,9 +116,9 @@ namespace Hearthdelve.Editor
             return AssetDatabase.LoadAssetAtPath<Sprite>(k_PixelPath);
         }
 
-        static Sprite UISprite(string name) => MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "ClassicUI", name);
+        internal static Sprite UISprite(string name) => MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "ClassicUI", name);
 
-        static Image AddImage(RectTransform rect, Sprite sprite, Color color, Image.Type type = Image.Type.Simple)
+        internal static Image AddImage(RectTransform rect, Sprite sprite, Color color, Image.Type type = Image.Type.Simple)
         {
             var image = rect.gameObject.AddComponent<Image>();
             image.sprite = sprite;
@@ -138,18 +138,18 @@ namespace Hearthdelve.Editor
             return root;
         }
 
-        static RectTransform Panel(RectTransform root, Vector2 size, Vector2 offset)
+        internal static RectTransform Panel(RectTransform root, Vector2 size, Vector2 offset)
         {
             RectTransform panel = LookTestBuilder.UIRect(root, "Panel", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), offset, size);
             AddImage(panel, UISprite("Panel"), Color.white, Image.Type.Sliced);
             return panel;
         }
 
-        static LocalizedSuperText Title(RectTransform panel, string key) =>
+        internal static LocalizedSuperText Title(RectTransform panel, string key) =>
             LookTestBuilder.Text(panel, "Title", key, 7f, k_Ink, TextAnchor.UpperCenter,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -7f), new Vector2(panel.sizeDelta.x - 14f, 10f));
 
-        static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 8f) =>
+        internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 8f) =>
             LookTestBuilder.Text(panel, name, key, 6f, k_Ink, TextAnchor.MiddleCenter,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(panel.sizeDelta.x - 16f, height));
 

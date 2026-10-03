@@ -76,7 +76,9 @@ namespace Hearthdelve.Editor
             ProjectConfigurator.ConfigureAll();
             MinifantasyImporter.ImportAll();
             LocalizationBuilder.Build();
+            TavernStationContent.AssignDishIcons();
             NpcContent.Built npcs = NpcContent.Build();
+            AddCarryViewToPlayer();
             var scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
             var tavernCamera = GameObject.Find("Tavern Camera");
             if (tavernCamera == null) throw new InvalidOperationException("The tavern scene has no Tavern Camera.");
@@ -90,6 +92,8 @@ namespace Hearthdelve.Editor
             GameObject.Find("Stew Fire").transform.position = k_StewPot + new Vector2(0f, 0.25f);
             SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
             AddService(npcs);
+            AddStations();
+            TavernStationContent.BuildStationPanel(Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI"));
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -131,7 +135,9 @@ namespace Hearthdelve.Editor
         public static void Generate(bool rebuildSceneApproved)
         {
             LookTestBuilder.Content content = LookTestBuilder.BuildContent();
+            TavernStationContent.AssignDishIcons();
             NpcContent.Built npcs = NpcContent.Build();
+            AddCarryViewToPlayer();
             if (LookTestBuilder.MayWrite(EditorPaths.TavernScene, rebuildSceneApproved)) BuildScene(content, npcs);
             ProjectConfigurator.SetBuildOrder(EditorPaths.TestFloorScene, EditorPaths.TavernScene, EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
             AssetDatabase.SaveAssets();
@@ -150,9 +156,11 @@ namespace Hearthdelve.Editor
             BuildFurniture();
             BuildLights();
             AddService(npcs);
+            AddStations();
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
+            TavernStationContent.BuildStationPanel(canvas);
             LocalizedSuperText controls = LookTestBuilder.Text(canvas.transform, "Controls", TavernLocKeys.TavernControls, 6f, new Color(0.95f, 0.92f, 0.85f),
                 TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(310f, 10f));
             controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
@@ -351,7 +359,7 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>Removes a piece's footprints, interaction and highlight, so it can be set up again.</summary>
-        static void ClearStation(SpriteRenderer piece)
+        static void ClearStation(Component piece)
         {
             foreach (BoxCollider2D box in piece.GetComponents<BoxCollider2D>()) Object.DestroyImmediate(box);
             Object.DestroyImmediate(piece.GetComponent<TavernInteractable>());
@@ -363,7 +371,7 @@ namespace Hearthdelve.Editor
         /// Makes a piece usable: where the player stands (relative to its pivot) and how near, plus its
         /// highlight: gold corners around <paramref name="frame"/> (pivot-relative) and a bobbing marker above.
         /// </summary>
-        static void Station(SpriteRenderer piece, TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, Rect frame,
+        static void Station(Component piece, TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, Rect frame,
             Vector2[] alsoFrom = null)
         {
             var unlit = AssetDatabase.LoadAssetAtPath<Material>(k_UnlitSprite);
@@ -450,6 +458,100 @@ namespace Hearthdelve.Editor
             // Pip from an earlier run of this updater.
             foreach (StaffAgent extra in Object.FindObjectsByType<StaffAgent>(FindObjectsInactive.Include))
                 if (extra.gameObject != pip) Object.DestroyImmediate(extra.gameObject);
+        }
+
+        // ------------------------------------------------------------------ stations and serving (step 3)
+
+        /// <summary>The keeper carries plates over their head (4c decision 2): added to the tavern player prefab in place.</summary>
+        static void AddCarryViewToPlayer()
+        {
+            GameObject contents = PrefabUtility.LoadPrefabContents(LookTestContent.TavernPlayerPrefab);
+            try
+            {
+                TavernStationContent.AddCarryView(contents);
+                PrefabUtility.SaveAsPrefabAsset(contents, LookTestContent.TavernPlayerPrefab);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(contents);
+            }
+        }
+
+        /// <summary>
+        /// Seats become serving targets (gold corners round the chair and its sitter while carrying a plate);
+        /// plates waiting on the pass, the stew pot's simmer bar and helpings, the kitchen at work; and the
+        /// keeper's work, which connects the stations, the pass and the seats to the service. Replaces any it had.
+        /// </summary>
+        static void AddStations()
+        {
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>(k_UnlitSprite);
+            var layout = Object.FindAnyObjectByType<TavernLayout>();
+            float reach = AssetDatabase.LoadAssetAtPath<TavernContent>(k_ContentPath).serving.serving.arriveDistance + 0.2f;
+            var seats = new List<TavernInteractable>();
+            foreach (TavernSeat seat in layout.Seats)
+            {
+                ClearStation(seat);
+                Station(seat, TavernInteractableKind.Seat, null, Vector2.zero, reach, new Rect(-0.5f, -0.1f, 1f, 1.85f));
+                seats.Add(seat.GetComponent<TavernInteractable>());
+            }
+
+            // The pass: up to four plates along its top, sorted with the table.
+            SpriteRenderer pass = GameObject.Find("Pass").GetComponent<SpriteRenderer>();
+            if (pass.GetComponent<SortingGroup>() == null) pass.gameObject.AddComponent<SortingGroup>().sortingLayerName = SortingLayers.YSorted;
+            Transform oldPlates = pass.transform.Find("Plates");
+            if (oldPlates != null) Object.DestroyImmediate(oldPlates.gameObject);
+            var plates = new GameObject("Plates").transform;
+            plates.SetParent(pass.transform, false);
+            var slots = new SpriteRenderer[4];
+            for (int i = 0; i < slots.Length; i++)
+                slots[i] = LookTestContent.AddSprite(plates, $"Plate{i + 1}", null, SortingLayers.YSorted, 1, new Vector3(-1.2f + i * 0.8f, 0.55f, 0f));
+            Replace<PassView>(pass.gameObject).Configure(slots);
+
+            // The stew pot: a bar while it simmers, and a pip per helping.
+            Transform stewRoot = GameObject.Find("StewPot").transform;
+            Transform oldStatus = stewRoot.Find("Status");
+            if (oldStatus != null) Object.DestroyImmediate(oldStatus.gameObject);
+            var status = new GameObject("Status").transform;
+            status.SetParent(stewRoot, false);
+            status.localPosition = new Vector3(0f, 2.1f, 0f);
+            var overlay = new List<SpriteRenderer>();
+            var bar = new GameObject("Bar").transform;
+            bar.SetParent(status, false);
+            SpriteRenderer barBack = LookTestContent.AddSprite(bar, "Back", DungeonUI.Pixel(), SortingLayers.Above, 0, Vector3.zero);
+            barBack.transform.localScale = new Vector3(12f, 3f, 1f);
+            barBack.color = new Color(0.08f, 0.06f, 0.06f);
+            var barAnchor = new GameObject("Anchor").transform;
+            barAnchor.SetParent(bar, false);
+            barAnchor.localPosition = new Vector3(-0.625f, 0f, 0f);
+            SpriteRenderer barFill = LookTestContent.AddSprite(barAnchor, "Fill", DungeonUI.Pixel(), SortingLayers.Above, 1, new Vector3(0.0625f, 0f, 0f));
+            barFill.color = new Color(1f, 0.66f, 0.3f);
+            overlay.Add(barBack);
+            overlay.Add(barFill);
+            var pips = new SpriteRenderer[5];
+            for (int i = 0; i < pips.Length; i++)
+            {
+                pips[i] = LookTestContent.AddSprite(status, $"Pip{i + 1}", DungeonUI.Pixel(), SortingLayers.Above, 1, new Vector3((i - 2) * 0.375f, -0.375f, 0f));
+                pips[i].transform.localScale = new Vector3(2f, 2f, 1f);
+                overlay.Add(pips[i]);
+            }
+            if (unlit != null) foreach (SpriteRenderer r in overlay) r.sharedMaterial = unlit;
+            Replace<StewPotView>(stewRoot.gameObject).Configure(bar.gameObject, barAnchor, pips);
+
+            // The kitchen works (fire, pans, smoke) while anyone cooks at the Grill.
+            SpriteRenderer kitchen = GameObject.Find("Kitchen").GetComponent<SpriteRenderer>();
+            Replace<KitchenView>(kitchen.gameObject).Configure(kitchen, Single(MinifantasySheets.CraftingAndProfessions, "Kitchen"),
+                MinifantasyImporter.Row(MinifantasySheets.CraftingAndProfessions, "KitchenWorking", 0, 8));
+
+            GameObject service = GameObject.Find("Service");
+            Replace<KeeperWork>(service).Configure(GameObject.Find("Kitchen").GetComponent<TavernInteractable>(), GameObject.Find("Bar").GetComponent<TavernInteractable>(),
+                GameObject.Find("Cauldron").GetComponent<TavernInteractable>(), GameObject.Find("Pass").GetComponent<TavernInteractable>(), seats.ToArray());
+        }
+
+        static T Replace<T>(GameObject target) where T : Component
+        {
+            T old = target.GetComponent<T>();
+            if (old != null) Object.DestroyImmediate(old);
+            return target.AddComponent<T>();
         }
 
         // ------------------------------------------------------------------ lights

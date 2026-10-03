@@ -199,6 +199,7 @@ namespace Hearthdelve.Editor
             look.SetAppearance(new[] { set });
             root.GetComponent<CharacterMovement>().WalkSpeed = 3.2f;
             root.AddComponent<StaffAgent>();
+            TavernStationContent.AddCarryView(root);
             return LookTestContent.SavePrefab(root, PipPrefab);
         }
     }

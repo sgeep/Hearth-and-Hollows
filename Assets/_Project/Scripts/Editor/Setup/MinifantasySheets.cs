@@ -81,6 +81,8 @@ namespace Hearthdelve.Editor
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
         const string k_Cooking = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Cooking";
+        const string k_DishIcons = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Craftable_Item_Icons";
+        const string k_PotionIcons = "Minifantasy_CraftingAndProfessions_v1.0/Minifantasy_CraftingAndProfessions_Assets/Craftable_Item_Icons";
         const string k_Fireplaces = "Minifantasy_DwarvenKingdom_v1.0/Minifantasy_DwarvenKingdom_Assets/Props/Ilumination";
         const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
 
@@ -287,6 +289,26 @@ namespace Hearthdelve.Editor
             sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenProp.png", Pack = CraftingAndProfessions, File = "Kitchen", Pivot = k_BottomLeft });
             sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenPropShadow.png", Pack = CraftingAndProfessions, File = "KitchenShadow", Pivot = k_BottomLeft });
             sheets.Add(new Sheet { Source = $"{k_Cooking}/Minifantasy_CraftingAndProfessions2KitchenWorking.png", Pack = CraftingAndProfessions, File = "KitchenWorking", Mode = SliceMode.Grid, Cell = new Vector2Int(32, 32), Pivot = k_BottomLeft });
+            // 4c dish icons (8×8, on an 8 px grid): grilled skewers and a drumstick, soup bowls (Crafting And
+            // Professions II recipes), and potion flasks for the Tap's drinks (Crafting And Professions I).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_DishIcons}/Minifantasy_CraftingAndProfessions2Recipes.png", Pack = CraftingAndProfessions, File = "DishIcons", Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("MeatSkewer", 64, 8, 8, 8, k_Centre),
+                    new SheetRect("GreenSkewer", 96, 8, 8, 8, k_Centre),
+                    new SheetRect("Drumstick", 136, 8, 8, 8, k_Centre),
+                    new SheetRect("BrownStew", 40, 64, 8, 8, k_Centre),
+                    new SheetRect("RedStew", 64, 64, 8, 8, k_Centre),
+                },
+            });
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_PotionIcons}/Minifantasy_CraftingAndProfessionsPotionIcons.png", Pack = CraftingAndProfessions, File = "PotionIcons", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("BlueFlask", 72, 40, 8, 8, k_Centre), new SheetRect("GreenFlask", 72, 56, 8, 8, k_Centre) },
+            });
+
             // Fire (Dwarven Kingdom): a floor fire under the stew cauldron, and a wall fireplace.
             sheets.Add(new Sheet { Source = $"{k_Fireplaces}/FloorFireplace/FloorFireplace.png", Pack = DwarvenKingdom, File = "FloorFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(16, 16), Pivot = new Vector2(0.5f, 0f) });
             sheets.Add(new Sheet { Source = $"{k_Fireplaces}/WallFireplace/WallFireplace.png", Pack = DwarvenKingdom, File = "WallFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(24, 24), Pivot = new Vector2(0.5f, 0f) });

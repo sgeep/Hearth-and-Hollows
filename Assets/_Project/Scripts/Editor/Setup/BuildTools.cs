@@ -138,6 +138,73 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>
+        /// Batch entry point (run without -nographics): the station panel drawing each minigame (Grill, Tap, Chop)
+        /// mid-game, and the keeper carrying a half-spilled plate among customers, to check layout and readability.
+        /// </summary>
+        public static void CaptureTavernStationsBatch()
+        {
+            try
+            {
+                EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                var content = AssetDatabase.LoadAssetAtPath<Hearthdelve.Tavern.Scene.TavernContent>(EditorPaths.Data + "/Tavern/TavernContent.asset");
+                var panel = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Tavern.StationPanel>(FindObjectsInactive.Include);
+                var canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = Camera.main;
+                canvas.planeDistance = 1f;
+                canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
+                canvas.sortingOrder = 100;
+
+                var grill = new Hearthdelve.Tavern.Minigames.GrillMinigame(content.grill.grill);
+                grill.Begin();
+                for (int i = 0; i < 70; i++) grill.Tick(1f / 60f, default);
+                var tap = new Hearthdelve.Tavern.Minigames.TapMinigame(content.tap.tap);
+                tap.Begin();
+                for (int i = 0; i < 90; i++) tap.Tick(1f / 60f, new Hearthdelve.Core.Minigames.MinigameInput { ActionHeld = true, Aim = new Vector2(0.3f, 0f) });
+                var chop = new Hearthdelve.Tavern.Minigames.ChopMinigame(content.stew.chop, 3, new Hearthdelve.Core.Random.SeededRandom(3));
+                chop.Begin();
+                chop.Tick(0.5f, new Hearthdelve.Core.Minigames.MinigameInput { ActionPressed = true });
+                var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+                foreach (var (game, draw, file) in new (Hearthdelve.Core.Minigames.IMinigame, string, string)[]
+                         { (grill, "DrawGrill", "panel_grill"), (tap, "DrawTap", "panel_tap"), (chop, "DrawChop", "panel_chop") })
+                {
+                    typeof(Hearthdelve.UI.Tavern.StationPanel).GetMethod("Show", flags).Invoke(panel, new object[] { game });
+                    typeof(Hearthdelve.UI.Tavern.StationPanel).GetMethod(draw, flags).Invoke(panel, new object[] { game });
+                    Capture(EditorPaths.TavernScene, $"BatchLogs/{file}.png", TavernBuilder.CameraCentre, reopen: false);
+                }
+                typeof(Hearthdelve.UI.Tavern.StationPanel).GetMethod("Show", flags).Invoke(panel, new object[] { null });
+
+                // Carrying among customers.
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(NpcContent.CustomerPrefab);
+                var layout = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.Tavern.Scene.TavernLayout>();
+                for (int i = 0; i < 5; i++)
+                {
+                    var customer = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                    customer.transform.position = i < 3 ? (Vector3)layout.Seats[i].SitPoint : new Vector3(15f + i, 5f, 0f);
+                    var pool = content.customers[i % content.customers.Count].appearance;
+                    var look = customer.GetComponentInChildren<Hearthdelve.Shared.Animation.LayeredSpriteAnimator>();
+                    look.LockFacing(i < 3 ? layout.Seats[i].Facing : Hearthdelve.Core.Movement.Facing4.FrontLeft);
+                    look.SetAppearance(pool.Layers(pool.Pick(i * 101 + 7)));
+                }
+                var keeper = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(LookTestContent.TavernPlayerPrefab));
+                keeper.transform.position = new Vector3(16.5f, 6f, 0f);
+                var carry = keeper.GetComponent<Hearthdelve.Tavern.Scene.CarryView>();
+                carry.Show(content.recipes[0].icon);
+                carry.SetSpill(0.5f);
+                var plates = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.Tavern.Scene.PassView>().GetComponentsInChildren<SpriteRenderer>(true).Where(r => r.name.StartsWith("Plate")).ToArray();
+                plates[0].sprite = content.recipes[4].icon;
+                plates[1].sprite = content.recipes[2].icon;
+                Capture(EditorPaths.TavernScene, "BatchLogs/tavern_carry.png", TavernBuilder.CameraCentre, reopen: false);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         public static void CaptureTestFloorBatch()
         {
             try
