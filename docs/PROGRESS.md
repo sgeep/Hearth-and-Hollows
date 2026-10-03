@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4b step 4)_
+_Last updated: 2026-10-03 (4b step 5)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -236,7 +236,17 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Slime and bat pushing the player.** They chased right into the player and shoved them; the bat was then always inside its swoop's minimum range and only attacked if the player moved. They now keep a stand-off from their data like the spider (`keepDistance`: slime holds at 1.2 tiles, bat hovers 1.4–2.6 and backs off if crowded), applied at runtime from the definition. Attacks now need only line of sight: the old body-sized check refused leaps near walls and props, which is why the slime only attacked "after a while".
 - Regression tests: a still player is attacked by the slime and the bat without being shoved; being pushed in and out of the rope's trigger logs nothing and the hint still follows.
 
-**Next: step 5,** the dungeon HUD. After your review and playtest of step 4.
+**Step 4 approved (2026-10-03).** Kept as they are: the heartbeat threshold and pacing, the death-screen dimming, the Lockbox flow, and the rise-and-fade climb (until clothed climb art exists).
+
+**Step 5 done (2026-10-03), awaiting review and playtest: the dungeon HUD.**
+
+- **Essence**, top left: the UI Overhaul's Classic bar (a dark trough with a blue fill). When low it switches to the red fill and pulses (two cues, not just a colour); a hit flashes it. "Essence" sits under it. Replaces the look test's placeholder bar on the test floor (the 4a look room keeps its placeholder).
+- **Satchel**, bottom left: the six slots, the same view as the swap prompt (icon, count, quality dots, freshness bar), live: parts appear as they go in, and freshness bars shorten as they spoil.
+- **Harvest feed**, top right: what each kill produced, newest on top, with the part's icon: "Clean kill! Fine Bat Wing ×2", "Overkill! …", "Finisher! …", or "… was destroyed". Lines hold for 2.4 s and fade over 0.5 s (tunable on the HarvestFeed).
+- **Prompts** (satchel full, climb out) moved up to sit above the satchel row. The test floor's debug controls line fades after 6 s so it doesn't sit over the satchel.
+- **Tests (PlayMode, test floor):** the bar follows Essence, flashes on a hit, turns red and pulses when low; the satchel HUD binds to the delve's satchel, shows a part as it goes in with three dots for Fine, and its freshness bar shortens; a kill puts "Clean kill! … Bat Wing ×N" with its icon on the feed, which then fades; the feed picks the right words for clean kills, overkills and destroyed parts; the bar, its label, the satchel, the feed, the prompts and the debug label never overlap and stay on screen (checked at the test window's narrower-than-16:9 width).
+
+**Next: step 6,** the feedback and haptics pass. After your review and playtest of step 5.
 
 ### Open design questions (4a)
 
