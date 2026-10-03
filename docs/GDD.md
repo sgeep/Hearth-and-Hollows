@@ -1,8 +1,8 @@
 # HEARTHDELVE — Project Design Document
 
-*Working title. Version 0.2 (top-down pivot, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
+*Working title. Version 0.3 (design philosophy, tavern immersion, quests and relationships, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
 
-> **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections without a mark are unchanged from v0.1. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+> **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections and lines added in v0.3 are marked **(added in v0.3)** or *(v0.3)*; they record design direction and do not widen any milestone's approved scope. Sections without a mark are unchanged from v0.1. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
 
 ---
 
@@ -32,6 +32,7 @@ Hybrid: top-down action roguelite + tavern management sim.
 3. **A home that grows with you.** The tavern visibly transforms from a quiet inn into a fortified stronghold full of people you saved.
 4. **Cozy on the surface, dread below.** The warmth of the tavern contrasts with the growing menace of the depths.
 5. **You can feel it.** *(added in v0.2)* Every important moment lands through visuals, sound and haptics together.
+6. **Your tavern, your hands.** *(added in v0.3)* Tavern immersion: running the Sunken Flagon should feel physical and present. You walk the room, work the stations, carry the plates and watch strange monster parts become recognizable dishes. Immersion serves the fun and is never an excuse for busywork (Section 6.5).
 
 ### 1.4 Target Platform and Audience
 
@@ -39,6 +40,72 @@ Hybrid: top-down action roguelite + tavern management sim.
 - **Input:** Controller-first design, full keyboard and mouse support.
 - **Audience:** Players who enjoy action roguelites and cozy management games; fans of *Cult of the Lamb*, *Hades*, *Dave the Diver*, *Moonlighter*, *Potion Craft*, *Stardew Valley*.
 - **Rating target:** Teen (fantasy violence, mild monster gore played for comedy).
+
+### 1.5 Design Philosophy (added in v0.3)
+
+The goal is not systems that work correctly; it is the experience the player has. A system can be bug-free and balanced on paper and still fail if it isn't fun, understandable or satisfying in play. The final test is always the experience in play.
+
+**Questions for a non-trivial design decision**
+
+- What experience is this supposed to create for the player, and which parts of it are essential?
+- Does the mechanic actually create that experience in play?
+- Is it fun, understandable and satisfying, rather than merely technically correct?
+- Does it create curiosity, meaningful choices, challenge, mastery or surprise?
+- Does it support good pacing and flow?
+- Is the complexity producing interesting decisions, or merely more work?
+- Does the player get clear and satisfying feedback?
+- Does it reinforce Hearthdelve's theme, world and other systems?
+- Can the idea be tested cheaply before we commit to a large build?
+
+**Lenses as perspectives, not rules.** Jesse Schell's *The Art of Game Design: A Book of Lenses* is the project's recurring vocabulary for questioning a design. Schell presents each lens as a different way of looking at a design, and that is how we use them: pick the lenses that reveal something about the problem in front of us. No feature has to satisfy every lens, and a lens is never a box to tick. When an important design choice is proposed, it states the player experience it targets and, where useful, the lens or principle behind it; but the argument has to stand on its own, and "Schell says so" is not a reason. (The book is reference material only and is not kept in the repository.)
+
+Where each lens most often matters in Hearthdelve:
+
+| Lens | Where it tends to bite |
+|---|---|
+| Essential Experience | The start of every feature: the satisfying kill-and-harvest, the busy evening service, a rare dish carried out to the table |
+| Fun | Whether a moment is enjoyable, not only correct: hits, minigames, serving |
+| Curiosity | Rooms behind doors, unfamiliar monster parts, Test Kitchen experiments, Old Tamsin's disappearance |
+| Problem Solving | Planning a delve around what the menu needs; routing service through a busy room |
+| Elemental Tetrad | Checking that mechanics, story, aesthetics and technology pull the same way (a dish's preparation, its icon, its sound and its lore) |
+| Flow | Minigame length and difficulty; service pacing; the rhythm of fights and choices in a delve |
+| Challenge | Enemy telegraphs and fairness; timing windows; patience under load |
+| Meaningful Choices | Room rewards, satchel space, the Lockbox, the menu, which part to cook and which to sell |
+| Reward | Harvest quality, dish results, Renown, story beats, relationship moments |
+| Simplicity/Complexity | Preferring emergent complexity (simple rules that interact) over innate complexity (more rules); see "Meaningful complexity" below |
+| Elegance | One system serving several purposes, as Essence is both the delve timer and the health pool |
+| Balance | The economy, the risk of going deeper, staff quality against the player's; tuning lives in ScriptableObjects so it can move |
+| Visible Progress | The tavern growing through its stages; preparation depth rising with rarer dishes; familiar faces returning |
+| Feedback | Every action answering the player in visuals, sound and haptics (Section 9A) |
+| Juiciness | Hits, flips, pours and plating that feel good simply to do |
+| Interest Curve | The shape of a delve, an evening and an act, with peaks for bosses and signature dishes |
+| Character / Character Web | Gundra, Pip, Ser Aldric, Sylvaris, Grukka and the regulars, and how they relate to Bram and each other (Section 2.7) |
+| World | Aldmere, Brackenford and the dungeons' ecology: why monsters are edible, why refugees come |
+| Playtesting | The final judge (below) |
+| Technology | Choosing tools that serve the experience, and not letting a tool's shape dictate the design |
+
+**Playtesting over theory.** Hearthdelve keeps its prototype-and-playtest approach: every sub-milestone step is playtested before the next. A theoretically elegant design that feels bad in play is not a successful design. For uncertain or expensive ideas:
+
+1. identify the desired experience;
+2. identify the smallest version that can test it;
+3. build only that much;
+4. playtest it;
+5. analyze specifically what felt good or bad, and why;
+6. iterate.
+
+Player feedback is interpreted, not blindly obeyed. What players actually experience and do matters more than the solution they suggest.
+
+**Meaningful complexity over system count.** Hearthdelve is not judged by how many mechanics it has. It already combines action combat, roguelite runs, harvesting, inventory and freshness, cooking minigames, tavern service, economy and upgrades, quests, relationships, story and stronghold progression, so a smaller number of systems that interact richly beats many isolated ones. Before adding a rule or subsystem, ask:
+
+- Does it create new decisions?
+- Does it interact with existing systems?
+- Does it serve more than one purpose?
+- Does it strengthen the essential experience?
+- Could an existing system do the same thing more elegantly?
+
+Nothing is added only because another RPG or management game has it.
+
+**Immersion and convenience.** Tavern immersion is a pillar, but immersion is a preference, not permission to create tedium. When the two conflict, neither extreme wins automatically; the question is what experience the interaction actually produces. Section 6.5 has the details.
 
 ---
 
@@ -85,6 +152,46 @@ The story unfolds in four acts, advanced by reaching dungeon depths and by taver
 | **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder |
 | **The Warden Below** | The intelligence behind the dungeons; antagonist |
 
+*(v0.3)* Gundra, Pip, Ser Aldric, Sylvaris, Grukka and other important characters are the obvious candidates for personal questlines (Section 2.6) and persistent relationship state (Section 2.7), and they speak with Portrait Generator portraits (Section 8.1). Their quest trees and relationship progressions are not designed yet.
+
+### 2.6 Quests and Objectives (added in v0.3)
+
+A real, persistent quest and objective system is a required feature. **Quest Machine** (Pixel Crushers) owns quest and objective state. Quests include:
+
+- main-story objectives;
+- personal questlines for important NPCs;
+- resident and refugee questlines (Section 6.4);
+- meaningful requests from patrons and customers, including requests for particular monster parts or ingredients ("bring me cave troll liver");
+- exploration and discovery objectives;
+- onboarding and tutorial objectives, where they help;
+- multi-stage objectives and their rewards.
+
+**Ordinary service orders are not quests.** A customer ordering a kebab during service belongs to the tavern service systems and lives and ends within that evening. A quest is an objective that persists, or matters, beyond a single ordinary order.
+
+**How the pieces fit.** Quest Machine owns the quest state. Dialogue System presents the conversations that offer, discuss and complete quests, and can query or advance quest state through Hearthdelve-owned adapters. Hearthdelve's gameplay systems publish gameplay events (a part harvested, a dish served, a boss defeated, a resident housed), and the adapters turn those into objective progress. Gameplay code never calls Quest Machine directly (Section 10.3).
+
+Quests should strengthen the essential experience: they point a delve at a particular monster, give a rare dish someone to be cooked for, and deepen the people in the tavern. They are not lists of chores.
+
+### 2.7 Relationships and Recurring Characters (added in v0.3)
+
+Persistent relationships with selected named NPCs and recurring patrons are a required feature, whatever the middleware. The plan is **Love/Hate** (Pixel Crushers), which is not yet purchased.
+
+Three different things, kept separate:
+
+| Measure | What it describes | Drives |
+|---|---|---|
+| **Renown** | The reputation of the Sunken Flagon as a tavern | Customer tiers, story progress (Section 7.1) |
+| **Morale** | The state of the wider Sanctuary/Stronghold community | **Cheer** in the dungeon (Section 6.4) |
+| **Disposition** | What one named character, or a relevant faction, thinks of Bram | That character's dialogue, quests, help and reactions |
+
+**What characters remember.** Selected characters remember and react to meaningful things, such as: completing or failing their requests; being served something they love or dislike; Bram finding ingredients that matter to them; helping people they care about; major story choices; helping refugees and residents; tavern improvements or failures; dungeon accomplishments; events they witness in the tavern; and repeated good or bad interactions.
+
+**What relationships can change.** Dialogue and barks, personal quests, gifts and rewards, willingness to help, special services or discounts where appropriate, story reactions, how patrons and residents behave, and optional content.
+
+**Scope.** Hearthdelve is not a dating sim or a large social sim. The goal is that important characters feel as if they know Bram, remember what has happened and live in the same world. Relationship state is used selectively, where it creates meaningful character moments.
+
+**Recurring patrons.** The tavern should gradually feel less like a room of disposable customer entities and more like a place with familiar faces. Some patrons return, develop preferences, recognize Bram, react to the tavern's changes and to other residents or events, remember notable service, offer or take part in quests, and change their disposition over time. Most customers stay lightweight and procedurally generated; persistent relationship state is kept for the characters whose continuity creates value. Familiar faces are part of tavern immersion (Section 6.5).
+
 ---
 
 ## 3. Core Gameplay Loop
@@ -95,7 +202,7 @@ The loop is unchanged by the pivot.
 
 Each in-game day is divided into four phases:
 
-1. **Morning — Prep (Tavern hub).** Check stock, set the day's menu, eat a buff meal, choose gear, accept customer requests (e.g. "bring me cave troll liver").
+1. **Morning — Prep (Tavern hub).** Check stock, set the day's menu, eat a buff meal, choose gear, accept requests from patrons and residents (e.g. "bring me cave troll liver"; these are quests, Section 2.6).
 2. **Day — The Delve (Dungeon).** A roguelite run. Fight, harvest, and choose when to return. Deeper = rarer ingredients and more risk.
 3. **Evening — Service (Tavern).** Cook and serve using minigames. Earn gold, tips, and renown.
 4. **Night — Upgrade (Tavern hub).** Spend earnings on equipment, tavern expansions, recipes, and staff. Story scenes play here. Save point.
@@ -249,8 +356,30 @@ Every ingredient is data-driven (ScriptableObject) with:
 - Recipes are discovered through NPCs, recipe scraps found in the dungeon, customer hints, and experimentation.
 - Each recipe has required ingredient slots (by category or specific item) and optional slots that add flavor tags and bonuses.
 - **Experimentation:** combining ingredients freely at the "Test Kitchen" can discover new recipes. Failed experiments produce funny "Questionable Stew".
-- Dish score = base recipe value × ingredient quality × freshness × minigame performance.
+- Dish score = base recipe value × ingredient quality × freshness × minigame performance. *(v0.3)* For a dish with several stages, minigame performance combines the results of its stages; exactly how is decided with the first multi-stage dish.
 - *(v0.2)* Dish art comes from the Minifantasy food icon sets (*More Food Recipes* and others); dishes are named to fit the icons available.
+
+### 5.4 Preparation Depth (added in v0.3)
+
+Long-term design direction, not the scope of any current milestone.
+
+Preparation complexity is one way to communicate progression and value, and to make rare monster parts feel precious when they come back from the dungeon.
+
+| Dish tier | Preparation |
+|---|---|
+| Everyday / basic | Quick: usually one station |
+| Better dishes | One additional meaningful ingredient or process |
+| Rare / signature | Several distinct, satisfying stages |
+
+The shapes the design should allow include `raw monster part → preparation → cooking → finishing/serving`, and dishes whose ingredients are each prepared differently before being combined. Possible stages include butchering or trimming a monster part, chopping, grilling, simmering or stewing, pouring or adding a component, combining prepared ingredients, and a final timing or finishing step. These are examples, not a crafting tree to design now.
+
+**Every step must earn its existence.** A stage has to contribute at least one of: tactile fun, player skill, a meaningful choice, anticipation, risk and reward, stronger sensory feedback, a higher perceived value for the finished dish, story or worldbuilding, or interesting service logistics. No step exists only to make a recipe take longer. A rare dish feels special because the player performed an interesting process, not because they clicked through more menus.
+
+**Reward in proportion.** The time and attention a premium dish takes is paid back through its value, the customer's response, Renown, relationships, special effects or other meaningful outcomes.
+
+**Pacing.** Stages must not pile up until service pacing collapses. Staff, upgrades and mastery can take over familiar stages over time (Section 6.5).
+
+**Data.** Today each recipe names one cooking station (`RecipeDefinition.station`), and the Stew Pot already has two steps (chop, then simmer). That is the Stage 1 shape, not a limit: when the first multi-stage dish is designed, recipe data gains its stages, and how intermediate results are held (on the pass, carried, or inside one panel) is decided then.
 
 ---
 
@@ -264,7 +393,7 @@ The cooking minigames stay as **screen panels** that open over the room when the
 
 ### 6.2 Minigames
 
-Each station is a short, skill-based minigame. Staff can auto-complete stations at reduced quality so the player can focus on others.
+Each station is a short, skill-based minigame. Staff can auto-complete stations at reduced quality so the player can focus on others. *(v0.3)* Most dishes use one station; rare and signature dishes may pass through several (Section 5.4).
 
 | Station | Minigame | Skill |
 |---|---|---|
@@ -284,7 +413,8 @@ Additional minigames can be introduced over time (fermentation, bread proofing, 
 - **Types:** villagers, adventurers, dwarves, elves, orcs, merchants, nobles, refugees, and eventually soldiers and heroes.
 - **Preferences:** each race/type has favorite flavor tags and categories (e.g. dwarves love savory and strong ale; elves prefer herbs and fungus; orcs demand big meat portions).
 - **Patience:** a timer; slow service lowers tips and reviews.
-- **Special Guests:** named characters with unique requests that drive story, unlock recipes, or give quests.
+- **Special Guests:** named characters with unique requests that drive story, unlock recipes, or give quests. *(v0.3)* Requests that persist beyond one evening are quests (Section 2.6).
+- *(v0.3)* **Recurring patrons:** some customers are named regulars who return, remember and change over time (Section 2.7). Most remain lightweight procedurally generated customers.
 - **Reviews and Renown:** satisfied customers raise the tavern's Renown, which attracts better-paying clientele and unlocks story beats.
 - *(v0.2)* Customers are built from the layered *A Myriad Of NPCs* characters, which gives a large variety of bodies, outfits and hair.
 
@@ -304,11 +434,34 @@ The inn plays the role the cult plays in *Cult of the Lamb*. It grows across the
 - **No freeform construction** (placing walls and rooms) for now, but nothing should be designed in a way that rules it out later.
 - Art: *Tavern Indoor*, *Towns*, *Towns 2*, *Crafting And Professions I/II* (kitchen, preparation table and other workbenches), *Farm*, *Castles And Strongholds*, *Builders*.
 
-**Residents:** refugees who move in can be assigned roles (cook, server, gardener, smith, guard). Each resident has a small personal questline.
+**Residents:** refugees who move in can be assigned roles (cook, server, gardener, smith, guard). Each resident has a small personal questline (Quest Machine, Section 2.6); selected residents also carry relationship state (Section 2.7).
 
-**Morale and Cheer:** the stronghold has a Morale value driven by food quality, housing, and story events. High morale grants **Cheer** in the dungeon: temporary buffs, extra revives, or crowd "chants" that power up the Kitchen Arts meter. This makes the story theme of people rallying behind you a real mechanic.
+**Morale and Cheer:** the stronghold has a Morale value driven by food quality, housing, and story events. High morale grants **Cheer** in the dungeon: temporary buffs, extra revives, or crowd "chants" that power up the Kitchen Arts meter. This makes the story theme of people rallying behind you a real mechanic. *(v0.3)* Morale is the community's state; it is separate from the tavern's Renown and from any one character's disposition (Section 2.7).
 
 **Defense Events (undecided):** occasionally monsters breach the surface and attack the stronghold, and the player defends with residents helping. Not built yet. Because the tavern now uses the same top-down character as the dungeon, adding them later is cheap.
+
+### 6.5 Tavern Immersion (added in v0.3)
+
+Pillar 6. One of the most important parts of Hearthdelve is the feeling of actually running this fantasy tavern and preparing strange monster cuisine. When two otherwise viable designs are on the table, the one that gives a stronger sense of presence, physicality and immersion in the tavern is generally preferred.
+
+**Physical and grounded.** The important actions should feel physical: walking to stations, carrying plates, pouring drinks, cooking, preparing ingredients, dealing with patrons, managing a busy room, and seeing ingredients become recognizable finished dishes. Animation, audio, haptics, movement, station interactions, visual feedback and NPC behaviour all reinforce it. (An early example from 4c: the stove and cauldron can be worked from behind, like a cook at a range.)
+
+**Immersion is not maximum manual labour.** The goal is the essential experience of preparing and serving food, not a literal simulation of every mundane action. When immersion and convenience conflict, ask what experience the interaction actually produces, and avoid:
+
+- repetitive busywork;
+- needless menu navigation;
+- waiting with nothing meaningful to do;
+- repeating low-skill actions the player has already mastered;
+- realism that doesn't make a better fantasy;
+- so many preparation stages that service pacing collapses.
+
+If the more immersive option is clearly more repetitive, confusing, slow or frustrating, it is not chosen silently for realism; the tradeoff is flagged.
+
+**Progression can lift repetition without removing the fantasy.** Staff, upgrades or mastery may eventually automate or simplify parts of familiar work while the player keeps personally doing the most interesting or valuable steps, so the tavern grows more capable without turning late-game play into the same chores forever. Staff auto-completing stations (Section 6.2) is the first form of this; the full progression is not designed yet.
+
+**Feedback sells the fantasy.** Tactile feedback is part of the immersion. Chopping, flipping, sizzling near the burn threshold, pouring, reaching the right fill level, spilling, plating, serving and finishing a high-quality dish should all feel responsive and satisfying, through the combined visuals, sound and haptics of Section 9A. Feedback carries information and emotion at once: the player should often know they did well because they saw, heard and felt it, not only because a score appeared afterwards. In a multi-stage premium dish each stage builds anticipation, so finishing it feels proportionally rewarding.
+
+**Familiar faces.** Recurring patrons and residents who remember Bram (Section 2.7) make the room feel lived in.
 
 ---
 
@@ -352,10 +505,13 @@ All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×
 - **Food** should look appetizing even at this scale; dishes use the Minifantasy food icons, shown enlarged in menus and results.
 - **Content adapts to the art:** monsters, ingredients, dishes, stations, NPCs and bosses are chosen from what Minifantasy contains (`docs/ASSET_MAP.md`).
 - **Known gaps:** no rat with an attack, no mallet or frying pan weapon, no plate-carrying overlay, and no fonts or audio.
+- *(v0.3)* **Portraits:** important NPCs get dialogue portraits made with the **Minifantasy Portrait Generator** by Krishna Palacio, so they belong with the rest of the art. The usual Minifantasy rules apply: raw files stay outside the repo, the catalog is searched first, only what is used is imported, and the workflow and choices are recorded in `docs/ASSET_MAP.md`. Nothing is imported yet (4g).
 
 ### 8.2 UI (rewritten in v0.2)
 
 Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD in the dungeon. All text is localized.
+
+*(v0.3)* Dialogue (4g) is presented in uGUI + Super Text Mesh through Dialogue System. Portraits are data-driven: character and NPC data reference a portrait, and the presenter reads it from there, never from a portrait hard-coded into a particular dialogue screen.
 
 ### 8.3 Audio
 
@@ -456,7 +612,7 @@ Unity 6.6 now, moving to 6.7 LTS when it is released and staying there through l
 - **Pathfinding:** our own grid A* (TDE has none for 2D).
 - **Content Loading:** Addressables for biome assets and room prefabs when room loading is built; until then only Localization uses it.
 - **Localization:** Unity Localization package; every player-facing string comes from a string table.
-- **Story, dialogue and quests:** Dialogue System for Unity and Quest Machine, presented through Super Text Mesh, with Minifantasy Portrait Generator portraits; hooks for Love/Hate relationships later. *(Locked 2026-10-03, replacing Yarn Spinner.)*
+- **Story, dialogue and quests:** Dialogue System for Unity and Quest Machine (Pixel Crushers; licensed, imported when 4g begins), presented through uGUI + Super Text Mesh, with Minifantasy Portrait Generator portraits; hooks for Love/Hate relationships (planned, not purchased). *(Locked 2026-10-03, replacing Yarn Spinner entirely; there is no second dialogue system.)*
 
 Versions, licenses and vendor rules are in `docs/THIRD_PARTY.md` and `CLAUDE.md`.
 
@@ -482,6 +638,13 @@ Additive scene loading keeps the persistent `Boot` services alive.
 - **Minigames:** each station implements `IMinigame` (Begin, Tick, Evaluate → score 0–1), so staff can auto-resolve any station.
 - **Customer AI:** a state machine (Enter, Queue, Seat, Order, Wait, Eat, Pay, Leave) with a patience timer and preference scoring; movement follows A* paths to tables.
 - **Feedbacks:** one `MMF_Player` per important moment, containing visuals, sound and a named haptic pattern. All intensities respect the player's settings.
+- *(v0.3)* **Story middleware boundary.** The Pixel Crushers packages must not become a second gameplay architecture.
+  - **Dialogue System:** conversations, branching dialogue, dialogue conditions and story variables, contextual barks, dialogue presentation.
+  - **Quest Machine:** persistent quest and objective state.
+  - **Love/Hate** (when added): disposition of selected NPCs and factions.
+  - **Hearthdelve:** inventory, ingredients, recipes, combat, harvesting, Essence, economy, Renown, Morale, progression, day flow, tavern service, upgrades and all other core gameplay, plus the authoritative save.
+
+  They are reached only through Hearthdelve-owned adapters and bridges at the event bus boundary, the same way TDE events are. Gameplay systems publish events; adapters turn them into quest progress, dialogue variables and relationship changes, and expose game state to dialogue conditions. Dungeon, Tavern, combat and inventory code never call Pixel Crushers APIs, pure logic never depends on Pixel Crushers packages, and Dungeon and Tavern still never reference each other. Which assembly holds the adapters is decided in the 4g plan.
 
 ### 10.4 Key Systems
 
@@ -493,8 +656,9 @@ Additive scene loading keeps the persistent `Boot` services alive.
 | `ServiceSystem` | Customer spawning, orders, timers, payment, reviews |
 | `EconomySystem` | Currencies, prices, wages |
 | `ProgressionSystem` | Unlocks, relics, tavern stages, story flags |
-| `StoryManager` | Act progression, dialogue and quest triggers (Dialogue System for Unity, Quest Machine) |
-| `SaveSystem` | Versioned JSON of persistent state; autosave at Night phase |
+| `StoryManager` | Act progression; the Hearthdelve-owned bridge between gameplay events and Dialogue System for Unity and Quest Machine (4g) |
+| Relationships *(planned)* | Disposition of selected NPCs and factions behind a Hearthdelve-owned interface; Love/Hate when added |
+| `SaveSystem` | Versioned JSON of persistent state; autosave at Night phase. The only authoritative save, including middleware state through adapters |
 | `LevelGenerator` | Builds dungeon floors from room graphs |
 | `HapticService` | Plays named haptic patterns, applies settings, checks device support |
 | `GridPathfinder` | A* on the room's tile grid for customers and enemies |
@@ -512,6 +676,8 @@ Designer-authored **room prefabs** chosen by a **graph-based generator**, played
 ### 10.6 Save Data
 
 Persistent: tavern stage and upgrades, placed furniture, unlocked weapons/relics/recipes, storeroom inventory, currencies, residents, story flags, settings. Run state is saved only at biome transitions to prevent save-scumming (optionally allow a "suspend run" save).
+
+*(v0.3)* `SaveSystem` stays the authoritative save. When the Pixel Crushers systems arrive, their persistent state joins its save/load lifecycle through adapters: Dialogue System story state as required, Quest Machine quest and objective state, and Love/Hate relationship state when added. An adapter may use the middleware's own serialization internally, but the data lives in Hearthdelve's save file and follows its versioning; there is no separate player-save path.
 
 ### 10.7 Project Folder Structure
 
@@ -564,7 +730,7 @@ Assets/
 - **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena.
 - **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.
 - **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement.
-- **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine with an STM presenter, Minifantasy Portrait Generator portraits, architecture and hooks for Love/Hate later, the Act I opening, onboarding, character creation.
+- **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later.
 - **4h Menus, options and polish:** settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
 
 ### 11.2 Scope Warning
@@ -594,8 +760,12 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 4. **Time pressure:** no calendar deadline. Delves are limited by Essence, which depletes over time and when the player takes damage, and can be upgraded.
 5. **Death penalty:** lose everything except one satchel slot the player chooses to keep.
 6. **Co-op:** no.
-7. **Dialogue and quest tooling:** Dialogue System for Unity and Quest Machine, with Minifantasy Portrait Generator portraits and hooks for Love/Hate later (locked 2026-10-03; replaces Yarn Spinner).
+7. **Dialogue and quest tooling:** Dialogue System for Unity and Quest Machine, with Minifantasy Portrait Generator portraits and hooks for Love/Hate later (locked 2026-10-03; replaces Yarn Spinner entirely).
 8. **Monetization:** premium only, with possible paid expansions.
+9. **Tavern immersion is a design pillar** (Section 6.5), without equating immersion with manual labour *(2026-10-03)*.
+10. **Persistent quests are required,** owned by Quest Machine; ordinary service orders are not quests (Section 2.6) *(2026-10-03)*.
+11. **Persistent relationships with selected characters are required,** kept separate from Renown and Morale (Section 2.7) *(2026-10-03)*.
+12. **`SaveSystem` is the only authoritative save;** middleware state joins it through adapters (Section 10.6) *(2026-10-03)*.
 
 **Open**
 
@@ -604,6 +774,9 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 3. **Audio source:** where SFX and music come from.
 4. **Font:** a pixel font for Super Text Mesh.
 5. **Freeform construction:** not planned, but kept possible.
+6. **Patron requests before quests exist** *(v0.3)*: 4f lists "customer requests", but requests for parts or ingredients that persist beyond an evening are now quests (Section 2.6), and Quest Machine arrives in 4g. See `docs/PROGRESS.md`.
+7. **Love/Hate in 4g or later** *(v0.3)*: decided when 4g is planned, depending on whether it has been purchased and suits the vertical slice.
+8. **The multi-stage dish model** *(v0.3)*: how stages are represented and scored, and how intermediate results are held. Decided with the first multi-stage dish (Section 5.4).
 
 ---
 
@@ -616,6 +789,11 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 - **Kitchen Arts:** the player's special meter attack.
 - **Cheer:** in-dungeon buffs granted by stronghold morale.
 - **Renown:** the tavern's reputation, driving customer tiers and story.
+- **Morale:** the state of the Sanctuary/Stronghold community; it produces Cheer.
+- **Disposition:** what one named character or faction thinks of Bram (Section 2.7).
+- **Quest:** an objective that persists or matters beyond a single ordinary order, owned by Quest Machine.
+- **Recurring patron:** a named customer who returns and remembers.
+- **Preparation stage:** one step of a multi-stage dish (Section 5.4).
 - **Satchel / Lockbox:** carry inventory / the one slot kept on death.
 - **Run power-up:** a temporary boon chosen from three, lasting one run.
 - **Haptic pattern:** a named vibration design triggered by gameplay.

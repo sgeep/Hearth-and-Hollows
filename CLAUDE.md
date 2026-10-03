@@ -4,6 +4,19 @@ You are the lead gameplay programmer on **Hearthdelve**, a 2D **top-down** actio
 
 The game was a side-scroller through Phase 3. That prototype is preserved at the tag `v0-sidescroller-prototype`; the pivot to top-down happened on 2026-10-02 (see `docs/PROGRESS.md`, Phase 4).
 
+## Making design decisions
+
+The goal is the intended player experience, not systems that are merely correct. The full philosophy is in GDD §1.5 (design philosophy) and §6.5 (tavern immersion); these are the guardrails.
+
+- **Experience first.** Before a non-trivial design choice, name the experience it should create and which parts of it are essential, then judge whether the mechanic produces that experience in play.
+- **Lenses, not a checklist.** Jesse Schell's *The Art of Game Design* lenses are a shared vocabulary for questioning a design. Use the ones that fit the problem; no feature has to "pass" every lens, and "the book says so" is never the reason for a choice. (The book is reference material only: never commit or redistribute it.)
+- **Playtesting beats theory.** For uncertain or expensive ideas: name the experience, build the smallest version that tests it, playtest, say specifically what felt good or bad and why, then iterate. Interpret player feedback; watch what players do, not only the fix they suggest.
+- **When proposing an important design choice,** state the experience being targeted in a sentence and, where it helps, the lens or principle behind the recommendation.
+- **Small, reversible choices inside an approved feature** can be made independently, in this order of concern: (1) the intended experience; (2) fun and clarity; (3) immersion where it strengthens that experience; (4) meaningful interaction over busywork; (5) meaningful choices and rich interactions over system count; (6) flow and pacing; (7) strong feedback for every player action; (8) elegant solutions that serve several purposes; (9) expose tuning values rather than treating first-pass balance as final; (10) confirm subjective calls in playtesting.
+- **Immersion bias, with a flag.** Between two otherwise similar options, prefer the more immersive one. If the immersive option is clearly more repetitive, confusing, slow or frustrating, don't silently choose it for realism: flag the tradeoff.
+- **Meaningful complexity over system count.** Before adding a rule or subsystem, ask whether it creates new decisions, interacts with existing systems, serves more than one purpose, strengthens the essential experience, and whether an existing system could do it more elegantly. Never add a feature just because another game has it.
+- **Ask, don't guess,** on anything expensive to reverse, any major new mechanic or progression structure, and anything that conflicts with a locked decision.
+
 ## Folders
 
 - `C:\Dev\Hearthdelve` — the repository and the Unity 6.6 project. All work happens here.
@@ -26,8 +39,14 @@ The game was a side-scroller through Phase 3. That prototype is preserved at the
 - **Death penalty:** on death (or Essence depletion) the player loses the entire haul except **one satchel slot they choose to keep — the whole stack in it** (the Lockbox, chosen on the death screen). Permanent unlocks, relics, gold already banked, and tavern progress are never lost. Unspent run currency is lost.
 - **Runs:** room by room. Clear a room, doors unlock, choose the next room by its displayed reward. Floors are generated from a room graph, with a boss at the end of each biome.
 - **Tavern:** a top-down room the player walks around. Customers path to tables; serving means carrying plates through the room. Minigames stay as screen panels. New areas unlock through story and upgrades; furniture and decor are placed freely inside them. No freeform construction yet, but don't design it out.
+- **Tavern immersion is a design pillar** (GDD §1.3, §6.5). The player should feel they are running this tavern and cooking strange monster food: walking to stations, carrying plates, pouring, cooking, preparing ingredients, dealing with patrons and seeing parts become recognizable dishes. Immersion means capturing the essential experience, not simulating every mundane action, and it never licenses tedium. Later progression (staff, upgrades, mastery) may take over familiar low-level work while the player keeps the interesting steps.
+- **Preparation depth:** everyday dishes stay quick; better dishes add one meaningful ingredient or process; rare and signature dishes may have several distinct stages (GDD §5.4). Every added step must earn its place (skill, choice, tactile fun, anticipation, risk/reward, feedback, perceived value, story or service logistics), never only add time. Recipe data must not assume that every dish is one station interaction forever, but this is long-term direction: it does not widen the current milestone's cooking scope.
+- **Quests:** a persistent quest and objective system is a required feature, owned by Quest Machine (GDD §2.6). Ordinary service orders are not quests; they stay in the tavern service systems.
+- **Relationships:** persistent relationships with selected named NPCs and recurring patrons are a required feature, whatever the middleware (GDD §2.7). Keep three things separate: **Renown** (the tavern's reputation), **Morale** (the Sanctuary/Stronghold community, which produces Cheer) and **disposition** (what one character or faction thinks of Bram). Use relationship state selectively, where continuity creates value; Hearthdelve is not a dating or social sim.
 - **Co-op:** none. Single-player only; do not build networking abstractions.
-- **Story, dialogue and quests:** **Dialogue System for Unity** with **Quest Machine** (Pixel Crushers), presented through Super Text Mesh, with portraits from the **Minifantasy Portrait Generator**. Leave architecture and hooks for **Love/Hate** (relationships) later. Expose game state to the dialogue and quest systems through their Lua variables, custom functions and conditions rather than hard-coding story logic in C#. Locked 2026-10-03; it replaces Yarn Spinner. Built in 4g.
+- **Story, dialogue and quests:** **Dialogue System for Unity** with **Quest Machine** (Pixel Crushers), presented through uGUI + Super Text Mesh, with portraits from the **Minifantasy Portrait Generator**. Leave architecture and hooks for **Love/Hate** (relationships) later. Expose game state to the dialogue and quest systems through their Lua variables, custom functions and conditions, registered by Hearthdelve-owned adapters, rather than hard-coding story logic in C#. Locked 2026-10-03; it **replaces Yarn Spinner entirely** (no Yarn Spinner, and no second dialogue system alongside). Built in 4g.
+- **Pixel Crushers ownership:** Dialogue System owns conversations, dialogue state and contextual barks; Quest Machine owns persistent quest and objective state; Love/Hate, when added, owns selected NPC and faction disposition. **Hearthdelve owns everything else**: inventory, ingredients, recipes, combat, harvesting, Essence, economy, Renown, Morale, progression, day flow, tavern service and upgrades. The middleware must not become a second gameplay architecture.
+- **Portraits:** dialogue portraits are made with the Minifantasy Portrait Generator, referenced from character or NPC data and read by the dialogue presenter; never hard-coded into individual dialogue screens. Portrait Generator assets follow the Minifantasy rules above: raw files stay in `C:\Dev\Minifantasy`, catalog first, import only what is used, record the workflow and selections in `docs/ASSET_MAP.md`, and credit Krishna Palacio.
 - **Monetization:** premium, no in-game purchases. Keep content modular (biomes, recipes, customers as data) so paid expansions can be added later.
 - **Stronghold defense events:** still undecided. Do not build them yet, but do not design the Tavern scene in a way that would make adding combat there impossible. They are now cheap to add later, because the tavern uses the same TDE character as the dungeon.
 
@@ -44,7 +63,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 - **UI:** uGUI + Super Text Mesh + Minifantasy UI sprites replace UI Toolkit. STM does not work with UI Toolkit; use its **Ultra** shader under URP.
 - **Localization:** every player-facing string goes through a Localization string table — no literal UI text in C# or in prefabs. Use Localization 1.5.13 or later (1.5.8 does not compile on Unity 6.6).
 - **Addressables:** deferred. Do not use Addressables for game content until we build biome/room loading. (The package is present only as a transitive dependency of Localization, which stores its string tables in Addressables groups; leave those Localization-managed groups alone and don't add our own yet.)
-- **Dialogue System for Unity and Quest Machine:** install when 4g begins, not before. Verify their versions against the current Unity version and check their Super Text Mesh and Localization integration then; don't assume APIs from older versions.
+- **Dialogue System for Unity and Quest Machine:** licensed, **not imported**. Install when 4g begins, not before. Verify their versions against the current Unity version and check their Super Text Mesh and Localization integration then; don't assume APIs from older versions. **Love/Hate** is planned but not purchased or imported; whether it joins 4g or comes later is decided when 4g is planned. Don't describe any of the three as present until it is in the project.
 - **Pathfinding:** TDE has none for 2D. Tavern customers and enemies use our own grid A* (pure logic, EditMode tests), driven through a thin TDE AI action.
 - **Web build:** keep it working at the end of each sub-milestone.
 
@@ -60,6 +79,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 
 ## Game feel
 
+- Feedback is part of immersion, not decoration: it should tell the player how well they did and how it felt at the same time, so a good chop, pour or plate reads in the moment, not only as a score afterwards (GDD §6.5).
 - Every new player-facing interaction gets a **feedback pass** covering visuals, sound and haptics, authored together in the same `MMF_Player` so each important moment has one combined feedback.
 - Haptics use **named patterns** from the haptic library (ScriptableObjects). Gameplay triggers named patterns, never raw motor values. Any mapping from a gameplay value to intensity (e.g. pour speed → rumble strength) is pure logic with EditMode tests.
 - All feedback intensities respect the player's settings (screen shake, flash, vibration on/off, vibration intensity, reduced-intensity accessibility option). Haptics degrade gracefully where unsupported.
@@ -74,7 +94,8 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 - Assembly definitions: `Hearthdelve.Core`, `Hearthdelve.Dungeon`, `Hearthdelve.Tavern`, `Hearthdelve.Shared`, `Hearthdelve.UI`, `Hearthdelve.Editor`, `Hearthdelve.Tests`. Dungeon and Tavern must not reference each other; they share through Core/Shared.
 - Pure logic (damage calculation, harvest rules, recipe scoring, economy, Essence drain, pathfinding, haptic intensity mapping, save serialization) lives in plain C# classes with EditMode unit tests. MonoBehaviours stay thin. TDE-dependent behaviour gets PlayMode tests.
 - Minigames implement a common `IMinigame` interface (Begin, Tick, Evaluate returning a 0–1 score) so staff can auto-resolve any station.
-- Save data is versioned JSON. Autosave at the Night phase.
+- **Pixel Crushers boundary:** Dialogue System, Quest Machine and Love/Hate are reached only through Hearthdelve-owned adapters and bridges, at the `EventBus` boundary. Gameplay systems publish gameplay events (an ingredient harvested, a dish served, a boss killed); the adapters turn them into quest progress, dialogue variables or relationship changes. No Pixel Crushers calls inside Dungeon, Tavern, combat, inventory or other gameplay code, pure logic never depends on Pixel Crushers packages, and Dungeon and Tavern still never reference each other.
+- Save data is versioned JSON. Autosave at the Night phase. **`SaveSystem` is the only authoritative save.** Dialogue, quest and relationship state are captured and restored by adapters inside its save/load lifecycle, never through a separate player-save path.
 
 ## Working in Unity from outside the editor
 
@@ -87,6 +108,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 
 ## Workflow rules
 
+- Long-term design direction recorded in the docs (preparation depth, quests, relationships, portraits) never widens the approved scope of the current milestone. Raise it when the milestone it belongs to is planned.
 - Work one milestone at a time. Phase 4 is split into sub-milestones 4a–4h (see `docs/PROGRESS.md`); each is planned, approved, built and playtested separately. At the start of each, propose a plan (systems, files, tests, what I'll need to do in the editor) and wait for approval.
 - The pivot branch `pivot/top-down` was merged into `main` on 2026-10-02, after the 4a look test was approved. Work now happens on `main`; push `main` to the private GitHub repo (`origin`) at the end of each work session. Keep `pivot/top-down` and the `v0-sidescroller-prototype` tag; do not delete or move them.
 - Commit in small, logical steps with clear messages. The repo uses Git with Unity's standard `.gitignore` and Git LFS for art and audio.
