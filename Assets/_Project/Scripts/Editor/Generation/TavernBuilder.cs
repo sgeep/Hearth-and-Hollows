@@ -64,17 +64,23 @@ namespace Hearthdelve.Editor
         const string k_UnlitSprite = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
 
         /// <summary>
-        /// Applies builder changes to the existing tavern scene in place, without rebuilding it:
-        /// the camera's resting point.
+        /// Applies builder changes to the existing tavern scene in place, without rebuilding it: the
+        /// camera's resting point; the kitchen and stew pot blocking back to the wall, the whole kitchen
+        /// being the Grill, and highlights drawn from corner sprites (step 1 playtest).
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Tavern", priority = 3)]
         public static void UpdateTavern()
         {
+            MinifantasyImporter.ImportAll();
             var scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
             var tavernCamera = GameObject.Find("Tavern Camera");
             if (tavernCamera == null) throw new InvalidOperationException("The tavern scene has no Tavern Camera.");
             tavernCamera.transform.position = new Vector3(CameraCentre.x, CameraCentre.y, -10f);
             Camera.main.transform.position = tavernCamera.transform.position;
+            SetUpBar(GameObject.Find("Bar").GetComponent<SpriteRenderer>());
+            SetUpPass(GameObject.Find("Pass").GetComponent<SpriteRenderer>());
+            SetUpKitchen(GameObject.Find("Kitchen").GetComponent<SpriteRenderer>());
+            SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -245,16 +251,12 @@ namespace Hearthdelve.Editor
             SpriteRenderer bar = Piece(furniture, Tavern("props", "Bar"), "Bar", k_Bar);
             bar.gameObject.AddComponent<SortingGroup>().sortingLayerName = SortingLayers.YSorted;
             Piece(bar.transform, Tavern("props2", "BarTop"), "Taps", new Vector2(0.25f, 1.125f), SortingLayers.YSorted, 1);
-            Footprint(bar, 4f, 55f, 14f);
-            Footprint(bar, 0f, 5f, 22f);
-            Station(bar, TavernInteractableKind.Tap, TavernLocKeys.StationTap, new Vector2(1.1f, -0.55f), 1.0f, new Rect(0.1f, 1f, 1.8f, 1.75f));
+            SetUpBar(bar);
 
             // The kitchen: the oven behind, the range in front (the Grill). Its working loop plays while cooking (step 3).
             SpriteRenderer kitchen = Piece(furniture, Single(MinifantasySheets.CraftingAndProfessions, "Kitchen"), "Kitchen", k_Kitchen);
             Piece(kitchen.transform, Single(MinifantasySheets.CraftingAndProfessions, "KitchenShadow"), "Shadow", Vector2.zero, SortingLayers.Floor, 5);
-            Footprint(kitchen, 12f, 16f, 8f, 3f);
-            Footprint(kitchen, 1f, 11f, 18f, 10f);
-            Station(kitchen, TavernInteractableKind.Grill, TavernLocKeys.StationGrill, new Vector2(2.5f, -0.2f), 1.0f, new Rect(1.5f, 0.375f, 2f, 1f));
+            SetUpKitchen(kitchen);
 
             // The stew pot: the Dungeon cauldron over a small floor fire, sorted as one.
             var stewRoot = new GameObject("StewPot").transform;
@@ -267,13 +269,11 @@ namespace Hearthdelve.Editor
             fire.gameObject.AddComponent<SpriteLoop>().Configure(fireFrames, 0.12f);
             SpriteRenderer cauldron = Piece(stewRoot, MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Props", "Cauldron"), "Cauldron", Vector2.zero, SortingLayers.YSorted, 1);
             cauldron.transform.localPosition = Vector2.zero;
-            FullFootprint(cauldron);
-            Station(cauldron, TavernInteractableKind.StewPot, TavernLocKeys.StationStewPot, new Vector2(0f, -0.6f), 1.0f, new Rect(-0.75f, 0f, 1.5f, 1.4f));
+            SetUpStewPot(cauldron);
 
             // The pass: finished plates wait here; usable from either side.
             SpriteRenderer pass = Piece(furniture, Tavern("props", "LongTableH"), "Pass", k_Pass + new Vector2(1.75f, 0f));
-            FullFootprint(pass);
-            Station(pass, TavernInteractableKind.Pass, TavernLocKeys.StationPass, new Vector2(0f, 0.5f), 1.5f, new Rect(-1.75f, 0f, 3.5f, 1f));
+            SetUpPass(pass);
 
             // Dining: a round table with a chair each side, facing it. Seats are marked for customers (step 2).
             var seats = new GameObject("Seats").transform;
@@ -299,9 +299,57 @@ namespace Hearthdelve.Editor
             FullFootprint(Piece(furniture, Tavern("props", "StoolRedA"), "Stool", new Vector2(11.5f, 11.5f)));
         }
 
+        /// <summary>The bar, used at its taps from the customer side.</summary>
+        static void SetUpBar(SpriteRenderer bar)
+        {
+            ClearStation(bar);
+            Footprint(bar, 4f, 55f, 14f);
+            Footprint(bar, 0f, 5f, 22f);
+            Station(bar, TavernInteractableKind.Tap, TavernLocKeys.StationTap, new Vector2(1.1f, -0.55f), 1.0f, new Rect(0.1f, 1f, 1.8f, 1.75f));
+        }
+
+        /// <summary>The pass, usable from either side of its table.</summary>
+        static void SetUpPass(SpriteRenderer pass)
+        {
+            ClearStation(pass);
+            FullFootprint(pass);
+            Station(pass, TavernInteractableKind.Pass, TavernLocKeys.StationPass, new Vector2(0f, 0.5f), 1.5f, new Rect(-1.75f, 0f, 3.5f, 1f));
+        }
+
+        /// <summary>
+        /// The whole kitchen is the Grill: the range in front and the oven behind it, used from in front of
+        /// either. Both block back to the wall, so the stove can't be walked round and used from behind.
+        /// </summary>
+        static void SetUpKitchen(SpriteRenderer kitchen)
+        {
+            ClearStation(kitchen);
+            float toWall = (FloorTop - kitchen.transform.position.y) * MinifantasySheets.PixelsPerUnit;
+            Footprint(kitchen, 12f, 16f, toWall - 3f, 3f);
+            Footprint(kitchen, 1f, 11f, 18f, 10f);
+            Station(kitchen, TavernInteractableKind.Grill, TavernLocKeys.StationGrill, new Vector2(1.8125f, -0.2f), 1.5f, new Rect(0.125f, 0.375f, 3.375f, 3.125f));
+        }
+
+        /// <summary>The cauldron, used from the front; it blocks back to the wall, so it can't be used from behind.</summary>
+        static void SetUpStewPot(SpriteRenderer cauldron)
+        {
+            ClearStation(cauldron);
+            float toWall = (FloorTop - cauldron.transform.position.y) * MinifantasySheets.PixelsPerUnit;
+            Footprint(cauldron, 0f, 12f, toWall);
+            Station(cauldron, TavernInteractableKind.StewPot, TavernLocKeys.StationStewPot, new Vector2(0f, -0.6f), 1.0f, new Rect(-0.75f, 0f, 1.5f, 1.4f));
+        }
+
+        /// <summary>Removes a piece's footprints, interaction and highlight, so it can be set up again.</summary>
+        static void ClearStation(SpriteRenderer piece)
+        {
+            foreach (BoxCollider2D box in piece.GetComponents<BoxCollider2D>()) Object.DestroyImmediate(box);
+            Object.DestroyImmediate(piece.GetComponent<TavernInteractable>());
+            Transform highlight = piece.transform.Find("Highlight");
+            if (highlight != null) Object.DestroyImmediate(highlight.gameObject);
+        }
+
         /// <summary>
         /// Makes a piece usable: where the player stands (relative to its pivot) and how near, plus its
-        /// highlight: gold corner brackets around <paramref name="frame"/> (pivot-relative) and a bobbing marker above.
+        /// highlight: gold corners around <paramref name="frame"/> (pivot-relative) and a bobbing marker above.
         /// </summary>
         static void Station(SpriteRenderer piece, TavernInteractableKind kind, string nameKey, Vector2 useOffset, float reach, Rect frame)
         {
@@ -309,20 +357,24 @@ namespace Hearthdelve.Editor
             var highlight = new GameObject("Highlight").transform;
             highlight.SetParent(piece.transform, false);
 
-            SpriteRenderer brackets = LookTestContent.AddSprite(highlight, "Brackets", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Selectors", "Brackets"),
-                SortingLayers.Above, 0, frame.center);
-            brackets.drawMode = SpriteDrawMode.Sliced;
-            brackets.size = frame.size + Vector2.one * 0.25f;
-            brackets.color = k_Highlight;
+            // Four corner sprites rather than one 9-sliced frame: a sliced SpriteRenderer dropped the
+            // frame's top row and right column of pixels (step 1 playtest).
+            Rect outer = new(frame.xMin - 0.125f, frame.yMin - 0.125f, frame.width + 0.25f, frame.height + 0.25f);
+            var corners = new List<SpriteRenderer>();
+            foreach (var (name, at) in new[] { ("CornerTL", new Vector2(outer.xMin, outer.yMax)), ("CornerTR", new Vector2(outer.xMax, outer.yMax)),
+                         ("CornerBL", new Vector2(outer.xMin, outer.yMin)), ("CornerBR", new Vector2(outer.xMax, outer.yMin)) })
+            {
+                SpriteRenderer corner = LookTestContent.AddSprite(highlight, name, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Selectors", name),
+                    SortingLayers.Above, 0, at);
+                corner.color = k_Highlight;
+                corners.Add(corner);
+            }
             SpriteRenderer marker = LookTestContent.AddSprite(highlight, "Marker", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Selectors", "Marker"),
                 SortingLayers.Above, 1, new Vector2(frame.center.x, frame.yMax + 0.25f));
             marker.color = k_Highlight;
             marker.gameObject.AddComponent<SpriteBob>();
             if (unlit != null)
-            {
-                brackets.sharedMaterial = unlit;
-                marker.sharedMaterial = unlit;
-            }
+                foreach (SpriteRenderer r in corners.Append(marker)) r.sharedMaterial = unlit;
 
             piece.gameObject.AddComponent<TavernInteractable>().Configure(kind, nameKey, useOffset, reach, highlight.gameObject);
             highlight.gameObject.SetActive(false);

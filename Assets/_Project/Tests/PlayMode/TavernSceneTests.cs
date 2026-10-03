@@ -117,6 +117,40 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         /// <summary>Furniture can move (4f): the grid is invalidated and rebuilt, and its version tells path followers to re-plan.</summary>
+        /// <summary>
+        /// Step 1 playtest: the stove and cauldron could be walked round and approached from behind, where
+        /// nothing reached. They block back to the wall now, and the whole kitchen (oven and range) is the Grill.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Stations_AreUsedFromTheFront_AndTheWholeKitchenIsTheGrill()
+        {
+            yield return Load(Scene);
+            NavGrid grid = NavGrid.Current;
+            foreach (string name in new[] { "Kitchen", "Cauldron" })
+            {
+                Bounds piece = GameObject.Find(name).GetComponents<Collider2D>().Select(c => c.bounds).Aggregate((a, b) => { a.Encapsulate(b); return a; });
+                for (float x = piece.min.x + 0.5f; x < piece.max.x; x += 1f)
+                    Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(new Vector2(x, 13.5f))), Is.False, $"no way behind the {name} at x {x}");
+                Assert.That(piece.max.y, Is.GreaterThanOrEqualTo(14f - 0.01f), $"the {name} blocks back to the wall");
+            }
+
+            TavernInteractable grill = Station(TavernInteractableKind.Grill);
+            var interactor = Player.GetComponent<TavernInteractor>();
+            Bounds oven = GameObject.Find("Kitchen").GetComponents<Collider2D>().OrderByDescending(c => c.bounds.min.y).First().bounds;
+            // Walk up to the oven, left of the range.
+            Teleport(Player, new Vector2(oven.center.x, oven.min.y - 1.2f));
+            yield return new WaitForFixedUpdate();
+            Hold(Key.W);
+            yield return new WaitForSeconds(0.6f);
+            ReleaseKeys();
+            yield return WaitUntil(() => interactor.Target == grill, 1f, "the oven, part of the kitchen, to target the Grill");
+            Assert.That(grill.IsHighlighted);
+            // All four corners of the highlight draw (a 9-sliced frame lost its top and right edges).
+            Transform highlight = grill.transform.Find("Highlight");
+            foreach (string corner in new[] { "CornerTL", "CornerTR", "CornerBL", "CornerBR" })
+                Assert.That(highlight.Find(corner)?.GetComponent<SpriteRenderer>()?.sprite, Is.Not.Null, corner);
+        }
+
         [UnityTest]
         public IEnumerator Grid_IsRebuilt_WhenTheFurnitureLayoutChanges()
         {

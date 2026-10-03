@@ -194,6 +194,94 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Selectors_CornerTL
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 221
+        width: 4
+        height: 4
+      alignment: 9
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 061ec56bb9f73d2e8e71ce958cf5d472
+      internalID: -1416936925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Selectors_CornerTR
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 221
+        width: 4
+        height: 4
+      alignment: 9
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d63eda2dc064dd27cf1afb186e930552
+      internalID: 103680895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Selectors_CornerBL
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 207
+        width: 4
+        height: 4
+      alignment: 9
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 74990851ceca13f214d57a8c6e7d2f82
+      internalID: -209608156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Selectors_CornerBR
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 207
+        width: 4
+        height: 4
+      alignment: 9
+      pivot: {x: 1, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 12095d5911d1e87c82116a3ca9011449
+      internalID: -200601266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -209,6 +297,10 @@ TextureImporter:
       entries: []
     nameFileIdTable:
       Selectors_Brackets: -603216410
+      Selectors_CornerBL: -209608156
+      Selectors_CornerBR: -200601266
+      Selectors_CornerTL: -1416936925
+      Selectors_CornerTR: 103680895
       Selectors_Marker: 507633014
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

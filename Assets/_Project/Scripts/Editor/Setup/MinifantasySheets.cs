@@ -231,7 +231,7 @@ namespace Hearthdelve.Editor
             // Fire (Dwarven Kingdom): a floor fire under the stew cauldron, and a wall fireplace.
             sheets.Add(new Sheet { Source = $"{k_Fireplaces}/FloorFireplace/FloorFireplace.png", Pack = DwarvenKingdom, File = "FloorFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(16, 16), Pivot = new Vector2(0.5f, 0f) });
             sheets.Add(new Sheet { Source = $"{k_Fireplaces}/WallFireplace/WallFireplace.png", Pack = DwarvenKingdom, File = "WallFireplace", Mode = SliceMode.Grid, Cell = new Vector2Int(24, 24), Pivot = new Vector2(0.5f, 0f) });
-            // The target highlight (UI Overhaul selectors): a corner-bracket frame, 9-sliced to fit, and a small down marker.
+            // The target highlight (UI Overhaul selectors): a corner-bracket frame (its corners cut separately) and a small down marker.
             sheets.Add(new Sheet
             {
                 Source = $"{k_Selectors}/_Selectors.png", Pack = UIOverhaul, File = "Selectors", Mode = SliceMode.Rects,
@@ -239,6 +239,11 @@ namespace Hearthdelve.Editor
                 {
                     new SheetRect("Brackets", 255, 95, 18, 18, k_Centre, new Vector4(5, 5, 5, 5)),
                     new SheetRect("Marker", 84, 254, 8, 5, new Vector2(0.5f, 0f)),
+                    // The frame's four corners on their own, each pivoted at its outer corner.
+                    new SheetRect("CornerTL", 255, 95, 4, 4, new Vector2(0f, 1f)),
+                    new SheetRect("CornerTR", 269, 95, 4, 4, new Vector2(1f, 1f)),
+                    new SheetRect("CornerBL", 255, 109, 4, 4, new Vector2(0f, 0f)),
+                    new SheetRect("CornerBR", 269, 109, 4, 4, new Vector2(1f, 0f)),
                 },
             });
 

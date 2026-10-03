@@ -168,7 +168,8 @@ The pack's `Characters/KitchenWorking_<race>` sheets are unclothed base bodies w
 
 | Sprite | Rect | What |
 |---|---|---|
-| `Brackets` | 255,95 18×18, 9-sliced (5 px) | White corner brackets, tinted gold and sized to fit: the target highlight around a station |
+| `Brackets` | 255,95 18×18 | White corner brackets (a 9-sliced SpriteRenderer drops its top row and right column, so it isn't used) |
+| `CornerTL` / `TR` / `BL` / `BR` | 255,95 / 269,95 / 255,109 / 269,109, 4×4 | The bracket corners on their own, tinted gold and placed at a station's corners: the target highlight |
 | `Marker` | 84,254 8×5 | A small white down marker, tinted gold, bobbing above the target |
 
 The sheet has the same frames in black, red and green, dashed and dotted, and arrows in four directions.
