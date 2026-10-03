@@ -25,13 +25,21 @@ namespace Hearthdelve.Tests.PlayMode
     {
         const string Scene = "Tavern";
 
+        /// <summary>Loads the tavern and opens an evening at once (the scene starts at Prep, with walking off).</summary>
+        IEnumerator LoadServing()
+        {
+            yield return Load(Scene);
+            TavernDirector.Instance.OpenDebugEvening();
+            yield return null;
+        }
+
         static TavernInteractable Station(TavernInteractableKind kind) =>
             Object.FindObjectsByType<TavernInteractable>().First(s => s.Kind == kind);
 
         [UnityTest]
         public IEnumerator Room_HasItsStations_SeatsAndGrid()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat).ToList();
             Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.Pass }));
             Assert.That(GameObject.Find("Seats").transform.childCount, Is.EqualTo(8), "4 tables of 2 seats");
@@ -48,7 +56,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Camera_HoldsStill_WithTheWholeRoomOnScreen()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             Camera camera = Camera.main;
             Vector3 before = camera.transform.position;
             Hold(Key.D, Key.S);
@@ -70,7 +78,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Furniture_StopsThePlayerInFront_AndDrawsBehindThem()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             string[] pieces = { "Bar", "Kitchen", "Cauldron", "Pass", "Table1", "Table3", "Chair1W", "Chair3E" };
             foreach (string name in pieces)
             {
@@ -95,7 +103,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Grid_ReachesEveryStation_FromTheDoorAndTheSpawn()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             NavGrid grid = NavGrid.Current;
             var path = new List<GridCell>();
             GridCell door = grid.Space.ToCell(new Vector2(13.5f, 2.5f));
@@ -125,7 +133,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator TheGrillAndStewPot_AreUsableFromBehind_AndTheWholeKitchenIsTheGrill()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             NavGrid grid = NavGrid.Current;
             var path = new List<GridCell>();
             GridCell spawn = grid.Space.ToCell(Player.transform.position);
@@ -165,7 +173,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Grid_IsRebuilt_WhenTheFurnitureLayoutChanges()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             NavGrid grid = NavGrid.Current;
             GameObject table = GameObject.Find("Table1");
             GridCell under = grid.Space.ToCell(table.GetComponent<Collider2D>().bounds.center);
@@ -191,7 +199,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             var used = new List<TavernInteracted>();
             EventBus<TavernInteracted>.Subscribe(used.Add);
-            yield return Load(Scene);
+            yield return LoadServing();
             yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
             var hint = Object.FindAnyObjectByType<TavernHintView>();
             TavernInteractable grill = Station(TavernInteractableKind.Grill), pass = Station(TavernInteractableKind.Pass);
@@ -235,7 +243,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Interaction_IsOff_WhileTheTavernMapIsOff()
         {
-            yield return Load(Scene);
+            yield return LoadServing();
             TavernInteractable tap = Station(TavernInteractableKind.Tap);
             var interactor = Player.GetComponent<TavernInteractor>();
             Teleport(Player, tap.UsePoint);

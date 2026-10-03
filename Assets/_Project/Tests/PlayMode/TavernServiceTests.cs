@@ -35,11 +35,8 @@ namespace Hearthdelve.Tests.PlayMode
         IEnumerator Open(string recipeId, StaffStation pip = StaffStation.None)
         {
             yield return Load(Scene);
-            yield return WaitUntil(() => Director != null && Director.IsServing, 2f, "the debug evening to open");
             yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
             Director.ArrivalsPaused = true;
-            Director.EndServiceNow();
-            yield return null;
             RecipeDefinition recipe = Director.Content.recipes.First(r => r.id == recipeId);
             Director.SetMenu(new[] { recipe });
             Director.AssignStaff(pip);

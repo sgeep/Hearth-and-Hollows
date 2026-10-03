@@ -27,7 +27,8 @@ namespace Hearthdelve.Tests.PlayMode
         IEnumerator Open()
         {
             yield return Load(Scene);
-            yield return WaitUntil(() => Director != null && Director.IsServing, 2f, "the debug evening to open");
+            Director.OpenDebugEvening();
+            Assert.That(Director.IsServing, "the evening opens");
             Director.ArrivalsPaused = true;
         }
 

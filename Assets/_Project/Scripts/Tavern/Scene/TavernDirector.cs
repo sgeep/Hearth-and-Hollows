@@ -12,14 +12,23 @@ using UnityEngine;
 
 namespace Hearthdelve.Tavern.Scene
 {
+    /// <summary>The parts of an evening in the tavern.</summary>
+    public enum TavernPhase
+    {
+        Prep,
+        Service,
+        Results,
+    }
+
     /// <summary>
     /// Runs the evening in the tavern room: owns the <see cref="ServiceSession"/> (the ported, tested
     /// service rules: seats, the queue, orders, patience, walkouts), spawns customers by the arrival
     /// schedule, and starts Pip at their job. UI reads it directly (CLAUDE.md).
     /// </summary>
     /// <remarks>
-    /// 4c step 2: played on its own the scene opens straight into a debug evening (a filled storeroom and
-    /// the first dishes it can make). The prep screen (step 4) and the day loop (step 5) replace that.
+    /// The evening runs Prep → Service → Results (<see cref="Phase"/>). Played on its own the scene starts
+    /// at Prep with a debug-filled storeroom, and Results offers another evening; the day loop (4c step 5)
+    /// brings the real storeroom and goes on to Night.
     /// </remarks>
     [DefaultExecutionOrder(-50)]
     public sealed class TavernDirector : MonoBehaviour
@@ -29,8 +38,6 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] CustomerAgent m_CustomerPrefab;
         [SerializeField] StaffAgent m_Staff;
         [SerializeField, Tooltip("0 = random each evening.")] int m_Seed;
-        [SerializeField, Tooltip("Open the doors at once with a debug-filled storeroom (until the prep screen exists).")]
-        bool m_AutoOpen = true;
 
         readonly List<RecipeDefinition> m_Menu = new();
         readonly List<CustomerAgent> m_Agents = new();
@@ -56,8 +63,18 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Stops scheduled arrivals (tests, debugging); customers can still be let in with <see cref="SpawnCustomer"/>.</summary>
         public bool ArrivalsPaused { get; set; }
 
+        public TavernPhase Phase { get; private set; } = TavernPhase.Prep;
+        /// <summary>The evening's outcome, once it's over (Results).</summary>
+        public EveningReport Report { get; private set; }
+        public int MaxMenuSize => m_Content.service.service.maxMenuSize;
+        /// <summary>A menu is set and the storeroom can make at least one dish on it.</summary>
+        public bool CanOpen => Phase == TavernPhase.Prep && PrepRules.CanOpen(m_Menu, Storeroom);
+
         public event Action ServiceOpened;
         public event Action ServiceEnded;
+        public event Action PhaseChanged;
+        /// <summary>The storeroom, menu or staff job changed during Prep.</summary>
+        public event Action PrepChanged;
 
         public void Configure(TavernContent content, TavernLayout layout, CustomerAgent customerPrefab, StaffAgent staff)
         {
@@ -84,7 +101,50 @@ namespace Hearthdelve.Tavern.Scene
         void Start()
         {
             if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
-            if (m_AutoOpen) OpenDebugEvening();
+            // Played on its own: one evening from a debug-filled storeroom (F4 fills it again).
+            FillStoreroom();
+            SetPhase(TavernPhase.Prep);
+        }
+
+        // ---------- Prep ----------
+
+        /// <summary>Debug (F4) and standalone: stocks the storeroom with test ingredients at mixed quality and freshness.</summary>
+        public void FillStoreroom()
+        {
+            DebugStockFiller.Fill(Storeroom, m_Content.debugStockIngredients, m_Random);
+            PrepChanged?.Invoke();
+        }
+
+        /// <summary>Adds a dish to tonight's menu or takes it off. Returns whether it's on the menu afterwards.</summary>
+        public bool ToggleMenu(RecipeDefinition recipe)
+        {
+            if (Phase != TavernPhase.Prep) return m_Menu.Contains(recipe);
+            bool on = PrepRules.Toggle(m_Menu, recipe, MaxMenuSize);
+            PrepChanged?.Invoke();
+            return on;
+        }
+
+        /// <summary>Close without opening the doors (nothing to cook, or by choice).</summary>
+        public void CloseForTheNight()
+        {
+            if (Phase != TavernPhase.Prep) return;
+            Report = new EveningReport(null, false, stayedShut: true);
+            SetPhase(TavernPhase.Results);
+        }
+
+        /// <summary>Results: done with the evening. Played on its own, another evening begins (the day loop goes to Night).</summary>
+        public void FinishEvening()
+        {
+            if (Phase != TavernPhase.Results) return;
+            UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
+        }
+
+        void SetPhase(TavernPhase phase)
+        {
+            Phase = phase;
+            if (phase == TavernPhase.Service) InputMaps.Activate(InputMaps.Tavern);
+            else InputMaps.ActivateUIOnly();
+            PhaseChanged?.Invoke();
         }
 
         void OnDestroy()
@@ -92,10 +152,9 @@ namespace Hearthdelve.Tavern.Scene
             if (Instance == this) Instance = null;
         }
 
-        /// <summary>Fills the storeroom with debug stock, puts the first dishes it can make on the menu, and opens.</summary>
+        /// <summary>Tests: puts the first dishes the storeroom can make on the menu and opens at once.</summary>
         public void OpenDebugEvening()
         {
-            DebugStockFiller.Fill(Storeroom, m_Content.debugStockIngredients, m_Random);
             m_Menu.Clear();
             foreach (RecipeDefinition recipe in m_Content.recipes)
                 if (recipe != null && m_Menu.Count < m_Content.service.service.maxMenuSize && RecipeMatcher.CanCook(recipe, Storeroom))
@@ -107,9 +166,11 @@ namespace Hearthdelve.Tavern.Scene
         public void SetMenu(IEnumerable<RecipeDefinition> recipes)
         {
             if (IsServing) return;
+            if (Phase == TavernPhase.Results) SetPhase(TavernPhase.Prep);
             m_Menu.Clear();
             foreach (RecipeDefinition recipe in recipes)
                 if (recipe != null && !m_Menu.Contains(recipe) && m_Menu.Count < m_Content.service.service.maxMenuSize) m_Menu.Add(recipe);
+            PrepChanged?.Invoke();
         }
 
         /// <summary>Puts Pip on a job (the prep screen, step 4; tests). They walk to its post and start at once.</summary>
@@ -117,17 +178,19 @@ namespace Hearthdelve.Tavern.Scene
         {
             StaffAssignment = StaffMember != null ? station : StaffStation.None;
             if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
+            PrepChanged?.Invoke();
         }
 
         public void OpenService()
         {
-            if (m_Menu.Count == 0 || IsServing) return;
+            if (IsServing || !PrepRules.CanOpen(m_Menu, Storeroom)) return;
             var economy = m_Content.economy;
             Session = new ServiceSession(m_Content.service.service, economy.dishScoring, economy.service, Storeroom, m_Menu, ActiveSeats, m_Random,
                 m_Content.stew != null ? m_Content.stew.pot : StewPotSettings.Default);
             Session.Ended += OnServiceEnded;
             m_Arrivals = new ArrivalSchedule(m_Content.service.service, m_Content.customers, m_Random);
-            InputMaps.Activate(InputMaps.Tavern);
+            Report = null;
+            SetPhase(TavernPhase.Service);
             ServiceOpened?.Invoke();
         }
 
@@ -179,6 +242,11 @@ namespace Hearthdelve.Tavern.Scene
             return -1;
         }
 
-        void OnServiceEnded() => ServiceEnded?.Invoke();
+        void OnServiceEnded()
+        {
+            Report = new EveningReport(Session.Ledger, Session.ClosedEarly, stayedShut: false);
+            SetPhase(TavernPhase.Results);
+            ServiceEnded?.Invoke();
+        }
     }
 }
