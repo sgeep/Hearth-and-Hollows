@@ -13,6 +13,19 @@ namespace Hearthdelve.Shared.Animation
         Dodge,
         Hurt,
         Die,
+        // Added in 4b; appended so existing assets keep their values.
+        /// <summary>Heavy attack wind-up while the button is held.</summary>
+        Charge,
+        /// <summary>Heavy attack fully wound up, looping until release.</summary>
+        ChargeHold,
+        /// <summary>The heavy attack itself (the charged spin).</summary>
+        HeavyAttack,
+        /// <summary>A ranged attack (the spider's web shot).</summary>
+        Shoot,
+        /// <summary>Asleep (the bat hanging).</summary>
+        Sleep,
+        /// <summary>Waking up.</summary>
+        Wake,
     }
 
     /// <summary>One action's frames, for each of the four drawn facings.</summary>

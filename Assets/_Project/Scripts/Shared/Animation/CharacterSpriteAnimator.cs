@@ -7,9 +7,10 @@ namespace Hearthdelve.Shared.Animation
 {
     /// <summary>
     /// Shows a TDE character with Minifantasy sprite sheets: picks the action from the
-    /// character's state (idle, walk, dodge, attack, hurt, dead) and one of the four drawn
-    /// facings from its movement or aim. An optional second renderer shows the matching
-    /// shadow sheet.
+    /// character's state (idle, walk, dodge, attack, heavy charge, hurt, dead) and one of the four
+    /// drawn facings from its movement or aim. An optional second renderer shows the matching
+    /// shadow sheet. Presentation only (CLAUDE.md, Animation): gameplay code tells it what is
+    /// happening (an enemy's telegraphed attack, a held pose), and it never drives gameplay.
     /// </summary>
     public sealed class CharacterSpriteAnimator : MonoBehaviour
     {
@@ -23,15 +24,30 @@ namespace Hearthdelve.Shared.Animation
         TopDownController m_Controller;
         Health m_Health;
         CharacterHandleWeapon m_HandleWeapon;
+        CharacterHandleSecondaryWeapon m_HandleHeavy;
 
         CharacterAnim m_Current = CharacterAnim.Idle;
         CharacterAnim m_OneShot;
         bool m_OneShotActive;
         float m_Time;
         Weapon.WeaponStates m_LastWeaponState = Weapon.WeaponStates.WeaponIdle;
+        bool m_WasCharging;
+        bool m_HeavyWasInUse;
+        float m_ChargeStartedAt;
+
+        // A telegraphed attack (enemies) or a held pose (a sleeping bat), set by gameplay code.
+        bool m_TelegraphedActive;
+        CharacterAnim m_Telegraphed;
+        float m_TelegraphTime;
+        int m_ReleaseFrame;
+        float m_TelegraphStartedAt;
+        Vector2 m_TelegraphDirection;
+        bool m_HeldActive;
+        CharacterAnim m_Held;
 
         public Facing4 Facing { get; private set; }
         public CharacterAnim Current => m_Current;
+        public bool IsTelegraphing => m_TelegraphedActive;
 
         public void Configure(SpriteAnimationSet set, SpriteRenderer renderer, SpriteAnimationSet shadowSet, SpriteRenderer shadowRenderer)
         {
@@ -48,13 +64,19 @@ namespace Hearthdelve.Shared.Animation
             if (m_Character == null) return;
             m_Controller = m_Character.GetComponent<TopDownController>();
             m_Health = m_Character.GetComponent<Health>();
-            m_HandleWeapon = m_Character.GetComponent<CharacterHandleWeapon>();
+            // The secondary handle (the heavy attack) is a subclass of the primary one.
+            foreach (CharacterHandleWeapon handle in m_Character.GetComponents<CharacterHandleWeapon>())
+            {
+                if (handle is CharacterHandleSecondaryWeapon secondary) m_HandleHeavy = secondary;
+                else if (m_HandleWeapon == null) m_HandleWeapon = handle;
+            }
         }
 
         void OnEnable()
         {
             if (m_Health != null) m_Health.OnHit += OnHit;
             m_OneShotActive = false;
+            m_TelegraphedActive = false;
             m_Time = 0f;
         }
 
@@ -63,7 +85,11 @@ namespace Hearthdelve.Shared.Animation
             if (m_Health != null) m_Health.OnHit -= OnHit;
         }
 
-        void OnHit() => PlayOneShot(CharacterAnim.Hurt);
+        // An attack that isn't interrupted keeps its animation; the hit reaction plays Hurt when it is.
+        void OnHit()
+        {
+            if (!m_TelegraphedActive) PlayOneShot(CharacterAnim.Hurt);
+        }
 
         /// <summary>Plays an action once, then returns to the state-driven animation.</summary>
         public void PlayOneShot(CharacterAnim action)
@@ -75,14 +101,53 @@ namespace Hearthdelve.Shared.Animation
             m_Time = 0f;
         }
 
+        /// <summary>
+        /// Plays an attack animation timed to its telegraph: the frames before
+        /// <paramref name="releaseFrame"/> fill the telegraph, and the rest play after it. Facing
+        /// stays towards <paramref name="direction"/> until <see cref="StopTelegraphed"/>.
+        /// </summary>
+        public void PlayTelegraphed(CharacterAnim action, float telegraph, int releaseFrame, Vector2 direction)
+        {
+            if (m_Set == null || m_Set.Find(action) == null) return;
+            m_TelegraphedActive = true;
+            m_Telegraphed = action;
+            m_TelegraphTime = telegraph;
+            m_ReleaseFrame = releaseFrame;
+            m_TelegraphStartedAt = Time.time;
+            m_TelegraphDirection = direction;
+            m_OneShotActive = false;
+        }
+
+        public void StopTelegraphed() => m_TelegraphedActive = false;
+
+        /// <summary>Holds an action (looping or on its last frame) until released with <see cref="Release"/>.</summary>
+        public void Hold(CharacterAnim action)
+        {
+            if (m_Set == null || m_Set.Find(action) == null) return;
+            m_HeldActive = true;
+            m_Held = action;
+        }
+
+        public void Release() => m_HeldActive = false;
+
         void LateUpdate()
         {
             if (m_Set == null || m_Renderer == null) return;
-
             UpdateFacing();
             CharacterAnim wanted = StateAnimation();
+            bool dead = wanted == CharacterAnim.Die;
+            if (dead || wanted == CharacterAnim.Dodge)
+            {
+                m_OneShotActive = false;
+                m_TelegraphedActive = false;
+                m_HeldActive = false;
+            }
 
-            if (wanted == CharacterAnim.Die || wanted == CharacterAnim.Dodge) m_OneShotActive = false;
+            if (m_TelegraphedActive)
+            {
+                ShowTelegraphed();
+                return;
+            }
             if (m_OneShotActive)
             {
                 SpriteAnim oneShot = m_Set.Find(m_OneShot);
@@ -90,13 +155,16 @@ namespace Hearthdelve.Shared.Animation
                 if (SpriteAnimationMath.IsFinished(m_Time, count, oneShot.frameDuration, false)) m_OneShotActive = false;
                 else wanted = m_OneShot;
             }
+            else if (m_HeldActive && !dead)
+            {
+                wanted = m_Held;
+            }
 
             if (wanted != m_Current)
             {
                 m_Current = wanted;
                 m_Time = 0f;
             }
-
             Show(m_Set, m_Renderer);
             if (m_ShadowSet != null && m_ShadowRenderer != null) Show(m_ShadowSet, m_ShadowRenderer);
             m_Time += Time.deltaTime;
@@ -115,6 +183,25 @@ namespace Hearthdelve.Shared.Animation
                 m_LastWeaponState = state;
             }
 
+            if (m_HandleHeavy != null && m_HandleHeavy.CurrentWeapon is ChargeWeapon charge)
+            {
+                bool inUse = AnyStepInUse(charge);
+                if (inUse && !m_HeavyWasInUse) PlayOneShot(CharacterAnim.HeavyAttack);
+                m_HeavyWasInUse = inUse;
+
+                if (charge.Charging && !m_WasCharging) m_ChargeStartedAt = Time.time;
+                m_WasCharging = charge.Charging;
+                if (charge.Charging && !m_OneShotActive)
+                {
+                    // Wind up once, then loop the charged pose until release.
+                    SpriteAnim windUp = m_Set.Find(CharacterAnim.Charge);
+                    float windUpLength = windUp != null ? SpriteAnimationMath.Length(windUp.For(Facing).Length, windUp.frameDuration) : 0f;
+                    return Time.time - m_ChargeStartedAt < windUpLength || m_Set.Find(CharacterAnim.ChargeHold) == null
+                        ? CharacterAnim.Charge
+                        : CharacterAnim.ChargeHold;
+                }
+            }
+
             switch (m_Character.MovementState.CurrentState)
             {
                 case CharacterStates.MovementStates.Dashing:
@@ -127,18 +214,44 @@ namespace Hearthdelve.Shared.Animation
             }
         }
 
+        static bool AnyStepInUse(ChargeWeapon charge)
+        {
+            if (charge.Weapons == null) return false;
+            foreach (ChargeWeaponStep step in charge.Weapons)
+                if (step.TargetWeapon != null && step.TargetWeapon.WeaponState.CurrentState == Weapon.WeaponStates.WeaponUse)
+                    return true;
+            return false;
+        }
+
         void UpdateFacing()
         {
             if (m_Character != null && m_Character.ConditionState.CurrentState == CharacterStates.CharacterConditions.Dead) return;
-
             Vector2 direction = Vector2.zero;
             bool attacking = m_OneShotActive && m_OneShot == CharacterAnim.Attack;
-            if (attacking && m_HandleWeapon != null && m_HandleWeapon.WeaponAimComponent != null)
+            if (m_TelegraphedActive)
+                direction = m_TelegraphDirection;
+            else if (attacking && m_HandleWeapon != null && m_HandleWeapon.WeaponAimComponent != null)
                 direction = m_HandleWeapon.WeaponAimComponent.CurrentAim;
             else if (m_Controller != null && m_Controller.CurrentMovement.sqrMagnitude > 0.01f)
                 direction = m_Controller.CurrentMovement.normalized;
-
             Facing = FacingLogic.FromDirection(direction.x, direction.y, Facing);
+        }
+
+        void ShowTelegraphed()
+        {
+            m_Current = m_Telegraphed;
+            float elapsed = Time.time - m_TelegraphStartedAt;
+            ShowTelegraphed(m_Set, m_Renderer, elapsed);
+            if (m_ShadowSet != null && m_ShadowRenderer != null) ShowTelegraphed(m_ShadowSet, m_ShadowRenderer, elapsed);
+        }
+
+        void ShowTelegraphed(SpriteAnimationSet set, SpriteRenderer target, float elapsed)
+        {
+            SpriteAnim anim = set.Find(m_Telegraphed) ?? set.Find(CharacterAnim.Idle);
+            if (anim == null) return;
+            Sprite[] frames = anim.For(Facing);
+            if (frames == null || frames.Length == 0) return;
+            target.sprite = frames[SpriteAnimationMath.TelegraphedFrame(elapsed, m_TelegraphTime, m_ReleaseFrame, frames.Length, anim.frameDuration)];
         }
 
         void Show(SpriteAnimationSet set, SpriteRenderer target)

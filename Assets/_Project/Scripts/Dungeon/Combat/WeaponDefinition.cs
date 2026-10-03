@@ -44,6 +44,12 @@ namespace Hearthdelve.Dungeon.Combat
         [Min(0), Tooltip("After an attack fully recovers, how long a press still continues the combo.")]
         public float comboLinkWindow = 0.2f;
 
+        [Header("Heavy (hold to charge)")]
+        [Tooltip("Charge steps, in order of hold time. The first is a tap (charge time 0); releasing gives the last step reached.")]
+        public List<HeavyChargeStep> heavy = new();
+        [Range(0f, 1f), Tooltip("Movement speed while charging, as a share of normal speed.")]
+        public float heavyChargeMoveMultiplier = 0.4f;
+
         /// <summary>Damage of the weakest attack in the combo (the clean finisher).</summary>
         public float LightestHitDamage
         {
