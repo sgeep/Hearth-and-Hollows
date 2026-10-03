@@ -1,0 +1,275 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Hearthdelve.Core;
+using Hearthdelve.Dungeon.Harvest;
+using Hearthdelve.Shared.Animation;
+using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Navigation;
+using Hearthdelve.UI.Localization;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Tilemaps;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
+
+namespace Hearthdelve.Editor
+{
+    /// <summary>
+    /// Builds the 4b dungeon test floor: three hand-made Cellar rooms drawn from the text map
+    /// below, for migrating and playtesting the dungeon systems. Rooms and run structure come
+    /// from the room graph in 4d; this floor is fixed on purpose. The 4a look scenes are left
+    /// alone. The scene is created when missing and never overwritten without approval (a
+    /// dialog in the editor; <c>-rebuildScene</c> in batch mode).
+    /// </summary>
+    public static class TestFloorBuilder
+    {
+        /// <summary>
+        /// One character per tile, top row first. Walls are auto-tiled from the Dungeon tileset's
+        /// wall sample (docs/ASSET_MAP.md): a north wall is two rows (top face, then brick face).
+        /// </summary>
+        /// <remarks>
+        /// <c>#</c> wall, <c>t</c> wall with a torch, <c>.</c> floor, <c>o</c> pillar (two rows),
+        /// <c>c</c> crate, <c>b</c> barrel, <c>B</c> open barrel, <c>T</c> table (two tiles),
+        /// <c>u</c> cauldron, <c>s</c> statue, <c>P</c> player spawn, <c>S</c> green slime,
+        /// <c>1</c>–<c>6</c> navigation test points (editor only).
+        /// </remarks>
+        internal static readonly string[] Map =
+        {
+            "############################################",
+            "####t#######t###t#######t#########t#####t###",
+            "#..b.c........s....#.....................s.#",
+            "#..B...............#...o......o............#",
+            "#.6................#...o......o............#",
+            "#..................#.......................#",
+            "#.....P..................................S.#",
+            "#..........................................#",
+            "#..................#...o......o............#",
+            "#....T.............#...o......o.........5..#",
+            "#..................#.......................#",
+            "#.................u#.......................#",
+            "########..##########################..######",
+            "####t###..####t####################t..##t###",
+            "#..........................................#",
+            "#..............2...........................#",
+            "#...........#########........c.............#",
+            "#...........#########........b.............#",
+            "#...........#.......#........c.............#",
+            "#...........#...1...#.....3..b...4.........#",
+            "#...........#.......#........c.........S...#",
+            "#...........#.......#........b.............#",
+            "#............................c.............#",
+            "#..........................................#",
+            "############################################",
+            "############################################",
+        };
+
+        public static int Width => Map[0].Length;
+        public static int Height => Map.Length;
+
+        [MenuItem("Hearthdelve/Generate/4b Test Floor", priority = 1)]
+        public static void GenerateMenu() => Generate(rebuildSceneApproved: false);
+
+        /// <summary>Batch entry point: <c>-executeMethod Hearthdelve.Editor.TestFloorBuilder.RunBatch [-rebuildScene]</c>.</summary>
+        public static void RunBatch()
+        {
+            try
+            {
+                Generate(Environment.GetCommandLineArgs().Contains("-rebuildScene"));
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        public static void Generate(bool rebuildSceneApproved)
+        {
+            LookTestBuilder.Content content = LookTestBuilder.BuildContent();
+            if (LookTestBuilder.MayWrite(EditorPaths.TestFloorScene, rebuildSceneApproved)) BuildScene(content);
+            ProjectConfigurator.SetBuildOrder(EditorPaths.TestFloorScene, EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Hearthdelve] 4b test floor generated.");
+        }
+
+        /// <summary>Map character at a world tile (x right, y up); outside the map is wall.</summary>
+        static char At(int x, int y) => x < 0 || y < 0 || x >= Width || y >= Height ? '#' : Map[Height - 1 - y][x];
+
+        static bool IsWall(char c) => c is '#' or 't';
+        static bool IsSolid(int x, int y) => IsWall(At(x, y)) || At(x, y) == 'o';
+        static bool IsOpen(int x, int y) => !IsSolid(x, y);
+
+        /// <summary>Feet position for something standing in a tile.</summary>
+        static Vector2 Feet(int x, int y) => new(x + 0.5f, y + 0.3f);
+
+        static void BuildScene(LookTestBuilder.Content content)
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            Vector2 spawn = Vector2.zero;
+            var slimes = new List<Vector2>();
+            var testPoints = new List<(char id, Vector2 feet)>();
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                char c = At(x, y);
+                if (c == 'P') spawn = Feet(x, y);
+                else if (c == 'S') slimes.Add(Feet(x, y));
+                else if (c is >= '1' and <= '9') testPoints.Add((c, Feet(x, y)));
+            }
+
+            GameObject managers = LookTestBuilder.Managers(HearthdelveInputManager.GameplayMap.Dungeon, content.Library, content.Player, spawn);
+            managers.AddComponent<HarvestSystem>().Configure(content.HarvestRules, content.Cleaver, content.Pickup.GetComponent<IngredientPickup>());
+            managers.AddComponent<NavGrid>().Configure(new RectInt(0, 0, Width, Height), LayerMask.GetMask(Layers.Obstacles));
+            PixelPerfectCamera camera = LookTestBuilder.Cameras(new Color(0.05f, 0.05f, 0.07f));
+            LookTestBuilder.Light("Global Light 2D", Vector3.zero, Light2D.LightType.Global);
+
+            var grid = new GameObject("Grid").AddComponent<Grid>();
+            Tilemap floor = LookTestBuilder.Layer(grid, "Floor", SortingLayers.Floor, 0, false);
+            Tilemap walls = LookTestBuilder.Layer(grid, "Walls", SortingLayers.Floor, 1, true);
+            PaintFloor(floor);
+            PaintWalls(walls);
+            walls.GetComponent<TilemapCollider2D>().ProcessTilemapChanges();
+            walls.GetComponent<CompositeCollider2D>().GenerateGeometry();
+
+            var props = new GameObject("Props").transform;
+            Sprite[] torchFrames = MinifantasyImporter.Row(MinifantasySheets.Dungeon, "Torch", 0, 8);
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                var foot = new Vector2(x + 0.5f, y);
+                switch (At(x, y))
+                {
+                    case 'c': LookTestBuilder.Prop(props, "Crate", foot); break;
+                    case 'b': LookTestBuilder.Prop(props, "Barrel", foot); break;
+                    case 'B': LookTestBuilder.Prop(props, "BarrelOpen", foot); break;
+                    case 'u': LookTestBuilder.Prop(props, "Cauldron", foot); break;
+                    case 's': LookTestBuilder.Prop(props, "Statue", foot); break;
+                    case 'T': LookTestBuilder.Prop(props, "Table", foot + new Vector2(0.5f, 0f)); break;
+                    case 't':
+                        // On the brick face, like the look test's torches; lit from just above.
+                        SpriteRenderer torch = LookTestContent.AddSprite(props, "Torch", torchFrames[0], SortingLayers.Floor, 2, new Vector3(x + 0.5f, y - 1.4f, 0f));
+                        torch.gameObject.AddComponent<SpriteLoop>().Configure(torchFrames, 0.2f);
+                        LookTestBuilder.Light("Torch Light", new Vector3(x + 0.5f, y + 0.5f, 0f), Light2D.LightType.Point);
+                        break;
+                }
+            }
+
+            var enemies = new GameObject("Enemies").transform;
+            foreach (Vector2 position in slimes)
+            {
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(content.Slime, enemies);
+                instance.transform.position = position;
+            }
+
+            // Fixed spots for the navigation PlayMode tests. EditorOnly: stripped from player builds.
+            var points = new GameObject("NavTestPoints") { tag = "EditorOnly" }.transform;
+            foreach (var (id, feet) in testPoints)
+            {
+                var point = new GameObject($"Point{id}") { tag = "EditorOnly" };
+                point.transform.SetParent(points, false);
+                point.transform.position = feet;
+            }
+
+            Canvas canvas = LookTestBuilder.Canvas(content.Actions, out CanvasScaler scaler);
+            LookTestBuilder.AddEssenceBar(canvas);
+            LookTestBuilder.Overlay(canvas, scaler, camera, LocKeys.TestFloorHint, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
+
+            LookTestBuilder.ApplyLighting(dungeon: true);
+            EditorPaths.Ensure(EditorPaths.Scenes);
+            EditorSceneManager.SaveScene(scene, EditorPaths.TestFloorScene);
+        }
+
+        static void PaintFloor(Tilemap floor)
+        {
+            Tile[] tiles =
+            {
+                LookTestContent.DungeonTile(13, 2, false), LookTestContent.DungeonTile(14, 2, false),
+                LookTestContent.DungeonTile(15, 2, false), LookTestContent.DungeonTile(16, 2, false), LookTestContent.DungeonTile(18, 2, false),
+            };
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                // Under everything open, and under pillars and wall bricks so no gap shows at their edges.
+                if (IsSolid(x, y) && IsSolid(x, y - 1) && IsSolid(x, y + 1)) continue;
+                int roll = Mathf.Abs(x * 7349 + y * 9151) % 17;
+                floor.SetTile(new Vector3Int(x, y, 0), tiles[roll < 12 ? roll % 2 : 2 + roll % 3]);
+            }
+        }
+
+        static void PaintWalls(Tilemap walls)
+        {
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                if (At(x, y) == 'o')
+                {
+                    // A pillar is two tiles: its top face over its brick base.
+                    bool top = At(x, y - 1) == 'o';
+                    walls.SetTile(new Vector3Int(x, y, 0), LookTestContent.DungeonTile(1, top ? 2 : 3, true));
+                }
+                else if (IsWall(At(x, y)))
+                {
+                    Vector2Int cell = WallCell(x, y);
+                    walls.SetTile(new Vector3Int(x, y, 0), LookTestContent.DungeonTile(cell.x, cell.y, true));
+                }
+            }
+        }
+
+        enum Face { None, Top, Bricks, BottomTop, BottomBricks }
+
+        /// <summary>How a wall tile reads from the floor directly above or below it.</summary>
+        static Face FaceOf(int x, int y)
+        {
+            if (!IsWall(At(x, y))) return Face.None;
+            if (IsOpen(x, y - 1)) return Face.Bricks;
+            if (IsWall(At(x, y - 1)) && IsOpen(x, y - 2)) return Face.Top;
+            if (IsOpen(x, y + 1)) return Face.BottomTop;
+            if (IsWall(At(x, y + 1)) && IsOpen(x, y + 2)) return Face.BottomBricks;
+            return Face.None;
+        }
+
+        /// <summary>
+        /// Picks a tile from the Dungeon tileset's wall sample (columns 4–10, rows 5–12): plain
+        /// faces in columns 5–6 (alternating), west ends in column 4, east ends in column 10,
+        /// and pieces with walls on both sides in column 7.
+        /// </summary>
+        static Vector2Int WallCell(int x, int y)
+        {
+            int alternate = 5 + Mathf.Abs(x) % 2;
+            Face face = FaceOf(x, y);
+            bool openLeft = IsOpen(x - 1, y), openRight = IsOpen(x + 1, y);
+
+            if (face != Face.None && !openLeft && !openRight) return new Vector2Int(alternate, Row(face, false));
+            if (face == Face.None)
+            {
+                if (openLeft && openRight) return new Vector2Int(7, 7);
+                if (openRight) return new Vector2Int(4, 7);
+                if (openLeft) return new Vector2Int(10, 7);
+
+                // A corner or a junction: take the face of the wall run beside it.
+                Face right = FaceOf(x + 1, y), left = FaceOf(x - 1, y);
+                bool junction = IsWall(At(x, y + 1)) && IsWall(At(x, y - 1));
+                if (right != Face.None && left != Face.None) return new Vector2Int(7, Row(right, junction));
+                if (right != Face.None) return new Vector2Int(4, Row(right, junction));
+                if (left != Face.None) return new Vector2Int(10, Row(left, junction));
+                return new Vector2Int(alternate, 5);
+            }
+            // A face at the end of a run that is open at the side.
+            return new Vector2Int(openRight && !openLeft ? 4 : openLeft && !openRight ? 10 : 7, Row(face, false));
+        }
+
+        static int Row(Face face, bool junction) => face switch
+        {
+            Face.Top => junction ? 8 : 5,
+            Face.Bricks => junction ? 9 : 6,
+            Face.BottomTop => 11,
+            Face.BottomBricks => 12,
+            _ => 5,
+        };
+    }
+}

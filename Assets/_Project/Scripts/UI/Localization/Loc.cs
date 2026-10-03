@@ -173,6 +173,7 @@ namespace Hearthdelve.UI.Localization
         public const string LookTestHintDungeon = "looktest.hint_dungeon";
         public const string LookTestHintTavern = "looktest.hint_tavern";
         public const string LookTestGreeting = "looktest.greeting";
+        public const string TestFloorHint = "testfloor.hint";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
@@ -217,6 +218,7 @@ namespace Hearthdelve.UI.Localization
             (LookTestHintDungeon, "Move: WASD / stick   Attack: left mouse / X   Dodge: Space / B   F3: tavern"),
             (LookTestHintTavern, "Move: WASD / stick   F3: dungeon"),
             (LookTestGreeting, "Welcome to the Hearth!"),
+            (TestFloorHint, "Move: WASD / stick   Attack: left mouse / X   Dodge: Space / B   F3: tavern look test"),
         };
     }
 }

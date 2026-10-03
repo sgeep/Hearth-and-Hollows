@@ -21,6 +21,7 @@ namespace Hearthdelve.Editor
         public const string Scenes = Root + "/Scenes";
         public const string LookTestDungeonScene = Scenes + "/LookTest_Dungeon.unity";
         public const string LookTestTavernScene = Scenes + "/LookTest_Tavern.unity";
+        public const string TestFloorScene = Scenes + "/Dungeon_TestFloor.unity";
         public const string Settings = Root + "/Settings";
         public const string InputActions = Settings + "/Hearthdelve.inputactions";
         public const string Localization = Root + "/Localization";

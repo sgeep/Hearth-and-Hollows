@@ -59,7 +59,31 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>Everything the generated scenes use: settings, art, data and prefabs.</summary>
+        internal sealed class Content
+        {
+            public InputActionAsset Actions;
+            public HapticLibrary Library;
+            public GameObject Player, TavernPlayer, Slime, Pickup, Cook;
+            public HarvestRulesConfig HarvestRules;
+            public WeaponDefinition Cleaver;
+        }
+
         public static void Generate(bool rebuildScenesApproved)
+        {
+            Content content = BuildContent();
+            if (MayWrite(EditorPaths.LookTestDungeonScene, rebuildScenesApproved))
+                BuildDungeon(content.Actions, content.Library, content.Player, content.Slime, content.Pickup, content.HarvestRules, content.Cleaver);
+            if (MayWrite(EditorPaths.LookTestTavernScene, rebuildScenesApproved))
+                BuildTavern(content.Actions, content.Library, content.TavernPlayer, content.Cook);
+
+            ProjectConfigurator.SetBuildOrder(EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
+            AssetDatabase.SaveAssets();
+            Debug.Log("[Hearthdelve] 4a look test generated.");
+        }
+
+        /// <summary>Configures the project and (re)builds the shared data and prefabs. Never touches scenes.</summary>
+        internal static Content BuildContent()
         {
             ProjectConfigurator.ConfigureAll();
             InputActionAsset actions = InputActionsBuilder.Build(force: false);
@@ -85,19 +109,15 @@ namespace Hearthdelve.Editor
             GameObject pickup = LookTestContent.BuildPickup();
             GameObject cookPrefab = LookTestContent.BuildCook(cook);
             AssetDatabase.SaveAssets();
-
-            if (MayWrite(EditorPaths.LookTestDungeonScene, rebuildScenesApproved))
-                BuildDungeon(actions, library, player, slimePrefab, pickup, harvestRules, cleaverDefinition);
-            if (MayWrite(EditorPaths.LookTestTavernScene, rebuildScenesApproved))
-                BuildTavern(actions, library, tavernPlayer, cookPrefab);
-
-            ProjectConfigurator.SetBuildOrder(EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
-            AssetDatabase.SaveAssets();
-            Debug.Log("[Hearthdelve] 4a look test generated.");
+            return new Content
+            {
+                Actions = actions, Library = library, Player = player, TavernPlayer = tavernPlayer, Slime = slimePrefab,
+                Pickup = pickup, Cook = cookPrefab, HarvestRules = harvestRules, Cleaver = cleaverDefinition,
+            };
         }
 
         /// <summary>Scenes are never overwritten without asking (CLAUDE.md).</summary>
-        static bool MayWrite(string scenePath, bool approved)
+        internal static bool MayWrite(string scenePath, bool approved)
         {
             if (!File.Exists(scenePath)) return true;
             if (Application.isBatchMode)
@@ -111,7 +131,7 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ shared scene pieces
 
-        static GameObject Managers(HearthdelveInputManager.GameplayMap map, HapticLibrary library, GameObject playerPrefab, Vector2 spawn)
+        internal static GameObject Managers(HearthdelveInputManager.GameplayMap map, HapticLibrary library, GameObject playerPrefab, Vector2 spawn)
         {
             // TDE's GameManager is a persistent singleton: it keeps its whole GameObject alive across
             // scene loads and destroys later copies, so it must not share an object with scene managers.
@@ -137,7 +157,7 @@ namespace Hearthdelve.Editor
             return managers;
         }
 
-        static PixelPerfectCamera Cameras(Color background)
+        internal static PixelPerfectCamera Cameras(Color background)
         {
             var cameraGo = new GameObject("Main Camera") { tag = "MainCamera" };
             cameraGo.transform.position = new Vector3(0f, 0f, -10f);
@@ -266,7 +286,7 @@ namespace Hearthdelve.Editor
             }
         }
 
-        static Light2D Light(string name, Vector3 position, Light2D.LightType type)
+        internal static Light2D Light(string name, Vector3 position, Light2D.LightType type)
         {
             var go = new GameObject(name);
             go.transform.position = position;
@@ -291,7 +311,7 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>Applies the look-test lighting to the open scene: ambient by light type, local lights by name.</summary>
-        static void ApplyLighting(bool dungeon)
+        internal static void ApplyLighting(bool dungeon)
         {
             foreach (Light2D light in Object.FindObjectsByType<Light2D>(FindObjectsInactive.Include))
             {
@@ -387,7 +407,7 @@ namespace Hearthdelve.Editor
             return material;
         }
 
-        static LocalizedSuperText Text(Transform parent, string name, string key, float size, Color color, TextAnchor anchor,
+        internal static LocalizedSuperText Text(Transform parent, string name, string key, float size, Color color, TextAnchor anchor,
             Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 sizeDelta)
         {
             var prefab = Resources.Load<GameObject>("STMPrefabs/Super Text");
@@ -417,7 +437,7 @@ namespace Hearthdelve.Editor
             return localized;
         }
 
-        static RectTransform UIRect(Transform parent, string name, Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 size)
+        internal static RectTransform UIRect(Transform parent, string name, Vector2 anchor, Vector2 pivot, Vector2 position, Vector2 size)
         {
             var go = new GameObject(name, typeof(RectTransform));
             var rect = (RectTransform)go.transform;
@@ -429,7 +449,7 @@ namespace Hearthdelve.Editor
             return rect;
         }
 
-        static Canvas Canvas(InputActionAsset actions, out CanvasScaler scaler)
+        internal static Canvas Canvas(InputActionAsset actions, out CanvasScaler scaler)
         {
             var go = new GameObject("UI");
             var canvas = go.AddComponent<Canvas>();
@@ -449,7 +469,7 @@ namespace Hearthdelve.Editor
             return canvas;
         }
 
-        static void Overlay(Canvas canvas, CanvasScaler scaler, PixelPerfectCamera camera, string hintKey, string otherScene)
+        internal static void Overlay(Canvas canvas, CanvasScaler scaler, PixelPerfectCamera camera, string hintKey, string otherScene)
         {
             Color light = new(0.95f, 0.92f, 0.85f);
             LocalizedSuperText label = Text(canvas.transform, "Resolution", LocKeys.LookTestResolution, 7f, light, TextAnchor.UpperRight,
@@ -558,6 +578,17 @@ namespace Hearthdelve.Editor
             }
 
             Canvas canvas = Canvas(actions, out CanvasScaler scaler);
+            AddEssenceBar(canvas);
+            Overlay(canvas, scaler, camera, LocKeys.LookTestHintDungeon, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
+
+            ApplyLighting(dungeon: true);
+            EditorPaths.Ensure(EditorPaths.Scenes);
+            EditorSceneManager.SaveScene(scene, EditorPaths.LookTestDungeonScene);
+        }
+
+        /// <summary>The placeholder Essence bar and its label, top left.</summary>
+        internal static void AddEssenceBar(Canvas canvas)
+        {
             RectTransform bar = UIRect(canvas.transform, "PH_EssenceBar", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -4f), new Vector2(64f, 5f));
             var back = bar.gameObject.AddComponent<Image>();
             back.color = new Color(0.08f, 0.08f, 0.1f, 0.85f);
@@ -570,14 +601,9 @@ namespace Hearthdelve.Editor
             bar.gameObject.AddComponent<EssenceBar>().Configure(fill);
             Text(canvas.transform, "EssenceLabel", LocKeys.HudEssence, 6f, new Color(0.95f, 0.92f, 0.85f), TextAnchor.UpperLeft,
                 new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -10f), new Vector2(80f, 10f));
-            Overlay(canvas, scaler, camera, LocKeys.LookTestHintDungeon, Path.GetFileNameWithoutExtension(EditorPaths.LookTestTavernScene));
-
-            ApplyLighting(dungeon: true);
-            EditorPaths.Ensure(EditorPaths.Scenes);
-            EditorSceneManager.SaveScene(scene, EditorPaths.LookTestDungeonScene);
         }
 
-        static Tilemap Layer(Grid grid, string name, string sortingLayer, int order, bool solid)
+        internal static Tilemap Layer(Grid grid, string name, string sortingLayer, int order, bool solid)
         {
             var go = new GameObject(name);
             go.transform.SetParent(grid.transform, false);
@@ -601,7 +627,7 @@ namespace Hearthdelve.Editor
             return tilemap;
         }
 
-        static void Prop(Transform parent, string name, Vector2 position)
+        internal static void Prop(Transform parent, string name, Vector2 position)
         {
             Sprite sprite = MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Props", name);
             SpriteRenderer renderer = LookTestContent.AddSprite(parent, name, sprite, SortingLayers.YSorted, 0, position);

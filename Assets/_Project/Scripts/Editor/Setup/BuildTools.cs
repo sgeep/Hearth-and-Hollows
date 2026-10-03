@@ -80,7 +80,28 @@ namespace Hearthdelve.Editor
             }
         }
 
-        static void Capture(string scenePath, string output)
+        /// <summary>
+        /// Batch entry point (run without -nographics): the 4b test floor, once at the reference
+        /// resolution at the spawn and once as an overview of the whole floor at 8 px per tile.
+        /// </summary>
+        public static void CaptureTestFloorBatch()
+        {
+            try
+            {
+                Capture(EditorPaths.TestFloorScene, "BatchLogs/testfloor_spawn.png");
+                Capture(EditorPaths.TestFloorScene, "BatchLogs/testfloor_overview.png",
+                    new Vector2(TestFloorBuilder.Width, TestFloorBuilder.Height) * 0.5f, TestFloorBuilder.Width * 8, TestFloorBuilder.Height * 8);
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        /// <summary>Renders the scene's camera to a PNG: at the spawn point by default, or over a given area at 8 px per tile.</summary>
+        static void Capture(string scenePath, string output, Vector2? centre = null, int width = 0, int height = 0)
         {
             EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
             var level = UnityEngine.Object.FindAnyObjectByType<LevelManager>();
@@ -97,7 +118,21 @@ namespace Hearthdelve.Editor
             }
 
             Camera camera = Camera.main;
-            var target = new RenderTexture(LookTestBuilder.ReferenceWidth, LookTestBuilder.ReferenceHeight, 24) { filterMode = FilterMode.Point };
+            if (width <= 0)
+            {
+                width = LookTestBuilder.ReferenceWidth;
+                height = LookTestBuilder.ReferenceHeight;
+                if (player != null) camera.transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -10f);
+            }
+            else
+            {
+                // An overview: the Pixel Perfect Camera would force the reference view size.
+                var pixelPerfect = camera.GetComponent<UnityEngine.Rendering.Universal.PixelPerfectCamera>();
+                if (pixelPerfect != null) pixelPerfect.enabled = false;
+                camera.orthographicSize = height / 2f / MinifantasySheets.PixelsPerUnit;
+            }
+            if (centre.HasValue) camera.transform.position = new Vector3(centre.Value.x, centre.Value.y, -10f);
+            var target = new RenderTexture(width, height, 24) { filterMode = FilterMode.Point };
             camera.targetTexture = target;
             camera.Render();
             RenderTexture.active = target;
