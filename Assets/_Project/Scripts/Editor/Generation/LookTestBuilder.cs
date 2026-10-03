@@ -154,15 +154,14 @@ namespace Hearthdelve.Editor
             pixelPerfect.refResolutionY = ReferenceHeight;
             pixelPerfect.gridSnapping = PixelPerfectCamera.GridSnapping.UpscaleRenderTexture;
             pixelPerfect.cropFrame = PixelPerfectCamera.CropFrame.None;
-            cameraGo.AddComponent<CinemachineBrain>();
+            ConfigureFollow(cameraGo.AddComponent<CinemachineBrain>(), null);
 
             var follow = new GameObject("Follow Camera");
             follow.transform.position = new Vector3(0f, 0f, -10f);
             var virtualCamera = follow.AddComponent<CinemachineCamera>();
             virtualCamera.Lens.ModeOverride = LensSettings.OverrideModes.Orthographic;
             virtualCamera.Lens.OrthographicSize = camera.orthographicSize;
-            var composer = follow.AddComponent<CinemachinePositionComposer>();
-            composer.Damping = new Vector3(0.4f, 0.4f, 0f);
+            ConfigureFollow(null, follow.AddComponent<CinemachinePositionComposer>());
             follow.AddComponent<CinemachinePixelPerfect>();
             follow.AddComponent<CinemachineImpulseListener>();
             follow.AddComponent<PlayerCameraTarget>();
@@ -193,6 +192,62 @@ namespace Hearthdelve.Editor
         static readonly Color k_HearthColor = new(1f, 0.68f, 0.38f);
         const float k_HearthIntensity = 0.9f;
         const float k_HearthRadius = 7f;
+
+        /// <summary>
+        /// Camera follow for the pixel-perfect pipeline. The Pixel Perfect Camera snaps the view to
+        /// the art-pixel grid; Cinemachine only positions it. Two rules keep the world from
+        /// shaking by a pixel as the player moves:
+        /// - The brain updates in LateUpdate: the player is an interpolated rigidbody whose
+        ///   transform changes every rendered frame, so SmartUpdate or FixedUpdate would let the
+        ///   camera lag or stall on frames without a physics step.
+        /// - The follow has no damping: a damped camera trails the player by a fractional amount
+        ///   that changes frame to frame, so the player and the camera round to different pixels on
+        ///   alternate frames and, with the eye on the player, the whole room appears to shake.
+        /// </summary>
+        static void ConfigureFollow(CinemachineBrain brain, CinemachinePositionComposer composer)
+        {
+            if (brain != null)
+            {
+                brain.UpdateMethod = CinemachineBrain.UpdateMethods.LateUpdate;
+                brain.BlendUpdateMethod = CinemachineBrain.BrainUpdateMethods.LateUpdate;
+                EditorUtility.SetDirty(brain);
+            }
+            if (composer != null)
+            {
+                composer.Damping = Vector3.zero;
+                EditorUtility.SetDirty(composer);
+            }
+        }
+
+        /// <summary>Applies the camera follow rules to the existing look-test scenes in place (no rebuild).</summary>
+        [MenuItem("Hearthdelve/Generate/Update Look Test Camera", priority = 23)]
+        public static void UpdateLookTestCamera()
+        {
+            foreach (string path in new[] { EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene })
+            {
+                var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+                foreach (CinemachineBrain brain in Object.FindObjectsByType<CinemachineBrain>(FindObjectsInactive.Include)) ConfigureFollow(brain, null);
+                foreach (CinemachinePositionComposer composer in Object.FindObjectsByType<CinemachinePositionComposer>(FindObjectsInactive.Include)) ConfigureFollow(null, composer);
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+            Debug.Log("[Hearthdelve] Look-test camera follow updated.");
+        }
+
+        /// <summary>Batch entry point for <see cref="UpdateLookTestCamera"/>.</summary>
+        public static void UpdateLookTestCameraBatch()
+        {
+            try
+            {
+                UpdateLookTestCamera();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
 
         static Light2D Light(string name, Vector3 position, Light2D.LightType type)
         {
