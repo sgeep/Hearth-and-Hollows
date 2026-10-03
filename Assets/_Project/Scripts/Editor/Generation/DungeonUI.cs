@@ -153,7 +153,7 @@ namespace Hearthdelve.Editor
             LookTestBuilder.Text(panel, name, key, 6f, k_Ink, TextAnchor.MiddleCenter,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(panel.sizeDelta.x - 16f, height));
 
-        static Button TextButton(RectTransform panel, string name, string key, Vector2 position, float width, out LocalizedSuperText label)
+        internal static Button TextButton(RectTransform panel, string name, string key, Vector2 position, float width, out LocalizedSuperText label)
         {
             RectTransform rect = LookTestBuilder.UIRect(panel, name, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), position, new Vector2(width, 13f));
             Image image = AddImage(rect, UISprite("Bar"), Color.white, Image.Type.Sliced);
@@ -172,7 +172,7 @@ namespace Hearthdelve.Editor
         /// One satchel slot (icon, count, quality pips, freshness bar), with an optional outline mark.
         /// Its bottom-centre sits at <paramref name="position"/> from the panel's centre.
         /// </summary>
-        static SatchelSlotView Slot(RectTransform panel, int index, Vector2 position, bool withMark, out Button button)
+        internal static SatchelSlotView Slot(RectTransform panel, int index, Vector2 position, bool withMark, out Button button)
         {
             Sprite pixel = Pixel();
             RectTransform slot = LookTestBuilder.UIRect(panel, $"Slot{index}", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0f), position, new Vector2(14f, 17f));

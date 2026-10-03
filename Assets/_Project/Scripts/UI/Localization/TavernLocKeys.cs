@@ -14,6 +14,24 @@ namespace Hearthdelve.UI.Localization
         public const string PrepStaff = "tavern.prep.staff";
         public const string PrepStaffOff = "tavern.prep.staff_off";
         public const string PrepOpen = "tavern.prep.open";
+        public const string PrepTonight = "tavern.prep.tonight";
+        /// <summary>Text that's already localized (a dish name, a list of steps), shown as it is.</summary>
+        public const string Plain = "tavern.plain";
+        public const string PrepServings = "tavern.prep.servings";
+        public const string PrepPots = "tavern.prep.pots";
+        public const string PrepPot = "tavern.prep.pot";
+        public const string PrepDetail = "tavern.prep.detail";
+        public const string PrepNone = "tavern.prep.none";
+        public const string PrepValue = "tavern.prep.value";
+        public const string PrepValueStew = "tavern.prep.value_stew";
+        public const string PrepThen = "tavern.prep.then";
+        public const string StepChop = "tavern.step.chop";
+        public const string StepSimmer = "tavern.step.simmer";
+        public const string PrepStaffJob = "tavern.prep.staff_job";
+        public const string PrepNothingCookable = "tavern.prep.nothing_cookable";
+        public const string PrepFillKey = "tavern.prep.fill_key";
+        public const string ResultsStayedShut = "results.stayed_shut";
+        public const string ResultsTakings = "results.takings";
 
         public const string StationGrill = "station.grill";
         public const string StationTap = "station.tap";
@@ -81,6 +99,21 @@ namespace Hearthdelve.UI.Localization
             (PrepStaff, "Staff helper: {0}"),
             (PrepStaffOff, "Off duty"),
             (PrepOpen, "Open the doors"),
+            (PrepTonight, "Tonight: {0} of {1} dishes"),
+            (Plain, "{0}"),
+            (PrepServings, "{0} to serve"),
+            (PrepPots, "{0} pots"),
+            (PrepPot, "1 pot"),
+            (PrepDetail, "{0}, {1}"),
+            (PrepNone, "Not in stock"),
+            (PrepValue, "{0} gold"),
+            (PrepValueStew, "{0} gold a bowl"),
+            (PrepThen, "{0}, then {1}"),
+            (StepChop, "Chop"),
+            (StepSimmer, "Simmer"),
+            (PrepStaffJob, "{0}: {1}"),
+            (PrepNothingCookable, "Nothing in the storeroom makes a dish tonight."),
+            (PrepFillKey, "F4: fill the storeroom (debug)"),
 
             (StationGrill, "Grill"),
             (StationPass, "The pass"),
@@ -98,10 +131,10 @@ namespace Hearthdelve.UI.Localization
             (HudOrders, "Orders"),
             (TicketQueued, "Waiting"),
             (TicketCooking, "Cooking"),
-            (TicketReady, "On the pass"),
+            (TicketReady, "Ready"),
             (TicketDelivering, "Serving"),
             (TicketSpare, "Spare"),
-            (TicketStewWaiting, "Waiting on the pot"),
+            (TicketStewWaiting, "Stewing"),
 
             (HintCook, "{0}: cook {1}"),
             (HintUse, "{0}: {1}"),
@@ -134,6 +167,8 @@ namespace Hearthdelve.UI.Localization
             (ResultsSoldOut, "Left because we'd sold out: {0}"),
             (ResultsDropped, "Plates dropped: {0}"),
             (ResultsAgain, "Prepare another evening"),
+            (ResultsStayedShut, "We kept the doors shut tonight."),
+            (ResultsTakings, "Takings: {0} gold"),
         };
     }
 }

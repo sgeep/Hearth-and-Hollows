@@ -93,7 +93,9 @@ namespace Hearthdelve.Editor
             SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
             AddService(npcs);
             AddStations();
-            TavernStationContent.BuildStationPanel(Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI"));
+            Canvas ui = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
+            TavernStationContent.BuildStationPanel(ui);
+            TavernScreens.Rebuild(ui);
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -161,6 +163,7 @@ namespace Hearthdelve.Editor
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
             TavernStationContent.BuildStationPanel(canvas);
+            TavernScreens.Rebuild(canvas);
             LocalizedSuperText controls = LookTestBuilder.Text(canvas.transform, "Controls", TavernLocKeys.TavernControls, 6f, new Color(0.95f, 0.92f, 0.85f),
                 TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(310f, 10f));
             controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
