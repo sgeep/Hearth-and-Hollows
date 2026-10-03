@@ -588,8 +588,9 @@ namespace Hearthdelve.Tests.PlayMode
                 Renderer[] renderers = Object.FindObjectsByType<Renderer>(FindObjectsInactive.Include)
                     .Where(r => r is SpriteRenderer || r is UnityEngine.Tilemaps.TilemapRenderer).ToArray();
                 Assert.That(renderers, Is.Not.Empty, scene);
-                // The one exception: an enemy's "!" telegraph is unlit, so it reads in the dark (CLAUDE.md, Lighting).
-                foreach (Renderer renderer in renderers.Where(r => r.name != "Alert"))
+                // The exceptions read in the dark, so they're unlit (CLAUDE.md, Lighting): an enemy's "!" telegraph, and
+                // markers on the Above layer (target highlights, patience bars, a carried plate on the tavern player).
+                foreach (Renderer renderer in renderers.Where(r => r.name != "Alert" && r.sortingLayerName != Hearthdelve.Core.SortingLayers.Above))
                     Assert.That(renderer.sharedMaterial != null ? renderer.sharedMaterial.shader.name : "none", Is.EqualTo(litShader), $"{scene}/{renderer.name}");
 
                 Light2D[] lights = Object.FindObjectsByType<Light2D>();

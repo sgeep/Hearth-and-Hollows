@@ -32,7 +32,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Room_HasItsStations_SeatsAndGrid()
         {
             yield return Load(Scene);
-            var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).ToList();
+            var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat).ToList();
             Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.Pass }));
             Assert.That(GameObject.Find("Seats").transform.childCount, Is.EqualTo(8), "4 tables of 2 seats");
             Assert.That(NavGrid.Current, Is.Not.Null);
