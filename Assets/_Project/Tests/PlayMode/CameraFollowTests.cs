@@ -51,20 +51,41 @@ namespace Hearthdelve.Tests.PlayMode
         /// <summary>
         /// Frames where the snapped camera stepped on both axes together, and on one axis only, counting
         /// only steady diagonal movement: the player moved on both axes, in the same direction as on the
-        /// frame before. (Sliding along a wall is one-axis movement, and a change of direction takes one
-        /// step to realign; neither is a zig-zag.)
+        /// frame before. (Sliding along a wall is one-axis movement; neither it nor a turn is a zig-zag.)
+        /// A diagonal walk can start with the two axes at different sub-pixel phases, so before its first
+        /// step on both axes there may be one step on a single axis to bring them into line; that step is
+        /// counted as an alignment, not a zig-zag. Any single-axis step after the axes are in line is.
         /// </summary>
-        static (int both, int single) DiagonalSteps(IReadOnlyList<int> x, IReadOnlyList<int> y, IReadOnlyList<Vector2> moved)
+        static (int both, int single, int alignments, int runs) DiagonalSteps(IReadOnlyList<int> x, IReadOnlyList<int> y, IReadOnlyList<Vector2> moved)
         {
-            int both = 0, single = 0;
+            int both = 0, single = 0, alignments = 0, runs = 0;
+            bool inRun = false, aligned = false;
             for (int i = 2; i < x.Count; i++)
             {
-                if (!SteadyDiagonal(moved[i], moved[i - 1])) continue;
+                if (!SteadyDiagonal(moved[i], moved[i - 1]))
+                {
+                    inRun = false;
+                    continue;
+                }
+                if (!inRun)
+                {
+                    inRun = true;
+                    aligned = false;
+                    runs++;
+                }
                 bool dx = x[i] != x[i - 1], dy = y[i] != y[i - 1];
-                if (dx && dy) both++;
-                else if (dx || dy) single++;
+                if (dx && dy)
+                {
+                    both++;
+                    aligned = true;
+                }
+                else if (dx || dy)
+                {
+                    if (aligned) single++;
+                    else alignments++;
+                }
             }
-            return (both, single);
+            return (both, single, alignments, runs);
         }
 
         static bool SteadyDiagonal(Vector2 now, Vector2 before) =>
@@ -207,17 +228,18 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Reversals(cameraX), Is.LessThanOrEqualTo(Reversals(playerX)), $"{scene}: the snapped camera stepped back on X more often than the player");
             Assert.That(Reversals(cameraY), Is.LessThanOrEqualTo(Reversals(playerY)), $"{scene}: the snapped camera stepped back on Y more often than the player");
             // Diagonal movement: both axes should step on the same frames, not in a zig-zag.
-            var (both, single) = DiagonalSteps(cameraX, cameraY, moved);
+            var (both, single, alignments, runs) = DiagonalSteps(cameraX, cameraY, moved);
             for (int i = 2; i < cameraX.Count; i++)
             {
                 bool dx = cameraX[i] != cameraX[i - 1], dy = cameraY[i] != cameraY[i - 1];
                 if (dx != dy && SteadyDiagonal(moved[i], moved[i - 1]))
-                    TestContext.WriteLine($"{scene} zig-zag step at frame {i}: player moved ({moved[i].x * k_PixelsPerUnit:F3}, {moved[i].y * k_PixelsPerUnit:F3}) px, previous ({moved[i - 1].x * k_PixelsPerUnit:F3}, {moved[i - 1].y * k_PixelsPerUnit:F3}), camera step ({cameraX[i] - cameraX[i - 1]}, {cameraY[i] - cameraY[i - 1]})");
+                    TestContext.WriteLine($"{scene} single-axis step at frame {i}: player moved ({moved[i].x * k_PixelsPerUnit:F3}, {moved[i].y * k_PixelsPerUnit:F3}) px, previous ({moved[i - 1].x * k_PixelsPerUnit:F3}, {moved[i - 1].y * k_PixelsPerUnit:F3}), camera step ({cameraX[i] - cameraX[i - 1]}, {cameraY[i] - cameraY[i - 1]})");
             }
             Assert.That(both, Is.GreaterThan(15), $"{scene}: the walk included steady diagonal movement");
             Assert.That(single, Is.Zero, $"{scene}: the camera stepped on one axis at a time during steady diagonal movement ({single} single, {both} both): a zig-zag");
+            Assert.That(alignments, Is.LessThanOrEqualTo(runs), $"{scene}: more than one alignment step per diagonal run ({alignments} in {runs} runs)");
             TestContext.WriteLine($"{scene}: camera reversals {Reversals(cameraX)}/{Reversals(cameraY)}, player reversals {Reversals(playerX)}/{Reversals(playerY)}, " +
-                                  $"frames {cameraX.Count}, camera steps on both axes {both}, on one axis {single}");
+                                  $"frames {cameraX.Count}, camera steps on both axes {both}, on one axis {single}, alignment steps {alignments} in {runs} diagonal runs");
         }
     }
 }
