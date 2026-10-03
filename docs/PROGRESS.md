@@ -26,7 +26,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 | | Sub-milestone | Contents |
 |---|---|---|
 | **4a** | Integration and look test (**complete**, 2026-10-02) | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
-| 4b | Dungeon migration (**in progress**) | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. Dungeon-only: ends on a result screen with restart. |
+| 4b | Dungeon migration (**complete**, 2026-10-03) | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. Dungeon-only: ends on a result screen with restart. |
 | 4c | Tavern and UI migration | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. **Acceptance criterion: the complete top-down day loop is restored through `GameFlow` (Tavern → Dungeon → Tavern, Morning to Night, saves).** |
 | 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
 | 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. |
@@ -266,7 +266,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Tests:** PlayMode `FeedbackTests`: one `Tap.Firm` per light hit, one `Hit.Heavy` per heavy hit (and the spin's damage lands once), a harder shake for the heavy; a tick per charge level past the first; `Kill.Clean` on a clean kill, `Bump.Soft` on an overkill; one buzz when the satchel first refuses a part; the telegraph cue only when aimed at the player; no haptic on a dodge. EditMode: the one-hit invincibility rule. `HapticService.PatternPlayed` reports each named pattern played (tests and debug overlays).
 - **Needs you:** controller rumble checks (strength and feel of each pattern) and the placeholder sounds' volumes.
 
-**Step 7 done (2026-10-03), awaiting review: web smoke test and docs.**
+**Step 7 approved (2026-10-03): web smoke test and docs.**
 
 **Web smoke test (2026-10-03): passed after one fix.** A development web build (`Builds/Web`, 125 MB, 0 errors) of `Dungeon_TestFloor`, served locally and played in Chrome:
 
@@ -278,11 +278,17 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - The browser console shows no errors from the game (only the web template's missing `productVersion` warning).
 - **Fixed:** the em dash in the Lockbox and satchel-full strings showed as a gap. The web build has only Unity's built-in font, with no system fallback for characters past Latin-1. Those strings (and three tavern strings) now use plain punctuation, and a test keeps every UI string within Latin-1 until a real font exists. Rebuilt and rechecked: the Lockbox line now reads correctly in the browser.
 - **Not exercised in the browser:** the satchel-full swap prompt (covered by PlayMode tests) and rumble (none on the web, by design).
-- **Observation, not changed:** fighting all three enemies at once without dodging drains a full Essence bar in a few seconds (about 5 in the playthrough; two enemies took about 10) (slime 10, bat 8, spider 14 per hit, 0.6 s of invulnerability after each). Worth a look when room encounters are designed in 4d.
+- **Damage pace:** fighting all three enemies at once without dodging drains a full Essence bar in a few seconds (about 5 in the playthrough; two enemies took about 10; slime 10, bat 8, spider 14 per hit, 0.6 s of invulnerability after each). **Decided:** enemy damage stays as it is; judge the pace again in 4d with real room encounters.
 
 **Docs:** `PORT_MANIFEST.md` is current for 4b (the rows 4b replaced now name their replacements; the dungeon debug panel is recorded as not rebuilt). Known issues are updated below.
 
-**4b is complete pending your review.** Next is **4c** (reconnecting the full day loop through `GameFlow`), which starts with a plan for your approval.
+**4b complete (approved 2026-10-03).** Decisions at sign-off:
+
+1. Enemy damage values are unchanged; damage pace is judged again in 4d, once real room encounters exist.
+2. The prototype's F1 debug panel is **not** 4c scope. It stays recorded as a developer-tooling gap; individual debug controls are rebuilt only when they're genuinely useful during 4c/4d.
+3. The Latin-1 limit on UI text is temporary. When the real game font is chosen, replace it with a proper glyph-coverage check against that font.
+
+**Next: 4c,** the tavern and UI migration, starting with a plan for your approval.
 
 ### Open design questions (4a)
 
@@ -307,8 +313,8 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **Pathfinding ignores other enemies:** enemies path around walls and props only, and can bunch up on the way to the player.
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
-- **No dungeon debug panel:** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) was scheduled for 4b but not rebuilt. The look-test overlay's F2–F4 keys still work.
-- **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else.
+- **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
+- **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else. Temporary: once the game font is chosen, the test becomes a glyph-coverage check against that font.
 - **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
 
 ### Regenerating and verifying (current project)
