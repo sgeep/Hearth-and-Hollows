@@ -54,6 +54,34 @@ namespace Hearthdelve.Core.Pathfinding
 
         public void SetBlocked(int x, int y, bool blocked) => SetBlocked(new GridCell(x, y), blocked);
 
+        /// <summary>
+        /// The walkable cell nearest to <paramref name="cell"/> (itself if walkable), searching
+        /// outwards ring by ring up to <paramref name="maxRadius"/>. A character pressed against a
+        /// prop can stand in a cell the prop partly covers; paths start from the nearest open one.
+        /// </summary>
+        public bool TryFindNearestWalkable(GridCell cell, int maxRadius, out GridCell nearest)
+        {
+            nearest = cell;
+            if (IsWalkable(cell)) return true;
+            for (int radius = 1; radius <= maxRadius; radius++)
+            {
+                int best = int.MaxValue;
+                for (int y = cell.Y - radius; y <= cell.Y + radius; y++)
+                for (int x = cell.X - radius; x <= cell.X + radius; x++)
+                {
+                    if (Math.Max(Math.Abs(x - cell.X), Math.Abs(y - cell.Y)) != radius) continue;
+                    var candidate = new GridCell(x, y);
+                    if (!IsWalkable(candidate)) continue;
+                    int distance = (x - cell.X) * (x - cell.X) + (y - cell.Y) * (y - cell.Y);
+                    if (distance >= best) continue;
+                    best = distance;
+                    nearest = candidate;
+                }
+                if (best != int.MaxValue) return true;
+            }
+            return false;
+        }
+
         internal int Index(GridCell cell) => cell.Y * Width + cell.X;
     }
 }
