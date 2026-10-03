@@ -6,21 +6,21 @@ using UnityEngine;
 namespace Hearthdelve.Tavern.Minigames
 {
     /// <summary>
-    /// Serving tuning. Target: 5–10 seconds per delivery to a typical mid-floor table (about
-    /// 8–12 tiles from the pass at the default carry speed).
+    /// Serving tuning (4c: a top-down room). A typical trip from the pass to a table is 10–15 tiles of
+    /// walking, about 3–5 seconds at the carry speed.
     /// </summary>
     [Serializable]
     public struct ServingSettings
     {
-        [Min(0.1f), Tooltip("Walking speed while carrying a plate (tiles per second).")]
+        [Min(0.1f), Tooltip("Walking speed while carrying a plate (tiles per second; the keeper walks at 6 without one).")]
         public float carrySpeed;
-        [Min(0.05f), Tooltip("How close to the customer counts as arrived.")]
+        [Min(0.05f), Tooltip("How near a seated customer the carrier must be to serve them (tiles).")]
         public float arriveDistance;
-        [Min(0), Tooltip("Spill added by each bump into someone crossing the floor.")]
+        [Min(0), Tooltip("Spill added by a normal bump into a customer walking across the floor.")]
         public float spillPerBump;
         [Range(0, 1), Tooltip("Score lost at a full spill meter (just before dropping).")]
         public float spillPenalty;
-        [Min(1), Tooltip("Par time = distance / carry speed × this.")]
+        [Min(1), Tooltip("Par time = shortest walkable distance / carry speed × this, plus the slack.")]
         public float parFactor;
         [Min(0)] public float parSlack;
         [Min(0), Tooltip("Can't be bumped again for this long after a bump.")]
@@ -32,65 +32,49 @@ namespace Hearthdelve.Tavern.Minigames
 
         public static ServingSettings Default => new()
         {
-            carrySpeed = 1.6f,
-            arriveDistance = 0.4f,
-            spillPerBump = 0.4f,
+            carrySpeed = 4f,
+            arriveDistance = 1.2f,
+            spillPerBump = 0.34f,
             spillPenalty = 0.6f,
-            parFactor = 1.2f,
-            parSlack = 0.5f,
+            parFactor = 1.25f,
+            parSlack = 0.75f,
             bumpCooldown = 0.6f,
             autoSlowestSpeed = 0.55f,
         };
     }
 
     /// <summary>
-    /// Serving: carry a plate along the tavern floor (x axis) from the pass to a table. Each
-    /// bump into a customer crossing the floor spills; a full spill meter drops the plate (0).
-    /// Score = time factor (vs par, from the straight-line distance to where it was delivered)
-    /// × spill factor. With a target (staff) it completes on arrival; without one (the player)
-    /// it completes when <see cref="Deliver"/> is called at the chosen table.
+    /// Serving, top-down (4c): carry a plate from the pass through the room to a seated customer. The
+    /// world does the walking; this keeps the time, the spill and the score. Bumping into a customer
+    /// who is walking across the floor spills (harder bumps spill more); a full meter drops the plate (0).
+    /// When the plate is served, the score compares the time taken with par for the shortest walkable
+    /// path from the pass to where it was served, so wandering costs quality. Pure logic.
     /// </summary>
     public sealed class ServingMinigame : IMinigame
     {
         public const float DropAt = 1f;
 
         readonly ServingSettings m_Settings;
-        readonly float m_Start;
         float m_BumpCooldown;
 
-        /// <summary>Carry to a fixed table; arriving there delivers the plate.</summary>
-        public ServingMinigame(ServingSettings settings, float startX, float targetX) : this(settings, startX)
-        {
-            Target = targetX;
-            HasTarget = true;
-        }
-
-        /// <summary>Carry freely; the carrier chooses who to serve with <see cref="Deliver"/>.</summary>
-        public ServingMinigame(ServingSettings settings, float startX)
-        {
-            m_Settings = settings;
-            m_Start = startX;
-            Target = startX;
-            Position = startX;
-        }
+        public ServingMinigame(ServingSettings settings) => m_Settings = settings;
 
         public ServingSettings Settings => m_Settings;
-        public float Position { get; private set; }
-        /// <summary>Where the plate is headed (or was delivered). Equals the start until one is known.</summary>
-        public float Target { get; private set; }
-        public bool HasTarget { get; private set; }
         public float Spill { get; private set; }
         public bool Dropped { get; private set; }
+        /// <summary>Served (handed over).</summary>
         public bool Arrived { get; private set; }
         public bool IsComplete => Arrived || Dropped;
         public float Elapsed { get; private set; }
-        public float ParTime => Mathf.Abs(Target - m_Start) / m_Settings.carrySpeed * m_Settings.parFactor + m_Settings.parSlack;
+        /// <summary>Shortest walkable distance from the pass to where the plate was served (set on delivery).</summary>
+        public float ShortestDistance { get; private set; }
+        public float ParTime => ShortestDistance / m_Settings.carrySpeed * m_Settings.parFactor + m_Settings.parSlack;
 
         public void Begin()
         {
-            Position = m_Start;
             Spill = 0f;
             Elapsed = 0f;
+            ShortestDistance = 0f;
             Dropped = Arrived = false;
             m_BumpCooldown = 0f;
         }
@@ -100,29 +84,33 @@ namespace Hearthdelve.Tavern.Minigames
             if (IsComplete || deltaTime <= 0f) return;
             Elapsed += deltaTime;
             if (m_BumpCooldown > 0f) m_BumpCooldown -= deltaTime;
-            Position += Mathf.Clamp(input.Move, -1f, 1f) * m_Settings.carrySpeed * deltaTime;
-            if (HasTarget && Mathf.Abs(Position - Target) <= m_Settings.arriveDistance) Arrived = true;
         }
 
-        /// <summary>Hands the plate over at a table at <paramref name="tableX"/> (the carrier checks reach). Returns false if already finished.</summary>
-        public bool Deliver(float tableX)
+        /// <summary>Hands the plate over, <paramref name="shortestDistance"/> (tiles of walkable path) from the pass. False if already finished.</summary>
+        public bool Deliver(float shortestDistance)
         {
             if (IsComplete) return false;
-            Target = tableX;
-            HasTarget = true;
+            ShortestDistance = Mathf.Max(0f, shortestDistance);
             Arrived = true;
             return true;
         }
 
-        /// <summary>Called by the world when the carrier collides with someone. Returns true if it counted.</summary>
-        public bool RegisterBump()
+        /// <summary>
+        /// The carrier collided with someone walking across the floor; <paramref name="strength"/> scales the
+        /// spill (see <see cref="BumpStrength"/>). Returns true if it counted (not within the cooldown).
+        /// </summary>
+        public bool RegisterBump(float strength = 1f)
         {
             if (IsComplete || m_BumpCooldown > 0f) return false;
             m_BumpCooldown = m_Settings.bumpCooldown;
-            Spill = Mathf.Min(DropAt, Spill + m_Settings.spillPerBump);
+            Spill = Mathf.Min(DropAt, Spill + m_Settings.spillPerBump * Mathf.Max(0f, strength));
             if (Spill >= DropAt) Dropped = true;
             return true;
         }
+
+        /// <summary>How hard a bump is: the speed the two close at, against the carry speed (0.5 a brush, 1.5 a collision at a run).</summary>
+        public static float BumpStrength(float closingSpeed, float carrySpeed) =>
+            Mathf.Clamp(closingSpeed / Mathf.Max(0.01f, carrySpeed), 0.5f, 1.5f);
 
         public float Evaluate()
         {
@@ -134,20 +122,22 @@ namespace Hearthdelve.Tavern.Minigames
         }
     }
 
-    /// <summary>Walks the plate to the table; lower skill walks slower and hesitates.</summary>
+    /// <summary>
+    /// Staff serving: the world walks them to the table on the grid; skill sets how fast (lower skill
+    /// walks slower and so scores lower). <see cref="NextInput"/>'s Move is that speed, as a fraction of
+    /// the carry speed.
+    /// </summary>
     public sealed class ServingAutoPlayer : IMinigameAutoPlayer
     {
-        readonly ServingMinigame m_Game;
-        readonly float m_Speed;
-
         public ServingAutoPlayer(ServingMinigame game, float skill, IRandom random)
         {
-            m_Game = game;
             float s = Mathf.Clamp01(skill);
-            m_Speed = Mathf.Lerp(game.Settings.autoSlowestSpeed, 1f, s) * Mathf.Lerp(0.9f, 1f, random.Value());
+            SpeedFactor = Mathf.Lerp(game.Settings.autoSlowestSpeed, 1f, s) * Mathf.Lerp(0.9f, 1f, random.Value());
         }
 
-        public MinigameInput NextInput(float deltaTime) =>
-            new() { Move = Mathf.Sign(m_Game.Target - m_Game.Position) * m_Speed };
+        /// <summary>Walking speed while carrying, as a fraction of the carry speed.</summary>
+        public float SpeedFactor { get; }
+
+        public MinigameInput NextInput(float deltaTime) => new() { Move = SpeedFactor };
     }
 }

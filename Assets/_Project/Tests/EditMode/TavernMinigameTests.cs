@@ -135,39 +135,85 @@ namespace Hearthdelve.Tests
         }
     }
 
+    /// <summary>Serving, top-down (4c): time and spill, scored against par for the shortest walkable path.</summary>
     public class ServingMinigameTests
     {
         const float Dt = 1f / 60f;
         static readonly ServingSettings S = ServingSettings.Default;
 
-        static float Walk(ServingMinigame m)
+        /// <summary>Walks <paramref name="walked"/> tiles at the carry speed, then serves <paramref name="shortest"/> tiles from the pass.</summary>
+        static float Carry(ServingMinigame m, float walked, float shortest, float speedFactor = 1f)
         {
             m.Begin();
-            while (!m.IsComplete) m.Tick(Dt, new MinigameInput { Move = Mathf.Sign(m.Target - m.Position) });
+            float seconds = walked / (S.carrySpeed * speedFactor);
+            for (float t = 0f; t < seconds; t += Dt) m.Tick(Dt, default);
+            m.Deliver(shortest);
             return m.Evaluate();
         }
 
         [Test]
-        public void DirectDelivery_ScoresOne()
+        public void TheShortestWay_ScoresOne()
         {
-            Assert.That(Walk(new ServingMinigame(S, 15f, 5f)), Is.EqualTo(1f).Within(1e-4f));
+            Assert.That(Carry(new ServingMinigame(S), 12f, 12f), Is.EqualTo(1f).Within(1e-4f));
         }
 
         [Test]
-        public void EachBump_Spills_AndLowersScore()
+        public void Wandering_ScoresBelowTheShortestWay()
         {
-            var m = new ServingMinigame(S, 15f, 5f);
+            float direct = Carry(new ServingMinigame(S), 12f, 12f);
+            float roundabout = Carry(new ServingMinigame(S), 30f, 12f);
+            Assert.That(roundabout, Is.LessThan(direct));
+            Assert.That(roundabout, Is.LessThan(0.5f), "two and a half times the walk");
+        }
+
+        [Test]
+        public void ParComes_FromTheShortestPath_ToWhereItWasServed()
+        {
+            var m = new ServingMinigame(S);
+            Carry(m, 8f, 8f);
+            Assert.That(m.ParTime, Is.EqualTo(8f / S.carrySpeed * S.parFactor + S.parSlack).Within(1e-4f));
+            Assert.That(m.Deliver(8f), Is.False, "only once");
+        }
+
+        [Test]
+        public void OnlyCompletes_WhenServedOrDropped()
+        {
+            var m = new ServingMinigame(S);
+            m.Begin();
+            for (int i = 0; i < 600; i++) m.Tick(Dt, default);
+            Assert.That(m.IsComplete, Is.False, "walking around doesn't hand the plate over");
+            Assert.That(m.Evaluate(), Is.EqualTo(0f));
+        }
+
+        [Test]
+        public void EachBump_Spills_AndLowersTheScore()
+        {
+            var m = new ServingMinigame(S);
             m.Begin();
             Assert.That(m.RegisterBump(), Is.True);
-            while (!m.IsComplete) m.Tick(Dt, new MinigameInput { Move = -1f });
+            m.Deliver(0f);
             Assert.That(m.Spill, Is.EqualTo(S.spillPerBump).Within(1e-5f));
             Assert.That(m.Evaluate(), Is.EqualTo(1f - S.spillPerBump * S.spillPenalty).Within(1e-4f));
         }
 
         [Test]
+        public void HarderBumps_SpillMore()
+        {
+            var soft = new ServingMinigame(S);
+            soft.Begin();
+            soft.RegisterBump(ServingMinigame.BumpStrength(1f, S.carrySpeed));
+            var hard = new ServingMinigame(S);
+            hard.Begin();
+            hard.RegisterBump(ServingMinigame.BumpStrength(8f, S.carrySpeed));
+            Assert.That(hard.Spill, Is.GreaterThan(soft.Spill));
+            Assert.That(ServingMinigame.BumpStrength(0f, S.carrySpeed), Is.EqualTo(0.5f), "even a brush counts a little");
+            Assert.That(ServingMinigame.BumpStrength(100f, S.carrySpeed), Is.EqualTo(1.5f), "and there is a cap");
+        }
+
+        [Test]
         public void BumpCooldown_PreventsDoubleCounting()
         {
-            var m = new ServingMinigame(S, 15f, 5f);
+            var m = new ServingMinigame(S);
             m.Begin();
             m.RegisterBump();
             Assert.That(m.RegisterBump(), Is.False);
@@ -176,12 +222,12 @@ namespace Hearthdelve.Tests
         [Test]
         public void FullSpill_DropsThePlate_ScoringZero()
         {
-            var m = new ServingMinigame(S, 15f, 5f);
+            var m = new ServingMinigame(S);
             m.Begin();
             for (int i = 0; i < 3; i++)
             {
                 m.RegisterBump();
-                for (int f = 0; f < 60; f++) m.Tick(Dt, default); // wait out the cooldown in place
+                for (int f = 0; f < 60; f++) m.Tick(Dt, default); // wait out the cooldown
             }
             Assert.That(m.Dropped);
             Assert.That(m.IsComplete);
@@ -189,45 +235,10 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void Dawdling_PastPar_LowersScore()
+        public void DefaultTuning_ATypicalTrip_TakesThreeToFiveSeconds()
         {
-            var m = new ServingMinigame(S, 15f, 5f);
-            m.Begin();
-            for (int i = 0; i < 60 * 4; i++) m.Tick(Dt, default); // stand still for 4 s
-            while (!m.IsComplete) m.Tick(Dt, new MinigameInput { Move = -1f });
-            Assert.That(m.Evaluate(), Is.LessThan(0.8f));
-        }
-
-        [Test]
-        public void FreeCarry_OnlyCompletesWhenDelivered_AndScoresAgainstThatTable()
-        {
-            var m = new ServingMinigame(S, 15f);
-            m.Begin();
-            while (m.Position > 5f) m.Tick(Dt, new MinigameInput { Move = -1f });
-            Assert.That(m.IsComplete, Is.False, "walking past tables doesn't hand the plate over");
-            Assert.That(m.Deliver(5f), Is.True);
-            Assert.That(m.Arrived);
-            Assert.That(m.Evaluate(), Is.EqualTo(1f).Within(1e-4f));
-            Assert.That(m.Deliver(5f), Is.False, "only once");
-        }
-
-        [Test]
-        public void FreeCarry_Wandering_ScoresBelowADirectDelivery()
-        {
-            var m = new ServingMinigame(S, 15f);
-            m.Begin();
-            while (m.Position > 3f) m.Tick(Dt, new MinigameInput { Move = -1f }); // overshoot to the far end
-            while (m.Position < 11f) m.Tick(Dt, new MinigameInput { Move = 1f });  // then back to a near table
-            m.Deliver(11f);
-            Assert.That(m.Evaluate(), Is.LessThan(0.5f));
-        }
-
-        [Test]
-        public void DefaultTuning_MidFloorTable_TakesFiveToTenSeconds()
-        {
-            var m = new ServingMinigame(S, 15f, 5f); // 10 tiles
-            Walk(m);
-            Assert.That(m.Elapsed, Is.InRange(5f, 10f));
+            foreach (float tiles in new[] { 12f, 15f })
+                Assert.That(tiles / S.carrySpeed, Is.InRange(3f, 5f));
         }
     }
 
@@ -253,10 +264,16 @@ namespace Hearthdelve.Tests
             return MinigameRunner.RunToCompletion(t, MinigameFactory.CreateAutoPlayer(t, skill, new SeededRandom(seed)));
         }
 
+        /// <summary>Staff serving: the auto-player's speed decides how long the 12-tile walk takes.</summary>
         static float Serve(float skill, int seed)
         {
-            var s = new ServingMinigame(ServingSettings.Default, 15f, 5f);
-            return MinigameRunner.RunToCompletion(s, MinigameFactory.CreateAutoPlayer(s, skill, new SeededRandom(seed)));
+            var s = new ServingMinigame(ServingSettings.Default);
+            var player = (ServingAutoPlayer)MinigameFactory.CreateAutoPlayer(s, skill, new SeededRandom(seed));
+            s.Begin();
+            float seconds = 12f / (ServingSettings.Default.carrySpeed * player.SpeedFactor);
+            for (float t = 0f; t < seconds; t += 1f / 60f) s.Tick(1f / 60f, player.NextInput(1f / 60f));
+            s.Deliver(12f);
+            return s.Evaluate();
         }
 
         [Test]
@@ -288,7 +305,7 @@ namespace Hearthdelve.Tests
             var random = new SeededRandom(1);
             Assert.That(MinigameFactory.CreateAutoPlayer(f.CreateCook(Shared.Recipes.CookStation.Grill), 0.5f, random), Is.Not.Null);
             Assert.That(MinigameFactory.CreateAutoPlayer(f.CreateCook(Shared.Recipes.CookStation.Tap), 0.5f, random), Is.Not.Null);
-            Assert.That(MinigameFactory.CreateAutoPlayer(f.CreateServing(0f, 5f), 0.5f, random), Is.Not.Null);
+            Assert.That(MinigameFactory.CreateAutoPlayer(f.CreateServing(), 0.5f, random), Is.Not.Null);
         }
     }
 }

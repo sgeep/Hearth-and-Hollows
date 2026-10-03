@@ -28,13 +28,11 @@ namespace Hearthdelve.Tavern.Minigames
             _ => throw new ArgumentOutOfRangeException(nameof(station)),
         };
 
-        public ServingMinigame CreateServing(float fromX, float toX) => new(Serving, fromX, toX);
+        /// <summary>A plate to carry; the carrier serves it with <see cref="ServingMinigame.Deliver"/>.</summary>
+        public ServingMinigame CreateServing() => new(Serving);
 
         /// <summary>Chopping <paramref name="items"/> ingredients for a stew batch.</summary>
         public ChopMinigame CreateChop(int items, IRandom random) => new(Chop, items, random);
-
-        /// <summary>A plate carried freely; the carrier picks the table (<see cref="ServingMinigame.Deliver"/>).</summary>
-        public ServingMinigame CreateServing(float fromX) => new(Serving, fromX);
 
         /// <summary>An auto-player for any minigame this factory makes (staff auto-resolve).</summary>
         public static IMinigameAutoPlayer CreateAutoPlayer(IMinigame game, float skill, IRandom random) => game switch

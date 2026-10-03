@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: ServingConfig
   m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Minigames.ServingConfig
   serving:
-    carrySpeed: 1.6
-    arriveDistance: 0.4
-    spillPerBump: 0.4
+    carrySpeed: 4
+    arriveDistance: 1.2
+    spillPerBump: 0.34
     spillPenalty: 0.6
-    parFactor: 1.2
-    parSlack: 0.5
+    parFactor: 1.25
+    parSlack: 0.75
     bumpCooldown: 0.6
     autoSlowestSpeed: 0.55
