@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - LevelBounds
+  - FX
+  - Enemy
+  - World
+  - NoMask
   layers:
   - Default
   - TransparentFX
@@ -11,23 +16,23 @@ TagManager:
   - 
   - Water
   - UI
-  - Ground
-  - OneWayPlatform
-  - Player
-  - Enemy
   - Pickup
+  - 
+  - Obstacles
+  - Ground
+  - Player
+  - ObstaclesDoors
+  - NoPathfinding
+  - Enemies
+  - NoCollisions
+  - Hole
+  - MovingPlatform
+  - FallingPlatform
   - Projectile
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Camera1
+  - Camera2
+  - Camera3
+  - Camera4
   - 
   - 
   - 
@@ -42,25 +47,20 @@ TagManager:
     uniqueID: 0
     locked: 0
   - name: Background
-    uniqueID: 275768050
+    uniqueID: 1798043625
     locked: 0
-  - name: Level
-    uniqueID: 299808236
-    locked: 0
-  - name: Pickups
-    uniqueID: 1530966094
-    locked: 0
-  - name: Enemies
-    uniqueID: 1613500383
-    locked: 0
-  - name: Player
-    uniqueID: 1918770171
-    locked: 0
-  - name: FX
-    uniqueID: 1464037883
+  - name: Ground
+    uniqueID: 2296623839
     locked: 0
   - name: Foreground
-    uniqueID: 308342647
+    uniqueID: 1603220759
+    locked: 0
+  - name: Characters
+    uniqueID: 47421343
+    locked: 0
+  - name: Above
+    uniqueID: 961700441
     locked: 0
   m_RenderingLayers:
   - Default
+  m_MigratedRenderPipelines: []

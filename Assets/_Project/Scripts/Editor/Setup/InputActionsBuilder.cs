@@ -49,19 +49,7 @@ namespace Hearthdelve.Editor
             asset.AddControlScheme(KM).WithRequiredDevice("<Keyboard>").WithOptionalDevice("<Mouse>");
             asset.AddControlScheme(GP).WithRequiredDevice("<Gamepad>");
 
-            // --- Dungeon (GDD §9) ---
-            var d = asset.AddActionMap(InputMaps.Dungeon);
-            AddMove(d, DungeonActions.Move);
-            Button(d, DungeonActions.Jump, ("<Keyboard>/space", KM), ("<Gamepad>/buttonSouth", GP));
-            Button(d, DungeonActions.Attack, ("<Keyboard>/j", KM), ("<Mouse>/leftButton", KM), ("<Gamepad>/buttonWest", GP));
-            Button(d, DungeonActions.Secondary, ("<Keyboard>/k", KM), ("<Mouse>/rightButton", KM), ("<Gamepad>/buttonNorth", GP));
-            Button(d, DungeonActions.Dodge, ("<Keyboard>/leftShift", KM), ("<Keyboard>/l", KM), ("<Gamepad>/buttonEast", GP));
-            Button(d, DungeonActions.Interact, ("<Keyboard>/e", KM), ("<Gamepad>/dpad/up", GP));
-            Button(d, DungeonActions.Skill1, ("<Keyboard>/q", KM), ("<Gamepad>/leftShoulder", GP));
-            Button(d, DungeonActions.Skill2, ("<Keyboard>/r", KM), ("<Gamepad>/rightShoulder", GP));
-            Button(d, DungeonActions.KitchenArts, ("<Keyboard>/f", KM), ("<Gamepad>/rightTrigger", GP));
-            Button(d, DungeonActions.Finisher, ("<Keyboard>/c", KM), ("<Gamepad>/leftTrigger", GP));
-            Button(d, DungeonActions.Pause, ("<Keyboard>/escape", KM), ("<Gamepad>/start", GP));
+            AddDungeonMap(asset);
 
             // --- Tavern (stub for Phase 2) ---
             var t = asset.AddActionMap(InputMaps.Tavern);
@@ -83,7 +71,7 @@ namespace Hearthdelve.Editor
             Button(m, "Cancel", ("<Keyboard>/escape", KM), ("<Gamepad>/buttonEast", GP));
             AddPoint(m);
 
-            // --- UI (drives UI Toolkit through InputSystemUIInputModule) ---
+            // --- UI (drives uGUI through InputSystemUIInputModule) ---
             var ui = asset.AddActionMap(InputMaps.UI);
             var navigate = ui.AddAction("Navigate", InputActionType.PassThrough, expectedControlLayout: "Vector2");
             navigate.AddBinding("<Gamepad>/leftStick", groups: GP);
@@ -112,8 +100,17 @@ namespace Hearthdelve.Editor
         static void AddMissingActions()
         {
             var asset = InputActionAsset.FromJson(File.ReadAllText(EditorPaths.InputActions));
-            var minigame = asset.FindActionMap(InputMaps.Minigame);
             bool changed = false;
+            var dungeon = asset.FindActionMap(InputMaps.Dungeon);
+            if (dungeon == null || dungeon.FindAction(DungeonActions.AimPoint) == null)
+            {
+                // The side-scroller Dungeon map (jump, drop-through) is replaced by the top-down one.
+                if (dungeon != null) asset.RemoveActionMap(dungeon);
+                AddDungeonMap(asset);
+                changed = true;
+                Debug.Log("[Hearthdelve] Rebuilt the Dungeon action map for top-down controls.");
+            }
+            var minigame = asset.FindActionMap(InputMaps.Minigame);
             if (minigame != null && minigame.FindAction(MinigameActions.Point) == null)
             {
                 AddPoint(minigame);
@@ -123,9 +120,26 @@ namespace Hearthdelve.Editor
             {
                 File.WriteAllText(EditorPaths.InputActions, asset.ToJson());
                 AssetDatabase.ImportAsset(EditorPaths.InputActions, ImportAssetOptions.ForceUpdate);
-                Debug.Log("[Hearthdelve] Added missing input actions (Minigame/Point).");
             }
             Object.DestroyImmediate(asset);
+        }
+
+        /// <summary>Top-down Dungeon controls (GDD section 9).</summary>
+        static void AddDungeonMap(InputActionAsset asset)
+        {
+            var d = asset.AddActionMap(InputMaps.Dungeon);
+            AddMove(d, DungeonActions.Move);
+            var aim = d.AddAction(DungeonActions.AimPoint, InputActionType.PassThrough, expectedControlLayout: "Vector2");
+            aim.AddBinding("<Pointer>/position", groups: KM);
+            Button(d, DungeonActions.Attack, ("<Mouse>/leftButton", KM), ("<Gamepad>/buttonWest", GP));
+            Button(d, DungeonActions.Heavy, ("<Mouse>/rightButton", KM), ("<Gamepad>/buttonNorth", GP));
+            Button(d, DungeonActions.Dodge, ("<Keyboard>/space", KM), ("<Gamepad>/buttonEast", GP));
+            Button(d, DungeonActions.Interact, ("<Keyboard>/e", KM), ("<Gamepad>/buttonSouth", GP));
+            Button(d, DungeonActions.Skill1, ("<Keyboard>/1", KM), ("<Gamepad>/leftShoulder", GP));
+            Button(d, DungeonActions.Skill2, ("<Keyboard>/2", KM), ("<Gamepad>/rightShoulder", GP));
+            Button(d, DungeonActions.KitchenArts, ("<Keyboard>/q", KM), ("<Gamepad>/rightTrigger", GP));
+            Button(d, DungeonActions.Finisher, ("<Keyboard>/f", KM), ("<Gamepad>/leftTrigger", GP));
+            Button(d, DungeonActions.Pause, ("<Keyboard>/escape", KM), ("<Gamepad>/start", GP));
         }
 
         static void AddPoint(InputActionMap map)

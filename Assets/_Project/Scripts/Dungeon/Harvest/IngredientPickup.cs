@@ -1,81 +1,58 @@
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Harvest
 {
-    /// <summary>A harvested part lying in the world. Physics-driven so it pops out of the kill.</summary>
-    [RequireComponent(typeof(Rigidbody2D))]
+    /// <summary>
+    /// A harvested part lying on the floor. Walking over it puts as many as fit into the
+    /// satchel; what doesn't fit stays on the ground (the swap prompt arrives in 4b).
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
     public sealed class IngredientPickup : MonoBehaviour
     {
-        [SerializeField] SpriteRenderer m_Renderer;
-        [SerializeField] SpriteRenderer m_QualityPip;
-        [SerializeField, Min(0), Tooltip("Can't be collected until this long after spawning.")]
-        float m_PickupDelay = 0.35f;
-
-        Rigidbody2D m_Body;
-        float m_Age;
+        [SerializeField] SpriteRenderer m_Icon;
+        [SerializeField, Tooltip("Played when the part is picked up (sound, haptic, visual together).")]
+        MMF_Player m_PickedFeedback;
 
         public IngredientItem Item { get; private set; }
-        public int Count { get; set; }
-        public float Freshness { get; private set; } = 1f;
-        public IngredientStack Stack => new(Item, Count, Freshness);
-        public bool IsCollectable => m_Age >= m_PickupDelay && Count > 0 && !m_WaitingForPlayerToLeave;
+        public int Count { get; private set; }
+        public float Freshness { get; private set; } = Shared.Inventory.Freshness.Max;
 
-        const float k_LeaveDistance = 2f;
-        bool m_WaitingForPlayerToLeave;
-
-        /// <summary>
-        /// For a stack the player just discarded from the swap prompt: don't auto-collect it
-        /// until they've stepped away, or it would jump straight back into the satchel.
-        /// </summary>
-        public void WaitForPlayerToLeave() => m_WaitingForPlayerToLeave = true;
-
-        public void Configure(SpriteRenderer renderer, SpriteRenderer qualityPip)
+        public void Configure(SpriteRenderer icon, MMF_Player pickedFeedback)
         {
-            m_Renderer = renderer;
-            m_QualityPip = qualityPip;
+            m_Icon = icon;
+            m_PickedFeedback = pickedFeedback;
         }
 
-        void Awake() => m_Body = GetComponent<Rigidbody2D>();
-
-        public void Initialize(IngredientStack stack, Vector2 velocity)
+        public void Initialize(IngredientItem item, int count)
         {
-            var item = stack.Item;
             Item = item;
-            Count = stack.Count;
-            Freshness = stack.Freshness;
-            m_Age = 0f;
-            m_Body.linearVelocity = velocity;
-
-            var def = item.Definition;
-            if (m_Renderer != null)
-            {
-                if (def.icon != null) m_Renderer.sprite = def.icon;
-                m_Renderer.color = item.Prep == PrepState.Inedible ? Color.Lerp(def.placeholderColor, new Color(0.4f, 0.8f, 0.2f), 0.6f) : def.placeholderColor;
-            }
-            if (m_QualityPip != null) m_QualityPip.color = QualityColor(item.Quality);
-            name = $"Pickup_{def.id}_{item.Quality}";
+            Count = count;
+            if (m_Icon != null && item.IsValid && item.Definition.icon != null) m_Icon.sprite = item.Definition.icon;
         }
 
-        void Update()
-        {
-            m_Age += Time.deltaTime;
-            if (m_WaitingForPlayerToLeave)
-            {
-                var player = PlayerLocator.Player;
-                if (player == null || Vector2.Distance(player.position, transform.position) > k_LeaveDistance)
-                    m_WaitingForPlayerToLeave = false;
-            }
-        }
+        void OnTriggerEnter2D(Collider2D other) => TryCollect(other);
+        void OnTriggerStay2D(Collider2D other) => TryCollect(other);
 
-        /// <summary>Placeholder quality tint for the pip; the HUD also names the tier in text.</summary>
-        public static Color QualityColor(Quality quality) => quality switch
+        void TryCollect(Collider2D other)
         {
-            Quality.Poor => new Color(0.55f, 0.45f, 0.4f),
-            Quality.Standard => new Color(0.85f, 0.85f, 0.85f),
-            Quality.Fine => new Color(0.35f, 0.7f, 1f),
-            _ => new Color(1f, 0.8f, 0.2f),
-        };
+            if (Count <= 0 || !Item.IsValid) return;
+            // Only the carrier's own body collects: a weapon's damage area is a child collider and must not.
+            if (!other.TryGetComponent(out SatchelCarrier carrier) || carrier.Satchel == null) return;
+
+            int left = carrier.Satchel.Add(Item, Count, Freshness);
+            if (left == Count) return;
+
+            Count = left;
+            if (m_PickedFeedback != null) m_PickedFeedback.PlayFeedbacks(transform.position);
+            if (Count > 0) return;
+
+            // Let the feedback finish (it lives on this object) before the pickup goes away.
+            if (m_Icon != null) m_Icon.enabled = false;
+            GetComponent<Collider2D>().enabled = false;
+            Destroy(gameObject, m_PickedFeedback != null ? Mathf.Max(0.1f, m_PickedFeedback.TotalDuration) : 0f);
+        }
     }
 }

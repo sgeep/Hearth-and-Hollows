@@ -53,9 +53,11 @@ namespace Hearthdelve.Core.Input
     public static class DungeonActions
     {
         public const string Move = "Move";
-        public const string Jump = "Jump";
+        /// <summary>Mouse / pointer position in screen pixels; aim on keyboard and mouse.</summary>
+        public const string AimPoint = "AimPoint";
         public const string Attack = "Attack";
-        public const string Secondary = "Secondary";
+        /// <summary>Heavy / charged attack (hold).</summary>
+        public const string Heavy = "Heavy";
         public const string Dodge = "Dodge";
         public const string Interact = "Interact";
         public const string Skill1 = "Skill1";

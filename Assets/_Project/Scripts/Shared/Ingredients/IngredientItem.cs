@@ -27,7 +27,7 @@ namespace Hearthdelve.Shared.Ingredients
         public override bool Equals(object obj) => obj is IngredientItem other && Equals(other);
 
         public override int GetHashCode() =>
-            HashCode.Combine(Definition != null ? Definition.GetInstanceID() : 0, (int)Quality, (int)Prep);
+            HashCode.Combine(Definition != null ? Definition.GetHashCode() : 0, (int)Quality, (int)Prep);
 
         public static bool operator ==(IngredientItem a, IngredientItem b) => a.Equals(b);
         public static bool operator !=(IngredientItem a, IngredientItem b) => !a.Equals(b);

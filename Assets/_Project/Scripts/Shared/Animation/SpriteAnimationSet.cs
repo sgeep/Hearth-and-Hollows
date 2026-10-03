@@ -1,0 +1,59 @@
+using System;
+using System.Collections.Generic;
+using Hearthdelve.Core.Movement;
+using UnityEngine;
+
+namespace Hearthdelve.Shared.Animation
+{
+    public enum CharacterAnim
+    {
+        Idle,
+        Walk,
+        Attack,
+        Dodge,
+        Hurt,
+        Die,
+    }
+
+    /// <summary>One action's frames, for each of the four drawn facings.</summary>
+    [Serializable]
+    public sealed class SpriteAnim
+    {
+        public CharacterAnim action;
+        [Min(0.01f)] public float frameDuration = 0.1f;
+        public bool loop;
+        public Sprite[] frontRight = Array.Empty<Sprite>();
+        public Sprite[] frontLeft = Array.Empty<Sprite>();
+        public Sprite[] backRight = Array.Empty<Sprite>();
+        public Sprite[] backLeft = Array.Empty<Sprite>();
+
+        /// <summary>Frames for a facing. Sheets with a single row (deaths) reuse it for every facing.</summary>
+        public Sprite[] For(Facing4 facing)
+        {
+            Sprite[] frames = facing switch
+            {
+                Facing4.FrontLeft => frontLeft,
+                Facing4.BackRight => backRight,
+                Facing4.BackLeft => backLeft,
+                _ => frontRight,
+            };
+            return frames != null && frames.Length > 0 ? frames : frontRight;
+        }
+    }
+
+    /// <summary>
+    /// A character's sprite-sheet animations, generated from the Minifantasy sheets and their
+    /// frame-duration guides. All protagonist bodies share one set's layout.
+    /// </summary>
+    [CreateAssetMenu(menuName = "Hearthdelve/Sprite Animation Set", fileName = "Anim_")]
+    public sealed class SpriteAnimationSet : ScriptableObject
+    {
+        public List<SpriteAnim> animations = new();
+
+        public SpriteAnim Find(CharacterAnim action)
+        {
+            foreach (var a in animations) if (a != null && a.action == action) return a;
+            return null;
+        }
+    }
+}

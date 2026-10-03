@@ -1,875 +1,697 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
-</head><body>
-<h1>HEARTHDELVE — Project Design Document</h1>
-<p><em>Working title. Version 0.1 (first draft). Engine: Unity 6.3 LTS.</em></p>
-<hr>
-<h2>1. Overview</h2>
-<h3>1.1 Elevator Pitch</h3>
-<p>You are the keeper of a small tavern built atop the mouth of an ancient dungeon. By day you descend into <strong>The Dungeons</strong>, carving through monsters in fast, side‑scrolling hack‑and‑slash runs, harvesting their parts. By night you cook those parts into meals and pour brews for a growing crowd of patrons. The coin you earn buys better gear so you can delve deeper for rarer ingredients. As the dungeons begin to spill onto the surface, your tavern becomes a sanctuary, then a stronghold, and finally the rallying point of a world looking for a champion.</p>
-<h3>1.2 Genre and Inspirations</h3>
-<p>Hybrid: side‑scrolling action roguelite + restaurant/tavern management sim.</p>
-<table>
-<thead>
-<tr>
-<th>Inspiration</th>
-<th>What we take from it</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><em>Dead Cells</em></td>
-<td>Fluid 2D melee combat, weapon variety, procedurally stitched levels, run‑based structure with persistent unlocks</td>
-</tr>
-<tr>
-<td><em>Dave the Diver</em></td>
-<td>Day/night split between exploration and restaurant service, minigame‑driven cooking, charming NPC cast</td>
-</tr>
-<tr>
-<td><em>Delicious in Dungeon</em></td>
-<td>Monsters as food, the ecology and &quot;cookability&quot; of creatures, how you kill something affecting how it tastes</td>
-</tr>
-<tr>
-<td><em>Warcraft / Lord of the Rings</em></td>
-<td>Classic high‑fantasy world: humans, dwarves, elves, orcs, ancient evils, kingdoms under threat</td>
-</tr>
-</tbody>
-</table>
-<h3>1.3 Design Pillars</h3>
-<ol>
-<li><strong>Every kill is a harvest.</strong> Combat is not only about survival; <em>how</em> you fight determines what you bring home.</li>
-<li><strong>Two halves, one loop.</strong> The dungeon and the tavern feed each other constantly. Neither half should feel like a detour from the &quot;real&quot; game.</li>
-<li><strong>A home that grows with you.</strong> The tavern visibly transforms from a quiet inn into a fortified stronghold full of people you saved.</li>
-<li><strong>Cozy on the surface, dread below.</strong> The warmth of the tavern contrasts with the growing menace of the depths.</li>
-</ol>
-<h3>1.4 Target Platform and Audience</h3>
-<ul>
-<li><strong>Primary:</strong> PC (Steam). <strong>Secondary:</strong> Nintendo Switch 2, PlayStation 5, Xbox Series (post‑launch consideration).</li>
-<li><strong>Input:</strong> Controller‑first design, full keyboard and mouse support.</li>
-<li><strong>Audience:</strong> Players who enjoy action roguelites and cozy management games; fans of <em>Dave the Diver</em>, <em>Dead Cells</em>, <em>Hades</em>, <em>Potion Craft</em>, <em>Stardew Valley</em>.</li>
-<li><strong>Rating target:</strong> Teen (fantasy violence, mild monster gore played for comedy).</li>
-</ul>
-<hr>
-<h2>2. World and Story</h2>
-<h3>2.1 Setting</h3>
-<p>The world of <strong>Aldmere</strong> is a traditional high‑fantasy continent: human kingdoms, dwarven holds carved into mountains, elven forests, orcish clans of the steppes, and wild borderlands between them. Ages ago a civilization delved too deep and sealed what it found beneath the earth. Those seals are failing.</p>
-<p><strong>The Dungeons</strong> are not ordinary caves. They are living, shifting underworlds that rearrange themselves (justifying procedural layouts). Each one grows outward and upward over time, and monsters from their depths are beginning to emerge onto the surface.</p>
-<h3>2.2 The Tavern</h3>
-<p><strong>The Sunken Flagon</strong> sits in the frontier village of <strong>Brackenford</strong>, built directly over a dungeon entrance that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the shallow floors. The player inherits the tavern at the start of the game (see Act I).</p>
-<h3>2.3 The Protagonist</h3>
-<p>A retired (or reluctant) adventurer who has taken over the tavern. Recommended approach: a customizable protagonist with a fixed voice/personality, or a named character with light customization (appearance, name). Default name for this document: <strong>Bram Holloway</strong>.</p>
-<h3>2.4 Story Arc</h3>
-<p>The story unfolds in four acts, advanced by reaching dungeon depths and by tavern milestones (renown, sanctuary capacity).</p>
-<p><strong>Act I — The Inn (Biomes 1–2).</strong> Bram inherits the Sunken Flagon from a mentor who vanished in the dungeon. Business is slow. A wandering dwarf cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the dungeon walls.</p>
-<p><strong>Act II — The Sanctuary (Biomes 3–4).</strong> Travelers bring news: other dungeons have opened across Aldmere. Monsters raid nearby farms. Refugees begin arriving at the tavern looking for food and safety. Bram expands the inn into a sanctuary with rooms, a wall, and space for newcomers. Some refugees have skills and join the tavern's workforce. The player learns the dungeons are connected beneath the world.</p>
-<p><strong>Act III — The Stronghold (Biomes 5–6).</strong> A neighboring kingdom falls. The tavern becomes one of the last safe places on the frontier. Soldiers, a disgraced knight, an elven scout and an orc warband arrive, uneasy allies. The tavern is fortified. Patrons now watch Bram's delves with hope; their morale becomes a mechanical force (see Section 6.4). Bram discovers what happened to his mentor.</p>
-<p><strong>Act IV — The Champion (Biome 7 and the Heart).</strong> The source of the dungeons is revealed at the deepest point beneath Brackenford. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post‑game: endless/ascension mode and &quot;legendary&quot; ingredients.</p>
-<h3>2.5 Key Characters (Draft)</h3>
-<table>
-<thead>
-<tr>
-<th>Character</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Bram Holloway</strong></td>
-<td>Protagonist, tavern keeper and delver</td>
-</tr>
-<tr>
-<td><strong>Gundra Ashbelly</strong> (dwarf)</td>
-<td>Head cook and mentor for cooking mechanics; gruff, obsessed with flavor</td>
-</tr>
-<tr>
-<td><strong>Pip Marrowby</strong> (halfling)</td>
-<td>Server and bookkeeper; runs the floor during service</td>
-</tr>
-<tr>
-<td><strong>Old Tamsin</strong></td>
-<td>Former owner/mentor, missing in the dungeon; central mystery</td>
-</tr>
-<tr>
-<td><strong>Ser Aldric Vane</strong></td>
-<td>Disgraced knight who arrives in Act II; unlocks weapon training</td>
-</tr>
-<tr>
-<td><strong>Sylvaris</strong> (elf)</td>
-<td>Herbalist and scout; unlocks herb garden and brewing depth</td>
-</tr>
-<tr>
-<td><strong>Grukka Stonejaw</strong> (orc)</td>
-<td>Warband chief; blacksmith and fortification builder</td>
-</tr>
-<tr>
-<td><strong>The Warden Below</strong></td>
-<td>The intelligence behind the dungeons; antagonist</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2>3. Core Gameplay Loop</h2>
-<h3>3.1 The Day Cycle</h3>
-<p>Each in‑game day is divided into four phases:</p>
-<ol>
-<li><strong>Morning — Prep (Tavern hub).</strong> Check stock, set the day's menu, eat a buff meal, choose gear, accept customer requests (e.g. &quot;bring me cave troll liver&quot;).</li>
-<li><strong>Day — The Delve (Dungeon).</strong> A roguelite run. Fight, harvest, and choose when to return. Deeper = rarer ingredients and more risk.</li>
-<li><strong>Evening — Service (Tavern).</strong> Cook and serve using minigames. Earn gold, tips, and renown.</li>
-<li><strong>Night — Upgrade (Tavern hub).</strong> Spend earnings on equipment, tavern expansions, recipes, and staff. Story scenes play here. Save point.</li>
-</ol>
-<h3>3.2 Loop Diagram</h3>
-<pre class="mermaid">flowchart LR
-    A[Morning Prep] --&gt; B[Delve into the Dungeon]
-    B --&gt; C[Evening Service]
-    C --&gt; D[Night Upgrades &amp; Story]
-    D --&gt; A
-    B -- monster parts --&gt; C
-    C -- gold &amp; renown --&gt; D
-    D -- gear, buffs, unlocks --&gt; B
-</pre>
-<h3>3.3 How the Two Halves Feed Each Other</h3>
-<table>
-<thead>
-<tr>
-<th>From Dungeon to Tavern</th>
-<th>From Tavern to Dungeon</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Monster parts are ingredients</td>
-<td>Gold buys weapons, armor, and tools</td>
-</tr>
-<tr>
-<td>Harvest quality affects dish quality</td>
-<td>Pre‑delve meals grant run buffs</td>
-</tr>
-<tr>
-<td>Rare parts unlock new recipes</td>
-<td>Customer requests point you at specific monsters</td>
-</tr>
-<tr>
-<td>Found recipe scraps and lore</td>
-<td>Refugee staff unlock new dungeon abilities</td>
-</tr>
-<tr>
-<td>Rescued NPCs join the tavern</td>
-<td>Stronghold morale grants in‑dungeon &quot;Cheer&quot;</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<h2>4. Dungeon Gameplay</h2>
-<h3>4.1 Combat Feel</h3>
-<p>Target feel is <em>Dead Cells</em>: responsive, fast, readable, with heavy hit‑stop and satisfying animation canceling.</p>
-<ul>
-<li><strong>Movement:</strong> run, jump, double jump (unlockable), dodge roll with i‑frames, wall slide/jump, drop‑through platforms, ledge grab.</li>
-<li><strong>Attacks:</strong> primary weapon (combo chains), secondary weapon or shield, two skill slots (tools/throwables), and a special &quot;Kitchen Arts&quot; meter attack.</li>
-<li><strong>Feedback:</strong> hit‑stop, screen shake (subtle, toggleable), damage numbers (toggleable), clear enemy telegraphs.</li>
-</ul>
-<h3>4.2 Weapons as Kitchen Tools</h3>
-<p>A signature flavor hook: many weapons are culinary. This also ties weapon choice to harvesting.</p>
-<table>
-<thead>
-<tr>
-<th>Weapon Type</th>
-<th>Example</th>
-<th>Harvest Specialty</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Cleaver</td>
-<td>Butcher's Cleaver</td>
-<td>Clean cuts, bonus to meat quality</td>
-</tr>
-<tr>
-<td>Filleting Blade</td>
-<td>Eel‑Tooth Knife</td>
-<td>Fast combos, perfect for fish/serpent parts</td>
-</tr>
-<tr>
-<td>Tenderizer</td>
-<td>Troll‑Mallet</td>
-<td>Stagger damage, softens tough meats (bonus to stews)</td>
-</tr>
-<tr>
-<td>Skewer Spear</td>
-<td>Rotisserie Pike</td>
-<td>Reach, pins enemies; &quot;spit‑roast&quot; fire variant</td>
-</tr>
-<tr>
-<td>Frying Pan</td>
-<td>Iron Skillet</td>
-<td>Parry/block weapon; counter hits sear enemies</td>
-</tr>
-<tr>
-<td>Traditional</td>
-<td>Swords, axes, bows, staves</td>
-<td>Standard harvest; wider combat variety</td>
-</tr>
-</tbody>
-</table>
-<p>Weapons have rarity tiers (Common → Fine → Masterwork → Legendary) and random affixes per run, <em>Dead Cells</em> style. Permanent unlocks add weapons to the drop pool.</p>
-<h3>4.3 The Harvest System</h3>
-<p>The heart of the fantasy. How a monster dies influences what it drops.</p>
-<ul>
-<li><strong>Clean Kill:</strong> finishing with a matching tool type or a finisher move yields higher quality parts.</li>
-<li><strong>Overkill:</strong> excessive damage (big explosions, over‑hits) damages parts, lowering quality or destroying some.</li>
-<li><strong>Elemental Kills:</strong> fire‑killed monsters may drop &quot;Seared&quot; parts (pre‑cooked, faster to prepare but some recipes need raw). Ice‑killed monsters drop &quot;Chilled&quot; parts that stay fresh longer. Poison kills make parts inedible. Inedible parts still drop and can be carried; they will get a use later (a small sale value, poisons, or traps).</li>
-<li><strong>Harvest Finisher:</strong> when an enemy is low, a prompt allows a quick finisher that guarantees a premium part at the cost of a moment of vulnerability. Risk/reward.</li>
-</ul>
-<h3>4.4 Inventory, Freshness, and Extraction</h3>
-<ul>
-<li><strong>The Satchel:</strong> limited carry slots for ingredients, upgradeable in the tavern. Forces choices about what to keep.</li>
-<li><strong>Freshness:</strong> parts decay over time in the dungeon (measured in rooms cleared or real time, to be tuned). Salt, ice runes, and preservation jars extend freshness.</li>
-<li><strong>Extraction:</strong> the player can return via exit points at the end of each biome (a lift or rope back to the tavern). Leaving early keeps everything; continuing deeper risks it.</li>
-<li><strong>Death:</strong> on death, the player keeps a portion of the haul (e.g. items in a protected &quot;Lockbox&quot; slot plus a percentage of the rest), loses the remainder, and loses the day's unspent run currency. Permanent unlocks are never lost. This keeps death painful but not punishing enough to stall the tavern economy.</li>
-</ul>
-<h3>4.5 Field Cooking (Optional Mechanic)</h3>
-<p>At campfire rooms, the player can cook a quick meal from carried parts for a mid‑run heal or buff. This sacrifices ingredients that could be sold, creating a meaningful choice, and echoes the <em>Delicious in Dungeon</em> spirit.</p>
-<h3>4.6 Run Structure and Biomes</h3>
-<p>Levels are assembled from hand‑authored rooms stitched together procedurally (see Section 10.5). Each biome has 3–5 floors plus a boss.</p>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Biome</th>
-<th>Theme</th>
-<th>Signature Ingredients</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>The Cellars</td>
-<td>Flooded old cellars and tunnels</td>
-<td>Giant rats, slimes, cave mushrooms</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Fungal Warrens</td>
-<td>Glowing fungal forest</td>
-<td>Myconids, spore beetles, walking truffles</td>
-</tr>
-<tr>
-<td>3</td>
-<td>Goblin Sprawl</td>
-<td>Goblin shanty‑town and mines</td>
-<td>Boar‑riders, cave boars, stolen spices</td>
-</tr>
-<tr>
-<td>4</td>
-<td>Drowned Halls</td>
-<td>Sunken dwarven ruins</td>
-<td>Giant eels, crab knights, kelp horrors</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Ember Forge</td>
-<td>Volcanic dwarven forge</td>
-<td>Salamanders, fire drakes, magma snails</td>
-</tr>
-<tr>
-<td>6</td>
-<td>Frostvault</td>
-<td>Frozen crypts</td>
-<td>Ice trolls, wyrm eggs, frost wraiths</td>
-</tr>
-<tr>
-<td>7</td>
-<td>The Rootdeep</td>
-<td>Living, pulsing underworld</td>
-<td>Aberrations, dragon cuts, legendary parts</td>
-</tr>
-<tr>
-<td>—</td>
-<td>The Heart</td>
-<td>Final area</td>
-<td>Final boss</td>
-</tr>
-</tbody>
-</table>
-<p>Branching paths between biomes (as in <em>Dead Cells</em>) let players choose which ingredients to target on a given run.</p>
-<h3>4.7 Enemies and Bosses</h3>
-<p>Each enemy has a <strong>combat profile</strong> (behavior, attacks, telegraphs) and a <strong>harvest profile</strong> (parts, preferred kill method, freshness rate). Bosses drop signature ingredients that unlock &quot;Legendary Dishes&quot; and progress the story.</p>
-<p>Example bosses: <em>The Cellar King</em> (giant rat monarch), <em>Grandmother Spore</em> (myconid matriarch), <em>Chieftain Gutgrin</em> (goblin warlord on a war boar), <em>The Leviathan Eel</em>, <em>Forge‑Drake Cindermaw</em>, <em>The Frost Troll Queen</em>, <em>The Warden Below</em> (final).</p>
-<hr>
-<h2>5. Ingredients and Recipes</h2>
-<h3>5.1 Ingredient Properties</h3>
-<p>Every ingredient is data‑driven (ScriptableObject) with:</p>
-<ul>
-<li><strong>Category:</strong> Meat, Offal, Fish, Fungus, Plant, Egg, Spice, Liquid, Magical.</li>
-<li><strong>Flavor Tags:</strong> Savory, Sweet, Spicy, Sour, Bitter, Umami, Earthy, Arcane.</li>
-<li><strong>Quality:</strong> Poor / Standard / Fine / Premium (from the Harvest system).</li>
-<li><strong>Freshness:</strong> 0–100%, decays over time; affects dish score. Tracked per stack: when two stacks of the same part merge, freshness becomes the count-weighted average. Kitchens use the least-fresh stock first (on a tie, the lower quality first). Freshness is designed to also drop in the storeroom overnight, slowed by preservation upgrades (salt, ice runes, jars); storeroom decay is not in the Phase 2 prototype.</li>
-<li><strong>Rarity:</strong> Common → Legendary; affects price.</li>
-<li><strong>Special Effects:</strong> some ingredients carry buffs (e.g. Fire Drake Heart grants fire resistance when eaten).</li>
-</ul>
-<h3>5.2 Example Ingredient Table</h3>
-<table>
-<thead>
-<tr>
-<th>Monster</th>
-<th>Part</th>
-<th>Category</th>
-<th>Flavor</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Giant Rat</td>
-<td>Haunch</td>
-<td>Meat</td>
-<td>Savory</td>
-<td>Staple early meat</td>
-</tr>
-<tr>
-<td>Green Slime</td>
-<td>Gel</td>
-<td>Liquid</td>
-<td>Sweet</td>
-<td>Used in jellies and drinks</td>
-</tr>
-<tr>
-<td>Myconid</td>
-<td>Cap</td>
-<td>Fungus</td>
-<td>Earthy, Umami</td>
-<td>Great in stews</td>
-</tr>
-<tr>
-<td>Cave Boar</td>
-<td>Belly</td>
-<td>Meat</td>
-<td>Savory</td>
-<td>Premium when killed with Cleaver</td>
-</tr>
-<tr>
-<td>Giant Eel</td>
-<td>Fillet</td>
-<td>Fish</td>
-<td>Umami</td>
-<td>Spoils fast; needs chilling</td>
-</tr>
-<tr>
-<td>Salamander</td>
-<td>Tail</td>
-<td>Meat</td>
-<td>Spicy</td>
-<td>Arrives &quot;Seared&quot; if fire‑killed</td>
-</tr>
-<tr>
-<td>Ice Troll</td>
-<td>Liver</td>
-<td>Offal</td>
-<td>Bitter</td>
-<td>Grants frost resistance</td>
-</tr>
-<tr>
-<td>Fire Drake</td>
-<td>Heart</td>
-<td>Magical</td>
-<td>Spicy, Arcane</td>
-<td>Legendary dish ingredient</td>
-</tr>
-</tbody>
-</table>
-<h3>5.3 Recipes</h3>
-<ul>
-<li>Recipes are discovered through NPCs, recipe scraps found in the dungeon, customer hints, and experimentation.</li>
-<li>Each recipe has required ingredient slots (by category or specific item) and optional slots that add flavor tags and bonuses.</li>
-<li><strong>Experimentation:</strong> combining ingredients freely at the &quot;Test Kitchen&quot; can discover new recipes. Failed experiments produce funny &quot;Questionable Stew&quot;.</li>
-<li>Dish score = base recipe value × ingredient quality × freshness × minigame performance.</li>
-</ul>
-<hr>
-<h2>6. Tavern Gameplay</h2>
-<h3>6.1 Service Phase</h3>
-<p>During evening service the camera shows the tavern floor and kitchen in a side view. Customers enter, sit, and order from the menu the player set that morning. The player moves between stations to cook, pour, and serve, with staff helping as they're unlocked. Service lasts a fixed in‑game time (e.g. 5–8 real minutes at launch, tuned in playtesting).</p>
-<h3>6.2 Minigames</h3>
-<p>Each station is a short, skill‑based minigame. Staff can auto‑complete stations at reduced quality so the player can focus on others.</p>
-<table>
-<thead>
-<tr>
-<th>Station</th>
-<th>Minigame</th>
-<th>Skill</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Butcher Block</strong></td>
-<td>Follow cut lines on a monster part; accuracy sets portion count</td>
-<td>Precision</td>
-</tr>
-<tr>
-<td><strong>Grill / Pan</strong></td>
-<td>Flip at the right moment; watch a doneness meter</td>
-<td>Timing</td>
-</tr>
-<tr>
-<td><strong>Stew Pot</strong></td>
-<td>Add ingredients in order, stir to keep temperature in a band</td>
-<td>Rhythm/management</td>
-</tr>
-<tr>
-<td><strong>Oven</strong></td>
-<td>Set heat and pull at the right time while multitasking</td>
-<td>Timing</td>
-</tr>
-<tr>
-<td><strong>Tap &amp; Brew</strong></td>
-<td>Pour ale/mead to the line with correct foam; mix cocktails and potions</td>
-<td>Precision</td>
-</tr>
-<tr>
-<td><strong>Plating</strong></td>
-<td>Arrange garnish quickly for presentation bonus</td>
-<td>Speed</td>
-</tr>
-<tr>
-<td><strong>Serving</strong></td>
-<td>Carry plates across a busy floor, avoid collisions</td>
-<td>Movement</td>
-</tr>
-<tr>
-<td><strong>Bouncer</strong></td>
-<td>Rowdy customers occasionally brawl; quick combat‑lite minigame to throw them out</td>
-<td>Reflex</td>
-</tr>
-</tbody>
-</table>
-<p>Additional minigames can be introduced over time (fermentation, bread proofing, spice grinding) to keep service fresh through the campaign.</p>
-<h3>6.3 Customers</h3>
-<ul>
-<li><strong>Types:</strong> villagers, adventurers, dwarves, elves, orcs, merchants, nobles, refugees, and eventually soldiers and heroes.</li>
-<li><strong>Preferences:</strong> each race/type has favorite flavor tags and categories (e.g. dwarves love savory and strong ale; elves prefer herbs and fungus; orcs demand big meat portions).</li>
-<li><strong>Patience:</strong> a timer; slow service lowers tips and reviews.</li>
-<li><strong>Special Guests:</strong> named characters with unique requests that drive story, unlock recipes, or give quests.</li>
-<li><strong>Reviews and Renown:</strong> satisfied customers raise the tavern's Renown, which attracts better‑paying clientele and unlocks story beats.</li>
-</ul>
-<h3>6.4 The Growing Stronghold</h3>
-<p>The tavern evolves across the acts. Each stage adds visual changes, new rooms, and mechanics.</p>
-<table>
-<thead>
-<tr>
-<th>Stage</th>
-<th>Name</th>
-<th>Adds</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>The Inn</td>
-<td>Kitchen, bar, small dining room</td>
-</tr>
-<tr>
-<td>2</td>
-<td>The Sanctuary</td>
-<td>Guest rooms, refugee quarters, herb garden, storeroom</td>
-</tr>
-<tr>
-<td>3</td>
-<td>The Stronghold</td>
-<td>Walls, watchtower, forge, training yard, brewery, great hall</td>
-</tr>
-<tr>
-<td>4</td>
-<td>The Bastion</td>
-<td>War room, shrine, feast hall for the finale</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Residents:</strong> refugees who move in can be assigned roles (cook, server, gardener, smith, guard). Each resident has a small personal questline.</p>
-<p><strong>Morale and Cheer:</strong> the stronghold has a Morale value driven by food quality, housing, and story events. High morale grants <strong>Cheer</strong> in the dungeon: temporary buffs, extra revives, or crowd &quot;chants&quot; that power up the Kitchen Arts meter. This makes the story theme of people rallying behind you a real mechanic.</p>
-<p><strong>Defense Events (optional, later scope):</strong> occasionally monsters breach the surface and attack the stronghold. The player defends in a short side‑scrolling combat encounter with residents helping.</p>
-<hr>
-<h2>7. Progression and Economy</h2>
-<h3>7.1 Currencies</h3>
-<table>
-<thead>
-<tr>
-<th>Currency</th>
-<th>Earned From</th>
-<th>Spent On</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Gold</strong></td>
-<td>Service, selling surplus ingredients</td>
-<td>Gear, tavern upgrades, recipes, staff wages</td>
-</tr>
-<tr>
-<td><strong>Renown</strong></td>
-<td>Customer satisfaction, story</td>
-<td>Unlocks tiers of customers, story progress (not spent)</td>
-</tr>
-<tr>
-<td><strong>Delve Marks</strong></td>
-<td>Found in dungeon runs (lost on death if unspent)</td>
-<td>Permanent combat unlocks at the &quot;Delver's Board&quot;</td>
-</tr>
-<tr>
-<td><strong>Relics</strong></td>
-<td>Bosses, secrets</td>
-<td>Major permanent abilities (double jump, dash, etc.)</td>
-</tr>
-</tbody>
-</table>
-<h3>7.2 Upgrade Tracks</h3>
-<ul>
-<li><strong>Combat:</strong> weapon blueprints (added to drop pools), armor, satchel size, preservation tools, health flasks.</li>
-<li><strong>Traversal:</strong> metroidvania‑style relics that open shortcuts and hidden rooms.</li>
-<li><strong>Tavern:</strong> stations, furniture, seating capacity, decor (decor raises customer satisfaction), room expansions.</li>
-<li><strong>Staff:</strong> hire and train residents; staff skill levels affect auto‑complete quality.</li>
-</ul>
-<h3>7.3 Economy Balance Goals</h3>
-<ul>
-<li>A good delve should fund roughly one meaningful upgrade.</li>
-<li>Selling raw ingredients should be viable but noticeably worse than cooking them.</li>
-<li>Staff wages and refugee upkeep create light pressure without becoming a punishing survival mechanic.</li>
-</ul>
-<hr>
-<h2>8. Art and Audio Direction</h2>
-<h3>8.1 Visual Style</h3>
-<p>Options to decide early (see Open Questions):</p>
-<ul>
-<li><strong>Option A — High‑res hand‑painted 2D</strong> with skeletal animation (Unity 2D Animation package or Spine). Scales well for many enemy variants.</li>
-<li><strong>Option B — Detailed pixel art</strong> in the spirit of <em>Dead Cells</em> and <em>Dave the Diver</em>'s 2D characters. Strong genre fit, but animation‑heavy.</li>
-</ul>
-<p>In either case: warm, saturated tavern palettes (amber candlelight, wood, hearth) contrasted with cool, eerie dungeon palettes (teal, violet, bioluminescence). Food should look genuinely appetizing, with close‑up &quot;dish reveal&quot; art for each recipe.</p>
-<h3>8.2 UI</h3>
-<p>Rustic fantasy UI: parchment menus, wooden signage, chalkboard menu board. Readable during fast combat, with a minimal HUD in the dungeon.</p>
-<h3>8.3 Audio</h3>
-<ul>
-<li><strong>Tavern:</strong> folk instrumentation (fiddle, lute, accordion, bodhrán); music gains layers as the tavern grows and more residents join in.</li>
-<li><strong>Dungeon:</strong> darker, percussive, biome‑specific themes that intensify in combat.</li>
-<li><strong>SFX:</strong> chunky, satisfying combat impacts; sizzling, chopping, pouring, and crowd chatter in the tavern.</li>
-<li><strong>Voice:</strong> grunts and barks (&quot;Hmm!&quot;, &quot;Aye!&quot;) rather than full voice acting, for scope.</li>
-</ul>
-<hr>
-<h2>9. Controls (Default Controller Layout)</h2>
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Dungeon</th>
-<th>Tavern</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Left Stick</td>
-<td>Move</td>
-<td>Move between stations</td>
-</tr>
-<tr>
-<td>A / Cross</td>
-<td>Jump</td>
-<td>Interact / confirm</td>
-</tr>
-<tr>
-<td>X / Square</td>
-<td>Primary attack</td>
-<td>Minigame action</td>
-</tr>
-<tr>
-<td>Y / Triangle</td>
-<td>Secondary attack</td>
-<td>Minigame alt action</td>
-</tr>
-<tr>
-<td>B / Circle</td>
-<td>Dodge roll</td>
-<td>Cancel / back</td>
-</tr>
-<tr>
-<td>LB / RB</td>
-<td>Skills 1 and 2</td>
-<td>Cycle orders</td>
-</tr>
-<tr>
-<td>RT</td>
-<td>Kitchen Arts special</td>
-<td>Speed up (hold)</td>
-</tr>
-<tr>
-<td>LT</td>
-<td>Harvest finisher</td>
-<td>—</td>
-</tr>
-<tr>
-<td>Start</td>
-<td>Pause menu</td>
-<td>Pause menu</td>
-</tr>
-</tbody>
-</table>
-<p>All controls remappable via the Unity Input System.</p>
-<hr>
-<h2>10. Technical Design (Unity 6.3 LTS)</h2>
-<h3>10.1 Engine Configuration</h3>
-<ul>
-<li><strong>Render Pipeline:</strong> Universal Render Pipeline (URP) with the 2D Renderer, 2D lights and shadow casters for torchlit dungeons and a warm tavern.</li>
-<li><strong>Input:</strong> Input System package with separate action maps (<code>Dungeon</code>, <code>Tavern</code>, <code>UI</code>, <code>Minigame</code>) and runtime rebinding.</li>
-<li><strong>Camera:</strong> Cinemachine for follow cameras, confiner bounds per room, and impulse‑based screen shake.</li>
-<li><strong>UI:</strong> UI Toolkit for menus and HUD; uGUI where world‑space UI is easier (customer speech bubbles, order tickets).</li>
-<li><strong>Animation:</strong> 2D Animation package (or Spine runtime) for skeletal characters; Animator or a code‑driven state machine for combat.</li>
-<li><strong>Physics:</strong> Physics 2D with a custom kinematic character controller (not Rigidbody‑driven) for tight platforming.</li>
-<li><strong>Content Loading:</strong> Addressables for biome assets, room prefabs, and localization.</li>
-<li><strong>Localization:</strong> Unity Localization package from day one.</li>
-</ul>
-<p><em>Note: confirm package versions against the Unity 6.3 LTS package manifest at project setup.</em></p>
-<h3>10.2 Scene Structure</h3>
-<ul>
-<li><code>Boot</code> — initializes services (save, audio, input, localization) and persists.</li>
-<li><code>MainMenu</code></li>
-<li><code>Tavern</code> — hub scene for Prep, Service, and Night phases.</li>
-<li><code>Dungeon</code> — single scene into which biome rooms are loaded procedurally.</li>
-<li><code>Cutscene</code> scenes as needed (or Timeline sequences inside Tavern).</li>
-</ul>
-<p>Additive scene loading keeps the persistent <code>Boot</code> services alive.</p>
-<h3>10.3 Architecture Overview</h3>
-<ul>
-<li><strong>Data‑driven design with ScriptableObjects:</strong> <code>IngredientDefinition</code>, <code>RecipeDefinition</code>, <code>EnemyDefinition</code>, <code>WeaponDefinition</code>, <code>CustomerProfile</code>, <code>BiomeDefinition</code>, <code>RoomDefinition</code>, <code>TavernUpgradeDefinition</code>.</li>
-<li><strong>Game State Machine:</strong> a top‑level <code>GameFlowManager</code> drives phases (Prep → Delve → Service → Night) and scene transitions.</li>
-<li><strong>Event channels:</strong> ScriptableObject‑based event channels (or a lightweight event bus) to decouple systems, e.g. <code>OnEnemyKilled</code> → Harvest system → Inventory.</li>
-<li><strong>Character controller:</strong> state machine (Idle, Run, Jump, Fall, Dodge, Attack, Hurt, Dead) with frame‑data‑driven attacks (startup, active, recovery frames, cancel windows).</li>
-<li><strong>Combat:</strong> hitbox/hurtbox components, damage pipeline with modifiers (element, crit, overkill), and hit‑stop via a time‑scale service.</li>
-<li><strong>Minigames:</strong> each station implements an <code>IMinigame</code> interface (Begin, Tick, Evaluate → score 0–1), making it easy to add new minigames and to let staff auto‑resolve.</li>
-<li><strong>Customer AI:</strong> simple state machine (Enter, Queue, Seat, Order, Wait, Eat, Pay, Leave) with a patience timer and preference scoring.</li>
-</ul>
-<h3>10.4 Key Systems</h3>
-<table>
-<thead>
-<tr>
-<th>System</th>
-<th>Responsibility</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>HarvestSystem</code></td>
-<td>Determines drops from kill context (weapon type, element, overkill)</td>
-</tr>
-<tr>
-<td><code>InventorySystem</code></td>
-<td>Satchel, storeroom, freshness decay, preservation modifiers</td>
-</tr>
-<tr>
-<td><code>RecipeSystem</code></td>
-<td>Recipe matching, experimentation, dish scoring</td>
-</tr>
-<tr>
-<td><code>ServiceSystem</code></td>
-<td>Customer spawning, orders, timers, payment, reviews</td>
-</tr>
-<tr>
-<td><code>EconomySystem</code></td>
-<td>Currencies, prices, wages</td>
-</tr>
-<tr>
-<td><code>ProgressionSystem</code></td>
-<td>Unlocks, relics, tavern stages, story flags</td>
-</tr>
-<tr>
-<td><code>StoryManager</code></td>
-<td>Act progression, dialogue triggers (e.g. Yarn Spinner or Ink integration)</td>
-</tr>
-<tr>
-<td><code>SaveSystem</code></td>
-<td>JSON serialization of persistent state; autosave at Night phase</td>
-</tr>
-<tr>
-<td><code>LevelGenerator</code></td>
-<td>Builds dungeon floors from room graphs</td>
-</tr>
-</tbody>
-</table>
-<h3>10.5 Procedural Level Generation</h3>
-<p>Approach similar to <em>Dead Cells</em>: designer‑authored <strong>room prefabs</strong> stitched together by a <strong>graph‑based generator</strong>.</p>
-<ol>
-<li>Each biome defines a floor template graph (entrance, combat rooms, treasure, campfire, shop, secret, exit, boss).</li>
-<li>The generator picks room prefabs matching each node's type and required door connections.</li>
-<li>Rooms are placed on a grid with connection validation to avoid overlap.</li>
-<li>Enemies and loot spawn from weighted tables per biome and depth.</li>
-<li>Seeds are stored for debugging and potential daily‑challenge modes.</li>
-</ol>
-<h3>10.6 Save Data</h3>
-<p>Persistent: tavern stage and upgrades, unlocked weapons/relics/recipes, storeroom inventory, currencies, residents, story flags, settings. Run state is saved only at biome transitions to prevent save‑scumming (optionally allow a &quot;suspend run&quot; save).</p>
-<h3>10.7 Suggested Project Folder Structure</h3>
-<pre><code>Assets/
+# HEARTHDELVE — Project Design Document
+
+*Working title. Version 0.2 (top-down pivot, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
+
+> **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections without a mark are unchanged from v0.1. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+
+---
+
+## 1. Overview
+
+### 1.1 Elevator Pitch (rewritten in v0.2)
+
+You are the keeper of a small inn built atop the mouth of an ancient dungeon. By day you descend into **The Dungeons**, fighting room by room through top-down, hack-and-slash runs and harvesting the monsters you kill. By night you cook those parts into meals and pour brews for a growing crowd of patrons. The coin you earn buys better gear so you can delve deeper for rarer ingredients. As the dungeons begin to spill onto the surface, your inn grows the way a cult grows in *Cult of the Lamb*: from a quiet inn into a sanctuary, then a stronghold, and finally the rallying point of a world looking for a champion.
+
+### 1.2 Genre and Inspirations (rewritten in v0.2)
+
+Hybrid: top-down action roguelite + tavern management sim.
+
+| Inspiration | What we take from it |
+|---|---|
+| *Cult of the Lamb* | The overall shape: short top-down combat runs feeding a home base that grows, with residents who have roles and moods |
+| *Hades* | Combat feel: 8-direction movement, dodge with i-frames, light combo plus a heavy/charged attack; room-by-room runs where you pick the next room by its reward |
+| *Moonlighter* | Dungeon by day, shop by night; what you carry out is what you sell |
+| *Dave the Diver* | Minigame-driven cooking and service, a limited "oxygen" resource (our Essence), charming NPC cast |
+| *Delicious in Dungeon* | Monsters as food, the ecology and "cookability" of creatures, how you kill something affecting how it tastes |
+| *Warcraft / Lord of the Rings* | Classic high-fantasy world: humans, dwarves, elves, orcs, ancient evils, kingdoms under threat |
+
+### 1.3 Design Pillars
+
+1. **Every kill is a harvest.** Combat is not only about survival; *how* you fight determines what you bring home.
+2. **Two halves, one loop.** The dungeon and the tavern feed each other constantly. Neither half should feel like a detour from the "real" game.
+3. **A home that grows with you.** The tavern visibly transforms from a quiet inn into a fortified stronghold full of people you saved.
+4. **Cozy on the surface, dread below.** The warmth of the tavern contrasts with the growing menace of the depths.
+5. **You can feel it.** *(added in v0.2)* Every important moment lands through visuals, sound and haptics together.
+
+### 1.4 Target Platform and Audience
+
+- **Primary:** PC (Steam), plus a web build kept working throughout development. **Secondary:** Nintendo Switch 2, PlayStation 5, Xbox Series (post-launch consideration).
+- **Input:** Controller-first design, full keyboard and mouse support.
+- **Audience:** Players who enjoy action roguelites and cozy management games; fans of *Cult of the Lamb*, *Hades*, *Dave the Diver*, *Moonlighter*, *Potion Craft*, *Stardew Valley*.
+- **Rating target:** Teen (fantasy violence, mild monster gore played for comedy).
+
+---
+
+## 2. World and Story
+
+### 2.1 Setting
+
+The world of **Aldmere** is a traditional high-fantasy continent: human kingdoms, dwarven holds carved into mountains, elven forests, orcish clans of the steppes, and wild borderlands between them. Ages ago a civilization delved too deep and sealed what it found beneath the earth. Those seals are failing.
+
+**The Dungeons** are not ordinary caves. They are living, shifting underworlds that rearrange themselves (justifying procedural layouts). Each one grows outward and upward over time, and monsters from their depths are beginning to emerge onto the surface.
+
+### 2.2 The Tavern
+
+**The Sunken Flagon** sits in the frontier village of **Brackenford**, built directly over a dungeon entrance that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the shallow floors. The player inherits the tavern at the start of the game (see Act I).
+
+### 2.3 The Protagonist
+
+A retired (or reluctant) adventurer who has taken over the tavern. The protagonist is customizable (name, body, colours) with a fixed voice and personality. Default name for this document: **Bram Holloway**.
+
+*(v0.2)* Customization is limited by the art: the player picks a body and recolours skin, hair and outfit through palette swaps. Layered outfits are not possible, because Minifantasy has no clothing or hair layers for attack animations.
+
+### 2.4 Story Arc
+
+The story unfolds in four acts, advanced by reaching dungeon depths and by tavern milestones (renown, sanctuary capacity).
+
+**Act I — The Inn (Biomes 1–2).** Bram inherits the Sunken Flagon from a mentor who vanished in the dungeon. Business is slow. A wandering dwarf cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the dungeon walls.
+
+**Act II — The Sanctuary (Biomes 3–4).** Travelers bring news: other dungeons have opened across Aldmere. Monsters raid nearby farms. Refugees begin arriving at the tavern looking for food and safety. Bram expands the inn into a sanctuary with rooms, a wall, and space for newcomers. Some refugees have skills and join the tavern's workforce. The player learns the dungeons are connected beneath the world.
+
+**Act III — The Stronghold (Biomes 5–6).** A neighboring kingdom falls. The tavern becomes one of the last safe places on the frontier. Soldiers, a disgraced knight, an elven scout and an orc warband arrive, uneasy allies. The tavern is fortified. Patrons now watch Bram's delves with hope; their morale becomes a mechanical force (see Section 6.4). Bram discovers what happened to his mentor.
+
+**Act IV — The Champion (Biome 7 and the Heart).** The source of the dungeons is revealed at the deepest point beneath Brackenford. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post-game: endless/ascension mode and "legendary" ingredients.
+
+### 2.5 Key Characters (Draft)
+
+| Character | Role |
+|---|---|
+| **Bram Holloway** | Protagonist, tavern keeper and delver |
+| **Gundra Ashbelly** (dwarf) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
+| **Pip Marrowby** (halfling) | Server and bookkeeper; runs the floor during service |
+| **Old Tamsin** | Former owner/mentor, missing in the dungeon; central mystery |
+| **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
+| **Sylvaris** (elf) | Herbalist and scout; unlocks herb garden and brewing depth |
+| **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder |
+| **The Warden Below** | The intelligence behind the dungeons; antagonist |
+
+---
+
+## 3. Core Gameplay Loop
+
+The loop is unchanged by the pivot.
+
+### 3.1 The Day Cycle
+
+Each in-game day is divided into four phases:
+
+1. **Morning — Prep (Tavern hub).** Check stock, set the day's menu, eat a buff meal, choose gear, accept customer requests (e.g. "bring me cave troll liver").
+2. **Day — The Delve (Dungeon).** A roguelite run. Fight, harvest, and choose when to return. Deeper = rarer ingredients and more risk.
+3. **Evening — Service (Tavern).** Cook and serve using minigames. Earn gold, tips, and renown.
+4. **Night — Upgrade (Tavern hub).** Spend earnings on equipment, tavern expansions, recipes, and staff. Story scenes play here. Save point.
+
+### 3.2 Loop Diagram
+
+```mermaid
+flowchart LR
+    A[Morning Prep] --> B[Delve into the Dungeon]
+    B --> C[Evening Service]
+    C --> D[Night Upgrades & Story]
+    D --> A
+    B -- monster parts --> C
+    C -- gold & renown --> D
+    D -- gear, buffs, unlocks --> B
+```
+
+### 3.3 How the Two Halves Feed Each Other
+
+| From Dungeon to Tavern | From Tavern to Dungeon |
+|---|---|
+| Monster parts are ingredients | Gold buys weapons, armor, and tools |
+| Harvest quality affects dish quality | Pre-delve meals grant run buffs |
+| Rare parts unlock new recipes | Customer requests point you at specific monsters |
+| Found recipe scraps and lore | Refugee staff unlock new dungeon abilities |
+| Rescued NPCs join the tavern | Stronghold morale grants in-dungeon "Cheer" |
+
+---
+
+## 4. Dungeon Gameplay
+
+### 4.1 Combat Feel (rewritten in v0.2)
+
+Target feel is *Hades* and *Cult of the Lamb*: responsive, fast, readable top-down melee with strong hit feedback.
+
+- **Movement:** 8-direction run; dodge roll with i-frames. No jumping.
+- **Facing:** the art has four diagonal facings (front-right, front-left, back-right, back-left). Movement is 8-directional; the sprite shows the nearest facing.
+- **Aim:** by movement direction on gamepad; by mouse on keyboard and mouse.
+- **Attacks:** a light combo (three hits), a heavy/charged attack (hold to charge), two skill slots (tools/throwables), the **Harvest Finisher**, and the **Kitchen Arts** special (meter attack).
+- **Feedback:** each hit plays one combined feedback: flash, a short freeze-frame, camera shake (subtle, adjustable), sound and a haptic pattern. Damage numbers are optional. Enemy attacks are clearly telegraphed.
+- **Health:** Essence is the only health pool (Section 4.4).
+
+### 4.2 Weapons as Kitchen Tools (rewritten in v0.2)
+
+A signature flavor hook: many weapons are culinary, which ties weapon choice to harvesting. Weapon types now follow the attack animations Minifantasy provides (slash, thrust, swing, two-handed, ranged, guard, each with a charged version where available).
+
+| Weapon Type | Example | Minifantasy animation | Harvest Specialty |
+|---|---|---|---|
+| Cleaver | Butcher's Cleaver | Slash (axe) | Clean cuts, bonus to meat quality |
+| Filleting Blade | Eel-Tooth Knife | Slash (dagger) | Fast combos, perfect for fish/serpent parts |
+| Skewer Spear | Rotisserie Pike | Thrust (spear, pitchfork) | Reach, pins enemies; "spit-roast" fire variant |
+| Tenderizer | Troll-Mallet | Two-handed (waraxe) | Stagger damage, softens tough meats (bonus to stews). No mallet art exists; the waraxe stands in or is recoloured. |
+| Frying Pan | Iron Skillet | Guard (buckler) | Parry/block weapon; counter hits sear enemies. No pan art exists; needs a small edit of the buckler. |
+| Traditional | Sword, longsword, flail, whip, bow, slingshot | Slash, two-handed, swing, ranged | Standard harvest; wider combat variety |
+
+Weapons have rarity tiers (Common → Fine → Masterwork → Legendary) and random affixes per run. Permanent unlocks add weapons to the drop pool. Elemental variants use the effect layers from *Magic Weapons And Effects*.
+
+### 4.3 The Harvest System
+
+The heart of the fantasy. How a monster dies influences what it drops. Unchanged by the pivot.
+
+- **Clean Kill:** finishing with a matching tool type or a finisher move yields higher quality parts.
+- **Overkill:** excessive damage (big explosions, over-hits) damages parts, lowering quality or destroying some.
+- **Elemental Kills:** fire-killed monsters may drop "Seared" parts (pre-cooked, faster to prepare but some recipes need raw). Ice-killed monsters drop "Chilled" parts that stay fresh longer. Poison kills make parts inedible. Inedible parts still drop and can be carried; they will get a use later (a small sale value, poisons, or traps).
+- **Harvest Finisher:** when an enemy is low, a prompt allows a quick finisher that guarantees a premium part at the cost of a moment of vulnerability. Risk/reward.
+
+### 4.4 Essence, Inventory, Freshness, and Extraction
+
+- **Essence:** delves are limited by Essence, which drains over time in the dungeon and drops when the player takes damage. At zero Essence the player is forced out (treated as a death). It is the only health pool. Max Essence and drain rate are upgradeable in the tavern.
+- **The Satchel:** limited carry slots for ingredients (6 by default, stacks of up to 3), upgradeable in the tavern. Forces choices about what to keep. When it is full, picking up a part opens a swap prompt.
+- **Freshness:** parts decay over time in the dungeon. Salt, ice runes, and preservation jars extend freshness.
+- **Extraction:** the player can return via exit points (a rope or lift back to the tavern). Leaving early keeps everything; continuing deeper risks it.
+- **Death:** the player loses the entire haul except one satchel slot they choose to keep (the Lockbox, the whole stack in it), and loses the day's unspent run currency. Permanent unlocks are never lost.
+
+### 4.5 Field Cooking (Optional Mechanic)
+
+At campfire rooms, the player can cook a quick meal from carried parts to restore Essence or grant a buff. This sacrifices ingredients that could be sold, creating a meaningful choice, and echoes the *Delicious in Dungeon* spirit.
+
+### 4.6 Run Structure and Biomes (rewritten in v0.2)
+
+**Runs are room by room.**
+
+1. Enter a room; the doors lock.
+2. Clear the room.
+3. The doors unlock. Each door shows the **reward** of the room behind it.
+4. Choose the next room by its reward.
+
+Room rewards:
+
+- **Ingredients** (a guaranteed part, or a room with a particular monster)
+- **Gold**
+- **Delve Marks**
+- **A weapon**
+- **A run power-up**, chosen from three
+
+Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floors plus a boss arena. Special rooms: campfire (field cooking), shop, extraction point.
+
+**Biomes and their Minifantasy packs.** Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
+
+| # | Biome | Theme | Environment packs | Creature candidates | Boss candidate |
+|---|---|---|---|---|---|
+| 1 | The Cellars | Old cellars and tunnels | Dungeon, More Dungeons, Dungeon Traps | Green Slime, Bat, Giant Spider, Skeleton, Mushroom People; Slime Cube as elite | Mother Slime |
+| 2 | Fungal Warrens | Glowing fungal caves | Deep Caves, Glowing Mushrooms, Giant Mushrooms | Mushroom People, Blue Slime, Giant Snail, Necrofungus risen corpses | Open (no fungal boss found yet) |
+| 3 | Goblin Sprawl | Goblin shanty-town and mines | Deep Caves, Old Mine Addon, Gold And Rock Nodes | Goblin, Goblin Raider, Goblin Sapper, Warg, Trasgo | Goblin King |
+| 4 | Drowned Halls | Sunken dwarven ruins | Dwarven Kingdom, Shallow Water, Cenote | Frogfolk, Naga, Water Elemental, Octopurr | Kraken |
+| 5 | Ember Forge | Volcanic dwarven forge | Lava Forge, Dungeon Lava Pit, Volcano | Magma Hound, Magma Golem, Fire Elemental, Imp, Burning Skull | Dragon or Balrog |
+| 6 | Frostvault | Frozen crypts | Icy Wilderness, Ice Dungeon (More Dungeons) | Yeti, Wraith, Spectre, Skeleton, Evil Snowman | Lich or Ancient Troll |
+| 7 | The Rootdeep | Living, pulsing underworld | Lost Civilization, The Void, Chamber Of Secrets | Tree Spirits, Beholder, Alien Bio Horror, Shoggoth's Avatar | The King In Yellow |
+| — | The Heart | Final area | To be chosen | — | Demon Lord (as The Warden Below) |
+
+Changes from v0.1 forced by the art: there is no rat with an attack, so the Giant Rat and the Cellar King are replaced in Biome 1; the Leviathan Eel becomes the Kraken; other v0.1 monsters without art (boar-riders, crab knights, salamanders, ice trolls) are replaced by the candidates above.
+
+Branching between biomes lets players choose which ingredients to target on a given run.
+
+### 4.7 Enemies and Bosses
+
+Each enemy has a **combat profile** (behavior, attacks, telegraphs) and a **harvest profile** (parts, preferred kill method, freshness rate). Bosses drop signature ingredients that unlock "Legendary Dishes" and progress the story. Boss candidates per biome are in Section 4.6. Enemies are chosen from creatures that have idle, move, attack, damage and death animations.
+
+---
+
+## 5. Ingredients and Recipes
+
+### 5.1 Ingredient Properties
+
+Every ingredient is data-driven (ScriptableObject) with:
+
+- **Category:** Meat, Offal, Fish, Fungus, Plant, Egg, Spice, Liquid, Magical.
+- **Flavor Tags:** Savory, Sweet, Spicy, Sour, Bitter, Umami, Earthy, Arcane.
+- **Quality:** Poor / Standard / Fine / Premium (from the Harvest system).
+- **Freshness:** 0–100%, decays over time; affects dish score. Tracked per stack: when two stacks of the same part merge, freshness becomes the count-weighted average. Kitchens use the least-fresh stock first (on a tie, the lower quality first). Freshness is designed to also drop in the storeroom overnight, slowed by preservation upgrades (salt, ice runes, jars).
+- **Rarity:** Common → Legendary; affects price.
+- **Special Effects:** some ingredients carry buffs (e.g. a dragon heart grants fire resistance when eaten).
+
+### 5.2 Example Ingredient Table
+
+*(v0.2)* Ingredients follow the monster roster in Section 4.6. Icons come from the Minifantasy *Body Part Icons*, *Loot Icons* and food icon sets.
+
+| Monster | Part | Category | Flavor | Notes |
+|---|---|---|---|---|
+| Green Slime | Gel | Liquid | Sweet | Used in jellies and drinks |
+| Green Slime | Core | Magical | Arcane | Tonic ingredient |
+| Bat | Wing | Meat | Savory | Staple early meat (replaces Rat Haunch) |
+| Giant Spider | Leg | Meat | Savory, Umami | Premium when killed with a Cleaver |
+| Giant Spider | Venom Sac | Offal | Bitter | Replaces Rat Liver |
+| Mushroom People | Cap | Fungus | Earthy, Umami | Great in stews |
+| Mushroom People | Spore Sac | Spice | Earthy | Seasoning |
+| Dragon | Heart | Magical | Spicy, Arcane | Legendary dish ingredient |
+
+### 5.3 Recipes
+
+- Recipes are discovered through NPCs, recipe scraps found in the dungeon, customer hints, and experimentation.
+- Each recipe has required ingredient slots (by category or specific item) and optional slots that add flavor tags and bonuses.
+- **Experimentation:** combining ingredients freely at the "Test Kitchen" can discover new recipes. Failed experiments produce funny "Questionable Stew".
+- Dish score = base recipe value × ingredient quality × freshness × minigame performance.
+- *(v0.2)* Dish art comes from the Minifantasy food icon sets (*More Food Recipes* and others); dishes are named to fit the icons available.
+
+---
+
+## 6. Tavern Gameplay
+
+### 6.1 Service Phase (rewritten in v0.2)
+
+The tavern is a **top-down room the player walks around**. Customers enter, path to a free table, sit, and order from the menu the player set that morning. The player moves between stations to cook and pour, and **carries plates through the room** to the tables, avoiding people on the way. Staff help as they're unlocked. Service lasts a fixed time (currently 2.5 minutes, tuned in playtesting).
+
+The cooking minigames stay as **screen panels** that open over the room when the player uses a station.
+
+### 6.2 Minigames
+
+Each station is a short, skill-based minigame. Staff can auto-complete stations at reduced quality so the player can focus on others.
+
+| Station | Minigame | Skill |
+|---|---|---|
+| **Butcher Block** | Follow cut lines on a monster part; accuracy sets portion count | Precision |
+| **Grill / Pan** | Flip at the right moment; watch a doneness meter | Timing |
+| **Stew Pot** | Chop ingredients; the pot simmers on its own | Precision/management |
+| **Oven** | Set heat and pull at the right time while multitasking | Timing |
+| **Tap & Brew** | Pour ale/mead to the line with correct foam; mix cocktails and potions | Precision |
+| **Plating** | Arrange garnish quickly for presentation bonus | Speed |
+| **Serving** | Carry plates through the room; collisions fill a spill meter | Movement |
+| **Bouncer** | Rowdy customers occasionally brawl; quick combat-lite minigame to throw them out | Reflex |
+
+Additional minigames can be introduced over time (fermentation, bread proofing, spice grinding) to keep service fresh through the campaign. Each minigame's haptics are described in Section 9A.
+
+### 6.3 Customers
+
+- **Types:** villagers, adventurers, dwarves, elves, orcs, merchants, nobles, refugees, and eventually soldiers and heroes.
+- **Preferences:** each race/type has favorite flavor tags and categories (e.g. dwarves love savory and strong ale; elves prefer herbs and fungus; orcs demand big meat portions).
+- **Patience:** a timer; slow service lowers tips and reviews.
+- **Special Guests:** named characters with unique requests that drive story, unlock recipes, or give quests.
+- **Reviews and Renown:** satisfied customers raise the tavern's Renown, which attracts better-paying clientele and unlocks story beats.
+- *(v0.2)* Customers are built from the layered *A Myriad Of NPCs* characters, which gives a large variety of bodies, outfits and hair.
+
+### 6.4 The Growing Stronghold (rewritten in v0.2)
+
+The inn plays the role the cult plays in *Cult of the Lamb*. It grows across the acts from a small inn into a stronghold.
+
+| Stage | Name | Adds |
+|---|---|---|
+| 1 | The Inn | Kitchen, bar, small dining room |
+| 2 | The Sanctuary | Guest rooms, refugee quarters, herb garden, storeroom |
+| 3 | The Stronghold | Walls, watchtower, forge, training yard, brewery, great hall |
+| 4 | The Bastion | War room, shrine, feast hall for the finale |
+
+- **Areas** unlock through story and upgrades.
+- **Furniture and decor** are placed freely inside unlocked areas. Decor raises customer satisfaction.
+- **No freeform construction** (placing walls and rooms) for now, but nothing should be designed in a way that rules it out later.
+- Art: *Tavern Indoor*, *Towns*, *Towns 2*, *Crafting And Professions I/II* (kitchen, preparation table and other workbenches), *Farm*, *Castles And Strongholds*, *Builders*.
+
+**Residents:** refugees who move in can be assigned roles (cook, server, gardener, smith, guard). Each resident has a small personal questline.
+
+**Morale and Cheer:** the stronghold has a Morale value driven by food quality, housing, and story events. High morale grants **Cheer** in the dungeon: temporary buffs, extra revives, or crowd "chants" that power up the Kitchen Arts meter. This makes the story theme of people rallying behind you a real mechanic.
+
+**Defense Events (undecided):** occasionally monsters breach the surface and attack the stronghold, and the player defends with residents helping. Not built yet. Because the tavern now uses the same top-down character as the dungeon, adding them later is cheap.
+
+---
+
+## 7. Progression and Economy
+
+### 7.1 Currencies
+
+| Currency | Earned From | Spent On |
+|---|---|---|
+| **Gold** | Service, selling surplus ingredients, gold rooms | Gear, tavern upgrades, recipes, staff wages |
+| **Renown** | Customer satisfaction, story | Unlocks tiers of customers, story progress (not spent) |
+| **Delve Marks** | Found in dungeon runs (lost on death if unspent) | Permanent combat unlocks at the "Delver's Board" |
+| **Relics** | Bosses, secrets | Major permanent abilities |
+
+### 7.2 Upgrade Tracks
+
+- **Combat:** weapon blueprints (added to drop pools), armor, satchel size, preservation tools, Essence Tonics.
+- **Run power-ups:** *(v0.2)* temporary boons chosen one-of-three in power-up rooms; they last for the run.
+- **Relics:** permanent abilities that open shortcuts and hidden rooms. *(v0.2: no longer platforming abilities such as double jump.)*
+- **Tavern:** stations, furniture, seating capacity, decor, new areas.
+- **Staff:** hire and train residents; staff skill levels affect auto-complete quality.
+
+### 7.3 Economy Balance Goals
+
+- A good delve should fund roughly one meaningful upgrade.
+- Selling raw ingredients should be viable but noticeably worse than cooking them.
+- Staff wages and refugee upkeep create light pressure without becoming a punishing survival mechanic.
+
+---
+
+## 8. Art and Audio Direction
+
+### 8.1 Visual Style (rewritten in v0.2)
+
+All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×8 grid.
+
+- **Resolution:** 320×180 reference at 8 pixels per unit; 1 world unit = 1 tile = 8 px. Pixel Perfect Camera. Locked after the 4a look test (2026-10-02).
+- **Characters:** 32×32 frames with a body of about 8×8, four diagonal facings.
+- **Sorting:** sprites sort by Y position, with pivots at the feet.
+- **Palette and lighting:** warm, saturated tavern (amber candlelight, wood, hearth) against cool, eerie dungeons (teal, violet, bioluminescence). Sprites are lit with URP 2D lights: this is the visual baseline. Each environment has an ambient light plus local lights (hearth and candles in the tavern; torches, and later bioluminescence, in the dungeon), always keeping characters, enemies and pickups readable.
+- **Food** should look appetizing even at this scale; dishes use the Minifantasy food icons, shown enlarged in menus and results.
+- **Content adapts to the art:** monsters, ingredients, dishes, stations, NPCs and bosses are chosen from what Minifantasy contains (`docs/ASSET_MAP.md`).
+- **Known gaps:** no rat with an attack, no mallet or frying pan weapon, no plate-carrying overlay, and no fonts or audio.
+
+### 8.2 UI (rewritten in v0.2)
+
+Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD in the dungeon. All text is localized.
+
+### 8.3 Audio
+
+- **Tavern:** folk instrumentation (fiddle, lute, accordion, bodhrán); music gains layers as the tavern grows and more residents join in.
+- **Dungeon:** darker, percussive, biome-specific themes that intensify in combat.
+- **SFX:** chunky, satisfying combat impacts; sizzling, chopping, pouring, and crowd chatter in the tavern.
+- **Voice:** grunts and barks ("Hmm!", "Aye!") rather than full voice acting, for scope.
+- *(v0.2)* No audio source exists yet. Generated placeholder sounds are used until real SFX and music are sourced.
+
+---
+
+## 9. Controls (rewritten in v0.2)
+
+| Action | Gamepad | Keyboard and mouse |
+|---|---|---|
+| Move | Left stick | W A S D |
+| Aim | Movement direction | Mouse |
+| Light attack (combo) | X / Square | Left mouse |
+| Heavy / charged attack (hold) | Y / Triangle | Right mouse |
+| Dodge roll | B / Circle | Space |
+| Interact / pick up / use station / serve | A / Cross | E |
+| Skills 1 and 2 | LB / RB | 1 / 2 |
+| Kitchen Arts special | RT | Q |
+| Harvest Finisher | LT | F |
+| Pause | Start | Esc |
+
+In the tavern the same character controls apply (move, interact); attacks are disabled. Minigames use their own actions (minigame action on X / left mouse, alternate on Y, cancel on B / Esc).
+
+All controls are remappable via the Unity Input System.
+
+## 9A. Haptics (new in v0.2)
+
+Haptics are a core part of game feel, designed in from the start.
+
+**Principles**
+
+- **A vocabulary of named patterns.** Gameplay triggers named patterns, never raw motor values. Patterns are data (ScriptableObjects).
+- **Authored with visuals and sound.** Each important moment has one combined feedback containing all three.
+- **Pure, tested mappings.** Any mapping from a gameplay value to intensity (e.g. pour speed → rumble strength) is plain logic with unit tests.
+- **Player control.** Vibration on/off and an intensity slider apply globally, plus a reduced-intensity accessibility option. Vibration defaults to on when a supported controller is connected.
+- **Graceful degradation.** Where rumble is unsupported (no controller, web builds, some controllers), haptics do nothing and nothing else changes.
+
+**Starting vocabulary** (a gamepad has a low motor for heavy thuds and a high motor for light buzz)
+
+| Pattern | Shape | Used for |
+|---|---|---|
+| `Tap.Light` | High, very short | Grill flip, UI confirm, pickup |
+| `Tap.Firm` | Both, short | Light hit landed, clean cut |
+| `Hit.Heavy` | Low-dominant, medium, quick decay | Heavy/charged hit, enemy slam |
+| `Hit.Taken` | Low, sharp, short tail | Player damaged |
+| `Kill.Clean` | Firm tap, then a rising high tick | Clean-kill cue |
+| `Finisher.Harvest` | Low build-up, pause, strong double pulse | Harvest Finisher |
+| `Pulse.Success` | Two rising high pulses | Perfect flip, perfect pour |
+| `Buzz.Failure` | Rough low buzz | Overflow, burnt, dropped plate |
+| `Cue.Threshold` | Single crisp high tick | Foam reaches the line |
+| `Bump.Soft` / `Bump.Hard` | Low, short; strength by spill meter | Serving collisions |
+| `Cut.Ragged` | Two uneven low ticks | Butcher Block miss |
+| `Heartbeat.Warning` | Low double-beat, looping, rate rises | Low Essence |
+| `Boss.Telegraph` / `Boss.PhaseChange` | Slow low swell / long rumble with a peak | Boss attacks and phases |
+| `Rumble.Continuous` | Level set each frame, 0–1 | Pour speed, grill nearing burn |
+
+**Cooking minigames**
+
+- **Grill:** a tap on each flip; a rising rumble as doneness nears the burn zone; a success pulse for a perfect flip.
+- **Tap:** a continuous rumble that scales with pour speed; a distinct cue as foam reaches the line; a failure buzz on overflow.
+- **Serving:** a bump pulse on collisions, intensifying as the spill meter fills.
+- **Butcher Block:** a cue for each cut, with clean cuts feeling different from ragged ones.
+
+**Dungeon**
+
+- Light hits versus heavy hits.
+- A distinct, satisfying clean-kill cue.
+- The Harvest Finisher.
+- Damage taken.
+- A warning heartbeat at low Essence.
+- Boss attacks and phase changes.
+
+**Platform support** (expected; to be tested on hardware): Xbox controllers on PC; DualShock 4 and DualSense over USB; no rumble for Switch Pro on PC unless remapped by Steam Input; no rumble in web builds.
+
+---
+
+## 10. Technical Design (rewritten in v0.2)
+
+Unity 6.6 now, moving to 6.7 LTS when it is released and staying there through launch.
+
+### 10.1 Engine Configuration and Third-Party Assets
+
+- **Render Pipeline:** URP with the 2D Renderer and 2D lights; sprites and tilemaps use the lit sprite material. Pixel Perfect Camera at 320×180, 8 PPU. Custom transparency sort axis (0, 1, 0).
+- **TopDown Engine 5.0 (TDE):** character controller, abilities (movement, dash, weapons), combat, enemy AI, camera and rooms. It replaces the custom kinematic controller.
+- **MMFeedbacks / MMTools** (bundled with TDE): all game feel. There is only one copy; Feel's copies are never imported.
+- **Nice Vibrations** (from Feel): haptics.
+- **Super Text Mesh (STM):** all player-facing text, in uGUI and world space, with its Ultra shader under URP.
+- **Input:** Input System with separate action maps (`Dungeon`, `Tavern`, `UI`, `Minigame`) and runtime rebinding. TDE reads input through a subclass of its `InputSystemManager` that maps our Dungeon and Tavern maps onto TDE's buttons.
+- **Camera:** Cinemachine 6.6 (TDE's Cinemachine 3 code path), room confiners, impulse-based shake.
+- **UI:** uGUI + STM + Minifantasy UI sprites. UI Toolkit is no longer used.
+- **Animation:** sprite-sheet animation through our own **SpriteSet** path, not Mecanim. Each character has a `SpriteAnimationSet` asset (per action: frames for the four drawn facings, a frame duration and a loop flag), generated from the Minifantasy sheets and their frame-duration guides. `CharacterSpriteAnimator` picks the action and facing from the TDE character's state and shows the frame. We deliberately don't use Animator Controllers or AnimationClips: four facings per action would mean 24 or more states per character, and TDE's animator parameters go unused. The animator is **presentation only**: TDE and our gameplay code stay authoritative for attack timing, damage, the dodge and its i-frames, and death, and the animator only reflects that state. It never drives gameplay, and gameplay never waits on an animation.
+- **Physics:** Physics 2D with no gravity.
+- **Pathfinding:** our own grid A* (TDE has none for 2D).
+- **Content Loading:** Addressables for biome assets and room prefabs when room loading is built; until then only Localization uses it.
+- **Localization:** Unity Localization package; every player-facing string comes from a string table.
+- **Dialogue:** Yarn Spinner with an STM dialogue presenter.
+
+Versions, licenses and vendor rules are in `docs/THIRD_PARTY.md` and `CLAUDE.md`.
+
+### 10.2 Scene Structure
+
+- `Boot` — initializes services (save, audio, input, localization, haptics) and persists.
+- `MainMenu`
+- `Tavern` — hub scene for Prep, Service, and Night phases.
+- `Dungeon` — single scene into which biome rooms are loaded.
+- `Cutscene` scenes as needed (or Timeline sequences inside Tavern).
+
+Additive scene loading keeps the persistent `Boot` services alive.
+
+### 10.3 Architecture Overview
+
+- **Data-driven design with ScriptableObjects:** `IngredientDefinition`, `RecipeDefinition`, `EnemyDefinition`, `WeaponDefinition`, `CustomerProfile`, `BiomeDefinition`, `RoomDefinition`, `TavernUpgradeDefinition`, plus haptic patterns.
+- **Pure logic in plain C#** with EditMode tests: Essence, harvest rules, inventory, freshness, recipes, economy, service session, customer order and patience logic, staff, game flow, saving, pathfinding, haptic intensity mapping. TDE-dependent behaviour gets PlayMode tests.
+- **Game flow:** `GameFlow` drives phases (Prep → Delve → Service → Night) and scene transitions.
+- **Event bus:** a lightweight event bus decouples systems. TDE and MoreMountains events are **bridged onto our bus at the boundary** rather than used throughout our code.
+- **Characters:** the player, enemies, customers and staff are TDE characters. Our behaviour is added through subclasses, composition and TDE abilities in our own assemblies; vendor code is never modified.
+- **Essence and health:** Essence is the only health pool, implemented as a subclass of TDE's `Health` backed by `EssenceMeter`.
+- **Combat:** TDE weapons and damage areas, with our damage pipeline (element, overkill) and harvest rules reading the kill context.
+- **Minigames:** each station implements `IMinigame` (Begin, Tick, Evaluate → score 0–1), so staff can auto-resolve any station.
+- **Customer AI:** a state machine (Enter, Queue, Seat, Order, Wait, Eat, Pay, Leave) with a patience timer and preference scoring; movement follows A* paths to tables.
+- **Feedbacks:** one `MMF_Player` per important moment, containing visuals, sound and a named haptic pattern. All intensities respect the player's settings.
+
+### 10.4 Key Systems
+
+| System | Responsibility |
+|---|---|
+| `HarvestSystem` | Determines drops from kill context (weapon type, element, overkill) |
+| `InventorySystem` | Satchel, storeroom, freshness decay, preservation modifiers |
+| `RecipeSystem` | Recipe matching, experimentation, dish scoring |
+| `ServiceSystem` | Customer spawning, orders, timers, payment, reviews |
+| `EconomySystem` | Currencies, prices, wages |
+| `ProgressionSystem` | Unlocks, relics, tavern stages, story flags |
+| `StoryManager` | Act progression, dialogue triggers (Yarn Spinner) |
+| `SaveSystem` | Versioned JSON of persistent state; autosave at Night phase |
+| `LevelGenerator` | Builds dungeon floors from room graphs |
+| `HapticService` | Plays named haptic patterns, applies settings, checks device support |
+| `GridPathfinder` | A* on the room's tile grid for customers and enemies |
+
+### 10.5 Procedural Level Generation
+
+Designer-authored **room prefabs** chosen by a **graph-based generator**, played one room at a time.
+
+1. Each biome defines a floor template graph (entrance, combat rooms, reward rooms, campfire, shop, extraction, boss).
+2. The generator picks a room prefab for each node by type and door layout, and assigns each room a reward.
+3. Each exit door shows the reward of the room it leads to.
+4. Enemies and loot spawn from weighted tables per biome and depth.
+5. Seeds are stored for debugging and potential daily-challenge modes.
+
+### 10.6 Save Data
+
+Persistent: tavern stage and upgrades, placed furniture, unlocked weapons/relics/recipes, storeroom inventory, currencies, residents, story flags, settings. Run state is saved only at biome transitions to prevent save-scumming (optionally allow a "suspend run" save).
+
+### 10.7 Project Folder Structure
+
+```
+Assets/
   _Project/
-    Art/            (Characters, Enemies, Environments, UI, VFX)
+    Art/            (our own edits and placeholders)
     Audio/          (Music, SFX)
-    Data/           (Ingredients, Recipes, Enemies, Weapons, Biomes, Customers)
+    Data/           (Ingredients, Recipes, Enemies, Weapons, Biomes, Customers, Haptics)
+    Dialogue/       (.yarn files)
     Prefabs/        (Player, Enemies, Rooms, Tavern, UI)
     Scenes/
     Scripts/
-      Core/         (GameFlow, Save, Events, Services)
-      Dungeon/      (Player, Combat, Enemies, Harvest, LevelGen)
-      Tavern/       (Service, Customers, Minigames, Stations, Upgrades)
-      Shared/       (Inventory, Economy, Progression, Story)
+      Core/         (Events, Services, Input, Pathfinding)
+      Dungeon/      (Combat, Enemies, Harvest, Essence, Run)
+      Tavern/       (Service, Customers, Minigames, Staff)
+      Shared/       (Game flow, Inventory, Economy, Progression, Save)
       UI/
-    Settings/       (Input actions, URP assets, Addressables)
+      Editor/
+    Settings/       (Input actions)
     Localization/
-</code></pre>
-<hr>
-<h2>11. Scope and Milestones</h2>
-<h3>11.1 Recommended Development Phases</h3>
-<table>
-<thead>
-<tr>
-<th>Phase</th>
-<th>Goal</th>
-<th>Contents</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>1. Prototype: Combat</strong></td>
-<td>Prove the dungeon feels good</td>
-<td>Player controller, one weapon, 3 enemies, greybox rooms, harvest drops</td>
-</tr>
-<tr>
-<td><strong>2. Prototype: Tavern</strong></td>
-<td>Prove service is fun</td>
-<td>3 minigames (grill, pour, serve), 3 customer types, 5 recipes</td>
-</tr>
-<tr>
-<td><strong>3. Loop Prototype</strong></td>
-<td>Prove the halves connect</td>
-<td>Full day cycle, inventory carryover, gold, 3 upgrades</td>
-</tr>
-<tr>
-<td><strong>4. Vertical Slice</strong></td>
-<td>Represent final quality</td>
-<td>Biome 1 fully arted + boss, Stage 1 tavern polished, Act I opening story</td>
-</tr>
-<tr>
-<td><strong>5. Production</strong></td>
-<td>Content build‑out</td>
-<td>Biomes 2–7, all minigames, stronghold stages, full story</td>
-</tr>
-<tr>
-<td><strong>6. Polish and Launch</strong></td>
-<td>Ship</td>
-<td>Balance, accessibility, localization, performance, platform certification</td>
-</tr>
-</tbody>
-</table>
-<h3>11.2 Scope Warning</h3>
-<p>Two full games in one is ambitious, especially for a small team. Recommended guardrails: keep minigames short and reusable; build a strong, small vertical slice before expanding; consider Early Access with 3–4 biomes and the first two tavern stages, adding later acts in updates.</p>
-<hr>
-<h2>12. Accessibility</h2>
-<ul>
-<li>Remappable controls, hold/toggle options.</li>
-<li>Adjustable combat speed and &quot;assist mode&quot; (damage taken, freshness decay, customer patience).</li>
-<li>Minigame assist: wider timing windows or auto‑complete.</li>
-<li>Colorblind‑safe telegraphs and freshness indicators (use shapes/icons, not color alone).</li>
-<li>Screen shake and flash intensity sliders; text size options.</li>
-</ul>
-<hr>
-<h2>13. Open Questions</h2>
-<ol>
-<li><strong>Art style:</strong> pixel art</li>
-<li><strong>Protagonist:</strong> customizable</li>
-<li><strong>Time pressure:</strong> No calendar deadline, but like Dave the Diver can only delve into dungeon with enough "essence" which depletes over time or when you take damage. It can be upgraded eventually.</li>
-<li><strong>Death penalty tuning:</strong> lose everything except 1 item you choose to keep</li>
-<li><strong>Stronghold defense events:</strong> core feature or post‑launch?</li>
-<li><strong>Co‑op:</strong> No. </li>
-<li><strong>Dialogue tooling:</strong> Yarn Spinner</li>
-<li><strong>Monetization:</strong> premium only (recommended for this genre) with possible paid expansions.</li>
-</ol>
-<hr>
-<h2>14. Appendix: Glossary</h2>
-<ul>
-<li><strong>Delve:</strong> a single roguelite run into the dungeon.</li>
-<li><strong>Haul:</strong> ingredients carried back from a delve.</li>
-<li><strong>Harvest Finisher:</strong> a special kill move that guarantees a premium part.</li>
-<li><strong>Kitchen Arts:</strong> the player's special meter attack.</li>
-<li><strong>Cheer:</strong> in‑dungeon buffs granted by stronghold morale.</li>
-<li><strong>Renown:</strong> the tavern's reputation, driving customer tiers and story.</li>
-<li><strong>Satchel / Lockbox:</strong> carry inventory / protected slot kept on death.</li>
-</ul>
+    Tests/
+  ThirdParty/
+    Minifantasy/    (imported packs, only what we need)
+  TopDownEngine/    (vendor, default folder)
+  Clavian/          (Super Text Mesh, default folder)
+  Feel/             (Nice Vibrations only, default folder)
+```
 
+---
 
-<!--claude-mermaid-runtime-begin:3477-->
-<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
-<script src="/_runtime/mermaid-11.16.1.min.js"></script>
-<script>(function(){
-var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
-if(typeof mermaid==='undefined')return;
-var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
-if(!pres.length)return;
-var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
-var root=document.documentElement;
-var items=pres.map(function(pre){
-var mount=document.createElement('div');mount.className='mermaid-diagram';
-return {pre:pre,mount:mount,src:pre.textContent||''};
-});
-var seq=0;
-var renderGen=0;
-var lastKey='';
-function pageBg(fallback){
-var els=[document.body,document.documentElement];
-for(var i=0;i<els.length;i++){
-var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
-if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
-}
-return fallback;
-}
-function render(){
-var theme=root.getAttribute('data-theme');
-var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
-var pal=dark?CFG.palettes.dark:CFG.palettes.light;
-var bg=pageBg(pal.bg);
-var key=(dark?'d':'l')+'|'+bg;
-if(key===lastKey)return;
-lastKey=key;
-var gen=++renderGen;
-var font=getComputedStyle(document.body).fontFamily||'sans-serif';
-var nat={useMaxWidth:false};
-mermaid.initialize({
-startOnLoad:false,securityLevel:'strict',theme:'base',
-flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
-gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
-quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
-packet:nat,kanban:nat,architecture:nat,radar:nat,
-themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
-primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
-nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
-clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
-darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
-attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
-fontSize:'16px',fontFamily:font},
-themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
-});
-items.forEach(function(it){
-var id='claude-mermaid-'+seq++;
-mermaid.render(id,it.src).then(function(r){
-if(gen!==renderGen)return;
-var prev=it.pre.previousElementSibling;
-if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
-it.mount.innerHTML=r.svg;
-if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
-it.pre.style.display='none';
-},function(){
-var scratch=document.getElementById(id);
-if(scratch)scratch.parentNode.removeChild(scratch);
-scratch=document.getElementById('d'+id);
-if(scratch)scratch.parentNode.removeChild(scratch);
-if(gen!==renderGen)return;
-if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
-it.pre.style.display='';
-});
-});
-}
-render();
-if(mq&&mq.addEventListener)mq.addEventListener('change',render);
-if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
-})();</script>
-<!--claude-mermaid-runtime-end-->
-</body></html>
+## 11. Scope and Milestones
+
+### 11.1 Development Phases
+
+| Phase | Goal | Contents |
+|---|---|---|
+| **1. Prototype: Combat** | Prove the dungeon feels good | Done as a side-scroller (see tag `v0-sidescroller-prototype`) |
+| **2. Prototype: Tavern** | Prove service is fun | Done as a side-scroller |
+| **3. Loop Prototype** | Prove the halves connect | Done as a side-scroller |
+| **4. Vertical Slice** | Represent final quality, top-down | Biome 1 fully arted + boss, Stage 1 tavern polished, Act I opening story |
+| **5. Production** | Content build-out | Biomes 2–7, all minigames, stronghold stages, full story |
+| **6. Polish and Launch** | Ship | Balance, accessibility, localization, performance, platform certification |
+
+**Phase 4 sub-milestones** *(v0.2)*. Each is planned, approved, built and playtested separately; the web build works at the end of each.
+
+- **4a Integration and look test:** project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline, one dungeon room and one tavern corner with real art, `docs/ASSET_MAP.md`.
+- **4b Dungeon migration:** Phase 1 and 3 dungeon gameplay rebuilt on TDE, with the dungeon haptics.
+- **4c Tavern and UI migration:** top-down tavern, customer pathing, 2D serving, Grill/Tap/Serving with haptics, all UI in uGUI + STM.
+- **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena.
+- **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.
+- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement.
+- **4g Story and character creation:** Yarn Spinner with an STM dialogue presenter, the Act I opening, onboarding.
+- **4h Menus, options and polish:** settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
+
+### 11.2 Scope Warning
+
+Two full games in one is ambitious, especially for a small team. Recommended guardrails: keep minigames short and reusable; build a strong, small vertical slice before expanding; consider Early Access with 3–4 biomes and the first two tavern stages, adding later acts in updates.
+
+---
+
+## 12. Accessibility
+
+- Remappable controls, hold/toggle options.
+- Adjustable combat speed and "assist mode" (damage taken, freshness decay, customer patience).
+- Minigame assist: wider timing windows or auto-complete.
+- Colorblind-safe telegraphs and freshness indicators (use shapes/icons, not color alone).
+- Screen shake and flash intensity sliders; text size options.
+- *(v0.2)* Vibration on/off, a vibration intensity slider, and a reduced-intensity option. No gameplay information is conveyed by haptics alone.
+
+---
+
+## 13. Decisions and Open Questions
+
+**Decided**
+
+1. **Art style:** pixel art, Minifantasy (8×8, top-down).
+2. **Perspective:** top-down *(v0.2)*.
+3. **Protagonist:** customizable through body choice and palette swaps.
+4. **Time pressure:** no calendar deadline. Delves are limited by Essence, which depletes over time and when the player takes damage, and can be upgraded.
+5. **Death penalty:** lose everything except one satchel slot the player chooses to keep.
+6. **Co-op:** no.
+7. **Dialogue tooling:** Yarn Spinner.
+8. **Monetization:** premium only, with possible paid expansions.
+
+**Open**
+
+1. **Stronghold defense events:** core feature or post-launch?
+2. **Biome 2 boss:** no fungal boss found in the art yet.
+3. **Audio source:** where SFX and music come from.
+4. **Font:** a pixel font for Super Text Mesh.
+5. **Freeform construction:** not planned, but kept possible.
+
+---
+
+## 14. Appendix A: Glossary
+
+- **Delve:** a single roguelite run into the dungeon.
+- **Essence:** the delve timer and the player's only health pool.
+- **Haul:** ingredients carried back from a delve.
+- **Harvest Finisher:** a special kill move that guarantees a premium part.
+- **Kitchen Arts:** the player's special meter attack.
+- **Cheer:** in-dungeon buffs granted by stronghold morale.
+- **Renown:** the tavern's reputation, driving customer tiers and story.
+- **Satchel / Lockbox:** carry inventory / the one slot kept on death.
+- **Run power-up:** a temporary boon chosen from three, lasting one run.
+- **Haptic pattern:** a named vibration design triggered by gameplay.
+
+---
+
+## Appendix B: Superseded v0.1 side-scroller design
+
+Kept for reference. None of this describes the current game. The playable prototype built from it is at the tag `v0-sidescroller-prototype`.
+
+### B.1 Elevator pitch (v0.1)
+
+"…By day you descend into The Dungeons, carving through monsters in fast, **side-scrolling** hack-and-slash runs, harvesting their parts…"
+
+### B.2 Genre and inspirations (v0.1)
+
+Hybrid: side-scrolling action roguelite + restaurant/tavern management sim. *Dead Cells* was the main combat inspiration: fluid 2D melee combat, weapon variety, procedurally stitched levels, run-based structure with persistent unlocks. Target audience listed fans of *Dead Cells*.
+
+### B.3 Combat feel (v0.1, Section 4.1)
+
+Target feel was *Dead Cells*: responsive, fast, readable, with heavy hit-stop and satisfying animation canceling.
+
+- **Movement:** run, jump, double jump (unlockable), dodge roll with i-frames, wall slide/jump, drop-through platforms, ledge grab.
+- **Attacks:** primary weapon (combo chains), secondary weapon or shield, two skill slots (tools/throwables), and a special "Kitchen Arts" meter attack.
+- **Feedback:** hit-stop, screen shake (subtle, toggleable), damage numbers (toggleable), clear enemy telegraphs.
+
+### B.4 Weapons (v0.1, Section 4.2)
+
+Cleaver (Butcher's Cleaver), Filleting Blade (Eel-Tooth Knife), Tenderizer (Troll-Mallet), Skewer Spear (Rotisserie Pike), Frying Pan (Iron Skillet), Traditional (swords, axes, bows, staves). Random affixes per run, "*Dead Cells* style".
+
+### B.5 Death (v0.1, Section 4.4)
+
+"On death, the player keeps a portion of the haul (e.g. items in a protected 'Lockbox' slot plus a percentage of the rest)…" Replaced before the pivot by the one-slot Lockbox rule.
+
+### B.6 Run structure and biomes (v0.1, Section 4.6)
+
+Levels were assembled from hand-authored rooms stitched together procedurally into continuous side-scrolling levels; each biome had 3–5 floors plus a boss, with branching paths between biomes as in *Dead Cells*.
+
+| # | Biome | Theme | Signature Ingredients |
+|---|---|---|---|
+| 1 | The Cellars | Flooded old cellars and tunnels | Giant rats, slimes, cave mushrooms |
+| 2 | Fungal Warrens | Glowing fungal forest | Myconids, spore beetles, walking truffles |
+| 3 | Goblin Sprawl | Goblin shanty-town and mines | Boar-riders, cave boars, stolen spices |
+| 4 | Drowned Halls | Sunken dwarven ruins | Giant eels, crab knights, kelp horrors |
+| 5 | Ember Forge | Volcanic dwarven forge | Salamanders, fire drakes, magma snails |
+| 6 | Frostvault | Frozen crypts | Ice trolls, wyrm eggs, frost wraiths |
+| 7 | The Rootdeep | Living, pulsing underworld | Aberrations, dragon cuts, legendary parts |
+
+Example bosses: *The Cellar King* (giant rat monarch), *Grandmother Spore* (myconid matriarch), *Chieftain Gutgrin* (goblin warlord on a war boar), *The Leviathan Eel*, *Forge-Drake Cindermaw*, *The Frost Troll Queen*, *The Warden Below* (final).
+
+### B.7 Example ingredients (v0.1, Section 5.2)
+
+Giant Rat Haunch (Meat, Savory), Green Slime Gel (Liquid, Sweet), Myconid Cap (Fungus, Earthy/Umami), Cave Boar Belly (Meat, Savory), Giant Eel Fillet (Fish, Umami), Salamander Tail (Meat, Spicy), Ice Troll Liver (Offal, Bitter), Fire Drake Heart (Magical, Spicy/Arcane).
+
+### B.8 Service phase and defense events (v0.1, Sections 6.1 and 6.4)
+
+"During evening service the camera shows the tavern floor and kitchen in a **side view**…" The player moved between stations along one axis. Defense events were described as "a short side-scrolling combat encounter".
+
+### B.9 Visual style (v0.1, Section 8.1)
+
+Two options were open: high-res hand-painted 2D with skeletal animation, or detailed pixel art in the spirit of *Dead Cells* and *Dave the Diver*. The prototype used pixel-art placeholders at 640×360 and 32 PPU. UI was planned in UI Toolkit.
+
+### B.10 Controls (v0.1, Section 9)
+
+| Action | Dungeon | Tavern |
+|---|---|---|
+| Left Stick | Move | Move between stations |
+| A / Cross | Jump | Interact / confirm |
+| X / Square | Primary attack | Minigame action |
+| Y / Triangle | Secondary attack | Minigame alt action |
+| B / Circle | Dodge roll | Cancel / back |
+| LB / RB | Skills 1 and 2 | Cycle orders |
+| RT | Kitchen Arts special | Speed up (hold) |
+| LT | Harvest finisher | — |
+| Start | Pause menu | Pause menu |
+
+### B.11 Technical design (v0.1, Section 10)
+
+Unity 6.3 LTS. UI Toolkit for menus and HUD, with uGUI only for world-space UI. 2D Animation package (or Spine) for skeletal characters. Physics 2D with a **custom kinematic character controller** for tight platforming. Character state machine: Idle, Run, Jump, Fall, Dodge, Attack, Hurt, Dead, with frame-data-driven attacks. Hitbox/hurtbox components and hit-stop via a time-scale service. Level generation "similar to *Dead Cells*": room prefabs placed on a grid with connection validation to avoid overlap. Relics granted traversal abilities (double jump, dash).

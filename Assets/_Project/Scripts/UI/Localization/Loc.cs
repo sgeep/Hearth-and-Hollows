@@ -1,8 +1,12 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Hearthdelve.Shared.Ingredients;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
+using UnityEngine.Localization.Tables;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Hearthdelve.UI.Localization
 {
@@ -16,12 +20,58 @@ namespace Hearthdelve.UI.Localization
         public const string UITable = "UI";
         public const string ContentTable = "Content";
 
+        static readonly Dictionary<string, StringTable> s_Tables = new();
+
+        /// <summary>True once <see cref="Preload"/> has loaded the string tables.</summary>
+        public static bool IsReady { get; private set; }
+
+        /// <summary>Raised when the tables finish loading; text set earlier should refresh.</summary>
+        public static event Action Ready;
+
+        /// <summary>
+        /// Loads the string tables without blocking. Web builds can't wait synchronously for
+        /// Addressables, so every scene preloads at boot (<see cref="LocalizationBoot"/>) and
+        /// lookups read the loaded tables.
+        /// </summary>
+        public static IEnumerator Preload()
+        {
+            if (IsReady) yield break;
+            yield return LocalizationSettings.InitializationOperation;
+            foreach (string name in new[] { UITable, ContentTable })
+            {
+                var handle = LocalizationSettings.StringDatabase.GetTableAsync(name);
+                yield return handle;
+                if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null) s_Tables[name] = handle.Result;
+                else Debug.LogWarning($"Localization table '{name}' failed to load.");
+            }
+            IsReady = true;
+            Ready?.Invoke();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            s_Tables.Clear();
+            IsReady = false;
+            Ready = null;
+        }
+
         public static string UI(string key, params object[] args) => Get(UITable, key, args);
 
         public static string Get(string table, string key, params object[] args)
         {
             try
             {
+                if (s_Tables.TryGetValue(table, out StringTable loaded))
+                {
+                    StringTableEntry entry = loaded.GetEntry(key);
+                    if (entry == null) return $"#{key}";
+                    string text = args != null && args.Length > 0 ? entry.GetLocalizedString(args) : entry.GetLocalizedString();
+                    return string.IsNullOrEmpty(text) ? $"#{key}" : text;
+                }
+                // Not preloaded: a synchronous lookup works everywhere except the web.
+                if (Application.platform == RuntimePlatform.WebGLPlayer) return $"#{key}";
+
                 var value = args != null && args.Length > 0
                     ? LocalizationSettings.StringDatabase.GetLocalizedString(table, key, args)
                     : LocalizationSettings.StringDatabase.GetLocalizedString(table, key);
@@ -37,7 +87,16 @@ namespace Hearthdelve.UI.Localization
         public static string Get(LocalizedString text)
         {
             if (text == null || text.IsEmpty) return "#missing";
-            try { return text.GetLocalizedString(); }
+            try
+            {
+                if (s_Tables.TryGetValue(text.TableReference.TableCollectionName ?? string.Empty, out StringTable loaded))
+                {
+                    var entry = loaded.GetEntryFromReference(text.TableEntryReference);
+                    return entry != null ? entry.GetLocalizedString() : "#missing";
+                }
+                if (Application.platform == RuntimePlatform.WebGLPlayer) return "#missing";
+                return text.GetLocalizedString();
+            }
             catch (Exception) { return "#missing"; }
         }
 
@@ -110,6 +169,11 @@ namespace Hearthdelve.UI.Localization
         public const string SwapSubtitle = "swap.subtitle";
         public const string SwapCancel = "swap.cancel";
 
+        public const string LookTestResolution = "looktest.resolution";
+        public const string LookTestHintDungeon = "looktest.hint_dungeon";
+        public const string LookTestHintTavern = "looktest.hint_tavern";
+        public const string LookTestGreeting = "looktest.greeting";
+
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
         {
@@ -148,6 +212,11 @@ namespace Hearthdelve.UI.Localization
             (SwapTitle, "Satchel Full"),
             (SwapSubtitle, "Found {0} ×{1}. Choose a slot to drop for it."),
             (SwapCancel, "Leave it"),
+
+            (LookTestResolution, "{0}×{1}  (F2 to change)"),
+            (LookTestHintDungeon, "Move: WASD / stick   Attack: left mouse / X   Dodge: Space / B   F3: tavern"),
+            (LookTestHintTavern, "Move: WASD / stick   F3: dungeon"),
+            (LookTestGreeting, "Welcome to the Hearth!"),
         };
     }
 }
