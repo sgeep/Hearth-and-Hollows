@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-02 (4a complete)_
+_Last updated: 2026-10-02 (4b step 1)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -153,6 +153,20 @@ Decisions (2026-10-02):
 
 Adjustments: satchel quality is shown by an icon or mark as well as a tint (never colour alone); knockback and stagger stay a simple hit response, not a poise system; pathfinding tests check that the real character collider follows paths around corners and props without clipping.
 
+### 4b status
+
+**Step 1 done (2026-10-02): test floor, grid pathfinding, pathfinding AI action.**
+
+- **`Dungeon_TestFloor`** (*Hearthdelve → Generate → 4b Test Floor*): three Cellar rooms joined by doorways, drawn from a text map in `TestFloorBuilder` and auto-tiled from the Dungeon tileset's wall sample. Room A (spawn, props), room B (pillars, a slime), room C (a U-shaped wall, a column of crates and barrels, a slime). Torches with the 4a lighting. It is first in the build list; F3 still opens the tavern look test. The 4a look scenes were not touched.
+- **Enemy pathfinding:** `NavGrid` (in the scene) bakes the walkable grid from the obstacle colliders on first use; a tile is blocked when any collider overlaps it, even partly. `AIActionPathfindToTarget2D` (a TDE AI action in `Hearthdelve.Shared`) heads straight for the target when the enemy's whole collision box can slide there, and otherwise follows a grid A* path, re-planned four times a second. The follower aims at the furthest waypoint the box can reach in a straight line, so movement is smooth, not cell by cell.
+- The slime prefab uses the new action. In the 4a look room (no `NavGrid`) it heads straight for the player as before, but no longer stalls when lined up with the player.
+- **Tests:**
+  - EditMode: the world-to-grid mapping, the box sweep (including a box that would clip a corner its centre line clears), the nearest open tile, the follower, and a simulated box following paths around a U-shaped wall, through a doorway and around a column of props at three sizes and speeds, never overlapping a blocked tile.
+  - PlayMode: the baked grid matches the map; a real slime chases the player around the U-shaped wall, around the crate column and through a doorway into the next room. Its collider never touches a wall or prop on any physics step (0 touching, 0 overlapping in all three).
+- **Camera test fix:** the 4a camera test failed about one run in four in the tavern. When a 45° walk starts with the axes at different sub-pixel phases, the first step can move one axis only to bring them into line; after that they step together. The stepping unit tests already allowed this, but the PlayMode test counted it as a zig-zag. It now allows one alignment step per diagonal run and still fails on any one-axis step after that.
+
+**Next: step 2,** the damage pipeline, heavy attack, hit-stop, simple knockback and stagger, and the three enemies with telegraphs.
+
 ### Open design questions (4a)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
@@ -170,8 +184,8 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 - **The look-test UI is placeholder:** the Essence bar is a plain bar, and text uses Unity's built-in font through Super Text Mesh (no pixel font exists).
 - **Look-test death:** at zero Essence the room restarts after 2.5 s. The real death screen and Lockbox flow are 4b.
 - **Heavy / charged attack** is bound (`Dungeon/Heavy`) but not built; it is 4b with the rest of combat.
-- **Slime behaviour** is chase and contact damage only. Telegraphed attacks from `AttackCycle` are 4b. TDE's move-towards action stops once the slime is lined up horizontally, so a slime can sit just above or below the player without touching (`UseMinimumXDistance`; fix with the 4b enemy work).
-- **Enemies ignore obstacles** when chasing; the grid A* is not wired to a TDE AI action yet (4b).
+- **Slime behaviour** is chase and contact damage only. Telegraphed attacks from `AttackCycle` are 4b step 2.
+- **Pathfinding ignores other enemies:** enemies path around walls and props only, and can bunch up on the way to the player.
 - **No swap prompt:** a pickup that doesn't fit in the satchel stays on the floor (4b).
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Leftovers to remove in 4b:** `GamePause`'s hit-stop flag and the `HitStopRequested` event (hit-stop moves to MMFeedbacks).
@@ -179,7 +193,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 
 ### Regenerating and verifying (current project)
 
-- **Menu:** *Hearthdelve → Generate → 4a Look Test (All)*. It configures the project, imports the Minifantasy sheets, and builds the data assets, prefabs and the two scenes.
+- **Menu:** *Hearthdelve → Generate → 4a Look Test (All)*. It configures the project, imports the Minifantasy sheets, and builds the data assets, prefabs and the two scenes. *Hearthdelve → Generate → 4b Test Floor* does the same for the 4b test floor (and leaves the look scenes alone).
   - Scenes are created when missing and **never overwritten without asking** (a dialog in the editor; `-rebuildScene` in batch mode).
   - Data assets (configs, haptic patterns) are only created, so your tuning is kept. Animation sets, tiles and prefabs are rebuilt every run.
 - **Command line** (close the editor first):

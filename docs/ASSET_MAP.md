@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-02 (4a look test)_
+_Last updated: 2026-10-02 (4b test floor)_
 
 ## How art gets into the project
 
@@ -68,6 +68,17 @@ Cells are (column, row) from the top-left.
 | (17,5–6) | Wall banner |
 | (13–15,9) | Cracked brick wall |
 | (13–15,11–12) | Wall with vines |
+
+**Wall auto-tiling (4b test floor).** `TestFloorBuilder` picks wall tiles from the sample by what is open around each wall tile:
+
+| Situation | Tiles |
+|---|---|
+| Brick face (floor below) / top face (brick face below) | (5–6, 6) / (5–6, 5), alternating by column |
+| Bottom wall: top face (floor above) / outer brick face | (5–6, 11) / (5–6, 12) |
+| Side wall with floor to the east / west / both sides | (4,7) / (10,7) / (7,7) |
+| Corner at the west / east end of a face, or between two runs | column 4 / 10 / 7, on the face's row |
+| T-junction (wall above and below) | rows 8 (top face) and 9 (brick face) instead of 5 and 6 |
+| Pillar: top face over brick base | (1,2) over (1,3) |
 
 `Shadows.png` (same layout) is not imported yet.
 
