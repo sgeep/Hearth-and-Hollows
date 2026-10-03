@@ -31,7 +31,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 | 4d | Biome 1 runs | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. |
 | 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. |
 | 4f | Tavern Stage 1 content | Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement. |
-| 4g | Story and character creation | Yarn Spinner with an STM dialogue presenter, the Act I opening, onboarding. |
+| 4g | Story, quests and character creation | Dialogue System for Unity and Quest Machine with a Super Text Mesh presenter, Minifantasy Portrait Generator portraits, architecture and hooks for Love/Hate later; the Act I opening, onboarding, character creation. (Locked 2026-10-03; replaces Yarn Spinner.) |
 | 4h | Menus, options and polish | Settings (screen shake, flash and vibration intensity), accessibility per GDD 12, audio system, web build. |
 
 ### 4a status: complete
@@ -288,7 +288,32 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 2. The prototype's F1 debug panel is **not** 4c scope. It stays recorded as a developer-tooling gap; individual debug controls are rebuilt only when they're genuinely useful during 4c/4d.
 3. The Latin-1 limit on UI text is temporary. When the real game font is chosen, replace it with a proper glyph-coverage check against that font.
 
-**Next: 4c,** the tavern and UI migration, starting with a plan for your approval.
+**Next: 4c,** the tavern and UI migration.
+
+### 4c plan (approved 2026-10-03)
+
+Goal: the complete top-down day loop restored through `GameFlow` (Main Menu → Morning → Delve → Evening service → Results → Night → Sleep → Morning, with saves), working in the web build. Out of scope: room graphs and run rewards (4d), combat depth and the boss (4e), furniture placement, the Butcher Block, new recipes and Pip's and Gundra's characters (4f), story, quests and dialogue (4g).
+
+Order of work, each step reviewed and playtested before the next:
+
+1. The `Tavern` scene and layout, Minifantasy art import, the walkable grid, the player's movement and interactions.
+2. Customers (paths, seats, queue, patience) and Pip as TDE characters.
+3. Stations and their panels (Grill, Tap, Stew Pot with Chop), the pass, and 2D serving.
+4. Prep, the Tavern HUD and Results: one complete evening.
+5. Boot, Main Menu, Morning and Night, the delve integration, saves: the full day loop.
+6. Feedback and haptics pass.
+7. Web smoke test of the full loop; PROGRESS, ASSET_MAP and PORT_MANIFEST.
+
+Decisions (2026-10-03):
+
+1. **Camera:** fixed on the one-screen Stage 1 room. Follow comes back when later tavern stages are larger than one screen.
+2. **Carrying a plate:** the dish icon above the player's head, with the spill meter. No waiting for a clothed carrying animation.
+3. **Customers:** layered A Myriad of NPCs characters (body, outfit and hair). Drawn by a tavern NPC layered presentation component that reuses the existing facing and frame-selection logic and keeps every layer in step; the combat `CharacterSpriteAnimator` is not complicated for it. Presentation only. A customer's appearance is fixed for as long as that customer exists (deterministic, never re-rolled as their state changes).
+4. **Debug controls:** F4 fill the storeroom, F5 end service now, F6 spawn a customer, F8 skip to the next phase, F9 +100 gold. The old F1 panel stays deferred.
+5. **Delve scene:** `Dungeon_TestFloor` in the day loop until 4d.
+6. **Main menu:** New Game and Continue; settings are 4h.
+
+Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
 ### Open design questions (4a)
 

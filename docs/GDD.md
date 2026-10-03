@@ -456,7 +456,7 @@ Unity 6.6 now, moving to 6.7 LTS when it is released and staying there through l
 - **Pathfinding:** our own grid A* (TDE has none for 2D).
 - **Content Loading:** Addressables for biome assets and room prefabs when room loading is built; until then only Localization uses it.
 - **Localization:** Unity Localization package; every player-facing string comes from a string table.
-- **Dialogue:** Yarn Spinner with an STM dialogue presenter.
+- **Story, dialogue and quests:** Dialogue System for Unity and Quest Machine, presented through Super Text Mesh, with Minifantasy Portrait Generator portraits; hooks for Love/Hate relationships later. *(Locked 2026-10-03, replacing Yarn Spinner.)*
 
 Versions, licenses and vendor rules are in `docs/THIRD_PARTY.md` and `CLAUDE.md`.
 
@@ -493,7 +493,7 @@ Additive scene loading keeps the persistent `Boot` services alive.
 | `ServiceSystem` | Customer spawning, orders, timers, payment, reviews |
 | `EconomySystem` | Currencies, prices, wages |
 | `ProgressionSystem` | Unlocks, relics, tavern stages, story flags |
-| `StoryManager` | Act progression, dialogue triggers (Yarn Spinner) |
+| `StoryManager` | Act progression, dialogue and quest triggers (Dialogue System for Unity, Quest Machine) |
 | `SaveSystem` | Versioned JSON of persistent state; autosave at Night phase |
 | `LevelGenerator` | Builds dungeon floors from room graphs |
 | `HapticService` | Plays named haptic patterns, applies settings, checks device support |
@@ -564,7 +564,7 @@ Assets/
 - **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena.
 - **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.
 - **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement.
-- **4g Story and character creation:** Yarn Spinner with an STM dialogue presenter, the Act I opening, onboarding.
+- **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine with an STM presenter, Minifantasy Portrait Generator portraits, architecture and hooks for Love/Hate later, the Act I opening, onboarding, character creation.
 - **4h Menus, options and polish:** settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
 
 ### 11.2 Scope Warning
@@ -594,7 +594,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 4. **Time pressure:** no calendar deadline. Delves are limited by Essence, which depletes over time and when the player takes damage, and can be upgraded.
 5. **Death penalty:** lose everything except one satchel slot the player chooses to keep.
 6. **Co-op:** no.
-7. **Dialogue tooling:** Yarn Spinner.
+7. **Dialogue and quest tooling:** Dialogue System for Unity and Quest Machine, with Minifantasy Portrait Generator portraits and hooks for Love/Hate later (locked 2026-10-03; replaces Yarn Spinner).
 8. **Monetization:** premium only, with possible paid expansions.
 
 **Open**

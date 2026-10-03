@@ -27,13 +27,13 @@ The game was a side-scroller through Phase 3. That prototype is preserved at the
 - **Runs:** room by room. Clear a room, doors unlock, choose the next room by its displayed reward. Floors are generated from a room graph, with a boss at the end of each biome.
 - **Tavern:** a top-down room the player walks around. Customers path to tables; serving means carrying plates through the room. Minigames stay as screen panels. New areas unlock through story and upgrades; furniture and decor are placed freely inside them. No freeform construction yet, but don't design it out.
 - **Co-op:** none. Single-player only; do not build networking abstractions.
-- **Dialogue:** Yarn Spinner for Unity, presented through Super Text Mesh. Dialogue lives in `.yarn` files under `Assets/_Project/Dialogue/`. Expose game state to Yarn through custom commands and functions rather than hard-coding story logic in C#.
+- **Story, dialogue and quests:** **Dialogue System for Unity** with **Quest Machine** (Pixel Crushers), presented through Super Text Mesh, with portraits from the **Minifantasy Portrait Generator**. Leave architecture and hooks for **Love/Hate** (relationships) later. Expose game state to the dialogue and quest systems through their Lua variables, custom functions and conditions rather than hard-coding story logic in C#. Locked 2026-10-03; it replaces Yarn Spinner. Built in 4g.
 - **Monetization:** premium, no in-game purchases. Keep content modular (biomes, recipes, customers as data) so paid expansions can be added later.
 - **Stronghold defense events:** still undecided. Do not build them yet, but do not design the Tavern scene in a way that would make adding combat there impossible. They are now cheap to add later, because the tavern uses the same TDE character as the dungeon.
 
 ## Tech stack
 
-URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Cinemachine, **TopDown Engine 5.0** (character controller, abilities, combat, enemy AI, camera, rooms), TDE's bundled **MMFeedbacks/MMTools** for all game feel, **Nice Vibrations** for haptics, **uGUI + Super Text Mesh** for all UI and player-facing text, sprite-sheet animation (SpriteSet, not Mecanim), Physics 2D (no gravity), Addressables, Localization, Yarn Spinner, Unity Test Framework.
+URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Cinemachine, **TopDown Engine 5.0** (character controller, abilities, combat, enemy AI, camera, rooms), TDE's bundled **MMFeedbacks/MMTools** for all game feel, **Nice Vibrations** for haptics, **uGUI + Super Text Mesh** for all UI and player-facing text, sprite-sheet animation (SpriteSet, not Mecanim), Physics 2D (no gravity), Addressables, Localization, Dialogue System for Unity and Quest Machine (4g), Unity Test Framework.
 
 - **TopDown Engine** replaces the custom kinematic character controller. We are not using Corgi Engine.
 - **TDE knockback:** TDE's force knockback (`DamageOnTouch` AddForce, `TopDownController.Impact`) does nothing with our characters, because `TopDownController2D` moves the dynamic rigidbody with `MovePosition` every physics step. Enemy knockback is a short slide through `CharacterMovement` (`HitReaction`, `StaggerRules`); keep TDE's knockback type at NoKnockback.
@@ -44,7 +44,7 @@ URP (2D Renderer), Input System (action maps: Dungeon, Tavern, Minigame, UI), Ci
 - **UI:** uGUI + Super Text Mesh + Minifantasy UI sprites replace UI Toolkit. STM does not work with UI Toolkit; use its **Ultra** shader under URP.
 - **Localization:** every player-facing string goes through a Localization string table — no literal UI text in C# or in prefabs. Use Localization 1.5.13 or later (1.5.8 does not compile on Unity 6.6).
 - **Addressables:** deferred. Do not use Addressables for game content until we build biome/room loading. (The package is present only as a transitive dependency of Localization, which stores its string tables in Addressables groups; leave those Localization-managed groups alone and don't add our own yet.)
-- **Yarn Spinner:** install when the first dialogue work begins. Verify package versions against what the current Unity version actually ships with; don't assume APIs from older versions.
+- **Dialogue System for Unity and Quest Machine:** install when 4g begins, not before. Verify their versions against the current Unity version and check their Super Text Mesh and Localization integration then; don't assume APIs from older versions.
 - **Pathfinding:** TDE has none for 2D. Tavern customers and enemies use our own grid A* (pure logic, EditMode tests), driven through a thin TDE AI action.
 - **Web build:** keep it working at the end of each sub-milestone.
 
