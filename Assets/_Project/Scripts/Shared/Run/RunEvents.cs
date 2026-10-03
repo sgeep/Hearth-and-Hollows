@@ -113,6 +113,25 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
+    /// <summary>
+    /// Ask the UI to show the delve's result (what came home, what was lost). The UI calls
+    /// <see cref="OnContinue"/> when the player moves on.
+    /// </summary>
+    public readonly struct DelveResultRequested : IEvent
+    {
+        public readonly Game.DelveReport Report;
+        /// <summary>True when the day loop continues to the tavern; false when the floor restarts (played on its own).</summary>
+        public readonly bool BackToTavern;
+        public readonly Action OnContinue;
+
+        public DelveResultRequested(Game.DelveReport report, bool backToTavern, Action onContinue)
+        {
+            Report = report;
+            BackToTavern = backToTavern;
+            OnContinue = onContinue;
+        }
+    }
+
     /// <summary>Raised after the death penalty is applied, before the player leaves the dungeon.</summary>
     public readonly struct DelveEnded : IEvent
     {

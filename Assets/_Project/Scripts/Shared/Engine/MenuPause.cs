@@ -31,6 +31,19 @@ namespace Hearthdelve.Shared.Engine
             else MMTimeScaleEvent.Trigger(MMTimeScaleMethods.Unfreeze, 1f, 0f, false, 0f, false);
         }
 
+        /// <summary>Drops every pause and resumes (tests, and leaving a scene mid-menu).</summary>
+        public static void Clear()
+        {
+            bool wasPaused = s_Count > 0;
+            s_Count = 0;
+            if (wasPaused)
+            {
+                if (s_Direct || Object.FindAnyObjectByType<MMTimeManager>() == null) Time.timeScale = 1f;
+                else MMTimeScaleEvent.Trigger(MMTimeScaleMethods.Reset, 1f, 0f, false, 0f, true);
+            }
+            s_Direct = false;
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void Reset()
         {
