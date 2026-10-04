@@ -516,11 +516,16 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 4. Serving: are brushes, collisions, the near-fall warning and a drop proportionate? Is a successful serve satisfying?
 5. Overall: is the vibration useful rather than constant, and does the game feel more alive without becoming noisy?
 
-**Step 6 playtest fix (2026-10-03):** the haptics and feedback feel right; the text was readable but titles, labels and amounts were hard to tell apart (one font, one size, one ink), and some places felt cramped. A text hierarchy, by colour and layout rather than size (m5x7 has only 1× and 2×):
+**Step 6 playtest fix (2026-10-03):** the haptics and feedback feel right; the text was readable but titles, labels and amounts were hard to tell apart (one font, one size, one ink), and some places felt cramped. A text hierarchy, by colour and layout rather than size (a pixel font has only 1× and 2×):
 - **Titles** in a deep red, with a thin rule under each panel's title; section headings ("tonight: …", what you ate) in the same red.
 - **Labels and amounts are separate text:** labels in a muted tone, amounts in full ink (on the dark HUD, a dim label over a gold number, with a gap between stats). Night's summary and Results are now two-column ledgers (label, then amount); the takings sit under a rule in gold. Prices on Prep's cards are gold.
 - **Slot counts** are a plain dark number in the slot's corner (a white "×12" covered half the icon in m5x7).
 - Strings split accordingly (the summary's and results' keys are now labels, with value strings beside them); tests follow.
+
+**Step 6 second playtest change (2026-10-04):** the font is now **Silver** (Poppy Works), and resource names keep a capital in English (Essence, Gold, Renown; also reserved for Morale, Cheer, Marks); everything else keeps the lower-case style ("gold band" the colour stays lower case, as do tips, satchel and lockbox).
+- **m5x7 is removed** from the project. Silver is pixel-exact at STM size 19 (1×) and 38 (2×): its pixels are 100 units on a 1900-unit em, capitals 9 px, descenders 2, on a **12-pixel line** (`GameFonts.LinePixels`; was 10). Imported as hinted raster at 19, no fallback names. It covers far more scripts than m5x7 (Latin, Greek, Cyrillic, Japanese, Chinese, Korean, Thai; not Arabic or Hebrew); the glyph test still checks against the font itself.
+- **Every screen re-laid out for the taller line**, against measured Silver widths (about 6% wider than m5x7): buttons 16 px tall; Prep's cards 150×24 (two lines exactly) in a 316-px panel; Prep's menu count shortened to "menu: 3 of 3"; Night's summary is now a two-column ledger (the day on the left; banked tonight, purse and Renown with today's change on the right), with shorter labels ("served", "kept shut"); the HUD's stats and order rail repacked (still 8 rail rows, one per seat with every seating upgrade); station boxes 256 px wide with the chop board clear of its prompt; the dungeon's swap, death and result panels a little taller.
+- Tests follow (font identity, resource casing, renamed strings). EditMode 369/369, PlayMode 108/108 (plus 2 explicit capture tests).
 
 **Next: step 7,** the web smoke test of the full loop, and the docs (PROGRESS, ASSET_MAP, PORT_MANIFEST). After your playtest of step 6.
 
