@@ -132,7 +132,7 @@ namespace Hearthdelve.Editor
             chopGroup.anchorMax = Vector2.one;
             chopGroup.sizeDelta = Vector2.zero;
             RectTransform chop = Box(chopGroup, "ChopBox", null, out LocalizedSuperText chopPrompt);
-            LocalizedSuperText chopTitle = DungeonUI.Title(chop, TavernLocKeys.ChopTitle);
+            LocalizedSuperText chopTitle = DungeonUI.Title(chop, TavernLocKeys.ChopTitle, rule: false);
             LocalizedSuperText chopProgress = DungeonUI.Line(chop, "Progress", TavernLocKeys.ChopProgress, 8f);
             RectTransform board = LookTestBuilder.UIRect(chopGroup, "Board", new Vector2(0.25f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 28f), new Vector2(0f, 14f));
             board.anchorMax = new Vector2(0.75f, 0f);
@@ -174,7 +174,7 @@ namespace Hearthdelve.Editor
         {
             RectTransform box = DungeonUI.Panel(root, new Vector2(240f, 66f), new Vector2(0f, -50f));
             box.name = name;
-            if (titleKey != null) DungeonUI.Title(box, titleKey);
+            if (titleKey != null) DungeonUI.Title(box, titleKey, rule: false);
             prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -21f);
             return box;
         }

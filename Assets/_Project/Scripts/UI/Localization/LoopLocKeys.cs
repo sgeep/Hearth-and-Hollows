@@ -53,6 +53,9 @@ namespace Hearthdelve.UI.Localization
         public const string SummaryNextUpgrade = "summary.next_upgrade";
         public const string SummaryAllBought = "summary.all_bought";
         public const string SummaryShut = "summary.shut";
+        public const string SummaryEvening = "summary.evening";
+        public const string SummaryPartsValue = "summary.parts_value";
+        public const string SummaryDishesValue = "summary.dishes_value";
         public const string NightBanked = "night.banked";
         public const string NightRenownToday = "night.renown_today";
         public const string NightBuyCost = "night.buy_cost";
@@ -116,18 +119,21 @@ namespace Hearthdelve.UI.Localization
             (UpgradeSeats, "+{0} seat"),
 
             (SummaryTitle, "today"),
-            (SummaryDelve, "delve: {0}"),
+            (SummaryDelve, "delve"),
             (SummaryExtracted, "made it out"),
             (SummaryDied, "essence ran out"),
             (SummarySkipped, "skipped"),
-            (SummaryParts, "parts brought back: {0} (lost: {1})"),
-            (SummaryDishes, "dishes served: {0} · walkouts: {1}"),
+            (SummaryParts, "parts home"),
+            (SummaryDishes, "dishes served"),
             (SummaryEarned, "earned: {0} gold + {1} tips = {2}"),
             (SummaryNextUpgrade, "cheapest next upgrade: {0} gold"),
             (SummaryAllBought, "every upgrade is bought."),
-            (SummaryShut, "the doors stayed shut tonight."),
-            (NightBanked, "banked tonight: {0} gold"),
-            (NightRenownToday, "renown today: {0}"),
+            (SummaryShut, "the doors stayed shut"),
+            (SummaryEvening, "evening"),
+            (SummaryPartsValue, "{0} ({1} lost)"),
+            (SummaryDishesValue, "{0} ({1} walked out)"),
+            (NightBanked, "banked tonight"),
+            (NightRenownToday, "renown today"),
             (NightBuyCost, "{0} gold"),
             (NightNextTime, "next: {0}"),
             (MorningBonuses, "today's delve: {0}"),

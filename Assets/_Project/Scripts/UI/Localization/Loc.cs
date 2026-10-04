@@ -217,7 +217,7 @@ namespace Hearthdelve.UI.Localization
             (ItemFormat, "{0} {1}"),
             (ItemFormatPrep, "{0} {1} ({2})"),
             (SlotEmpty, "empty"),
-            (SlotCount, "×{0}"),
+            (SlotCount, "{0}"),
 
             (DeathTitle, "your essence fades"),
             (DeathSubtitle, "the dungeon casts you back to the surface. choose one slot to save in your lockbox. its whole stack is kept; the rest of the haul is lost."),

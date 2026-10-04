@@ -126,7 +126,7 @@ namespace Hearthdelve.Tests.PlayMode
             Time.timeScale = 1f;
             yield return null;
             Assert.That(Hud.RowsShown, Is.Zero, "served orders leave the rail");
-            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Any(t => t.name == "Gold" && t.text == $"gold\n{Director.Session.Ledger.Gold}"), "the takings show");
+            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Any(t => t.name == "Gold" && t.text == $"{Director.Session.Ledger.Gold}"), "the takings show");
         }
 
         [UnityTest]
@@ -164,8 +164,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Results.IsRevealing, 10f, "the lines to be revealed");
             var texts = Object.FindObjectsByType<SuperTextMesh>().Where(t => t.gameObject.activeInHierarchy).Select(t => t.text).ToList();
             Assert.That(texts, Has.Some.EqualTo("everything sold out, so we closed early."));
-            Assert.That(texts, Has.Some.EqualTo("dishes served: 1"));
-            Assert.That(texts, Has.Some.StartWith("takings: "));
+            Assert.That(texts, Has.Some.EqualTo("dishes served").And.Some.EqualTo("1"), "a label and its amount");
+            Assert.That(texts, Has.Some.EqualTo("takings"));
             Assert.That(texts, Has.None.StartWith("walkouts"), "no trouble line when there was none");
 
             Results.DoneButton.onClick.Invoke();

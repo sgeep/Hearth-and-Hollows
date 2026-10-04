@@ -122,9 +122,9 @@ namespace Hearthdelve.UI.Localization
             (StationStewPot, "stew pot"),
 
             (HudTime, "time left {0}"),
-            (HudGold, "gold\n{0}"),
-            (HudTips, "tips\n{0}"),
-            (HudRenown, "renown\n{0}"),
+            (HudGold, "gold"),
+            (HudTips, "tips"),
+            (HudRenown, "renown"),
             (HudLastOrders, "last orders!"),
             (HudMenu, "menu"),
             (HudSoldOut, "sold out"),
@@ -159,16 +159,16 @@ namespace Hearthdelve.UI.Localization
 
             (ResultsTitle, "service over"),
             (ResultsClosedEarly, "everything sold out, so we closed early."),
-            (ResultsServed, "dishes served: {0}"),
-            (ResultsGold, "gold earned: {0}"),
-            (ResultsTips, "tips: {0}"),
-            (ResultsRenown, "renown: {0}"),
-            (ResultsWalkouts, "walkouts: {0}"),
-            (ResultsSoldOut, "left because we'd sold out: {0}"),
-            (ResultsDropped, "plates dropped: {0}"),
+            (ResultsServed, "dishes served"),
+            (ResultsGold, "gold earned"),
+            (ResultsTips, "tips"),
+            (ResultsRenown, "renown"),
+            (ResultsWalkouts, "walkouts"),
+            (ResultsSoldOut, "left, sold out"),
+            (ResultsDropped, "plates dropped"),
             (ResultsAgain, "prepare another evening"),
             (ResultsStayedShut, "we kept the doors shut tonight."),
-            (ResultsTakings, "takings: {0} gold"),
+            (ResultsTakings, "takings"),
         };
     }
 }

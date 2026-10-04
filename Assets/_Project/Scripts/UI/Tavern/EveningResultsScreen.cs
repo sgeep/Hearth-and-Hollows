@@ -20,7 +20,9 @@ namespace Hearthdelve.UI.Tavern
     {
         [SerializeField] GameObject m_Root;
         [SerializeField] LocalizedSuperText m_Note;
-        [SerializeField] LocalizedSuperText[] m_Lines = Array.Empty<LocalizedSuperText>();
+        [SerializeField] LocalizedSuperText[] m_Labels = Array.Empty<LocalizedSuperText>();
+        [SerializeField, Tooltip("Each line's amount, beside its label.")] LocalizedSuperText[] m_Lines = Array.Empty<LocalizedSuperText>();
+        [SerializeField] GameObject m_TakingsRow;
         [SerializeField] LocalizedSuperText m_Takings;
         [SerializeField] Button m_Done;
         [SerializeField] LocalizedSuperText m_DoneLabel;
@@ -34,8 +36,11 @@ namespace Hearthdelve.UI.Tavern
         public bool IsRevealing => m_Reveal != null;
         public Button DoneButton => m_Done;
 
-        public void Configure(GameObject root, LocalizedSuperText note, LocalizedSuperText[] lines, LocalizedSuperText takings, Button done, LocalizedSuperText doneLabel)
+        public void Configure(GameObject root, LocalizedSuperText note, LocalizedSuperText[] labels, LocalizedSuperText[] lines, GameObject takingsRow, LocalizedSuperText takings,
+            Button done, LocalizedSuperText doneLabel)
         {
+            m_Labels = labels;
+            m_TakingsRow = takingsRow;
             m_DoneLabel = doneLabel;
             m_Root = root;
             m_Note = note;
@@ -68,8 +73,8 @@ namespace Hearthdelve.UI.Tavern
             m_Note.gameObject.SetActive(report.StayedShut || report.ClosedEarly);
             if (report.StayedShut) m_Note.Set(TavernLocKeys.ResultsStayedShut);
             else if (report.ClosedEarly) m_Note.Set(TavernLocKeys.ResultsClosedEarly);
-            foreach (LocalizedSuperText line in m_Lines) line.gameObject.SetActive(false);
-            m_Takings.gameObject.SetActive(false);
+            for (int i = 0; i < m_Lines.Length; i++) ShowLine(i, false);
+            m_TakingsRow.SetActive(false);
             // In the day loop the evening ends in Night (the takings are banked there); on its own, another evening.
             if (m_DoneLabel != null) m_DoneLabel.Set(m_Director.InDayLoop ? LoopLocKeys.ResultsToNight : TavernLocKeys.ResultsAgain);
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(m_Done.gameObject);
@@ -96,20 +101,21 @@ namespace Hearthdelve.UI.Tavern
                 yield return new WaitForSecondsRealtime(m_LineGap);
                 var (kind, value) = report.Lines[i];
                 LocalizedSuperText text = m_Lines[i];
-                text.gameObject.SetActive(true);
+                ShowLine(i, true);
+                m_Labels[i].Set(KeyFor(kind));
                 UiFeedback.Play(UiMoment.Tick);
                 for (float t = 0f; t < m_CountTime; t += Time.unscaledDeltaTime)
                 {
-                    text.Set(KeyFor(kind), Format(kind, Mathf.RoundToInt(value * (t / m_CountTime))));
+                    text.Set(TavernLocKeys.Plain, Format(kind, Mathf.RoundToInt(value * (t / m_CountTime))));
                     yield return null;
                 }
-                text.Set(KeyFor(kind), Format(kind, value));
+                text.Set(TavernLocKeys.Plain, Format(kind, value));
             }
             if (!report.StayedShut)
             {
                 yield return new WaitForSecondsRealtime(m_LineGap);
-                m_Takings.gameObject.SetActive(true);
-                m_Takings.Set(TavernLocKeys.ResultsTakings, report.Takings);
+                m_TakingsRow.SetActive(true);
+                m_Takings.Set(TavernLocKeys.PrepValue, report.Takings);
                 UiFeedback.Play(UiMoment.Takings);
             }
             m_Reveal = null;
@@ -120,11 +126,19 @@ namespace Hearthdelve.UI.Tavern
             for (int i = 0; i < m_Lines.Length; i++)
             {
                 bool has = i < report.Lines.Count;
-                m_Lines[i].gameObject.SetActive(has);
-                if (has) m_Lines[i].Set(KeyFor(report.Lines[i].line), Format(report.Lines[i].line, report.Lines[i].value));
+                ShowLine(i, has);
+                if (!has) continue;
+                m_Labels[i].Set(KeyFor(report.Lines[i].line));
+                m_Lines[i].Set(TavernLocKeys.Plain, Format(report.Lines[i].line, report.Lines[i].value));
             }
-            m_Takings.gameObject.SetActive(!report.StayedShut);
-            if (!report.StayedShut) m_Takings.Set(TavernLocKeys.ResultsTakings, report.Takings);
+            m_TakingsRow.SetActive(!report.StayedShut);
+            if (!report.StayedShut) m_Takings.Set(TavernLocKeys.PrepValue, report.Takings);
+        }
+
+        void ShowLine(int i, bool shown)
+        {
+            m_Lines[i].gameObject.SetActive(shown);
+            if (i < m_Labels.Length) m_Labels[i].gameObject.SetActive(shown);
         }
 
         public static string KeyFor(EveningLine line) => line switch

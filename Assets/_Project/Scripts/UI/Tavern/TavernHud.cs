@@ -92,11 +92,11 @@ namespace Hearthdelve.UI.Tavern
             {
                 // Paid: the takings flash (the coin sound is the room's; no vibration for routine payments).
                 if (m_ShownGold != int.MinValue && ledger.Gold > m_ShownGold) m_GoldFlashLeft = m_GoldFlashSeconds;
-                m_Gold.Set(TavernLocKeys.HudGold, m_ShownGold = ledger.Gold);
+                m_Gold.Set(TavernLocKeys.Plain, m_ShownGold = ledger.Gold);
             }
             FlashGold();
-            if (ledger.Tips != m_ShownTips) m_Tips.Set(TavernLocKeys.HudTips, m_ShownTips = ledger.Tips);
-            if (ledger.Renown != m_ShownRenown) m_Renown.Set(TavernLocKeys.HudRenown, Signed(m_ShownRenown = ledger.Renown));
+            if (ledger.Tips != m_ShownTips) m_Tips.Set(TavernLocKeys.Plain, m_ShownTips = ledger.Tips);
+            if (ledger.Renown != m_ShownRenown) m_Renown.Set(TavernLocKeys.Plain, Signed(m_ShownRenown = ledger.Renown));
 
             for (int i = 0; i < m_Menu.Length; i++)
             {

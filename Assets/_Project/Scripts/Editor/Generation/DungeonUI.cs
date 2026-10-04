@@ -17,6 +17,10 @@ namespace Hearthdelve.Editor
         const string k_PixelPath = EditorPaths.Art + "/UI/Pixel.png";
         internal static readonly Color k_Ink = new(0.25f, 0.16f, 0.1f);
         internal static readonly Color k_Light = new(0.95f, 0.92f, 0.85f);
+        /// <summary>Text hierarchy on parchment (4c step 6 playtest): titles stand out, labels step back, amounts are marked.</summary>
+        internal static readonly Color k_Title = new(0.55f, 0.15f, 0.1f);
+        internal static readonly Color k_Label = new(0.5f, 0.37f, 0.27f);
+        internal static readonly Color k_Accent = new(0.55f, 0.35f, 0.02f);
         internal static readonly Color k_Mark = new(1f, 0.82f, 0.3f);
         /// <summary>Prompts sit above the satchel row.</summary>
         const float k_HintY = 34f;
@@ -146,9 +150,18 @@ namespace Hearthdelve.Editor
             return panel;
         }
 
-        internal static LocalizedSuperText Title(RectTransform panel, string key) =>
-            LookTestBuilder.Text(panel, "Title", key, 7f, k_Ink, TextAnchor.UpperCenter,
+        /// <summary>A panel's title: deep red, with a thin rule under it where there's room (<paramref name="rule"/>).</summary>
+        internal static LocalizedSuperText Title(RectTransform panel, string key, bool rule = true)
+        {
+            LocalizedSuperText title = LookTestBuilder.Text(panel, "Title", key, 7f, k_Title, TextAnchor.UpperCenter,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -7f), new Vector2(panel.sizeDelta.x - 14f, 10f));
+            if (rule)
+            {
+                RectTransform line = LookTestBuilder.UIRect(panel, "TitleRule", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -20f), new Vector2(panel.sizeDelta.x - 40f, 1f));
+                AddImage(line, Pixel(), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
+            }
+            return title;
+        }
 
         internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 10f) =>
             LookTestBuilder.Text(panel, name, key, 6f, k_Ink, TextAnchor.MiddleCenter,
@@ -213,8 +226,9 @@ namespace Hearthdelve.Editor
 
             RectTransform iconRect = LookTestBuilder.UIRect(slot, "Icon", new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 7f), new Vector2(8f, 8f));
             Image icon = AddImage(iconRect, null, Color.white);
-            LocalizedSuperText count = LookTestBuilder.Text(slot, "Count", LocKeys.SlotCount, 5f, k_Light, TextAnchor.LowerRight,
-                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 4f), new Vector2(12f, 6f));
+            // The stack's count: a plain dark number in the slot's lower-right corner (in m5x7 a "×12" covered half the icon).
+            LocalizedSuperText count = LookTestBuilder.Text(slot, "Count", LocKeys.SlotCount, 5f, k_Ink, TextAnchor.LowerRight,
+                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-1f, 3f), new Vector2(12f, 6f));
             var pips = new Image[4];
             for (int p = 0; p < pips.Length; p++)
             {

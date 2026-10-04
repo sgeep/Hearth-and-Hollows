@@ -32,7 +32,8 @@ namespace Hearthdelve.UI.Tavern
     {
         [SerializeField] GameObject m_Root;
         [SerializeField] LocalizedSuperText m_Title;
-        [SerializeField] LocalizedSuperText[] m_Summary = Array.Empty<LocalizedSuperText>();
+        [SerializeField] LocalizedSuperText[] m_SummaryLabels = Array.Empty<LocalizedSuperText>();
+        [SerializeField, Tooltip("Each summary line's value, beside its label.")] LocalizedSuperText[] m_Summary = Array.Empty<LocalizedSuperText>();
         [SerializeField] LocalizedSuperText m_Purse;
         [SerializeField] UpgradeRow[] m_Upgrades = Array.Empty<UpgradeRow>();
         [SerializeField] LocalizedSuperText m_Saved;
@@ -55,9 +56,10 @@ namespace Hearthdelve.UI.Tavern
         public Button SleepButton => m_Sleep;
         public bool SavedNoteShown => m_Saved != null && m_Saved.gameObject.activeSelf;
 
-        public void Configure(GameObject root, LocalizedSuperText title, LocalizedSuperText[] summary, LocalizedSuperText purse, UpgradeRow[] upgrades,
-            LocalizedSuperText saved, Button sleep)
+        public void Configure(GameObject root, LocalizedSuperText title, LocalizedSuperText[] summaryLabels, LocalizedSuperText[] summary, LocalizedSuperText purse,
+            UpgradeRow[] upgrades, LocalizedSuperText saved, Button sleep)
         {
+            m_SummaryLabels = summaryLabels;
             m_Root = root;
             m_Title = title;
             m_Summary = summary;
@@ -159,19 +161,23 @@ namespace Hearthdelve.UI.Tavern
                 _ => LoopLocKeys.SummarySkipped,
             });
             bool shut = m_Director.Report != null && m_Director.Report.StayedShut;
-            var lines = new (string key, object[] args)[]
+            var lines = new (string label, string value, object[] args)[]
             {
-                (LoopLocKeys.SummaryDelve, new object[] { outcome }),
-                (LoopLocKeys.SummaryParts, new object[] { today.PartsBroughtBack, today.PartsLost }),
-                shut ? (LoopLocKeys.SummaryShut, Array.Empty<object>()) : (LoopLocKeys.SummaryDishes, new object[] { today.DishesServed, today.Walkouts }),
-                (LoopLocKeys.NightBanked, new object[] { today.Earned }),
-                (LoopLocKeys.NightRenownToday, new object[] { today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString() }),
+                (LoopLocKeys.SummaryDelve, TavernLocKeys.Plain, new object[] { outcome }),
+                (LoopLocKeys.SummaryParts, LoopLocKeys.SummaryPartsValue, new object[] { today.PartsBroughtBack, today.PartsLost }),
+                shut ? (LoopLocKeys.SummaryEvening, LoopLocKeys.SummaryShut, Array.Empty<object>())
+                     : (LoopLocKeys.SummaryDishes, LoopLocKeys.SummaryDishesValue, new object[] { today.DishesServed, today.Walkouts }),
+                (LoopLocKeys.NightBanked, TavernLocKeys.PrepValue, new object[] { today.Earned }),
+                (LoopLocKeys.NightRenownToday, TavernLocKeys.Plain, new object[] { today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString() }),
             };
             for (int i = 0; i < m_Summary.Length; i++)
             {
                 bool has = i < lines.Length;
                 m_Summary[i].gameObject.SetActive(has);
-                if (has) m_Summary[i].Set(lines[i].key, lines[i].args);
+                if (i < m_SummaryLabels.Length) m_SummaryLabels[i].gameObject.SetActive(has);
+                if (!has) continue;
+                if (i < m_SummaryLabels.Length) m_SummaryLabels[i].Set(lines[i].label);
+                m_Summary[i].Set(lines[i].value, lines[i].args);
             }
             m_Purse.Set(LoopLocKeys.NightPurse, state.Gold, state.Renown);
 
