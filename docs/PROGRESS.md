@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-04 (direction update to a village life sim, GDD v0.5, documentation only; 4d paused before step 3)_
+_Last updated: 2026-10-04 (4d step 3: rewards, door previews, run Gold)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -596,6 +596,17 @@ The experience: clear a room, see the rewards behind the exits, choose what you 
 
 **Step 3 under the v0.5 direction (when it resumes, after approval).** Rewards are designed knowing a larger ingredient ecosystem exists (GDD §5.5): ingredient routes don't assume monster parts will be the player's only cooking ingredients, so dungeon ingredient rewards lean toward the unusual and the rare. The reward abstraction (kind plus payload) stays open to dungeon ingredients, quest objects, customization discoveries and future weapons and currencies. Ingredient and Gold rewards remain the prototype's focus. No farming, fishing or ranching in 4d.
 
+**Step 3: rewards, door previews, run Gold (2026-10-04).** Resumed after the v0.5 update; steps 1 and 2 unchanged.
+- **Rewards are data on the graph:** each fight gets a `RoomReward` (kind plus payload: `RewardKind` Gold or Ingredient; an item id, a quality and an amount), rolled when the run is generated, so a seed replays it. Quiet rooms give nothing; the arena's reward waits for 4e's boss. The door to a fight shows its kind; the exact roll appears when the room is clear.
+- **Door previews** (replacing step 2's temporary signs): a coin for Gold, a drumstick for a dungeon ingredient, ↑ the rope out, ↓ deeper, crossed swords the arena. Where a room offers a choice of fights, the generator makes it a choice of different rewards.
+- **Ingredient rewards are dungeon opportunities, not pantry stock** (GDD §4.8, §5.5): a stack of 1–3 parts of one of the Cellars' monster parts (slime gel, bat wing, spider leg; slime core and venom sac from floor 2 down), standard or fine (fine more often deeper), dropped as an ordinary part through the harvest system, so it competes for satchel space like any part. It doesn't replace harvesting: kills still give the parts, and clean kills their quality.
+- **Gold rewards and run Gold:** a coin on the floor once the room is clear; walking over it adds its Gold to the run (`DelveRunController.Loot`, a `RunLoot`), shown under the Essence bar. It's unbanked: extracting brings it home (`DelveReport.GoldSecured`, banked by `DayRules.CompleteDelve`), dying loses it (`GoldLost`); Gold already banked is never at risk. The delve result says which ("+N Gold to the purse" or "N Gold left in the dark"). Parts and Gold left lying stay behind with the room.
+- **Depth:** per-floor tuning in `RunSettings` (Gold 10–18, 18–30, 30–45; parts 1–2, 1–2, 2–3; fine chance 20%, 45%, 70%; Gold and ingredient rooms equally likely). Existing settings got these once, when their ingredient list was empty; later edits are kept.
+- **Extension points:** a new reward is a new `RewardKind` with its payload in the same fields, a door sign, and a case in `RoomRunner.GrantReward`; non-satchel finds (furnishing discoveries, quest objects) join `RunLoot` and travel home in the `DelveReport`. Run power-ups (step 4), Delve Marks and weapons (4e), furnishing discoveries (4f) and quest objects (4g) plug in there without touching the graph, room clearing, the previews or the report.
+- **Art:** the Miscellany Icons pack's gold coin (door sign, HUD, the pickup) and UI Overhaul's food icon (`docs/ASSET_MAP.md`); `PH_Coin` for picking up Gold.
+- **Not changed:** `GameFlow` still runs the old day order; the day loop still delves in `Dungeon_TestFloor` (step 5). Run Gold reaching the purse works in `DayRules` already, for when it does.
+- Tests: generator rewards across 300 seeds (every fight has one in its floor's range, quiet rooms none, ingredients only from their floor down, a choice of fights is a choice of rewards, deeper floors pay more, both kinds common); `DayRules` banking run Gold on extraction and not on death; `RunLoot`; in PlayMode, every door's sign matching its room, a Gold room's coin adding to the run and the HUD, an ingredient room leaving its parts, and run Gold secured by extraction and lost by death.
+
 **Step 5 note (for its plan).** Integrating the run into the day loop is the natural point to adopt the new order (evening service → delve → sleep, with the Morning panel standing in for the daytime). Moving the delve after service means deciding where the Night upgrade screen's functions and the breakfast buff go, and that dungeon parts now wait a day in the storeroom before they're cooked (freshness tuning). Proposed, to be decided when step 5 is planned.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
@@ -639,6 +650,7 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "Gold" in tight spots later; not imported in step 6.
 - **The delve's controls line overlaps the satchel row** for its first few seconds, then fades (as designed in 4b; cosmetic).
 - **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
+- **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f).
 - **All sound is placeholder** (`PH_…`, generated), including the tavern feedback pass's moments. Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)

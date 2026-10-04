@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-04 (4d step 2: the hole down, exit signs)_
+_Last updated: 2026-10-04 (4d step 3: coin and food door signs)_
 
 ## How art gets into the project
 
@@ -122,6 +122,10 @@ Cells are (column, row) from the top-left.
 
 Source: `All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate/Gate_open_close.png`, 128×48: 8 frames of 32×24 (4 per row), a portcullis in a sandstone arch. Frame 0 closed, 1–3 the bars sinking, 3 open (only the tips show), 4–7 rising again, 7 closed. Only each frame's **barred interior** is imported (`Gate0`–`Gate7`, 16×15 at frame (8, 9), pivot bottom centre): it fills a two-tile doorway cut through the Cellars' own grey north wall, so the sandstone arch never shows. The bars are copper on a transparent ground. Also in the folder: `Gate_shadows_in_exteriors.png` and `Gate_shadows_towards_indoor.png` (not imported) and `GIFs/Gate.gif`. The Dungeon tileset's own archway (cells 13–15, 5–6) has a one-tile opening, too narrow for these bars.
 
+### Miscellany Icons (exclusive → `MiscellanyIcons/Miscellany.png`)
+
+Source: `All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)/Miscellany_1.png` (72×136, 8×8 cells). Rows per the pack: 1 coins (gold, silver, copper; big and small; stacks), 2 torches (new, lit, used), 3 a pick-up animation, 4 a drink-potion animation, 5 party, 6 class icons (barbarian, druid, rogue), 7 woodwork, 8 log in/out and new character, 9 beer (full, half, empty), 10 card frames. Imported: `Miscellany_GoldCoin` 0,0 8×8 (the big gold coin): run Gold on the HUD, the Gold room door sign and the Gold pickup (4d step 3).
+
 ### `Props.png` — 232×88
 
 Rectangles are x, y, width, height from the top-left.
@@ -230,7 +234,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | `UIOverhaul/Bubble.png` (UI Overhaul, `Character_Emotions/Bubble_Only.png`, 280×72) | `Bubble_Body` 31,7 10×10 (9-sliced, 3 px border); `Bubble_Tail` 33,17 4×3 | Speech bubble. The sheet holds the same bubble with its tail on each side, in two sizes. `_Emotions.png` holds faces only (no "!"); not imported. |
 | `UIOverhaul/ClassicUI.png` (UI Overhaul, `Classic_Minifantasy_UI/_Classic_UI.png`, 1872×848; built from 16 px pieces) | `ClassicUI_Panel` 64,48 48×48 (9-sliced, 8 px); `ClassicUI_Bar` 64,16 48×16 (9-sliced, 6 px); `ClassicUI_Slot` 561,30 14×17; `ClassicUI_SlotSelected` 593,30 14×17; `ClassicUI_BarTrough` 208,562 48×12; `ClassicUI_BarFillBlue` 596,709 40×6; `ClassicUI_BarFillRed` 340,709 40×6 | Parchment panel with a red inner border (the swap prompt), a pill bar (its button), and a 14×14 slot, plus the same slot with a ▼ marker tab above it for the selected one (selection that doesn't rely on colour). The Essence bar is the dark trough with the blue fill inside it (red when low); the sheet has troughs in four heights and fills in red, blue and yellow, each in four thicknesses. The sheet also has Grim and Stylized versions, scroll and book panels, bars and frames. |
 | (buttons) | — | Since 4c step 6, text buttons are a plain parchment face with a one-pixel dark edge (`DungeonUI.ButtonFace`, drawn from a white pixel), because the pill bar's art fought with the text. `ClassicUI_Bar` stays imported. |
-| `UIOverhaul/Icons.png` (UI Overhaul, `_General_UI_Resources/Icons/Icons_Only.png`, 576×432) | `Icons_MagicSpark` 488,40 8×8; `Icons_ArrowUp` 32,64, `Icons_ArrowDown` 64,64, `Icons_Swords` 392,40 (all 8×8, white) | The **Essence icon**, beside the bar (replaced the "Essence" label, 2026-10-04). The arrows and the crossed swords are 4d step 2's temporary signs over room exits (out, deeper, the arena) until step 3's reward previews. The sheet holds 8×8 icons "to be used in menus and placed next to relevant overlay elements such as HP bars": general (settings, sound, save, lock, arrows, maths and media symbols) in white plus red, orange, yellow, green, blue and purple copies; a CHARACTER group (map, compass, book, scroll, chest, anvil, needle and thread; body, crossed swords, armour, shield, hammer, backpack, heart, magic spark, lightning, stamina, food, water); and social-media logos. Listed in its `_Info.txt`. |
+| `UIOverhaul/Icons.png` (UI Overhaul, `_General_UI_Resources/Icons/Icons_Only.png`, 576×432) | `Icons_MagicSpark` 488,40 8×8; `Icons_ArrowUp` 32,64, `Icons_ArrowDown` 64,64, `Icons_Swords` 392,40, `Icons_Food` 536,40 (all 8×8, white) | The **Essence icon**, beside the bar (replaced the "Essence" label, 2026-10-04). Over room exits (4d door previews): ↑ the rope out, ↓ deeper, crossed swords the arena, the food icon an ingredient room. The sheet holds 8×8 icons "to be used in menus and placed next to relevant overlay elements such as HP bars": general (settings, sound, save, lock, arrows, maths and media symbols) in white plus red, orange, yellow, green, blue and purple copies; a CHARACTER group (map, compass, book, scroll, chest, anvil, needle and thread; body, crossed swords, armour, shield, hammer, backpack, heart, magic spark, lightning, stamina, food, water); and social-media logos. Listed in its `_Info.txt`. |
 | `UserInterface/GuiEmoticons.png` (User Interface pack, `Miscellany/Emoticons/Minifantasy_GuiEmoticons.png`, 176×160, 16 px cells) | `GuiEmoticons_AlertRed` 22,116 5×10 | The red "!" shown over an enemy winding up an attack. Rows 7 and 8 (from 0) hold "!", "?" and "X" marks in six colours. The rest of the sheet is faces. Drawn with the **unlit** sprite material so it reads in the dark. |
 
 ## Icons
