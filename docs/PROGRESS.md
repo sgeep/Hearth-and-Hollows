@@ -542,6 +542,13 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 - **Silver's license verified** (CC BY 4.0, attribution to Poppy Works, with a budget condition): `docs/THIRD_PARTY.md`, `docs/CREDITS.md`.
 - Docs brought up to date: `PORT_MANIFEST.md` (what 4c ported or replaced), `ASSET_MAP.md` (font, buttons, icon gaps), the known issues below, and one stale `CLAUDE.md` line (overnight storeroom freshness loss exists since step 5).
 
+**Step 7 playtest changes (2026-10-04):**
+- **Plain punctuation.** Silver draws its period, middle dot, comma, colon and semicolon as 3×3 plus signs. Our copy is adapted (CC BY 4.0 allows it; the credit says so): those five glyphs are single-pixel dots like Silver's own "!" and "?", with narrower advances, by `Tools/fonts/silver_plain_punctuation.py` (reproducible and idempotent). No strings changed. `TextStyleTests` guards it.
+- **The Essence label is now an icon.** Silver has no smaller pixel-exact size, so the word under the bar became UI Overhaul's 8×8 magic-spark icon beside the bar (the pack's icons are meant for "next to ... HP bars"), centred on it; the bar moved right to make room. (A second, smaller font was considered and dropped: Silver stays the only font.)
+- **The colon sat low:** its dots are raised a pixel (rows 1 and 5, centred on the x-height), and the semicolon's dot with it.
+- **The empty storeroom row read "storeroom the storeroom is empty."** It now reads as a label and its value, "storeroom  empty"; the line under it (breakfast at Morning, dishes at Prep) says what that means.
+- **A Night resumed from a save showed a made-up day** ("delve: skipped", "served 0", "banked tonight 0 Gold"): the save keeps the purse and Renown but not the day's story (found on the web build). A resumed Night now shows only the purse and Renown. Tested by `ContinuingAtNight_ShowsOnlyWhatTheSaveKnows`.
+
 **4c status: all steps built; awaiting your sign-off.** Deferred, as planned: biome runs, room graph and the boss (4d); the Harvest Finisher, Kitchen Arts, more weapons (4e); recipe rework, customer requests, furniture placement, Pip's own look (4f); dialogue, quests, portraits, Love/Hate timing (4g); settings, the title screen and a decorative title font (4h).
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
@@ -582,7 +589,6 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "Gold" in tight spots later; not imported in step 6.
 - **The delve's controls line overlaps the satchel row** for its first few seconds, then fades (as designed in 4b; cosmetic).
 - **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
-- **Morning and Prep's storeroom row reads "storeroom the storeroom is empty."** when empty (the label and the message sit side by side; wording only).
 - **All sound is placeholder** (`PH_…`, generated), including the tavern feedback pass's moments. Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)
