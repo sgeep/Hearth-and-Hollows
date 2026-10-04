@@ -516,6 +516,12 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 4. Serving: are brushes, collisions, the near-fall warning and a drop proportionate? Is a successful serve satisfying?
 5. Overall: is the vibration useful rather than constant, and does the game feel more alive without becoming noisy?
 
+**Step 6 playtest fix (2026-10-03):** the haptics and feedback feel right; the text was readable but titles, labels and amounts were hard to tell apart (one font, one size, one ink), and some places felt cramped. A text hierarchy, by colour and layout rather than size (m5x7 has only 1× and 2×):
+- **Titles** in a deep red, with a thin rule under each panel's title; section headings ("tonight: …", what you ate) in the same red.
+- **Labels and amounts are separate text:** labels in a muted tone, amounts in full ink (on the dark HUD, a dim label over a gold number, with a gap between stats). Night's summary and Results are now two-column ledgers (label, then amount); the takings sit under a rule in gold. Prices on Prep's cards are gold.
+- **Slot counts** are a plain dark number in the slot's corner (a white "×12" covered half the icon in m5x7).
+- Strings split accordingly (the summary's and results' keys are now labels, with value strings beside them); tests follow.
+
 **Next: step 7,** the web smoke test of the full loop, and the docs (PROGRESS, ASSET_MAP, PORT_MANIFEST). After your playtest of step 6.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
