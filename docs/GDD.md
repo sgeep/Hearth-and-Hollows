@@ -1,8 +1,8 @@
 # HEARTHDELVE — Project Design Document
 
-*Working title. Version 0.3 (design philosophy, tavern immersion, quests and relationships, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
+*Working title. Version 0.4 (learning priorities, tavern customization, decor rewards, worker customization, 2026-10-04; design philosophy, tavern immersion, quests and relationships in v0.3, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
 
-> **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections and lines added in v0.3 are marked **(added in v0.3)** or *(v0.3)*; they record design direction and do not widen any milestone's approved scope. Sections without a mark are unchanged from v0.1. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+> **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections and lines added in v0.3 are marked **(added in v0.3)** or *(v0.3)*, and those added in v0.4 **(added in v0.4)** or *(v0.4)*; they record design direction and do not widen any milestone's approved scope (the roadmap in Section 11.1 says what each milestone builds). Sections without a mark are unchanged from v0.1. Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
 
 ---
 
@@ -33,6 +33,7 @@ Hybrid: top-down action roguelite + tavern management sim.
 4. **Cozy on the surface, dread below.** The warmth of the tavern contrasts with the growing menace of the depths.
 5. **You can feel it.** *(added in v0.2)* Every important moment lands through visuals, sound and haptics together.
 6. **Your tavern, your hands.** *(added in v0.3)* Tavern immersion: running the Sunken Flagon should feel physical and present. You walk the room, work the stations, carry the plates and watch strange monster parts become recognizable dishes. Immersion serves the fun and is never an excuse for busywork (Section 6.5).
+7. **A home you made.** *(added in v0.4)* The Sunken Flagon increasingly becomes a place the player personally created: they choose how it looks and how it works, and fill it with things they bought, earned and dragged up from the dungeon. "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done" (Section 6.6).
 
 ### 1.4 Target Platform and Audience
 
@@ -107,6 +108,19 @@ Nothing is added only because another RPG or management game has it.
 
 **Immersion and convenience.** Tavern immersion is a pillar, but immersion is a preference, not permission to create tedium. When the two conflict, neither extreme wins automatically; the question is what experience the interaction actually produces. Section 6.5 has the details.
 
+**Learning priorities** *(added in v0.4)*. Hearthdelve is meant to become a finished, coherent game, and it is also a deliberate way for its designer to practise the parts of game development they most enjoy:
+
+1. interactive dialogue writing;
+2. building and tavern customization;
+3. cooking minigames;
+4. funny, strange, memorable NPC interactions;
+5. persistent NPC relationships and reactivity;
+6. top-down action combat.
+
+This shapes where complexity and content budget go. In these areas the goal is **not always the smallest number of systems or pieces of content**: depth, iteration, experimentation and variety have value of their own. A large furnishing catalog, several distinct cooking minigames and elaborate premium recipes, substantial dialogue and reactivity for important characters, and lots of amusing contextual NPC moments are all welcome. When one of these pillars has two viable options, the smaller one is not chosen automatically for being smaller: prefer the option that makes the more useful and enjoyable design experiment while staying maintainable.
+
+The other rules still hold. "Meaningful complexity over system count" governs everything outside these pillars, and inside them every step, rule and piece of content still has to earn its place (no busywork, no stages that only add time, no feature because another game has it). Unrelated technical systems get the minimum that serves the game. Combat should be responsive, readable and satisfying, with interesting enemies and bosses worth fighting, but it is one pillar among six: it does not grow into a combat-engineering project that crowds out customization, cooking, dialogue, NPC interactions or relationships. The dungeon is as much a source of ingredients, stories, discoveries and objects for the player's home as it is a fight.
+
 ---
 
 ## 2. World and Story
@@ -154,6 +168,8 @@ The story unfolds in four acts, advanced by reaching dungeon depths and by taver
 
 *(v0.3)* Gundra, Pip, Ser Aldric, Sylvaris, Grukka and other important characters are the obvious candidates for personal questlines (Section 2.6) and persistent relationship state (Section 2.7), and they speak with Portrait Generator portraits (Section 8.1). Their quest trees and relationship progressions are not designed yet.
 
+*(v0.4)* **Canonical characters keep their identities.** Authored story characters (Pip Marrowby, Gundra Ashbelly, Grukka Stonejaw, Sylvaris, Ser Aldric Vane and others) are not renameable, because their names are part of the story; they may still allow visual customization where it fits. Full naming and appearance customization belongs to hired and recruited workers (Section 6.7). Making a named character renameable would be an explicit story decision.
+
 ### 2.6 Quests and Objectives (added in v0.3)
 
 A real, persistent quest and objective system is a required feature. **Quest Machine** (Pixel Crushers) owns quest and objective state. Quests include:
@@ -189,6 +205,8 @@ Three different things, kept separate:
 **What relationships can change.** Dialogue and barks, personal quests, gifts and rewards, willingness to help, special services or discounts where appropriate, story reactions, how patrons and residents behave, and optional content.
 
 **Scope.** Hearthdelve is not a dating sim or a large social sim. The goal is that important characters feel as if they know Bram, remember what has happened and live in the same world. Relationship state is used selectively, where it creates meaningful character moments.
+
+**Contextual reactivity** *(v0.4)*. Funny, strange and memorable NPC interactions are a learning priority (Section 1.5), so dialogue and relationship work is designed for reactivity, not only linear conversations. Recurring characters should be able to remember earlier conversations, have preferences, disagree, develop running jokes, surprise the player, react to other residents, and comment on the world they share with Bram, including the tavern itself: a patron noticing the absurd monster trophy placed beside their favourite table, a resident who hates the new rug, someone recognizing a boss trophy (Section 6.6). Hearthdelve publishes the facts (what is placed where, what was just bought or found) for the adapters to expose as dialogue conditions and variables; the dialogue decides what is funny about them. Whether decor affects disposition mechanically is open (Section 13).
 
 **Recurring patrons.** The tavern should gradually feel less like a room of disposable customer entities and more like a place with familiar faces. Some patrons return, develop preferences, recognize Bram, react to the tavern's changes and to other residents or events, remember notable service, offer or take part in quests, and change their disposition over time. Most customers stay lightweight and procedurally generated; persistent relationship state is kept for the characters whose continuity creates value. Familiar faces are part of tavern immersion (Section 6.5).
 
@@ -298,6 +316,8 @@ Room rewards:
 - **A weapon**
 - **A run power-up**, chosen from three
 
+*(v0.4)* The run's reward model must not assume these are the only kinds. Persistent **customization discoveries** (Section 6.6) are a planned future reward kind, from enemy drops and possibly from rooms, and must plug in later without rewriting the run reward system.
+
 Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floors plus a boss arena. Special rooms: campfire (field cooking), shop, extraction point.
 
 **Biomes and their Minifantasy packs.** Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
@@ -319,7 +339,7 @@ Branching between biomes lets players choose which ingredients to target on a gi
 
 ### 4.7 Enemies and Bosses
 
-Each enemy has a **combat profile** (behavior, attacks, telegraphs) and a **harvest profile** (parts, preferred kill method, freshness rate). Bosses drop signature ingredients that unlock "Legendary Dishes" and progress the story. Boss candidates per biome are in Section 4.6. Enemies are chosen from creatures that have idle, move, attack, damage and death animations.
+Each enemy has a **combat profile** (behavior, attacks, telegraphs) and a **harvest profile** (parts, preferred kill method, freshness rate). Bosses drop signature ingredients that unlock "Legendary Dishes" and progress the story. *(v0.4)* Enemies may later also carry a **decor drop profile** (a small chance of customization discoveries, by enemy and biome), and bosses can award rare or unique furnishings (Section 6.6). Boss candidates per biome are in Section 4.6. Enemies are chosen from creatures that have idle, move, attack, damage and death animations.
 
 ---
 
@@ -379,6 +399,8 @@ The shapes the design should allow include `raw monster part → preparation →
 
 **Pacing.** Stages must not pile up until service pacing collapses. Staff, upgrades and mastery can take over familiar stages over time (Section 6.5).
 
+**A depth priority** *(v0.4)*. Cooking minigames are a learning priority (Section 1.5). "Keep scope small" is not by itself an argument against more distinct preparation interactions, premium multi-stage dishes, ingredient-specific preparation, unusual monster-food mechanics or richer cooking feedback; each still has to be fun and earn its complexity, and more stages must make valuable food more interesting to prepare, never merely longer.
+
 **Data.** Today each recipe names one cooking station (`RecipeDefinition.station`), and the Stew Pot already has two steps (chop, then simmer). That is the Stage 1 shape, not a limit: when the first multi-stage dish is designed, recipe data gains its stages, and how intermediate results are held (on the pass, carried, or inside one panel) is decided then.
 
 ---
@@ -430,8 +452,9 @@ The inn plays the role the cult plays in *Cult of the Lamb*. It grows across the
 | 4 | The Bastion | War room, shrine, feast hall for the finale |
 
 - **Areas** unlock through story and upgrades.
-- **Furniture and decor** are placed freely inside unlocked areas. Decor raises customer satisfaction.
+- **Furniture and decor** are placed freely inside unlocked areas *(v0.4: see Section 6.6; whether decor carries gameplay bonuses such as customer satisfaction is open)*.
 - **No freeform construction** (placing walls and rooms) for now, but nothing should be designed in a way that rules it out later.
+- *(v0.4)* Every stage uses **the same customization architecture** as the Stage 1 inn (Section 6.6): the home the player starts decorating early is the stronghold they later defend and return to. This is not a city-builder.
 - Art: *Tavern Indoor*, *Towns*, *Towns 2*, *Crafting And Professions I/II* (kitchen, preparation table and other workbenches), *Farm*, *Castles And Strongholds*, *Builders*.
 
 **Residents:** refugees who move in can be assigned roles (cook, server, gardener, smith, guard). Each resident has a small personal questline (Quest Machine, Section 2.6); selected residents also carry relationship state (Section 2.7).
@@ -463,6 +486,47 @@ If the more immersive option is clearly more repetitive, confusing, slow or frus
 
 **Familiar faces.** Recurring patrons and residents who remember Bram (Section 2.7) make the room feel lived in.
 
+### 6.6 Customization: the Tavern as the Player's Creation (added in v0.4)
+
+Long-term design direction (pillar 7, and a learning priority in Section 1.5). The 4f milestone builds its foundation (Section 11.1); Phase 5 grows it.
+
+**The essential experience.** "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done." Customization should create ownership, expression, visible progress, discovery, anticipation, meaningful choices, reward and storytelling, and give the cast something to react to (Section 2.7). It is not merely a level editor. The Stage 1 layout is only a starting arrangement.
+
+**Decorate Mode.** Over time, and where the art and technology allow, the player can move, remove and add furniture; rearrange tables, chairs, counters and bar pieces; move functional stations; position decorative props; swap variants; rotate or flip where supported; recolour compatible pieces; buy furnishings with Gold; unlock new collections; find unusual furnishings in the dungeon; and keep the whole layout persistently. Controller-first, like the rest of the game.
+
+**Data-driven furniture.** Customization is built on reusable furniture definitions and placed instances, not layouts baked into the Tavern scene, and never duplicate scenes per layout. A definition may describe a stable id, display name, sprites and variants, category, footprint, collision, navigation blocking, wall or floor placement, orientation and flip support, functional type and interaction, Gold price, rarity, unlock source, biome or theme tags, palette channels, and whether owning duplicates is meaningful. A placed instance may store the furniture id, position, orientation, variant, palette choices and any instance state. These are guidelines, not class names. Registering many furnishings should be tooling and data, not bespoke code per chair, barrel or rug.
+
+**Functional furniture is decor too.** Where practical the Grill, Tap, Stew Pot, serving pass, tables, chairs, counters and later stations use the same placement architecture, so players change how their tavern *works*, not only where the paintings hang. Moving a functional piece keeps its station and service behaviour. Whether every functional station can move is open (Section 13).
+
+**Freedom with understandable validation.** The tavern's walkable grid is rebuilt when the layout changes (already supported since 4c). Placement is generous; instead of many arbitrary restrictions, the game checks the layout against real service needs before the doors open and names the actual problem: "the Grill can't be reached", "the entrance is blocked", "2 seats can't be reached", "Pip can't reach the serving pass". The checks test gameplay constraints, not resemblance to the authored layout. Exact UX is open.
+
+**Where furnishings come from.**
+
+| Source | Role |
+|---|---|
+| **Gold** | Ordinary and common furnishings: serve customers → earn Gold → improve and personalize the tavern |
+| **Dungeon discoveries** | Things that can't simply be bought: a second, emotional reward axis for delving beyond power and ingredients |
+| **Bosses** | Rare or unique pieces that remember a victory |
+| **Story, quests, relationships** | Special furnishings tied to events and characters (an NPC's storyline ending with an object of theirs) |
+
+**Decor as dungeon loot.** Enemies can occasionally drop customization discoveries ("Oh! It dropped something new for my tavern"): furniture, decorative objects, wall decorations, rugs, lighting, bar and kitchen pieces, trophies, banners, monster-themed decor, palette or material unlocks, unusual variants and biome-specific pieces. Normal enemies have low chances of common or uncommon rewards; enemy type and biome shape the pool (dungeon inhabitants drop things from their own environment and culture). Not one or two scripted trophies: a real part of the reward ecosystem. Probabilities and tables are not set yet.
+
+**Boss rewards.** Biome bosses can award rare or unique furnishings (a trophy, a distinctive piece of furniture, rare lighting, a banner, a statue, a unique bar or kitchen piece, a palette or material), so that "I beat that thing, and now part of my tavern tells that story." A guaranteed first-clear unique reward from major bosses, rather than pure chance, is the leading idea (not locked).
+
+**Discoveries, extraction and death (open).** Discoveries should look and feel like dungeon loot but **never take Satchel slots**: the six-slot Satchel's job is ingredient pressure, not general inventory. The leading idea is a separate lightweight **curio** channel: the enemy drops the discovery visibly, the player picks it up, it belongs to the current run, extracting unlocks it permanently, and dying may lose it. That keeps extraction tension without stealing ingredient space. It is to be compared with simpler alternatives when the system is designed, and boss trophies may need different rules (losing a unique first-clear trophy may feel bad).
+
+**Duplicates (open).** With a large catalog, random drops must not turn into frustration. Options to weigh, without adding a currency casually: exclude already-unlocked permanent discoveries from the roll, reroll duplicates, convert them to Gold, or allow duplicates only where owning several copies is useful (chairs, tables, barrels, candles, yes; a palette unlock or a unique boss trophy, no). Furniture data distinguishes the two.
+
+**Recolouring.** More expressive than a few tint buttons, while keeping the Minifantasy look coherent: an authored **palette-swap / recolour-channel** approach where the art permits (channels such as wood, metal, cloth, upholstery, trim, banner, accent), with possible tools such as curated palettes, presets, copying colours from another object, apply-to-set, saved schemes, material or style variants, and eyedropper-like workflows. No unrestricted full-sprite RGB tinting that makes the art look broken. Prototype on a small group of real Minifantasy sprites before scaling; the technical approach is open.
+
+**Content at scale.** As many suitable building, furniture and decoration options from the Minifantasy collection as reasonably practical; quantity and variety are wanted here. Candidates are found through the asset catalog CSVs, raw packs stay outside the repository, and only selected, player-usable sprites are imported, but "only selected" does not mean small: a large curated set is right when it is actually usable.
+
+**Growing with the home.** The same architecture later serves the Sanctuary and the Stronghold (Section 6.4): early game, personalize the Sunken Flagon; Act II, the inn grows into a Sanctuary with new areas and furnishing possibilities; Act III, the Stronghold's larger customizable spaces; Act IV, a home that visibly reflects everything the player survived and collected. No separate building system per stage.
+
+### 6.7 Staff and Worker Customization (added in v0.4)
+
+Character customization and attachment are worth practising, so future hired or recruited workers can carry real personalization: a player-entered name, appearance, clothing and clothing colours, accessories, job-related looks and other light touches. Canonical story characters keep their names (Section 2.5) and may allow visual customization where appropriate. Like the protagonist (Section 2.3), worker appearance is limited by the art's layers (A Myriad Of NPCs layers bodies, clothing and hair for idle, walk, damage and death).
+
 ---
 
 ## 7. Progression and Economy
@@ -471,7 +535,7 @@ If the more immersive option is clearly more repetitive, confusing, slow or frus
 
 | Currency | Earned From | Spent On |
 |---|---|---|
-| **Gold** | Service, selling surplus ingredients, gold rooms | Gear, tavern upgrades, recipes, staff wages |
+| **Gold** | Service, selling surplus ingredients, gold rooms | Gear, tavern upgrades, recipes, staff wages, *(v0.4)* furnishings |
 | **Renown** | Customer satisfaction, story | Unlocks tiers of customers, story progress (not spent) |
 | **Delve Marks** | Found in dungeon runs (lost on death if unspent) | Permanent combat unlocks at the "Delver's Board" |
 | **Relics** | Bosses, secrets | Major permanent abilities |
@@ -481,7 +545,7 @@ If the more immersive option is clearly more repetitive, confusing, slow or frus
 - **Combat:** weapon blueprints (added to drop pools), armor, satchel size, preservation tools, Essence Tonics.
 - **Run power-ups:** *(v0.2)* temporary boons chosen one-of-three in power-up rooms; they last for the run.
 - **Relics:** permanent abilities that open shortcuts and hidden rooms. *(v0.2: no longer platforming abilities such as double jump.)*
-- **Tavern:** stations, furniture, seating capacity, decor, new areas.
+- **Tavern:** stations, furniture, seating capacity, decor, new areas. *(v0.4)* Furnishings are bought with Gold or discovered (Section 6.6).
 - **Staff:** hire and train residents; staff skill levels affect auto-complete quality.
 
 ### 7.3 Economy Balance Goals
@@ -511,7 +575,7 @@ All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×
 
 Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD in the dungeon. All text is localized.
 
-*(v0.3)* **Text:** the body font is **Silver**, a pixel font drawn at the game's own pixel size so it sits with the Minifantasy art, with wide language coverage; a decorative title font may follow in 4h. English is written in a lower-case style ("open the doors", "cellar stew", "last orders!"), with proper nouns, resource names (Essence, Gold, Renown) and control labels capitalised; the style lives in the written strings, and other languages follow their own conventions.
+*(v0.3)* **Text:** the body font is **Silver**, a pixel font drawn at the game's own pixel size so it sits with the Minifantasy art, with wide language coverage (our copy has plain single-pixel punctuation, *v0.4*); a decorative title font may follow in 4h. English is written in a lower-case style ("open the doors", "cellar stew", "last orders!"), with proper nouns, resource names (Essence, Gold, Renown) and control labels capitalised; the style lives in the written strings, and other languages follow their own conventions.
 
 *(v0.3)* Dialogue (4g) is presented in uGUI + Super Text Mesh through Dialogue System. Portraits are data-driven: character and NPC data reference a portrait, and the presenter reads it from there, never from a portrait hard-coded into a particular dialogue screen.
 
@@ -630,7 +694,8 @@ Additive scene loading keeps the persistent `Boot` services alive.
 
 ### 10.3 Architecture Overview
 
-- **Data-driven design with ScriptableObjects:** `IngredientDefinition`, `RecipeDefinition`, `EnemyDefinition`, `WeaponDefinition`, `CustomerProfile`, `BiomeDefinition`, `RoomDefinition`, `TavernUpgradeDefinition`, plus haptic patterns.
+- **Data-driven design with ScriptableObjects:** `IngredientDefinition`, `RecipeDefinition`, `EnemyDefinition`, `WeaponDefinition`, `CustomerProfile`, `BiomeDefinition`, `RoomDefinition`, `TavernUpgradeDefinition`, plus haptic patterns. *(v0.4)* Furniture definitions join them in 4f (Section 6.6).
+- *(v0.4)* **Rewards are open-ended.** Run and room rewards, enemy drops and boss rewards are designed so a new reward kind (persistent customization discoveries) can be added without rewriting them: rewards are not assumed to be only ingredients, Gold, Delve Marks, weapons or run power.
 - **Pure logic in plain C#** with EditMode tests: Essence, harvest rules, inventory, freshness, recipes, economy, service session, customer order and patience logic, staff, game flow, saving, pathfinding, haptic intensity mapping. TDE-dependent behaviour gets PlayMode tests.
 - **Game flow:** `GameFlow` drives phases (Prep → Delve → Service → Night) and scene transitions.
 - **Event bus:** a lightweight event bus decouples systems. TDE and MoreMountains events are **bridged onto our bus at the boundary** rather than used throughout our code.
@@ -664,6 +729,7 @@ Additive scene loading keeps the persistent `Boot` services alive.
 | `LevelGenerator` | Builds dungeon floors from room graphs |
 | `HapticService` | Plays named haptic patterns, applies settings, checks device support |
 | `GridPathfinder` | A* on the room's tile grid for customers and enemies |
+| Customization *(planned, 4f)* | Furniture definitions, placed layouts per area, Decorate Mode, layout validation against service needs, palettes; owned and unlocked furnishings |
 
 ### 10.5 Procedural Level Generation
 
@@ -677,7 +743,7 @@ Designer-authored **room prefabs** chosen by a **graph-based generator**, played
 
 ### 10.6 Save Data
 
-Persistent: tavern stage and upgrades, placed furniture, unlocked weapons/relics/recipes, storeroom inventory, currencies, residents, story flags, settings. Run state is saved only at biome transitions to prevent save-scumming (optionally allow a "suspend run" save).
+Persistent: tavern stage and upgrades, placed furniture *(v0.4: each area's layout as placed instances with their variants and palettes, plus owned and unlocked furnishings)*, unlocked weapons/relics/recipes, storeroom inventory, currencies, residents, story flags, settings. Run state is saved only at biome transitions to prevent save-scumming (optionally allow a "suspend run" save).
 
 *(v0.3)* `SaveSystem` stays the authoritative save. When the Pixel Crushers systems arrive, their persistent state joins its save/load lifecycle through adapters: Dialogue System story state as required, Quest Machine quest and objective state, and Love/Hate relationship state when added. An adapter may use the middleware's own serialization internally, but the data lives in Hearthdelve's save file and follows its versioning; there is no separate player-save path.
 
@@ -721,7 +787,7 @@ Assets/
 | **2. Prototype: Tavern** | Prove service is fun | Done as a side-scroller |
 | **3. Loop Prototype** | Prove the halves connect | Done as a side-scroller |
 | **4. Vertical Slice** | Represent final quality, top-down | Biome 1 fully arted + boss, Stage 1 tavern polished, Act I opening story |
-| **5. Production** | Content build-out | Biomes 2–7, all minigames, stronghold stages, full story |
+| **5. Production** | Content build-out | Biomes 2–7, all minigames, stronghold stages, full story; *(v0.4)* the customization catalog, decor drops and boss furnishings, Sanctuary and Stronghold customization, worker customization |
 | **6. Polish and Launch** | Ship | Balance, accessibility, localization, performance, platform certification |
 
 **Phase 4 sub-milestones** *(v0.2)*. Each is planned, approved, built and playtested separately; the web build works at the end of each.
@@ -729,15 +795,15 @@ Assets/
 - **4a Integration and look test:** project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline, one dungeon room and one tavern corner with real art, `docs/ASSET_MAP.md`.
 - **4b Dungeon migration:** Phase 1 and 3 dungeon gameplay rebuilt on TDE, with the dungeon haptics.
 - **4c Tavern and UI migration:** top-down tavern, customer pathing, 2D serving, Grill/Tap/Serving with haptics, all UI in uGUI + STM.
-- **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena.
-- **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.
-- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, furniture and decor placement.
+- **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. *(v0.4)* The reward architecture leaves room for future persistent reward kinds (customization discoveries) without building any.
+- **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. *(v0.4)* Boss rewards are designed so a unique boss furnishing can plug in later.
+- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5.
 - **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later.
 - **4h Menus, options and polish:** settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
 
 ### 11.2 Scope Warning
 
-Two full games in one is ambitious, especially for a small team. Recommended guardrails: keep minigames short and reusable; build a strong, small vertical slice before expanding; consider Early Access with 3–4 biomes and the first two tavern stages, adding later acts in updates.
+Two full games in one is ambitious, especially for a small team. Recommended guardrails: keep minigames short and reusable; build a strong, small vertical slice before expanding; consider Early Access with 3–4 biomes and the first two tavern stages, adding later acts in updates. *(v0.4)* The learning priorities (Section 1.5) deliberately spend more of the budget on customization, cooking, dialogue, NPC interactions and relationships; the guardrails apply most strictly everywhere else.
 
 ---
 
@@ -768,17 +834,34 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 10. **Persistent quests are required,** owned by Quest Machine; ordinary service orders are not quests (Section 2.6) *(2026-10-03)*.
 11. **Persistent relationships with selected characters are required,** kept separate from Renown and Morale (Section 2.7) *(2026-10-03)*.
 12. **`SaveSystem` is the only authoritative save;** middleware state joins it through adapters (Section 10.6) *(2026-10-03)*.
+13. **Learning priorities** shape the content and complexity budget (Section 1.5) *(2026-10-04)*.
+14. **Tavern customization is a major pillar** (pillar 7, Section 6.6): data-driven furniture and layouts, functional furniture included where practical, a large Minifantasy catalog, Gold purchases plus dungeon, boss and story discoveries, one architecture from the inn to the Stronghold *(2026-10-04)*.
+15. **Discoveries never use Satchel slots** (Section 6.6) *(2026-10-04)*.
+16. **Canonical story characters are not renameable;** hired and recruited workers carry full naming and appearance customization (Sections 2.5, 6.7) *(2026-10-04)*.
+17. **Font:** Silver, adapted with plain punctuation (Section 8.2) *(2026-10-04)*.
 
 **Open**
 
 1. **Stronghold defense events:** core feature or post-launch?
 2. **Biome 2 boss:** no fungal boss found in the art yet.
 3. **Audio source:** where SFX and music come from.
-4. **Font:** a pixel font for Super Text Mesh.
+4. ~~**Font:** a pixel font for Super Text Mesh.~~ Decided: Silver (Decided 17).
 5. **Freeform construction:** not planned, but kept possible.
 6. **Patron requests before quests exist** *(v0.3)*: 4f lists "customer requests", but requests for parts or ingredients that persist beyond an evening are now quests (Section 2.6), and Quest Machine arrives in 4g. See `docs/PROGRESS.md`.
 7. **Love/Hate in 4g or later** *(v0.3)*: decided when 4g is planned, depending on whether it has been purchased and suits the vertical slice.
 8. **The multi-stage dish model** *(v0.3)*: how stages are represented and scored, and how intermediate results are held. Decided with the first multi-stage dish (Section 5.4).
+9. **Customization decisions** *(v0.4)*, each to be prototyped or brought back to the owner, not decided silently (Section 6.6):
+   - free placement or grid placement;
+   - whether walls, floors and doors are editable;
+   - whether every functional station can move;
+   - furniture ownership and quantity rules;
+   - duplicate-drop behaviour;
+   - how decor discoveries survive extraction and death (the curio channel or a simpler alternative);
+   - whether boss trophies can be lost;
+   - the palette and recolouring technique (shader or authored variants);
+   - whether furniture carries gameplay stat bonuses;
+   - what relationship effects tavern decor has;
+   - whether any canonical character becomes renameable (a story decision).
 
 ---
 
