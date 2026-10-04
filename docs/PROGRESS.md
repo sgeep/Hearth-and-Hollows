@@ -410,6 +410,13 @@ Decisions (2026-10-03):
 3. Sell out on purpose (choose one dish with little stock) and check service ends once the last diners pay.
 4. Read Results, then press the button for another evening. Also try F4 at Prep, and Close for the night.
 
+**Step 4 playtest fixes (2026-10-03):**
+
+- **The keeper glided in the idle (glancing about) instead of walking.** TDE counts a character as grounded only over a Ground-layer collider, and none of our floors has one, so every TDE character sat in the Falling state and never reached Walking, which the sprite animator plays the walk from. This was true in the dungeon too (the player and the spider), hidden by attacks and dodges. New `FloorController2D` (a subclass of TDE's 2D controller, in our assembly) is grounded everywhere except over a hole; the generators add it, and *Hearthdelve → Setup → Upgrade Character Controllers* converted the seven existing prefabs in place (only the script reference changes). The idle still has the art's occasional glance while standing still; customers and Pip use the same idle.
+- **The kitchen drew over the keeper in front of it.** The kitchen is one sprite sorted at the bottom of its frame; the range's footprint started 3 px up but the oven's 10 px up, so in front of the oven the keeper could stand inside the sort point. Both footprints now start 3 px up, on a tile edge (so pathfinding keeps the row in front open); every character's collider is at least 0.4 tiles tall, so anyone stopped in front draws in front. The furniture test now walks up to every footprint of a piece, not only the lowest.
+- **A released stick stepped menus back.** The stick springs back slightly past centre, and the UI's Navigate action read that overshoot as a press the other way. The left stick's Navigate binding now has a 0.5 dead zone (menus only; walking and aiming are unchanged). Gamepad tests with a virtual pad cover the walk animation and the spring-back.
+- Builder fix: the stew pot's progress bar was also named "Bar", and an update could find it instead of the bar; it's now "Progress", and the builder finds the bar by path.
+
 **Next: step 5,** Boot, Main Menu, Morning and Night, the delve integration and saves (F8, F9). After your review and playtest of step 4.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
