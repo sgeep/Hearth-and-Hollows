@@ -5,7 +5,7 @@ The list of credits the shipped game must show, kept up to date as assets are ad
 ## Required by license
 
 - **Art:** Minifantasy by **Krishna Palacio**. Required credit. On completion, send Krishna Palacio a link to the game.
-- **Font:** m5x7 by **Daniel Linssen** (managore). Credit him; confirm the exact license terms from the page the font came from (not recorded yet).
+- **Font:** Silver by **Poppy Works** (2019). Credit them; confirm the exact license terms from the page the font came from (not recorded yet).
 
 ## Tools and middleware (courtesy credits)
 

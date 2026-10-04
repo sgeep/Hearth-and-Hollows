@@ -16,8 +16,8 @@ using UnityEngine.SceneManagement;
 namespace Hearthdelve.Tests
 {
     /// <summary>
-    /// The game's text (4c step 6): m5x7 can draw every string in every locale (a glyph check against the font itself,
-    /// replacing the old Latin-1 rule), English is written in Hearthdelve's lower-case style by its authors (not
+    /// The game's text (4c step 6): the game font (Silver) can draw every string in every locale (a glyph check against
+    /// the font itself, replacing the old Latin-1 rule), English is written in Hearthdelve's lower-case style by its authors (not
     /// converted at runtime), and the scenes' text and canvases are set up to draw the pixel font crisply.
     /// </summary>
     public class TextStyleTests
@@ -38,27 +38,29 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void TheGameFont_IsM5x7_ImportedAsAPixelFont_WithNoFallbackFonts()
+        public void TheGameFont_IsSilver_ImportedAsAPixelFont_WithNoFallbackFonts()
         {
             Assert.That(Font, Is.Not.Null, GameFonts.FontPath);
             var importer = (TrueTypeFontImporter)AssetImporter.GetAtPath(GameFonts.FontPath);
             Assert.That(importer.fontRenderingMode, Is.EqualTo(FontRenderingMode.HintedRaster));
             Assert.That(importer.fontSize, Is.EqualTo(GameFonts.Native));
             Assert.That(importer.includeFontData, "the font travels with the build (no system font on the web)");
-            Assert.That(importer.fontNames, Is.EqualTo(new[] { "m5x7" }), "no other font names to fall back to");
+            Assert.That(importer.fontNames, Is.EqualTo(new[] { GameFonts.FontName }), "no other font names to fall back to");
             Assert.That(importer.fontReferences, Is.Empty, "no fallback font references");
-            Assert.That(Directory.GetFiles("Assets", "m5x7*.ttf", SearchOption.AllDirectories), Has.Length.EqualTo(1), "one copy of the font");
+            Assert.That(Directory.GetFiles("Assets/_Project/Fonts", "*.ttf", SearchOption.AllDirectories).Select(f => f.Replace(Path.DirectorySeparatorChar, '/')), Is.EqualTo(new[] { GameFonts.FontPath }),
+                "one game font, one copy (m5x7 is gone)");
         }
 
         /// <summary>
-        /// m5x7 covers Basic Latin, Latin-1 (less the soft hyphen), Latin Extended-A and €: English and most European
-        /// languages. Nothing else may appear in a string, in any locale, or it would draw as nothing (the web build has no
-        /// system fonts to fall back on). A language the font can't draw needs a font decision, not a quiet fallback.
+        /// Every character in every string, in every locale, must be one the game font has: there is deliberately no
+        /// fallback font (the web build has no system fonts), so a missing glyph would draw as nothing. Silver covers a
+        /// great deal (Latin, Greek, Cyrillic, Japanese, Chinese, Korean, Thai and more), but the check is against the
+        /// font itself, not a list.
         /// </summary>
         [Test]
-        public void EveryString_InEveryLocale_IsDrawableInM5x7()
+        public void EveryString_InEveryLocale_IsDrawableInTheGameFont()
         {
-            Assert.That(Font.HasCharacter('a') && Font.HasCharacter('ž'), "the font's coverage can be read");
+            Assert.That(Font.HasCharacter('a') && Font.HasCharacter('ž') && Font.HasCharacter('Ж'), "the font's coverage can be read");
             var missing = new List<string>();
             foreach (var (where, text) in TableStrings().Concat(CodeEnglish.Select(e => ($"code/{e.key}", e.text))))
             foreach (char c in text)
@@ -67,10 +69,11 @@ namespace Hearthdelve.Tests
             Assert.That(missing, Is.Empty, string.Join("\n", missing.Distinct()));
         }
 
-        /// <summary>Words that keep a capital in English: proper nouns and control labels (CLAUDE.md, Localization).</summary>
+        /// <summary>Words that keep a capital in English: proper nouns, resource names and control labels (CLAUDE.md, Localization).</summary>
         static readonly HashSet<string> k_Capitalised = new()
         {
             "Hearthdelve", "Pip", "Cellars",
+            "Essence", "Gold", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };
 
@@ -103,6 +106,9 @@ namespace Hearthdelve.Tests
             Assert.That(english["ingredient.spider_leg"], Is.EqualTo("spider leg"));
             Assert.That(english["staff.pip"], Is.EqualTo("Pip"), "a proper noun keeps its capital");
             Assert.That(english[LoopLocKeys.MenuTitle], Is.EqualTo("Hearthdelve"));
+            Assert.That(english[TavernLocKeys.PrepValue], Is.EqualTo("{0} Gold"), "resource names are capitalised");
+            Assert.That(english[LoopLocKeys.BuffMaxEssence], Is.EqualTo("+{0} max Essence"));
+            Assert.That(english[TavernLocKeys.GrillPrompt], Does.Contain("gold band"), "gold the colour isn't the resource");
             Assert.That(english[TavernLocKeys.TavernControls], Does.Contain("WASD").And.Contain("E / A"), "control labels keep their casing");
         }
 
@@ -127,9 +133,9 @@ namespace Hearthdelve.Tests
             Assert.That(PixelScale.For(200, 100), Is.EqualTo(1), "at least one");
         }
 
-        /// <summary>Every text in the day loop's scenes draws m5x7 at a pixel size, and every canvas scales by whole pixels.</summary>
+        /// <summary>Every text in the day loop's scenes draws the game font at a pixel size, and every canvas scales by whole pixels.</summary>
         [Test]
-        public void TheDayLoopsScenes_DrawEveryTextInM5x7_OnWholePixels()
+        public void TheDayLoopsScenes_DrawEveryTextInTheGameFont_OnWholePixels()
         {
             string[] scenes = { EditorPaths.TavernScene, EditorPaths.TestFloorScene, BootBuilder.BootScene, BootBuilder.MainMenuScene };
             var problems = new List<string>();

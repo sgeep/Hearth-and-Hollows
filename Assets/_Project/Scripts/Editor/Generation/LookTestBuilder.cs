@@ -459,7 +459,7 @@ namespace Hearthdelve.Editor
             text.autoWrap = rect.rect.width;
             Material material = TextMaterial();
             if (material != null) text.textMaterial = material;
-            // m5x7 at its pixel size (the requested size snaps to 1× or 2×).
+            // The game font at its pixel size (the requested size snaps to 1× or 2×).
             GameFonts.Apply(text, size >= GameFonts.LargeRequest);
 
             var localized = go.AddComponent<LocalizedSuperText>();

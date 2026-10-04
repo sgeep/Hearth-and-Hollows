@@ -8,46 +8,47 @@ using UnityEngine.UI;
 namespace Hearthdelve.Editor
 {
     /// <summary>
-    /// The game's text font (locked 2026-10-03): <b>m5x7</b> by Daniel Linssen, a pixel font drawn on a 16-unit em.
-    /// Imported as hinted raster at 16 and rasterised by Super Text Mesh at 16 (one font pixel per texel), point
-    /// filtered so its pixels stay square: at size 16 one font pixel is one game pixel at 320×180 (measured in
-    /// captures). Any other size drops or doubles pixel rows, so text is only ever <see cref="Body"/> (1×) or
-    /// <see cref="Large"/> (2×).
+    /// The game's text font: <b>Silver</b> by Poppy Works (chosen 2026-10-03, replacing m5x7), a pixel font on a
+    /// 1900-unit em whose pixels are 100 units, so it is pixel-exact at size 19 (one font pixel per game pixel at
+    /// 320×180) and at 38. Capitals and ascenders are 9 pixels, descenders 2. Imported as hinted raster at 19 and
+    /// rasterised by Super Text Mesh at 19, point filtered, on a 12-pixel line. Any other size drops or doubles pixel
+    /// rows, so text is only ever <see cref="Body"/> (1×) or <see cref="Large"/> (2×).
     /// </summary>
     public static class GameFonts
     {
-        public const string FontPath = "Assets/_Project/Fonts/m5x7/m5x7.ttf";
-        /// <summary>The font's native pixel size.</summary>
-        public const int Native = 16;
+        public const string FontPath = "Assets/_Project/Fonts/silver/Silver.ttf";
+        public const string FontName = "Silver";
+        /// <summary>The font's native pixel size (its em in pixels).</summary>
+        public const int Native = 19;
         public const float Body = Native;
         public const float Large = Native * 2;
+        /// <summary>A line in game pixels: 9-pixel capitals, 2-pixel descenders and a pixel between lines.</summary>
+        public const int LinePixels = 12;
+        /// <summary>Super Text Mesh's line height is the size times this.</summary>
+        public const float LineSpacing = (float)LinePixels / Native;
         /// <summary>
-        /// A line is 10 game pixels (7-pixel capitals, 2-pixel descenders, a pixel between lines); Super Text Mesh's
-        /// line height is the size times this. The font's own metrics would give 16 and sit text low in its box.
+        /// Super Text Mesh drops the first line by the full size (19), not the spaced line: lifting every glyph by 9/19 of
+        /// the size puts the first baseline 10 pixels under the box's top (capitals a pixel below it, descenders to its
+        /// line's bottom), like the lines after it.
         /// </summary>
-        public const float LineSpacing = 0.625f;
-        /// <summary>
-        /// Super Text Mesh drops the first line by the full size (16), not the spaced line (10): lifting every glyph by
-        /// 6/16 of the size puts the first baseline 10 pixels under the box's top, like the lines after it (measured).
-        /// </summary>
-        public const float BaseLift = 6f / Native;
+        public const float BaseLift = (float)(Native - 10) / Native;
 
         public static Font Load() => AssetDatabase.LoadAssetAtPath<Font>(FontPath);
 
-        /// <summary>Imports m5x7 as a pixel font: hinted raster at its native size, its own data only (no OS fallback names).</summary>
+        /// <summary>Imports the font as a pixel font: hinted raster at its native size, its own data only (no OS fallback names).</summary>
         public static void ConfigureImporter()
         {
             if (AssetImporter.GetAtPath(FontPath) is not TrueTypeFontImporter importer) return;
             bool changed = importer.fontSize != Native || importer.fontRenderingMode != FontRenderingMode.HintedRaster
                 || importer.fontTextureCase != FontTextureCase.Dynamic || !importer.includeFontData
-                || importer.fontNames == null || importer.fontNames.Length != 1 || importer.fontNames[0] != "m5x7"
+                || importer.fontNames == null || importer.fontNames.Length != 1 || importer.fontNames[0] != FontName
                 || (importer.fontReferences != null && importer.fontReferences.Length > 0);
             if (!changed) return;
             importer.fontSize = Native;
             importer.fontRenderingMode = FontRenderingMode.HintedRaster;
             importer.fontTextureCase = FontTextureCase.Dynamic;
             importer.includeFontData = true;
-            importer.fontNames = new[] { "m5x7" };
+            importer.fontNames = new[] { FontName };
             importer.fontReferences = new Font[0];
             importer.SaveAndReimport();
         }
@@ -59,7 +60,7 @@ namespace Hearthdelve.Editor
         static bool IsLarge(SuperTextMesh text) =>
             text.name == "Caption" || (text.name == "Title" && text.transform.parent != null && text.transform.parent.name == "Menu");
 
-        /// <summary>Sets a text up to draw m5x7 crisply, at body (1×) or large (2×) size.</summary>
+        /// <summary>Sets a text up to draw the font crisply, at body (1×) or large (2×) size.</summary>
         public static void Apply(SuperTextMesh text, bool large)
         {
             Font font = Load();
@@ -76,7 +77,7 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
-        /// The open scene's text and canvases, in place: every Super Text Mesh gets m5x7, and every screen-space canvas
+        /// The open scene's text and canvases, in place: every Super Text Mesh gets the font, and every screen-space canvas
         /// scales by whole pixels. For text built before the font (screens that are rebuilt get it as they're built).
         /// </summary>
         public static void ApplyToOpenScene()

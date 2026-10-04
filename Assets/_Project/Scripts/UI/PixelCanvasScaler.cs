@@ -6,7 +6,7 @@ namespace Hearthdelve.UI
 {
     /// <summary>
     /// Scales a screen-space canvas by whole pixels (<see cref="PixelScale"/>), like the Pixel Perfect Camera zooms the
-    /// world: one canvas unit is one game pixel, and always a whole number of screen pixels, so m5x7 and the UI sprites
+    /// world: one canvas unit is one game pixel, and always a whole number of screen pixels, so the pixel font and the UI sprites
     /// stay crisp at any window size. Replaces the scaler's stretch-to-height mode.
     /// </summary>
     [RequireComponent(typeof(CanvasScaler))]
