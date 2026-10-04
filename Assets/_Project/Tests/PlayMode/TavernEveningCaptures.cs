@@ -56,18 +56,21 @@ namespace Hearthdelve.Tests.PlayMode
             Capture("BatchLogs/tavern_results.png");
         }
 
-        static void Capture(string output)
+        /// <summary>Renders the main camera and every screen-space canvas (each over the world, in its own order) at 320×180.</summary>
+        internal static void Capture(string output)
         {
-            Canvas canvas = Object.FindObjectsByType<Canvas>().First(c => c.name == "UI");
-            RenderMode mode = canvas.renderMode;
             Camera camera = Camera.main;
-            canvas.renderMode = RenderMode.ScreenSpaceCamera;
-            canvas.worldCamera = camera;
-            canvas.planeDistance = 1f;
-            string layer = canvas.sortingLayerName;
-            int order = canvas.sortingOrder;
-            canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
-            canvas.sortingOrder = 100;
+            var canvases = Object.FindObjectsByType<Canvas>().Where(c => c.isRootCanvas && c.renderMode == RenderMode.ScreenSpaceOverlay).ToArray();
+            var saved = canvases.Select(c => (c, c.sortingLayerName, c.sortingOrder)).ToArray();
+            foreach (Canvas canvas in canvases)
+            {
+                int order = canvas.sortingOrder;
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = camera;
+                canvas.planeDistance = 1f;
+                canvas.sortingLayerName = Hearthdelve.Core.SortingLayers.Above;
+                canvas.sortingOrder = 100 + order;
+            }
             var target = new RenderTexture(320, 180, 24) { filterMode = FilterMode.Point };
             camera.targetTexture = target;
             foreach (var scaler in Object.FindObjectsByType<UnityEngine.UI.CanvasScaler>())
@@ -85,9 +88,12 @@ namespace Hearthdelve.Tests.PlayMode
             RenderTexture.active = null;
             camera.targetTexture = null;
             target.Release();
-            canvas.renderMode = mode;
-            canvas.sortingLayerName = layer;
-            canvas.sortingOrder = order;
+            foreach (var (canvas, layer, order) in saved)
+            {
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingLayerName = layer;
+                canvas.sortingOrder = order;
+            }
         }
     }
 }

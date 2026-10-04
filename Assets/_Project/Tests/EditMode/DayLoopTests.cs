@@ -344,6 +344,28 @@ namespace Hearthdelve.Tests
             Assert.That(json, Does.Contain("\"rat_haunch\""), "content is saved by id");
         }
 
+        /// <summary>Saving and loading again and again (each night, each purchase, each Continue) never duplicates or loses the haul.</summary>
+        [Test]
+        public void RepeatedRoundTrips_NeitherDuplicateNorLoseTheHaul()
+        {
+            var state = new GameState();
+            DayRules.StartDelve(state);
+            var satchel = new Satchel(6, 3);
+            satchel.Add(new IngredientItem(Haunch, Quality.Standard), 3);
+            satchel.Add(new IngredientItem(Gel, Quality.Fine), 2);
+            DayRules.CompleteDelve(state, DelveReport.Extraction(satchel));
+            DayRules.CompleteService(state, new ServiceReport(1, 12, 3, 1, 0));
+
+            GameState loaded = state;
+            for (int i = 0; i < 3; i++)
+                loaded = SaveSystem.Restore(SaveSystem.FromJson(SaveSystem.ToJson(SaveSystem.Capture(loaded))), Lookup, KnownUpgrade);
+
+            Assert.That(loaded.Storeroom.TotalCount, Is.EqualTo(5));
+            Assert.That(loaded.Storeroom.Stacks.Count(s => !s.IsEmpty), Is.EqualTo(2), "stacks stay merged as they were");
+            Assert.That(loaded.Gold, Is.EqualTo(15));
+            Assert.That((loaded.Day, loaded.Phase), Is.EqualTo((1, DayPhase.Night)));
+        }
+
         [Test]
         public void RoundTrip_KeepsAnUneatenBreakfastBuff()
         {
