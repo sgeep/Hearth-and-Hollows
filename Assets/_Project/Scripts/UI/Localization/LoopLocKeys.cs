@@ -146,7 +146,7 @@ namespace Hearthdelve.UI.Localization
             (BonusDrain, "drain -{0}%"),
             (BonusJoin, "{0} · {1}"),
             (MorningCookAt, "cook at the {0}"),
-            (TransitionDelve, "closing time · down to the Cellars"),
+            (TransitionDelve, "closing time · the Cellars"),
             (TransitionEvening, "evening · day {0}"),
             (MenuContinueFrom, "day {0}, {1}"),
             (PhaseMorning, "daytime"),

@@ -180,8 +180,10 @@ namespace Hearthdelve.UI.Tavern
             };
             for (int i = 0; i < m_Summary.Length; i++)
             {
-                // Unrecorded: the day (0-2) and tonight's takings (3) are unknown.
-                bool has = i < lines.Length && (recorded || i >= 4);
+                // What a save resumed mid-day doesn't know: the evening (0) if the game was loaded after it, the delve (1-2)
+                // if loaded after that too, and today's takings (3) unless both were played. The purse and Renown always.
+                bool evening = today.EveningRecorded;
+                bool has = i < lines.Length && (i switch { 0 => evening, 1 or 2 => recorded, 3 => evening && recorded, _ => true });
                 m_Summary[i].gameObject.SetActive(has);
                 if (i < m_SummaryLabels.Length) m_SummaryLabels[i].gameObject.SetActive(has);
                 if (!has) continue;

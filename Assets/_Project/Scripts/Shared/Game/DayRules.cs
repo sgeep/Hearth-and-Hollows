@@ -117,6 +117,7 @@ namespace Hearthdelve.Shared.Game
             state.Today.Tips += report.Tips;
             state.Today.Walkouts += report.Walkouts;
             state.Today.RenownChange += report.RenownChange;
+            state.Today.EveningRecorded = true;
             state.Cycle.AdvanceTo(DayPhase.Delve);
         }
 
@@ -125,6 +126,7 @@ namespace Hearthdelve.Shared.Game
         {
             Require(state, DayPhase.Evening);
             state.Today.KeptShut = true;
+            state.Today.EveningRecorded = true;
             state.Cycle.AdvanceTo(DayPhase.Delve);
         }
 

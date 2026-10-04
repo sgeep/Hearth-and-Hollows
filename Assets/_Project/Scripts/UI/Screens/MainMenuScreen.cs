@@ -58,7 +58,7 @@ namespace Hearthdelve.UI.Screens
             // The gap between Continue and New Game goes with them.
             Transform gap = m_Choices.transform.Find("Gap");
             if (gap != null) gap.gameObject.SetActive(m_HasSave);
-            if (m_HasSave) m_ContinueDetail.Set(LoopLocKeys.MenuContinueFrom, save.day, Loc.UI(PhaseKey(save.phase)));
+            if (m_HasSave) StartCoroutine(ShowSave(save));
             m_Continue.onClick.AddListener(() => m_Flow.Continue());
             m_NewGame.onClick.AddListener(NewGame);
             m_ConfirmYes.onClick.AddListener(() => m_Flow.NewGame());
@@ -89,6 +89,16 @@ namespace Hearthdelve.UI.Screens
         static void Select(Button button)
         {
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(button.gameObject);
+        }
+
+        /// <summary>
+        /// "day 3, daytime". The phase word is looked up as an argument, so it waits for the string tables: on the web they
+        /// load asynchronously, and a lookup before then freezes the raw key into the line (found in the 4d web smoke test).
+        /// </summary>
+        System.Collections.IEnumerator ShowSave(SaveData save)
+        {
+            while (!Loc.IsReady) yield return null;
+            m_ContinueDetail.Set(LoopLocKeys.MenuContinueFrom, save.day, Loc.UI(PhaseKey(save.phase)));
         }
 
         static string PhaseKey(string phase) => phase switch

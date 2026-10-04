@@ -81,6 +81,8 @@ namespace Hearthdelve.Shared.Game
         public int RenownChange;
         /// <summary>The tavern stayed shut this evening.</summary>
         public bool KeptShut;
+        /// <summary>This evening was played since the game was loaded (the save doesn't keep the day's story).</summary>
+        public bool EveningRecorded;
         /// <summary>Run Gold the delve brought home, and run Gold it lost.</summary>
         public int DelveGold;
         public int DelveGoldLost;
@@ -92,7 +94,7 @@ namespace Hearthdelve.Shared.Game
         {
             Delve = DelveOutcome.None;
             PartsBroughtBack = PartsLost = DishesServed = Gold = Tips = Walkouts = RenownChange = DelveGold = DelveGoldLost = 0;
-            KeptShut = false;
+            KeptShut = EveningRecorded = false;
         }
     }
 
