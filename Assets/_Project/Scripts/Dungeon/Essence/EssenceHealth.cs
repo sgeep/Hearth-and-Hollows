@@ -18,6 +18,8 @@ namespace Hearthdelve.Dungeon.Essence
     {
         [Header("Essence")]
         [SerializeField] EssenceConfig m_Config;
+        [SerializeField, Tooltip("Debug, for playtesting: no drain and no damage. Tick it while playing.")]
+        bool m_GodMode;
 
         EssenceMeter m_Meter;
         bool m_Dying;
@@ -27,7 +29,11 @@ namespace Hearthdelve.Dungeon.Essence
         public EssenceConfig Config => m_Config;
 
         /// <summary>Debug: no drain and no damage.</summary>
-        public bool GodMode { get; set; }
+        public bool GodMode
+        {
+            get => m_GodMode;
+            set => m_GodMode = value;
+        }
 
         /// <summary>Stops the time drain (menus, safe rooms). Damage still applies.</summary>
         public bool DrainPaused
