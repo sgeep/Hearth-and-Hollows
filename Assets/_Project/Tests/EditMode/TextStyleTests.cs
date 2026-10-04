@@ -97,7 +97,7 @@ namespace Hearthdelve.Tests
         {
             var english = CodeEnglish.ToDictionary(e => e.key, e => e.text);
             Assert.That(english[TavernLocKeys.PrepOpen], Is.EqualTo("open the doors"));
-            Assert.That(english[LoopLocKeys.PrepClose], Is.EqualTo("close for the night"));
+            Assert.That(english[LoopLocKeys.PrepClose], Is.EqualTo("stay shut tonight"));
             Assert.That(english[TavernLocKeys.HudLastOrders], Is.EqualTo("last orders!"));
             Assert.That(english[TavernLocKeys.TicketReady], Is.EqualTo("ready"));
             Assert.That(english[TavernLocKeys.TicketStewWaiting], Is.EqualTo("stewing"));

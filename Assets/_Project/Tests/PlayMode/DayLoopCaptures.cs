@@ -49,7 +49,7 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/day_menu.png");
 
             Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Morning, 30f, "morning");
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime, 30f, "morning");
             IngredientDefinition leg = Flow.Database.Ingredient("spider_leg");
             Flow.State.Storeroom.Add(new IngredientStack(new IngredientItem(leg, Quality.Fine), 2, 0.9f));
             Flow.State.Storeroom.Add(new IngredientStack(new IngredientItem(Flow.Database.Ingredient("slime_gel"), Quality.Standard), 3, 0.7f));
@@ -62,18 +62,23 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(0.2f);
             TavernEveningCaptures.Capture("BatchLogs/day_morning_ate.png");
 
+            // The evening, kept shut; the way down; the delve result; the night.
             morning.DescendButton.onClick.Invoke();
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "evening");
+            yield return new WaitForSeconds(0.6f);
+            TavernEveningCaptures.Capture("BatchLogs/day_evening.png");
+            Director.CloseForTheNight();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance && LevelManager.Instance.Players.Count > 0, 30f, "the delve");
             yield return null;
             FreezeEnemies();
+            DelveRunController.Active.Loot.AddGold(24);
             var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
             DelveRunController.Active.Extract();
             yield return WaitUntil(() => result.IsOpen, 5f, "result");
+            yield return new WaitForSecondsRealtime(0.5f);
+            TavernEveningCaptures.Capture("BatchLogs/day_delve_result.png");
             result.Proceed();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "evening");
-            Director.CloseForTheNight();
-            yield return null;
-            yield return null;
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "night");
             TavernEveningCaptures.Capture("BatchLogs/day_nightfall.png");
             Flow.DebugAddGold(120);
             yield return new WaitForSeconds(2.5f);

@@ -18,25 +18,25 @@ namespace Hearthdelve.Tests
     public class DayCycleTests
     {
         [Test]
-        public void StartsOnDayOneMorning_AndRunsThePhasesInOrder()
+        public void StartsOnDayOneDaytime_AndRunsTheNewOrder_TavernBeforeTheDungeon()
         {
             var c = new DayCycle();
-            Assert.That((c.Day, c.Phase), Is.EqualTo((1, DayPhase.Morning)));
-            c.AdvanceTo(DayPhase.Delve);
+            Assert.That((c.Day, c.Phase), Is.EqualTo((1, DayPhase.Daytime)));
             c.AdvanceTo(DayPhase.Evening);
+            c.AdvanceTo(DayPhase.Delve);
             c.AdvanceTo(DayPhase.Night);
             Assert.That(c.Day, Is.EqualTo(1));
-            c.AdvanceTo(DayPhase.Morning);
-            Assert.That((c.Day, c.Phase), Is.EqualTo((2, DayPhase.Morning)), "sleeping starts a new day");
+            c.AdvanceTo(DayPhase.Daytime);
+            Assert.That((c.Day, c.Phase), Is.EqualTo((2, DayPhase.Daytime)), "sleeping starts a new day");
         }
 
         [Test]
         public void SkippingAPhase_Throws_AndChangesNothing()
         {
             var c = new DayCycle();
-            Assert.Throws<InvalidOperationException>(() => c.AdvanceTo(DayPhase.Evening));
-            Assert.Throws<InvalidOperationException>(() => c.AdvanceTo(DayPhase.Morning));
-            Assert.That((c.Day, c.Phase), Is.EqualTo((1, DayPhase.Morning)));
+            Assert.Throws<InvalidOperationException>(() => c.AdvanceTo(DayPhase.Delve), "no delve before the evening");
+            Assert.Throws<InvalidOperationException>(() => c.AdvanceTo(DayPhase.Daytime));
+            Assert.That((c.Day, c.Phase), Is.EqualTo((1, DayPhase.Daytime)));
         }
 
         [Test]
@@ -46,8 +46,20 @@ namespace Hearthdelve.Tests
             (DayPhase from, DayPhase to)? seen = null;
             c.Changed += (from, to) => seen = (from, to);
             c.Advance();
-            Assert.That(seen, Is.EqualTo((DayPhase.Night, DayPhase.Morning)));
+            Assert.That(seen, Is.EqualTo((DayPhase.Night, DayPhase.Daytime)));
             Assert.That(c.Day, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void SavedPhases_ParseByName_AndTheOldMorningIsDaytime()
+        {
+            Assert.That(DayCycle.Parse("Morning"), Is.EqualTo(DayPhase.Daytime), "saves from before the v0.5 day order");
+            Assert.That(DayCycle.Parse("Evening"), Is.EqualTo(DayPhase.Evening));
+            Assert.That(DayCycle.Parse("Delve"), Is.EqualTo(DayPhase.Delve));
+            Assert.That(DayCycle.Parse("Night"), Is.EqualTo(DayPhase.Night));
+            Assert.That(DayCycle.Parse("Breakfast"), Is.EqualTo(DayPhase.Daytime), "unknown: the day's start");
+            Assert.That(DayCycle.Parse("7"), Is.EqualTo(DayPhase.Daytime));
+            Assert.That(DayCycle.Parse(null), Is.EqualTo(DayPhase.Daytime));
         }
     }
 
@@ -96,7 +108,7 @@ namespace Hearthdelve.Tests
             var satchel = Haul();
             DayRules.CompleteDelve(state, DelveReport.Extraction(satchel));
 
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Evening));
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Night), "home from the night's delve");
             Assert.That(state.Storeroom.TotalCount, Is.EqualTo(5));
             var haunch = state.Storeroom.Stacks.Single(s => s.Item.Definition == Haunch);
             Assert.That(haunch.Freshness, Is.EqualTo(0.9f).Within(1e-5f));
@@ -113,7 +125,7 @@ namespace Hearthdelve.Tests
             var result = DeathPenalty.Resolve(satchel, keepSlotIndex: 1, runCurrency: 0);
             DayRules.CompleteDelve(state, DelveReport.Death(result));
 
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Evening), "a bad delve means a lean night, not a lost day");
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Night), "a bad delve means a lean tomorrow, not a lost day");
             Assert.That(state.Storeroom.CountMatching(i => i.Definition == Gel), Is.EqualTo(2), "the kept stack");
             Assert.That(state.Storeroom.CountMatching(i => i.Definition == Haunch), Is.Zero);
             Assert.That(state.Storeroom.CountMatching(i => i.Definition == Cap), Is.EqualTo(1), "stock already home is untouched");
@@ -122,13 +134,13 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void Death_KeepingNothing_StillEndsInTheEvening()
+        public void Death_KeepingNothing_StillEndsInTheNight()
         {
             var state = At(DayPhase.Delve);
             var result = DeathPenalty.Resolve(Haul(), DeathPenalty.KeepNothing, 0);
             DayRules.CompleteDelve(state, DelveReport.Death(result));
             Assert.That(state.Storeroom.TotalCount, Is.Zero);
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Evening));
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Night));
         }
 
         [Test]
@@ -172,13 +184,13 @@ namespace Hearthdelve.Tests
         // ---------- Service, night ----------
 
         [Test]
-        public void Service_BanksPaymentsAndTips_ChangesRenown_AndMovesToNight()
+        public void Service_BanksPaymentsAndTips_ChangesRenown_AndTheDelveIsNext()
         {
             var state = At(DayPhase.Evening);
             DayRules.CompleteService(state, new ServiceReport(dishesServed: 6, gold: 70, tips: 15, renownChange: 4, walkouts: 1));
             Assert.That(state.Gold, Is.EqualTo(85));
             Assert.That(state.Renown, Is.EqualTo(4));
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Night));
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Delve));
             Assert.That(state.Today.DishesServed, Is.EqualTo(6));
             Assert.That(state.Today.Earned, Is.EqualTo(85));
         }
@@ -190,16 +202,42 @@ namespace Hearthdelve.Tests
             Assert.Throws<InvalidOperationException>(() => DayRules.CompleteService(state, default));
             Assert.Throws<InvalidOperationException>(() => DayRules.CompleteDelve(state, DelveReport.Empty));
             Assert.Throws<InvalidOperationException>(() => DayRules.Sleep(state, FreshnessSettings.Default));
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Morning));
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Daytime));
         }
 
         [Test]
-        public void ClosingWithoutService_GoesStraightToNight()
+        public void StayingShut_GoesStraightToTheDelve_AndIsRemembered()
         {
             var state = At(DayPhase.Evening);
             DayRules.SkipService(state);
-            Assert.That(state.Phase, Is.EqualTo(DayPhase.Night));
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Delve));
             Assert.That(state.Gold, Is.Zero);
+            Assert.That(state.Today.KeptShut, "the night's summary says so");
+        }
+
+        [Test]
+        public void TheDaytime_OpensTheEvening_AndNothingElse()
+        {
+            var state = new GameState();
+            Assert.Throws<InvalidOperationException>(() => DayRules.CompleteService(state, default), "no service before the evening");
+            DayRules.StartEvening(state);
+            Assert.That(state.Phase, Is.EqualTo(DayPhase.Evening));
+            Assert.Throws<InvalidOperationException>(() => DayRules.StartEvening(state));
+        }
+
+        [Test]
+        public void TodaysBankedTotal_IncludesTheDelvesGold_AndSleepClearsIt()
+        {
+            var state = At(DayPhase.Evening);
+            DayRules.CompleteService(state, new ServiceReport(2, 30, 5, 1, 0));
+            DayRules.CompleteDelve(state, DelveReport.Extraction(Haul(), runGold: 20));
+            Assert.That(state.Today.DelveGold, Is.EqualTo(20));
+            Assert.That(state.Today.Earned, Is.EqualTo(55));
+            Assert.That(state.Gold, Is.EqualTo(55));
+            DayRules.Sleep(state, FreshnessSettings.Default);
+            Assert.That(state.Today.Earned, Is.Zero);
+            Assert.That(state.Today.KeptShut, Is.False);
+            Assert.That(state.Gold, Is.EqualTo(55), "banked Gold stays");
         }
 
         [Test]
@@ -212,7 +250,7 @@ namespace Hearthdelve.Tests
             var f = FreshnessSettings.Default;
             DayRules.Sleep(state, f);
 
-            Assert.That((state.Day, state.Phase), Is.EqualTo((2, DayPhase.Morning)));
+            Assert.That((state.Day, state.Phase), Is.EqualTo((2, DayPhase.Daytime)));
             Assert.That(state.Storeroom.Stacks.Single(s => s.Item.Definition == Haunch).Freshness, Is.EqualTo(0.9f - f.overnightLoss).Within(1e-5f));
             Assert.That(state.Storeroom.Stacks.Single(s => s.Item.Definition == Gel).Freshness,
                 Is.EqualTo(0.9f - f.overnightLoss * f.chilledMultiplier).Within(1e-5f), "Chilled keeps better");
@@ -299,9 +337,9 @@ namespace Hearthdelve.Tests
             Assert.That(e.Seats, Is.Zero);
         }
 
-        // ---------- Breakfast ----------
+        // ---------- The delve meal ----------
 
-        RecipeDefinition Breakfast(MealBuffKind kind, float amount)
+        RecipeDefinition DelveMeal(MealBuffKind kind, float amount)
         {
             var r = Recipe("grilled_haunch", 12, FlavorTags.Savory, Needs(Haunch));
             r.mealBuff = new MealBuffSettings { kind = kind, amount = amount };
@@ -311,37 +349,40 @@ namespace Hearthdelve.Tests
         [Test]
         public void MealBuff_ScalesWithDishQuality_UpToACap()
         {
-            var r = Breakfast(MealBuffKind.MaxEssence, 20f);
+            var r = DelveMeal(MealBuffKind.MaxEssence, 20f);
             Assert.That(MealBuff.FromDish(r, 1f).Amount, Is.EqualTo(20f));
             Assert.That(MealBuff.FromDish(r, 0.5f).Amount, Is.EqualTo(10f));
             Assert.That(MealBuff.FromDish(r, 3f).Amount, Is.EqualTo(20f * MealBuff.MaxQualityScale));
-            Assert.That(MealBuff.FromDish(Breakfast(MealBuffKind.None, 20f), 1f).IsActive, Is.False, "no buff: not a breakfast");
+            Assert.That(MealBuff.FromDish(DelveMeal(MealBuffKind.None, 20f), 1f).IsActive, Is.False, "no buff: not a delve meal");
         }
 
         [Test]
-        public void Loadout_CombinesUpgradesAndBreakfast()
+        public void Loadout_CombinesUpgradesAndTheDelveMeal()
         {
             var up = new UpgradeEffects { SatchelSlots = 1, MaxEssence = 20f };
-            var hearty = DelveLoadout.From(up, MealBuff.FromDish(Breakfast(MealBuffKind.MaxEssence, 20f), 1f));
+            var hearty = DelveLoadout.From(up, MealBuff.FromDish(DelveMeal(MealBuffKind.MaxEssence, 20f), 1f));
             Assert.That(hearty.ExtraSatchelSlots, Is.EqualTo(1));
             Assert.That(hearty.MaxEssenceBonus, Is.EqualTo(40f));
             Assert.That(hearty.DrainMultiplier, Is.EqualTo(1f));
 
-            var drink = DelveLoadout.From(up, MealBuff.FromDish(Breakfast(MealBuffKind.SlowerDrain, 0.2f), 1f));
+            var drink = DelveLoadout.From(up, MealBuff.FromDish(DelveMeal(MealBuffKind.SlowerDrain, 0.2f), 1f));
             Assert.That(drink.MaxEssenceBonus, Is.EqualTo(20f));
             Assert.That(drink.DrainMultiplier, Is.EqualTo(0.8f).Within(1e-5f));
             Assert.That(DelveLoadout.From(up, new MealBuff(MealBuffKind.SlowerDrain, 5f, "x")).DrainMultiplier, Is.EqualTo(DelveLoadout.MinDrainMultiplier));
         }
 
         [Test]
-        public void OneBreakfastPerMorning_UsedUpByTheDelve()
+        public void OneDelveMealADay_EatenInTheDaytime_LastsUntilTheNightsDelve()
         {
             var state = new GameState();
-            var meal = MealBuff.FromDish(Breakfast(MealBuffKind.SlowerDrain, 0.2f), 1f);
+            var meal = MealBuff.FromDish(DelveMeal(MealBuffKind.SlowerDrain, 0.2f), 1f);
             Assert.That(DayRules.EatMeal(state, meal));
-            Assert.That(DayRules.EatMeal(state, meal), Is.False, "one per morning");
-            DayRules.StartDelve(state);
-            Assert.That(state.Meal.IsActive, "lasts through the delve");
+            Assert.That(DayRules.EatMeal(state, meal), Is.False, "one a day");
+            DayRules.StartEvening(state);
+            Assert.Throws<InvalidOperationException>(() => DayRules.EatMeal(state, meal), "cooked in the daytime");
+            Assert.That(state.Meal.IsActive, "through the evening");
+            DayRules.CompleteService(state, default);
+            Assert.That(state.Meal.IsActive, "and into the delve");
             DayRules.CompleteDelve(state, DelveReport.Empty);
             Assert.That(state.Meal.IsActive, Is.False, "used up");
         }
@@ -357,7 +398,8 @@ namespace Hearthdelve.Tests
         public void RoundTrip_KeepsEverythingThatPersists()
         {
             var state = new GameState(4, DayPhase.Evening);
-            DayRules.CompleteService(state, new ServiceReport(3, 200, 37, 5, 0)); // → Night, 237 gold, renown 5
+            DayRules.CompleteService(state, new ServiceReport(3, 200, 37, 5, 0)); // → Delve, 237 gold, renown 5
+            DayRules.CompleteDelve(state, DelveReport.Empty); // → Night
             state.Storeroom.Add(Stack(Haunch, 3, Quality.Fine, 0.75f));
             state.Storeroom.Add(Stack(Gel, 2, Quality.Poor, 0.5f, PrepState.Chilled));
             var satchel = ScriptableObject.CreateInstance<TavernUpgradeDefinition>();
@@ -387,12 +429,12 @@ namespace Hearthdelve.Tests
         public void RepeatedRoundTrips_NeitherDuplicateNorLoseTheHaul()
         {
             var state = new GameState();
-            DayRules.StartDelve(state);
+            DayRules.StartEvening(state);
+            DayRules.CompleteService(state, new ServiceReport(1, 12, 3, 1, 0));
             var satchel = new Satchel(6, 3);
             satchel.Add(new IngredientItem(Haunch, Quality.Standard), 3);
             satchel.Add(new IngredientItem(Gel, Quality.Fine), 2);
             DayRules.CompleteDelve(state, DelveReport.Extraction(satchel));
-            DayRules.CompleteService(state, new ServiceReport(1, 12, 3, 1, 0));
 
             GameState loaded = state;
             for (int i = 0; i < 3; i++)
@@ -431,7 +473,7 @@ namespace Hearthdelve.Tests
             var data = SaveSystem.FromJson(k_Version1Save);
             Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
             var state = SaveSystem.Restore(data, Lookup, KnownUpgrade);
-            Assert.That((state.Day, state.Phase), Is.EqualTo((7, DayPhase.Morning)), "v1 had no phase: resume in the morning");
+            Assert.That((state.Day, state.Phase), Is.EqualTo((7, DayPhase.Daytime)), "v1 had no phase: resume in the morning");
             Assert.That(state.Gold, Is.EqualTo(320));
             Assert.That(state.Renown, Is.Zero);
             Assert.That(state.UpgradeLevels, Is.Empty);
