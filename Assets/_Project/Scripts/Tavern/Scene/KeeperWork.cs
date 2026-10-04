@@ -218,8 +218,10 @@ namespace Hearthdelve.Tavern.Scene
                 case TavernInteractableKind.Pass:
                     if (Carrying != null)
                     {
+                        RecipeDefinition back = CarryTicket.Recipe;
                         session.PutBack(CarryTicket);
                         EndCarry();
+                        EventBus<KeeperPlate>.Publish(new KeeperPlate(PlateMoment.PutBack, back));
                     }
                     else PickUp(session.NextToServe());
                     break;
@@ -228,8 +230,11 @@ namespace Hearthdelve.Tavern.Scene
                     CustomerAgent customer = seat >= 0 ? CustomerAt(seat) : null;
                     if (Carrying == null || customer == null || !session.CanDeliver(CarryTicket, customer.Logic)) break;
                     Carrying.Deliver(ShortestWalk(m_CarryFrom, m_Player.transform.position));
-                    session.Deliver(CarryTicket, customer.Logic, Carrying.Evaluate());
+                    float served = Carrying.Evaluate();
+                    RecipeDefinition dish = CarryTicket.Recipe;
+                    session.Deliver(CarryTicket, customer.Logic, served);
                     EndCarry();
+                    EventBus<KeeperPlate>.Publish(new KeeperPlate(PlateMoment.Served, dish, served));
                     break;
             }
         }
@@ -375,6 +380,7 @@ namespace Hearthdelve.Tavern.Scene
             m_CarryFrom = m_Player.transform.position;
             if (m_PlayerMovement != null) m_PlayerMovement.MovementSpeed = Carrying.Settings.carrySpeed;
             m_CarryView?.Show(ticket.Recipe.icon);
+            EventBus<KeeperPlate>.Publish(new KeeperPlate(PlateMoment.PickedUp, ticket.Recipe));
         }
 
         void TickCarry(float dt)
@@ -390,8 +396,10 @@ namespace Hearthdelve.Tavern.Scene
                 EventBus<ServingBumped>.Publish(new ServingBumped(strength, Carrying.Spill, Carrying.Dropped, true));
             m_CarryView?.SetSpill(Carrying.Spill);
             if (!Carrying.Dropped) return;
+            RecipeDefinition dropped = CarryTicket.Recipe;
             Session.Dropped(CarryTicket);
             EndCarry();
+            EventBus<KeeperPlate>.Publish(new KeeperPlate(PlateMoment.Dropped, dropped));
         }
 
         void EndCarry()

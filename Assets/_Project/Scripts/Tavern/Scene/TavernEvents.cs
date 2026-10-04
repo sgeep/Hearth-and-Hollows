@@ -98,6 +98,31 @@ namespace Hearthdelve.Tavern.Scene
     }
 
     /// <summary>A carried plate was bumped (for feedback: step 6). <see cref="Spill"/> is the meter after the bump.</summary>
+    /// <summary>What happened to the plate the keeper carries.</summary>
+    public enum PlateMoment
+    {
+        PickedUp,
+        PutBack,
+        Served,
+        Dropped,
+    }
+
+    /// <summary>The keeper picked a plate up from the pass, put it back, served it, or dropped it (feedback listens).</summary>
+    public readonly struct KeeperPlate : IEvent
+    {
+        public readonly PlateMoment Moment;
+        public readonly RecipeDefinition Dish;
+        /// <summary>The serving score when served (0–1).</summary>
+        public readonly float Score;
+
+        public KeeperPlate(PlateMoment moment, RecipeDefinition dish, float score = 0f)
+        {
+            Moment = moment;
+            Dish = dish;
+            Score = score;
+        }
+    }
+
     public readonly struct ServingBumped : IEvent
     {
         public readonly float Strength;

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 204200d9e00e57d47a3aa55ffd10d4e8, type: 3}
+  m_Name: TavernFeedbackConfig
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Minigames.TavernFeedbackConfig
+  feedback:
+    perfectFlip: 0.9
+    burnWarning:
+      inMin: 0
+      inMax: 1
+      outMin: 0.12
+      outMax: 0.8
+      exponent: 1.6
+    pourBase: 0.12
+    pourRise:
+      inMin: 0.6
+      inMax: 1.15
+      outMin: 0.04
+      outMax: 0.85
+      exponent: 1.5
+    cleanPour: 0.85
+    cleanCut: 0.75
+    goodChop: 0.75
+    hardBump: 1
+    spillWarning: 0.66

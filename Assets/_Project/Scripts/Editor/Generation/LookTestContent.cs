@@ -177,7 +177,7 @@ namespace Hearthdelve.Editor
             WriteWav("PH_ChargeTick", 0.06f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * 1500f) * Mathf.Exp(-t * 60f) * 0.45f);
         }
 
-        static float Noise(int n)
+        internal static float Noise(int n)
         {
             unchecked
             {
@@ -187,7 +187,7 @@ namespace Hearthdelve.Editor
             }
         }
 
-        static void WriteWav(string name, float seconds, Func<float, int, float> wave)
+        internal static void WriteWav(string name, float seconds, Func<float, int, float> wave)
         {
             string path = $"{EditorPaths.Audio}/{name}.wav";
             if (File.Exists(path)) return;
