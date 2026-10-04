@@ -113,6 +113,25 @@ namespace Hearthdelve.Tests
         }
 
         /// <summary>The style is written into the strings, never applied in code (so proper nouns, control labels and other languages are safe).</summary>
+        /// <summary>
+        /// Silver is adapted (Tools/fonts/silver_plain_punctuation.py): its period, middle dot, comma, colon and semicolon
+        /// were 3×3 plus signs, now single-pixel dots like its "!" and "?". Guards against re-importing the original.
+        /// </summary>
+        [Test]
+        public void ThePunctuation_IsPlainDots_NotPlusSigns()
+        {
+            // The adapted glyphs' advances (the plus-sign originals were 5, 5, 5, 4 and 5 pixels); a re-imported
+            // original font fails here. (Unity reports a hinted-raster glyph's width as its advance, so the advance is
+            // what can be checked; the drawing itself is checked in the captures.)
+            Font font = Font;
+            font.RequestCharactersInTexture(".·,:;", GameFonts.Native);
+            foreach (var (c, advance) in new[] { ('.', 3), ('·', 3), (',', 4), (':', 2), (';', 4) })
+            {
+                Assert.That(font.GetCharacterInfo(c, out CharacterInfo info, GameFonts.Native), $"'{c}' is in the font");
+                Assert.That(info.advance, Is.EqualTo(advance), $"'{c}' is the adapted dot");
+            }
+        }
+
         [Test]
         public void NoCodeChangesTheCaseOfText()
         {
