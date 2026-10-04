@@ -295,6 +295,28 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Day, Is.EqualTo(2));
         }
 
+        /// <summary>
+        /// While a transition swaps scenes there's a moment with no content scene at all. Something must still render
+        /// (and draw the black cover over it), or the screen shows whatever was there last (the step 5 playtest: a
+        /// different screen flickered behind "Evening · Day 1").
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EveryFrameOfATransition_HasACameraDrawingTheCover()
+        {
+            yield return BootToMenu();
+            int framesWithoutCamera = 0, frames = 0;
+            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            var transition = Object.FindAnyObjectByType<TransitionScreen>();
+            do
+            {
+                yield return null;
+                frames++;
+                if (transition.IsCovering && Camera.allCamerasCount == 0) framesWithoutCamera++;
+            } while (Flow.IsLoading || transition.IsCovering);
+            Assert.That(frames, Is.GreaterThan(5), "a transition happened");
+            Assert.That(framesWithoutCamera, Is.Zero, "a camera renders through the scene swap");
+        }
+
         [UnityTest]
         public IEnumerator NewGame_OverASave_AsksOnce_AndBackKeepsIt()
         {

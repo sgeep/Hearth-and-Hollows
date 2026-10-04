@@ -32,7 +32,7 @@ namespace Hearthdelve.Editor
         public static void Generate()
         {
             LocalizationBuilder.Build();
-            if (File.Exists(BootScene)) Debug.Log($"[Hearthdelve] {BootScene} exists; kept as it is.");
+            if (File.Exists(BootScene)) UpdateBoot();
             else BuildBoot();
             if (File.Exists(MainMenuScene)) Debug.Log($"[Hearthdelve] {MainMenuScene} exists; kept as it is.");
             else BuildMainMenu();
@@ -56,9 +56,41 @@ namespace Hearthdelve.Editor
             }
         }
 
+        /// <summary>Adds what's missing to an existing Boot scene (in place; nothing already there is rebuilt).</summary>
+        static void UpdateBoot()
+        {
+            var scene = EditorSceneManager.OpenScene(BootScene, OpenSceneMode.Single);
+            if (GameObject.Find("Boot Camera") == null)
+            {
+                AddBootCamera();
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+                Debug.Log($"[Hearthdelve] {BootScene}: added the Boot Camera.");
+            }
+            else Debug.Log($"[Hearthdelve] {BootScene} is up to date.");
+        }
+
+        /// <summary>
+        /// A camera that is always there, behind every scene's own: it draws nothing but black. While a transition
+        /// swaps scenes there's a moment with no other camera, and URP draws the screen-space cover only as part of
+        /// a camera's render; without this one the screen showed whatever was there last (4c step 5 playtest).
+        /// </summary>
+        static void AddBootCamera()
+        {
+            var go = new GameObject("Boot Camera");
+            var camera = go.AddComponent<Camera>();
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.black;
+            camera.cullingMask = 0;
+            camera.depth = -100f;
+            camera.orthographic = true;
+            go.AddComponent<UniversalAdditionalCameraData>().renderPostProcessing = false;
+        }
+
         static void BuildBoot()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            AddBootCamera();
             var services = new GameObject("GameFlow");
             services.AddComponent<GameFlow>().Configure(AssetDatabase.LoadAssetAtPath<GameDatabase>(EditorPaths.Data + "/GameDatabase.asset"));
             services.AddComponent<LocalizationBoot>();
