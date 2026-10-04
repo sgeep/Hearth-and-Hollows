@@ -142,7 +142,10 @@ namespace Hearthdelve.Shared.Save
         }
     }
 
-    /// <summary>The single save slot on disk. Writes go to a temp file first so a crash can't leave half a save.</summary>
+    /// <summary>
+    /// The single save slot on disk. Writes go to a temp file first so a crash can't leave half a save. On the web, each
+    /// write and delete is flushed to the browser's storage (<see cref="WebStorage"/>).
+    /// </summary>
     public sealed class SaveStore
     {
         public const string FileName = "save_slot_1.json";
@@ -164,6 +167,7 @@ namespace Hearthdelve.Shared.Save
             File.WriteAllText(temp, json);
             if (File.Exists(FilePath)) File.Delete(FilePath);
             File.Move(temp, FilePath);
+            WebStorage.Flush();
         }
 
         public string Read() => File.ReadAllText(FilePath);
@@ -171,6 +175,7 @@ namespace Hearthdelve.Shared.Save
         public void Delete()
         {
             if (File.Exists(FilePath)) File.Delete(FilePath);
+            WebStorage.Flush();
         }
     }
 }
