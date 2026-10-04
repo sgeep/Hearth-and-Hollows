@@ -63,17 +63,18 @@ namespace Hearthdelve.Editor
             }
             satchel.gameObject.AddComponent<Hearthdelve.UI.Hud.SatchelHud>().Configure(slots);
 
-            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(180f, 52f));
+            // The harvest feed: one line per message (the longest, "standard spider leg was destroyed", is 190 pixels in Silver).
+            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(212f, 52f));
             var lines = new Hearthdelve.UI.Hud.HarvestFeedLine[4];
             for (int i = 0; i < lines.Length; i++)
             {
-                RectTransform line = LookTestBuilder.UIRect(feed, $"Line{i}", Vector2.one, Vector2.one, new Vector2(0f, -i * 13f), new Vector2(180f, 12f));
+                RectTransform line = LookTestBuilder.UIRect(feed, $"Line{i}", Vector2.one, Vector2.one, new Vector2(0f, -i * 13f), new Vector2(212f, 12f));
                 var group = line.gameObject.AddComponent<CanvasGroup>();
                 group.alpha = 0f;
                 group.blocksRaycasts = false;
                 RectTransform iconRect = LookTestBuilder.UIRect(line, "Icon", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
                 LocalizedSuperText text = LookTestBuilder.Text(line, "Text", LocKeys.HarvestGot, 6f, k_Light, TextAnchor.MiddleRight,
-                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(168f, 12f));
+                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(200f, 12f));
                 lines[i] = new Hearthdelve.UI.Hud.HarvestFeedLine { group = group, icon = AddImage(iconRect, null, Color.white), text = text };
             }
             feed.gameObject.AddComponent<Hearthdelve.UI.Hud.HarvestFeed>().Configure(lines);
