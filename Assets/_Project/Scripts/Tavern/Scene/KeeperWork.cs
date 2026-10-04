@@ -52,6 +52,9 @@ namespace Hearthdelve.Tavern.Scene
         public Ticket CookTicket { get; private set; }
         public bool ChoppingPot { get; private set; }
         public ServingMinigame Carrying { get; private set; }
+        /// <summary>The dish being cooked for breakfast (Morning), if any.</summary>
+        public RecipeDefinition Breakfast { get; private set; }
+        CookedIngredients m_BreakfastUsed;
         public Ticket CarryTicket { get; private set; }
 
         public void Configure(TavernInteractable grill, TavernInteractable tap, TavernInteractable stewPot, TavernInteractable pass, TavernInteractable[] seats)
@@ -110,6 +113,11 @@ namespace Hearthdelve.Tavern.Scene
         void Update()
         {
             if (m_Director == null || !FindPlayer()) return;
+            if (Breakfast != null)
+            {
+                TickBreakfast(Time.deltaTime);
+                return;
+            }
             if (!m_Director.IsServing)
             {
                 if (ActiveCook != null || Carrying != null) StopWork();
@@ -235,6 +243,43 @@ namespace Hearthdelve.Tavern.Scene
             OpenPanel(m_Director.Minigames.CreateCook(station));
         }
 
+        // ---------- Breakfast (Morning) ----------
+
+        /// <summary>
+        /// Takes one serving from the storeroom and cooks it at its station's panel, as in service. Finishing eats
+        /// it (the buff for today's delve); Cancel puts the ingredients back.
+        /// </summary>
+        public bool CookBreakfast(RecipeDefinition recipe)
+        {
+            if (ActiveCook != null || recipe == null || recipe.station == CookStation.StewPot || m_Director == null || !FindPlayer()) return false;
+            CookedIngredients used = RecipeMatcher.TryTake(recipe, m_Director.Storeroom);
+            if (used == null) return false;
+            Breakfast = recipe;
+            m_BreakfastUsed = used;
+            OpenPanel(m_Director.Minigames.CreateCook(recipe.station));
+            return true;
+        }
+
+        void TickBreakfast(float dt)
+        {
+            if (m_Cancel != null && m_Cancel.WasPressedThisFrame())
+            {
+                CancelBreakfast();
+                return;
+            }
+            ActiveCook.Tick(dt, ReadMinigameInput());
+            if (ActiveCook.IsComplete) FinishCook(ActiveCook.Evaluate());
+        }
+
+        void CancelBreakfast()
+        {
+            if (Breakfast == null) return;
+            m_Director.Storeroom.AddRange(m_BreakfastUsed.Used);
+            Breakfast = null;
+            m_BreakfastUsed = null;
+            EndCook();
+        }
+
         void OpenPanel(IMinigame game)
         {
             ActiveCook = game;
@@ -270,6 +315,16 @@ namespace Hearthdelve.Tavern.Scene
         public void FinishCook(float score)
         {
             if (ActiveCook == null) return;
+            if (Breakfast != null)
+            {
+                RecipeDefinition recipe = Breakfast;
+                CookedIngredients used = m_BreakfastUsed;
+                Breakfast = null;
+                m_BreakfastUsed = null;
+                EndCook();
+                m_Director.EatBreakfast(recipe, used, score);
+                return;
+            }
             if (ChoppingPot) Session.FinishChopping(this, score);
             else Session.FinishCooking(CookTicket, score);
             EndCook();
@@ -281,6 +336,7 @@ namespace Hearthdelve.Tavern.Scene
             CookTicket = null;
             ChoppingPot = false;
             if (m_Director != null && m_Director.IsServing) InputMaps.Activate(InputMaps.Tavern);
+            else InputMaps.ActivateUIOnly();
         }
 
         MinigameInput ReadMinigameInput()
@@ -375,9 +431,10 @@ namespace Hearthdelve.Tavern.Scene
             return Vector2.Distance(from, to);
         }
 
-        /// <summary>Service is over: put everything down.</summary>
+        /// <summary>Service is over (or the keeper sets off): put everything down. An unfinished breakfast goes back in the storeroom.</summary>
         public void StopWork()
         {
+            if (Breakfast != null) CancelBreakfast();
             if (ActiveCook != null) EndCook();
             if (Carrying != null) EndCarry();
         }
