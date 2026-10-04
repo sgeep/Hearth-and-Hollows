@@ -80,7 +80,7 @@ namespace Hearthdelve.Editor
             {
                 "##########xx####################xx##########",
                 "#####t####xx#####t########t#####xx####t#####",
-                "#...v...................v..............v...#",
+                "#.............v.........v..............v...#",
                 "#..b....................................B..#",
                 "#..........................................#",
                 "#.............m...............m............#",
@@ -194,7 +194,7 @@ namespace Hearthdelve.Editor
             {
                 "############xx################xx############",
                 "#####t######xx######t##t######xx######t#####",
-                "#......v............................v......#",
+                "#.........v.........................v......#",
                 "#..........................................#",
                 "#..........................................#",
                 "#...m................m.................m...#",
@@ -256,7 +256,7 @@ namespace Hearthdelve.Editor
             {
                 "########xx###############xx###############xx########",
                 "####t###xx#######t###t###xx#######t#######xx###t####",
-                "#....v........................v...............v....#",
+                "#...........v.................v...............v....#",
                 "#..................................................#",
                 "#..................................................#",
                 "#.....m..................m...................m.....#",
@@ -322,7 +322,7 @@ namespace Hearthdelve.Editor
             {
                 "#########################xx#########################",
                 "#######t##########t######xx######t##########t#######",
-                "#..v.........v........................v.........v..#",
+                "#........v...v........................v.........v..#",
                 "#..................................................#",
                 "#.............m......................m.............#",
                 "#...m..........................................m...#",
@@ -353,7 +353,7 @@ namespace Hearthdelve.Editor
             {
                 "#########xx######################xx#########",
                 "####t####xx####t############t####xx####t####",
-                "#....v.................................v...#",
+                "#............v.........................v...#",
                 "#..........................................#",
                 "#..........................................#",
                 "#..........m....................m..........#",
@@ -467,7 +467,7 @@ namespace Hearthdelve.Editor
             {
                 "########################################################",
                 "####t#######t#######t##############t#######t#######t####",
-                "#.....v.........v......................v.........v.....#",
+                "#.........v.....v......................v.........v.....#",
                 "#......................s........s......................#",
                 "#......................................................#",
                 "#..........................R...........................#",
@@ -691,8 +691,20 @@ namespace Hearthdelve.Editor
             marker.enabled = false;
             BoxCollider2D block = Solid(exit.transform, "Block", new Vector2(0f, 0.5f), new Vector2(2f, 1f));
             Solid(exit.transform, "Stop", new Vector2(0f, 1.5f), new Vector2(2f, 1f));
+            // For an exit the run doesn't use: the wall's own brick and top tiles across the doorway (shown by the runner).
+            var bricked = new GameObject("Bricked");
+            bricked.transform.SetParent(exit.transform, false);
+            for (int i = 0; i < 2; i++)
+            {
+                int column = 5 + (socket.Cells.x + i) % 2;
+                LookTestContent.AddSprite(bricked.transform, $"Bricks{i}", MinifantasyImporter.Cell(MinifantasySheets.Dungeon, "Tileset", column, 6),
+                    SortingLayers.Floor, 1, new Vector3(i - 0.5f, 0.5f, 0f));
+                LookTestContent.AddSprite(bricked.transform, $"Top{i}", MinifantasyImporter.Cell(MinifantasySheets.Dungeon, "Tileset", column, 5),
+                    SortingLayers.Floor, 1, new Vector3(i - 0.5f, 1.5f, 0f));
+            }
+            bricked.SetActive(false);
             var component = exit.AddComponent<RoomExit>();
-            component.Configure(index, gate, frames, block, marker);
+            component.Configure(index, gate, frames, block, marker, bricked);
             return component;
         }
 

@@ -34,6 +34,12 @@ namespace Hearthdelve.Dungeon.Rooms
     public sealed class RoomLayout
     {
         public const int MinWidth = 40, MaxWidth = 60, MinHeight = 23, MaxHeight = 34;
+        /// <summary>
+        /// The HUD's top-left corner (the Essence bar and its icon, about 8 tiles across) covers the north wall's first
+        /// columns whenever the camera is at the room's west edge, so a bat asleep there can't be seen (the step 2
+        /// playtest): perches start at this column.
+        /// </summary>
+        public const int FirstPerchColumn = 9;
         const string k_Known = "#t.oScbBusTVXPRxemvH";
 
         readonly string[] m_Rows;
@@ -118,6 +124,7 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (c == 'v') m_PerchSpawns.Add(new Vector2Int(x, y));
                 if (IsEnemy(c)) m_Enemies.Add((c, new Vector2Int(x, y)));
                 if (c is 'V' or 'v' && !IsWall(At(x, y + 1))) m_Problems.Add($"the bat at ({x}, {y}) has no wall directly above it to hang from");
+                if (c is 'V' or 'v' && x < FirstPerchColumn) m_Problems.Add($"the bat at ({x}, {y}) would sleep under the Essence bar (perches start at column {FirstPerchColumn})");
             }
 
             if (arrivals.Count != 1) m_Problems.Add($"there must be exactly one P (arrival), not {arrivals.Count}");

@@ -177,7 +177,9 @@ namespace Hearthdelve.Dungeon.Rooms
             {
                 if (exit == null) continue;
                 exit.Entered += OnExitEntered;
-                exit.SetMarker(exit.Index < node.Next.Count ? MarkerFor(floor.Node(node.Next[exit.Index])) : null);
+                bool used = exit.Index < node.Next.Count;
+                exit.SetUnused(!used);
+                exit.SetMarker(used ? MarkerFor(floor.Node(node.Next[exit.Index])) : null);
             }
             if (Current.Descent != null) Current.Descent.Entered += OnDescent;
 
