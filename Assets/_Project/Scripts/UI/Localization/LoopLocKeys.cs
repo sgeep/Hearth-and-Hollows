@@ -15,7 +15,7 @@ namespace Hearthdelve.UI.Localization
 
         public const string MorningTitle = "morning.title";
         public const string MorningStoreroom = "morning.storeroom";
-        public const string MorningBreakfast = "morning.breakfast";
+        public const string MorningBreakfast = "morning.delve meal";
         public const string MorningBreakfastRow = "morning.breakfast_row";
         public const string MorningNoBreakfast = "morning.no_breakfast";
         public const string MorningAte = "morning.ate";
@@ -74,6 +74,7 @@ namespace Hearthdelve.UI.Localization
         public const string PhaseMorning = "phase.morning";
         public const string PhaseEvening = "phase.evening";
         public const string PhaseNight = "phase.night";
+        public const string PhaseDelve = "phase.delve";
         public const string MenuConfirm = "menu.confirm";
         public const string MenuConfirmYes = "menu.confirm_yes";
         public const string MenuConfirmNo = "menu.confirm_no";
@@ -90,21 +91,21 @@ namespace Hearthdelve.UI.Localization
             (HudExit, "press {0} to climb back to the tavern"),
             (SlotFreshness, "{0}% fresh"),
 
-            (MorningTitle, "morning · day {0}"),
+            (MorningTitle, "daytime · day {0}"),
             (MorningStoreroom, "storeroom"),
-            (MorningBreakfast, "breakfast (one dish, eaten before you go)"),
+            (MorningBreakfast, "delve meal (one dish, for tonight's delve)"),
             (MorningBreakfastRow, "{0} · {1}"),
-            (MorningNoBreakfast, "nothing in the storeroom makes a breakfast."),
+            (MorningNoBreakfast, "nothing in the storeroom makes a delve meal."),
             (MorningAte, "ate {0}: {1}"),
-            (MorningCooking, "cooking breakfast..."),
-            (MorningLoadout, "today's delve bonuses: +{0} satchel slots · +{1} max Essence · Essence drain {2}%"),
-            (MorningDescend, "descend into the dungeon"),
+            (MorningCooking, "cooking the delve meal..."),
+            (MorningLoadout, "tonight's delve bonuses: +{0} satchel slots · +{1} max Essence · Essence drain {2}%"),
+            (MorningDescend, "open for the evening"),
 
             (BuffMaxEssence, "+{0} max Essence"),
             (BuffSlowerDrain, "Essence drain -{0}%"),
 
-            (PrepClose, "close for the night"),
-            (ResultsToNight, "close up for the night"),
+            (PrepClose, "stay shut tonight"),
+            (ResultsToNight, "close up and head below"),
 
             (NightTitle, "night · day {0}"),
             (NightPurse, "purse"),
@@ -133,23 +134,24 @@ namespace Hearthdelve.UI.Localization
             (SummaryEvening, "evening"),
             (SummaryPartsValue, "{0} ({1} lost)"),
             (SummaryDishesValue, "{0} ({1} walked out)"),
-            (NightBanked, "banked tonight"),
+            (NightBanked, "banked today"),
             (NightRenownToday, "Renown"),
             (NightRenownValue, "{0} ({1})"),
             (NightBuyCost, "{0} Gold"),
             (NightNextTime, "next: {0}"),
-            (MorningBonuses, "today's delve: {0}"),
-            (MorningNoBonuses, "today's delve: no bonuses yet"),
+            (MorningBonuses, "tonight's delve: {0}"),
+            (MorningNoBonuses, "tonight's delve: no bonuses yet"),
             (BonusSatchel, "satchel +{0}"),
             (BonusEssence, "Essence +{0}"),
             (BonusDrain, "drain -{0}%"),
             (BonusJoin, "{0} · {1}"),
             (MorningCookAt, "cook at the {0}"),
-            (TransitionDelve, "into the dungeon"),
+            (TransitionDelve, "closing time · down to the Cellars"),
             (TransitionEvening, "evening · day {0}"),
             (MenuContinueFrom, "day {0}, {1}"),
-            (PhaseMorning, "morning"),
+            (PhaseMorning, "daytime"),
             (PhaseEvening, "evening"),
+            (PhaseDelve, "the night's delve"),
             (PhaseNight, "night"),
             (MenuConfirm, "start a new game? your saved game will be replaced."),
             (MenuConfirmYes, "start over"),

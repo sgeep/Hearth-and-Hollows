@@ -248,8 +248,8 @@ namespace Hearthdelve.UI.Localization
             (ResultTitleExtracted, "back from the Cellars"),
             (ResultTitleDied, "dragged back to the surface"),
             (ResultSummary, "brought home: {0} parts. lost: {1}."),
-            (ResultNothing, "nothing brought home."),
-            (ResultNothingLost, "nothing brought home. lost: {0} parts."),
+            (ResultNothing, "no parts brought home."),
+            (ResultNothingLost, "no parts brought home. lost: {0} parts."),
             (ResultDelveAgain, "delve again"),
             (ResultBackToTavern, "back to the tavern"),
 

@@ -55,7 +55,8 @@ namespace Hearthdelve.Shared.Save
             Func<string, bool> upgradeExists, List<string> warnings = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
-            var phase = Enum.TryParse(data.phase, out DayPhase p) ? p : DayPhase.Morning;
+            // Saves from before the v0.5 day order name daytime "Morning".
+            DayPhase phase = DayCycle.Parse(data.phase);
             var state = new GameState(Math.Max(1, data.day), phase)
             {
                 Gold = Math.Max(0, data.gold),
@@ -114,14 +115,14 @@ namespace Hearthdelve.Shared.Save
             }
         }
 
-        /// <summary>v1 → v2: parts gain prep state (Raw) and full freshness; renown, upgrades and a pending meal start empty; resume at Morning.</summary>
+        /// <summary>v1 → v2: parts gain prep state (Raw) and full freshness; renown, upgrades and a pending meal start empty; resume in the daytime.</summary>
         static SaveData MigrateV1(SaveDataV1 v1)
         {
             var data = new SaveData
             {
                 version = CurrentVersion,
                 day = v1.day,
-                phase = DayPhase.Morning.ToString(),
+                phase = DayPhase.Daytime.ToString(),
                 gold = v1.gold,
                 renown = 0,
                 meal = new MealData { kind = MealBuffKind.None.ToString() },

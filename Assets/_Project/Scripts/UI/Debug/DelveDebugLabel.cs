@@ -14,7 +14,12 @@ namespace Hearthdelve.UI.Debugging
     {
         LocalizedSuperText m_Text;
 
-        void Awake() => m_Text = GetComponent<LocalizedSuperText>();
+        void Awake()
+        {
+            m_Text = GetComponent<LocalizedSuperText>();
+            // A development aid: not in release builds.
+            if (!Debug.isDebugBuild) gameObject.SetActive(false);
+        }
         void OnEnable() => EventBus<RoomEntered>.Subscribe(OnEntered);
         void OnDisable() => EventBus<RoomEntered>.Unsubscribe(OnEntered);
 

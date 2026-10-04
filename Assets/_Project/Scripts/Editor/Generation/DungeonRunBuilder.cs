@@ -150,12 +150,12 @@ namespace Hearthdelve.Editor
                 list.Add(power);
             }
             Power("deep_reserves", "DeepReserves", Hearthdelve.Shared.Run.RunPowerEffect.MaxEssence, 25f, "BardBallad");
-            Power("slow_burn", "SlowBurn", Hearthdelve.Shared.Run.RunPowerEffect.SlowerDrain, 0.3f, "ClericDivineFire");
+            Power("slow_burn", "SlowBurn", Hearthdelve.Shared.Run.RunPowerEffect.SlowerDrain, 0.5f, "ClericDivineFire");
             Power("thick_hide", "ThickHide", Hearthdelve.Shared.Run.RunPowerEffect.LighterHits, 0.3f, "BardDefense");
             Power("keen_edge", "KeenEdge", Hearthdelve.Shared.Run.RunPowerEffect.LightDamage, 0.25f, "BardMelee");
             Power("heavy_hand", "HeavyHand", Hearthdelve.Shared.Run.RunPowerEffect.HeavyDamage, 0.4f, "PaladinHolyHammer");
             Power("light_feet", "LightFeet", Hearthdelve.Shared.Run.RunPowerEffect.FasterDodge, 0.4f, "RogueDodge");
-            Power("second_wind", "SecondWind", Hearthdelve.Shared.Run.RunPowerEffect.EssenceOnClear, 10f, "ClericHealingWords");
+            Power("second_wind", "SecondWind", Hearthdelve.Shared.Run.RunPowerEffect.EssenceOnClear, 4f, "ClericHealingWords");
             Power("butchers_eye", "ButchersEye", Hearthdelve.Shared.Run.RunPowerEffect.GentleKills, 0.5f, "RogueAttack");
             AssetDatabase.SaveAssets();
             return list.ToArray();

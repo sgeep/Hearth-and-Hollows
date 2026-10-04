@@ -138,17 +138,17 @@ namespace Hearthdelve.Editor
             LocalizedSuperText title = DungeonUI.Title(panel, LoopLocKeys.MorningTitle);
             SatchelSlotView[] stock = Storeroom(panel, out LocalizedSuperText empty);
 
-            // Breakfast: what to cook, or what was eaten.
-            LocalizedSuperText breakfast = TextLine(panel, "Breakfast", LoopLocKeys.MorningBreakfast, k_Title, TextAnchor.UpperCenter, 0f, 40f, 296f);
+            // The delve meal: what to cook, or what was eaten.
+            LocalizedSuperText meal = TextLine(panel, "Breakfast", LoopLocKeys.MorningBreakfast, k_Title, TextAnchor.UpperCenter, 0f, 40f, 296f);
             var cards = new DishCard[6];
-            // Breakfast cards: the name with its station on the right, then the buff across the card.
+            // The delve meal cards: the name with its station on the right, then the buff across the card.
             for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, 27f), 130f);
 
-            // What today's delve starts with, from upgrades and breakfast: the tavern feeding the dungeon.
+            // What today's delve starts with, from upgrades and delve meal: the tavern feeding the dungeon.
             LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, new Color(0.3f, 0.2f, 0.45f), TextAnchor.UpperCenter, 0f, -49f, 296f);
             Button descend = BottomButton(panel, "Descend", LoopLocKeys.MorningDescend, 0f, 156f, out _);
             UiFeedbackContent.Commit(descend);
-            root.gameObject.AddComponent<MorningScreen>().Configure(panel.gameObject, title, stock, empty, cards, breakfast, bonuses, descend);
+            root.gameObject.AddComponent<MorningScreen>().Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend);
             panel.gameObject.SetActive(false);
         }
 

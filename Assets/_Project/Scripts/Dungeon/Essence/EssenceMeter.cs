@@ -18,7 +18,9 @@ namespace Hearthdelve.Dungeon.Essence
         public static EssenceSettings Default => new()
         {
             baseMax = 100f,
-            drainPerSecond = 0.5f,
+            // 4d step 5: drain alone lasts about 11 minutes, against a full Cellars run of about 6-7 minutes for competent
+            // play; hits are what spend the rest (GDD §4.4: pressure, not a predetermined failure).
+            drainPerSecond = 0.15f,
             damageMultiplier = 1f,
             lowThreshold = 0.25f,
         };
@@ -52,7 +54,7 @@ namespace Hearthdelve.Dungeon.Essence
         }
 
         public float Max { get; private set; }
-        /// <summary>The upgrade and breakfast modifiers this meter was built with.</summary>
+        /// <summary>The upgrade and delve meal modifiers this meter was built with.</summary>
         public EssenceModifiers Modifiers => m_Modifiers;
         public float Current { get; private set; }
         public float Normalized => Current / Max;

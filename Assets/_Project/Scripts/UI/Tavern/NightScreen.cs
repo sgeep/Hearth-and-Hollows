@@ -160,19 +160,19 @@ namespace Hearthdelve.UI.Tavern
                 DelveOutcome.Died => LoopLocKeys.SummaryDied,
                 _ => LoopLocKeys.SummarySkipped,
             });
-            bool shut = m_Director.Report != null && m_Director.Report.StayedShut;
+            bool shut = today.KeptShut;
             string change = today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString();
             // Every played day reaches Night through a delve. A Night with no delve on record was resumed from a save,
             // which keeps the purse and Renown but not the day's story: show only what's known, not zeros.
             bool recorded = today.Delve != DelveOutcome.None;
             var lines = new (string label, string value, object[] args)[]
             {
-                // The day: the delve, what came home, the evening.
-                (LoopLocKeys.SummaryDelve, TavernLocKeys.Plain, new object[] { outcome }),
-                (LoopLocKeys.SummaryParts, LoopLocKeys.SummaryPartsValue, new object[] { today.PartsBroughtBack, today.PartsLost }),
+                // The day in order: the evening, the night's delve, what came home.
                 shut ? (LoopLocKeys.SummaryEvening, LoopLocKeys.SummaryShut, Array.Empty<object>())
                      : (LoopLocKeys.SummaryDishes, LoopLocKeys.SummaryDishesValue, new object[] { today.DishesServed, today.Walkouts }),
-                // The money and standing: tonight's takings, the purse, Renown and today's change.
+                (LoopLocKeys.SummaryDelve, TavernLocKeys.Plain, new object[] { outcome }),
+                (LoopLocKeys.SummaryParts, LoopLocKeys.SummaryPartsValue, new object[] { today.PartsBroughtBack, today.PartsLost }),
+                // The money and standing: today's takings and the delve's Gold, the purse, Renown and today's change.
                 (LoopLocKeys.NightBanked, TavernLocKeys.PrepValue, new object[] { today.Earned }),
                 (LoopLocKeys.NightPurse, TavernLocKeys.PrepValue, new object[] { state.Gold }),
                 recorded ? (LoopLocKeys.NightRenownToday, LoopLocKeys.NightRenownValue, new object[] { state.Renown, change })

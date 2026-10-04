@@ -7,9 +7,8 @@ namespace Hearthdelve.UI.Screens
 {
     /// <summary>
     /// The day's transitions (Boot scene): every scene change fades to black, names where the day is going
-    /// ("Morning · Day 2", "Into the dungeon", "Evening · Day 2") and fades in; nightfall, which happens in
-    /// the tavern without a scene change, cuts to "Night · Day 2" and fades into the darkened room. Real time,
-    /// so a paused game doesn't stall it. Blocks input while the screen is covered.
+    /// ("daytime · day 2", "evening · day 2", the tavern closing and the way down, "night · day 2") and fades in.
+    /// Real time, so a paused game doesn't stall it. Blocks input while the screen is covered.
     /// </summary>
     public sealed class TransitionScreen : MonoBehaviour, ISceneTransition
     {
@@ -67,28 +66,15 @@ namespace Hearthdelve.UI.Screens
             m_Caption.gameObject.SetActive(false);
         }
 
-        // Night falls in the tavern (no scene change): cut to black with the caption, then fade in.
-        void OnPhaseChanged()
-        {
-            // Only nightfall inside the tavern; resuming a game saved at night is a scene load like any other.
-            if (m_Flow.IsLoading || !m_Flow.InGame || m_Flow.Phase != DayPhase.Night || m_Flow.LoadedScene != GameScenes.Tavern) return;
-            StopAllCoroutines();
-            StartCoroutine(Nightfall());
-        }
-
-        IEnumerator Nightfall()
-        {
-            ShowCaption();
-            SetAlpha(1f);
-            yield return Reveal();
-        }
+        // Every phase change now loads a scene, which shows its caption; nothing to do in place.
+        void OnPhaseChanged() { }
 
         void ShowCaption()
         {
             GameState state = m_Flow != null ? m_Flow.State : null;
             CaptionKey = state == null ? null : state.Phase switch
             {
-                DayPhase.Morning => LoopLocKeys.MorningTitle,
+                DayPhase.Daytime => LoopLocKeys.MorningTitle,
                 DayPhase.Delve => LoopLocKeys.TransitionDelve,
                 DayPhase.Evening => LoopLocKeys.TransitionEvening,
                 _ => LoopLocKeys.NightTitle,

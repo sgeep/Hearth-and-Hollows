@@ -15,8 +15,8 @@ namespace Hearthdelve.Shared.Game
         public const string Boot = "Boot";
         public const string MainMenu = "MainMenu";
         public const string Tavern = "Tavern";
-        /// <summary>The test floor is the delve until 4d's generated floors (4c decision 5).</summary>
-        public const string Dungeon = "Dungeon_TestFloor";
+        /// <summary>The night's delve: the generated Cellars run (4d). <c>Dungeon_TestFloor</c> stays a standalone test bed.</summary>
+        public const string Dungeon = "Dungeon";
     }
 
     /// <summary>
@@ -53,7 +53,7 @@ namespace Hearthdelve.Shared.Game
         public GameDatabase Database => m_Database;
         public GameState State { get; private set; }
         public bool InGame => State != null;
-        public DayPhase Phase => State?.Phase ?? DayPhase.Morning;
+        public DayPhase Phase => State?.Phase ?? DayPhase.Daytime;
         public DelveLoadout Loadout => State != null && m_Database != null ? m_Database.Loadout(State) : DelveLoadout.None;
         public SaveStore Store { get; private set; }
         public bool HasSave => Store != null && Store.Exists;
@@ -149,33 +149,49 @@ namespace Hearthdelve.Shared.Game
 
         // ---------- The day ----------
 
-        public void StartDelve()
+        /// <summary>
+        /// The day is done and the tavern opens for the evening (a fresh tavern scene). The daytime placeholder calls this
+        /// today; the free-roaming village day will call it when its day ends. Not saved: daytime has nothing to lose.
+        /// </summary>
+        public void StartEvening()
         {
-            DayRules.StartDelve(State);
-            PhaseChanged?.Invoke();
-            Load(GameScenes.Dungeon);
-        }
-
-        public void CompleteDelve(DelveReport report)
-        {
-            DayRules.CompleteDelve(State, report);
+            DayRules.StartEvening(State);
             PhaseChanged?.Invoke();
             Load(GameScenes.Tavern);
         }
 
-        /// <summary>Evening service is over: bank the takings, move to Night (the tavern stays loaded), autosave.</summary>
+        /// <summary>
+        /// Service is over: bank the takings, close up, and head below for the night's delve. Saved here (phase Delve,
+        /// before the run): quitting mid-run and continuing starts the night's delve again from the top, with nothing
+        /// from the abandoned run (the run itself is never saved).
+        /// </summary>
         public void CompleteService(ServiceReport report)
         {
             DayRules.CompleteService(State, report);
             PhaseChanged?.Invoke();
             Save();
+            Load(GameScenes.Dungeon);
         }
 
+        /// <summary>Kept shut tonight: straight on to the delve, saved as above.</summary>
         public void SkipService()
         {
             DayRules.SkipService(State);
             PhaseChanged?.Invoke();
             Save();
+            Load(GameScenes.Dungeon);
+        }
+
+        /// <summary>
+        /// Back from the delve: the haul and the run's Gold are applied once and saved at once (phase Night), so a reload
+        /// can't apply them again or lose them; then home to the tavern for the night.
+        /// </summary>
+        public void CompleteDelve(DelveReport report)
+        {
+            DayRules.CompleteDelve(State, report);
+            PhaseChanged?.Invoke();
+            Save();
+            Load(GameScenes.Tavern);
         }
 
         public bool EatMeal(MealBuff meal)
@@ -193,7 +209,7 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
-        /// <summary>Overnight freshness loss, next morning, autosave, fresh tavern scene.</summary>
+        /// <summary>Sleep: overnight freshness loss, the next day's daytime, autosave, fresh tavern scene.</summary>
         public void Sleep()
         {
             DayRules.Sleep(State, m_Database != null ? m_Database.Freshness : default);
@@ -213,9 +229,9 @@ namespace Hearthdelve.Shared.Game
             }
             switch (State.Phase)
             {
-                case DayPhase.Morning: StartDelve(); break;
-                case DayPhase.Delve: CompleteDelve(DelveReport.Empty); break;
+                case DayPhase.Daytime: StartEvening(); break;
                 case DayPhase.Evening: SkipService(); break;
+                case DayPhase.Delve: CompleteDelve(DelveReport.Empty); break;
                 case DayPhase.Night: Sleep(); break;
             }
         }

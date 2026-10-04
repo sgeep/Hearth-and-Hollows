@@ -6,7 +6,7 @@ namespace Hearthdelve.Shared.Recipes
     /// <summary>What a dish eaten before a delve does (GDD §3.1 Morning Prep, §3.3 "pre-delve meals grant run buffs").</summary>
     public enum MealBuffKind
     {
-        /// <summary>Not offered as breakfast.</summary>
+        /// <summary>Not offered as delve meal.</summary>
         None,
         /// <summary>Adds max Essence for the next delve.</summary>
         MaxEssence,

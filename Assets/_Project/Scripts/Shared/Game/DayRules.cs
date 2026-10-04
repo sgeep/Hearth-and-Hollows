@@ -83,9 +83,13 @@ namespace Hearthdelve.Shared.Game
     /// </summary>
     public static class DayRules
     {
-        public static void StartDelve(GameState state) => Require(state, DayPhase.Morning).Cycle.AdvanceTo(DayPhase.Delve);
+        /// <summary>The day is done: the tavern opens for the evening (the daytime placeholder's button; later the village day's end).</summary>
+        public static void StartEvening(GameState state) => Require(state, DayPhase.Daytime).Cycle.AdvanceTo(DayPhase.Evening);
 
-        /// <summary>The haul goes into the storeroom, the run's Gold into the purse, the breakfast buff is used up, and it's evening.</summary>
+        /// <summary>
+        /// Back from the night's delve: the haul goes into the storeroom, the run's Gold into the purse, the delve meal is
+        /// used up, and it's night.
+        /// </summary>
         public static void CompleteDelve(GameState state, DelveReport report)
         {
             Require(state, DayPhase.Delve);
@@ -96,11 +100,13 @@ namespace Hearthdelve.Shared.Game
             state.Today.Delve = report.Outcome;
             state.Today.PartsBroughtBack += report.PartsBroughtBack;
             state.Today.PartsLost += report.PartsLost;
+            state.Today.DelveGold += report.GoldSecured;
+            state.Today.DelveGoldLost += report.GoldLost;
             state.Meal = MealBuff.None;
-            state.Cycle.AdvanceTo(DayPhase.Evening);
+            state.Cycle.AdvanceTo(DayPhase.Night);
         }
 
-        /// <summary>Service takings (payments and tips) are banked; renown changes; it's night.</summary>
+        /// <summary>Service takings (payments and tips) are banked; renown changes; the tavern closes and the night's delve is next.</summary>
         public static void CompleteService(GameState state, ServiceReport report)
         {
             Require(state, DayPhase.Evening);
@@ -111,16 +117,21 @@ namespace Hearthdelve.Shared.Game
             state.Today.Tips += report.Tips;
             state.Today.Walkouts += report.Walkouts;
             state.Today.RenownChange += report.RenownChange;
-            state.Cycle.AdvanceTo(DayPhase.Night);
+            state.Cycle.AdvanceTo(DayPhase.Delve);
         }
 
-        /// <summary>Closed without serving (nothing to cook, or by choice).</summary>
-        public static void SkipService(GameState state) => Require(state, DayPhase.Evening).Cycle.AdvanceTo(DayPhase.Night);
+        /// <summary>Kept shut without serving (nothing to cook, or by choice): on to the night's delve.</summary>
+        public static void SkipService(GameState state)
+        {
+            Require(state, DayPhase.Evening);
+            state.Today.KeptShut = true;
+            state.Cycle.AdvanceTo(DayPhase.Delve);
+        }
 
-        /// <summary>Eat breakfast: one buff per morning.</summary>
+        /// <summary>Eat the delve meal: one a day, cooked in the daytime; its buff waits for tonight's delve.</summary>
         public static bool EatMeal(GameState state, MealBuff meal)
         {
-            Require(state, DayPhase.Morning);
+            Require(state, DayPhase.Daytime);
             if (state.Meal.IsActive || !meal.IsActive) return false;
             state.Meal = meal;
             return true;
@@ -143,7 +154,7 @@ namespace Hearthdelve.Shared.Game
             Require(state, DayPhase.Night);
             state.Storeroom.Decay(freshness, freshness.overnightLoss);
             state.Today.Reset();
-            state.Cycle.AdvanceTo(DayPhase.Morning);
+            state.Cycle.AdvanceTo(DayPhase.Daytime);
         }
 
         static GameState Require(GameState state, DayPhase phase)

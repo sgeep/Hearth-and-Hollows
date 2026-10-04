@@ -69,7 +69,7 @@ namespace Hearthdelve.Dungeon.Essence
             }
 
             EssenceSettings settings = m_Config != null ? m_Config.essence : EssenceSettings.Default;
-            // Upgrades (max Essence) and breakfast (max Essence or slower drain) from the day loop.
+            // Upgrades (max Essence) and delve meal (max Essence or slower drain) from the day loop.
             DelveLoadout loadout = GameFlow.Instance != null ? GameFlow.Instance.Loadout : DelveLoadout.None;
             m_Meter = new EssenceMeter(settings, new EssenceModifiers { MaxBonus = loadout.MaxEssenceBonus, DrainMultiplier = loadout.DrainMultiplier });
             m_Meter.Changed += PublishChanged;

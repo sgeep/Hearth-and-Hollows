@@ -70,7 +70,7 @@ namespace Hearthdelve.Tavern.Scene
 
         Mood MoodFor(TavernPhase phase) => phase switch
         {
-            TavernPhase.Morning => m_Morning,
+            TavernPhase.Daytime => m_Morning,
             TavernPhase.Night => m_Night,
             _ => m_Evening,
         };

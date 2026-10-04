@@ -16,11 +16,11 @@ using UnityEngine;
 
 namespace Hearthdelve.Tavern.Scene
 {
-    /// <summary>What's happening in the tavern: the morning before a delve, the evening's three parts, and the night.</summary>
+    /// <summary>What's happening in the tavern: the daytime, the evening's three parts, and the night after the delve.</summary>
     public enum TavernPhase
     {
-        /// <summary>Day loop: the storeroom, breakfast, setting off.</summary>
-        Morning,
+        /// <summary>Day loop: the daytime placeholder (the storeroom, tonight's delve meal, opening for the evening).</summary>
+        Daytime,
         Prep,
         Service,
         Results,
@@ -35,8 +35,8 @@ namespace Hearthdelve.Tavern.Scene
     /// </summary>
     /// <remarks>
     /// The evening runs Prep → Service → Results (<see cref="Phase"/>). In the day loop (a <see cref="GameFlow"/>
-    /// is running) the storeroom is the game's, the scene opens at the day's phase (Morning, the evening's Prep, or
-    /// Night), Results banks the takings and moves on to Night, and Sleep starts the next day. Played on its own the
+    /// is running) the storeroom is the game's, the scene opens at the day's phase (daytime, the evening's Prep, or
+    /// Night after the delve), Results banks the takings and closes up for the night's delve, and Sleep starts the next day. Played on its own the
     /// scene starts at Prep with a debug-filled storeroom, and Results offers another evening.
     /// </remarks>
     [DefaultExecutionOrder(-50)]
@@ -79,8 +79,8 @@ namespace Hearthdelve.Tavern.Scene
         public bool InDayLoop => m_Flow != null;
         /// <summary>F4 may fill the storeroom: always on its own, in the day loop only if the database allows it.</summary>
         public bool CanDebugFill => Debug.isDebugBuild && (m_Flow == null || m_Flow.AllowDebugFill);
-        /// <summary>This morning's breakfast has been eaten.</summary>
-        public bool HasEatenBreakfast => m_Flow != null && m_Flow.State.Meal.IsActive;
+        /// <summary>Today's delve meal has been eaten (it waits for tonight's delve).</summary>
+        public bool HasEatenDelveMeal => m_Flow != null && m_Flow.State.Meal.IsActive;
         /// <summary>The evening's outcome, once it's over (Results).</summary>
         public EveningReport Report { get; private set; }
         public int MaxMenuSize => m_Content.service.service.maxMenuSize;
@@ -131,7 +131,7 @@ namespace Hearthdelve.Tavern.Scene
             }
             SetPhase(m_Flow.Phase switch
             {
-                DayPhase.Morning => TavernPhase.Morning,
+                DayPhase.Daytime => TavernPhase.Daytime,
                 DayPhase.Night => TavernPhase.Night,
                 _ => TavernPhase.Prep,
             });
@@ -142,24 +142,24 @@ namespace Hearthdelve.Tavern.Scene
 
         void OnStoreroomChanged() => PrepChanged?.Invoke();
 
-        // ---------- Morning (day loop) ----------
+        // ---------- Daytime (day loop) ----------
 
-        /// <summary>Dishes that make a breakfast: Grill and Tap dishes with a buff (a stew is too slow for the morning).</summary>
-        public IEnumerable<RecipeDefinition> BreakfastOptions()
+        /// <summary>Dishes that make a delve meal: Grill and Tap dishes with a buff (a stew is too slow for the morning).</summary>
+        public IEnumerable<RecipeDefinition> DelveMealOptions()
         {
             foreach (RecipeDefinition recipe in m_Content.recipes)
                 if (recipe != null && recipe.station != CookStation.StewPot && recipe.mealBuff.kind != MealBuffKind.None) yield return recipe;
         }
 
-        public bool CanCookBreakfast(RecipeDefinition recipe) =>
-            Phase == TavernPhase.Morning && !HasEatenBreakfast && KeeperWork.Instance != null && KeeperWork.Instance.ActiveCook == null &&
+        public bool CanCookDelveMeal(RecipeDefinition recipe) =>
+            Phase == TavernPhase.Daytime && !HasEatenDelveMeal && KeeperWork.Instance != null && KeeperWork.Instance.ActiveCook == null &&
             recipe != null && recipe.station != CookStation.StewPot && recipe.mealBuff.kind != MealBuffKind.None && RecipeMatcher.CanCook(recipe, Storeroom);
 
-        /// <summary>Cooks one serving for breakfast at its station (the station panel opens, as in service).</summary>
-        public bool CookBreakfast(RecipeDefinition recipe) => CanCookBreakfast(recipe) && KeeperWork.Instance.CookBreakfast(recipe);
+        /// <summary>Cooks one serving for delve meal at its station (the station panel opens, as in service).</summary>
+        public bool CookDelveMeal(RecipeDefinition recipe) => CanCookDelveMeal(recipe) && KeeperWork.Instance.CookDelveMeal(recipe);
 
-        /// <summary>Breakfast is cooked and eaten: its buff, scaled by how well it came out, waits for today's delve.</summary>
-        public void EatBreakfast(RecipeDefinition recipe, CookedIngredients used, float cookScore)
+        /// <summary>The delve meal is cooked and eaten: its buff, scaled by how well it came out, waits for today's delve.</summary>
+        public void EatDelveMeal(RecipeDefinition recipe, CookedIngredients used, float cookScore)
         {
             DishScoringSettings scoring = m_Content.economy.dishScoring;
             float quality = DishScoring.DishQuality(used.Used, DishScoring.MinigameScore(cookScore, 1f, scoring), scoring);
@@ -167,12 +167,12 @@ namespace Hearthdelve.Tavern.Scene
             PrepChanged?.Invoke();
         }
 
-        /// <summary>Set off for the dungeon.</summary>
-        public void Descend()
+        /// <summary>The day is done: open the tavern for the evening.</summary>
+        public void OpenForEvening()
         {
-            if (Phase != TavernPhase.Morning || m_Flow == null || m_Flow.IsLoading) return;
+            if (Phase != TavernPhase.Daytime || m_Flow == null || m_Flow.IsLoading) return;
             KeeperWork.Instance?.StopWork();
-            m_Flow.StartDelve();
+            m_Flow.StartEvening();
         }
 
         // ---------- Night (day loop) ----------
@@ -191,7 +191,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             switch (Phase)
             {
-                case TavernPhase.Morning: Descend(); break;
+                case TavernPhase.Daytime: OpenForEvening(); break;
                 case TavernPhase.Prep: CloseForTheNight(); break;
                 case TavernPhase.Service: EndServiceNow(); break;
                 case TavernPhase.Results: FinishEvening(); break;
@@ -230,13 +230,14 @@ namespace Hearthdelve.Tavern.Scene
                 SetPhase(TavernPhase.Results);
                 return;
             }
+            // Kept shut: on to the night's delve (GameFlow loads the dungeon).
+            if (m_Flow.IsLoading) return;
             m_Flow.SkipService();
-            SetPhase(TavernPhase.Night);
         }
 
         /// <summary>
-        /// Results: done with the evening. In the day loop the takings are banked (and saved) and it's Night;
-        /// played on its own, another evening begins.
+        /// Results: done with the evening. In the day loop the takings are banked (and saved), the tavern closes and the
+        /// night's delve begins; played on its own, another evening begins.
         /// </summary>
         public void FinishEvening()
         {
@@ -246,9 +247,9 @@ namespace Hearthdelve.Tavern.Scene
                 UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
                 return;
             }
+            if (m_Flow.IsLoading) return;
             ServiceLedger ledger = Session != null ? Session.Ledger : new ServiceLedger();
             m_Flow.CompleteService(new ServiceReport(ledger.DishesServed, ledger.Gold, ledger.Tips, ledger.Renown, ledger.Walkouts));
-            SetPhase(TavernPhase.Night);
         }
 
         void SetPhase(TavernPhase phase)

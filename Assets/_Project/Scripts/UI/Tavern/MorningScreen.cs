@@ -14,9 +14,10 @@ using UnityEngine.UI;
 namespace Hearthdelve.UI.Tavern
 {
     /// <summary>
-    /// Morning (GDD §3.1, day loop): what's in the storeroom, an optional breakfast (one Grill or Tap dish, cooked
-    /// at its station's panel; how well it comes out scales its buff), what today's delve starts with from upgrades
-    /// and breakfast, and setting off. Out of the way while breakfast cooks.
+    /// The daytime placeholder (GDD §3.1, day loop; named for the old morning screen it grew from): what's in the
+    /// storeroom, an optional delve meal (one Grill or Tap dish, cooked at its station's panel; how well it comes out
+    /// scales its buff, which waits for tonight's delve), what tonight's delve starts with from upgrades and the meal,
+    /// and opening for the evening. Out of the way while the meal cooks. The free-roaming village day replaces it later.
     /// </summary>
     public sealed class MorningScreen : MonoBehaviour
     {
@@ -25,12 +26,12 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] SatchelSlotView[] m_Stock = Array.Empty<SatchelSlotView>();
         [SerializeField] LocalizedSuperText m_StockEmpty;
         [SerializeField] DishCard[] m_Cards = Array.Empty<DishCard>();
-        [SerializeField] LocalizedSuperText m_Breakfast;
+        [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_Breakfast")] LocalizedSuperText m_Meal;
         [SerializeField] LocalizedSuperText m_Bonuses;
         [SerializeField] Button m_Descend;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("The dish eaten this morning.")] Color m_EatenColour = new(0.98f, 0.86f, 0.5f);
-        [SerializeField, Tooltip("The bonus line flashes this colour when breakfast adds to it.")] Color m_BonusFlash = new(0.85f, 0.55f, 0.1f);
+        [SerializeField, Tooltip("The bonus line flashes this colour when delve meal adds to it.")] Color m_BonusFlash = new(0.85f, 0.55f, 0.1f);
         [SerializeField, Min(0.01f)] float m_BonusFlashSeconds = 0.8f;
 
         float m_BonusFlashLeft;
@@ -48,14 +49,14 @@ namespace Hearthdelve.UI.Tavern
         public Button DescendButton => m_Descend;
 
         public void Configure(GameObject root, LocalizedSuperText title, SatchelSlotView[] stock, LocalizedSuperText stockEmpty, DishCard[] cards,
-            LocalizedSuperText breakfast, LocalizedSuperText bonuses, Button descend)
+            LocalizedSuperText meal, LocalizedSuperText bonuses, Button descend)
         {
             m_Root = root;
             m_Title = title;
             m_Stock = stock;
             m_StockEmpty = stockEmpty;
             m_Cards = cards;
-            m_Breakfast = breakfast;
+            m_Meal = meal;
             m_Bonuses = bonuses;
             m_Descend = descend;
         }
@@ -65,13 +66,13 @@ namespace Hearthdelve.UI.Tavern
             m_Director = TavernDirector.Instance;
             m_Root.SetActive(false);
             if (m_Director == null) return;
-            m_Options.AddRange(m_Director.BreakfastOptions().Take(m_Cards.Length));
+            m_Options.AddRange(m_Director.DelveMealOptions().Take(m_Cards.Length));
             for (int i = 0; i < m_Cards.Length; i++)
             {
                 int index = i;
                 m_Cards[i].button.onClick.AddListener(() => Cook(index));
             }
-            m_Descend.onClick.AddListener(() => m_Director.Descend());
+            m_Descend.onClick.AddListener(() => m_Director.OpenForEvening());
             m_Director.PhaseChanged += MarkDirty;
             m_Director.PrepChanged += MarkDirty;
         }
@@ -89,14 +90,14 @@ namespace Hearthdelve.UI.Tavern
         {
             if (card >= m_Options.Count) return;
             RecipeDefinition recipe = m_Options[card];
-            m_Director.CookBreakfast(recipe);
+            m_Director.CookDelveMeal(recipe);
         }
 
         void LateUpdate()
         {
             if (m_Director == null) return;
-            // Hidden while breakfast cooks: the station panel has the screen.
-            bool shown = m_Director.Phase == TavernPhase.Morning && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null);
+            // Hidden while delve meal cooks: the station panel has the screen.
+            bool shown = m_Director.Phase == TavernPhase.Daytime && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null);
             if (shown != m_Root.activeSelf) m_Root.SetActive(shown);
             if (!shown)
             {
@@ -107,9 +108,9 @@ namespace Hearthdelve.UI.Tavern
             FlashBonuses();
             if (!m_WasShown && EventSystem.current != null)
             {
-                // First thing in the morning: the first breakfast you can cook; afterwards (or with none), setting off.
+                // First thing in the morning: the first delve meal you can cook; afterwards (or with none), setting off.
                 DishCard first = m_Cards.FirstOrDefault(c => c.button.gameObject.activeSelf && c.button.interactable);
-                EventSystem.current.SetSelectedGameObject(first != null && !m_Director.HasEatenBreakfast ? first.button.gameObject : m_Descend.gameObject);
+                EventSystem.current.SetSelectedGameObject(first != null && !m_Director.HasEatenDelveMeal ? first.button.gameObject : m_Descend.gameObject);
             }
             m_WasShown = true;
         }
@@ -139,7 +140,7 @@ namespace Hearthdelve.UI.Tavern
                 if (!exists) continue;
                 RecipeDefinition recipe = m_Options[i];
                 bool eaten = meal.IsActive && meal.RecipeId == recipe.id;
-                bool can = m_Director.CanCookBreakfast(recipe);
+                bool can = m_Director.CanCookDelveMeal(recipe);
                 card.icon.sprite = recipe.icon;
                 card.icon.enabled = recipe.icon != null;
                 card.name.Set(TavernLocKeys.Plain, Loc.Get(recipe.displayName));
@@ -156,13 +157,13 @@ namespace Hearthdelve.UI.Tavern
             if (meal.IsActive)
             {
                 RecipeDefinition dish = m_Director.Content.recipes.FirstOrDefault(r => r != null && r.id == meal.RecipeId);
-                m_Breakfast.Set(LoopLocKeys.MorningAte, dish != null ? Loc.Get(dish.displayName) : meal.RecipeId, Buff(meal.Kind, meal.Amount));
+                m_Meal.Set(LoopLocKeys.MorningAte, dish != null ? Loc.Get(dish.displayName) : meal.RecipeId, Buff(meal.Kind, meal.Amount));
             }
-            else if (!m_Options.Any(m_Director.CanCookBreakfast)) m_Breakfast.Set(LoopLocKeys.MorningNoBreakfast);
-            else m_Breakfast.Set(LoopLocKeys.MorningBreakfast);
+            else if (!m_Options.Any(m_Director.CanCookDelveMeal)) m_Meal.Set(LoopLocKeys.MorningNoBreakfast);
+            else m_Meal.Set(LoopLocKeys.MorningBreakfast);
 
             m_Bonuses.Set(TavernLocKeys.Plain, Bonuses(flow != null ? flow.Loadout : DelveLoadout.None));
-            // Breakfast just landed: the delve's bonus line lights up, so the meal's effect is seen.
+            // The delve meal just landed: the delve's bonus line lights up, so the meal's effect is seen.
             if (meal.IsActive && !m_HadMeal) m_BonusFlashLeft = m_BonusFlashSeconds;
             m_HadMeal = meal.IsActive;
         }

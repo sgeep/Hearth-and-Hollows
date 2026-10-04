@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Hearthdelve.Shared.Game
 {
-    /// <summary>A breakfast buff waiting for the next delve.</summary>
+    /// <summary>The delve meal's buff, eaten in the daytime and waiting for tonight's delve.</summary>
     public readonly struct MealBuff
     {
         /// <summary>A dish's buff is scaled by its quality, up to this multiple (Premium ingredients can beat a perfect Fine dish).</summary>
@@ -33,7 +33,7 @@ namespace Hearthdelve.Shared.Game
             recipe == null ? None : new MealBuff(recipe.mealBuff.kind, recipe.mealBuff.amount * Mathf.Clamp(dishQuality, 0f, MaxQualityScale), recipe.id);
     }
 
-    /// <summary>What the next delve starts with, from upgrades and breakfast.</summary>
+    /// <summary>What tonight's delve starts with, from upgrades and the delve meal.</summary>
     public readonly struct DelveLoadout
     {
         /// <summary>Essence drain can't be slowed below this fraction of normal.</summary>
@@ -79,26 +79,33 @@ namespace Hearthdelve.Shared.Game
         public int Tips;
         public int Walkouts;
         public int RenownChange;
+        /// <summary>The tavern stayed shut this evening.</summary>
+        public bool KeptShut;
+        /// <summary>Run Gold the delve brought home, and run Gold it lost.</summary>
+        public int DelveGold;
+        public int DelveGoldLost;
 
-        public int Earned => Gold + Tips;
+        /// <summary>Banked today: service takings and the delve's Gold.</summary>
+        public int Earned => Gold + Tips + DelveGold;
 
         public void Reset()
         {
             Delve = DelveOutcome.None;
-            PartsBroughtBack = PartsLost = DishesServed = Gold = Tips = Walkouts = RenownChange = 0;
+            PartsBroughtBack = PartsLost = DishesServed = Gold = Tips = Walkouts = RenownChange = DelveGold = DelveGoldLost = 0;
+            KeptShut = false;
         }
     }
 
     /// <summary>
     /// Everything that persists between days (and goes in the save): the day and phase, gold,
-    /// renown, the storeroom, upgrade levels, and a breakfast buff not yet used. Pure data;
+    /// renown, the storeroom, upgrade levels, and a delve meal not yet used. Pure data;
     /// <see cref="DayRules"/> changes it.
     /// </summary>
     public sealed class GameState
     {
         readonly Dictionary<string, int> m_UpgradeLevels = new();
 
-        public GameState(int day = 1, DayPhase phase = DayPhase.Morning) => Cycle = new DayCycle(day, phase);
+        public GameState(int day = 1, DayPhase phase = DayPhase.Daytime) => Cycle = new DayCycle(day, phase);
 
         public DayCycle Cycle { get; }
         public int Day => Cycle.Day;

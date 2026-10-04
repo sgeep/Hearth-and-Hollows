@@ -94,6 +94,7 @@ namespace Hearthdelve.UI.Screens
         static string PhaseKey(string phase) => phase switch
         {
             nameof(DayPhase.Evening) => LoopLocKeys.PhaseEvening,
+            nameof(DayPhase.Delve) => LoopLocKeys.PhaseDelve,
             nameof(DayPhase.Night) => LoopLocKeys.PhaseNight,
             _ => LoopLocKeys.PhaseMorning,
         };
