@@ -84,7 +84,8 @@ namespace Hearthdelve.Shared.Haptics
         {
             if (s_Instance != null && s_Instance != this)
             {
-                Destroy(gameObject);
+                // Only this component: a scene's copy shares its object with other managers (the Boot scene's runs the day loop).
+                Destroy(this);
                 return;
             }
             s_Instance = this;

@@ -14,8 +14,19 @@ namespace Hearthdelve.Shared.Game
     {
         public const string Boot = "Boot";
         public const string MainMenu = "MainMenu";
-        public const string Tavern = "TavernGreybox";
-        public const string Dungeon = "CombatGreybox";
+        public const string Tavern = "Tavern";
+        /// <summary>The test floor is the delve until 4d's generated floors (4c decision 5).</summary>
+        public const string Dungeon = "Dungeon_TestFloor";
+    }
+
+    /// <summary>
+    /// Covers the screen while the content scene changes and reveals it again (a fade with the day and
+    /// phase, in the UI). Optional: without one, scenes simply swap.
+    /// </summary>
+    public interface ISceneTransition
+    {
+        IEnumerator Cover();
+        IEnumerator Reveal();
     }
 
     /// <summary>Debug: skip to the next phase. The loaded scene finishes its phase properly if it can.</summary>
@@ -46,11 +57,11 @@ namespace Hearthdelve.Shared.Game
         public DelveLoadout Loadout => State != null && m_Database != null ? m_Database.Loadout(State) : DelveLoadout.None;
         public SaveStore Store { get; private set; }
         public bool HasSave => Store != null && Store.Exists;
+        /// <summary>The screen transition (the Boot scene's fade), if any.</summary>
+        public ISceneTransition Transition { get; set; }
         public bool IsLoading { get; private set; }
         public string LoadedScene => m_LoadedScene;
         public bool AllowDebugFill => m_Database != null && m_Database.allowDebugFill;
-        /// <summary>Debug end-of-day summary at Night (F10).</summary>
-        public bool ShowSummary { get; set; }
         /// <summary>Messages from the last load (dropped content) or save failure.</summary>
         public List<string> LastWarnings { get; } = new();
 
@@ -70,7 +81,6 @@ namespace Hearthdelve.Shared.Game
             }
             Instance = this;
             Store = new SaveStore(SaveDirectoryOverride ?? Application.persistentDataPath);
-            ShowSummary = Debug.isDebugBuild;
         }
 
         void Start() => Load(GameScenes.MainMenu);
@@ -82,9 +92,29 @@ namespace Hearthdelve.Shared.Game
 
         // ---------- Menu ----------
 
+        /// <summary>
+        /// The saved game, if there is one and it can be read: what Continue offers (and whether it's offered
+        /// at all). Null for no save, or one that's unreadable or from a newer version.
+        /// </summary>
+        public SaveData PeekSave()
+        {
+            if (!HasSave) return null;
+            try
+            {
+                return SaveSystem.FromJson(Store.Read());
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Hearthdelve] The save can't be read: {e.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>Starts day 1. It's saved at once, so Continue never brings back a game the player started over from.</summary>
         public void NewGame()
         {
             State = new GameState { Gold = m_Database != null ? m_Database.newGameGold : 0 };
+            Save();
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));
         }
@@ -93,10 +123,11 @@ namespace Hearthdelve.Shared.Game
         public bool Continue()
         {
             LastWarnings.Clear();
-            if (!HasSave) return false;
+            SaveData data = PeekSave();
+            if (data == null) return false;
             try
             {
-                State = SaveSystem.Restore(SaveSystem.FromJson(Store.Read()), m_Database, LastWarnings);
+                State = SaveSystem.Restore(data, m_Database, LastWarnings);
             }
             catch (Exception e)
             {
@@ -221,12 +252,15 @@ namespace Hearthdelve.Shared.Game
         {
             while (IsLoading) yield return null;
             IsLoading = true;
+            ISceneTransition transition = Transition;
+            if (transition != null) yield return transition.Cover();
             if (!string.IsNullOrEmpty(m_LoadedScene) && SceneManager.GetSceneByName(m_LoadedScene).isLoaded)
                 yield return SceneManager.UnloadSceneAsync(m_LoadedScene);
             yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene));
             m_LoadedScene = scene;
             IsLoading = false;
+            if (transition != null) yield return transition.Reveal();
         }
     }
 }

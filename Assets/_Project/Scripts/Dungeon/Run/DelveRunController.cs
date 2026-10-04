@@ -37,8 +37,20 @@ namespace Hearthdelve.Dungeon.Run
 
         void Awake() => Active = this;
 
-        void OnEnable() => EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
-        void OnDisable() => EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
+        void OnEnable()
+        {
+            EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
+            EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
+        }
+
+        void OnDisable()
+        {
+            EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
+            EventBus<DebugSkipPhaseRequested>.Unsubscribe(OnDebugSkip);
+        }
+
+        // F8 in the day loop: leave as if through the exit, result screen and all.
+        void OnDebugSkip(DebugSkipPhaseRequested _) => Extract();
 
         void OnDestroy()
         {
