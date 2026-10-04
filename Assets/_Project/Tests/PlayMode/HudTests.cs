@@ -116,7 +116,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.Destroyed | Hearthdelve.Shared.Run.HarvestFlags.Overkill), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestDestroyed));
         }
 
-        /// <summary>Nothing on the HUD covers anything else at 320×180: bar, label, satchel, feed, prompts, the debug label.</summary>
+        /// <summary>Nothing on the HUD covers anything else at 320×180: bar, its icon, satchel, feed, prompts, the debug label.</summary>
         [UnityTest]
         public IEnumerator HudAndPrompts_NeverOverlap()
         {
@@ -125,7 +125,7 @@ namespace Hearthdelve.Tests.PlayMode
             var parts = new Dictionary<string, RectTransform>
             {
                 ["essence bar"] = Object.FindAnyObjectByType<EssenceBar>().GetComponent<RectTransform>(),
-                ["essence label"] = (RectTransform)canvas.transform.Find("Hud/EssenceLabel"),
+                ["essence icon"] = (RectTransform)canvas.transform.Find("Hud/EssenceIcon"),
                 ["satchel"] = Object.FindAnyObjectByType<SatchelHud>().GetComponent<RectTransform>(),
                 ["harvest feed"] = Object.FindAnyObjectByType<HarvestFeed>().GetComponent<RectTransform>(),
                 ["prompts"] = (RectTransform)canvas.transform.Find("SwapPrompt/Hint"),

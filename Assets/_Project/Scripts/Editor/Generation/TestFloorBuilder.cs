@@ -307,6 +307,7 @@ namespace Hearthdelve.Editor
         [MenuItem("Hearthdelve/Generate/4b Update Test Floor UI")]
         public static void UpdateTestFloorUI()
         {
+            MinifantasyImporter.ImportAll();
             LocalizationBuilder.Build();
             var scene = EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
             Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI");

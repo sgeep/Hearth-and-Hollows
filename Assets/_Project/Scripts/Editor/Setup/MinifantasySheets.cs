@@ -85,6 +85,7 @@ namespace Hearthdelve.Editor
         const string k_PotionIcons = "Minifantasy_CraftingAndProfessions_v1.0/Minifantasy_CraftingAndProfessions_Assets/Craftable_Item_Icons";
         const string k_Fireplaces = "Minifantasy_DwarvenKingdom_v1.0/Minifantasy_DwarvenKingdom_Assets/Props/Ilumination";
         const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
+        const string k_UiIcons = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Icons";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -326,6 +327,14 @@ namespace Hearthdelve.Editor
                     new SheetRect("CornerBL", 255, 109, 4, 4, new Vector2(0f, 0f)),
                     new SheetRect("CornerBR", 269, 109, 4, 4, new Vector2(1f, 0f)),
                 },
+            });
+
+            // UI Overhaul's 8×8 icons, "to be placed next to overlay elements such as HP bars": the magic spark marks
+            // the Essence bar (CHARACTER group, 8th icon of the second row).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_UiIcons}/Icons_Only.png", Pack = UIOverhaul, File = "Icons", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("MagicSpark", 488, 40, 8, 8, k_Centre) },
             });
 
             // UI and icons.
