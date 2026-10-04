@@ -46,10 +46,12 @@ namespace Hearthdelve.Dungeon.Rooms
         MMF_Player m_ClearFeedback;
         [SerializeField, Tooltip("Dropping into a hole: sound and haptic together.")]
         MMF_Player m_FallFeedback;
-        [Header("TEMPORARY (4d step 2): signs over exits until step 3's reward previews")]
+        [Header("What each exit promises (the door previews)")]
         [SerializeField] Sprite m_MarkerOut;
         [SerializeField] Sprite m_MarkerDeeper;
         [SerializeField] Sprite m_MarkerArena;
+        [SerializeField] Sprite m_MarkerGold;
+        [SerializeField] Sprite m_MarkerIngredient;
 
         RoomEncounter m_Encounter;
         int m_Entered = -1;
@@ -69,7 +71,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public int RoomsEntered => m_Entered + 1;
 
         public void Configure(RunSettings settings, Transform roomRoot, NavGrid nav, CinemachineCamera camera, RoomCameraBounds cameraBounds,
-            MMF_Player sealFeedback, MMF_Player clearFeedback, MMF_Player fallFeedback, Sprite markerOut, Sprite markerDeeper, Sprite markerArena)
+            MMF_Player sealFeedback, MMF_Player clearFeedback, MMF_Player fallFeedback, Sprite markerOut, Sprite markerDeeper, Sprite markerArena,
+            Sprite markerGold, Sprite markerIngredient)
         {
             m_Settings = settings;
             m_RoomRoot = roomRoot;
@@ -82,6 +85,8 @@ namespace Hearthdelve.Dungeon.Rooms
             m_MarkerOut = markerOut;
             m_MarkerDeeper = markerDeeper;
             m_MarkerArena = markerArena;
+            m_MarkerGold = markerGold;
+            m_MarkerIngredient = markerIngredient;
         }
 
         void OnEnable() => Active = this;
@@ -122,6 +127,7 @@ namespace Hearthdelve.Dungeon.Rooms
 
         void OnCleared()
         {
+            GrantReward(Node.Reward);
             OpenUsedExits(instant: false);
             Current.SetRevealed(true);
             m_ClearFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
@@ -142,14 +148,51 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (exit != null) exit.SetOpen(exit.Index < Node.Next.Count, instant);
         }
 
-        /// <summary>Where each exit leads, as a sign over its doorway.</summary>
+        /// <summary>What each exit promises, as a sign over its doorway: the way out, deeper, the arena, or the kind of reward a fight gives.</summary>
         Sprite MarkerFor(FloorNode target) => target.Kind switch
         {
             RoomKind.Extraction => m_MarkerOut,
             RoomKind.Descent => m_MarkerDeeper,
             RoomKind.Arena => m_MarkerArena,
+            RoomKind.Combat => target.Reward.Kind switch
+            {
+                RewardKind.Gold => m_MarkerGold,
+                RewardKind.Ingredient => m_MarkerIngredient,
+                _ => null,
+            },
             _ => null,
         };
+
+        /// <summary>The room's reward, on the floor near its middle once it's clear.</summary>
+        public void GrantReward(RoomReward reward)
+        {
+            if (reward.Kind == RewardKind.None || reward.Amount <= 0 || Current == null) return;
+            Vector2 at = RewardPoint();
+            switch (reward.Kind)
+            {
+                case RewardKind.Gold when m_Settings.goldPickup != null:
+                    GoldPickup coin = Instantiate(m_Settings.goldPickup, at, Quaternion.identity, Current.transform);
+                    coin.SetAmount(reward.Amount);
+                    break;
+                case RewardKind.Ingredient when HarvestSystem.Instance != null:
+                    Hearthdelve.Shared.Ingredients.IngredientDefinition ingredient = m_Settings.RewardIngredient(reward.ItemId);
+                    if (ingredient == null) break;
+                    HarvestSystem.Instance.Drop(new Hearthdelve.Shared.Inventory.IngredientStack(
+                        new Hearthdelve.Shared.Ingredients.IngredientItem(ingredient, reward.Quality), reward.Amount, 1f), at, null);
+                    break;
+            }
+        }
+
+        /// <summary>The ground spawn point nearest the room's middle (spawn points are always reachable floor).</summary>
+        Vector2 RewardPoint()
+        {
+            Vector2 middle = (Vector2)Current.transform.position + (Vector2)Current.Size / 2f;
+            Transform best = null;
+            foreach (Transform point in Current.GroundSpawns)
+                if (point != null && (best == null || Vector2.Distance(point.position, middle) < Vector2.Distance(best.position, middle)))
+                    best = point;
+            return best != null ? best.position : Current.Arrival.position + Vector3.up * 3f;
+        }
 
         /// <summary>Unloads the current room and loads <paramref name="node"/> with the player at its arrival.</summary>
         void Load(FloorGraph floor, FloorNode node)
@@ -291,11 +334,12 @@ namespace Hearthdelve.Dungeon.Rooms
             if (target != player.transform) target.position = new Vector3(at.x, at.y, target.position.z);
         }
 
-        /// <summary>Parts left lying and webs in flight stay behind with the room.</summary>
+        /// <summary>Parts and Gold left lying, and webs in flight, stay behind with the room.</summary>
         static void ClearLeftovers()
         {
             foreach (IngredientPickup pickup in FindObjectsByType<IngredientPickup>(FindObjectsSortMode.None)) Destroy(pickup.gameObject);
             foreach (WebProjectile web in FindObjectsByType<WebProjectile>(FindObjectsSortMode.None)) Destroy(web.gameObject);
+            foreach (GoldPickup coin in FindObjectsByType<GoldPickup>(FindObjectsSortMode.None)) Destroy(coin.gameObject);
         }
     }
 }

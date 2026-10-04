@@ -41,6 +41,8 @@ namespace Hearthdelve.Dungeon.Rooms
         /// <summary>The nodes this room's exits lead to, left to right (exit 0 → Next[0]).</summary>
         public List<int> Next { get; } = new();
         public List<EncounterSpawn> Encounter { get; } = new();
+        /// <summary>What clearing the room gives (fights only); its door shows the kind.</summary>
+        public RoomReward Reward { get; internal set; } = RoomReward.None;
 
         /// <summary>Where the run ends or leaves the floor: no exits.</summary>
         public bool IsEnd => Kind is RoomKind.Extraction or RoomKind.Descent or RoomKind.Arena;
@@ -82,7 +84,7 @@ namespace Hearthdelve.Dungeon.Rooms
             {
                 text.Append($"floor {floor.Floor}\n");
                 foreach (FloorNode node in floor.Nodes)
-                    text.Append($"  {node.Id} L{node.Layer}.{node.Lane} {node.Kind} {node.RoomId} -> [{string.Join(",", node.Next)}] {{{string.Join(" ", node.Encounter)}}}\n");
+                    text.Append($"  {node.Id} L{node.Layer}.{node.Lane} {node.Kind} {node.RoomId} -> [{string.Join(",", node.Next)}] {{{string.Join(" ", node.Encounter)}}} <{node.Reward}>\n");
             }
             return text.ToString();
         }

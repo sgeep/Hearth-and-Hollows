@@ -52,6 +52,15 @@ namespace Hearthdelve.Editor
             bar.Configure(fill);
             bar.ConfigureArt(UISprite("BarFillBlue"), UISprite("BarFillRed"), flash);
 
+            // The run's unbanked Gold (4d step 3): a coin and the amount under the bar, once there is some.
+            RectTransform gold = LookTestBuilder.UIRect(root, "RunGold", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -18f), new Vector2(60f, 12f));
+            RectTransform coin = LookTestBuilder.UIRect(gold, "Coin", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
+            AddImage(coin, MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"), Color.white);
+            LocalizedSuperText amount = LookTestBuilder.Text(gold, "Amount", LocKeys.HudRunGold, 6f, new Color(1f, 0.85f, 0.45f), TextAnchor.UpperLeft,
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(11f, 0f), new Vector2(49f, 12f));
+            var runGold = root.gameObject.AddComponent<Hearthdelve.UI.Hud.RunGoldView>();
+            runGold.Configure(gold.gameObject, amount);
+
             RectTransform satchel = LookTestBuilder.UIRect(root, "Satchel", Vector2.zero, Vector2.zero, new Vector2(4f, 8f), new Vector2(94f, 17f));
             var slots = new SatchelSlotView[6];
             for (int i = 0; i < slots.Length; i++)
@@ -370,7 +379,7 @@ namespace Hearthdelve.Editor
         public static DelveResultScreen BuildResultScreen(Canvas canvas)
         {
             RectTransform root = FullScreen(canvas, "DelveResult");
-            RectTransform panel = Panel(root, new Vector2(240f, 100f), new Vector2(0f, 4f));
+            RectTransform panel = Panel(root, new Vector2(240f, 112f), new Vector2(0f, 4f));
             LocalizedSuperText title = Title(panel, LocKeys.ResultTitleExtracted);
             SatchelSlotView[] slots = SlotRow(panel, 0f, false, out Button[] buttons);
             // Display only: nothing to choose here.
@@ -380,12 +389,15 @@ namespace Hearthdelve.Editor
                 button.navigation = new Navigation { mode = Navigation.Mode.None };
             }
             LocalizedSuperText summary = Line(panel, "Summary", LocKeys.ResultSummary, -14f);
+            // The run's Gold (4d step 3): brought home, or left behind.
+            LocalizedSuperText gold = Line(panel, "Gold", LocKeys.ResultGoldSecured, -26f);
+            gold.GetComponent<SuperTextMesh>().color = k_Accent;
             Button proceed = TextButton(panel, "Continue", LocKeys.ResultDelveAgain, new Vector2(0f, 7f), 112f, out LocalizedSuperText proceedLabel);
             UiFeedbackContent.Commit(proceed);
             proceed.navigation = new Navigation { mode = Navigation.Mode.None };
 
             var screen = root.gameObject.AddComponent<DelveResultScreen>();
-            screen.Configure(panel.gameObject, title, summary, slots, proceed, proceedLabel);
+            screen.Configure(panel.gameObject, title, summary, slots, proceed, proceedLabel, gold);
             panel.gameObject.SetActive(false);
             return screen;
         }

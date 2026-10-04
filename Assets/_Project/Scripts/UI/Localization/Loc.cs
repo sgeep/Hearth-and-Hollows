@@ -192,6 +192,10 @@ namespace Hearthdelve.UI.Localization
         public const string DelveControls = "delve.controls";
         /// <summary>4d debug: which run this is (the seed replays it), the floor and the room.</summary>
         public const string DelveDebug = "delve.debug";
+        /// <summary>4d step 3: the run's unbanked Gold, and what became of it.</summary>
+        public const string HudRunGold = "hud.run_gold";
+        public const string ResultGoldSecured = "result.gold_secured";
+        public const string ResultGoldLost = "result.gold_lost";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
@@ -253,6 +257,9 @@ namespace Hearthdelve.UI.Localization
             (TestFloorHint, "move: WASD / stick   attack: left mouse / X   dodge: Space / B   F3: tavern look test"),
             (DelveControls, "move: WASD / stick   attack: click / X   dodge: Space / B"),
             (DelveDebug, "seed {0} · floor {1} · room {2}"),
+            (HudRunGold, "{0} Gold"),
+            (ResultGoldSecured, "+{0} Gold to the purse"),
+            (ResultGoldLost, "{0} Gold left in the dark"),
         };
     }
 }

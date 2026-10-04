@@ -87,6 +87,7 @@ namespace Hearthdelve.Editor
         const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
         const string k_UiIcons = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Icons";
         const string k_GladiatorGate = "All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate";
+        const string k_Miscellany = "All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -99,6 +100,7 @@ namespace Hearthdelve.Editor
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         public const string DwarvenKingdom = "DwarvenKingdom";
         public const string GladiatorArena = "GladiatorArena";
+        public const string MiscellanyIcons = "MiscellanyIcons";
 
         /// <summary>The 4d room gate: frames 0–3 open it, 4–7 close it.</summary>
         public const int GateFrames = 8;
@@ -355,7 +357,16 @@ namespace Hearthdelve.Editor
                     new SheetRect("ArrowUp", 32, 64, 8, 8, k_Centre),
                     new SheetRect("ArrowDown", 64, 64, 8, 8, k_Centre),
                     new SheetRect("Swords", 392, 40, 8, 8, k_Centre),
+                    // 4d step 3: an ingredient room's door sign (CHARACTER group, food).
+                    new SheetRect("Food", 536, 40, 8, 8, k_Centre),
                 },
+            });
+
+            // Miscellany Icons (coins, torches, MMO UI): the big gold coin, for run Gold (4d step 3).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_Miscellany}/Miscellany_1.png", Pack = MiscellanyIcons, File = "Miscellany", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("GoldCoin", 0, 0, 8, 8, k_Centre) },
             });
 
             // UI and icons.

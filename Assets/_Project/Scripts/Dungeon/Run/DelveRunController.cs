@@ -32,6 +32,10 @@ namespace Hearthdelve.Dungeon.Run
         public bool IsEnding { get; private set; }
         /// <summary>Delve Marks collected this run (none drop yet; 4e).</summary>
         public int RunCurrency { get; set; }
+        /// <summary>What the run has found outside the satchel: its unbanked Gold (4d step 3).</summary>
+        public RunLoot Loot { get; } = new();
+
+        void PublishGold(int gold) => EventBus<RunGoldChanged>.Publish(new RunGoldChanged(gold));
         /// <summary>The report of the delve once it has ended.</summary>
         public DelveReport Report { get; private set; }
 
@@ -39,12 +43,14 @@ namespace Hearthdelve.Dungeon.Run
 
         void OnEnable()
         {
+            Loot.GoldChanged += PublishGold;
             EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
         }
 
         void OnDisable()
         {
+            Loot.GoldChanged -= PublishGold;
             EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Unsubscribe(OnDebugSkip);
         }
@@ -71,7 +77,7 @@ namespace Hearthdelve.Dungeon.Run
             if (IsEnding) return false;
             IsEnding = true;
             Satchel satchel = PlayerSatchel();
-            DelveReport report = satchel != null ? DelveReport.Extraction(satchel) : DelveReport.Empty;
+            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold) : DelveReport.Empty;
             satchel?.Clear();
             End(report);
             return true;
@@ -100,7 +106,7 @@ namespace Hearthdelve.Dungeon.Run
             DeathPenaltyResult result = DeathPenalty.Resolve(satchel, keepSlot, RunCurrency);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
-            End(DelveReport.Death(result));
+            End(DelveReport.Death(result, Loot.Gold));
         }
 
         void End(DelveReport report)

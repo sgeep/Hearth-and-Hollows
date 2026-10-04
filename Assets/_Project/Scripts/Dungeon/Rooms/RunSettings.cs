@@ -18,6 +18,12 @@ namespace Hearthdelve.Dungeon.Rooms
         public GameObject slime;
         public GameObject bat;
         public GameObject spider;
+        [Tooltip("A room's Gold reward, on the floor once it's clear.")]
+        public GoldPickup goldPickup;
+
+        /// <summary>A reward ingredient by id (from the tuning's options).</summary>
+        public Hearthdelve.Shared.Ingredients.IngredientDefinition RewardIngredient(string id) =>
+            tuning.ingredientRewards?.FirstOrDefault(o => o != null && o.ingredient != null && o.ingredient.id == id)?.ingredient;
 
         public RoomDefinition Room(string id) => rooms.FirstOrDefault(r => r != null && r.id == id);
 

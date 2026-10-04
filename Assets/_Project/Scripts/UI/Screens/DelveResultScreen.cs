@@ -18,6 +18,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] GameObject m_Panel;
         [SerializeField] LocalizedSuperText m_Title;
         [SerializeField] LocalizedSuperText m_Summary;
+        [SerializeField, Tooltip("The run's Gold: brought home, or lost.")]
+        LocalizedSuperText m_Gold;
         [SerializeField] SatchelSlotView[] m_Slots = Array.Empty<SatchelSlotView>();
         [SerializeField] Button m_Continue;
         [SerializeField] LocalizedSuperText m_ContinueLabel;
@@ -29,8 +31,10 @@ namespace Hearthdelve.UI.Screens
         public SatchelSlotView[] Slots => m_Slots;
         public Button Continue => m_Continue;
 
-        public void Configure(GameObject panel, LocalizedSuperText title, LocalizedSuperText summary, SatchelSlotView[] slots, Button proceed, LocalizedSuperText proceedLabel)
+        public void Configure(GameObject panel, LocalizedSuperText title, LocalizedSuperText summary, SatchelSlotView[] slots, Button proceed, LocalizedSuperText proceedLabel,
+            LocalizedSuperText gold = null)
         {
+            m_Gold = gold;
             m_Panel = panel;
             m_Title = title;
             m_Summary = summary;
@@ -58,6 +62,13 @@ namespace Hearthdelve.UI.Screens
             {
                 if (Report.Haul.Count == 0) m_Summary.Set(Report.PartsLost > 0 ? LocKeys.ResultNothingLost : LocKeys.ResultNothing, Report.PartsLost);
                 else m_Summary.Set(LocKeys.ResultSummary, Report.PartsBroughtBack, Report.PartsLost);
+            }
+            if (m_Gold != null)
+            {
+                bool any = Report.GoldSecured > 0 || Report.GoldLost > 0;
+                m_Gold.gameObject.SetActive(any);
+                if (Report.GoldSecured > 0) m_Gold.Set(LocKeys.ResultGoldSecured, Report.GoldSecured);
+                else if (Report.GoldLost > 0) m_Gold.Set(LocKeys.ResultGoldLost, Report.GoldLost);
             }
             for (int i = 0; i < m_Slots.Length; i++)
             {

@@ -49,6 +49,7 @@ namespace Hearthdelve.Editor
         }
 
         public const string SettingsPath = EditorPaths.Data + "/Dungeon/RunSettings.asset";
+        public const string GoldPickupPrefab = EditorPaths.Prefabs + "/Dungeon/GoldPickup.prefab";
 
         /// <summary>
         /// Rebuilds the rooms and the run settings (keeping their tuning). The scene is created if it doesn't exist, rebuilt
@@ -70,7 +71,7 @@ namespace Hearthdelve.Editor
             Debug.Log("[Hearthdelve] 4d dungeon generated.");
         }
 
-        /// <summary>The run's rooms and enemies are refreshed every time; its tuning is kept (it's for editing).</summary>
+        /// <summary>The run's rooms, enemies and Gold pickup are refreshed every time; its tuning is kept (it's for editing).</summary>
         static RunSettings BuildSettings(LookTestBuilder.Content content, Dictionary<string, RoomDefinition> rooms)
         {
             RunSettings settings = LookTestContent.LoadOrCreate<RunSettings>(SettingsPath);
@@ -78,9 +79,64 @@ namespace Hearthdelve.Editor
             settings.slime = content.Slime;
             settings.bat = content.Bat;
             settings.spider = content.Spider;
+            settings.goldPickup = BuildGoldPickup();
+            // Step 3's rewards, once: settings made before step 3 have no ingredient list, and their floors took the reward
+            // fields' plain defaults rather than the per-floor ones. Later edits are kept.
+            if (settings.tuning.ingredientRewards == null || settings.tuning.ingredientRewards.Length == 0)
+            {
+                settings.tuning.ingredientRewards = DefaultIngredientRewards();
+                FloorTuning[] defaults = RunTuning.Defaults();
+                for (int f = 0; f < settings.tuning.floors.Length && f < defaults.Length; f++)
+                {
+                    FloorTuning floor = settings.tuning.floors[f], d = defaults[f];
+                    floor.goldWeight = d.goldWeight;
+                    floor.ingredientWeight = d.ingredientWeight;
+                    floor.minGold = d.minGold;
+                    floor.maxGold = d.maxGold;
+                    floor.minParts = d.minParts;
+                    floor.maxParts = d.maxParts;
+                    floor.fineChance = d.fineChance;
+                }
+            }
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             return settings;
+        }
+
+        /// <summary>
+        /// The dungeon's own ingredients as room rewards: the Cellars' monster parts, the slime core and the venom sac only
+        /// from the second floor down. (Shroom cap and spore sac wait for the Mushroom People and their icons.)
+        /// </summary>
+        static IngredientRewardOption[] DefaultIngredientRewards()
+        {
+            IngredientRewardOption Option(string asset, float weight, int fromFloor) => new()
+            {
+                ingredient = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/Ingredient_{asset}.asset"),
+                weight = weight,
+                fromFloor = fromFloor,
+            };
+            return new[]
+            {
+                Option("SlimeGel", 1f, 1), Option("BatWing", 1f, 1), Option("SpiderLeg", 1f, 1),
+                Option("SlimeCore", 0.7f, 2), Option("VenomSac", 0.7f, 2),
+            }.Where(o => o.ingredient != null).ToArray();
+        }
+
+        /// <summary>A room's Gold reward: a bobbing coin (unlit, so it reads on a dim floor, like the parts) that adds to the run's Gold.</summary>
+        static GoldPickup BuildGoldPickup()
+        {
+            var root = new GameObject("GoldPickup") { layer = LayerMask.NameToLayer(Layers.Pickup) };
+            var trigger = root.AddComponent<CircleCollider2D>();
+            trigger.isTrigger = true;
+            trigger.radius = 0.45f;
+            trigger.offset = new Vector2(0f, 0.25f);
+            SpriteRenderer coin = LookTestContent.AddSprite(root.transform, "Coin", MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"),
+                SortingLayers.YSorted, 0, new Vector3(0f, 0.25f, 0f));
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            if (unlit != null) coin.sharedMaterial = unlit;
+            MMF_Player feedback = LookTestContent.Feedback(root.transform, "Feedback_Gold", null, 0f, LookTestContent.Sfx("PH_Coin"), LookTestContent.Pattern(HapticIds.TapLight));
+            root.AddComponent<GoldPickup>().Configure(coin.transform, feedback);
+            return LookTestContent.SavePrefab(root, GoldPickupPrefab).GetComponent<GoldPickup>();
         }
 
         /// <summary>
@@ -107,6 +163,8 @@ namespace Hearthdelve.Editor
         static void UpdateRun(RunSettings settings)
         {
             Scene scene = EditorSceneManager.OpenScene(EditorPaths.DungeonScene, OpenSceneMode.Single);
+            // The HUD and the result screen (step 3: run Gold) are rebuilt with the run.
+            DungeonUI.RebuildScreens(UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI"));
             var runner = UnityEngine.Object.FindAnyObjectByType<RoomRunner>(FindObjectsInactive.Include);
             ConfigureRunner(runner, settings);
             Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI");
@@ -141,7 +199,9 @@ namespace Hearthdelve.Editor
                 follow.GetComponent<RoomCameraBounds>(), seal, clear, fall,
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "ArrowUp"),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "ArrowDown"),
-                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Swords"));
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Swords"),
+                MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"),
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Food"));
             EditorUtility.SetDirty(runner);
         }
 
@@ -194,7 +254,7 @@ namespace Hearthdelve.Editor
                 (LookTestContent.Noise(n) * 0.5f + Sin(t, 70f - 40f * t) * 0.9f) * Mathf.Exp(-t * 14f) * 0.8f);
             LookTestContent.WriteWav("PH_GateRise", 0.5f, (t, n) =>
                 (LookTestContent.Noise(n) * 0.35f + Sin(t, 900f) * 0.15f) * (0.6f + 0.4f * Sin(t, 22f)) * Mathf.Sin(t / 0.5f * Mathf.PI) * 0.6f);
-            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh" })
+            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin" })
                 AssetDatabase.ImportAsset($"{EditorPaths.Audio}/{name}.wav");
         }
 

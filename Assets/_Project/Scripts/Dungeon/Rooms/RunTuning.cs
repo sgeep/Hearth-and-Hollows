@@ -1,4 +1,5 @@
 using System;
+using Hearthdelve.Shared.Ingredients;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Rooms
@@ -26,6 +27,19 @@ namespace Hearthdelve.Dungeon.Rooms
         [Min(0f)] public float batWeight = 0.3f;
         [Min(0f)] public float spiderWeight = 0.2f;
 
+        [Header("Room rewards (4d step 3)")]
+        [Tooltip("How often a fight's reward is run Gold.")]
+        [Min(0f)] public float goldWeight = 1f;
+        [Tooltip("How often a fight's reward is a dungeon ingredient.")]
+        [Min(0f)] public float ingredientWeight = 1f;
+        [Min(0)] public int minGold = 10;
+        [Min(0)] public int maxGold = 18;
+        [Tooltip("Parts in an ingredient reward.")]
+        [Range(1, 3)] public int minParts = 1;
+        [Range(1, 3)] public int maxParts = 2;
+        [Tooltip("Chance an ingredient reward is fine quality rather than standard.")]
+        [Range(0f, 1f)] public float fineChance = 0.2f;
+
         public float Weight(EnemyKind kind) => kind switch
         {
             EnemyKind.Slime => slimeWeight,
@@ -46,11 +60,22 @@ namespace Hearthdelve.Dungeon.Rooms
         [Min(0)] public int spiders = 2;
     }
 
-    /// <summary>The run's shape: three floors (top to bottom) and the arena's stand-in fight.</summary>
+    /// <summary>A dungeon ingredient a room can give, how often, and from which floor down.</summary>
+    [Serializable]
+    public sealed class IngredientRewardOption
+    {
+        public IngredientDefinition ingredient;
+        [Min(0f)] public float weight = 1f;
+        [Range(1, 3)] public int fromFloor = 1;
+    }
+
+    /// <summary>The run's shape: three floors (top to bottom), the arena's stand-in fight, and what rooms can give.</summary>
     [Serializable]
     public sealed class RunTuning
     {
         public FloorTuning[] floors = Defaults();
+        [Tooltip("Dungeon ingredients rooms can give: things the surface can't (GDD §4.8, §5.5).")]
+        public IngredientRewardOption[] ingredientRewards = Array.Empty<IngredientRewardOption>();
         [Tooltip("TEMPORARY: the arena's stand-in fight until the 4e boss.")]
         public ArenaPlaceholder arenaPlaceholder = new();
 
@@ -58,12 +83,12 @@ namespace Hearthdelve.Dungeon.Rooms
 
         public FloorTuning Floor(int index) => floors != null && floors.Length > 0 ? floors[Mathf.Clamp(index, 0, floors.Length - 1)] : new FloorTuning();
 
-        /// <summary>Deeper floors: more enemies, more mixed groups.</summary>
+        /// <summary>Deeper floors: more enemies, more mixed groups, more Gold and better parts.</summary>
         public static FloorTuning[] Defaults() => new[]
         {
-            new FloorTuning { minEnemies = 2, maxEnemies = 3, slimeWeight = 1f, batWeight = 0.25f, spiderWeight = 0.1f },
-            new FloorTuning { minEnemies = 3, maxEnemies = 4, slimeWeight = 1f, batWeight = 0.4f, spiderWeight = 0.35f },
-            new FloorTuning { minEnemies = 4, maxEnemies = 5, slimeWeight = 0.8f, batWeight = 0.5f, spiderWeight = 0.6f },
+            new FloorTuning { minEnemies = 2, maxEnemies = 3, slimeWeight = 1f, batWeight = 0.25f, spiderWeight = 0.1f, minGold = 10, maxGold = 18, minParts = 1, maxParts = 2, fineChance = 0.2f },
+            new FloorTuning { minEnemies = 3, maxEnemies = 4, slimeWeight = 1f, batWeight = 0.4f, spiderWeight = 0.35f, minGold = 18, maxGold = 30, minParts = 1, maxParts = 2, fineChance = 0.45f },
+            new FloorTuning { minEnemies = 4, maxEnemies = 5, slimeWeight = 0.8f, batWeight = 0.5f, spiderWeight = 0.6f, minGold = 30, maxGold = 45, minParts = 2, maxParts = 3, fineChance = 0.7f },
         };
     }
 

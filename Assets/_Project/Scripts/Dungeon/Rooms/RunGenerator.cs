@@ -17,6 +17,8 @@ namespace Hearthdelve.Dungeon.Rooms
     /// of a floor is "leave with what I have, or go deeper". Some floors also offer an early rope partway through.</item>
     /// <item>Rooms are chosen by kind and by how many exits they need, avoiding repeats where the pool allows.</item>
     /// <item>Each fight gets an encounter from the floor's tuning, placed on the room's spawn points.</item>
+    /// <item>Each fight gets a reward (4d step 3): run Gold or a dungeon ingredient, rolled now so a seed replays it, richer
+    /// deeper down. Where a room offers a choice of fights, the choice offers different kinds of reward.</item>
     /// </list>
     /// </summary>
     public static class RunGenerator
@@ -90,6 +92,9 @@ namespace Hearthdelve.Dungeon.Rooms
             var onThisFloor = new HashSet<string>();
             foreach (FloorNode node in nodes) AssignRoom(node, rooms, random, used, onThisFloor);
             foreach (FloorNode node in nodes) AssignEncounter(node, t, tuning.arenaPlaceholder, rooms, random);
+            foreach (FloorNode node in nodes)
+                if (node.Kind == RoomKind.Combat) node.Reward = RollReward(PickRewardKind(t, random), index + 1, t, tuning, random);
+            VaryChoices(nodes, index + 1, t, tuning, random);
             return new FloorGraph(index + 1, nodes);
         }
 
@@ -184,6 +189,54 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (roll < 0f) return kind;
             }
             return kinds[^1];
+        }
+
+        static RewardKind PickRewardKind(FloorTuning t, SeededRandom random)
+        {
+            float total = t.goldWeight + t.ingredientWeight;
+            if (total <= 0f) return RewardKind.Gold;
+            return random.Value() * total < t.goldWeight ? RewardKind.Gold : RewardKind.Ingredient;
+        }
+
+        /// <summary>The payload for a reward of the given kind on this floor (Gold, or which part, how many, how good).</summary>
+        static RoomReward RollReward(RewardKind kind, int floor, FloorTuning t, RunTuning tuning, SeededRandom random)
+        {
+            if (kind == RewardKind.Ingredient)
+            {
+                var options = (tuning.ingredientRewards ?? Array.Empty<IngredientRewardOption>())
+                    .Where(o => o != null && o.ingredient != null && o.fromFloor <= floor && o.weight > 0f).ToList();
+                if (options.Count > 0)
+                {
+                    float roll = random.Value() * options.Sum(o => o.weight);
+                    IngredientRewardOption pick = options[^1];
+                    foreach (IngredientRewardOption option in options)
+                    {
+                        roll -= option.weight;
+                        if (roll < 0f)
+                        {
+                            pick = option;
+                            break;
+                        }
+                    }
+                    int parts = random.Range(Math.Min(t.minParts, t.maxParts), Math.Max(t.minParts, t.maxParts));
+                    var quality = random.Value() < t.fineChance ? Hearthdelve.Shared.Ingredients.Quality.Fine : Hearthdelve.Shared.Ingredients.Quality.Standard;
+                    return RoomReward.Ingredient(pick.ingredient.id, quality, parts);
+                }
+            }
+            return RoomReward.Gold(random.Range(Math.Min(t.minGold, t.maxGold), Math.Max(t.minGold, t.maxGold)));
+        }
+
+        /// <summary>A choice between fights should be a choice between rewards: if every fight on offer gives the same kind, the last gives the other.</summary>
+        static void VaryChoices(List<FloorNode> nodes, int floor, FloorTuning t, RunTuning tuning, SeededRandom random)
+        {
+            foreach (FloorNode node in nodes)
+            {
+                List<FloorNode> fights = node.Next.Select(id => nodes[id]).Where(n => n.Kind == RoomKind.Combat).ToList();
+                if (fights.Count < 2 || fights.Select(n => n.Reward.Kind).Distinct().Count() > 1) continue;
+                RewardKind other = fights[0].Reward.Kind == RewardKind.Gold ? RewardKind.Ingredient : RewardKind.Gold;
+                // With at most two rooms a step, a choice of two fights is always the whole next step, so one change serves every room offering it.
+                fights[^1].Reward = RollReward(other, floor, t, tuning, random);
+            }
         }
 
         static List<int> Shuffled(int count, SeededRandom random)

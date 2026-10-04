@@ -9,16 +9,22 @@ namespace Hearthdelve.Shared.Game
     /// <summary>What a delve brought back.</summary>
     public sealed class DelveReport
     {
-        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost)
+        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost)
         {
             Outcome = outcome;
             Haul = haul;
             PartsLost = partsLost;
+            GoldSecured = goldSecured;
+            GoldLost = goldLost;
         }
 
         public DelveOutcome Outcome { get; }
         public IReadOnlyList<IngredientStack> Haul { get; }
         public int PartsLost { get; }
+        /// <summary>Run Gold brought home (extraction): banked when the delve completes.</summary>
+        public int GoldSecured { get; }
+        /// <summary>Run Gold left in the dungeon (death). Gold already banked is never lost.</summary>
+        public int GoldLost { get; }
 
         public int PartsBroughtBack
         {
@@ -30,26 +36,26 @@ namespace Hearthdelve.Shared.Game
             }
         }
 
-        /// <summary>Left through the exit: everything in the satchel comes home (freshness as it is now).</summary>
-        public static DelveReport Extraction(Satchel satchel)
+        /// <summary>Left through the exit: everything in the satchel comes home (freshness as it is now), and the run's Gold with it.</summary>
+        public static DelveReport Extraction(Satchel satchel, int runGold = 0)
         {
             var haul = new List<IngredientStack>();
             if (satchel != null)
                 foreach (var slot in satchel.Slots)
                     if (!slot.IsEmpty) haul.Add(slot);
-            return new DelveReport(DelveOutcome.Extracted, haul, 0);
+            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0);
         }
 
-        /// <summary>Died: only the Lockbox stack comes home.</summary>
-        public static DelveReport Death(DeathPenaltyResult result)
+        /// <summary>Died: only the Lockbox stack comes home; the run's Gold is lost.</summary>
+        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0)
         {
             var haul = new List<IngredientStack>();
             if (result.KeptSomething) haul.Add(result.Kept);
-            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost);
+            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold));
         }
 
         /// <summary>Debug skip: nothing brought back.</summary>
-        public static DelveReport Empty => new(DelveOutcome.None, new List<IngredientStack>(), 0);
+        public static DelveReport Empty => new(DelveOutcome.None, new List<IngredientStack>(), 0, 0, 0);
     }
 
     /// <summary>What an evening's service earned.</summary>
@@ -79,12 +85,14 @@ namespace Hearthdelve.Shared.Game
     {
         public static void StartDelve(GameState state) => Require(state, DayPhase.Morning).Cycle.AdvanceTo(DayPhase.Delve);
 
-        /// <summary>The haul goes into the storeroom, the breakfast buff is used up, and it's evening.</summary>
+        /// <summary>The haul goes into the storeroom, the run's Gold into the purse, the breakfast buff is used up, and it's evening.</summary>
         public static void CompleteDelve(GameState state, DelveReport report)
         {
             Require(state, DayPhase.Delve);
             if (report == null) throw new ArgumentNullException(nameof(report));
             state.Storeroom.AddRange(report.Haul);
+            // Run Gold is banked only if it came home (GDD §4.4); banked Gold is never at risk.
+            state.Gold += report.GoldSecured;
             state.Today.Delve = report.Outcome;
             state.Today.PartsBroughtBack += report.PartsBroughtBack;
             state.Today.PartsLost += report.PartsLost;

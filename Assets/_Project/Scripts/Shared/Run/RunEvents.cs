@@ -171,6 +171,13 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
+    /// <summary>The run's unbanked Gold changed (4d step 3), with the new total.</summary>
+    public readonly struct RunGoldChanged : IEvent
+    {
+        public readonly int Gold;
+        public RunGoldChanged(int gold) => Gold = gold;
+    }
+
     /// <summary>The last enemy in the room fell and its exits are opening.</summary>
     public readonly struct RoomCleared : IEvent
     {
