@@ -185,10 +185,10 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(EventSystem.current.currentSelectedGameObject, Is.SameAs(screen.Slots[0].gameObject), "the first slot is selected");
             yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
             string shown = string.Join(" | ", screen.GetComponentsInChildren<SuperTextMesh>().Select(t => t.text));
-            Assert.That(shown, Does.Contain("Satchel Full"), shown);
-            Assert.That(shown, Does.Contain("Fine Spider Leg"), "the subtitle names the part found: " + shown);
-            Assert.That(shown, Does.Contain("Leave it"), shown);
-            Assert.That(shown, Does.Contain("Bat Wing"), "the detail line names the selected slot's part: " + shown);
+            Assert.That(shown, Does.Contain("satchel full"), shown);
+            Assert.That(shown, Does.Contain("fine spider leg"), "the subtitle names the part found: " + shown);
+            Assert.That(shown, Does.Contain("leave it"), shown);
+            Assert.That(shown, Does.Contain("bat wing"), "the detail line names the selected slot's part: " + shown);
 
             yield return Tap(Key.RightArrow);
             Assert.That(EventSystem.current.currentSelectedGameObject, Is.SameAs(screen.Slots[1].gameObject), "right moves along the slots");

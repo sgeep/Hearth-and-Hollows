@@ -83,7 +83,7 @@ namespace Hearthdelve.Tests
             Assert.That(english, Does.Not.Contain("Rat Haunch").And.Not.Contain("Rat Liver").And.Not.Contain("Giant Rat"));
             foreach (string key in new[] { "ingredient.spider_leg", "ingredient.venom_sac", "ingredient.bat_wing", "enemy.bat", "enemy.giant_spider", "recipe.grilled_spider_leg" })
                 Assert.That(keys, Does.Contain($"m_Key: {key}"), key);
-            foreach (string name in new[] { "Spider Leg", "Venom Sac", "Bat Wing", "Giant Spider", "Grilled Spider Leg" })
+            foreach (string name in new[] { "spider leg", "venom sac", "bat wing", "giant spider", "grilled spider leg" })
                 Assert.That(english, Does.Contain($"m_Localized: {name}"), name);
         }
     }

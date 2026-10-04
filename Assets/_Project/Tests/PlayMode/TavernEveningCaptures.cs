@@ -73,6 +73,7 @@ namespace Hearthdelve.Tests.PlayMode
             }
             var target = new RenderTexture(320, 180, 24) { filterMode = FilterMode.Point };
             camera.targetTexture = target;
+            foreach (var pixel in Object.FindObjectsByType<Hearthdelve.UI.PixelCanvasScaler>()) pixel.Apply();
             foreach (var scaler in Object.FindObjectsByType<UnityEngine.UI.CanvasScaler>())
                 typeof(UnityEngine.UI.CanvasScaler).GetMethod("Handle", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(scaler, null);
             Canvas.ForceUpdateCanvases();

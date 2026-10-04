@@ -52,11 +52,11 @@ namespace Hearthdelve.Tests.PlayMode
 
             Assert.That(Prep.Recipes.Count, Is.EqualTo(Director.Content.recipes.Count), "a card per dish");
             DishCard stew = Prep.Cards[CardOf("cellar_stew")];
-            Assert.That(stew.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("Chop, then Simmer"), "the stew's two steps");
+            Assert.That(stew.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("chop, simmer"), "the stew's two steps");
             DishCard kebab = Prep.Cards[CardOf("cellar_kebab")];
-            Assert.That(kebab.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("Grill"));
-            Assert.That(kebab.detail.GetComponent<SuperTextMesh>().text, Does.StartWith($"{Director.Content.recipes.First(r => r.id == "cellar_kebab").baseValue} gold, "));
-            Assert.That(kebab.detail.GetComponent<SuperTextMesh>().text, Does.EndWith(" to serve"));
+            Assert.That(kebab.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("grill"));
+            Assert.That(kebab.detail.GetComponent<SuperTextMesh>().text, Is.EqualTo($"{Director.Content.recipes.First(r => r.id == "cellar_kebab").baseValue} gold"), "the price");
+            Assert.That(kebab.amount.GetComponent<SuperTextMesh>().text, Does.EndWith(" to serve"), "how many");
             Assert.That(Prep.OpenButton.interactable, Is.False, "nothing chosen yet: the doors stay shut");
         }
 
@@ -109,7 +109,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Hud.RowsShown, Is.EqualTo(1), "the order is on the rail");
             RailRow row = Hud.Rows[0];
             Assert.That(row.icon.sprite, Is.SameAs(kebab.icon));
-            Assert.That(row.state.GetComponent<SuperTextMesh>().text, Is.EqualTo("Waiting"));
+            Assert.That(row.state.GetComponent<SuperTextMesh>().text, Is.EqualTo("waiting"));
             Assert.That(row.patience.gameObject.activeSelf, "with the customer's patience");
             Assert.That(Hud.Clock, Is.LessThan(startClock), "the clock runs down");
 
@@ -117,7 +117,7 @@ namespace Hearthdelve.Tests.PlayMode
             Ticket ticket = Director.Session.Tickets.Single();
             Director.Session.StartCooking(ticket, this);
             yield return null;
-            Assert.That(row.state.GetComponent<SuperTextMesh>().text, Is.EqualTo("Cooking"));
+            Assert.That(row.state.GetComponent<SuperTextMesh>().text, Is.EqualTo("cooking"));
             Director.Session.FinishCooking(ticket, 1f);
             Director.Session.StartDelivery(ticket, this);
             Director.Session.Deliver(ticket, customer.Logic, 1f);
@@ -126,7 +126,7 @@ namespace Hearthdelve.Tests.PlayMode
             Time.timeScale = 1f;
             yield return null;
             Assert.That(Hud.RowsShown, Is.Zero, "served orders leave the rail");
-            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Any(t => t.name == "Gold" && t.text == $"Gold {Director.Session.Ledger.Gold}"), "the takings show");
+            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Any(t => t.name == "Gold" && t.text == $"gold\n{Director.Session.Ledger.Gold}"), "the takings show");
         }
 
         [UnityTest]
@@ -163,10 +163,10 @@ namespace Hearthdelve.Tests.PlayMode
 
             yield return WaitUntil(() => !Results.IsRevealing, 10f, "the lines to be revealed");
             var texts = Object.FindObjectsByType<SuperTextMesh>().Where(t => t.gameObject.activeInHierarchy).Select(t => t.text).ToList();
-            Assert.That(texts, Has.Some.EqualTo("Everything sold out, so we closed early."));
-            Assert.That(texts, Has.Some.EqualTo("Dishes served: 1"));
-            Assert.That(texts, Has.Some.StartWith("Takings: "));
-            Assert.That(texts, Has.None.StartWith("Walkouts"), "no trouble line when there was none");
+            Assert.That(texts, Has.Some.EqualTo("everything sold out, so we closed early."));
+            Assert.That(texts, Has.Some.EqualTo("dishes served: 1"));
+            Assert.That(texts, Has.Some.StartWith("takings: "));
+            Assert.That(texts, Has.None.StartWith("walkouts"), "no trouble line when there was none");
 
             Results.DoneButton.onClick.Invoke();
             yield return WaitUntil(() => Director != null && Director.Phase == TavernPhase.Prep && Prep != null && Prep.IsShown, 5f, "another evening's prep");
@@ -186,8 +186,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Director.Report.StayedShut);
             yield return WaitUntil(() => !Results.IsRevealing, 5f, "the screen to settle");
             var texts = Object.FindObjectsByType<SuperTextMesh>().Where(t => t.gameObject.activeInHierarchy).Select(t => t.text).ToList();
-            Assert.That(texts, Has.Some.EqualTo("We kept the doors shut tonight."));
-            Assert.That(texts, Has.None.StartWith("Takings"));
+            Assert.That(texts, Has.Some.EqualTo("we kept the doors shut tonight."));
+            Assert.That(texts, Has.None.StartWith("takings"));
         }
 
         /// <summary>The HUD keeps to the side margins and nothing on it overlaps.</summary>
@@ -205,7 +205,7 @@ namespace Hearthdelve.Tests.PlayMode
                 rect.GetWorldCorners(corners);
                 return Rect.MinMaxRect(corners[0].x, corners[0].y, corners[2].x, corners[2].y);
             }
-            string[] parts = { "Clock", "LastOrders", "Gold", "Tips", "Renown", "Menu1", "Orders", "Order1", "Order10" };
+            string[] parts = { "Clock", "LastOrders", "Gold", "Tips", "Renown", "Menu1", "Orders", "Order1", "Order8" };
             var rects = parts.ToDictionary(p => p, p => Bounds((RectTransform)content.Find(p)));
             for (int i = 0; i < parts.Length; i++)
             for (int j = i + 1; j < parts.Length; j++)

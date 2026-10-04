@@ -1,0 +1,163 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Hearthdelve.Core.Animation;
+using Hearthdelve.Editor;
+using Hearthdelve.UI;
+using Hearthdelve.UI.Localization;
+using NUnit.Framework;
+using UnityEditor;
+using UnityEditor.Localization;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace Hearthdelve.Tests
+{
+    /// <summary>
+    /// The game's text (4c step 6): m5x7 can draw every string in every locale (a glyph check against the font itself,
+    /// replacing the old Latin-1 rule), English is written in Hearthdelve's lower-case style by its authors (not
+    /// converted at runtime), and the scenes' text and canvases are set up to draw the pixel font crisply.
+    /// </summary>
+    public class TextStyleTests
+    {
+        static Font Font => GameFonts.Load();
+
+        static IEnumerable<(string key, string text)> CodeEnglish =>
+            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(LocalizationBuilder.ContentEnglish);
+
+        /// <summary>Every string in every locale's tables, as stored.</summary>
+        static IEnumerable<(string where, string text)> TableStrings()
+        {
+            foreach (StringTableCollection collection in LocalizationEditorSettings.GetStringTableCollections())
+            foreach (var table in collection.StringTables)
+            foreach (var entry in table.Values)
+                if (!string.IsNullOrEmpty(entry.Value))
+                    yield return ($"{collection.TableCollectionName}/{table.LocaleIdentifier.Code}/{entry.Key}", entry.Value);
+        }
+
+        [Test]
+        public void TheGameFont_IsM5x7_ImportedAsAPixelFont_WithNoFallbackFonts()
+        {
+            Assert.That(Font, Is.Not.Null, GameFonts.FontPath);
+            var importer = (TrueTypeFontImporter)AssetImporter.GetAtPath(GameFonts.FontPath);
+            Assert.That(importer.fontRenderingMode, Is.EqualTo(FontRenderingMode.HintedRaster));
+            Assert.That(importer.fontSize, Is.EqualTo(GameFonts.Native));
+            Assert.That(importer.includeFontData, "the font travels with the build (no system font on the web)");
+            Assert.That(importer.fontNames, Is.EqualTo(new[] { "m5x7" }), "no other font names to fall back to");
+            Assert.That(importer.fontReferences, Is.Empty, "no fallback font references");
+            Assert.That(Directory.GetFiles("Assets", "m5x7*.ttf", SearchOption.AllDirectories), Has.Length.EqualTo(1), "one copy of the font");
+        }
+
+        /// <summary>
+        /// m5x7 covers Basic Latin, Latin-1 (less the soft hyphen), Latin Extended-A and €: English and most European
+        /// languages. Nothing else may appear in a string, in any locale, or it would draw as nothing (the web build has no
+        /// system fonts to fall back on). A language the font can't draw needs a font decision, not a quiet fallback.
+        /// </summary>
+        [Test]
+        public void EveryString_InEveryLocale_IsDrawableInM5x7()
+        {
+            Assert.That(Font.HasCharacter('a') && Font.HasCharacter('ž'), "the font's coverage can be read");
+            var missing = new List<string>();
+            foreach (var (where, text) in TableStrings().Concat(CodeEnglish.Select(e => ($"code/{e.key}", e.text))))
+            foreach (char c in text)
+                if (c != '\n' && !Font.HasCharacter(c))
+                    missing.Add($"{where}: '{c}' (U+{(int)c:X4}) in \"{text}\"");
+            Assert.That(missing, Is.Empty, string.Join("\n", missing.Distinct()));
+        }
+
+        /// <summary>Words that keep a capital in English: proper nouns and control labels (CLAUDE.md, Localization).</summary>
+        static readonly HashSet<string> k_Capitalised = new()
+        {
+            "Hearthdelve", "Pip", "Cellars",
+            "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
+        };
+
+        /// <summary>
+        /// Hearthdelve's English is lower case except proper nouns and control labels: every capitalised word in a source
+        /// string must be one of those. (Not a snapshot of the text: it checks the rule, so new strings are held to it too.)
+        /// </summary>
+        [Test]
+        public void EnglishSourceStrings_AreLowerCase_ExceptProperNounsAndControls()
+        {
+            var bad = new List<string>();
+            foreach (var (key, text) in CodeEnglish)
+            foreach (Match word in Regex.Matches(text, @"[A-Za-z][A-Za-z0-9']*"))
+                if (char.IsUpper(word.Value[0]) && !k_Capitalised.Contains(word.Value))
+                    bad.Add($"{key}: \"{word.Value}\" in \"{text}\"");
+            Assert.That(bad, Is.Empty, string.Join("\n", bad) + "\nIf one of these is a proper noun, add it to the list (and say so in review).");
+        }
+
+        [Test]
+        public void ImportantStrings_HaveTheirAuthoredCasing()
+        {
+            var english = CodeEnglish.ToDictionary(e => e.key, e => e.text);
+            Assert.That(english[TavernLocKeys.PrepOpen], Is.EqualTo("open the doors"));
+            Assert.That(english[LoopLocKeys.PrepClose], Is.EqualTo("close for the night"));
+            Assert.That(english[TavernLocKeys.HudLastOrders], Is.EqualTo("last orders!"));
+            Assert.That(english[TavernLocKeys.TicketReady], Is.EqualTo("ready"));
+            Assert.That(english[TavernLocKeys.TicketStewWaiting], Is.EqualTo("stewing"));
+            Assert.That(english[LoopLocKeys.MenuNewGame], Is.EqualTo("new game"));
+            Assert.That(english["recipe.cellar_stew"], Is.EqualTo("cellar stew"));
+            Assert.That(english["ingredient.spider_leg"], Is.EqualTo("spider leg"));
+            Assert.That(english["staff.pip"], Is.EqualTo("Pip"), "a proper noun keeps its capital");
+            Assert.That(english[LoopLocKeys.MenuTitle], Is.EqualTo("Hearthdelve"));
+            Assert.That(english[TavernLocKeys.TavernControls], Does.Contain("WASD").And.Contain("E / A"), "control labels keep their casing");
+        }
+
+        /// <summary>The style is written into the strings, never applied in code (so proper nouns, control labels and other languages are safe).</summary>
+        [Test]
+        public void NoCodeChangesTheCaseOfText()
+        {
+            var offenders = Directory.GetFiles("Assets/_Project/Scripts", "*.cs", SearchOption.AllDirectories)
+                .Where(f => Regex.IsMatch(File.ReadAllText(f), @"\.(ToLower|ToLowerInvariant|ToUpper|ToUpperInvariant)\s*\(|ToTitleCase"))
+                .ToArray();
+            Assert.That(offenders, Is.Empty);
+        }
+
+        [Test]
+        public void PixelScale_IsTheLargestWholeNumberThatFits()
+        {
+            Assert.That(PixelScale.For(320, 180), Is.EqualTo(1));
+            Assert.That(PixelScale.For(1920, 1080), Is.EqualTo(6));
+            Assert.That(PixelScale.For(1280, 720), Is.EqualTo(4));
+            Assert.That(PixelScale.For(1366, 768), Is.EqualTo(4), "never fractional");
+            Assert.That(PixelScale.For(1920, 1200), Is.EqualTo(6), "the narrower fit wins");
+            Assert.That(PixelScale.For(200, 100), Is.EqualTo(1), "at least one");
+        }
+
+        /// <summary>Every text in the day loop's scenes draws m5x7 at a pixel size, and every canvas scales by whole pixels.</summary>
+        [Test]
+        public void TheDayLoopsScenes_DrawEveryTextInM5x7_OnWholePixels()
+        {
+            string[] scenes = { EditorPaths.TavernScene, EditorPaths.TestFloorScene, BootBuilder.BootScene, BootBuilder.MainMenuScene };
+            var problems = new List<string>();
+            foreach (string path in scenes)
+            {
+                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+                try
+                {
+                    foreach (GameObject root in scene.GetRootGameObjects())
+                    {
+                        foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
+                        {
+                            string name = $"{Path.GetFileNameWithoutExtension(path)}/{text.name}";
+                            if (text.font != Font) problems.Add($"{name}: font {text.font}");
+                            if (text.size != GameFonts.Body && text.size != GameFonts.Large) problems.Add($"{name}: size {text.size}");
+                            if (text.quality != GameFonts.Native || text.filterMode != FilterMode.Point) problems.Add($"{name}: quality {text.quality}, filter {text.filterMode}");
+                        }
+                        foreach (Canvas canvas in root.GetComponentsInChildren<Canvas>(true))
+                            if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace && canvas.GetComponent<PixelCanvasScaler>() == null)
+                                problems.Add($"{Path.GetFileNameWithoutExtension(path)}/{canvas.name}: no whole-pixel scaling");
+                    }
+                }
+                finally
+                {
+                    EditorSceneManager.CloseScene(scene, true);
+                }
+            }
+            Assert.That(problems, Is.Empty, string.Join("\n", problems));
+        }
+    }
+}

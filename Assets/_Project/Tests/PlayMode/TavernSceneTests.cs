@@ -221,7 +221,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(hint.IsShown);
             string key = Hearthdelve.UI.Screens.InputHints.TavernInteract();
             Assert.That(key, Does.StartWith("E"), "the hint names the Interact key");
-            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: Grill"));
+            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: grill"));
 
             Hold(Key.E);
             yield return null;
@@ -236,7 +236,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(grill.IsHighlighted, Is.False, "one highlight at a time");
             Assert.That(pass.IsHighlighted);
-            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: The pass"));
+            Assert.That(hint.GetComponentInChildren<SuperTextMesh>().text, Is.EqualTo($"{key}: the pass"));
 
             Teleport(Player, new Vector2(13.5f, 5.5f));
             yield return WaitUntil(() => interactor.Target == null, 1f, "walking away to clear the target");

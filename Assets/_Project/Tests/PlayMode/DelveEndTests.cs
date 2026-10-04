@@ -147,7 +147,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(EventSystem.current.currentSelectedGameObject, Is.SameAs(death.Confirm.gameObject), "then on to Return to the surface");
             yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
             string shown = string.Join(" | ", death.GetComponentsInChildren<SuperTextMesh>().Select(t => t.text));
-            Assert.That(shown, Does.Contain("Your Essence Fades").And.Contain("Lockbox: Fine Bat Wing ×3"), shown);
+            Assert.That(shown, Does.Contain("your essence fades").And.Contain("lockbox: fine bat wing ×3"), shown);
 
             yield return Tap(Key.Enter);
             Assert.That(death.IsOpen, Is.False);
@@ -159,7 +159,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(result.Report.PartsLost, Is.EqualTo(3), "the rest is lost");
             Assert.That(MenuPause.IsPaused, "still paused under the result");
             shown = string.Join(" | ", result.GetComponentsInChildren<SuperTextMesh>().Select(t => t.text));
-            Assert.That(shown, Does.Contain("Delve again").And.Contain("Lost: 3"), shown);
+            Assert.That(shown, Does.Contain("delve again").And.Contain("lost: 3"), shown);
 
             yield return ExpectFreshFloor(result);
         }
