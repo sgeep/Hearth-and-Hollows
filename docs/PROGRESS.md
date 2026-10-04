@@ -545,7 +545,6 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 **Step 7 playtest changes (2026-10-04):**
 - **Plain punctuation.** Silver draws its period, middle dot, comma, colon and semicolon as 3×3 plus signs. Our copy is adapted (CC BY 4.0 allows it; the credit says so): those five glyphs are single-pixel dots like Silver's own "!" and "?", with narrower advances, by `Tools/fonts/silver_plain_punctuation.py` (reproducible and idempotent). No strings changed. `TextStyleTests` guards it.
 - **The Essence label is now an icon.** Silver has no smaller pixel-exact size, so the word under the bar became UI Overhaul's 8×8 magic-spark icon beside the bar (the pack's icons are meant for "next to ... HP bars"), centred on it; the bar moved right to make room. (A second, smaller font was considered and dropped: Silver stays the only font.)
-- **The colon sat low:** its dots are raised a pixel (rows 1 and 5, centred on the x-height), and the semicolon's dot with it.
 - **The empty storeroom row read "storeroom the storeroom is empty."** It now reads as a label and its value, "storeroom  empty"; the line under it (breakfast at Morning, dishes at Prep) says what that means.
 - **A Night resumed from a save showed a made-up day** ("delve: skipped", "served 0", "banked tonight 0 Gold"): the save keeps the purse and Renown but not the day's story (found on the web build). A resumed Night now shows only the purse and Renown. Tested by `ContinuingAtNight_ShowsOnlyWhatTheSaveKnows`.
 

@@ -19,8 +19,8 @@ GLYPHS = {
     0x2E: (3, [(1, 0, 2, 1)]),                    # .  one pixel on the baseline
     0xB7: (3, [(1, 3, 2, 4)]),                    # ·  one pixel, raised
     0x2C: (4, [(2, 0, 3, 1), (1, -1, 2, 0)]),     # ,  a dot and a tail down-left
-    0x3A: (2, [(0, 1, 1, 2), (0, 5, 1, 6)]),      # :  two dots, centred on the x-height
-    0x3B: (4, [(2, 0, 3, 1), (1, -1, 2, 0), (2, 5, 3, 6)]),  # ;  a comma and a dot level with the colon's top
+    0x3A: (2, [(0, 0, 1, 1), (0, 4, 1, 5)]),      # :  two dots, the lower on the baseline
+    0x3B: (4, [(2, 0, 3, 1), (1, -1, 2, 0), (2, 4, 3, 5)]),  # ;  a comma and a dot level with the colon's top
 }
 
 
