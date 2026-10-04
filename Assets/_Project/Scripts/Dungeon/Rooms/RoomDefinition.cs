@@ -2,14 +2,19 @@ using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Rooms
 {
-    /// <summary>What a room is for. The floor graph (4d step 2) chooses rooms by kind.</summary>
+    /// <summary>What a room is for. The run generator chooses rooms by kind.</summary>
     public enum RoomKind
     {
         /// <summary>Where a run begins: no enemies.</summary>
         Start,
+        /// <summary>A fight, with spawn points for the encounter the run chooses.</summary>
         Combat,
-        /// <summary>The rope out.</summary>
+        /// <summary>The rope out: the run ends here, with everything carried.</summary>
         Extraction,
+        /// <summary>The hole down to the next floor.</summary>
+        Descent,
+        /// <summary>The biome's boss arena. Its rope appears once it's clear.</summary>
+        Arena,
     }
 
     /// <summary>

@@ -14,10 +14,22 @@ namespace Hearthdelve.Dungeon.Rooms
         [SerializeField] Transform m_Arrival;
         [SerializeField] RoomExit[] m_Exits = Array.Empty<RoomExit>();
         [SerializeField] Transform m_Enemies;
+        [SerializeField, Tooltip("Where the run's encounter stands: ground points, bottom row first.")]
+        Transform[] m_GroundSpawns = Array.Empty<Transform>();
+        [SerializeField, Tooltip("Bat perches, under the walls.")]
+        Transform[] m_PerchSpawns = Array.Empty<Transform>();
+        [SerializeField, Tooltip("Shown once the room is clear (the arena's rope).")]
+        GameObject[] m_RevealOnClear = Array.Empty<GameObject>();
+        [SerializeField, Tooltip("The hole down, in a descent room.")]
+        FloorDescent m_Descent;
 
         public Vector2Int Size => m_Size;
         public Transform Arrival => m_Arrival;
         public RoomExit[] Exits => m_Exits;
+        public Transform Enemies => m_Enemies;
+        public Transform[] GroundSpawns => m_GroundSpawns;
+        public Transform[] PerchSpawns => m_PerchSpawns;
+        public FloorDescent Descent => m_Descent;
         /// <summary>The room's tiles in world tile coordinates.</summary>
         public RectInt TileBounds => new(Vector2Int.RoundToInt(transform.position), m_Size);
 
@@ -27,6 +39,31 @@ namespace Hearthdelve.Dungeon.Rooms
             m_Arrival = arrival;
             m_Exits = exits;
             m_Enemies = enemies;
+        }
+
+        public void ConfigureRun(Transform[] groundSpawns, Transform[] perchSpawns, GameObject[] revealOnClear, FloorDescent descent)
+        {
+            m_GroundSpawns = groundSpawns;
+            m_PerchSpawns = perchSpawns;
+            m_RevealOnClear = revealOnClear;
+            m_Descent = descent;
+        }
+
+        /// <summary>Places one enemy of the run's encounter on its spawn point.</summary>
+        public GameObject Spawn(EncounterSpawn spawn, GameObject prefab)
+        {
+            Transform[] points = spawn.Kind == EnemyKind.Bat ? m_PerchSpawns : m_GroundSpawns;
+            if (prefab == null || spawn.Point < 0 || spawn.Point >= points.Length) return null;
+            GameObject enemy = Instantiate(prefab, points[spawn.Point].position, Quaternion.identity, m_Enemies);
+            enemy.name = prefab.name;
+            return enemy;
+        }
+
+        /// <summary>Shows what waits for the room to be clear (the arena's rope), or hides it.</summary>
+        public void SetRevealed(bool revealed)
+        {
+            foreach (GameObject thing in m_RevealOnClear)
+                if (thing != null) thing.SetActive(revealed);
         }
 
         /// <summary>Enemies in the room still alive.</summary>

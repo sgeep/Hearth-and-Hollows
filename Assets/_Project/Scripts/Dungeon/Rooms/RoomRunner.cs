@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using Hearthdelve.Core;
 using Hearthdelve.Core.Events;
@@ -17,16 +16,19 @@ using UnityEngine;
 namespace Hearthdelve.Dungeon.Rooms
 {
     /// <summary>
-    /// Plays a delve room by room (4d). One room is loaded at a time, at the origin: the player arrives at its P,
-    /// the navigation grid and the camera's bounds (<see cref="RoomCameraBounds"/>) switch to it, and its gates drop while anything in it is alive.
-    /// When the last enemy falls the gates rise; stepping into an open doorway fades out, unloads the room (and
-    /// anything left lying in it) and loads the next. One way: there is no going back.
-    /// Step 1 walks a fixed route; the floor graph (step 2) will choose the next room from the exit taken.
+    /// Plays a generated delve room by room (4d). At the start it generates the run from a seed (<see cref="RunGenerator"/>);
+    /// then one room is loaded at a time, at the origin: the player arrives at its P, the run's encounter is placed on
+    /// its spawn points, the navigation grid and the camera's bounds (<see cref="RoomCameraBounds"/>) switch to it, and
+    /// its gates drop while anything in it is alive. When the last enemy falls the gates of the exits the graph uses
+    /// rise (any other exit stays shut); each leads to the room the graph says. Leaving fades out, unloads the room
+    /// (and anything left lying in it) and loads the next. One way: there is no going back. A descent room's hole drops
+    /// the player to the next floor; the arena's rope appears once it's clear; rope rooms end the run.
     /// </summary>
     public sealed class RoomRunner : MonoBehaviour
     {
-        [SerializeField, Tooltip("The rooms in order (step 1's test route).")]
-        RoomDefinition[] m_Route = Array.Empty<RoomDefinition>();
+        [SerializeField] RunSettings m_Settings;
+        [SerializeField, Tooltip("0: a new seed every run. Any other number replays that run (for bug reports).")]
+        int m_Seed;
         [SerializeField, Tooltip("Rooms are loaded under this.")]
         Transform m_RoomRoot;
         [SerializeField] NavGrid m_Nav;
@@ -36,34 +38,50 @@ namespace Hearthdelve.Dungeon.Rooms
         float m_FadeOut = 0.25f;
         [SerializeField, Min(0f), Tooltip("Seconds the screen takes to uncover in the new room.")]
         float m_FadeIn = 0.3f;
+        [SerializeField, Min(0f), Tooltip("Seconds the fall into a hole takes before the screen covers.")]
+        float m_FallTime = 0.45f;
         [SerializeField, Tooltip("The gates dropping as a fight starts: sound and haptic together.")]
         MMF_Player m_SealFeedback;
         [SerializeField, Tooltip("The gates rising when the room is clear: sound and haptic together.")]
         MMF_Player m_ClearFeedback;
+        [SerializeField, Tooltip("Dropping into a hole: sound and haptic together.")]
+        MMF_Player m_FallFeedback;
+        [Header("TEMPORARY (4d step 2): signs over exits until step 3's reward previews")]
+        [SerializeField] Sprite m_MarkerOut;
+        [SerializeField] Sprite m_MarkerDeeper;
+        [SerializeField] Sprite m_MarkerArena;
 
         RoomEncounter m_Encounter;
         int m_Entered = -1;
-        int m_RouteIndex;
         bool m_Transitioning;
 
+        /// <summary>Tests: the seed the next run uses (0 = none).</summary>
+        public static int SeedOverride { get; set; }
         public static RoomRunner Active { get; private set; }
+
+        public RunGraph Graph { get; private set; }
+        public FloorGraph Floor { get; private set; }
+        public FloorNode Node { get; private set; }
         public RoomInstance Current { get; private set; }
-        public RoomDefinition CurrentDefinition => m_RouteIndex < m_Route.Length ? m_Route[m_RouteIndex] : null;
         public RoomEncounter Encounter => m_Encounter;
         public bool IsTransitioning => m_Transitioning;
         /// <summary>Rooms entered so far this run, counting the current one.</summary>
         public int RoomsEntered => m_Entered + 1;
 
-        public void Configure(RoomDefinition[] route, Transform roomRoot, NavGrid nav, CinemachineCamera camera, RoomCameraBounds cameraBounds,
-            MMF_Player sealFeedback, MMF_Player clearFeedback)
+        public void Configure(RunSettings settings, Transform roomRoot, NavGrid nav, CinemachineCamera camera, RoomCameraBounds cameraBounds,
+            MMF_Player sealFeedback, MMF_Player clearFeedback, MMF_Player fallFeedback, Sprite markerOut, Sprite markerDeeper, Sprite markerArena)
         {
-            m_Route = route;
+            m_Settings = settings;
             m_RoomRoot = roomRoot;
             m_Nav = nav;
             m_Camera = camera;
             m_CameraBounds = cameraBounds;
             m_SealFeedback = sealFeedback;
             m_ClearFeedback = clearFeedback;
+            m_FallFeedback = fallFeedback;
+            m_MarkerOut = markerOut;
+            m_MarkerDeeper = markerDeeper;
+            m_MarkerArena = markerArena;
         }
 
         void OnEnable() => Active = this;
@@ -77,28 +95,37 @@ namespace Hearthdelve.Dungeon.Rooms
         {
             // TDE spawns the player during its own Start.
             while (Player == null) yield return null;
-            if (m_Route.Length == 0)
+            if (m_Settings == null || m_Settings.rooms.Length == 0)
             {
-                Debug.LogWarning("[Hearthdelve] The room runner has no rooms.");
+                Debug.LogWarning("[Hearthdelve] The room runner has no run settings.");
                 yield break;
             }
-            Load(0);
-            EventBus<RoomEntered>.Publish(new RoomEntered(m_Entered, CurrentDefinition.id, m_Encounter.IsSealed, 0f));
+            int seed = SeedOverride != 0 ? SeedOverride : m_Seed != 0 ? m_Seed : new System.Random().Next(1, int.MaxValue);
+            Graph = RunGenerator.Generate(seed, m_Settings.tuning, m_Settings.Catalog());
+            Debug.Log($"[Hearthdelve] Delve seed {seed} (set it on the RoomRunner to replay this run).\n{Graph.Describe()}");
+            Load(Graph.Floors[0], Graph.Floors[0].Start);
+            PublishEntered(0f);
             if (m_Encounter.IsSealed) Seal();
         }
 
         static Character Player =>
             LevelManager.HasInstance && LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0 ? LevelManager.Instance.Players[0] : null;
 
+        void PublishEntered(float fade) =>
+            EventBus<RoomEntered>.Publish(new RoomEntered(m_Entered, Node.RoomId, m_Encounter.IsSealed, fade, Floor.Floor, Graph.Seed));
+
         void Update()
         {
             if (m_Encounter == null || m_Encounter.IsCleared || Current == null) return;
-            if (m_Encounter.Update(Current.LivingEnemies()))
-            {
-                Current.SetExitsOpen(true, instant: false);
-                m_ClearFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
-                EventBus<RoomCleared>.Publish(new RoomCleared(m_Entered, CurrentDefinition.id));
-            }
+            if (m_Encounter.Update(Current.LivingEnemies())) OnCleared();
+        }
+
+        void OnCleared()
+        {
+            OpenUsedExits(instant: false);
+            Current.SetRevealed(true);
+            m_ClearFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
+            EventBus<RoomCleared>.Publish(new RoomCleared(m_Entered, Node.RoomId));
         }
 
         void Seal()
@@ -108,26 +135,51 @@ namespace Hearthdelve.Dungeon.Rooms
             m_SealFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
         }
 
-        /// <summary>Unloads the current room and loads route room <paramref name="index"/> with the player at its arrival.</summary>
-        void Load(int index)
+        /// <summary>Opens the exits the graph uses; any other exit of the room stays shut.</summary>
+        void OpenUsedExits(bool instant)
+        {
+            foreach (RoomExit exit in Current.Exits)
+                if (exit != null) exit.SetOpen(exit.Index < Node.Next.Count, instant);
+        }
+
+        /// <summary>Where each exit leads, as a sign over its doorway.</summary>
+        Sprite MarkerFor(FloorNode target) => target.Kind switch
+        {
+            RoomKind.Extraction => m_MarkerOut,
+            RoomKind.Descent => m_MarkerDeeper,
+            RoomKind.Arena => m_MarkerArena,
+            _ => null,
+        };
+
+        /// <summary>Unloads the current room and loads <paramref name="node"/> with the player at its arrival.</summary>
+        void Load(FloorGraph floor, FloorNode node)
         {
             if (Current != null)
             {
                 foreach (RoomExit exit in Current.Exits)
                     if (exit != null) exit.Entered -= OnExitEntered;
+                if (Current.Descent != null) Current.Descent.Entered -= OnDescent;
                 // Off at once, so the new room's colliders are the only ones the grid sees this frame.
                 Current.gameObject.SetActive(false);
                 Destroy(Current.gameObject);
                 ClearLeftovers();
             }
 
-            m_RouteIndex = index;
+            Floor = floor;
+            Node = node;
             m_Entered++;
-            RoomDefinition definition = m_Route[index];
+            RoomDefinition definition = m_Settings.Room(node.RoomId);
             Current = Instantiate(definition.prefab, Vector3.zero, Quaternion.identity, m_RoomRoot);
             Current.name = definition.prefab.name;
+            foreach (EncounterSpawn spawn in node.Encounter) Current.Spawn(spawn, m_Settings.Prefab(spawn.Kind));
+            Current.SetRevealed(false);
             foreach (RoomExit exit in Current.Exits)
-                if (exit != null) exit.Entered += OnExitEntered;
+            {
+                if (exit == null) continue;
+                exit.Entered += OnExitEntered;
+                exit.SetMarker(exit.Index < node.Next.Count ? MarkerFor(floor.Node(node.Next[exit.Index])) : null);
+            }
+            if (Current.Descent != null) Current.Descent.Entered += OnDescent;
 
             if (m_Nav != null) m_Nav.Configure(Current.TileBounds, LayerMask.GetMask(Layers.Obstacles));
             Character player = Player;
@@ -135,18 +187,27 @@ namespace Hearthdelve.Dungeon.Rooms
             BindCamera(player);
 
             m_Encounter = new RoomEncounter(Current.LivingEnemies());
-            // Arrive with the gates up; they drop as the fight starts (after the fade).
-            Current.SetExitsOpen(true, instant: true);
+            // Arrive with the used gates up; they drop as the fight starts (after the fade).
+            OpenUsedExits(instant: true);
+            if (m_Encounter.IsCleared) Current.SetRevealed(true);
         }
+
+        bool CanLeave => !m_Transitioning && (DelveRunController.Active == null || !DelveRunController.Active.IsEnding);
 
         void OnExitEntered(RoomExit exit)
         {
-            if (m_Transitioning || DelveRunController.Active != null && DelveRunController.Active.IsEnding) return;
-            if (m_RouteIndex + 1 >= m_Route.Length) return;
-            StartCoroutine(Transition(m_RouteIndex + 1));
+            if (!CanLeave || exit.Index >= Node.Next.Count) return;
+            StartCoroutine(Transition(Floor, Floor.Node(Node.Next[exit.Index]), fall: false));
         }
 
-        IEnumerator Transition(int next)
+        void OnDescent(FloorDescent hole)
+        {
+            int next = Floor.Floor;  // 1-based floor number = index of the next floor
+            if (!CanLeave || next >= Graph.Floors.Count) return;
+            StartCoroutine(Transition(Graph.Floors[next], Graph.Floors[next].Start, fall: true));
+        }
+
+        IEnumerator Transition(FloorGraph floor, FloorNode node, bool fall)
         {
             m_Transitioning = true;
             Character player = Player;
@@ -156,10 +217,43 @@ namespace Hearthdelve.Dungeon.Rooms
             // Walking between rooms costs no Essence.
             if (essence != null) essence.DrainPaused = true;
 
+            SpriteRenderer[] sprites = null;
+            Vector3[] rest = null;
+            if (fall && player != null)
+            {
+                // Presentation only: the player sinks into the hole and fades; the character stays put.
+                m_FallFeedback?.PlayFeedbacks(player.transform.position);
+                sprites = (player.CharacterModel != null ? player.CharacterModel : player.gameObject).GetComponentsInChildren<SpriteRenderer>();
+                rest = new Vector3[sprites.Length];
+                for (int i = 0; i < sprites.Length; i++) rest[i] = sprites[i].transform.localPosition;
+                float started = Time.time;
+                while (Time.time - started < m_FallTime)
+                {
+                    float t = (Time.time - started) / m_FallTime;
+                    for (int i = 0; i < sprites.Length; i++)
+                    {
+                        sprites[i].transform.localPosition = rest[i] + Vector3.down * (t * t * 0.8f);
+                        Color color = sprites[i].color;
+                        color.a = 1f - t;
+                        sprites[i].color = color;
+                    }
+                    yield return null;
+                }
+            }
+
             EventBus<RoomTransitionStarted>.Publish(new RoomTransitionStarted(m_FadeOut));
             yield return new WaitForSecondsRealtime(m_FadeOut);
-            Load(next);
-            EventBus<RoomEntered>.Publish(new RoomEntered(m_Entered, CurrentDefinition.id, m_Encounter.IsSealed, m_FadeIn));
+            if (sprites != null)
+                for (int i = 0; i < sprites.Length; i++)
+                {
+                    if (sprites[i] == null) continue;
+                    sprites[i].transform.localPosition = rest[i];
+                    Color color = sprites[i].color;
+                    color.a = 1f;
+                    sprites[i].color = color;
+                }
+            Load(floor, node);
+            PublishEntered(m_FadeIn);
             yield return new WaitForSecondsRealtime(m_FadeIn);
 
             if (essence != null) essence.DrainPaused = false;

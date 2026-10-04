@@ -155,13 +155,19 @@ namespace Hearthdelve.Shared.Run
         /// <summary>True when the room has enemies, so its exits are sealing.</summary>
         public readonly bool Sealed;
         public readonly float FadeSeconds;
+        /// <summary>1, 2 or 3.</summary>
+        public readonly int Floor;
+        /// <summary>The run's seed (replays the same run).</summary>
+        public readonly int Seed;
 
-        public RoomEntered(int index, string roomId, bool @sealed, float fadeSeconds)
+        public RoomEntered(int index, string roomId, bool @sealed, float fadeSeconds, int floor = 1, int seed = 0)
         {
             Index = index;
             RoomId = roomId;
             Sealed = @sealed;
             FadeSeconds = fadeSeconds;
+            Floor = floor;
+            Seed = seed;
         }
     }
 

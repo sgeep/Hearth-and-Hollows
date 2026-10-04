@@ -21,6 +21,8 @@ namespace Hearthdelve.Dungeon.Rooms
         float m_FrameTime = 0.07f;
         [SerializeField, Tooltip("Which exit of the room this is, left to right.")]
         int m_Index;
+        [SerializeField, Tooltip("TEMPORARY (4d step 2): what lies beyond (out, deeper, the arena), until step 3's reward previews.")]
+        SpriteRenderer m_Marker;
 
         Coroutine m_Animation;
         bool m_Raised;
@@ -32,13 +34,25 @@ namespace Hearthdelve.Dungeon.Rooms
         /// <summary>The player stepped into the open doorway.</summary>
         public event Action<RoomExit> Entered;
 
-        public void Configure(int index, SpriteRenderer gate, Sprite[] frames, Collider2D block)
+        public void Configure(int index, SpriteRenderer gate, Sprite[] frames, Collider2D block, SpriteRenderer marker)
         {
             m_Index = index;
             m_Gate = gate;
             m_Frames = frames;
             m_Block = block;
+            m_Marker = marker;
         }
+
+        /// <summary>The sign over the doorway (none for an ordinary fight).</summary>
+        public void SetMarker(Sprite sprite)
+        {
+            if (m_Marker == null) return;
+            m_Marker.sprite = sprite;
+            m_Marker.enabled = sprite != null;
+        }
+
+        /// <summary>The marker currently shown, if any.</summary>
+        public Sprite Marker => m_Marker != null && m_Marker.enabled ? m_Marker.sprite : null;
 
         /// <summary>Opens or seals the doorway. The collider changes at once; the gate animates unless <paramref name="instant"/>.</summary>
         public void SetOpen(bool open, bool instant)

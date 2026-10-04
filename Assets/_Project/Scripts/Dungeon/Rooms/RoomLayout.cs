@@ -22,8 +22,10 @@ namespace Hearthdelve.Dungeon.Rooms
     /// <list type="bullet">
     /// <item><c>#</c> wall, <c>t</c> wall with a torch, <c>.</c> floor, <c>o</c> pillar (two rows: top over base).</item>
     /// <item>Props: <c>c</c> crate, <c>b</c> barrel, <c>B</c> open barrel, <c>u</c> cauldron, <c>s</c> statue, <c>T</c> table (two tiles: T and the tile to its right).</item>
-    /// <item>Enemies: <c>S</c> green slime, <c>V</c> bat (asleep; must hang directly under a wall), <c>X</c> giant spider.</item>
-    /// <item><c>P</c> where the player arrives; <c>R</c> the rope out.</item>
+    /// <item>Fixed enemies: <c>S</c> green slime, <c>V</c> bat (asleep; must hang directly under a wall), <c>X</c> giant spider.</item>
+    /// <item>Spawn points for the encounter chosen when the run is generated (4d step 2): <c>m</c> on the ground, <c>v</c> a
+    /// perch for a bat (directly under a wall).</item>
+    /// <item><c>P</c> where the player arrives; <c>R</c> the rope out; <c>H</c> the hole down to the next floor.</item>
     /// <item><c>x</c> an exit: a gated doorway through the north wall, two tiles wide and both wall rows tall.</item>
     /// <item><c>e</c> the entrance: a doorway through the south wall, the same size, where the player came in (one way).</item>
     /// </list>
@@ -32,12 +34,14 @@ namespace Hearthdelve.Dungeon.Rooms
     public sealed class RoomLayout
     {
         public const int MinWidth = 40, MaxWidth = 60, MinHeight = 23, MaxHeight = 34;
-        const string k_Known = "#t.oScbBusTVXPRxe";
+        const string k_Known = "#t.oScbBusTVXPRxemvH";
 
         readonly string[] m_Rows;
         readonly List<string> m_Problems = new();
         readonly List<RoomSocket> m_Exits = new();
         readonly List<(char kind, Vector2Int cell)> m_Enemies = new();
+        readonly List<Vector2Int> m_GroundSpawns = new();
+        readonly List<Vector2Int> m_PerchSpawns = new();
 
         public int Width { get; }
         public int Height { get; }
@@ -47,6 +51,12 @@ namespace Hearthdelve.Dungeon.Rooms
         public Vector2Int? Arrival { get; private set; }
         public IReadOnlyList<(char kind, Vector2Int cell)> Enemies => m_Enemies;
         public Vector2Int? Rope { get; private set; }
+        /// <summary>The hole down to the next floor (the <c>H</c> tile).</summary>
+        public Vector2Int? Hole { get; private set; }
+        /// <summary>Ground spawn points (<c>m</c>), bottom row first, left to right.</summary>
+        public IReadOnlyList<Vector2Int> GroundSpawns => m_GroundSpawns;
+        /// <summary>Bat perches (<c>v</c>), bottom row first, left to right.</summary>
+        public IReadOnlyList<Vector2Int> PerchSpawns => m_PerchSpawns;
         /// <summary>What's wrong with the layout; empty when it's valid.</summary>
         public IReadOnlyList<string> Problems => m_Problems;
         public bool IsValid => m_Problems.Count == 0;
@@ -94,6 +104,7 @@ namespace Hearthdelve.Dungeon.Rooms
 
             var arrivals = new List<Vector2Int>();
             var ropes = new List<Vector2Int>();
+            var holes = new List<Vector2Int>();
             for (int y = 0; y < Height; y++)
             for (int x = 0; x < Width; x++)
             {
@@ -102,14 +113,19 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (border && !IsWall(c) && !IsDoorway(c)) m_Problems.Add($"the border is open at ({x}, {y})");
                 if (c == 'P') arrivals.Add(new Vector2Int(x, y));
                 if (c == 'R') ropes.Add(new Vector2Int(x, y));
+                if (c == 'H') holes.Add(new Vector2Int(x, y));
+                if (c == 'm') m_GroundSpawns.Add(new Vector2Int(x, y));
+                if (c == 'v') m_PerchSpawns.Add(new Vector2Int(x, y));
                 if (IsEnemy(c)) m_Enemies.Add((c, new Vector2Int(x, y)));
-                if (c == 'V' && !IsWall(At(x, y + 1))) m_Problems.Add($"the bat at ({x}, {y}) has no wall directly above it to hang from");
+                if (c is 'V' or 'v' && !IsWall(At(x, y + 1))) m_Problems.Add($"the bat at ({x}, {y}) has no wall directly above it to hang from");
             }
 
             if (arrivals.Count != 1) m_Problems.Add($"there must be exactly one P (arrival), not {arrivals.Count}");
             else Arrival = arrivals[0];
             if (ropes.Count > 1) m_Problems.Add("there is more than one rope");
             else if (ropes.Count == 1) Rope = ropes[0];
+            if (holes.Count > 1) m_Problems.Add("there is more than one hole");
+            else if (holes.Count == 1) Hole = holes[0];
 
             foreach (RectInt cells in Doorways('x'))
             {
@@ -121,7 +137,7 @@ namespace Hearthdelve.Dungeon.Rooms
             if (entrances.Count != 1) m_Problems.Add($"there must be exactly one entrance (e), not {entrances.Count}");
             else if (entrances[0].width != 2 || entrances[0].height != 2 || entrances[0].y != 0) m_Problems.Add("the entrance must be 2×2 through the south wall");
             else Entrance = new RoomSocket(entrances[0]);
-            if (m_Exits.Count == 0 && Rope == null) m_Problems.Add("a room needs an exit or the rope out");
+            if (m_Exits.Count == 0 && Rope == null && Hole == null) m_Problems.Add("a room needs an exit, the rope out or the hole down");
 
             if (Arrival is { } start) CheckReachable(start);
         }
@@ -170,6 +186,11 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (!reached.Contains(new Vector2Int(exit.Cells.x, exit.Cells.y)) && !reached.Contains(new Vector2Int(exit.Cells.x + 1, exit.Cells.y)))
                     m_Problems.Add($"the exit at ({exit.Cells.x}, {exit.Cells.y}) can't be reached from P");
             if (Rope is { } rope && !reached.Contains(rope)) m_Problems.Add("the rope can't be reached from P");
+            if (Hole is { } hole && !reached.Contains(hole)) m_Problems.Add("the hole can't be reached from P");
+            foreach (Vector2Int spawn in m_GroundSpawns)
+                if (!reached.Contains(spawn)) m_Problems.Add($"the spawn point at ({spawn.x}, {spawn.y}) can't be reached from P");
+            foreach (Vector2Int perch in m_PerchSpawns)
+                if (!reached.Contains(perch)) m_Problems.Add($"the perch at ({perch.x}, {perch.y}) can't be reached from P");
             foreach (var (kind, cell) in m_Enemies)
                 if (!reached.Contains(cell)) m_Problems.Add($"the {kind} at ({cell.x}, {cell.y}) can't be reached from P");
         }
