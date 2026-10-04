@@ -141,7 +141,7 @@ namespace Hearthdelve.Editor
             UiFeedbackContent.Ensure(canvas);
             RectTransform root = DungeonUI.FullScreen(canvas, "Menu");
             var centre = new Vector2(0.5f, 0.5f);
-            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, 16f, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 50f), new Vector2(300f, 20f));
+            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, 16f, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 50f), new Vector2(300f, 24f));
             RectTransform panel = DungeonUI.Panel(root, new Vector2(300f, 76f), new Vector2(0f, -18f));
 
             // Stacked and centred, so the panel looks right with or without Continue.
@@ -152,14 +152,14 @@ namespace Hearthdelve.Editor
             stack.childControlWidth = stack.childControlHeight = false;
             stack.childForceExpandWidth = stack.childForceExpandHeight = false;
             Button continueButton = TavernScreens.SmallButton(choices, "Continue", LoopLocKeys.MenuContinue, centre, Vector2.zero, 110f, out _);
-            LocalizedSuperText detail = TavernScreens.Label(choices, "ContinueDetail", LoopLocKeys.MenuContinueFrom, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(180f, 10f));
+            LocalizedSuperText detail = TavernScreens.Label(choices, "ContinueDetail", LoopLocKeys.MenuContinueFrom, 6f, DungeonUI.k_Label, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(180f, 12f));
             var gap = TavernScreens.Rect(choices, "Gap", centre, centre, Vector2.zero, new Vector2(10f, 4f));
             Button newGame = TavernScreens.SmallButton(choices, "NewGame", LoopLocKeys.MenuNewGame, centre, Vector2.zero, 110f, out _);
 
             RectTransform confirm = TavernScreens.Rect(panel, "Confirm", centre, centre, Vector2.zero, new Vector2(300f, 76f));
-            TavernScreens.Label(confirm, "Question", LoopLocKeys.MenuConfirm, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, new Vector2(0f, 14f), new Vector2(290f, 10f));
-            Button yes = TavernScreens.SmallButton(confirm, "Yes", LoopLocKeys.MenuConfirmYes, centre, new Vector2(-45f, -12f), 80f, out _);
-            Button no = TavernScreens.SmallButton(confirm, "No", LoopLocKeys.MenuConfirmNo, centre, new Vector2(45f, -12f), 80f, out _);
+            TavernScreens.Label(confirm, "Question", LoopLocKeys.MenuConfirm, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, new Vector2(0f, 14f), new Vector2(290f, 12f));
+            Button yes = TavernScreens.SmallButton(confirm, "Yes", LoopLocKeys.MenuConfirmYes, centre, new Vector2(-45f, -10f), 80f, out _);
+            Button no = TavernScreens.SmallButton(confirm, "No", LoopLocKeys.MenuConfirmNo, centre, new Vector2(45f, -10f), 80f, out _);
             confirm.gameObject.SetActive(false);
 
             root.gameObject.AddComponent<MainMenuScreen>().Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);

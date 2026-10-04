@@ -164,7 +164,7 @@ namespace Hearthdelve.Tests.PlayMode
             float bonus = Flow.Loadout.MaxEssenceBonus;
             Assert.That(bonus, Is.GreaterThan(0f));
             Assert.That(morning.IsShown);
-            Assert.That(ShownText(morning), Has.Some.StartsWith("today's delve: essence +"));
+            Assert.That(ShownText(morning), Has.Some.StartsWith("today's delve: Essence +"));
 
             // The delve: the breakfast's Essence, a haul, and home.
             morning.DescendButton.onClick.Invoke();
@@ -197,7 +197,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(night.IsShown);
             Assert.That(night.SavedNoteShown, "says it saved");
-            Assert.That(ShownText(night), Has.Some.EqualTo("banked tonight").And.Some.EqualTo($"{takings} gold"), "label and amount");
+            Assert.That(ShownText(night), Has.Some.EqualTo("banked tonight").And.Some.EqualTo($"{takings} Gold"), "label and amount");
             Flow.DebugAddGold(300);
             int satchelRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.SatchelSlots);
             TavernUpgradeDefinition satchelUpgrade = night.Definitions[satchelRow];
@@ -292,7 +292,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().phase, Is.EqualTo(nameof(DayPhase.Night)));
             var night = Object.FindAnyObjectByType<NightScreen>();
             yield return null;
-            Assert.That(ShownText(night), Has.Some.EqualTo("the doors stayed shut"));
+            Assert.That(ShownText(night), Has.Some.EqualTo("kept shut"));
             night.SleepButton.onClick.Invoke();
             yield return InTavern(TavernPhase.Morning, "the next morning");
             Assert.That(Flow.State.Day, Is.EqualTo(2));

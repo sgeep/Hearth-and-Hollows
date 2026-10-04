@@ -147,7 +147,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(EventSystem.current.currentSelectedGameObject, Is.SameAs(death.Confirm.gameObject), "then on to Return to the surface");
             yield return WaitUntil(() => Hearthdelve.UI.Localization.Loc.IsReady, 5f, "the string tables");
             string shown = string.Join(" | ", death.GetComponentsInChildren<SuperTextMesh>().Select(t => t.text));
-            Assert.That(shown, Does.Contain("your essence fades").And.Contain("lockbox: fine bat wing ×3"), shown);
+            Assert.That(shown, Does.Contain("your Essence fades").And.Contain("lockbox: fine bat wing ×3"), shown);
 
             yield return Tap(Key.Enter);
             Assert.That(death.IsOpen, Is.False);

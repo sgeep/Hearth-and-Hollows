@@ -134,7 +134,7 @@ namespace Hearthdelve.Editor
             RectTransform chop = Box(chopGroup, "ChopBox", null, out LocalizedSuperText chopPrompt);
             LocalizedSuperText chopTitle = DungeonUI.Title(chop, TavernLocKeys.ChopTitle, rule: false);
             LocalizedSuperText chopProgress = DungeonUI.Line(chop, "Progress", TavernLocKeys.ChopProgress, 8f);
-            RectTransform board = LookTestBuilder.UIRect(chopGroup, "Board", new Vector2(0.25f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 28f), new Vector2(0f, 14f));
+            RectTransform board = LookTestBuilder.UIRect(chopGroup, "Board", new Vector2(0.25f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 31f), new Vector2(0f, 14f));
             board.anchorMax = new Vector2(0.75f, 0f);
             DungeonUI.AddImage(board, DungeonUI.Pixel(), new Color(0.55f, 0.36f, 0.2f));
             RectTransform foodRect = LookTestBuilder.UIRect(board, "Food", new Vector2(0f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-3f, 0f), new Vector2(8f, 8f));
@@ -159,10 +159,10 @@ namespace Hearthdelve.Editor
 
             // Under every box: how to step away.
             LocalizedSuperText stepAway = LookTestBuilder.Text(root, "StepAway", TavernLocKeys.HintStepAway, 6f, DungeonUI.k_Light, TextAnchor.LowerCenter,
-                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 1f), new Vector2(240f, 10f));
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 0f), new Vector2(240f, 12f));
             panel.ConfigureStepAway(stepAway);
             // The result flash: a wash over the box (every box sits in the same place).
-            RectTransform flash = LookTestBuilder.UIRect(root, "Flash", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -50f), new Vector2(240f, 66f));
+            RectTransform flash = LookTestBuilder.UIRect(root, "Flash", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -45f), new Vector2(256f, 66f));
             Image flashImage = DungeonUI.AddImage(flash, DungeonUI.Pixel(), new Color(1f, 1f, 1f, 0f));
             flashImage.raycastTarget = false;
             panel.ConfigureFlash(flashImage);
@@ -172,10 +172,10 @@ namespace Hearthdelve.Editor
         /// <summary>A framed box near the bottom of the screen, with a title (if any) and a prompt line at the bottom.</summary>
         static RectTransform Box(RectTransform root, string name, string titleKey, out LocalizedSuperText prompt)
         {
-            RectTransform box = DungeonUI.Panel(root, new Vector2(240f, 66f), new Vector2(0f, -50f));
+            RectTransform box = DungeonUI.Panel(root, new Vector2(256f, 66f), new Vector2(0f, -45f));
             box.name = name;
             if (titleKey != null) DungeonUI.Title(box, titleKey, rule: false);
-            prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -21f);
+            prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -23f);
             return box;
         }
 

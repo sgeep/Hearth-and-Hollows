@@ -161,14 +161,18 @@ namespace Hearthdelve.UI.Tavern
                 _ => LoopLocKeys.SummarySkipped,
             });
             bool shut = m_Director.Report != null && m_Director.Report.StayedShut;
+            string change = today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString();
             var lines = new (string label, string value, object[] args)[]
             {
+                // The day: the delve, what came home, the evening.
                 (LoopLocKeys.SummaryDelve, TavernLocKeys.Plain, new object[] { outcome }),
                 (LoopLocKeys.SummaryParts, LoopLocKeys.SummaryPartsValue, new object[] { today.PartsBroughtBack, today.PartsLost }),
                 shut ? (LoopLocKeys.SummaryEvening, LoopLocKeys.SummaryShut, Array.Empty<object>())
                      : (LoopLocKeys.SummaryDishes, LoopLocKeys.SummaryDishesValue, new object[] { today.DishesServed, today.Walkouts }),
+                // The money and standing: tonight's takings, the purse, Renown and today's change.
                 (LoopLocKeys.NightBanked, TavernLocKeys.PrepValue, new object[] { today.Earned }),
-                (LoopLocKeys.NightRenownToday, TavernLocKeys.Plain, new object[] { today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString() }),
+                (LoopLocKeys.NightPurse, TavernLocKeys.PrepValue, new object[] { state.Gold }),
+                (LoopLocKeys.NightRenownToday, LoopLocKeys.NightRenownValue, new object[] { state.Renown, change }),
             };
             for (int i = 0; i < m_Summary.Length; i++)
             {
@@ -179,7 +183,7 @@ namespace Hearthdelve.UI.Tavern
                 if (i < m_SummaryLabels.Length) m_SummaryLabels[i].Set(lines[i].label);
                 m_Summary[i].Set(lines[i].value, lines[i].args);
             }
-            m_Purse.Set(LoopLocKeys.NightPurse, state.Gold, state.Renown);
+            if (m_Purse != null) m_Purse.Set(LoopLocKeys.NightPurse, state.Gold, state.Renown);
 
             for (int i = 0; i < m_Upgrades.Length; i++)
             {

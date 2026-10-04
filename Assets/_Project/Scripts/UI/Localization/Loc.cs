@@ -192,7 +192,7 @@ namespace Hearthdelve.UI.Localization
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
         {
-            (HudEssence, "essence"),
+            (HudEssence, "Essence"),
             (HudSatchel, "satchel"),
             (HudSatchelFull, "satchel full: press {0} to swap"),
 
@@ -219,7 +219,7 @@ namespace Hearthdelve.UI.Localization
             (SlotEmpty, "empty"),
             (SlotCount, "{0}"),
 
-            (DeathTitle, "your essence fades"),
+            (DeathTitle, "your Essence fades"),
             (DeathSubtitle, "the dungeon casts you back to the surface. choose one slot to save in your lockbox. its whole stack is kept; the rest of the haul is lost."),
             (DeathSubtitleEmpty, "the dungeon casts you back to the surface. your satchel is empty."),
             (DeathSelected, "lockbox: {0} ×{1}"),

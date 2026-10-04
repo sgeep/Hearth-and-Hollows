@@ -47,6 +47,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] Button m_Open;
         [SerializeField] LocalizedSuperText m_Nothing;
         [SerializeField] GameObject m_FillHint;
+        [SerializeField, Tooltip("Behind the nothing-cookable message.")] GameObject m_NothingBanner;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("A chosen dish's tile, with gold corners as well.")] Color m_ChosenColour = new(0.98f, 0.86f, 0.5f);
 
@@ -64,8 +65,9 @@ namespace Hearthdelve.UI.Tavern
         public IReadOnlyList<RecipeDefinition> Recipes => m_Recipes;
 
         public void Configure(GameObject root, SatchelSlotView[] stock, LocalizedSuperText stockEmpty, LocalizedSuperText tonight, DishCard[] cards,
-            Button staff, LocalizedSuperText staffLabel, Button close, Button open, LocalizedSuperText nothing, GameObject fillHint)
+            Button staff, LocalizedSuperText staffLabel, Button close, Button open, LocalizedSuperText nothing, GameObject fillHint, GameObject nothingBanner = null)
         {
+            m_NothingBanner = nothingBanner;
             m_Root = root;
             m_Stock = stock;
             m_StockEmpty = stockEmpty;
@@ -163,6 +165,7 @@ namespace Hearthdelve.UI.Tavern
             if (pip != null) m_StaffLabel.Set(TavernLocKeys.PrepStaffJob, Loc.Get(pip.displayName), Loc.UI(JobKey(m_Director.StaffAssignment)));
             m_Open.interactable = m_Director.CanOpen;
             m_Nothing.gameObject.SetActive(nothing);
+            if (m_NothingBanner != null) m_NothingBanner.SetActive(nothing);
 
             if (!wasShown && EventSystem.current != null)
                 EventSystem.current.SetSelectedGameObject(m_Cards.Length > 0 ? m_Cards[0].button.gameObject : m_Open.gameObject);
