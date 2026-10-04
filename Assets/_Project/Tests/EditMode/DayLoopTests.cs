@@ -213,6 +213,7 @@ namespace Hearthdelve.Tests
             Assert.That(state.Phase, Is.EqualTo(DayPhase.Delve));
             Assert.That(state.Gold, Is.Zero);
             Assert.That(state.Today.KeptShut, "the night's summary says so");
+            Assert.That(state.Today.EveningRecorded);
         }
 
         [Test]

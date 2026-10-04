@@ -312,6 +312,13 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Gold, Is.Zero, "nothing banked");
             yield return ExtractAndGoHome();
             Assert.That(Flow.State.Day, Is.EqualTo(1));
+            // The evening was played before the reload: the night tells the delve, not an evening it can't know
+            // (found in the 4d web smoke test: it showed "served 0").
+            var night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            string[] shown = ShownText(night);
+            Assert.That(shown, Has.Some.EqualTo("made it out"));
+            Assert.That(shown, Has.None.EqualTo("served").And.None.EqualTo("kept shut").And.None.EqualTo("banked today"));
         }
 
         /// <summary>
