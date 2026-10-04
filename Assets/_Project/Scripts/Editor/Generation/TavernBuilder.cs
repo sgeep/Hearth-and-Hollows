@@ -477,7 +477,7 @@ namespace Hearthdelve.Editor
         // ------------------------------------------------------------------ stations and serving (step 3)
 
         /// <summary>The keeper carries plates over their head (4c decision 2): added to the tavern player prefab in place.</summary>
-        static void AddCarryViewToPlayer()
+        internal static void AddCarryViewToPlayer()
         {
             GameObject contents = PrefabUtility.LoadPrefabContents(LookTestContent.TavernPlayerPrefab);
             try

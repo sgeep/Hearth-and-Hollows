@@ -335,6 +335,9 @@ namespace Hearthdelve.Editor
             EditorUtility.SetDirty(light);
         }
 
+        /// <summary>A dungeon torch's light (for lights built into prefabs, outside any scene pass).</summary>
+        internal static void ConfigureTorchLight(Light2D light) => Configure(light, k_TorchColor, k_TorchIntensity, k_TorchRadius);
+
         /// <summary>Applies the look-test lighting to the open scene: ambient by light type, local lights by name.</summary>
         internal static void ApplyLighting(bool dungeon)
         {

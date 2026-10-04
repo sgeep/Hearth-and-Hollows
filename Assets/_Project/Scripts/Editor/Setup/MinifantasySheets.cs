@@ -86,6 +86,7 @@ namespace Hearthdelve.Editor
         const string k_Fireplaces = "Minifantasy_DwarvenKingdom_v1.0/Minifantasy_DwarvenKingdom_Assets/Props/Ilumination";
         const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
         const string k_UiIcons = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Icons";
+        const string k_GladiatorGate = "All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -97,6 +98,10 @@ namespace Hearthdelve.Editor
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         public const string DwarvenKingdom = "DwarvenKingdom";
+        public const string GladiatorArena = "GladiatorArena";
+
+        /// <summary>The 4d room gate: frames 0–3 open it, 4–7 close it.</summary>
+        public const int GateFrames = 8;
 
         /// <summary>
         /// The A Myriad of NPCs layers imported for 4c customers, curated for readability at 320×180:
@@ -328,6 +333,13 @@ namespace Hearthdelve.Editor
                     new SheetRect("CornerBR", 269, 109, 4, 4, new Vector2(1f, 0f)),
                 },
             });
+
+            // The room gate (4d): the Gladiator Arena animated gate's barred interior only (16×15 of each 32×24 frame), so it
+            // fits a two-tile doorway in the Cellars' own grey wall; its sandstone arch is left out.
+            var gate = new SheetRect[GateFrames];
+            for (int i = 0; i < GateFrames; i++)
+                gate[i] = new SheetRect($"Gate{i}", i % 4 * 32 + 8, i / 4 * 24 + 9, 16, 15, new Vector2(0.5f, 0f));
+            sheets.Add(new Sheet { Source = $"{k_GladiatorGate}/Gate_open_close.png", Pack = GladiatorArena, File = "Gate", Mode = SliceMode.Rects, Rects = gate });
 
             // UI Overhaul's 8×8 icons, "to be placed next to overlay elements such as HP bars": the magic spark marks
             // the Essence bar (CHARACTER group, 8th icon of the second row).

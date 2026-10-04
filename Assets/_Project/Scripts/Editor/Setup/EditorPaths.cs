@@ -23,6 +23,10 @@ namespace Hearthdelve.Editor
         public const string LookTestTavernScene = Scenes + "/LookTest_Tavern.unity";
         public const string TestFloorScene = Scenes + "/Dungeon_TestFloor.unity";
         public const string TavernScene = Scenes + "/Tavern.unity";
+        /// <summary>The room-by-room delve (4d): one scene into which rooms are loaded.</summary>
+        public const string DungeonScene = Scenes + "/Dungeon.unity";
+        public const string Rooms = Data + "/Dungeon/Rooms";
+        public const string RoomPrefabs = Prefabs + "/Dungeon/Rooms";
         public const string Settings = Root + "/Settings";
         public const string InputActions = Settings + "/Hearthdelve.inputactions";
         public const string Localization = Root + "/Localization";

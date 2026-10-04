@@ -1,0 +1,299 @@
+using System.Collections.Generic;
+using Hearthdelve.Core;
+using Hearthdelve.Dungeon.Rooms;
+using Hearthdelve.Shared.Animation;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
+
+namespace Hearthdelve.Editor
+{
+    /// <summary>
+    /// The 4d rooms: authored layouts (rows of characters, legend in <see cref="RoomLayout"/>), each saved as a
+    /// <see cref="RoomDefinition"/> and built into a room prefab: tiles, props, torches, enemies, the rope, the
+    /// arrival point, gated exits and the entrance. Step 1 has four test rooms in a line.
+    /// </summary>
+    internal static class RoomContent
+    {
+        /// <summary>The step 1 test route, in order.</summary>
+        public static readonly string[] TestRoute = { "start", "slime_hall", "spider_den", "rope" };
+
+        static readonly (string id, RoomKind kind, string[] rows)[] k_Rooms =
+        {
+            // A quiet first room: no enemies, one exit straight ahead.
+            ("start", RoomKind.Start, new[]
+            {
+                "###################xx###################",
+                "######t######t#####xx#####t######t######",
+                "#......................................#",
+                "#..bB..............................cc..#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#..............................s.......#",
+                "#......................................#",
+                "#.......u..............................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#..c................................b..#",
+                "#..................P...................#",
+                "#......................................#",
+                "###################ee###################",
+                "###################ee###################",
+            }),
+            // Two exits (both lead on in step 1), pillars, three slimes.
+            ("slime_hall", RoomKind.Combat, new[]
+            {
+                "##########xx####################xx##########",
+                "#####t####xx#####t########t#####xx####t#####",
+                "#..........................................#",
+                "#..b....................................B..#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..........S...............................#",
+                "#..............................S...........#",
+                "#..........................................#",
+                "#........o........................o........#",
+                "#........o........................o........#",
+                "#....................S.....................#",
+                "#..........................................#",
+                "#..........................................#",
+                "#...............o..........o...............#",
+                "#...............o..........o...............#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..........................................#",
+                "#..c.................P..................c..#",
+                "#..........................................#",
+                "#####################ee#####################",
+                "#####################ee#####################",
+            }),
+            // A bigger room: a bat asleep under the north wall, the spider and two slimes among crates.
+            ("spider_den", RoomKind.Combat, new[]
+            {
+                "#########################xx#########################",
+                "#######t##########t######xx######t##########t#######",
+                "#.............V....................................#",
+                "#..................................................#",
+                "#...........................................bb.....#",
+                "#..................................................#",
+                "#...b..............................................#",
+                "#..................................................#",
+                "#...................ccc............................#",
+                "#...................................X..............#",
+                "#..................................................#",
+                "#..................................................#",
+                "#..............o....................o..............#",
+                "#..............o....................o..............#",
+                "#...........S.............T........................#",
+                "#..................................................#",
+                "#..................................................#",
+                "#..................................................#",
+                "#.............................cc........S..........#",
+                "#..................................................#",
+                "#..................................................#",
+                "#..................................................#",
+                "#.......cc.........................................#",
+                "#..................................................#",
+                "#..................................................#",
+                "#..................................................#",
+                "#........................P.........................#",
+                "#..................................................#",
+                "#########################ee#########################",
+                "#########################ee#########################",
+            }),
+            // The way out: the rope, no exits, no enemies.
+            ("rope", RoomKind.Extraction, new[]
+            {
+                "########################################",
+                "######t######t############t######t######",
+                "#......................................#",
+                "#..b................................b..#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#..................R...................#",
+                "#......................................#",
+                "#......................................#",
+                "#.........s..................s.........#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#......................................#",
+                "#..................P...................#",
+                "#......................................#",
+                "###################ee###################",
+                "###################ee###################",
+            }),
+        };
+
+        public static string DefinitionPath(string id) => $"{EditorPaths.Rooms}/Room_{id}.asset";
+        public static string PrefabPath(string id) => $"{EditorPaths.RoomPrefabs}/Room_{id}.prefab";
+
+        /// <summary>Saves every room's definition and rebuilds its prefab. Throws if a layout is invalid.</summary>
+        public static Dictionary<string, RoomDefinition> Build(LookTestBuilder.Content content)
+        {
+            EditorPaths.Ensure(EditorPaths.Rooms);
+            EditorPaths.Ensure(EditorPaths.RoomPrefabs);
+            var built = new Dictionary<string, RoomDefinition>();
+            // Built in a scratch scene, so nothing lands in whatever scene is open. (An untitled scene, as in batch mode,
+            // can't have one added beside it: then the scratch scene replaces it.)
+            Scene active = SceneManager.GetActiveScene();
+            bool untitled = string.IsNullOrEmpty(active.path);
+            Scene scratch = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, untitled ? NewSceneMode.Single : NewSceneMode.Additive);
+            if (untitled) active = default;
+            SceneManager.SetActiveScene(scratch);
+            try
+            {
+                foreach (var (id, kind, rows) in k_Rooms)
+                {
+                    var layout = new RoomLayout(rows);
+                    if (!layout.IsValid) throw new System.InvalidOperationException($"Room '{id}' is invalid:\n" + string.Join("\n", layout.Problems));
+                    RoomInstance prefab = BuildPrefab(id, layout, content);
+                    built[id] = LookTestContent.CreateOrUpdate<RoomDefinition>(DefinitionPath(id), d =>
+                    {
+                        d.id = id;
+                        d.kind = kind;
+                        d.layout = rows;
+                        d.prefab = prefab;
+                    });
+                }
+            }
+            finally
+            {
+                if (active.IsValid()) SceneManager.SetActiveScene(active);
+                // The only scene can't be closed; the next scene opened replaces it.
+                if (!untitled) EditorSceneManager.CloseScene(scratch, true);
+            }
+            AssetDatabase.SaveAssets();
+            return built;
+        }
+
+        static Vector2 Feet(int x, int y) => new(x + 0.5f, y + 0.3f);
+
+        /// <summary>A bat hangs at the top of its tile, so its sleep pose is drawn on the brick face above it (as on the test floor).</summary>
+        static Vector2 EnemyFeet(char marker, int x, int y) => marker == 'V' ? new Vector2(x + 0.5f, y + 0.55f) : Feet(x, y);
+
+        static RoomInstance BuildPrefab(string id, RoomLayout layout, LookTestBuilder.Content content)
+        {
+            var root = new GameObject($"Room_{id}");
+
+            var grid = new GameObject("Grid").AddComponent<Grid>();
+            grid.transform.SetParent(root.transform, false);
+            Tilemap floor = LookTestBuilder.Layer(grid, "Floor", SortingLayers.Floor, 0, false);
+            Tilemap walls = LookTestBuilder.Layer(grid, "Walls", SortingLayers.Floor, 1, true);
+            var painter = new DungeonTilePainter(layout.Width, layout.Height, layout.At);
+            painter.PaintFloor(floor);
+            painter.PaintWalls(walls);
+            walls.GetComponent<TilemapCollider2D>().ProcessTilemapChanges();
+            walls.GetComponent<CompositeCollider2D>().GenerateGeometry();
+
+            var props = new GameObject("Props").transform;
+            props.SetParent(root.transform, false);
+            var enemies = new GameObject("Enemies").transform;
+            enemies.SetParent(root.transform, false);
+            Sprite[] torchFrames = MinifantasyImporter.Row(MinifantasySheets.Dungeon, "Torch", 0, 8);
+            for (int y = 0; y < layout.Height; y++)
+            for (int x = 0; x < layout.Width; x++)
+            {
+                char c = layout.At(x, y);
+                var foot = new Vector2(x + 0.5f, y);
+                switch (c)
+                {
+                    case 'c': LookTestBuilder.Prop(props, "Crate", foot); break;
+                    case 'b': LookTestBuilder.Prop(props, "Barrel", foot); break;
+                    case 'B': LookTestBuilder.Prop(props, "BarrelOpen", foot); break;
+                    case 'u': LookTestBuilder.Prop(props, "Cauldron", foot); break;
+                    case 's': LookTestBuilder.Prop(props, "Statue", foot); break;
+                    case 'T': LookTestBuilder.Prop(props, "Table", foot + new Vector2(0.5f, 0f)); break;
+                    case 'R':
+                        var rope = (GameObject)PrefabUtility.InstantiatePrefab(content.RopeExit, props);
+                        rope.transform.localPosition = Feet(x, y);
+                        break;
+                    case 't':
+                        // On the brick face, like the test floor's torches; lit from just above.
+                        SpriteRenderer torch = LookTestContent.AddSprite(props, "Torch", torchFrames[0], SortingLayers.Floor, 2, new Vector3(x + 0.5f, y - 1.4f, 0f));
+                        torch.gameObject.AddComponent<SpriteLoop>().Configure(torchFrames, 0.2f);
+                        Light2D light = LookTestBuilder.Light("Torch Light", new Vector3(x + 0.5f, y + 0.5f, 0f), Light2D.LightType.Point);
+                        light.transform.SetParent(props, false);
+                        LookTestBuilder.ConfigureTorchLight(light);
+                        break;
+                    default:
+                        GameObject enemy = c switch { 'S' => content.Slime, 'V' => content.Bat, 'X' => content.Spider, _ => null };
+                        if (enemy == null) break;
+                        var instance = (GameObject)PrefabUtility.InstantiatePrefab(enemy, enemies);
+                        instance.transform.localPosition = EnemyFeet(c, x, y);
+                        break;
+                }
+            }
+
+            var arrival = new GameObject("Arrival").transform;
+            arrival.SetParent(root.transform, false);
+            Vector2Int arrivalCell = layout.Arrival ?? Vector2Int.zero;
+            arrival.localPosition = Feet(arrivalCell.x, arrivalCell.y);
+
+            var exits = new List<RoomExit>();
+            var gateFrames = new Sprite[MinifantasySheets.GateFrames];
+            for (int i = 0; i < gateFrames.Length; i++) gateFrames[i] = MinifantasyImporter.Sprite(MinifantasySheets.GladiatorArena, "Gate", $"Gate{i}");
+            for (int i = 0; i < layout.Exits.Count; i++) exits.Add(BuildExit(root.transform, i, layout.Exits[i], gateFrames));
+            // The way in stays shut behind the player: a run only goes forward.
+            if (layout.Entrance is { } entrance)
+                Solid(root.transform, "EntranceStop", new Vector2(entrance.Cells.x + 1f, entrance.Cells.y + 1f), new Vector2(2f, 2f));
+
+            var room = root.AddComponent<RoomInstance>();
+            room.Configure(new Vector2Int(layout.Width, layout.Height), arrival, exits.ToArray(), enemies);
+            GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath(id));
+            Object.DestroyImmediate(root);
+            return saved.GetComponent<RoomInstance>();
+        }
+
+        /// <summary>
+        /// A gated exit in the north wall: the gate drawn in the doorway's brick row, a collider that blocks it while
+        /// sealed, a trigger at its threshold, and a stop behind it (the room ends at its wall).
+        /// </summary>
+        static RoomExit BuildExit(Transform room, int index, RoomSocket socket, Sprite[] frames)
+        {
+            var exit = new GameObject($"Exit{index}") { layer = LayerMask.NameToLayer(Layers.Pickup) };
+            exit.transform.SetParent(room, false);
+            exit.transform.localPosition = new Vector3(socket.Cells.x + 1f, socket.Cells.y, 0f);
+            var trigger = exit.AddComponent<BoxCollider2D>();
+            trigger.isTrigger = true;
+            trigger.size = new Vector2(1.6f, 0.8f);
+            trigger.offset = new Vector2(0f, 0.4f);
+            SpriteRenderer gate = LookTestContent.AddSprite(exit.transform, "Gate", frames[0], SortingLayers.YSorted, 0, Vector3.zero);
+            BoxCollider2D block = Solid(exit.transform, "Block", new Vector2(0f, 0.5f), new Vector2(2f, 1f));
+            Solid(exit.transform, "Stop", new Vector2(0f, 1.5f), new Vector2(2f, 1f));
+            var component = exit.AddComponent<RoomExit>();
+            component.Configure(index, gate, frames, block);
+            return component;
+        }
+
+        static BoxCollider2D Solid(Transform parent, string name, Vector2 centre, Vector2 size)
+        {
+            var go = new GameObject(name) { layer = LayerMask.NameToLayer(Layers.Obstacles) };
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = centre;
+            var box = go.AddComponent<BoxCollider2D>();
+            box.size = size;
+            return box;
+        }
+    }
+}
