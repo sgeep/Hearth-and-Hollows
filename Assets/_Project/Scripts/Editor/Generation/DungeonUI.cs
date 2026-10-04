@@ -40,7 +40,7 @@ namespace Hearthdelve.Editor
             // The Essence icon (UI Overhaul's magic spark) beside the bar, centred on it: the bar's name without words.
             RectTransform icon = LookTestBuilder.UIRect(root, "EssenceIcon", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -6f), new Vector2(8f, 8f));
             AddImage(icon, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "MagicSpark"), Color.white);
-            RectTransform trough = LookTestBuilder.UIRect(root, "Essence", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(12f, -4f), new Vector2(48f, 12f));
+            RectTransform trough = LookTestBuilder.UIRect(root, "Essence", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(13f, -4f), new Vector2(48f, 12f));
             AddImage(trough, UISprite("BarTrough"), Color.white);
             RectTransform fillRect = LookTestBuilder.UIRect(trough, "Fill", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(40f, 6f));
             Image fill = AddImage(fillRect, UISprite("BarFillBlue"), Color.white, Image.Type.Filled);
