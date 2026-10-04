@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-04 (4c complete; design direction: learning priorities and tavern customization)_
+_Last updated: 2026-10-04 (4d step 1: rooms, sealed exits, room camera)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -552,7 +552,23 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 
 **4c status: complete, approved 2026-10-04** after the final playtest of the web build. Deferred, as planned: biome runs, room graph and the boss (4d); the Harvest Finisher, Kitchen Arts, more weapons (4e); recipe rework, customer requests, the customization foundation, Pip's own look (4f); dialogue, quests, portraits, Love/Hate timing (4g); settings, the title screen and a decorative title font (4h).
 
-**Next: 4d (Biome 1 runs),** starting with a plan for approval. Its reward architecture must not assume every reward is an ingredient, Gold, Delve Marks, a weapon or run power (GDD §6.6, §10.3).
+**Next: 4d (Biome 1 runs).**
+
+### 4d plan (approved 2026-10-04)
+
+The experience: clear a room, see the rewards behind the exits, choose what you need, go deeper or take an extraction opportunity. Decisions: combat rooms of 1–1.5 screens with the camera confined to the room; dungeon Gold is unbanked run loot (kept on extraction, lost on death, banked Gold never lost); dedicated extraction opportunities in the floor graph, at least one reachable per floor, no extracting from any cleared room; the real boss arena with a temporary elite or mixed wave (the boss is 4e); door-lock art from the catalog or a `PH_` placeholder. A floor's graph has 5–7 nodes but a route traverses about 3–4 rooms per floor (9–12 rooms plus the arena per full run; tunable). One-way choices as in Hades, no backtracking. Doors show the reward category, not the exact roll. A small reward abstraction (kind plus payload) for ingredients, Gold and run power-ups, extendable later to Delve Marks, weapons and furnishing discoveries without rewriting the graph, room clearing, previews or the run report; no plugin framework. About 8 simple run power-ups on existing tuning. No mid-run saves. `Dungeon_TestFloor` stays a standalone test bed; the day loop switches over only in step 5. Steps: 1 rooms and sealed exits; 2 seeded floor graph, Biome 1 layouts, descent, extraction, arena placeholder; 3 rewards, previews, run report; 4 run power-ups; 5 day-loop integration, tuning, web, closeout. Each step stops for a playtest.
+
+### 4d status
+
+**Step 1: rooms, sealed exits, room camera (2026-10-04).** A new `Dungeon` scene (*Hearthdelve → Generate → 4d Dungeon (Rooms)*; *4d Update Dungeon UI* updates its UI in place) into which rooms are loaded one at a time.
+- **Rooms are data.** A `RoomDefinition` asset holds the room as rows of characters (`RoomLayout`: walls, torches, pillars, props, enemies, the arrival `P`, the rope `R`, exits `x` through the north wall, the entrance `e` through the south wall) and the prefab built from it (tiles, props, torch lights, enemies, gates, the arrival point). `RoomLayout` checks every layout: rectangular, known characters, a closed border, 1–1.5 screens (40–60 × 23–34 tiles), 2×2 doorways in the right walls, one entrance, one arrival, an exit or the rope, bats under a wall, and everything important reachable from the arrival. Four test rooms in a line: a quiet start room, a slime hall with two exits, a bigger spider den, and the rope room.
+- **One room at a time.** `RoomRunner` loads a room at the origin, puts the player on its `P`, points the navigation grid at it (rebaked on first use) and the camera's bounds at it. Leaving fades to black, unloads the room (parts left lying and webs in flight stay behind), loads the next and fades back; walking between rooms costs no Essence and takes no input. One way: the entrance stays shut behind the player.
+- **Sealed until clear.** Entering a room with enemies drops its gates (`RoomEncounter`, pure): a collider blocks each doorway and the gate shows its bars. When the last enemy falls the gates rise and stepping into any doorway leads on. Feedback: an iron slam with a soft bump as they drop, a rattle with the success pulse as they rise (`PH_GateSlam`, `PH_GateRise`).
+- **Gate art:** the Gladiator Arena animated gate's barred interior in a two-tile gap of the Cellars' own wall (`docs/ASSET_MAP.md`); no dungeon-pack gate exists.
+- **The camera stays in the room.** `RoomCameraBounds`, a small Cinemachine extension, clamps the view to the room's rectangle after the pixel-perfect correction, and centres on the room on an axis where the view is larger. Cinemachine's 2D confiner was tried first: it bakes its shape over several frames and didn't confine reliably when a room loaded; rooms are rectangles, so the clamp is exact and immediate.
+- **Also fixed:** the harvest feed's longer messages wrapped and overlapped in Silver; the feed is wider now (one line per message, on both dungeon scenes).
+- `Dungeon_TestFloor` is unchanged as the combat test bed (its tiles now come from the same painter as the rooms, with identical output); the day loop still uses it until step 5. The LookTest scenes are untouched.
+- Tests: `RoomTests` (EditMode: layout parsing and every validation rule, the encounter, the camera clamp, every room asset valid and matching its prefab) and `DungeonRoomTests` (PlayMode: arrival, sealing, a sealed doorway going nowhere, clearing, either exit leading on, leftovers staying behind, the navigation grid following the room, the camera inside the room, the route ending at the rope). `DungeonRoomCaptures` (explicit) renders the rooms.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

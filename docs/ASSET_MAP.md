@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-04 (end of 4c)_
+_Last updated: 2026-10-04 (4d step 1: the room gate)_
 
 ## How art gets into the project
 
@@ -117,6 +117,10 @@ Cells are (column, row) from the top-left.
 | `RopesShadows.png` | `RopesShadows_Hanging` 11,30 7×5 | The coil's shadow. |
 
 `HoleEntrances.png` has holes in the floor (three sizes, one with a stake, one with a ladder frame), not imported. `RopeClimbing_<race>.png` (8 frames of 32×32, back view) animates a climb, but only for the pack's bare base bodies; our player is the clothed Townsfolk, so the climb is shown by rising and fading instead.
+
+### The room gate (Gladiator Arena, exclusive add-on → `GladiatorArena/Gate.png`)
+
+Source: `All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate/Gate_open_close.png`, 128×48: 8 frames of 32×24 (4 per row), a portcullis in a sandstone arch. Frame 0 closed, 1–3 the bars sinking, 3 open (only the tips show), 4–7 rising again, 7 closed. Only each frame's **barred interior** is imported (`Gate0`–`Gate7`, 16×15 at frame (8, 9), pivot bottom centre): it fills a two-tile doorway cut through the Cellars' own grey north wall, so the sandstone arch never shows. The bars are copper on a transparent ground. Also in the folder: `Gate_shadows_in_exteriors.png` and `Gate_shadows_towards_indoor.png` (not imported) and `GIFs/Gate.gif`. The Dungeon tileset's own archway (cells 13–15, 5–6) has a one-tile opening, too narrow for these bars.
 
 ### `Props.png` — 232×88
 
@@ -264,6 +268,8 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
 - **No Shroom Cap or Spore Sac icons** in use: they belong to the Mushroom People (deferred), so their slots show only count, quality and freshness.
 - **No rope-climb animation for a clothed body** (only the base bodies): extraction rises and fades.
+- **No dungeon gate in the dungeon packs** (searched the catalog for gate, bars, portcullis, grate, door): the room gates borrow the Gladiator Arena gate's bars. A gate drawn for the Cellars' stone would replace them.
+- **No doorway art for side or south walls:** room exits are on the north wall only, and the entrance is a plain gap in the south wall.
 
 ## Portraits (planned for 4g; not yet inspected)
 
