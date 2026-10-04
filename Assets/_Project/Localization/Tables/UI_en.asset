@@ -391,7 +391,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963655
-    m_Localized: "morning \xB7 day {0}"
+    m_Localized: "daytime \xB7 day {0}"
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963656
@@ -407,7 +407,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963659
-    m_Localized: nothing in the storeroom makes a breakfast.
+    m_Localized: nothing in the storeroom makes a delve meal.
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963660
@@ -415,15 +415,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963661
-    m_Localized: cooking breakfast...
+    m_Localized: cooking the delve meal...
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963662
-    m_Localized: "today's delve bonuses: +{0} satchel slots \xB7 +{1} max Essence \xB7 Essence drain {2}%"
+    m_Localized: "tonight's delve bonuses: +{0} satchel slots \xB7 +{1} max Essence \xB7 Essence drain {2}%"
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963663
-    m_Localized: descend into the dungeon
+    m_Localized: open for the evening
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963664
@@ -435,11 +435,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963666
-    m_Localized: close for the night
+    m_Localized: stay shut tonight
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963667
-    m_Localized: close up for the night
+    m_Localized: close up and head below
     m_Metadata:
       m_Items: []
   - m_Id: 88764727963668
@@ -575,11 +575,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1235449487306754
-    m_Localized: nothing brought home.
+    m_Localized: no parts brought home.
     m_Metadata:
       m_Items: []
   - m_Id: 1235449487306755
-    m_Localized: 'nothing brought home. lost: {0} parts.'
+    m_Localized: 'no parts brought home. lost: {0} parts.'
     m_Metadata:
       m_Items: []
   - m_Id: 1235449487306756
@@ -687,7 +687,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302720
-    m_Localized: banked tonight
+    m_Localized: banked today
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302721
@@ -703,11 +703,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302724
-    m_Localized: 'today''s delve: {0}'
+    m_Localized: 'tonight''s delve: {0}'
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302725
-    m_Localized: 'today''s delve: no bonuses yet'
+    m_Localized: 'tonight''s delve: no bonuses yet'
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302726
@@ -731,7 +731,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302731
-    m_Localized: into the dungeon
+    m_Localized: "closing time \xB7 down to the Cellars"
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302732
@@ -743,7 +743,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302734
-    m_Localized: morning
+    m_Localized: daytime
     m_Metadata:
       m_Items: []
   - m_Id: 1536648086302735
@@ -872,6 +872,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1785174515003408
     m_Localized: 'overkill takes {0}% more spare damage: fewer bruised parts'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1856273290375168
+    m_Localized: delve meal (one dish, for tonight's delve)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1856273336512512
+    m_Localized: the night's delve
     m_Metadata:
       m_Items: []
   references:
