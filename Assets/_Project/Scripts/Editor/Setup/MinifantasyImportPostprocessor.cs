@@ -16,6 +16,9 @@ namespace Hearthdelve.Editor
     /// </summary>
     public sealed class MinifantasyImportPostprocessor : AssetPostprocessor
     {
+        /// <summary>Bumped when the settings below change, so Unity reimports the sheets.</summary>
+        public override uint GetVersion() => 2;
+
         void OnPreprocessTexture()
         {
             if (!assetPath.StartsWith(EditorPaths.Minifantasy + "/", StringComparison.Ordinal)) return;
@@ -37,7 +40,10 @@ namespace Hearthdelve.Editor
             importer.ReadTextureSettings(settings);
             settings.spriteMeshType = SpriteMeshType.FullRect;
             settings.spriteExtrude = 0;
-            settings.spriteGenerateFallbackPhysicsShape = false;
+            // Tiles placed in a room's walls carry a physics shape baked here. A tilemap collider instantiated at runtime
+            // (the generated rooms, 4d) asks each tile sprite for one; without it the player tries to trace it from the
+            // texture, which isn't readable, and logs an error per sprite (found in the 4d web smoke test).
+            settings.spriteGenerateFallbackPhysicsShape = sheet != null && sheet.Pack == MinifantasySheets.Dungeon && sheet.File == "Tileset";
             if (sheet != null && sheet.Mode == SliceMode.Single)
             {
                 settings.spriteAlignment = (int)SpriteAlignment.Custom;
