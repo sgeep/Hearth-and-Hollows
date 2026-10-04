@@ -333,7 +333,8 @@ namespace Hearthdelve.Editor
             collider.size = colliderSize;
             collider.offset = colliderOffset;
 
-            var controller = root.AddComponent<TopDownController2D>();
+            // Grounded everywhere: our floors have no Ground layer (FloorController2D).
+            var controller = root.AddComponent<Hearthdelve.Shared.Engine.FloorController2D>();
             controller.GroundLayerMask = LayerMask.GetMask(Layers.Ground);
             controller.ObstaclesLayerMask = LayerMask.GetMask(Layers.Obstacles);
             return root;
