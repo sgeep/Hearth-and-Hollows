@@ -22,6 +22,40 @@ namespace Hearthdelve.Editor
         /// <summary>Content-table entries (ingredient/enemy/weapon names).</summary>
         public static readonly List<(string key, string english)> ContentEntries = new();
 
+        /// <summary>
+        /// The English names of every piece of content, as authored (CLAUDE.md, Localization: lower case, proper nouns
+        /// capitalised). The source of truth for the Content table's English, written over it on every build.
+        /// </summary>
+        public static readonly (string key, string english)[] ContentEnglish =
+        {
+            ("ingredient.spider_leg", "spider leg"),
+            ("ingredient.venom_sac", "venom sac"),
+            ("ingredient.slime_gel", "slime gel"),
+            ("ingredient.slime_core", "slime core"),
+            ("ingredient.shroom_cap", "shroom cap"),
+            ("ingredient.spore_sac", "spore sac"),
+            ("ingredient.bat_wing", "bat wing"),
+            ("weapon.butchers_cleaver", "butcher's cleaver"),
+            ("enemy.bat", "bat"),
+            ("enemy.green_slime", "green slime"),
+            ("enemy.giant_spider", "giant spider"),
+            ("enemy.training_dummy", "training dummy"),
+            ("recipe.grilled_spider_leg", "grilled spider leg"),
+            ("recipe.shroom_skewer", "shroom skewer"),
+            ("recipe.cellar_kebab", "cellar kebab"),
+            ("recipe.gelbrew", "gelbrew"),
+            ("recipe.core_tonic", "core tonic"),
+            ("recipe.cellar_stew", "cellar stew"),
+            ("recipe.offal_pottage", "offal pottage"),
+            ("customer.villager", "villager"),
+            ("customer.adventurer", "adventurer"),
+            ("customer.dwarf", "dwarf"),
+            ("staff.pip", "Pip"),
+            ("upgrade.satchel_slots", "bigger satchel"),
+            ("upgrade.max_essence", "deeper reserves"),
+            ("upgrade.tavern_seats", "extra seating"),
+        };
+
         [MenuItem("Hearthdelve/Setup/Localization Tables", priority = 30)]
         public static void BuildMenu() => Build();
 
@@ -54,7 +88,7 @@ namespace Hearthdelve.Editor
             }
 
             FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English));
-            FillTable(Loc.ContentTable, ContentEntries);
+            FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();
         }
 

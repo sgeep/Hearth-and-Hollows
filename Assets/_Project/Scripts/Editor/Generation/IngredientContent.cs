@@ -29,12 +29,12 @@ namespace Hearthdelve.Editor
         public static void Build()
         {
             IngredientDefinition spiderLeg = Ingredient("Ingredient_RatHaunch", "Ingredient_SpiderLeg", "spider_leg",
-                "ingredient.rat_haunch", "ingredient.spider_leg", "Spider Leg", 13, 1, null);
+                "ingredient.rat_haunch", "ingredient.spider_leg", "spider leg", 13, 1, null);
             IngredientDefinition venomSac = Ingredient("Ingredient_RatLiver", "Ingredient_VenomSac", "venom_sac",
-                "ingredient.rat_liver", "ingredient.venom_sac", "Venom Sac", 16, 1, null);
+                "ingredient.rat_liver", "ingredient.venom_sac", "venom sac", 16, 1, null);
             // No bat parts on the loot sheet: the vampire's cape stands in for the wing (docs/ASSET_MAP.md).
             IngredientDefinition batWing = Ingredient(null, "Ingredient_BatWing", "bat_wing",
-                null, "ingredient.bat_wing", "Bat Wing", 14, 9, d =>
+                null, "ingredient.bat_wing", "bat wing", 14, 9, d =>
                 {
                     d.category = IngredientCategory.Meat;
                     d.flavors = spiderLeg != null ? spiderLeg.flavors : default;
@@ -42,9 +42,9 @@ namespace Hearthdelve.Editor
                     d.placeholderColor = new Color(0.4f, 0.25f, 0.35f);
                 });
 
-            Recipe("Recipe_GrilledHaunch", "Recipe_GrilledSpiderLeg", "grilled_spider_leg", "recipe.grilled_haunch", "recipe.grilled_spider_leg", "Grilled Spider Leg");
-            EnemyName(DungeonContent.BatDefinitionPath, "enemy.giant_rat", "enemy.bat", "Bat");
-            EnemyName(DungeonContent.SpiderDefinitionPath, "enemy.cellar_shroom", "enemy.giant_spider", "Giant Spider");
+            Recipe("Recipe_GrilledHaunch", "Recipe_GrilledSpiderLeg", "grilled_spider_leg", "recipe.grilled_haunch", "recipe.grilled_spider_leg", "grilled spider leg");
+            EnemyName(DungeonContent.BatDefinitionPath, "enemy.giant_rat", "enemy.bat", "bat");
+            EnemyName(DungeonContent.SpiderDefinitionPath, "enemy.cellar_shroom", "enemy.giant_spider", "giant spider");
 
             Harvest(DungeonContent.BatDefinitionPath, new HarvestPart { ingredient = batWing, baseQuality = Quality.Standard, dropChance = 1f, minCount = 1, maxCount = 2 });
             Harvest(DungeonContent.SpiderDefinitionPath,
