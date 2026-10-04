@@ -243,6 +243,75 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(PlayerSatchel.Capacity, Is.EqualTo(dayOneCapacity + 1), "the satchel upgrade applies to the delve");
         }
 
+        /// <summary>
+        /// 4c sign-off: the Essence and seating upgrades bought at Night reach the next day's scenes (the pure rules are
+        /// EditMode-tested; this checks the dungeon and tavern actually read them). Every seat opens, and the order rail
+        /// has a row for each.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EssenceAndSeatingUpgrades_ReachTheNextDaysScenes()
+        {
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Morning, "the first morning");
+            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            yield return InDungeon();
+            float baseMax = Player.GetComponent<EssenceHealth>().Essence.Max;
+            yield return ExtractAndGoHome();
+            int seatsBefore = Director.ActiveSeats;
+            Object.FindAnyObjectByType<PrepScreen>().CloseButton.onClick.Invoke();
+            yield return null;
+            Assert.That(Director.Phase, Is.EqualTo(TavernPhase.Night));
+
+            var night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            Flow.DebugAddGold(1000);
+            int essenceRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.MaxEssence);
+            int seatsRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.Seats);
+            night.Buy(essenceRow);
+            for (int i = 0; i < night.Definitions[seatsRow].levels.Count; i++) night.Buy(seatsRow);
+            Assert.That(Flow.State.UpgradeLevel(night.Definitions[seatsRow].id), Is.EqualTo(night.Definitions[seatsRow].levels.Count), "seating maxed");
+            night.SleepButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Morning, "the second morning");
+
+            float bonus = Flow.Loadout.MaxEssenceBonus;
+            Assert.That(bonus, Is.GreaterThan(0f), "no breakfast today: the bonus is the upgrade's");
+            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            yield return InDungeon();
+            Assert.That(Player.GetComponent<EssenceHealth>().Essence.Max, Is.EqualTo(baseMax + bonus).Within(0.01f), "the Essence upgrade applies to the delve");
+            yield return ExtractAndGoHome();
+
+            Assert.That(Director.ActiveSeats, Is.EqualTo(Director.Layout.Seats.Count), "every seat in the room is open");
+            Assert.That(Director.ActiveSeats, Is.GreaterThan(seatsBefore));
+            Assert.That(Director.Layout.Seats.Count(s => s.IsActive), Is.EqualTo(Director.ActiveSeats));
+            Transform rail = Object.FindObjectsByType<Canvas>().First(c => c.name == "UI").transform.Find("TavernHud/Content");
+            for (int i = 1; i <= Director.ActiveSeats; i++)
+                Assert.That(rail.Find($"Order{i}"), Is.Not.Null, $"a rail row for order {i}");
+        }
+
+        /// <summary>
+        /// 4c sign-off (found in the web smoke test): the day loop's delve runs in the test floor, whose look-test overlay
+        /// must stand down there: F3 would leave the day loop for a look-test scene. Its keys, label and debug hint go;
+        /// the controls line shows the game's controls and fits the screen.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheDelve_InTheDayLoop_HasNoLookTestKeys()
+        {
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Morning, "the first morning");
+            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            yield return InDungeon();
+            var overlay = Object.FindAnyObjectByType<Hearthdelve.UI.Debugging.LookTestOverlay>();
+            Assert.That(overlay, Is.Not.Null, "the test floor still has its overlay");
+            Assert.That(overlay.DebugKeysActive, Is.False, "F2-F4 do nothing in the day loop");
+            Assert.That(overlay.transform.Find("Resolution").gameObject.activeSelf, Is.False, "no resolution label");
+            var controls = overlay.transform.Find("Hint").GetComponent<SuperTextMesh>();
+            Assert.That(controls.text, Is.EqualTo("move: WASD / stick   attack: click / X   dodge: Space / B"));
+            Assert.That(controls.text, Does.Not.Contain("F3"));
+            Assert.That(((RectTransform)controls.transform).rect.width, Is.LessThanOrEqualTo(320f), "fits the screen");
+        }
+
         [UnityTest]
         public IEnumerator Dying_TheLockboxStack_ComesHome_AndTheEveningGoesOn()
         {
@@ -286,6 +355,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(prep.OpenButton.interactable, Is.False, "an empty storeroom can't open");
             Assert.That(ShownText(prep), Has.Some.EqualTo("nothing in the storeroom makes a dish tonight."));
+            Assert.That(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject, Is.SameAs(prep.CloseButton.gameObject),
+                "starts on closing for the night (found in the web smoke test: it started on a disabled card)");
             prep.CloseButton.onClick.Invoke();
             yield return null;
             Assert.That(Director.Phase, Is.EqualTo(TavernPhase.Night), "no results to click through");
