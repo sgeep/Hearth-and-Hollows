@@ -248,6 +248,103 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Runner.RoomsEntered, Is.GreaterThanOrEqualTo(12), "a full run");
         }
 
+        /// <summary>Goes on through fights, preferring one whose reward is the given kind, until standing in such a room.</summary>
+        IEnumerator WalkToReward(RewardKind kind)
+        {
+            for (int guard = 0; guard < 12 && !(Node.Kind == RoomKind.Combat && Node.Reward.Kind == kind); guard++)
+            {
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat && n.Reward.Kind == kind) ?? ExitTo(n => n.Kind == RoomKind.Combat));
+            }
+            Assert.That(Node.Reward.Kind, Is.EqualTo(kind), $"a {kind} room on the first floor");
+        }
+
+        [UnityTest]
+        public IEnumerator EachDoor_ShowsWhatItsRoomPromises()
+        {
+            yield return LoadRun();
+            for (int room = 0; room < 6; room++)
+            {
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                foreach (RoomExit exit in Room.Exits.Where(e => e.Index < Node.Next.Count))
+                {
+                    FloorNode target = Target(exit);
+                    string expected = target.Kind switch
+                    {
+                        RoomKind.Extraction => "ArrowUp",
+                        RoomKind.Descent => "ArrowDown",
+                        RoomKind.Arena => "Swords",
+                        _ => target.Reward.Kind == RewardKind.Gold ? "GoldCoin" : "Food",
+                    };
+                    Assert.That(exit.Marker, Is.Not.Null, $"{Node.RoomId} exit {exit.Index}");
+                    Assert.That(exit.Marker.name, Does.Contain(expected), $"{Node.RoomId} exit {exit.Index} leads to {target.Kind} {target.Reward}");
+                }
+                RoomExit next = ExitTo(n => n.Kind == RoomKind.Combat);
+                if (next == null) break;
+                yield return TakeExit(next);
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AGoldRoom_LeavesItsGold_AndPickingItUpAddsToTheRun()
+        {
+            yield return LoadRun();
+            yield return WalkToReward(RewardKind.Gold);
+            int promised = Node.Reward.Amount;
+            yield return ClearRoom();
+            var coin = Room.GetComponentInChildren<GoldPickup>();
+            Assert.That(coin, Is.Not.Null, "the Gold appears when the room is clear");
+            Assert.That(coin.Amount, Is.EqualTo(promised));
+            var hud = Object.FindAnyObjectByType<Hearthdelve.UI.Hud.RunGoldView>();
+            Assert.That(hud.Shown, Is.Zero);
+            Teleport(Player, coin.transform.position);
+            yield return WaitUntil(() => DelveRunController.Active.Loot.Gold == promised, 3f, "the Gold picked up");
+            Assert.That(hud.Shown, Is.EqualTo(promised), "the HUD shows the run's Gold");
+            Assert.That(coin == null, "the coin is gone");
+        }
+
+        [UnityTest]
+        public IEnumerator AnIngredientRoom_LeavesItsParts()
+        {
+            yield return LoadRun();
+            yield return WalkToReward(RewardKind.Ingredient);
+            RoomReward reward = Node.Reward;
+            yield return ClearRoom();
+            // Kills may drop parts of their own: the reward is the stack of the promised part and quality.
+            IngredientPickup[] drops = Object.FindObjectsByType<IngredientPickup>();
+            Assert.That(drops.Any(p => p.Stack.Item.Definition.id == reward.ItemId && p.Stack.Item.Quality == reward.Quality && p.Stack.Count == reward.Amount),
+                $"the reward {reward} on the floor");
+        }
+
+        [UnityTest]
+        public IEnumerator RunGold_ComesHome_OnExtraction()
+        {
+            yield return LoadRun();
+            DelveRunController.Active.Loot.AddGold(27);
+            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            Assert.That(DelveRunController.Active.Extract());
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
+            Assert.That(result.Report.GoldSecured, Is.EqualTo(27));
+            Assert.That(result.Report.GoldLost, Is.Zero);
+        }
+
+        [UnityTest]
+        public IEnumerator RunGold_IsLost_OnDeath()
+        {
+            yield return LoadRun();
+            var essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            DelveRunController.Active.Loot.AddGold(27);
+            var death = Object.FindAnyObjectByType<DeathScreen>(FindObjectsInactive.Include);
+            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            essence.Damage(essence.CurrentHealth + 50f, Player.gameObject, 0f, 0f, Vector3.zero);
+            yield return WaitUntil(() => death.IsOpen, 5f, "the death screen");
+            death.Confirm.onClick.Invoke();
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
+            Assert.That(result.Report.GoldSecured, Is.Zero);
+            Assert.That(result.Report.GoldLost, Is.EqualTo(27));
+        }
+
         [UnityTest]
         public IEnumerator TheCamera_StaysInsideEveryRoom()
         {

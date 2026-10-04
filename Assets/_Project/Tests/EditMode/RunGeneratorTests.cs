@@ -174,6 +174,75 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
+        public void EveryFight_HasAReward_InItsFloorsRange_AndQuietRoomsHaveNone()
+        {
+            RunTuning tuning = Settings.tuning;
+            Assert.That(tuning.ingredientRewards, Is.Not.Empty, "the dungeon's ingredients to give");
+            foreach (int seed in k_Seeds)
+            foreach (FloorGraph floor in Generate(seed).Floors)
+            {
+                FloorTuning t = tuning.Floor(floor.Floor - 1);
+                foreach (FloorNode node in floor.Nodes)
+                {
+                    string at = $"seed {seed}, floor {floor.Floor}, node {node.Id}";
+                    if (node.Kind != RoomKind.Combat)
+                    {
+                        Assert.That(node.Reward.Kind, Is.EqualTo(RewardKind.None), $"{at}: quiet rooms give nothing (the arena's reward is 4e's boss)");
+                        continue;
+                    }
+                    RoomReward reward = node.Reward;
+                    if (reward.Kind == RewardKind.Gold) Assert.That(reward.Amount, Is.InRange(t.minGold, t.maxGold), at);
+                    else
+                    {
+                        Assert.That(reward.Kind, Is.EqualTo(RewardKind.Ingredient), at);
+                        Assert.That(reward.Amount, Is.InRange(t.minParts, t.maxParts), at);
+                        Assert.That(reward.Quality is Hearthdelve.Shared.Ingredients.Quality.Standard or Hearthdelve.Shared.Ingredients.Quality.Fine, at);
+                        IngredientRewardOption option = tuning.ingredientRewards.Single(o => o.ingredient.id == reward.ItemId);
+                        Assert.That(option.fromFloor, Is.LessThanOrEqualTo(floor.Floor), $"{at}: {reward.ItemId} isn't found this high up");
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void AChoiceOfFights_IsAChoiceOfRewards()
+        {
+            foreach (int seed in k_Seeds)
+            foreach (FloorGraph floor in Generate(seed).Floors)
+            foreach (FloorNode node in floor.Nodes)
+            {
+                List<FloorNode> fights = node.Next.Select(floor.Node).Where(n => n.Kind == RoomKind.Combat).ToList();
+                if (fights.Count >= 2)
+                    Assert.That(fights.Select(n => n.Reward.Kind).Distinct().Count(), Is.GreaterThan(1), $"seed {seed}, floor {floor.Floor}, node {node.Id}");
+            }
+        }
+
+        [Test]
+        public void DeeperFloors_PayMore_AndBothRewardsTurnUp()
+        {
+            var gold = new List<double>[] { new(), new(), new() };
+            int ingredients = 0, golds = 0;
+            foreach (int seed in k_Seeds)
+            {
+                RunGraph run = Generate(seed);
+                for (int f = 0; f < 3; f++)
+                    foreach (FloorNode node in run.Floors[f].Nodes.Where(n => n.Kind == RoomKind.Combat))
+                    {
+                        if (node.Reward.Kind == RewardKind.Gold)
+                        {
+                            gold[f].Add(node.Reward.Amount);
+                            golds++;
+                        }
+                        else ingredients++;
+                    }
+            }
+            Assert.That(gold[1].Average(), Is.GreaterThan(gold[0].Average()));
+            Assert.That(gold[2].Average(), Is.GreaterThan(gold[1].Average()));
+            Assert.That(ingredients, Is.GreaterThan(golds / 3), "ingredient rooms are common");
+            Assert.That(golds, Is.GreaterThan(ingredients / 3), "Gold rooms are common");
+        }
+
+        [Test]
         public void ThePool_HasTheRoomsARunNeeds()
         {
             List<RoomCatalogEntry> rooms = Settings.Catalog();

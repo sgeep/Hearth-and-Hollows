@@ -131,6 +131,44 @@ namespace Hearthdelve.Tests
             Assert.That(state.Phase, Is.EqualTo(DayPhase.Evening));
         }
 
+        [Test]
+        public void RunGold_IsBanked_WhenTheDelveExtracts()
+        {
+            var state = At(DayPhase.Delve);
+            state.AddGold(40);
+            DelveReport report = DelveReport.Extraction(Haul(), runGold: 35);
+            Assert.That(report.GoldSecured, Is.EqualTo(35));
+            Assert.That(report.GoldLost, Is.Zero);
+            DayRules.CompleteDelve(state, report);
+            Assert.That(state.Gold, Is.EqualTo(75), "banked on top of the purse");
+        }
+
+        [Test]
+        public void RunGold_IsLost_OnDeath_ButBankedGoldIsSafe()
+        {
+            var state = At(DayPhase.Delve);
+            state.AddGold(40);
+            DelveReport report = DelveReport.Death(DeathPenalty.Resolve(Haul(), DeathPenalty.KeepNothing, 0), runGold: 35);
+            Assert.That(report.GoldSecured, Is.Zero);
+            Assert.That(report.GoldLost, Is.EqualTo(35));
+            DayRules.CompleteDelve(state, report);
+            Assert.That(state.Gold, Is.EqualTo(40), "Gold already banked is never lost");
+        }
+
+        [Test]
+        public void RunLoot_AddsGold_AndSaysSo()
+        {
+            var loot = new Hearthdelve.Shared.Run.RunLoot();
+            var seen = new List<int>();
+            loot.GoldChanged += seen.Add;
+            loot.AddGold(12);
+            loot.AddGold(0);
+            loot.AddGold(-5);
+            loot.AddGold(8);
+            Assert.That(loot.Gold, Is.EqualTo(20));
+            Assert.That(seen, Is.EqualTo(new[] { 12, 20 }), "only real gains are announced");
+        }
+
         // ---------- Service, night ----------
 
         [Test]
