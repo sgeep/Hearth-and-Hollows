@@ -52,6 +52,7 @@ namespace Hearthdelve.Dungeon.Rooms
         [SerializeField] Sprite m_MarkerArena;
         [SerializeField] Sprite m_MarkerGold;
         [SerializeField] Sprite m_MarkerIngredient;
+        [SerializeField] Sprite m_MarkerPower;
 
         RoomEncounter m_Encounter;
         int m_Entered = -1;
@@ -64,6 +65,7 @@ namespace Hearthdelve.Dungeon.Rooms
         public RunGraph Graph { get; private set; }
         public FloorGraph Floor { get; private set; }
         public FloorNode Node { get; private set; }
+        public RunSettings Settings => m_Settings;
         public RoomInstance Current { get; private set; }
         public RoomEncounter Encounter => m_Encounter;
         public bool IsTransitioning => m_Transitioning;
@@ -72,7 +74,7 @@ namespace Hearthdelve.Dungeon.Rooms
 
         public void Configure(RunSettings settings, Transform roomRoot, NavGrid nav, CinemachineCamera camera, RoomCameraBounds cameraBounds,
             MMF_Player sealFeedback, MMF_Player clearFeedback, MMF_Player fallFeedback, Sprite markerOut, Sprite markerDeeper, Sprite markerArena,
-            Sprite markerGold, Sprite markerIngredient)
+            Sprite markerGold, Sprite markerIngredient, Sprite markerPower)
         {
             m_Settings = settings;
             m_RoomRoot = roomRoot;
@@ -87,6 +89,7 @@ namespace Hearthdelve.Dungeon.Rooms
             m_MarkerArena = markerArena;
             m_MarkerGold = markerGold;
             m_MarkerIngredient = markerIngredient;
+            m_MarkerPower = markerPower;
         }
 
         void OnEnable() => Active = this;
@@ -158,6 +161,7 @@ namespace Hearthdelve.Dungeon.Rooms
             {
                 RewardKind.Gold => m_MarkerGold,
                 RewardKind.Ingredient => m_MarkerIngredient,
+                RewardKind.Power => m_MarkerPower,
                 _ => null,
             },
             _ => null,
@@ -173,6 +177,11 @@ namespace Hearthdelve.Dungeon.Rooms
                 case RewardKind.Gold when m_Settings.goldPickup != null:
                     GoldPickup coin = Instantiate(m_Settings.goldPickup, at, Quaternion.identity, Current.transform);
                     coin.SetAmount(reward.Amount);
+                    break;
+                case RewardKind.Power when m_Settings.powerPickup != null:
+                    // The offer is drawn when it's touched, from a seed fixed by the run and the room.
+                    Hearthdelve.Dungeon.Powers.PowerPickup spark = Instantiate(m_Settings.powerPickup, at, Quaternion.identity, Current.transform);
+                    spark.Setup(m_Settings.tuning.powers, unchecked(Graph.Seed * 31 + Floor.Floor * 7919 + Node.Id * 104729));
                     break;
                 case RewardKind.Ingredient when HarvestSystem.Instance != null:
                     Hearthdelve.Shared.Ingredients.IngredientDefinition ingredient = m_Settings.RewardIngredient(reward.ItemId);
@@ -334,12 +343,13 @@ namespace Hearthdelve.Dungeon.Rooms
             if (target != player.transform) target.position = new Vector3(at.x, at.y, target.position.z);
         }
 
-        /// <summary>Parts and Gold left lying, and webs in flight, stay behind with the room.</summary>
+        /// <summary>Parts, Gold and power sparks left lying, and webs in flight, stay behind with the room.</summary>
         static void ClearLeftovers()
         {
             foreach (IngredientPickup pickup in FindObjectsByType<IngredientPickup>(FindObjectsSortMode.None)) Destroy(pickup.gameObject);
             foreach (WebProjectile web in FindObjectsByType<WebProjectile>(FindObjectsSortMode.None)) Destroy(web.gameObject);
             foreach (GoldPickup coin in FindObjectsByType<GoldPickup>(FindObjectsSortMode.None)) Destroy(coin.gameObject);
+            foreach (Hearthdelve.Dungeon.Powers.PowerPickup spark in FindObjectsByType<Hearthdelve.Dungeon.Powers.PowerPickup>(FindObjectsSortMode.None)) Destroy(spark.gameObject);
         }
     }
 }

@@ -87,6 +87,7 @@ namespace Hearthdelve.Editor
         const string k_Selectors = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Selectors";
         const string k_UiIcons = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Icons";
         const string k_GladiatorGate = "All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate";
+        const string k_TrueHeroesIcons = "All_Exclusives_20261002/Icons/16x16px/True_Heroes_I&II_16x16px_Skill_Icons";
         const string k_Miscellany = "All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)";
 
         public const string Creatures = "Creatures";
@@ -101,6 +102,7 @@ namespace Hearthdelve.Editor
         public const string DwarvenKingdom = "DwarvenKingdom";
         public const string GladiatorArena = "GladiatorArena";
         public const string MiscellanyIcons = "MiscellanyIcons";
+        public const string SkillIcons = "SkillIcons";
 
         /// <summary>The 4d room gate: frames 0–3 open it, 4–7 close it.</summary>
         public const int GateFrames = 8;
@@ -359,6 +361,25 @@ namespace Hearthdelve.Editor
                     new SheetRect("Swords", 392, 40, 8, 8, k_Centre),
                     // 4d step 3: an ingredient room's door sign (CHARACTER group, food).
                     new SheetRect("Food", 536, 40, 8, 8, k_Centre),
+                    // 4d step 4: a power room's door sign, and its spark.
+                    new SheetRect("Lightning", 504, 40, 8, 8, k_Centre),
+                },
+            });
+
+            // True Heroes I & II skill icons (16×16 on a dark tile, 32 px apart): the run powers (4d step 4).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_TrueHeroesIcons}/16x16px_Skill_Icons.png", Pack = SkillIcons, File = "SkillIcons", Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("BardBallad", 112, 144, 16, 16, k_Centre),
+                    new SheetRect("ClericDivineFire", 48, 272, 16, 16, k_Centre),
+                    new SheetRect("BardDefense", 176, 176, 16, 16, k_Centre),
+                    new SheetRect("BardMelee", 176, 144, 16, 16, k_Centre),
+                    new SheetRect("PaladinHolyHammer", 112, 304, 16, 16, k_Centre),
+                    new SheetRect("RogueDodge", 80, 112, 16, 16, k_Centre),
+                    new SheetRect("ClericHealingWords", 80, 272, 16, 16, k_Centre),
+                    new SheetRect("RogueAttack", 16, 112, 16, 16, k_Centre),
                 },
             });
 

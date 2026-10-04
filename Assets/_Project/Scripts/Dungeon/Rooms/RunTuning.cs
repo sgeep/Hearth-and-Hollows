@@ -32,6 +32,8 @@ namespace Hearthdelve.Dungeon.Rooms
         [Min(0f)] public float goldWeight = 1f;
         [Tooltip("How often a fight's reward is a dungeon ingredient.")]
         [Min(0f)] public float ingredientWeight = 1f;
+        [Min(0f), Tooltip("How likely a fight is to give a run power, against Gold and ingredients (step 4).")]
+        public float powerWeight = 0.6f;
         [Min(0)] public int minGold = 10;
         [Min(0)] public int maxGold = 18;
         [Tooltip("Parts in an ingredient reward.")]
@@ -76,6 +78,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public FloorTuning[] floors = Defaults();
         [Tooltip("Dungeon ingredients rooms can give: things the surface can't (GDD §4.8, §5.5).")]
         public IngredientRewardOption[] ingredientRewards = Array.Empty<IngredientRewardOption>();
+        [Tooltip("The run powers a power room can offer (step 4). Empty: no power rooms.")]
+        public Hearthdelve.Shared.Run.RunPowerDefinition[] powers = Array.Empty<Hearthdelve.Shared.Run.RunPowerDefinition>();
         [Tooltip("TEMPORARY: the arena's stand-in fight until the 4e boss.")]
         public ArenaPlaceholder arenaPlaceholder = new();
 

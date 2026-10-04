@@ -93,7 +93,7 @@ namespace Hearthdelve.Dungeon.Rooms
             foreach (FloorNode node in nodes) AssignRoom(node, rooms, random, used, onThisFloor);
             foreach (FloorNode node in nodes) AssignEncounter(node, t, tuning.arenaPlaceholder, rooms, random);
             foreach (FloorNode node in nodes)
-                if (node.Kind == RoomKind.Combat) node.Reward = RollReward(PickRewardKind(t, random), index + 1, t, tuning, random);
+                if (node.Kind == RoomKind.Combat) node.Reward = RollReward(PickRewardKind(t, tuning, random), index + 1, t, tuning, random);
             VaryChoices(nodes, index + 1, t, tuning, random);
             return new FloorGraph(index + 1, nodes);
         }
@@ -191,16 +191,22 @@ namespace Hearthdelve.Dungeon.Rooms
             return kinds[^1];
         }
 
-        static RewardKind PickRewardKind(FloorTuning t, SeededRandom random)
+        static RewardKind PickRewardKind(FloorTuning t, RunTuning tuning, SeededRandom random)
         {
-            float total = t.goldWeight + t.ingredientWeight;
+            float power = HasPowers(tuning) ? t.powerWeight : 0f;
+            float total = t.goldWeight + t.ingredientWeight + power;
             if (total <= 0f) return RewardKind.Gold;
-            return random.Value() * total < t.goldWeight ? RewardKind.Gold : RewardKind.Ingredient;
+            float roll = random.Value() * total;
+            if (roll < t.goldWeight) return RewardKind.Gold;
+            return roll < t.goldWeight + t.ingredientWeight ? RewardKind.Ingredient : RewardKind.Power;
         }
+
+        static bool HasPowers(RunTuning tuning) => tuning.powers != null && tuning.powers.Any(p => p != null);
 
         /// <summary>The payload for a reward of the given kind on this floor (Gold, or which part, how many, how good).</summary>
         static RoomReward RollReward(RewardKind kind, int floor, FloorTuning t, RunTuning tuning, SeededRandom random)
         {
+            if (kind == RewardKind.Power && HasPowers(tuning)) return RoomReward.Power();
             if (kind == RewardKind.Ingredient)
             {
                 var options = (tuning.ingredientRewards ?? Array.Empty<IngredientRewardOption>())
@@ -226,7 +232,7 @@ namespace Hearthdelve.Dungeon.Rooms
             return RoomReward.Gold(random.Range(Math.Min(t.minGold, t.maxGold), Math.Max(t.minGold, t.maxGold)));
         }
 
-        /// <summary>A choice between fights should be a choice between rewards: if every fight on offer gives the same kind, the last gives the other.</summary>
+        /// <summary>A choice between fights should be a choice between rewards: if every fight on offer gives the same kind, the last gives another (Gold or an ingredient).</summary>
         static void VaryChoices(List<FloorNode> nodes, int floor, FloorTuning t, RunTuning tuning, SeededRandom random)
         {
             foreach (FloorNode node in nodes)
@@ -234,6 +240,7 @@ namespace Hearthdelve.Dungeon.Rooms
                 List<FloorNode> fights = node.Next.Select(id => nodes[id]).Where(n => n.Kind == RoomKind.Combat).ToList();
                 if (fights.Count < 2 || fights.Select(n => n.Reward.Kind).Distinct().Count() > 1) continue;
                 RewardKind other = fights[0].Reward.Kind == RewardKind.Gold ? RewardKind.Ingredient : RewardKind.Gold;
+                // Two power rooms side by side become a power or a sure thing.
                 // With at most two rooms a step, a choice of two fights is always the whole next step, so one change serves every room offering it.
                 fights[^1].Reward = RollReward(other, floor, t, tuning, random);
             }

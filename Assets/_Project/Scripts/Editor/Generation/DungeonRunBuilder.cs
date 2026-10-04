@@ -50,6 +50,8 @@ namespace Hearthdelve.Editor
 
         public const string SettingsPath = EditorPaths.Data + "/Dungeon/RunSettings.asset";
         public const string GoldPickupPrefab = EditorPaths.Prefabs + "/Dungeon/GoldPickup.prefab";
+        public const string PowerPickupPrefab = EditorPaths.Prefabs + "/Dungeon/PowerPickup.prefab";
+        const string k_PowersFolder = EditorPaths.Data + "/Dungeon/Powers";
 
         /// <summary>
         /// Rebuilds the rooms and the run settings (keeping their tuning). The scene is created if it doesn't exist, rebuilt
@@ -80,6 +82,10 @@ namespace Hearthdelve.Editor
             settings.bat = content.Bat;
             settings.spider = content.Spider;
             settings.goldPickup = BuildGoldPickup();
+            settings.powerPickup = BuildPowerPickup();
+            // Step 4's powers: the assets are refreshed (art) but their amounts are kept; the list is filled once.
+            Hearthdelve.Shared.Run.RunPowerDefinition[] powers = BuildPowers();
+            if (settings.tuning.powers == null || settings.tuning.powers.Length == 0) settings.tuning.powers = powers;
             // Step 3's rewards, once: settings made before step 3 have no ingredient list, and their floors took the reward
             // fields' plain defaults rather than the per-floor ones. Later edits are kept.
             if (settings.tuning.ingredientRewards == null || settings.tuning.ingredientRewards.Length == 0)
@@ -120,6 +126,62 @@ namespace Hearthdelve.Editor
                 Option("SlimeGel", 1f, 1), Option("BatWing", 1f, 1), Option("SpiderLeg", 1f, 1),
                 Option("SlimeCore", 0.7f, 2), Option("VenomSac", 0.7f, 2),
             }.Where(o => o.ingredient != null).ToArray();
+        }
+
+        /// <summary>
+        /// The run powers (4d step 4), one asset each: a small nudge to existing tuning, with a True Heroes skill icon.
+        /// New assets get these amounts; existing ones keep theirs (they're for tuning).
+        /// </summary>
+        static Hearthdelve.Shared.Run.RunPowerDefinition[] BuildPowers()
+        {
+            EditorPaths.Ensure(k_PowersFolder);
+            var list = new List<Hearthdelve.Shared.Run.RunPowerDefinition>();
+            void Power(string id, string asset, Hearthdelve.Shared.Run.RunPowerEffect effect, float amount, string icon)
+            {
+                var power = LookTestContent.LoadOrCreate<Hearthdelve.Shared.Run.RunPowerDefinition>($"{k_PowersFolder}/Power_{asset}.asset");
+                if (string.IsNullOrEmpty(power.id))
+                {
+                    power.id = id;
+                    power.effect = effect;
+                    power.amount = amount;
+                }
+                power.icon = MinifantasyImporter.Sprite(MinifantasySheets.SkillIcons, "SkillIcons", icon);
+                EditorUtility.SetDirty(power);
+                list.Add(power);
+            }
+            Power("deep_reserves", "DeepReserves", Hearthdelve.Shared.Run.RunPowerEffect.MaxEssence, 25f, "BardBallad");
+            Power("slow_burn", "SlowBurn", Hearthdelve.Shared.Run.RunPowerEffect.SlowerDrain, 0.3f, "ClericDivineFire");
+            Power("thick_hide", "ThickHide", Hearthdelve.Shared.Run.RunPowerEffect.LighterHits, 0.3f, "BardDefense");
+            Power("keen_edge", "KeenEdge", Hearthdelve.Shared.Run.RunPowerEffect.LightDamage, 0.25f, "BardMelee");
+            Power("heavy_hand", "HeavyHand", Hearthdelve.Shared.Run.RunPowerEffect.HeavyDamage, 0.4f, "PaladinHolyHammer");
+            Power("light_feet", "LightFeet", Hearthdelve.Shared.Run.RunPowerEffect.FasterDodge, 0.4f, "RogueDodge");
+            Power("second_wind", "SecondWind", Hearthdelve.Shared.Run.RunPowerEffect.EssenceOnClear, 10f, "ClericHealingWords");
+            Power("butchers_eye", "ButchersEye", Hearthdelve.Shared.Run.RunPowerEffect.GentleKills, 0.5f, "RogueAttack");
+            AssetDatabase.SaveAssets();
+            return list.ToArray();
+        }
+
+        /// <summary>A power room's reward: a bobbing spark with a small warm glow (unlit, so it reads anywhere), offering three powers.</summary>
+        static Hearthdelve.Dungeon.Powers.PowerPickup BuildPowerPickup()
+        {
+            var root = new GameObject("PowerPickup") { layer = LayerMask.NameToLayer(Layers.Pickup) };
+            var trigger = root.AddComponent<CircleCollider2D>();
+            trigger.isTrigger = true;
+            trigger.radius = 0.5f;
+            trigger.offset = new Vector2(0f, 0.3f);
+            SpriteRenderer spark = LookTestContent.AddSprite(root.transform, "Spark", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Lightning"),
+                SortingLayers.YSorted, 0, new Vector3(0f, 0.3f, 0f));
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            if (unlit != null) spark.sharedMaterial = unlit;
+            Light2D glow = LookTestBuilder.Light("Glow", new Vector3(0f, 0.4f, 0f), Light2D.LightType.Point);
+            glow.transform.SetParent(root.transform, false);
+            glow.color = new Color(1f, 0.82f, 0.4f);
+            glow.intensity = 0.9f;
+            glow.pointLightInnerRadius = 0.3f;
+            glow.pointLightOuterRadius = 2.5f;
+            MMF_Player feedback = LookTestContent.Feedback(root.transform, "Feedback_Power", null, 0f, LookTestContent.Sfx("PH_PowerUp"), LookTestContent.Pattern(HapticIds.PulseSuccess));
+            root.AddComponent<Hearthdelve.Dungeon.Powers.PowerPickup>().Configure(spark.transform, feedback);
+            return LookTestContent.SavePrefab(root, PowerPickupPrefab).GetComponent<Hearthdelve.Dungeon.Powers.PowerPickup>();
         }
 
         /// <summary>A room's Gold reward: a bobbing coin (unlit, so it reads on a dim floor, like the parts) that adds to the run's Gold.</summary>
@@ -201,7 +263,8 @@ namespace Hearthdelve.Editor
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "ArrowDown"),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Swords"),
                 MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"),
-                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Food"));
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Food"),
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Lightning"));
             EditorUtility.SetDirty(runner);
         }
 
@@ -254,7 +317,10 @@ namespace Hearthdelve.Editor
                 (LookTestContent.Noise(n) * 0.5f + Sin(t, 70f - 40f * t) * 0.9f) * Mathf.Exp(-t * 14f) * 0.8f);
             LookTestContent.WriteWav("PH_GateRise", 0.5f, (t, n) =>
                 (LookTestContent.Noise(n) * 0.35f + Sin(t, 900f) * 0.15f) * (0.6f + 0.4f * Sin(t, 22f)) * Mathf.Sin(t / 0.5f * Mathf.PI) * 0.6f);
-            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin" })
+            // A power taken: a rising shimmer.
+            LookTestContent.WriteWav("PH_PowerUp", 0.6f, (t, n) =>
+                (Sin(t, 520f + 700f * t) * 0.5f + Sin(t, 1040f + 1400f * t) * 0.25f) * Mathf.Sin(t / 0.6f * Mathf.PI) * 0.35f);
+            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp" })
                 AssetDatabase.ImportAsset($"{EditorPaths.Audio}/{name}.wav");
         }
 

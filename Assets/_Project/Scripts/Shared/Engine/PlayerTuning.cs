@@ -15,7 +15,20 @@ namespace Hearthdelve.Shared.Engine
         CharacterMovement m_Movement;
         CharacterDash2D m_Dash;
 
+        float m_DodgeCooldownMultiplier = 1f;
+
         public PlayerMoveConfig Config => m_Config;
+
+        /// <summary>A delve's run powers (4d step 4): 1 = the configured cooldown.</summary>
+        public float DodgeCooldownMultiplier
+        {
+            get => m_DodgeCooldownMultiplier;
+            set
+            {
+                m_DodgeCooldownMultiplier = Mathf.Max(0f, value);
+                Apply();
+            }
+        }
 
         public void Configure(PlayerMoveConfig config) => m_Config = config;
 
@@ -49,7 +62,7 @@ namespace Hearthdelve.Shared.Engine
                     m_Dash.Cooldown.Unlimited = false;
                     m_Dash.Cooldown.ConsumptionDuration = 0f;
                     m_Dash.Cooldown.PauseOnEmptyDuration = 0f;
-                    m_Dash.Cooldown.RefillDuration = m_Config.dodgeCooldown;
+                    m_Dash.Cooldown.RefillDuration = m_Config.dodgeCooldown * m_DodgeCooldownMultiplier;
                 }
             }
         }

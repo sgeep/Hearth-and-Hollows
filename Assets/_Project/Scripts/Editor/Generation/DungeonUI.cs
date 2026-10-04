@@ -61,6 +61,16 @@ namespace Hearthdelve.Editor
             var runGold = root.gameObject.AddComponent<Hearthdelve.UI.Hud.RunGoldView>();
             runGold.Configure(gold.gameObject, amount);
 
+            // The run's powers (4d step 4): their icons in a row under the Gold, as they're taken.
+            RectTransform powers = LookTestBuilder.UIRect(root, "RunPowers", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -31f), new Vector2(8 * 17f, 16f));
+            var powerIcons = new Image[8];
+            for (int i = 0; i < powerIcons.Length; i++)
+            {
+                RectTransform slot = LookTestBuilder.UIRect(powers, $"Power{i}", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(i * 17f, 0f), new Vector2(16f, 16f));
+                powerIcons[i] = AddImage(slot, null, Color.white);
+            }
+            powers.gameObject.AddComponent<Hearthdelve.UI.Hud.RunPowersHud>().Configure(powerIcons);
+
             RectTransform satchel = LookTestBuilder.UIRect(root, "Satchel", Vector2.zero, Vector2.zero, new Vector2(4f, 8f), new Vector2(94f, 17f));
             var slots = new SatchelSlotView[6];
             for (int i = 0; i < slots.Length; i++)
@@ -96,7 +106,7 @@ namespace Hearthdelve.Editor
         public static void RebuildScreens(Canvas canvas)
         {
             UiFeedbackContent.Ensure(canvas);
-            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult", "PH_EssenceBar", "EssenceLabel" })
+            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult", "RunPower", "PH_EssenceBar", "EssenceLabel" })
             {
                 Transform old = canvas.transform.Find(name);
                 if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -112,6 +122,7 @@ namespace Hearthdelve.Editor
             BuildExitHint(canvas);
             BuildDeathScreen(canvas);
             BuildResultScreen(canvas);
+            BuildPowerScreen(canvas);
         }
 
         /// <summary>A 1×1 white sprite for pips, bars and outlines, point filtered.</summary>
@@ -330,6 +341,36 @@ namespace Hearthdelve.Editor
             screen.Configure(panel.gameObject, subtitle, incomingIcon, detail, slots, leave, hint, hintText);
             panel.gameObject.SetActive(false);
             hint.SetActive(false);
+            return screen;
+        }
+
+        /// <summary>The power room's choice of three (4d step 4): a card each, icon, name and what it does.</summary>
+        public static RunPowerScreen BuildPowerScreen(Canvas canvas)
+        {
+            RectTransform root = FullScreen(canvas, "RunPower");
+            RectTransform panel = Panel(root, new Vector2(300f, 136f), new Vector2(0f, 4f));
+            Title(panel, LocKeys.PowerTitle);
+            var cards = new RunPowerScreen.Card[3];
+            var buttons = new Button[3];
+            for (int i = 0; i < cards.Length; i++)
+            {
+                RectTransform rect = LookTestBuilder.UIRect(panel, $"Card{i}", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2((i - 1) * 96f, -26f), new Vector2(90f, 88f));
+                Button button = ButtonFace(rect);
+                RectTransform iconRect = LookTestBuilder.UIRect(rect, "Icon", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(16f, 16f));
+                Image icon = AddImage(iconRect, null, Color.white);
+                LocalizedSuperText name = LookTestBuilder.Text(rect, "Name", LocKeys.PowerTitle, 6f, k_Title, TextAnchor.UpperCenter,
+                    new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -22f), new Vector2(84f, 12f));
+                LocalizedSuperText description = LookTestBuilder.Text(rect, "Description", LocKeys.PowerFooter, 6f, k_Ink, TextAnchor.UpperCenter,
+                    new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -35f), new Vector2(84f, 48f));
+                cards[i] = new RunPowerScreen.Card { button = button, icon = icon, name = name, description = description };
+                buttons[i] = button;
+            }
+            Navigate(buttons, null);
+            Line(panel, "Footer", LocKeys.PowerFooter, -55f);
+
+            var screen = root.gameObject.AddComponent<RunPowerScreen>();
+            screen.Configure(panel.gameObject, cards);
+            panel.gameObject.SetActive(false);
             return screen;
         }
 

@@ -51,14 +51,28 @@ namespace Hearthdelve.Dungeon.Essence
             Current = Max;
         }
 
-        public float Max { get; }
+        public float Max { get; private set; }
         /// <summary>The upgrade and breakfast modifiers this meter was built with.</summary>
         public EssenceModifiers Modifiers => m_Modifiers;
         public float Current { get; private set; }
         public float Normalized => Current / Max;
         public bool IsLow => Normalized <= m_Settings.lowThreshold;
         public bool IsDepleted { get; private set; }
-        public float DrainPerSecond => m_Settings.drainPerSecond * Math.Max(0f, m_Modifiers.DrainMultiplier);
+        public float DrainPerSecond => m_Settings.drainPerSecond * Math.Max(0f, m_Modifiers.DrainMultiplier) * Math.Max(0f, RunDrainMultiplier);
+
+        /// <summary>The run's powers (4d step 4): 1 = normal drain.</summary>
+        public float RunDrainMultiplier { get; set; } = 1f;
+        /// <summary>The run's powers (4d step 4): 1 = hits cost their full Essence.</summary>
+        public float HitCostMultiplier { get; set; } = 1f;
+
+        /// <summary>Raises the maximum and Essence alike (a run power).</summary>
+        public void RaiseMax(float amount)
+        {
+            if (IsDepleted || amount <= 0f) return;
+            Max += amount;
+            Current += amount;
+            Changed?.Invoke(false);
+        }
 
         /// <summary>When true, time-based drain stops (menus, cutscenes, safe rooms). Damage still applies.</summary>
         public bool Paused { get; set; }
@@ -77,7 +91,7 @@ namespace Hearthdelve.Dungeon.Essence
         public float TakeDamage(float damage)
         {
             if (IsDepleted || damage <= 0f) return 0f;
-            return Drain(damage * m_Settings.damageMultiplier, fromDamage: true);
+            return Drain(damage * m_Settings.damageMultiplier * Math.Max(0f, HitCostMultiplier), fromDamage: true);
         }
 
         public void Restore(float amount)

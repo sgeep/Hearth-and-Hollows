@@ -89,6 +89,19 @@ namespace Hearthdelve.Dungeon.Combat
             }
         }
 
+        /// <summary>The run's powers (4d step 4) scale the attack's damage as the swing begins.</summary>
+        protected override void EnableDamageArea()
+        {
+            if (_damageOnTouch != null && m_Attack != null)
+            {
+                Hearthdelve.Shared.Run.RunModifiers run = Run.DelveRunController.CurrentModifiers;
+                float damage = DamageCalculator.Scale(m_Attack.damage, m_IsHeavy ? run.HeavyDamageMultiplier : run.LightDamageMultiplier);
+                _damageOnTouch.MinDamageCaused = damage;
+                _damageOnTouch.MaxDamageCaused = damage;
+            }
+            base.EnableDamageArea();
+        }
+
         protected override void CreateDamageArea()
         {
             base.CreateDamageArea();

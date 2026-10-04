@@ -1,6 +1,7 @@
 using System.Collections;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
+using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Game;
@@ -36,6 +37,37 @@ namespace Hearthdelve.Dungeon.Run
         public RunLoot Loot { get; } = new();
 
         void PublishGold(int gold) => EventBus<RunGoldChanged>.Publish(new RunGoldChanged(gold));
+
+        /// <summary>The powers taken this run (4d step 4); they end with the delve.</summary>
+        public RunPowers Powers { get; } = new();
+        /// <summary>The active run's power totals, or none outside a delve.</summary>
+        public static RunModifiers CurrentModifiers => Active != null ? Active.Powers.Modifiers : RunModifiers.None;
+
+        /// <summary>Takes a power and applies it at once. False if the run already has it.</summary>
+        public bool TakePower(RunPowerDefinition power)
+        {
+            if (!Powers.Take(power)) return false;
+            Character player = Player();
+            if (player != null)
+            {
+                if (player.TryGetComponent(out EssenceHealth essence)) essence.ApplyRunModifiers(Powers.Modifiers);
+                if (player.TryGetComponent(out PlayerTuning tuning)) tuning.DodgeCooldownMultiplier = Powers.Modifiers.DodgeCooldownMultiplier;
+            }
+            EventBus<RunPowerTaken>.Publish(new RunPowerTaken(power, Powers.Taken));
+            return true;
+        }
+
+        // Second wind: Essence back as each room is cleared.
+        void OnRoomCleared(RoomCleared _)
+        {
+            float amount = Powers.Modifiers.EssenceOnClear;
+            if (amount <= 0f || IsEnding) return;
+            Character player = Player();
+            if (player != null && player.TryGetComponent(out EssenceHealth essence)) essence.Restore(amount);
+        }
+
+        static Character Player() =>
+            LevelManager.HasInstance && LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0 ? LevelManager.Instance.Players[0] : null;
         /// <summary>The report of the delve once it has ended.</summary>
         public DelveReport Report { get; private set; }
 
@@ -44,6 +76,7 @@ namespace Hearthdelve.Dungeon.Run
         void OnEnable()
         {
             Loot.GoldChanged += PublishGold;
+            EventBus<RoomCleared>.Subscribe(OnRoomCleared);
             EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
         }
@@ -51,6 +84,7 @@ namespace Hearthdelve.Dungeon.Run
         void OnDisable()
         {
             Loot.GoldChanged -= PublishGold;
+            EventBus<RoomCleared>.Unsubscribe(OnRoomCleared);
             EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Unsubscribe(OnDebugSkip);
         }

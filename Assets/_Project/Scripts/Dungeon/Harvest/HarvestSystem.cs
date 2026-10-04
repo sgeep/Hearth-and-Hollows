@@ -139,6 +139,10 @@ namespace Hearthdelve.Dungeon.Harvest
             EventBus<EnemyKilled>.Publish(new EnemyKilled(definition, kill, e.Position));
 
             HarvestRuleSettings settings = m_Rules != null ? m_Rules.rules : HarvestRuleSettings.Default;
+            // The run's powers (4d step 4) can make overkill harder to reach.
+            float tolerance = Run.DelveRunController.CurrentModifiers.OverkillToleranceMultiplier;
+            settings.overkillRatio *= tolerance;
+            settings.destroyRatio *= tolerance;
             List<HarvestDrop> drops = HarvestRules.Resolve(definition.harvest, kill, settings, m_Random);
             // The kill's own moment: a ruined harvest thuds; a clean one rings. A plain kill has the hit's feedback.
             if (drops.Any(d => (d.Flags & (HarvestFlags.Overkill | HarvestFlags.Destroyed)) != 0)) m_OverkillFeedback?.PlayFeedbacks(e.Position);

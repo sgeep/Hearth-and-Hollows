@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Hearthdelve.Core.Events;
+using Hearthdelve.Dungeon.Run;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Run;
 using MoreMountains.TopDownEngine;
@@ -22,6 +23,7 @@ namespace Hearthdelve.Dungeon.Essence
         bool m_GodMode;
 
         EssenceMeter m_Meter;
+        float m_RunMaxBonus;
         bool m_Dying;
         bool m_ApplyingDamage;
 
@@ -72,6 +74,25 @@ namespace Hearthdelve.Dungeon.Essence
             m_Meter = new EssenceMeter(settings, new EssenceModifiers { MaxBonus = loadout.MaxEssenceBonus, DrainMultiplier = loadout.DrainMultiplier });
             m_Meter.Changed += PublishChanged;
             m_Meter.Depleted += OnDepleted;
+            m_RunMaxBonus = 0f;
+            ApplyRunModifiers(DelveRunController.CurrentModifiers, publish: false);
+        }
+
+        /// <summary>The run's powers (4d step 4): slower drain, lighter hits, and more max Essence (filled as it's added).</summary>
+        public void ApplyRunModifiers(RunModifiers modifiers, bool publish = true)
+        {
+            if (m_Meter == null) return;
+            m_Meter.RunDrainMultiplier = modifiers.DrainMultiplier;
+            m_Meter.HitCostMultiplier = modifiers.HitCostMultiplier;
+            float added = modifiers.MaxEssenceBonus - m_RunMaxBonus;
+            if (added > 0f)
+            {
+                m_RunMaxBonus = modifiers.MaxEssenceBonus;
+                m_Meter.RaiseMax(added);
+                MaximumHealth = m_Meter.Max;
+                base.SetHealth(m_Meter.Current);
+            }
+            if (publish) PublishChanged(false);
         }
 
         protected virtual void Update()

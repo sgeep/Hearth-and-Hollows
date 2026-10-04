@@ -20,6 +20,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public GameObject spider;
         [Tooltip("A room's Gold reward, on the floor once it's clear.")]
         public GoldPickup goldPickup;
+        [Tooltip("A power room's reward: touched, it offers three run powers.")]
+        public Hearthdelve.Dungeon.Powers.PowerPickup powerPickup;
 
         /// <summary>A reward ingredient by id (from the tuning's options).</summary>
         public Hearthdelve.Shared.Ingredients.IngredientDefinition RewardIngredient(string id) =>

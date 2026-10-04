@@ -196,6 +196,11 @@ namespace Hearthdelve.UI.Localization
         public const string HudRunGold = "hud.run_gold";
         public const string ResultGoldSecured = "result.gold_secured";
         public const string ResultGoldLost = "result.gold_lost";
+        /// <summary>4d step 4: the power room's choice. Each power's name and description are keyed by its id.</summary>
+        public const string PowerTitle = "power.title";
+        public const string PowerFooter = "power.footer";
+        public static string PowerName(string id) => $"power.{id}";
+        public static string PowerDescription(string id) => $"power.{id}.desc";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
@@ -260,6 +265,24 @@ namespace Hearthdelve.UI.Localization
             (HudRunGold, "{0} Gold"),
             (ResultGoldSecured, "+{0} Gold to the purse"),
             (ResultGoldLost, "{0} Gold left in the dark"),
+            (PowerTitle, "choose a power"),
+            (PowerFooter, "it lasts until you leave the dungeon"),
+            ("power.deep_reserves", "deep reserves"),
+            ("power.deep_reserves.desc", "+{0} max Essence, filled at once"),
+            ("power.slow_burn", "slow burn"),
+            ("power.slow_burn.desc", "Essence drains {0}% slower"),
+            ("power.thick_hide", "thick hide"),
+            ("power.thick_hide.desc", "hits cost {0}% less Essence"),
+            ("power.keen_edge", "keen edge"),
+            ("power.keen_edge.desc", "light attacks deal {0}% more damage"),
+            ("power.heavy_hand", "heavy hand"),
+            ("power.heavy_hand.desc", "charged attacks deal {0}% more damage"),
+            ("power.light_feet", "light feet"),
+            ("power.light_feet.desc", "the dodge roll recovers {0}% sooner"),
+            ("power.second_wind", "second wind"),
+            ("power.second_wind.desc", "each room cleared restores {0} Essence"),
+            ("power.butchers_eye", "butcher's eye"),
+            ("power.butchers_eye.desc", "overkill takes {0}% more spare damage: fewer bruised parts"),
         };
     }
 }

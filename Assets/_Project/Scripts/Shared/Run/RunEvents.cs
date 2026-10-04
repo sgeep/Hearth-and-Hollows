@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
@@ -176,6 +177,32 @@ namespace Hearthdelve.Shared.Run
     {
         public readonly int Gold;
         public RunGoldChanged(int gold) => Gold = gold;
+    }
+
+    /// <summary>A power spark was touched (4d step 4): the run is paused; answer with the power chosen, or null to leave it.</summary>
+    public readonly struct RunPowerOfferRequested : IEvent
+    {
+        public readonly IReadOnlyList<RunPowerDefinition> Options;
+        public readonly Action<RunPowerDefinition> OnChosen;
+
+        public RunPowerOfferRequested(IReadOnlyList<RunPowerDefinition> options, Action<RunPowerDefinition> onChosen)
+        {
+            Options = options;
+            OnChosen = onChosen;
+        }
+    }
+
+    /// <summary>The run took a power; <see cref="All"/> is every power it holds now.</summary>
+    public readonly struct RunPowerTaken : IEvent
+    {
+        public readonly RunPowerDefinition Power;
+        public readonly IReadOnlyList<RunPowerDefinition> All;
+
+        public RunPowerTaken(RunPowerDefinition power, IReadOnlyList<RunPowerDefinition> all)
+        {
+            Power = power;
+            All = all;
+        }
     }
 
     /// <summary>The last enemy in the room fell and its exits are opening.</summary>
