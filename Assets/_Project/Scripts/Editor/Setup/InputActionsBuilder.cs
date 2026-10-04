@@ -74,7 +74,9 @@ namespace Hearthdelve.Editor
             // --- UI (drives uGUI through InputSystemUIInputModule) ---
             var ui = asset.AddActionMap(InputMaps.UI);
             var navigate = ui.AddAction("Navigate", InputActionType.PassThrough, expectedControlLayout: "Vector2");
-            navigate.AddBinding("<Gamepad>/leftStick", groups: GP);
+            // A wide dead zone for menus: a released stick springs back past centre, and the default (0.125)
+            // read that overshoot as a press the other way, so the selection stepped back (4c step 4 playtest).
+            navigate.AddBinding("<Gamepad>/leftStick", groups: GP, processors: "StickDeadzone(min=0.5)");
             navigate.AddBinding("<Gamepad>/dpad", groups: GP);
             navigate.AddCompositeBinding("2DVector")
                 .With("Up", "<Keyboard>/w", KM).With("Down", "<Keyboard>/s", KM)

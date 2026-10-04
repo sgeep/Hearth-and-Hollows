@@ -799,7 +799,7 @@
                     "id": "6d33d49d-71f9-406b-a96f-751dc9ba714a",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
-                    "processors": "",
+                    "processors": "StickDeadzone(min=0.5)",
                     "groups": "Gamepad",
                     "action": "Navigate",
                     "isComposite": false,
