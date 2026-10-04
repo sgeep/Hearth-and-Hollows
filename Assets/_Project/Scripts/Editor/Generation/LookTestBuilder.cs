@@ -506,7 +506,7 @@ namespace Hearthdelve.Editor
             LocalizedSuperText label = Text(canvas.transform, "Resolution", LocKeys.LookTestResolution, 7f, light, TextAnchor.UpperRight,
                 Vector2.one, Vector2.one, Vector2.one, new Vector2(-4f, -3f), new Vector2(150f, 10f));
             Text(canvas.transform, "Hint", hintKey, 6f, light, TextAnchor.LowerCenter,
-                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(310f, 10f));
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(316f, GameFonts.LinePixels));
             canvas.gameObject.AddComponent<LookTestOverlay>().Configure(camera, scaler, label, otherScene);
         }
 

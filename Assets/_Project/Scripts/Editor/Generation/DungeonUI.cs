@@ -94,6 +94,8 @@ namespace Hearthdelve.Editor
             Transform controls = canvas.transform.Find("Hint");
             if (controls != null && controls.GetComponent<Hearthdelve.UI.Debugging.FadeOutAfter>() == null)
                 controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
+            // Wide enough for the day loop's controls line (315 px in Silver) on one line.
+            if (controls != null) ((RectTransform)controls).sizeDelta = new Vector2(316f, GameFonts.LinePixels);
             BuildHud(canvas);
             BuildSwapPrompt(canvas);
             BuildExitHint(canvas);

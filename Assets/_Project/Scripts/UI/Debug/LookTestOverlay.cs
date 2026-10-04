@@ -1,6 +1,7 @@
 using System.Collections;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.UI.Localization;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,7 +15,10 @@ namespace Hearthdelve.UI.Debugging
     /// Look-test helper: F2 cycles the pixel-perfect reference resolution so character scale can
     /// be compared live, F3 swaps scenes, and F4 cycles the scroll mode (<see cref="ScrollMode"/>)
     /// so the scrolling options can be compared before one is chosen. It also restarts the room a
-    /// moment after the player dies (the real death and Lockbox flow is 4b). Not part of the game.
+    /// moment after the player dies (the real death and Lockbox flow is 4b). Not part of the game: when the test floor
+    /// is the day loop's delve (<see cref="GameFlow"/> is running a game), the overlay stands down. Its keys do
+    /// nothing (F3 would leave the day loop for a look-test scene), its label hides, and the controls line shows the
+    /// game's controls without the debug keys.
     /// </summary>
     public sealed class LookTestOverlay : MonoBehaviour
     {
@@ -44,6 +48,8 @@ namespace Hearthdelve.UI.Debugging
         PixelSnappedPresentation m_Presentation;
 
         public Vector2Int Resolution => k_Resolutions[s_Index];
+        /// <summary>False in the day loop: the F2–F4 keys are only for the test scenes run on their own.</summary>
+        public bool DebugKeysActive { get; private set; } = true;
         public static ScrollMode Mode => s_Mode;
 
         public void Configure(PixelPerfectCamera camera, CanvasScaler scaler, LocalizedSuperText label, string otherScene)
@@ -64,6 +70,16 @@ namespace Hearthdelve.UI.Debugging
         void Start()
         {
             m_BasePixelsPerUnit = m_Camera != null ? m_Camera.assetsPPU : 8;
+            if (GameFlow.Instance != null && GameFlow.Instance.InGame)
+            {
+                // The day loop's delve: the game's own view (smooth, 320×180) and controls, no comparison tools.
+                DebugKeysActive = false;
+                s_Index = 0;
+                s_Mode = ScrollMode.Smooth;
+                if (m_Label != null) m_Label.gameObject.SetActive(false);
+                var hint = transform.Find("Hint");
+                if (hint != null && hint.TryGetComponent(out LocalizedSuperText controls)) controls.Set(LocKeys.DelveControls);
+            }
             Apply();
         }
 
@@ -91,7 +107,7 @@ namespace Hearthdelve.UI.Debugging
                 if (m_Presentation != null) Apply();
             }
             Keyboard keyboard = Keyboard.current;
-            if (keyboard == null) return;
+            if (keyboard == null || !DebugKeysActive) return;
             if (keyboard.f2Key.wasPressedThisFrame) Cycle();
             if (keyboard.f4Key.wasPressedThisFrame) SetScrollMode((ScrollMode)(((int)s_Mode + 1) % 3));
             if (keyboard.f3Key.wasPressedThisFrame && !string.IsNullOrEmpty(m_OtherScene) && Application.CanStreamedLevelBeLoaded(m_OtherScene))

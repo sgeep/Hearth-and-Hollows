@@ -188,6 +188,8 @@ namespace Hearthdelve.UI.Localization
         public const string LookTestHintTavern = "looktest.hint_tavern";
         public const string LookTestGreeting = "looktest.greeting";
         public const string TestFloorHint = "testfloor.hint";
+        /// <summary>The delve's controls in the day loop: no debug keys, and narrow enough for the 320-pixel screen.</summary>
+        public const string DelveControls = "delve.controls";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
@@ -247,6 +249,7 @@ namespace Hearthdelve.UI.Localization
             (LookTestHintTavern, "move: WASD / stick   F3: dungeon"),
             (LookTestGreeting, "welcome to the hearth!"),
             (TestFloorHint, "move: WASD / stick   attack: left mouse / X   dodge: Space / B   F3: tavern look test"),
+            (DelveControls, "move: WASD / stick   attack: click / X   dodge: Space / B"),
         };
     }
 }
