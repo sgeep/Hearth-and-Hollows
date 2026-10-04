@@ -41,6 +41,12 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] RailRow[] m_Rows = Array.Empty<RailRow>();
         [SerializeField] Color m_PatienceFull = new(0.45f, 0.9f, 0.35f);
         [SerializeField] Color m_PatienceEmpty = new(0.95f, 0.3f, 0.25f);
+        [SerializeField, Tooltip("The takings flash this colour when a customer pays.")] Color m_GoldFlash = new(1f, 0.85f, 0.35f);
+        [SerializeField, Min(0.01f)] float m_GoldFlashSeconds = 0.5f;
+
+        float m_GoldFlashLeft;
+        Color m_GoldColour;
+        SuperTextMesh m_GoldText;
 
         readonly List<Ticket> m_Open = new();
         int m_ShownGold = int.MinValue, m_ShownTips = int.MinValue, m_ShownRenown = int.MinValue;
@@ -82,7 +88,13 @@ namespace Hearthdelve.UI.Tavern
             m_LastOrders.SetActive(session.IsLastOrders && !session.IsOver);
 
             ServiceLedger ledger = session.Ledger;
-            if (ledger.Gold != m_ShownGold) m_Gold.Set(TavernLocKeys.HudGold, m_ShownGold = ledger.Gold);
+            if (ledger.Gold != m_ShownGold)
+            {
+                // Paid: the takings flash (the coin sound is the room's; no vibration for routine payments).
+                if (m_ShownGold != int.MinValue && ledger.Gold > m_ShownGold) m_GoldFlashLeft = m_GoldFlashSeconds;
+                m_Gold.Set(TavernLocKeys.HudGold, m_ShownGold = ledger.Gold);
+            }
+            FlashGold();
             if (ledger.Tips != m_ShownTips) m_Tips.Set(TavernLocKeys.HudTips, m_ShownTips = ledger.Tips);
             if (ledger.Renown != m_ShownRenown) m_Renown.Set(TavernLocKeys.HudRenown, Signed(m_ShownRenown = ledger.Renown));
 
@@ -130,6 +142,23 @@ namespace Hearthdelve.UI.Tavern
                 TicketState.Ready => TavernLocKeys.TicketReady,
                 _ => TavernLocKeys.TicketDelivering,
             };
+        }
+
+        /// <summary>The takings are flashing from a payment (tests).</summary>
+        public bool GoldFlashing => m_GoldFlashLeft > 0f;
+
+        void FlashGold()
+        {
+            if (m_GoldText == null)
+            {
+                m_GoldText = m_Gold.GetComponent<SuperTextMesh>();
+                if (m_GoldText == null) return;
+                m_GoldColour = m_GoldText.color;
+            }
+            if (m_GoldFlashLeft <= 0f) return;
+            m_GoldFlashLeft = Mathf.Max(0f, m_GoldFlashLeft - Time.unscaledDeltaTime);
+            m_GoldText.color = Color.Lerp(m_GoldColour, m_GoldFlash, m_GoldFlashLeft / m_GoldFlashSeconds);
+            m_GoldText.Rebuild();
         }
 
         static string Signed(int value) => value > 0 ? $"+{value}" : value.ToString();

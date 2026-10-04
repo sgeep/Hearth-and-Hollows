@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Hearthdelve.Core.Haptics;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Haptics;
@@ -11,6 +12,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace Hearthdelve.Editor
 {
@@ -34,7 +36,7 @@ namespace Hearthdelve.Editor
             LocalizationBuilder.Build();
             if (File.Exists(BootScene)) UpdateBoot();
             else BuildBoot();
-            if (File.Exists(MainMenuScene)) Debug.Log($"[Hearthdelve] {MainMenuScene} exists; kept as it is.");
+            if (File.Exists(MainMenuScene)) UpdateMainMenu();
             else BuildMainMenu();
             ProjectConfigurator.SetBuildOrder(BootScene, MainMenuScene, EditorPaths.TavernScene, EditorPaths.TestFloorScene,
                 EditorPaths.LookTestDungeonScene, EditorPaths.LookTestTavernScene);
@@ -60,14 +62,25 @@ namespace Hearthdelve.Editor
         static void UpdateBoot()
         {
             var scene = EditorSceneManager.OpenScene(BootScene, OpenSceneMode.Single);
-            if (GameObject.Find("Boot Camera") == null)
-            {
-                AddBootCamera();
-                EditorSceneManager.MarkSceneDirty(scene);
-                EditorSceneManager.SaveScene(scene);
-                Debug.Log($"[Hearthdelve] {BootScene}: added the Boot Camera.");
-            }
-            else Debug.Log($"[Hearthdelve] {BootScene} is up to date.");
+            if (GameObject.Find("Boot Camera") == null) AddBootCamera();
+            GameFonts.ApplyToOpenScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[Hearthdelve] {BootScene} updated in place.");
+        }
+
+        /// <summary>The existing main menu, in place: the menu panel is rebuilt (current font, layout and buttons); the scene is kept.</summary>
+        static void UpdateMainMenu()
+        {
+            var scene = EditorSceneManager.OpenScene(MainMenuScene, OpenSceneMode.Single);
+            Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI");
+            Transform old = canvas.transform.Find("Menu");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
+            BuildMenu(canvas);
+            GameFonts.ApplyToOpenScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[Hearthdelve] {MainMenuScene} updated in place.");
         }
 
         /// <summary>
@@ -109,6 +122,7 @@ namespace Hearthdelve.Editor
             scaler.matchWidthOrHeight = 1f;
             scaler.referencePixelsPerUnit = MinifantasySheets.PixelsPerUnit;
             go.AddComponent<GraphicRaycaster>();
+            go.AddComponent<Hearthdelve.UI.PixelCanvasScaler>();
             RectTransform cover = DungeonUI.FullScreen(canvas, "Cover");
             Image black = DungeonUI.AddImage(cover, DungeonUI.Pixel(), new Color(0.03f, 0.02f, 0.03f));
             black.raycastTarget = true;
@@ -119,6 +133,39 @@ namespace Hearthdelve.Editor
 
             EditorSceneManager.SaveScene(scene, BootScene);
             Debug.Log($"[Hearthdelve] Created {BootScene}.");
+        }
+
+        /// <summary>The menu itself: the game's name over a panel with Continue and New Game, and the start-over question.</summary>
+        static void BuildMenu(Canvas canvas)
+        {
+            UiFeedbackContent.Ensure(canvas);
+            RectTransform root = DungeonUI.FullScreen(canvas, "Menu");
+            var centre = new Vector2(0.5f, 0.5f);
+            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, 16f, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 50f), new Vector2(300f, 20f));
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(300f, 76f), new Vector2(0f, -18f));
+
+            // Stacked and centred, so the panel looks right with or without Continue.
+            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(300f, 76f));
+            var stack = choices.gameObject.AddComponent<VerticalLayoutGroup>();
+            stack.childAlignment = TextAnchor.MiddleCenter;
+            stack.spacing = 3f;
+            stack.childControlWidth = stack.childControlHeight = false;
+            stack.childForceExpandWidth = stack.childForceExpandHeight = false;
+            Button continueButton = TavernScreens.SmallButton(choices, "Continue", LoopLocKeys.MenuContinue, centre, Vector2.zero, 110f, out _);
+            LocalizedSuperText detail = TavernScreens.Label(choices, "ContinueDetail", LoopLocKeys.MenuContinueFrom, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(180f, 10f));
+            var gap = TavernScreens.Rect(choices, "Gap", centre, centre, Vector2.zero, new Vector2(10f, 4f));
+            Button newGame = TavernScreens.SmallButton(choices, "NewGame", LoopLocKeys.MenuNewGame, centre, Vector2.zero, 110f, out _);
+
+            RectTransform confirm = TavernScreens.Rect(panel, "Confirm", centre, centre, Vector2.zero, new Vector2(300f, 76f));
+            TavernScreens.Label(confirm, "Question", LoopLocKeys.MenuConfirm, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, new Vector2(0f, 14f), new Vector2(290f, 10f));
+            Button yes = TavernScreens.SmallButton(confirm, "Yes", LoopLocKeys.MenuConfirmYes, centre, new Vector2(-45f, -12f), 80f, out _);
+            Button no = TavernScreens.SmallButton(confirm, "No", LoopLocKeys.MenuConfirmNo, centre, new Vector2(45f, -12f), 80f, out _);
+            confirm.gameObject.SetActive(false);
+
+            root.gameObject.AddComponent<MainMenuScreen>().Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
+            UiFeedbackContent.Commit(continueButton);
+            UiFeedbackContent.Commit(newGame);
+            UiFeedbackContent.Commit(yes);
         }
 
         static void BuildMainMenu()
@@ -134,30 +181,7 @@ namespace Hearthdelve.Editor
             cameraGo.AddComponent<UniversalAdditionalCameraData>();
 
             Canvas canvas = LookTestBuilder.Canvas(AssetDatabase.LoadAssetAtPath<InputActionAsset>(EditorPaths.InputActions), out _);
-            RectTransform root = DungeonUI.FullScreen(canvas, "Menu");
-            var centre = new Vector2(0.5f, 0.5f);
-            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, 16f, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 48f), new Vector2(300f, 20f));
-            RectTransform panel = DungeonUI.Panel(root, new Vector2(200f, 72f), new Vector2(0f, -18f));
-
-            // Stacked and centred, so the panel looks right with or without Continue.
-            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(200f, 72f));
-            var stack = choices.gameObject.AddComponent<VerticalLayoutGroup>();
-            stack.childAlignment = TextAnchor.MiddleCenter;
-            stack.spacing = 3f;
-            stack.childControlWidth = stack.childControlHeight = false;
-            stack.childForceExpandWidth = stack.childForceExpandHeight = false;
-            Button continueButton = TavernScreens.SmallButton(choices, "Continue", LoopLocKeys.MenuContinue, centre, Vector2.zero, 110f, out _);
-            LocalizedSuperText detail = TavernScreens.Label(choices, "ContinueDetail", LoopLocKeys.MenuContinueFrom, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(180f, 8f));
-            var gap = TavernScreens.Rect(choices, "Gap", centre, centre, Vector2.zero, new Vector2(10f, 4f));
-            Button newGame = TavernScreens.SmallButton(choices, "NewGame", LoopLocKeys.MenuNewGame, centre, Vector2.zero, 110f, out _);
-
-            RectTransform confirm = TavernScreens.Rect(panel, "Confirm", centre, centre, Vector2.zero, new Vector2(200f, 72f));
-            TavernScreens.Label(confirm, "Question", LoopLocKeys.MenuConfirm, 6f, DungeonUI.k_Ink, TextAnchor.MiddleCenter, centre, new Vector2(0f, 14f), new Vector2(190f, 8f));
-            Button yes = TavernScreens.SmallButton(confirm, "Yes", LoopLocKeys.MenuConfirmYes, centre, new Vector2(-45f, -12f), 80f, out _);
-            Button no = TavernScreens.SmallButton(confirm, "No", LoopLocKeys.MenuConfirmNo, centre, new Vector2(45f, -12f), 80f, out _);
-            confirm.gameObject.SetActive(false);
-
-            root.gameObject.AddComponent<MainMenuScreen>().Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
+            BuildMenu(canvas);
             EditorSceneManager.SaveScene(scene, MainMenuScene);
             Debug.Log($"[Hearthdelve] Created {MainMenuScene}.");
         }

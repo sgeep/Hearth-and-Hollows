@@ -3,6 +3,7 @@ using System.Collections;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.UI.Localization;
+using Hearthdelve.UI.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -96,6 +97,7 @@ namespace Hearthdelve.UI.Tavern
                 var (kind, value) = report.Lines[i];
                 LocalizedSuperText text = m_Lines[i];
                 text.gameObject.SetActive(true);
+                UiFeedback.Play(UiMoment.Tick);
                 for (float t = 0f; t < m_CountTime; t += Time.unscaledDeltaTime)
                 {
                     text.Set(KeyFor(kind), Format(kind, Mathf.RoundToInt(value * (t / m_CountTime))));
@@ -108,6 +110,7 @@ namespace Hearthdelve.UI.Tavern
                 yield return new WaitForSecondsRealtime(m_LineGap);
                 m_Takings.gameObject.SetActive(true);
                 m_Takings.Set(TavernLocKeys.ResultsTakings, report.Takings);
+                UiFeedback.Play(UiMoment.Takings);
             }
             m_Reveal = null;
         }

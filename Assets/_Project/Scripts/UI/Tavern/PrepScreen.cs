@@ -23,6 +23,7 @@ namespace Hearthdelve.UI.Tavern
         public Image icon;
         public LocalizedSuperText name;
         public LocalizedSuperText detail;
+        public LocalizedSuperText amount;
         public LocalizedSuperText steps;
         public GameObject selected;
         public Image back;
@@ -144,9 +145,8 @@ namespace Hearthdelve.UI.Tavern
                 card.icon.sprite = recipe.icon;
                 card.icon.enabled = recipe.icon != null;
                 card.name.Set(TavernLocKeys.Plain, Loc.Get(recipe.displayName));
-                card.detail.Set(TavernLocKeys.PrepDetail,
-                    Loc.UI(recipe.station == CookStation.StewPot ? TavernLocKeys.PrepValueStew : TavernLocKeys.PrepValue, recipe.baseValue),
-                    Amount(recipe, makeable));
+                card.detail.Set(recipe.station == CookStation.StewPot ? TavernLocKeys.PrepValueStew : TavernLocKeys.PrepValue, recipe.baseValue);
+                card.amount.Set(TavernLocKeys.Plain, Amount(recipe, makeable));
                 card.steps.Set(TavernLocKeys.Plain, Steps(recipe));
                 card.selected.SetActive(on);
                 card.back.color = on ? m_ChosenColour : m_CardColour;
@@ -168,15 +168,15 @@ namespace Hearthdelve.UI.Tavern
                 EventSystem.current.SetSelectedGameObject(m_Cards.Length > 0 ? m_Cards[0].button.gameObject : m_Open.gameObject);
         }
 
-        string Amount(RecipeDefinition recipe, int makeable)
+        /// <summary>"12 to serve", "2 pots", "0 to serve": the count even when it's none (the card dims as well).</summary>
+        static string Amount(RecipeDefinition recipe, int makeable)
         {
-            if (makeable <= 0) return Loc.UI(TavernLocKeys.PrepNone);
             if (recipe.station != CookStation.StewPot) return Loc.UI(TavernLocKeys.PrepServings, makeable);
             return makeable == 1 ? Loc.UI(TavernLocKeys.PrepPot) : Loc.UI(TavernLocKeys.PrepPots, makeable);
         }
 
-        /// <summary>"Grill", or "Chop, then Simmer": however many steps the dish has.</summary>
-        static string Steps(RecipeDefinition recipe)
+        /// <summary>"grill", or "chop, simmer": however many steps the dish has, in order.</summary>
+        public static string Steps(RecipeDefinition recipe)
         {
             IReadOnlyList<PrepStep> steps = PrepRules.Steps(recipe);
             string text = steps.Count > 0 ? StepName(steps[0]) : string.Empty;

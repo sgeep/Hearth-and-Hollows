@@ -43,7 +43,7 @@ namespace Hearthdelve.Editor
             bar.Configure(fill);
             bar.ConfigureArt(UISprite("BarFillBlue"), UISprite("BarFillRed"), flash);
             LookTestBuilder.Text(root, "EssenceLabel", LocKeys.HudEssence, 6f, k_Light, TextAnchor.UpperLeft,
-                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -17f), new Vector2(46f, 8f));
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -17f), new Vector2(46f, 10f));
 
             RectTransform satchel = LookTestBuilder.UIRect(root, "Satchel", Vector2.zero, Vector2.zero, new Vector2(4f, 8f), new Vector2(94f, 17f));
             var slots = new SatchelSlotView[6];
@@ -56,17 +56,17 @@ namespace Hearthdelve.Editor
             }
             satchel.gameObject.AddComponent<Hearthdelve.UI.Hud.SatchelHud>().Configure(slots);
 
-            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(130f, 36f));
+            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(180f, 44f));
             var lines = new Hearthdelve.UI.Hud.HarvestFeedLine[4];
             for (int i = 0; i < lines.Length; i++)
             {
-                RectTransform line = LookTestBuilder.UIRect(feed, $"Line{i}", Vector2.one, Vector2.one, new Vector2(0f, -i * 9f), new Vector2(130f, 8f));
+                RectTransform line = LookTestBuilder.UIRect(feed, $"Line{i}", Vector2.one, Vector2.one, new Vector2(0f, -i * 11f), new Vector2(180f, 10f));
                 var group = line.gameObject.AddComponent<CanvasGroup>();
                 group.alpha = 0f;
                 group.blocksRaycasts = false;
                 RectTransform iconRect = LookTestBuilder.UIRect(line, "Icon", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
                 LocalizedSuperText text = LookTestBuilder.Text(line, "Text", LocKeys.HarvestGot, 6f, k_Light, TextAnchor.MiddleRight,
-                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(118f, 8f));
+                    new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(168f, 10f));
                 lines[i] = new Hearthdelve.UI.Hud.HarvestFeedLine { group = group, icon = AddImage(iconRect, null, Color.white), text = text };
             }
             feed.gameObject.AddComponent<Hearthdelve.UI.Hud.HarvestFeed>().Configure(lines);
@@ -78,6 +78,7 @@ namespace Hearthdelve.Editor
         /// </summary>
         public static void RebuildScreens(Canvas canvas)
         {
+            UiFeedbackContent.Ensure(canvas);
             foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult", "PH_EssenceBar", "EssenceLabel" })
             {
                 Transform old = canvas.transform.Find(name);
@@ -149,22 +150,46 @@ namespace Hearthdelve.Editor
             LookTestBuilder.Text(panel, "Title", key, 7f, k_Ink, TextAnchor.UpperCenter,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -7f), new Vector2(panel.sizeDelta.x - 14f, 10f));
 
-        internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 8f) =>
+        internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 10f) =>
             LookTestBuilder.Text(panel, name, key, 6f, k_Ink, TextAnchor.MiddleCenter,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(panel.sizeDelta.x - 16f, height));
 
         internal static Button TextButton(RectTransform panel, string name, string key, Vector2 position, float width, out LocalizedSuperText label)
         {
-            RectTransform rect = LookTestBuilder.UIRect(panel, name, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), position, new Vector2(width, 13f));
-            Image image = AddImage(rect, UISprite("Bar"), Color.white, Image.Type.Sliced);
-            image.raycastTarget = true;
+            RectTransform rect = LookTestBuilder.UIRect(panel, name, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), position, new Vector2(width, 14f));
+            Button button = ButtonFace(rect);
+            // A pixel up: m5x7's capitals sit above the line's centre once descenders are counted.
+            label = LookTestBuilder.Text(rect, "Label", key, 6f, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), new Vector2(0f, 1f), Vector2.zero);
+            return button;
+        }
+
+        static readonly Color k_ButtonEdge = new(0.33f, 0.18f, 0.14f);
+        static readonly Color k_ButtonFace = new(0.93f, 0.8f, 0.58f);
+
+        /// <summary>
+        /// A button's face: plain parchment with a one-pixel dark edge, so its m5x7 label reads cleanly (the Classic UI
+        /// pill bar's inner border ran through 7-pixel text; 4c step 6). Selected turns it gold; disabled dims it.
+        /// </summary>
+        internal static Button ButtonFace(RectTransform rect)
+        {
+            AddImage(rect, Pixel(), k_ButtonEdge);
+            RectTransform faceRect = LookTestBuilder.UIRect(rect, "Face", Vector2.zero, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            faceRect.anchorMin = Vector2.zero;
+            faceRect.anchorMax = Vector2.one;
+            faceRect.sizeDelta = new Vector2(-2f, -2f);
+            Image face = AddImage(faceRect, Pixel(), k_ButtonFace);
+            face.raycastTarget = true;
             var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
+            button.targetGraphic = face;
+            rect.gameObject.AddComponent<Hearthdelve.UI.Screens.UiButtonFeedback>();
             ColorBlock colors = button.colors;
-            colors.highlightedColor = colors.selectedColor = new Color(1f, 1f, 0.75f);
+            colors.normalColor = Color.white;
+            colors.highlightedColor = colors.selectedColor = new Color(1f, 0.92f, 0.55f);
+            colors.pressedColor = new Color(0.85f, 0.75f, 0.45f);
+            colors.disabledColor = new Color(0.75f, 0.72f, 0.68f, 0.55f);
+            colors.colorMultiplier = 1.15f;
             colors.fadeDuration = 0f;
             button.colors = colors;
-            label = LookTestBuilder.Text(rect, "Label", key, 6f, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             return button;
         }
 
@@ -189,7 +214,7 @@ namespace Hearthdelve.Editor
             RectTransform iconRect = LookTestBuilder.UIRect(slot, "Icon", new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 7f), new Vector2(8f, 8f));
             Image icon = AddImage(iconRect, null, Color.white);
             LocalizedSuperText count = LookTestBuilder.Text(slot, "Count", LocKeys.SlotCount, 5f, k_Light, TextAnchor.LowerRight,
-                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(12f, 6f));
+                new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(1f, 4f), new Vector2(12f, 6f));
             var pips = new Image[4];
             for (int p = 0; p < pips.Length; p++)
             {
@@ -249,7 +274,7 @@ namespace Hearthdelve.Editor
 
         internal static GameObject Hint(RectTransform root, string key, float y, out LocalizedSuperText text)
         {
-            RectTransform hint = LookTestBuilder.UIRect(root, "Hint", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, y), new Vector2(150f, 10f));
+            RectTransform hint = LookTestBuilder.UIRect(root, "Hint", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, y), new Vector2(300f, 12f));
             AddImage(hint, Pixel(), new Color(0.05f, 0.04f, 0.06f, 0.75f));
             text = LookTestBuilder.Text(hint, "Text", key, 6f, k_Light, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-4f, 0f));
             return hint.gameObject;
@@ -261,15 +286,15 @@ namespace Hearthdelve.Editor
             RectTransform root = FullScreen(canvas, "SwapPrompt");
             GameObject hint = Hint(root, LocKeys.HudSatchelFull, k_HintY, out LocalizedSuperText hintText);
 
-            RectTransform panel = Panel(root, new Vector2(184f, 92f), new Vector2(0f, 6f));
+            RectTransform panel = Panel(root, new Vector2(250f, 104f), new Vector2(0f, 6f));
             Title(panel, LocKeys.SwapTitle);
-            RectTransform incoming = LookTestBuilder.UIRect(panel, "Incoming", new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(-78f, -24f), new Vector2(8f, 8f));
+            RectTransform incoming = LookTestBuilder.UIRect(panel, "Incoming", new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(-110f, -24f), new Vector2(8f, 8f));
             Image incomingIcon = AddImage(incoming, null, Color.white);
             LocalizedSuperText subtitle = LookTestBuilder.Text(panel, "Subtitle", LocKeys.SwapSubtitle, 6f, k_Ink, TextAnchor.UpperLeft,
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 1f), new Vector2(-72f, -19f), new Vector2(152f, 16f));
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 1f), new Vector2(-102f, -19f), new Vector2(222f, 20f));
             SatchelSlotView[] slots = SlotRow(panel, -10f, false, out Button[] buttons);
             LocalizedSuperText detail = Line(panel, "Detail", LocKeys.SlotEmpty, -22f);
-            Button leave = TextButton(panel, "LeaveIt", LocKeys.SwapCancel, new Vector2(0f, 7f), 56f, out _);
+            Button leave = TextButton(panel, "LeaveIt", LocKeys.SwapCancel, new Vector2(0f, 7f), 64f, out _);
             Navigate(buttons, leave);
             leave.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = buttons[2] };
 
@@ -303,14 +328,15 @@ namespace Hearthdelve.Editor
             shade.anchorMin = Vector2.zero;
             shade.anchorMax = Vector2.one;
             AddImage(shade, Pixel(), new Color(0.03f, 0.02f, 0.04f, 0.55f));
-            RectTransform panel = Panel(window, new Vector2(204f, 104f), new Vector2(0f, 4f));
+            RectTransform panel = Panel(window, new Vector2(300f, 132f), new Vector2(0f, 4f));
             Title(panel, LocKeys.DeathTitle);
             LocalizedSuperText subtitle = LookTestBuilder.Text(panel, "Subtitle", LocKeys.DeathSubtitle, 6f, k_Ink, TextAnchor.UpperCenter,
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(188f, 22f));
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -18f), new Vector2(284f, 30f));
             SatchelSlotView[] slots = SlotRow(panel, -14f, true, out Button[] buttons);
             LocalizedSuperText chosen = Line(panel, "Chosen", LocKeys.DeathSelectedNone, -26f);
-            Button keepNothing = TextButton(panel, "KeepNothing", LocKeys.DeathKeepNothing, new Vector2(-46f, 7f), 76f, out _);
-            Button confirm = TextButton(panel, "Confirm", LocKeys.DeathConfirm, new Vector2(46f, 7f), 92f, out _);
+            Button keepNothing = TextButton(panel, "KeepNothing", LocKeys.DeathKeepNothing, new Vector2(-60f, 7f), 84f, out _);
+            Button confirm = TextButton(panel, "Confirm", LocKeys.DeathConfirm, new Vector2(56f, 7f), 124f, out _);
+            UiFeedbackContent.Commit(confirm);
             Navigate(buttons, confirm);
             confirm.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = buttons[3], selectOnLeft = keepNothing };
             keepNothing.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = buttons[1], selectOnRight = confirm };
@@ -325,7 +351,7 @@ namespace Hearthdelve.Editor
         public static DelveResultScreen BuildResultScreen(Canvas canvas)
         {
             RectTransform root = FullScreen(canvas, "DelveResult");
-            RectTransform panel = Panel(root, new Vector2(184f, 84f), new Vector2(0f, 4f));
+            RectTransform panel = Panel(root, new Vector2(240f, 92f), new Vector2(0f, 4f));
             LocalizedSuperText title = Title(panel, LocKeys.ResultTitleExtracted);
             SatchelSlotView[] slots = SlotRow(panel, 0f, false, out Button[] buttons);
             // Display only: nothing to choose here.
@@ -335,7 +361,8 @@ namespace Hearthdelve.Editor
                 button.navigation = new Navigation { mode = Navigation.Mode.None };
             }
             LocalizedSuperText summary = Line(panel, "Summary", LocKeys.ResultSummary, -14f);
-            Button proceed = TextButton(panel, "Continue", LocKeys.ResultDelveAgain, new Vector2(0f, 7f), 84f, out LocalizedSuperText proceedLabel);
+            Button proceed = TextButton(panel, "Continue", LocKeys.ResultDelveAgain, new Vector2(0f, 7f), 112f, out LocalizedSuperText proceedLabel);
+            UiFeedbackContent.Commit(proceed);
             proceed.navigation = new Navigation { mode = Navigation.Mode.None };
 
             var screen = root.gameObject.AddComponent<DelveResultScreen>();

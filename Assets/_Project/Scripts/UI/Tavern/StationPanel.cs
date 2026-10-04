@@ -1,4 +1,5 @@
 using Hearthdelve.Core.Input;
+using Hearthdelve.Core.Services;
 using Hearthdelve.Core.Minigames;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Tavern.Minigames;
@@ -45,6 +46,17 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_ChopPrompt;
 
         [SerializeField] LocalizedSuperText m_StepAway;
+        [SerializeField, Tooltip("A wash over the box for a moment: gold for a perfect or clean result, red for a burn or overflow.")]
+        Image m_Flash;
+        [SerializeField, Min(0.01f)] float m_FlashSeconds = 0.3f;
+        [SerializeField] Color m_GoodFlash = new(1f, 0.85f, 0.35f, 0.45f);
+        [SerializeField] Color m_BadFlash = new(0.9f, 0.2f, 0.15f, 0.45f);
+        [SerializeField, Tooltip("The grill needle as the meat nears burning (it follows the warning rumble).")]
+        Color m_HotNeedle = new(1f, 0.3f, 0.2f);
+
+        TavernFeedback m_Feedback;
+        float m_FlashLeft;
+        Color m_FlashColour;
 
         static readonly Color k_CutBad = new(0.85f, 0.25f, 0.2f);
         static readonly Color k_CutGood = new(0.3f, 0.85f, 0.35f);
@@ -91,13 +103,60 @@ namespace Hearthdelve.UI.Tavern
         }
 
         public void ConfigureStepAway(LocalizedSuperText stepAway) => m_StepAway = stepAway;
+        public void ConfigureFlash(Image flash) => m_Flash = flash;
+
+        /// <summary>The flash showing now (tests).</summary>
+        public bool IsFlashing => m_FlashLeft > 0f;
 
         void Awake() => Show(null);
+
+        void Start()
+        {
+            m_Feedback = FindAnyObjectByType<TavernFeedback>();
+            if (m_Feedback != null) m_Feedback.MomentPlayed += OnMoment;
+            if (m_Flash != null) m_Flash.enabled = false;
+        }
+
+        void OnDestroy()
+        {
+            if (m_Feedback != null) m_Feedback.MomentPlayed -= OnMoment;
+        }
+
+        // What the result looked like, as well as felt and heard; skipped when the player turns flashes off.
+        void OnMoment(string moment)
+        {
+            if (m_Flash == null || !GameSettings.FlashEnabled || Showing == null) return;
+            switch (moment)
+            {
+                case nameof(TavernMoments.perfectFlip):
+                case nameof(TavernMoments.cleanPour):
+                case nameof(TavernMoments.lineReached):
+                case nameof(TavernMoments.chopDone):
+                    m_FlashColour = m_GoodFlash;
+                    break;
+                case nameof(TavernMoments.burned):
+                case nameof(TavernMoments.overflow):
+                    m_FlashColour = m_BadFlash;
+                    break;
+                default:
+                    return;
+            }
+            m_FlashLeft = m_FlashSeconds;
+        }
+
+        void UpdateFlash()
+        {
+            if (m_Flash == null) return;
+            m_FlashLeft = Mathf.Max(0f, m_FlashLeft - Time.unscaledDeltaTime);
+            m_Flash.enabled = m_FlashLeft > 0f;
+            if (m_Flash.enabled) m_Flash.color = new Color(m_FlashColour.r, m_FlashColour.g, m_FlashColour.b, m_FlashColour.a * m_FlashLeft / m_FlashSeconds);
+        }
 
         void LateUpdate()
         {
             IMinigame game = KeeperWork.Instance != null ? KeeperWork.Instance.ActiveCook : null;
             if (game != Showing) Show(game);
+            UpdateFlash();
             switch (game)
             {
                 case GrillMinigame grill: DrawGrill(grill); break;
@@ -162,6 +221,9 @@ namespace Hearthdelve.UI.Tavern
             }
             SpanX(m_GrillBand, s.bandMin, s.bandMax);
             AtX(m_GrillNeedle, g.IsPausing ? 0f : g.Meter);
+            // Past the band the needle reddens with the same warning the controller rumbles.
+            if (m_GrillNeedle.TryGetComponent(out Image needle))
+                needle.color = Color.Lerp(Color.white, m_HotNeedle, m_Feedback != null ? m_Feedback.GrillWarning : 0f);
         }
 
         void DrawTap(TapMinigame t)

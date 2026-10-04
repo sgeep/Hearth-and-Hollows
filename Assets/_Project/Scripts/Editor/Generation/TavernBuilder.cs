@@ -93,10 +93,13 @@ namespace Hearthdelve.Editor
             SetUpStewPot(GameObject.Find("Cauldron").GetComponent<SpriteRenderer>());
             AddService(npcs);
             AddStations();
+            TavernFeedbackContent.Build(GameObject.Find("Service").transform);
             Canvas ui = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
             TavernStationContent.BuildStationPanel(ui);
+            BuildHint(ui);
             TavernScreens.Rebuild(ui);
             AddMood();
+            GameFonts.ApplyToOpenScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -160,6 +163,7 @@ namespace Hearthdelve.Editor
             BuildLights();
             AddService(npcs);
             AddStations();
+            TavernFeedbackContent.Build(GameObject.Find("Service").transform);
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
@@ -606,6 +610,8 @@ namespace Hearthdelve.Editor
         /// <summary>"E: Grill" at the bottom of the screen while something is in reach.</summary>
         static void BuildHint(Canvas canvas)
         {
+            Transform old = canvas.transform.Find("TavernHint");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
             RectTransform root = DungeonUI.FullScreen(canvas, "TavernHint");
             GameObject hint = DungeonUI.Hint(root, TavernLocKeys.HintUse, 14f, out LocalizedSuperText text);
             root.gameObject.AddComponent<TavernHintView>().Configure(hint, text);

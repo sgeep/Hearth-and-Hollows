@@ -159,15 +159,20 @@ namespace Hearthdelve.Editor
 
             // Under every box: how to step away.
             LocalizedSuperText stepAway = LookTestBuilder.Text(root, "StepAway", TavernLocKeys.HintStepAway, 6f, DungeonUI.k_Light, TextAnchor.LowerCenter,
-                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 1f), new Vector2(196f, 8f));
+                new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 1f), new Vector2(240f, 10f));
             panel.ConfigureStepAway(stepAway);
+            // The result flash: a wash over the box (every box sits in the same place).
+            RectTransform flash = LookTestBuilder.UIRect(root, "Flash", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -50f), new Vector2(240f, 66f));
+            Image flashImage = DungeonUI.AddImage(flash, DungeonUI.Pixel(), new Color(1f, 1f, 1f, 0f));
+            flashImage.raycastTarget = false;
+            panel.ConfigureFlash(flashImage);
             return panel;
         }
 
         /// <summary>A framed box near the bottom of the screen, with a title (if any) and a prompt line at the bottom.</summary>
         static RectTransform Box(RectTransform root, string name, string titleKey, out LocalizedSuperText prompt)
         {
-            RectTransform box = DungeonUI.Panel(root, new Vector2(196f, 62f), new Vector2(0f, -50f));
+            RectTransform box = DungeonUI.Panel(root, new Vector2(240f, 66f), new Vector2(0f, -50f));
             box.name = name;
             if (titleKey != null) DungeonUI.Title(box, titleKey);
             prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -21f);

@@ -30,6 +30,12 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] Button m_Descend;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("The dish eaten this morning.")] Color m_EatenColour = new(0.98f, 0.86f, 0.5f);
+        [SerializeField, Tooltip("The bonus line flashes this colour when breakfast adds to it.")] Color m_BonusFlash = new(0.85f, 0.55f, 0.1f);
+        [SerializeField, Min(0.01f)] float m_BonusFlashSeconds = 0.8f;
+
+        float m_BonusFlashLeft;
+        Color m_BonusColour;
+        bool m_HadMeal;
 
         TavernDirector m_Director;
         readonly List<RecipeDefinition> m_Options = new();
@@ -98,6 +104,7 @@ namespace Hearthdelve.UI.Tavern
                 return;
             }
             if (m_Dirty || !m_WasShown) Refresh();
+            FlashBonuses();
             if (!m_WasShown && EventSystem.current != null)
             {
                 // First thing in the morning: the first breakfast you can cook; afterwards (or with none), setting off.
@@ -136,8 +143,10 @@ namespace Hearthdelve.UI.Tavern
                 card.icon.sprite = recipe.icon;
                 card.icon.enabled = recipe.icon != null;
                 card.name.Set(TavernLocKeys.Plain, Loc.Get(recipe.displayName));
-                card.detail.Set(TavernLocKeys.Plain, Buff(recipe.mealBuff.kind, recipe.mealBuff.amount));
-                card.steps.Set(LoopLocKeys.MorningCookAt, Loc.UI(recipe.station == CookStation.Tap ? TavernLocKeys.StationTap : TavernLocKeys.StationGrill));
+                // The name with its station on the right; the buff across the second line.
+                card.detail.Set(recipe.station == CookStation.Tap ? TavernLocKeys.StationTap : TavernLocKeys.StationGrill);
+                card.amount.Set(TavernLocKeys.Plain, Buff(recipe.mealBuff.kind, recipe.mealBuff.amount));
+                card.steps.gameObject.SetActive(false);
                 card.selected.SetActive(eaten);
                 card.back.color = eaten ? m_EatenColour : m_CardColour;
                 card.button.interactable = can;
@@ -153,9 +162,22 @@ namespace Hearthdelve.UI.Tavern
             else m_Breakfast.Set(LoopLocKeys.MorningBreakfast);
 
             m_Bonuses.Set(TavernLocKeys.Plain, Bonuses(flow != null ? flow.Loadout : DelveLoadout.None));
+            // Breakfast just landed: the delve's bonus line lights up, so the meal's effect is seen.
+            if (meal.IsActive && !m_HadMeal) m_BonusFlashLeft = m_BonusFlashSeconds;
+            m_HadMeal = meal.IsActive;
         }
 
-        /// <summary>"+15 max Essence", "Essence drains 20% slower".</summary>
+        void FlashBonuses()
+        {
+            if (!m_Bonuses.TryGetComponent(out SuperTextMesh text)) return;
+            if (m_BonusColour == default) m_BonusColour = text.color;
+            if (m_BonusFlashLeft <= 0f) return;
+            m_BonusFlashLeft = Mathf.Max(0f, m_BonusFlashLeft - Time.unscaledDeltaTime);
+            text.color = Color.Lerp(m_BonusColour, m_BonusFlash, m_BonusFlashLeft / m_BonusFlashSeconds);
+            text.Rebuild();
+        }
+
+        /// <summary>"+15 max essence", "essence drain -20%".</summary>
         public static string Buff(MealBuffKind kind, float amount) => kind switch
         {
             MealBuffKind.MaxEssence => Loc.UI(LoopLocKeys.BuffMaxEssence, Mathf.RoundToInt(amount)),

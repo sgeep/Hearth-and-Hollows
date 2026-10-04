@@ -300,6 +300,37 @@ namespace Hearthdelve.Editor
             return false;
         }
 
+        /// <summary>
+        /// The test floor's UI, in place: the HUD and screens are rebuilt (with the game font and its layout), and any
+        /// other text and canvas get the font and whole-pixel scaling. The floor itself is untouched.
+        /// </summary>
+        [MenuItem("Hearthdelve/Generate/4b Update Test Floor UI")]
+        public static void UpdateTestFloorUI()
+        {
+            LocalizationBuilder.Build();
+            var scene = EditorSceneManager.OpenScene(EditorPaths.TestFloorScene, OpenSceneMode.Single);
+            Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI");
+            DungeonUI.RebuildScreens(canvas);
+            GameFonts.ApplyToOpenScene();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+            Debug.Log("[Hearthdelve] Test floor UI updated.");
+        }
+
+        public static void UpdateTestFloorUIBatch()
+        {
+            try
+            {
+                UpdateTestFloorUI();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         /// <summary>Batch entry point for <see cref="UpdateTestFloor"/>.</summary>
         public static void UpdateTestFloorBatch()
         {

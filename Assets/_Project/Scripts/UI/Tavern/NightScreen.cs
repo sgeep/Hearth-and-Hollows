@@ -5,6 +5,7 @@ using Hearthdelve.Shared.Progression;
 using UpgradeRules = Hearthdelve.Shared.Progression.Upgrades;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
+using Hearthdelve.UI.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -37,6 +38,11 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_Saved;
         [SerializeField] Button m_Sleep;
         [SerializeField, Min(0f), Tooltip("Seconds the saved note stays up.")] float m_SavedSeconds = 2.5f;
+        [SerializeField, Min(0.01f), Tooltip("Seconds a bought row glows.")] float m_BoughtSeconds = 0.6f;
+        [SerializeField] Color m_BoughtColour = new(1f, 0.85f, 0.4f);
+
+        float[] m_Glow = Array.Empty<float>();
+        Color m_RowColour;
 
         TavernDirector m_Director;
         GameFlow m_Flow;
@@ -90,6 +96,9 @@ namespace Hearthdelve.UI.Tavern
         public void Buy(int row)
         {
             if (row >= m_Defs.Count || !m_Director.BuyUpgrade(m_Defs[row])) return;
+            // Bought: the row glows, a chime, a gentle pulse, and the saved note.
+            UiFeedback.Play(UiMoment.Buy);
+            if (row < m_Glow.Length) m_Glow[row] = m_BoughtSeconds;
             ShowSaved();
             // Keep the selection on something that still works (a maxed or unaffordable row's button goes away or greys out).
             if (EventSystem.current != null && !m_Upgrades[row].buy.interactable) EventSystem.current.SetSelectedGameObject(m_Sleep.gameObject);
@@ -117,9 +126,23 @@ namespace Hearthdelve.UI.Tavern
             m_Saved.Set(LoopLocKeys.NightSaved);
         }
 
+        /// <summary>A row is glowing from a purchase (tests).</summary>
+        public bool IsGlowing(int row) => row < m_Glow.Length && m_Glow[row] > 0f;
+
         void Update()
         {
             if (m_Saved != null && m_Saved.gameObject.activeSelf && Time.unscaledTime >= m_SavedUntil) m_Saved.gameObject.SetActive(false);
+            if (m_Glow.Length != m_Upgrades.Length)
+            {
+                m_Glow = new float[m_Upgrades.Length];
+                if (m_Upgrades.Length > 0 && m_Upgrades[0].root.TryGetComponent(out Image first)) m_RowColour = first.color;
+            }
+            for (int i = 0; i < m_Glow.Length; i++)
+            {
+                if (!m_Upgrades[i].root.TryGetComponent(out Image back)) continue;
+                m_Glow[i] = Mathf.Max(0f, m_Glow[i] - Time.unscaledDeltaTime);
+                back.color = Color.Lerp(m_RowColour, m_BoughtColour, m_Glow[i] / m_BoughtSeconds);
+            }
         }
 
         void Refresh()
