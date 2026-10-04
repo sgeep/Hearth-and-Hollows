@@ -450,6 +450,8 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 6. Try the other ways a day goes: die in the dungeon (Lockbox), and close for the night with nothing to cook.
 7. Overall: does it feel like one day, and is it always clear where you are and what to do next?
 
+**Step 5 playtest fix (2026-10-03):** flicking the left stick (down-left especially) and letting go could leave the character facing the opposite way. A released stick springs back past centre for a frame or two; that overshoot read as a short push the other way, and the character turned to face it as it stopped (the same spring-back as the menu bounce in step 4, but walking can't simply take a wide dead zone without losing gentle movement). New pure `StickReleaseFilter` (EditMode tests), applied to movement in `HearthdelveInputManager`: a weak push pointing away from a strong push made in the last 0.15 s reads as rest. A real push the other way (over half) passes at once, a gentle one once the window is over, and keyboards are unaffected. Tunable on the input manager (`StickRelease`). A virtual-gamepad PlayMode test reproduces the flick, spring-back and release, and checks that a real turn still turns. The filter applies in the dungeon and the tavern alike.
+
 **Next: step 6,** the tavern's feedback and haptics pass. After your full-day playtest of step 5.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
