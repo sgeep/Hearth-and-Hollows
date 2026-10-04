@@ -21,6 +21,7 @@ namespace Hearthdelve.Editor
         [MenuItem("Hearthdelve/Setup/Configure Project Settings", priority = 0)]
         public static void ConfigureAll()
         {
+            GameFonts.ConfigureImporter();
             ConfigureRenderPipeline();
             ConfigureVSync();
             ConfigureLayers();

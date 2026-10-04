@@ -415,6 +415,7 @@ namespace Hearthdelve.Editor
             if (centre.HasValue) camera.transform.position = new Vector3(centre.Value.x, centre.Value.y, -10f);
             var target = new RenderTexture(width, height, 24) { filterMode = FilterMode.Point };
             camera.targetTexture = target;
+            foreach (var pixel in UnityEngine.Object.FindObjectsByType<Hearthdelve.UI.PixelCanvasScaler>()) pixel.Apply();
             // Canvases drawn through the camera lay out for its target, not the batch "screen".
             foreach (var scaler in UnityEngine.Object.FindObjectsByType<UnityEngine.UI.CanvasScaler>())
                 typeof(UnityEngine.UI.CanvasScaler).GetMethod("Handle", BindingFlags.Instance | BindingFlags.NonPublic)?.Invoke(scaler, null);
