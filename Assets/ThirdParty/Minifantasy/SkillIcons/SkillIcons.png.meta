@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ae89ae0a042004d4db55cc328f570702
+guid: 81ab13d21b7f5514886cbb7f7698dc8f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -151,13 +151,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Icons_MagicSpark
+      name: SkillIcons_BardBallad
       rect:
         serializedVersion: 2
-        x: 488
-        y: 384
-        width: 8
-        height: 8
+        x: 112
+        y: 176
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -166,20 +166,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0790bc7774919a264932069438d32f8c
-      internalID: 230560272
+      spriteID: c6dd2bec429432b88705c55600de088f
+      internalID: 570786816
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Icons_ArrowUp
+      name: SkillIcons_ClericDivineFire
       rect:
         serializedVersion: 2
-        x: 32
-        y: 360
-        width: 8
-        height: 8
+        x: 48
+        y: 48
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -188,20 +188,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c2893ece2c23c652e97c2cf8fb566670
-      internalID: -697436249
+      spriteID: 29d765333f1d44caa0e87822424dab46
+      internalID: -1209330777
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Icons_ArrowDown
+      name: SkillIcons_BardDefense
       rect:
         serializedVersion: 2
-        x: 64
-        y: 360
-        width: 8
-        height: 8
+        x: 176
+        y: 144
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -210,20 +210,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1f719c57cb47a9aae35b733bbb3cf1cf
-      internalID: 259622444
+      spriteID: b6341db8081fa5dd4bf601a20fec266f
+      internalID: 936248027
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Icons_Swords
+      name: SkillIcons_BardMelee
       rect:
         serializedVersion: 2
-        x: 392
-        y: 384
-        width: 8
-        height: 8
+        x: 176
+        y: 176
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -232,20 +232,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4b4b13dc11bb6becf2f6cd803d6eeb49
-      internalID: 1669112149
+      spriteID: b36b38170abbabee3ce37eb1857b04b6
+      internalID: -353413496
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Icons_Food
+      name: SkillIcons_PaladinHolyHammer
       rect:
         serializedVersion: 2
-        x: 536
-        y: 384
-        width: 8
-        height: 8
+        x: 112
+        y: 16
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -254,20 +254,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: aba3027423c28a7bcfdd97a5fce6e4e7
-      internalID: 56035651
+      spriteID: 7c7e4f54d59a3e1ae51d9394c16a086c
+      internalID: 1126197772
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Icons_Lightning
+      name: SkillIcons_RogueDodge
       rect:
         serializedVersion: 2
-        x: 504
-        y: 384
-        width: 8
-        height: 8
+        x: 80
+        y: 208
+        width: 16
+        height: 16
       alignment: 9
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -276,8 +276,52 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1612da9870404ec4a78a9121584b46b4
-      internalID: 1563092157
+      spriteID: e1f9ed96ab2349577c74531b5f712941
+      internalID: -1044019654
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkillIcons_ClericHealingWords
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 48
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa111118b34862461086f0a76284a9d6
+      internalID: 731415122
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SkillIcons_RogueAttack
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 208
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 985a16200f48d9de1ee139c88a3ae63d
+      internalID: -58660216
       vertices: []
       indices: 
       edges: []
@@ -286,7 +330,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 9c7bbb31f3dbbe1408b89ec9dd2c19b4
+    spriteID: 4143109f264ce5c479cdc73becd08e1c
     internalID: 0
     vertices: []
     indices: 
@@ -296,12 +340,14 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Icons_ArrowDown: 259622444
-      Icons_ArrowUp: -697436249
-      Icons_Food: 56035651
-      Icons_Lightning: 1563092157
-      Icons_MagicSpark: 230560272
-      Icons_Swords: 1669112149
+      SkillIcons_BardBallad: 570786816
+      SkillIcons_BardDefense: 936248027
+      SkillIcons_BardMelee: -353413496
+      SkillIcons_ClericDivineFire: -1209330777
+      SkillIcons_ClericHealingWords: 731415122
+      SkillIcons_PaladinHolyHammer: 1126197772
+      SkillIcons_RogueAttack: -58660216
+      SkillIcons_RogueDodge: -1044019654
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

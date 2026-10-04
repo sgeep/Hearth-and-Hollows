@@ -27,6 +27,7 @@ MonoBehaviour:
       spiderWeight: 0.1
       goldWeight: 1
       ingredientWeight: 1
+      powerWeight: 0.6
       minGold: 10
       maxGold: 18
       minParts: 1
@@ -45,6 +46,7 @@ MonoBehaviour:
       spiderWeight: 0.35
       goldWeight: 1
       ingredientWeight: 1
+      powerWeight: 0.6
       minGold: 18
       maxGold: 30
       minParts: 1
@@ -63,6 +65,7 @@ MonoBehaviour:
       spiderWeight: 0.6
       goldWeight: 1
       ingredientWeight: 1
+      powerWeight: 0.6
       minGold: 30
       maxGold: 45
       minParts: 2
@@ -84,6 +87,15 @@ MonoBehaviour:
     - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
       weight: 0.7
       fromFloor: 2
+    powers:
+    - {fileID: 11400000, guid: dd8eb0a2d110b7d448c7e7ea010be192, type: 2}
+    - {fileID: 11400000, guid: 5ac6486793e0a2444a5fbb06014fd14e, type: 2}
+    - {fileID: 11400000, guid: cd435023817d421408a1c67dc71cee8d, type: 2}
+    - {fileID: 11400000, guid: f76370e22f547ba4baacd909b2202a20, type: 2}
+    - {fileID: 11400000, guid: 1053e2f4dd2afc845acf7939ce3d5765, type: 2}
+    - {fileID: 11400000, guid: 12ab78657394f0c49baace0b9687ea75, type: 2}
+    - {fileID: 11400000, guid: 8d1ac56982af5914f850b78d3bdaf03b, type: 2}
+    - {fileID: 11400000, guid: 9eb2c7c86c0ee4c44b1935ca0e607f8e, type: 2}
     arenaPlaceholder:
       slimes: 4
       bats: 2
@@ -109,3 +121,4 @@ MonoBehaviour:
   bat: {fileID: 9040731678127089465, guid: e60df2ef6faa82b43b5ac621cb0430a8, type: 3}
   spider: {fileID: 7032119628774444274, guid: 682140b0d6791ff439cad7ec6a05f9a4, type: 3}
   goldPickup: {fileID: 5263092997857751594, guid: 6f92e44bc916d5742abcb804f006fe31, type: 3}
+  powerPickup: {fileID: 5760000006229281841, guid: 27f59f77929fbd64084c3afec76e387e, type: 3}
