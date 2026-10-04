@@ -127,7 +127,10 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Node.Kind, Is.EqualTo(RoomKind.Start));
             Assert.That(Runner.Encounter.IsCleared, "no enemies, nothing sealed");
             foreach (RoomExit exit in Room.Exits)
+            {
                 Assert.That(exit.IsOpen, Is.EqualTo(exit.Index < Node.Next.Count), $"exit {exit.Index}: open only if the run uses it");
+                Assert.That(exit.IsUnused, Is.EqualTo(exit.Index >= Node.Next.Count), $"exit {exit.Index}: bricked up if the run doesn't use it");
+            }
             AssertRoomBound();
         }
 
@@ -154,7 +157,10 @@ namespace Hearthdelve.Tests.PlayMode
             {
                 yield return ClearRoom();
                 foreach (RoomExit exit in Room.Exits)
+                {
                     Assert.That(exit.IsOpen, Is.EqualTo(exit.Index < Node.Next.Count), $"exit {exit.Index}");
+                    Assert.That(exit.IsUnused, Is.EqualTo(exit.Index >= Node.Next.Count), $"exit {exit.Index}: a spare exit is wall");
+                }
                 Assert.That(cleared, Is.EqualTo(1));
             }
             finally

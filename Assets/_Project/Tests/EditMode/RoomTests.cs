@@ -142,6 +142,9 @@ namespace Hearthdelve.Tests
         [Test]
         public void ABat_MustHangUnderAWall() { List<string> rows = Room(); Set(rows, 12, 10, 'V'); AssertProblem(rows, "no wall directly above"); }
 
+        [Test]
+        public void ABat_MayNotSleepUnderTheEssenceBar() { List<string> rows = Room(); Set(rows, 5, 2, 'v'); AssertProblem(rows, "under the Essence bar"); }
+
         // ------------------------------------------------------------------ encounter
 
         [Test]
@@ -249,11 +252,11 @@ namespace Hearthdelve.Tests
             List<string> rows = Room();
             Set(rows, 5, 10, 'm');
             Set(rows, 25, 15, 'm');
-            Set(rows, 8, 2, 'v');
+            Set(rows, 12, 2, 'v');
             var layout = new RoomLayout(rows);
             Assert.That(layout.IsValid, string.Join("\n", layout.Problems));
             Assert.That(layout.GroundSpawns, Is.EqualTo(new[] { new Vector2Int(25, 8), new Vector2Int(5, 13) }), "bottom row first");
-            Assert.That(layout.PerchSpawns, Is.EqualTo(new[] { new Vector2Int(8, 21) }));
+            Assert.That(layout.PerchSpawns, Is.EqualTo(new[] { new Vector2Int(12, 21) }));
             Set(rows, 12, 12, 'v');
             AssertProblem(rows, "no wall directly above");
         }

@@ -75,6 +75,9 @@ namespace Hearthdelve.Tests.PlayMode
                         Teleport(Player, (Vector2)Runner.Current.Exits[0].transform.position + new Vector2(0f, -3f));
                         yield return Settle();
                         Shot($"{Node.RoomId}_open");
+                        Teleport(Player, (Vector2)Runner.Current.Exits[^1].transform.position + new Vector2(0f, -3f));
+                        yield return Settle();
+                        Shot($"{Node.RoomId}_open_last");
                     }
                     yield return Go(n => n.Kind is RoomKind.Descent or RoomKind.Arena or RoomKind.Combat);
                 }
