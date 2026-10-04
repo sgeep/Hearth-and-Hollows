@@ -74,7 +74,11 @@ namespace Hearthdelve.Tests.PlayMode
                 Assert.That(viewHeight * aspect, Is.GreaterThanOrEqualTo(28f), $"the room's width fits at aspect {aspect:0.00}");
         }
 
-        /// <summary>Walking up into each piece from below stops the player in front of it, drawn in front (footprints end at the sort point).</summary>
+        /// <summary>
+        /// Walking up into each footprint of each piece from below stops the player in front of it, drawn in front
+        /// (footprints end at the sort point). Every footprint, not only the lowest: the kitchen's oven started
+        /// higher than its range and drew over the player (4c step 4 playtest).
+        /// </summary>
         [UnityTest]
         public IEnumerator Furniture_StopsThePlayerInFront_AndDrawsBehindThem()
         {
@@ -84,19 +88,21 @@ namespace Hearthdelve.Tests.PlayMode
             {
                 GameObject piece = GameObject.Find(name);
                 Assert.That(piece, Is.Not.Null, name);
-                Collider2D footprint = piece.GetComponents<Collider2D>().OrderBy(c => c.bounds.min.y).First();
-                Vector2 start = new(footprint.bounds.center.x, footprint.bounds.min.y - 1.2f);
-                Teleport(Player, start);
-                yield return new WaitForFixedUpdate();
-                Hold(Key.W);
-                yield return new WaitForSeconds(0.6f);
-                ReleaseKeys();
-                yield return new WaitForFixedUpdate();
-                float feet = Player.transform.position.y;
-                Assert.That(feet, Is.LessThan(footprint.bounds.min.y), $"{name} blocks the player");
-                Assert.That(feet, Is.GreaterThan(footprint.bounds.min.y - 0.6f), $"the player walked right up to {name}");
-                Transform sortRoot = piece.GetComponentInParent<SortingGroup>()?.transform ?? piece.transform;
-                Assert.That(feet, Is.LessThan(sortRoot.position.y), $"the player sorts in front of {name}");
+                foreach (Collider2D footprint in piece.GetComponents<Collider2D>())
+                {
+                    Vector2 start = new(footprint.bounds.center.x, footprint.bounds.min.y - 1.2f);
+                    Teleport(Player, start);
+                    yield return new WaitForFixedUpdate();
+                    Hold(Key.W);
+                    yield return new WaitForSeconds(0.6f);
+                    ReleaseKeys();
+                    yield return new WaitForFixedUpdate();
+                    float feet = Player.transform.position.y;
+                    Assert.That(feet, Is.LessThan(footprint.bounds.min.y), $"{name} blocks the player");
+                    Assert.That(feet, Is.GreaterThan(footprint.bounds.min.y - 0.6f), $"the player walked right up to {name}");
+                    Transform sortRoot = piece.GetComponentInParent<SortingGroup>()?.transform ?? piece.transform;
+                    Assert.That(feet, Is.LessThan(sortRoot.position.y), $"the player sorts in front of {name}");
+                }
             }
         }
 

@@ -84,7 +84,7 @@ namespace Hearthdelve.Editor
             if (tavernCamera == null) throw new InvalidOperationException("The tavern scene has no Tavern Camera.");
             tavernCamera.transform.position = new Vector3(CameraCentre.x, CameraCentre.y, -10f);
             Camera.main.transform.position = tavernCamera.transform.position;
-            SetUpBar(GameObject.Find("Bar").GetComponent<SpriteRenderer>());
+            SetUpBar(GameObject.Find("Furniture/Bar").GetComponent<SpriteRenderer>());
             SetUpPass(GameObject.Find("Pass").GetComponent<SpriteRenderer>());
             SetUpKitchen(GameObject.Find("Kitchen").GetComponent<SpriteRenderer>());
             // Step 2 playtest: the stew pot moves half a tile off the wall, so it can be walked behind.
@@ -342,12 +342,17 @@ namespace Hearthdelve.Editor
         /// The whole kitchen is the Grill: the range in front and the oven beside it against the wall. There's
         /// a tile of floor behind the range (in round its east end), and the Grill can be used from there too,
         /// like a cook behind the stove (step 2 playtest: for immersion).
+        /// The kitchen is one sprite, sorted at the bottom of its frame. Both footprints start 3 px up, where the
+        /// range's art does, on a tile edge (so the row in front stays open for pathfinding): every character's
+        /// collider is at least 0.4 tiles tall, so anyone stopped in front has their feet below the sort point and
+        /// draws in front. The oven's footprint used to start at its own art, 10 px up, which let the keeper stand
+        /// inside the sort point and drew the kitchen over them (4c step 4 playtest).
         /// </summary>
         static void SetUpKitchen(SpriteRenderer kitchen)
         {
             ClearStation(kitchen);
             Footprint(kitchen, 12f, 16f, 8f, 3f);
-            Footprint(kitchen, 1f, 11f, 18f, 10f);
+            Footprint(kitchen, 1f, 11f, 25f, 3f);
             Station(kitchen, TavernInteractableKind.Grill, TavernLocKeys.StationGrill, new Vector2(1.8125f, -0.2f), 1.5f, new Rect(0.125f, 0.375f, 3.375f, 3.125f),
                 new[] { new Vector2(2.5f, 1.875f) });
         }
@@ -448,7 +453,7 @@ namespace Hearthdelve.Editor
             Vector2 UseOf(string piece) => GameObject.Find(piece).GetComponent<TavernInteractable>().UsePoint;
             var layout = root.gameObject.AddComponent<TavernLayout>();
             layout.Configure(door, queue, seats.ToArray(),
-                Point("Post Serving", new Vector2(21.5f, 7.6f)), Point("Post Grill", UseOf("Kitchen")), Point("Post Tap", UseOf("Bar")),
+                Point("Post Serving", new Vector2(21.5f, 7.6f)), Point("Post Grill", UseOf("Kitchen")), Point("Post Tap", UseOf("Furniture/Bar")),
                 Point("Post StewPot", UseOf("Cauldron")), Point("Post Rest", new Vector2(25.5f, 5.5f)));
 
             var pip = (GameObject)PrefabUtility.InstantiatePrefab(npcs.Pip);
@@ -518,7 +523,8 @@ namespace Hearthdelve.Editor
             status.SetParent(stewRoot, false);
             status.localPosition = new Vector3(0f, 2.1f, 0f);
             var overlay = new List<SpriteRenderer>();
-            var bar = new GameObject("Bar").transform;
+            // Not "Bar": that's the bar's name, and the builder finds furniture by name.
+            var bar = new GameObject("Progress").transform;
             bar.SetParent(status, false);
             SpriteRenderer barBack = LookTestContent.AddSprite(bar, "Back", DungeonUI.Pixel(), SortingLayers.Above, 0, Vector3.zero);
             barBack.transform.localScale = new Vector3(12f, 3f, 1f);
@@ -546,7 +552,7 @@ namespace Hearthdelve.Editor
                 MinifantasyImporter.Row(MinifantasySheets.CraftingAndProfessions, "KitchenWorking", 0, 8));
 
             GameObject service = GameObject.Find("Service");
-            Replace<KeeperWork>(service).Configure(GameObject.Find("Kitchen").GetComponent<TavernInteractable>(), GameObject.Find("Bar").GetComponent<TavernInteractable>(),
+            Replace<KeeperWork>(service).Configure(GameObject.Find("Kitchen").GetComponent<TavernInteractable>(), GameObject.Find("Furniture/Bar").GetComponent<TavernInteractable>(),
                 GameObject.Find("Cauldron").GetComponent<TavernInteractable>(), GameObject.Find("Pass").GetComponent<TavernInteractable>(), seats.ToArray());
         }
 
