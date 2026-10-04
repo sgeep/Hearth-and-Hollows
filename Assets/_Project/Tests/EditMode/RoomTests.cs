@@ -114,7 +114,7 @@ namespace Hearthdelve.Tests
                 Set(rows, x, 0, '#');
                 Set(rows, x, 1, '#');
             }
-            AssertProblem(rows, "needs an exit or the rope");
+            AssertProblem(rows, "needs an exit, the rope out or the hole down");
             Set(rows, 25, 12, 'R');
             Assert.That(new RoomLayout(rows).IsValid, "the rope room is fine with no exits");
         }
@@ -205,6 +205,72 @@ namespace Hearthdelve.Tests
             Assert.That(RoomView.Clamp(room, new Vector2(43f, 25f), 20f, 11.25f), Is.EqualTo(new Vector2(24f, 14.75f)), "the top-right corner");
             Assert.That(RoomView.Clamp(room, new Vector2(22f, 13f), 20f, 11.25f), Is.EqualTo(new Vector2(22f, 13f)), "free in the middle");
             Assert.That(RoomView.Clamp(room, new Vector2(5f, 13f), 30f, 11.25f), Is.EqualTo(new Vector2(22f, 13f)), "wider than the room: centred");
+        }
+
+        [Test]
+        public void EveryRoom_HasWhatItsKindNeeds()
+        {
+            foreach (RoomDefinition room in Definitions())
+            {
+                RoomLayout layout = room.Parse();
+                string at = $"{room.name} ({room.kind})";
+                switch (room.kind)
+                {
+                    case RoomKind.Start:
+                        Assert.That(layout.Exits, Is.Not.Empty, at);
+                        Assert.That(layout.Enemies.Count + layout.GroundSpawns.Count, Is.Zero, $"{at}: quiet");
+                        break;
+                    case RoomKind.Combat:
+                        Assert.That(layout.Exits, Is.Not.Empty, at);
+                        Assert.That(layout.GroundSpawns.Count, Is.GreaterThanOrEqualTo(6), $"{at}: room for the deepest floor's fights");
+                        Assert.That(layout.Rope == null && layout.Hole == null, at);
+                        break;
+                    case RoomKind.Extraction:
+                        Assert.That(layout.Rope, Is.Not.Null, at);
+                        Assert.That(layout.Exits, Is.Empty, $"{at}: the run ends here");
+                        break;
+                    case RoomKind.Descent:
+                        Assert.That(layout.Hole, Is.Not.Null, at);
+                        Assert.That(layout.Exits, Is.Empty, $"{at}: the way on is the hole");
+                        Assert.That(room.prefab.Descent, Is.Not.Null, at);
+                        break;
+                    case RoomKind.Arena:
+                        Assert.That(layout.Rope, Is.Not.Null, $"{at}: the way home once it's clear");
+                        Assert.That(layout.Exits, Is.Empty, at);
+                        Assert.That(layout.GroundSpawns.Count, Is.GreaterThanOrEqualTo(8), at);
+                        break;
+                }
+            }
+        }
+
+        [Test]
+        public void SpawnPoints_AreParsed_InOrder_AndPerchesMustHangUnderAWall()
+        {
+            List<string> rows = Room();
+            Set(rows, 5, 10, 'm');
+            Set(rows, 25, 15, 'm');
+            Set(rows, 8, 2, 'v');
+            var layout = new RoomLayout(rows);
+            Assert.That(layout.IsValid, string.Join("\n", layout.Problems));
+            Assert.That(layout.GroundSpawns, Is.EqualTo(new[] { new Vector2Int(25, 8), new Vector2Int(5, 13) }), "bottom row first");
+            Assert.That(layout.PerchSpawns, Is.EqualTo(new[] { new Vector2Int(8, 21) }));
+            Set(rows, 12, 12, 'v');
+            AssertProblem(rows, "no wall directly above");
+        }
+
+        [Test]
+        public void ARoom_CanEndInAHole()
+        {
+            List<string> rows = Room();
+            foreach (int x in new[] { 19, 20 })
+            {
+                Set(rows, x, 0, '#');
+                Set(rows, x, 1, '#');
+            }
+            Set(rows, 19, 10, 'H');
+            var layout = new RoomLayout(rows);
+            Assert.That(layout.IsValid, string.Join("\n", layout.Problems));
+            Assert.That(layout.Hole, Is.EqualTo(new Vector2Int(19, 13)));
         }
 
         [Test]

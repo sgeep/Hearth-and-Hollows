@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Linq;
-using Hearthdelve.Core;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Dungeon.Enemies;
@@ -12,6 +11,7 @@ using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Shared.Run;
+using Hearthdelve.UI.Screens;
 using MoreMountains.TopDownEngine;
 using NUnit.Framework;
 using UnityEngine;
@@ -21,15 +21,25 @@ using Object = UnityEngine.Object;
 namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
-    /// 4d step 1, in the <c>Dungeon</c> scene: rooms load one at a time, the player arrives at each room's P, the
-    /// gates seal while anything in the room is alive and open when it's clear, an open doorway leads to the next
-    /// room (the last is unloaded with whatever was left in it), and the navigation grid and the camera follow the room.
+    /// 4d, in the <c>Dungeon</c> scene with a fixed seed: the generated run's rooms load one at a time, the gates seal
+    /// while anything is alive and open (only the exits the graph uses) when it's clear, exits lead where the graph says
+    /// and never back, the hole drops to the next floor, ropes end the run, and the arena's placeholder fight ends a full
+    /// run. The navigation grid and the camera follow every room.
     /// </summary>
     public class DungeonRoomTests : LookTestFixture
     {
         const string RunScene = "Dungeon";
+        const int k_Seed = 20261004;
 
         static RoomRunner Runner => RoomRunner.Active;
+        static RoomInstance Room => Runner.Current;
+        static FloorNode Node => Runner.Node;
+
+        [SetUp]
+        public void FixTheSeed() => RoomRunner.SeedOverride = k_Seed;
+
+        [TearDown]
+        public void ReleaseTheSeed() => RoomRunner.SeedOverride = 0;
 
         IEnumerator LoadRun()
         {
@@ -37,20 +47,28 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Runner != null && Runner.Current != null && !Runner.IsTransitioning, 10f, "the first room");
             // Long tests shouldn't run out of Essence.
             Player.GetComponent<EssenceHealth>().GodMode = true;
+            FreezeEnemies();
         }
 
-        static RoomInstance Room => Runner.Current;
+        FloorNode Target(RoomExit exit) => Runner.Floor.Node(Node.Next[exit.Index]);
 
-        /// <summary>Steps the player into an open exit's doorway and waits for the next room.</summary>
-        IEnumerator TakeExit(int index, string expected)
+        /// <summary>Steps into an open exit and waits for the room it leads to.</summary>
+        IEnumerator TakeExit(RoomExit exit)
         {
-            RoomExit exit = Room.Exits[index];
-            Assert.That(exit.IsOpen, "the exit is open");
+            Assert.That(exit, Is.Not.Null, $"{Node.RoomId}: an exit to take");
+            Assert.That(exit.IsOpen, $"exit {exit.Index} is open");
+            FloorNode target = Target(exit);
+            int entered = Runner.RoomsEntered;
             Teleport(Player, (Vector2)exit.transform.position + new Vector2(0f, 0.3f));
-            yield return WaitUntil(() => Runner.CurrentDefinition.id == expected && !Runner.IsTransitioning, 5f, $"the room {expected}");
+            yield return WaitUntil(() => Runner.RoomsEntered == entered + 1 && !Runner.IsTransitioning, 5f, $"the room behind exit {exit.Index}");
+            Assert.That(Node, Is.SameAs(target), "the exit led where the graph says");
             FreezeEnemies();
             yield return null;
         }
+
+        /// <summary>The used exit whose room is what we want (the first that matches).</summary>
+        RoomExit ExitTo(System.Func<FloorNode, bool> wanted) =>
+            Room.Exits.Where(e => e.Index < Node.Next.Count).FirstOrDefault(e => wanted(Target(e)));
 
         IEnumerator ClearRoom()
         {
@@ -64,51 +82,79 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(0.6f);
         }
 
-        [UnityTest]
-        public IEnumerator TheFirstRoom_IsQuiet_ItsExitIsOpen_AndThePlayerArrivesAtItsP()
+        IEnumerator Descend()
         {
-            yield return LoadRun();
-            Assert.That(Runner.CurrentDefinition.id, Is.EqualTo("start"));
-            Assert.That(Runner.RoomsEntered, Is.EqualTo(1));
-            Assert.That(Runner.Encounter.IsCleared, "no enemies, nothing sealed");
-            Assert.That(Room.Exits.All(e => e.IsOpen));
-            Assert.That(Vector2.Distance(Player.transform.position, Room.Arrival.position), Is.LessThan(0.2f));
+            int floor = Runner.Floor.Floor;
+            Assert.That(Room.Descent, Is.Not.Null, "a hole");
+            Teleport(Player, Room.Descent.transform.position);
+            yield return WaitUntil(() => Runner.Floor.Floor == floor + 1 && !Runner.IsTransitioning, 5f, $"floor {floor + 1}");
+            FreezeEnemies();
+            yield return null;
+        }
+
+        void AssertRoomBound()
+        {
+            Assert.That(NavGrid.Current.Bounds, Is.EqualTo(Room.TileBounds), $"{Node.RoomId}: the grid covers the room");
+            Vector2Int arrival = Vector2Int.FloorToInt(Room.Arrival.position);
+            Assert.That(NavGrid.Current.Map.IsWalkable(new GridCell(arrival.x, arrival.y)), $"{Node.RoomId}: the arrival is walkable");
+            Assert.That(Vector2.Distance(Player.transform.position, Room.Arrival.position), Is.LessThan(0.2f), $"{Node.RoomId}: arrived at its P");
+        }
+
+        /// <summary>Goes on toward the way down (or the arena), never a rope, until the room is of the given kind.</summary>
+        IEnumerator WalkTo(RoomKind kind)
+        {
+            for (int guard = 0; guard < 30 && Node.Kind != kind; guard++)
+            {
+                AssertRoomBound();
+                if (Node.Kind == RoomKind.Descent)
+                {
+                    yield return Descend();
+                    continue;
+                }
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                RoomExit exit = ExitTo(n => n.Kind == kind) ?? ExitTo(n => n.Kind != RoomKind.Extraction);
+                yield return TakeExit(exit);
+            }
+            Assert.That(Node.Kind, Is.EqualTo(kind));
         }
 
         [UnityTest]
-        public IEnumerator EnteringAFight_SealsTheExits_AndASealedExitLeadsNowhere()
+        public IEnumerator TheRun_IsGeneratedFromTheSeed_AndOpensQuietly()
         {
             yield return LoadRun();
-            RoomInstance first = Room;
-            yield return TakeExit(0, "slime_hall");
-            Assert.That(first == null, "the last room is unloaded");
-            Assert.That(Runner.RoomsEntered, Is.EqualTo(2));
-            Assert.That(Vector2.Distance(Player.transform.position, Room.Arrival.position), Is.LessThan(0.2f), "arrives at the new room's P");
-            Assert.That(Runner.Encounter.IsSealed);
-            Assert.That(Room.LivingEnemies(), Is.EqualTo(3));
-            Assert.That(Room.Exits, Has.Length.EqualTo(2));
-            Assert.That(Room.Exits.All(e => !e.IsOpen), "the gates drop as the fight starts");
+            Assert.That(Runner.Graph.Seed, Is.EqualTo(k_Seed));
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(1));
+            Assert.That(Node.Kind, Is.EqualTo(RoomKind.Start));
+            Assert.That(Runner.Encounter.IsCleared, "no enemies, nothing sealed");
+            foreach (RoomExit exit in Room.Exits)
+                Assert.That(exit.IsOpen, Is.EqualTo(exit.Index < Node.Next.Count), $"exit {exit.Index}: open only if the run uses it");
+            AssertRoomBound();
+        }
 
-            // Standing in a sealed doorway goes nowhere.
+        [UnityTest]
+        public IEnumerator AFight_SealsItsExits_AndOpensOnlyTheUsedOnes_WhenClear()
+        {
+            yield return LoadRun();
+            yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat));
+            Assert.That(Runner.Encounter.IsSealed);
+            Assert.That(Room.LivingEnemies(), Is.EqualTo(Node.Encounter.Count), "the run's encounter, placed");
+            Assert.That(Room.Exits.All(e => !e.IsOpen), "the gates drop");
+            // A sealed doorway goes nowhere.
+            int entered = Runner.RoomsEntered;
             Teleport(Player, (Vector2)Room.Exits[0].transform.position + new Vector2(0f, 0.3f));
             for (int i = 0; i < 20; i++) yield return null;
-            Assert.That(Runner.CurrentDefinition.id, Is.EqualTo("slime_hall"));
-            Assert.That(Runner.IsTransitioning, Is.False);
-        }
+            Assert.That(Runner.RoomsEntered, Is.EqualTo(entered));
+            // Step back out of the doorway (or the gate rising would take the player straight through).
+            Teleport(Player, Room.Arrival.position);
 
-        [UnityTest]
-        public IEnumerator ClearingTheRoom_OpensEveryExit_Once()
-        {
-            yield return LoadRun();
-            yield return TakeExit(0, "slime_hall");
             int cleared = 0;
             void OnCleared(RoomCleared _) => cleared++;
             EventBus<RoomCleared>.Subscribe(OnCleared);
             try
             {
-                Assert.That(Room.Exits.All(e => !e.IsOpen));
                 yield return ClearRoom();
-                Assert.That(Room.Exits.All(e => e.IsOpen), "every gate rises");
+                foreach (RoomExit exit in Room.Exits)
+                    Assert.That(exit.IsOpen, Is.EqualTo(exit.Index < Node.Next.Count), $"exit {exit.Index}");
                 Assert.That(cleared, Is.EqualTo(1));
             }
             finally
@@ -118,78 +164,107 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator EitherExit_LeadsOn_AndPartsLeftLyingStayBehind()
+        public IEnumerator ChoosingABranch_LeavesTheOtherBehind_AndPartsLeftLyingStayBehind()
         {
             yield return LoadRun();
-            yield return TakeExit(0, "slime_hall");
-            yield return ClearRoom();
-            // A part left lying on the floor (whether or not the kills dropped any).
+            // Find a room with a choice between two fights.
+            for (int guard = 0; guard < 10 && Node.Next.Count(n => Runner.Floor.Node(n).Kind == RoomKind.Combat) < 2; guard++)
+            {
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat));
+            }
+            if (Runner.Encounter.IsSealed) yield return ClearRoom();
+            RoomExit[] fights = Room.Exits.Where(e => e.Index < Node.Next.Count && Target(e).Kind == RoomKind.Combat).ToArray();
+            Assert.That(fights.Length, Is.GreaterThanOrEqualTo(2), "a choice of fights on the first floor");
+            FloorNode from = Node, abandoned = Target(fights[0]);
+
+            // A part left on the floor.
             EnemyDefinition slime = Object.FindObjectsByType<EnemyIdentity>(FindObjectsInactive.Include).First().Definition;
             HarvestSystem.Instance.Drop(new IngredientStack(new IngredientItem(slime.harvest[0].ingredient, Quality.Standard), 1, 1f),
                 (Vector2)Room.Arrival.position + new Vector2(3f, 3f), null);
             yield return null;
             Assert.That(Object.FindObjectsByType<IngredientPickup>(), Is.Not.Empty);
-            yield return TakeExit(1, "spider_den");
+
+            yield return TakeExit(fights[1]);
             Assert.That(Object.FindObjectsByType<IngredientPickup>(), Is.Empty, "left behind with the room");
-            Assert.That(Runner.RoomsEntered, Is.EqualTo(3));
+            Assert.That(Node, Is.Not.SameAs(abandoned));
+            Assert.That(Node.Next.Concat(new[] { Node.Id }).Select(id => Runner.Floor.Node(id).Layer).All(l => l > from.Layer), "nothing leads back");
         }
 
         [UnityTest]
-        public IEnumerator TheNavigationGrid_FollowsTheRoom()
+        public IEnumerator ARope_EndsTheRun_WithTheDelveResult()
         {
             yield return LoadRun();
-            yield return TakeExit(0, "slime_hall");
-            NavGrid grid = NavGrid.Current;
-            Assert.That(grid, Is.Not.Null);
-            Assert.That(grid.Bounds, Is.EqualTo(Room.TileBounds), "covers the new room");
-            GridMap map = grid.Map;
-            Assert.That(map.Width, Is.EqualTo(44));
-            Assert.That(map.Height, Is.EqualTo(26));
-            Vector2Int arrival = Vector2Int.FloorToInt(Room.Arrival.position);
-            Assert.That(map.IsWalkable(new GridCell(arrival.x, arrival.y)), "the arrival is walkable");
-            Assert.That(map.IsWalkable(new GridCell(0, 10)), Is.False, "the west wall is blocked");
-            // A pillar (layout column 9, text rows 10–11 → y 14–15).
-            Assert.That(map.IsWalkable(new GridCell(9, 15)), Is.False, "a pillar is blocked");
+            // Take fights until a rope is on offer, then take it.
+            for (int guard = 0; guard < 12 && Node.Kind != RoomKind.Extraction; guard++)
+            {
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Extraction) ?? ExitTo(n => n.Kind == RoomKind.Combat));
+            }
+            Assert.That(Node.Kind, Is.EqualTo(RoomKind.Extraction));
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(1));
+            Assert.That(Room.GetComponentInChildren<DelveExit>(), Is.Not.Null, "the rope");
+            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            Assert.That(DelveRunController.Active.Extract(), "climbed out");
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
         }
 
         [UnityTest]
-        public IEnumerator TheCamera_FollowsThePlayer_ButStaysInsideTheRoom()
+        public IEnumerator AFullRun_DropsThroughThreeFloors_ToTheArena_WhosePlaceholderFightEndsTheRun()
+        {
+            yield return LoadRun();
+            yield return WalkTo(RoomKind.Descent);
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(1));
+            Assert.That(Room.Descent, Is.Not.Null, "the hole down");
+            yield return Descend();
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(2));
+            Assert.That(Node.Kind, Is.EqualTo(RoomKind.Combat), "dropped into a fight");
+            AssertRoomBound();
+
+            yield return WalkTo(RoomKind.Descent);
+            yield return Descend();
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(3));
+
+            yield return WalkTo(RoomKind.Arena);
+            AssertRoomBound();
+            var rope = Room.GetComponentInChildren<DelveExit>(true);
+            Assert.That(rope, Is.Not.Null);
+            Assert.That(rope.gameObject.activeInHierarchy, Is.False, "the way out waits for the fight");
+            Assert.That(Runner.Encounter.IsSealed);
+            Assert.That(Room.LivingEnemies(), Is.EqualTo(Node.Encounter.Count));
+            Assert.That(Node.Encounter.Count, Is.GreaterThanOrEqualTo(6), "the placeholder elite wave");
+            yield return ClearRoom();
+            Assert.That(rope.gameObject.activeInHierarchy, "the rope appears once the arena is clear");
+
+            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            Assert.That(DelveRunController.Active.Extract(), "climbed out");
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
+            Assert.That(Runner.RoomsEntered, Is.GreaterThanOrEqualTo(12), "a full run");
+        }
+
+        [UnityTest]
+        public IEnumerator TheCamera_StaysInsideEveryRoom()
         {
             yield return LoadRun();
             Camera camera = Camera.main;
-            Rect room = new(Vector2.zero, Room.Size);
-
-            IEnumerator CheckAt(Vector2 position)
+            for (int room = 0; room < 3; room++)
             {
-                Teleport(Player, position);
-                for (int i = 0; i < 10; i++) yield return null;
-                float height = camera.orthographicSize * 2f, width = height * camera.aspect;
-                Vector2 centre = camera.transform.position;
-                string at = $"at {position}: view {width:F2}×{height:F2} centred {centre}, ortho {camera.orthographicSize:F3}, aspect {camera.aspect:F3}, screen {Screen.width}×{Screen.height}, player {(Vector2)Player.transform.position}";
-                // Where the view is smaller than the room it stays inside it; where it's larger it centres on the room.
-                if (width <= room.width) Assert.That(centre.x - width / 2f >= -0.02f && centre.x + width / 2f <= room.width + 0.02f, "x inside " + at);
-                else Assert.That(centre.x, Is.EqualTo(room.center.x).Within(0.05f), at);
-                if (height <= room.height) Assert.That(centre.y - height / 2f >= -0.02f && centre.y + height / 2f <= room.height + 0.02f, "y inside " + at);
-                else Assert.That(centre.y, Is.EqualTo(room.center.y).Within(0.05f), at);
+                Rect bounds = new(Vector2.zero, Room.Size);
+                foreach (Vector2 corner in new[] { new Vector2(1.5f, 2.5f), new Vector2(bounds.width - 1.5f, bounds.height - 2.5f) })
+                {
+                    Teleport(Player, corner);
+                    for (int i = 0; i < 10; i++) yield return null;
+                    float height = camera.orthographicSize * 2f, width = height * camera.aspect;
+                    Vector2 centre = camera.transform.position;
+                    string at = $"{Node.RoomId} at {corner}: view {width:F1}×{height:F1} centred {centre}";
+                    if (width <= bounds.width) Assert.That(centre.x - width / 2f >= -0.02f && centre.x + width / 2f <= bounds.width + 0.02f, at);
+                    else Assert.That(centre.x, Is.EqualTo(bounds.center.x).Within(0.05f), at);
+                    if (height <= bounds.height) Assert.That(centre.y - height / 2f >= -0.02f && centre.y + height / 2f <= bounds.height + 0.02f, at);
+                    else Assert.That(centre.y, Is.EqualTo(bounds.center.y).Within(0.05f), at);
+                }
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat) ?? ExitTo(_ => true));
             }
-
-            yield return CheckAt(new Vector2(1.5f, 2.5f));
-            yield return CheckAt(new Vector2(room.width - 1.5f, room.height - 2.5f));
-        }
-
-        [UnityTest]
-        public IEnumerator TheRouteEndsAtTheRope()
-        {
-            yield return LoadRun();
-            yield return TakeExit(0, "slime_hall");
-            yield return ClearRoom();
-            yield return TakeExit(0, "spider_den");
-            yield return ClearRoom();
-            yield return TakeExit(0, "rope");
-            Assert.That(Room.Exits, Is.Empty);
-            Assert.That(Runner.Encounter.IsCleared);
-            Assert.That(Room.GetComponentInChildren<DelveExit>(), Is.Not.Null, "the way out");
-            Assert.That(DelveRunController.Active, Is.Not.Null);
         }
     }
 }
