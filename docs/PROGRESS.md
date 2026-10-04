@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 4: Prep, Tavern HUD and Results)_
+_Last updated: 2026-10-03 (4c step 5: the whole day loop)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -417,7 +417,40 @@ Decisions (2026-10-03):
 - **A released stick stepped menus back.** The stick springs back slightly past centre, and the UI's Navigate action read that overshoot as a press the other way. The left stick's Navigate binding now has a 0.5 dead zone (menus only; walking and aiming are unchanged). Gamepad tests with a virtual pad cover the walk animation and the spring-back.
 - Builder fix: the stew pot's progress bar was also named "Bar", and an update could find it instead of the bar; it's now "Progress", and the builder finds the bar by path.
 
-**Next: step 5,** Boot, Main Menu, Morning and Night, the delve integration and saves (F8, F9). After your review and playtest of step 4.
+**Step 4 approved (2026-10-03).** Kept as decided: the larger Prep panel (a dedicated planning phase; readable dish information matters more than seeing the room behind it), stew cards counting pots, the short order states, the HUD in the side margins, and the Results pacing. Prep's dish cards keep drawing a list of preparation steps, ready for multi-stage dishes later (not built in 4c). The missing Shroom Cap and Spore Sac icons stay a known content gap.
+
+**Step 5 done (2026-10-03), awaiting your full-day playtest: Boot, Main Menu, Morning, Night, the delve, saves — the whole day.**
+
+The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → delve result → Evening Prep → Service → Results → Night (upgrades, saves) → Sleep → next Morning.** `GameFlow` (in Boot) owns every scene change; the tavern and the dungeon never refer to each other.
+
+- **Boot** (new scene, first in the build list): `GameFlow` with the game database, localization, haptics, the F8/F9 debug keys, and the transition overlay. It stays loaded while the menu, tavern and dungeon load and unload beside it (GDD §10.2). A scene's own haptics service now steps aside for Boot's without taking its scene's other managers with it.
+- **Transitions** tie the day together: each scene change fades to black, names where the day is going ("Morning · Day 2", "Into the dungeon", "Evening · Day 2") and fades in. Nightfall, which happens in the tavern without a scene change, cuts to "Night · Day 2" and fades into the room. The tavern's light follows the day too (`TavernMood`, tunable): cool daylight in the morning, the warm evening, dim blue at night.
+- **Main Menu** (new scene): Continue only when there's a save that can be read, saying where it resumes ("Day 2, morning"); New Game. Starting over a save asks once (Back is the default). A new game is saved straight away, so Continue never brings back a game you started over from. Played on its own, the menu scene loads Boot.
+- **Morning** (the tavern, a panel like Prep): the storeroom; breakfast cards for the Grill and Tap dishes with a buff (the established rules: one dish per morning, cooked at its station's panel with the real minigame, quality scales the buff, stews aren't breakfast; Esc puts the ingredients back); what you ate; **today's delve bonuses** from upgrades and breakfast ("Today's delve: satchel +1 · Essence +17"); and *Descend into the dungeon*.
+- **The delve** is `Dungeon_TestFloor` (until 4d), started with the day's loadout (upgrades' satchel slots and max Essence, breakfast's Essence or slower drain). Extracting or dying (with the Lockbox) shows the delve result, whose button now reads *Back to the tavern*; the report goes to `GameFlow`, the haul goes into the storeroom, the breakfast is used up, and it's evening. F8 in the dungeon extracts. Played on its own the test floor still restarts itself.
+- **Evening:** step 4's Prep → Service → Results with the real storeroom; seat upgrades bring out the fourth table. Results' button reads *Close up for the night*: the takings are banked, autosaved, and it's Night. *Close for the night* at Prep (nothing to cook, or by choice) goes straight to Night, with no empty Results to click through.
+- **Night** (a panel): today's summary (how the delve went, parts brought home and lost, dishes served and walkouts or "The doors stayed shut tonight.", gold banked, Renown today), the purse, the existing three upgrades (each showing its level, what the next level adds, and its price; greyed when you can't afford it), "Game saved." after the autosave and each purchase, and *Sleep*. Sleep applies overnight freshness loss, saves, and the next morning loads.
+- **Saves** (the versioned JSON `SaveSystem`, unchanged format): at New Game, as night falls, after each purchase, and on Sleep. Continue resumes at the saved phase.
+- **Debug:** F8 finishes the current phase the way the player would (Morning sets off, the dungeon extracts, Prep closes, service ends, Results banks, Night sleeps); F9 adds 100 gold; F4 at Prep only on its own or if the game database allows it in the day loop (`allowDebugFill`, off).
+- Tests:
+  - PlayMode `DayLoopTests` (from the Boot scene, saves in a temp folder):
+    - the whole day: New Game, breakfast cooked and eaten (raising max Essence on the delve), a haul extracted into the storeroom once, a dish served, Results, takings banked and autosaved, an upgrade bought and saved, Sleep (freshness lower, day 2 saved), then a fresh boot and Continue restoring gold, Renown, upgrades, the storeroom (no duplicates, same freshness), with the upgrade's extra satchel slot on the next delve;
+    - death with the Lockbox (only the kept stack comes home);
+    - closing with nothing to cook (straight to Night, saved, Sleep to day 2);
+    - New Game over a save asks, Back keeps it, Start over replaces it.
+  - EditMode: repeated save/load round trips neither duplicate nor lose a hauled day.
+  - `DayLoopCaptures` (explicit) renders the menu, Morning, nightfall and Night.
+
+**Your playtest (open the `Boot` scene and press Play):**
+1. New Game. In the Morning, check the storeroom (empty on day 1), then *Descend*.
+2. In the dungeon, harvest a few parts and extract. Check the result, then the Evening's storeroom.
+3. Prep, serve, and close up after Results. Check the Night summary and the banked gold, buy an upgrade if you can (F9 for gold), and Sleep.
+4. Day 2: if you brought home a Grill or Tap dish's ingredients, cook breakfast and watch "Today's delve" change; check the bonus in the dungeon.
+5. Stop Play, press Play on `Boot` again, and Continue: you should be back where you saved.
+6. Try the other ways a day goes: die in the dungeon (Lockbox), and close for the night with nothing to cook.
+7. Overall: does it feel like one day, and is it always clear where you are and what to do next?
+
+**Next: step 6,** the tavern's feedback and haptics pass. After your full-day playtest of step 5.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -447,6 +480,8 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
+- **The main menu is a plain panel** on a dark background (no art yet); settings come in 4h.
+- **The day loop starts from `Boot`.** Playing `Tavern` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.
 - **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
