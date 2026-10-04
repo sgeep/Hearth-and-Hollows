@@ -25,6 +25,13 @@ MonoBehaviour:
       slimeWeight: 1
       batWeight: 0.25
       spiderWeight: 0.1
+      goldWeight: 1
+      ingredientWeight: 1
+      minGold: 10
+      maxGold: 18
+      minParts: 1
+      maxParts: 2
+      fineChance: 0.2
     - minFights: 3
       maxFights: 4
       maxWidth: 2
@@ -36,6 +43,13 @@ MonoBehaviour:
       slimeWeight: 1
       batWeight: 0.4
       spiderWeight: 0.35
+      goldWeight: 1
+      ingredientWeight: 1
+      minGold: 18
+      maxGold: 30
+      minParts: 1
+      maxParts: 2
+      fineChance: 0.45
     - minFights: 3
       maxFights: 4
       maxWidth: 2
@@ -47,6 +61,29 @@ MonoBehaviour:
       slimeWeight: 0.8
       batWeight: 0.5
       spiderWeight: 0.6
+      goldWeight: 1
+      ingredientWeight: 1
+      minGold: 30
+      maxGold: 45
+      minParts: 2
+      maxParts: 3
+      fineChance: 0.7
+    ingredientRewards:
+    - ingredient: {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
+      weight: 1
+      fromFloor: 1
+    - ingredient: {fileID: 11400000, guid: 344c2706f235a2141b4b9e5b7a0f5ef6, type: 2}
+      weight: 1
+      fromFloor: 1
+    - ingredient: {fileID: 11400000, guid: 98c7efdca280afb42a749aa85b5f9eef, type: 2}
+      weight: 1
+      fromFloor: 1
+    - ingredient: {fileID: 11400000, guid: 62cb142cf19470742bd2a4d436de2451, type: 2}
+      weight: 0.7
+      fromFloor: 2
+    - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
+      weight: 0.7
+      fromFloor: 2
     arenaPlaceholder:
       slimes: 4
       bats: 2
@@ -71,3 +108,4 @@ MonoBehaviour:
   slime: {fileID: 5135240155563862973, guid: 040b79a3e7c39a641998300c6ee8b899, type: 3}
   bat: {fileID: 9040731678127089465, guid: e60df2ef6faa82b43b5ac621cb0430a8, type: 3}
   spider: {fileID: 7032119628774444274, guid: 682140b0d6791ff439cad7ec6a05f9a4, type: 3}
+  goldPickup: {fileID: 5263092997857751594, guid: 6f92e44bc916d5742abcb804f006fe31, type: 3}
