@@ -90,7 +90,7 @@ namespace Hearthdelve.UI.Localization
         {
             (PrepTitle, "evening prep"),
             (PrepStoreroom, "storeroom"),
-            (PrepStoreroomEmpty, "the storeroom is empty."),
+            (PrepStoreroomEmpty, "empty"),
             (PrepStockRow, "{0} ×{1} · {2}% fresh"),
             (PrepFill, "fill storeroom (debug)"),
             (PrepMenu, "tonight's menu (up to {0})"),
