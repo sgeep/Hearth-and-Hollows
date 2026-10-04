@@ -312,6 +312,35 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(((RectTransform)controls.transform).rect.width, Is.LessThanOrEqualTo(320f), "fits the screen");
         }
 
+        /// <summary>
+        /// Found in the web smoke test: a save made at Night keeps the purse and Renown but not the day's story, so a
+        /// resumed Night showed "delve: skipped" and zeros. It now shows only the purse and Renown.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ContinuingAtNight_ShowsOnlyWhatTheSaveKnows()
+        {
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Morning, "the first morning");
+            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            yield return InDungeon();
+            yield return ExtractAndGoHome();
+            Object.FindAnyObjectByType<PrepScreen>().CloseButton.onClick.Invoke();
+            yield return null;
+            var night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            Assert.That(ShownText(night), Has.Some.EqualTo("made it out"), "played through: the day is told");
+
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Night, "the night, continued");
+            night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            string[] shown = ShownText(night);
+            Assert.That(shown, Has.None.EqualTo("skipped").And.None.EqualTo("delve").And.None.EqualTo("banked tonight"), "no made-up day");
+            Assert.That(shown, Has.Some.EqualTo("purse").And.Some.EqualTo("Renown"), "the purse and Renown are known");
+        }
+
         [UnityTest]
         public IEnumerator Dying_TheLockboxStack_ComesHome_AndTheEveningGoesOn()
         {

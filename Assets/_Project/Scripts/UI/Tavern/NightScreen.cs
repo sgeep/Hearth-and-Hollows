@@ -162,6 +162,9 @@ namespace Hearthdelve.UI.Tavern
             });
             bool shut = m_Director.Report != null && m_Director.Report.StayedShut;
             string change = today.RenownChange > 0 ? $"+{today.RenownChange}" : today.RenownChange.ToString();
+            // Every played day reaches Night through a delve. A Night with no delve on record was resumed from a save,
+            // which keeps the purse and Renown but not the day's story: show only what's known, not zeros.
+            bool recorded = today.Delve != DelveOutcome.None;
             var lines = new (string label, string value, object[] args)[]
             {
                 // The day: the delve, what came home, the evening.
@@ -172,11 +175,13 @@ namespace Hearthdelve.UI.Tavern
                 // The money and standing: tonight's takings, the purse, Renown and today's change.
                 (LoopLocKeys.NightBanked, TavernLocKeys.PrepValue, new object[] { today.Earned }),
                 (LoopLocKeys.NightPurse, TavernLocKeys.PrepValue, new object[] { state.Gold }),
-                (LoopLocKeys.NightRenownToday, LoopLocKeys.NightRenownValue, new object[] { state.Renown, change }),
+                recorded ? (LoopLocKeys.NightRenownToday, LoopLocKeys.NightRenownValue, new object[] { state.Renown, change })
+                         : (LoopLocKeys.NightRenownToday, TavernLocKeys.Plain, new object[] { state.Renown }),
             };
             for (int i = 0; i < m_Summary.Length; i++)
             {
-                bool has = i < lines.Length;
+                // Unrecorded: the day (0-2) and tonight's takings (3) are unknown.
+                bool has = i < lines.Length && (recorded || i >= 4);
                 m_Summary[i].gameObject.SetActive(has);
                 if (i < m_SummaryLabels.Length) m_SummaryLabels[i].gameObject.SetActive(has);
                 if (!has) continue;
