@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 5: the whole day loop)_
+_Last updated: 2026-10-03 (4c step 6: font, text style, feedback and haptics)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -288,7 +288,7 @@ Adjustments: satchel quality is shown by an icon or mark as well as a tint (neve
 
 1. Enemy damage values are unchanged; damage pace is judged again in 4d, once real room encounters exist.
 2. The prototype's F1 debug panel is **not** 4c scope. It stays recorded as a developer-tooling gap; individual debug controls are rebuilt only when they're genuinely useful during 4c/4d.
-3. The Latin-1 limit on UI text is temporary. When the real game font is chosen, replace it with a proper glyph-coverage check against that font.
+3. The Latin-1 limit on UI text is temporary. When the real game font is chosen, replace it with a proper glyph-coverage check against that font. *(Done in 4c step 6: m5x7 and `TextStyleTests`.)*
 
 **Next: 4c,** the tavern and UI migration.
 
@@ -454,7 +454,69 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 
 **Step 5 playtest fix (2026-10-03):** a different screen flickered behind the transition caption ("Evening · Day 1", "Morning · Day 2"). GameFlow unloads the old scene before loading the new one, so for a moment (as long as the load takes) there was no camera at all; URP draws the screen-space cover only as part of a camera's render, so the screen showed whatever was there last (in the editor, the Game view's "No cameras rendering"). Boot now has a **Boot Camera** that is always there, behind every scene's own (depth −100), drawing only black. Added to the existing Boot scene in place (*Hearthdelve → Generate → 4c Boot and Main Menu* updates an existing Boot rather than rebuilding it). A PlayMode test walks a transition frame by frame and fails if any covered frame has no camera.
 
-**Next: step 6,** the tavern's feedback and haptics pass. After your full-day playtest of step 5.
+**Step 5 approved (2026-10-03).** The full loop works and is fun. Kept as decided: the transition captions, the morning, evening and night lighting, skipping an empty Results when the doors never opened, and the movement/use reminder only during service.
+
+**Step 6 done (2026-10-03), awaiting your playtest: the font, text style, feedback, haptics and feel.**
+
+*Font and text*
+- **m5x7 is the game's font** (one copy, `Assets/_Project/Fonts/m5x7/`; the loose `Fonts/m5x7.ttf` was moved there with its `.meta`, nothing downloaded or replaced). Imported as hinted raster at 16, its own data only, no fallback fonts. Super Text Mesh draws it at size 16 (one font pixel per game pixel at 320×180, measured) or 32 for the game's name and the transition caption, rasterised at 16 and point filtered, on a 10-pixel line (`GameFonts`; any other size drops or doubles pixel rows, so none is used).
+- **Whole-pixel UI scaling** (`PixelCanvasScaler`): canvases scale by the same whole number as the Pixel Perfect Camera's zoom (×6 at 1080p, ×4 at 720p and at 1366×768), never fractionally, so text and UI art stay crisp at any window size. The canvas is then never smaller than 320×180.
+- **Layouts redone around the font's real widths** (each screen's strings measured against m5x7):
+  - Prep: one storeroom row across the top, and two-line dish cards (name and price, then how many and the steps).
+  - Morning: two-line breakfast cards (name and station, then the buff), and the bonus line can take two lines.
+  - Night: a full-width summary with the purse on its first line, and an upgrade row each with its price on a button.
+  - Results: wider.
+  - HUD: a label over each number in the 48-pixel margins; "last orders!" moved to the top centre, over the room; rail rows put the state under the dish.
+  - Station boxes, the interaction hint, the harvest feed, the swap prompt, the death screen, the delve result and the main menu: wider.
+  - Buttons are now plain parchment with a dark edge: the Classic UI pill bar's inner border ran through 7-pixel text. Selected is gold, disabled dims.
+  - All rebuilt in place by the updaters (*Update Tavern*, *4b Update Test Floor UI*, *4c Boot and Main Menu*). The 4a look-test scenes are untouched and keep the old font as baselines.
+- **Lower-case English**, written into the source strings (no runtime lowercasing): every UI string, and the content names (ingredients, dishes, enemies, customers, upgrades) now authored in code (`LocalizationBuilder.ContentEnglish`). Proper nouns keep capitals: Hearthdelve, Pip, the Cellars. So do control labels: WASD, E, A, B, X, Space and the F keys. The rule is in `CLAUDE.md` and GDD §8.2.
+- Wording tightened where the font needed room:
+  - stew prices read "8 gold/bowl";
+  - a dish's steps read "chop, simmer" (still drawn from the step list);
+  - a dish not in stock shows "0 to serve";
+  - the slower-drain buff reads "essence drain -30%";
+  - station prompts are shorter ("Space / A: flip in the gold band", "Space / A: pour · A D / LS: tilt for foam", "A D / LS: move the knife · Space / A: chop");
+  - the debug fill hint reads "F4: fill storeroom".
+- **Glyph coverage replaces the Latin-1 rule:** m5x7 covers Basic Latin, Latin-1 (less the soft hyphen), Latin Extended-A and €. `TextStyleTests` checks every string in every locale's tables against the font itself.
+
+*Feedback and haptics* (one combined feedback per moment: a placeholder sound, visuals and a named pattern in the same MMF player; all read from the minigames' and session's own state, never timed separately; tuning in `TavernFeedbackConfig`)
+
+| Moment | Haptic | Also |
+|---|---|---|
+| Grill flip | `Tap.Light` | sizzle tick |
+| Perfect flip (≥ 0.9) | `Pulse.Success` | bright ding, the box flashes gold |
+| Burned side | `Buzz.Failure` | hiss and thump, a small shake, the box flashes red |
+| Grill past the band | rising rumble (nothing before the band ends) | the sizzle loop grows, the needle reddens |
+| Pouring | steady low rumble, the high motor rising toward the line and beyond | the pour loop grows |
+| Fill reaches the line | `Cue.Threshold` | glass ting, the box flashes gold |
+| Clean pour (≥ 0.85) / plain / overflow | `Pulse.Success` / `Tap.Light` / `Buzz.Failure` | clink / clink / splash and a red flash |
+| Clean cut / ragged cut | `Tap.Firm` / `Cut.Ragged` | thock / dull double thud |
+| Board finished | `Pulse.Success` (half strength for a poor board) | flourish |
+| Stew pot ready | none | bubble and bell, once per pot, not per helping |
+| Plate picked up / put back | `Tap.Light` | clinks |
+| Bump: brush / collision | `Bump.Soft` / `Bump.Hard`, scaled by strength | thud (and a tiny shake for a collision) |
+| Spill near falling | `Bump.Hard`, once per plate | wobble; the spill meter reddens |
+| Dropped | `Buzz.Failure` | crash and a shake |
+| Served | `Tap.Firm` | warm three notes |
+| Payment / walkout | none | coin and the takings flash gold / a sour fall (and the angry emote) |
+| Menus: a choice / a commitment (open the doors, descend, sleep, start, return to the surface, close up) / a purchase | none / very light `Tap.Light` / gentle `Pulse.Success` | click / click / chime and the row glows |
+| Results lines / takings | none | soft ticks / a chime |
+| Breakfast eaten | the cooking moments above | the delve's bonus line flashes |
+
+- Only the keeper's own cooking and carrying are felt; Pip's work makes no vibration. Haptics follow the player's settings (on/off, intensity, reduced) through the haptic service and do nothing where unsupported (the web build); nothing depends on feeling them. Flashes follow the flash setting.
+- Tests:
+  - EditMode: the feedback rules (quiet before the band, rising to the burn; perfect, plain and burned flips; the pour's rise and the line crossing once; pour results; clean and ragged cuts; soft and hard bumps in proportion; the spill warning once); every tavern pattern is a named pattern in the library; m5x7's import and single copy; glyph coverage in every locale; lower-case source strings except listed proper nouns and controls; key strings' authored casing; no code changes text case; whole-pixel scale; every text in the day loop's scenes is m5x7 at a pixel size and every canvas scales by whole pixels.
+  - PlayMode: a perfect flip pulses and flashes, the warning comes only past the band and grows, a burn buzzes and the warning stops; soft, hard, warning and dropped plates, and Pip's bumps ignored; vibration off (and a controller that can't rumble) silences the motors and breaks nothing; a dish card clicks, opening the doors is a light tap; a purchase plays its moment and the row glows.
+
+**Your playtest:** play a full day from `Boot` and judge:
+1. Is the text crisp and readable (HUD, order rail, Prep cards, Results, Morning, Night, hints, upgrades, captions, menu)? Try a windowed size as well as full screen.
+2. Does m5x7 suit the art, and does the lower-case style feel cohesive?
+3. Cooking: does the grill feel tactile (flip taps, the warning past the band, a perfect flip against a burn)? The tap (the pour, the line, a clean pour against an overflow)? Chopping (clean against ragged)?
+4. Serving: are brushes, collisions, the near-fall warning and a drop proportionate? Is a successful serve satisfying?
+5. Overall: is the vibration useful rather than constant, and does the game feel more alive without becoming noisy?
+
+**Next: step 7,** the web smoke test of the full loop, and the docs (PROGRESS, ASSET_MAP, PORT_MANIFEST). After your playtest of step 6.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -489,7 +551,10 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
-- **UI strings stay within Latin-1** (no em dashes, curly quotes or ellipsis characters) until a real font replaces Unity's built-in one; the web build can't draw anything else. Temporary: once the game font is chosen, the test becomes a glyph-coverage check against that font.
+- **m5x7's coverage limits the languages:** Basic Latin, Latin-1, Latin Extended-A and € (English and most European languages). No curly quotes, ellipsis characters or long dashes in strings; Greek, Cyrillic and CJK would need another font (a decision for when localization is planned; there is deliberately no fallback). `TextStyleTests` enforces it.
+- **All sound is placeholder** (`PH_` files, generated); the tavern's feedback pass added its moments' placeholders.
+- **The font's license terms aren't recorded yet** (credited to Daniel Linssen in `CREDITS.md`; confirm the terms from the page it came from).
+- **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "gold" in tight spots later; not imported in step 6.
 - **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
 
 ### Regenerating and verifying (current project)

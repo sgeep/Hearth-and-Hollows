@@ -504,12 +504,14 @@ All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×
 - **Palette and lighting:** warm, saturated tavern (amber candlelight, wood, hearth) against cool, eerie dungeons (teal, violet, bioluminescence). Sprites are lit with URP 2D lights: this is the visual baseline. Each environment has an ambient light plus local lights (hearth and candles in the tavern; torches, and later bioluminescence, in the dungeon), always keeping characters, enemies and pickups readable.
 - **Food** should look appetizing even at this scale; dishes use the Minifantasy food icons, shown enlarged in menus and results.
 - **Content adapts to the art:** monsters, ingredients, dishes, stations, NPCs and bosses are chosen from what Minifantasy contains (`docs/ASSET_MAP.md`).
-- **Known gaps:** no rat with an attack, no mallet or frying pan weapon, no plate-carrying overlay, and no fonts or audio.
+- **Known gaps:** no rat with an attack, no mallet or frying pan weapon, no plate-carrying overlay, and no audio. *(v0.3)* The body font is m5x7 (Section 8.2).
 - *(v0.3)* **Portraits:** important NPCs get dialogue portraits made with the **Minifantasy Portrait Generator** by Krishna Palacio, so they belong with the rest of the art. The usual Minifantasy rules apply: raw files stay outside the repo, the catalog is searched first, only what is used is imported, and the workflow and choices are recorded in `docs/ASSET_MAP.md`. Nothing is imported yet (4g).
 
 ### 8.2 UI (rewritten in v0.2)
 
 Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD in the dungeon. All text is localized.
+
+*(v0.3)* **Text:** the body font is **m5x7**, a pixel font drawn at the game's own pixel size so it sits with the Minifantasy art; a decorative title font may follow in 4h. English is written in a lower-case style ("open the doors", "cellar stew", "last orders!"), with proper nouns and control labels capitalised as usual; the style lives in the written strings, and other languages follow their own conventions.
 
 *(v0.3)* Dialogue (4g) is presented in uGUI + Super Text Mesh through Dialogue System. Portraits are data-driven: character and NPC data reference a portrait, and the presenter reads it from there, never from a portrait hard-coded into a particular dialogue screen.
 
