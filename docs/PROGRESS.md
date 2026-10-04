@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-03 (4c step 6: font, text style, feedback and haptics)_
+_Last updated: 2026-10-04 (4c step 7: final QA, web build, docs; awaiting sign-off)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -527,7 +527,22 @@ The day: **Boot → Main Menu → New Game / Continue → Morning → Delve → 
 - **Every screen re-laid out for the taller line**, against measured Silver widths (about 6% wider than m5x7): buttons 16 px tall; Prep's cards 150×24 (two lines exactly) in a 316-px panel; Prep's menu count shortened to "menu: 3 of 3"; Night's summary is now a two-column ledger (the day on the left; banked tonight, purse and Renown with today's change on the right), with shorter labels ("served", "kept shut"); the HUD's stats and order rail repacked (still 8 rail rows, one per seat with every seating upgrade); station boxes 256 px wide with the chop board clear of its prompt; the dungeon's swap, death and result panels a little taller.
 - Tests follow (font identity, resource casing, renamed strings). EditMode 369/369, PlayMode 108/108 (plus 2 explicit capture tests).
 
-**Next: step 7,** the web smoke test of the full loop, and the docs (PROGRESS, ASSET_MAP, PORT_MANIFEST). After your playtest of step 6.
+**Step 6 approved (2026-10-04).** Kept: Silver as the only font and its layouts, the lower-case style with capitalised resource names, the colour/layout text hierarchy, and the feedback and haptics tuning.
+
+**Step 7: final QA, web build, docs (2026-10-04).** A verification step; no features added.
+- **Tests, from a clean compile:** EditMode **369/369**, PlayMode **110/110** (the 108 baseline plus two added in this step), plus the 2 explicit capture tests (2/2). New: `EssenceAndSeatingUpgrades_ReachTheNextDaysScenes` (the Essence and seating upgrades bought at Night reach the next day's dungeon and tavern; all 8 seats open, a rail row each) and `TheDelve_InTheDayLoop_HasNoLookTestKeys`. The nothing-to-cook test also checks Prep's first selection.
+- **The day loop is covered end to end by PlayMode tests from `Boot`:** New Game, Morning breakfast, delve, extraction, Evening, service, Results, Night with banking, a purchase and the autosave, Sleep with overnight freshness, Continue after a fresh boot (Gold, Renown, upgrades and the storeroom restored, nothing duplicated or lost), death with the Lockbox, closing with nothing to cook, selling out, and both upgrade kinds applying.
+- **Web build** (`BuildTools.BuildWebBatch`, Boot first) **builds and runs.** Checked in Chrome at 1280×720 (a whole 4× scale): Silver is the font (its copyright string is in the build data; no m5x7, no system fallback), crisp; no errors or warnings in the console at startup or in play (haptics no-op on the web). Played: menu, New Game, Morning, the delve HUD, Essence running out, the death screen, the delve result, Prep with an empty storeroom, closing for the night, Night, Sleep, Day 2, and Continue after reloading the page. Keyboard navigation works on every screen visited.
+- **Three defects found and fixed:**
+  1. **Web saves were lost on reload.** The web's `persistentDataPath` is an in-memory file system that reaches IndexedDB only when synced, and nothing synced it (IndexedDB was empty). `SaveStore` now calls `WebStorage.Flush` (a ten-line `Plugins/WebGL/HearthdelveStorage.jslib`) after each write and delete; a no-op elsewhere. `SaveSystem` and the save format are unchanged. Verified: Continue appears after a reload.
+  2. **The look-test overlay's debug keys were live in the day loop's delve** (the delve runs in `Dungeon_TestFloor`): F3 would load `LookTest_Tavern` outside GameFlow, and F2/F4 changed the game's resolution and scroll mode; its label showed, and its controls line ran off the screen. In the day loop the overlay now stands down (no keys, no label) and the controls line reads "move: WASD / stick   attack: click / X   dodge: Space / B" (315 px). Run on its own, the test floor keeps F2–F4.
+  3. **Prep with nothing to cook opened with a disabled card selected,** so A / Enter did nothing until a direction was pressed. It now starts on "close for the night" (otherwise the first dish that can be cooked).
+- **Not exercised in the browser** (scripted input can't steer through combat before Essence runs out): combat and harvesting, rope extraction, evening service and the stations, and a real gamepad. They share their code with the PlayMode tests above; a short manual web pass is on your list.
+- **Architecture checks:** Dungeon and Tavern reference only Core and Shared; GameFlow owns every phase change; the LookTest scenes are unchanged since 4b; `Dungeon_TestFloor` and `Tavern` still run on their own; no Pixel Crushers, Yarn or dialogue/quest/relationship code; `SaveSystem` unchanged.
+- **Silver's license verified** (CC BY 4.0, attribution to Poppy Works, with a budget condition): `docs/THIRD_PARTY.md`, `docs/CREDITS.md`.
+- Docs brought up to date: `PORT_MANIFEST.md` (what 4c ported or replaced), `ASSET_MAP.md` (font, buttons, icon gaps), the known issues below, and one stale `CLAUDE.md` line (overnight storeroom freshness loss exists since step 5).
+
+**4c status: all steps built; awaiting your sign-off.** Deferred, as planned: biome runs, room graph and the boss (4d); the Harvest Finisher, Kitchen Arts, more weapons (4e); recipe rework, customer requests, furniture placement, Pip's own look (4f); dialogue, quests, portraits, Love/Hate timing (4g); settings, the title screen and a decorative title font (4h).
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -547,7 +562,7 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 ### Known issues
 
 - **Character size:** at 320×180 a character is about 4% of screen height. This is the main thing to judge in the look test.
-- **Placeholder UI in the look scenes:** the 4a look scenes keep their plain Essence bar (the test floor has the real HUD). All text uses Unity's built-in font through Super Text Mesh (no pixel font exists).
+- **Placeholder UI in the look scenes:** the 4a look scenes keep their plain Essence bar and Unity's built-in font, as baselines (the game's scenes have the real HUD and Silver).
 - **Look-scene death:** at zero Essence the 4a look rooms still just restart after 2.5 s; the death screen, Lockbox and result screen are on the test floor.
 - **Enemy hits don't push the player back** (enemy knockback on the player was left out of 4b's simple stagger; the player's own knockback would need care not to fight input).
 - **Shroom Cap and Spore Sac drop from nothing** now (they were the Cellar Shroom's, which became the spider). They wait for the Mushroom People; until then Shroom Skewer, Cellar Kebab, Cellar Stew and Offal Pottage can't be cooked from a delve. The recipe rework is 4f.
@@ -562,11 +577,13 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
-- **m5x7's coverage limits the languages:** Basic Latin, Latin-1, Latin Extended-A and € (English and most European languages). No curly quotes, ellipsis characters or long dashes in strings; Greek, Cyrillic and CJK would need another font (a decision for when localization is planned; there is deliberately no fallback). `TextStyleTests` enforces it.
-- **All sound is placeholder** (`PH_` files, generated); the tavern's feedback pass added its moments' placeholders.
-- **The font's license terms aren't recorded yet** (credited to Daniel Linssen in `CREDITS.md`; confirm the terms from the page it came from).
-- **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "gold" in tight spots later; not imported in step 6.
-- **All sound is placeholder** (`PH_…`, generated). Rumble on real controllers is checked by you; web builds have no rumble.
+- **Silver doesn't cover Arabic or Hebrew** (it does cover Latin, Greek, Cyrillic, CJK and Thai). There is deliberately no fallback font; `TextStyleTests` checks every string against the font. A decision for when localization is planned.
+- **Silver's license has a budget condition:** CC BY 4.0 (attribution to Poppy Works), but productions over $100,000 USD in total spend or earnings are asked to contact Poppy Works to license it (`docs/THIRD_PARTY.md`). Owner decision before release; no effect on development.
+- **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "Gold" in tight spots later; not imported in step 6.
+- **The delve's controls line overlaps the satchel row** for its first few seconds, then fades (as designed in 4b; cosmetic).
+- **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
+- **Morning and Prep's storeroom row reads "storeroom the storeroom is empty."** when empty (the label and the message sit side by side; wording only).
+- **All sound is placeholder** (`PH_…`, generated), including the tavern feedback pass's moments. Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)
 

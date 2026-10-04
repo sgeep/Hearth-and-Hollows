@@ -5,7 +5,7 @@ The list of credits the shipped game must show, kept up to date as assets are ad
 ## Required by license
 
 - **Art:** Minifantasy by **Krishna Palacio**. Required credit. On completion, send Krishna Palacio a link to the game.
-- **Font:** Silver by **Poppy Works** (2019). Credit them; confirm the exact license terms from the page the font came from (not recorded yet).
+- **Font:** Silver by **Poppy Works** (Wolfgang Wozniak), with major contributions from Itou Hiro (PixelMplus), leedheo (DOSGothic) and ぶち. Licensed CC BY 4.0, which requires attribution to Poppy Works; suggested credit line: "Silver font by Poppy Works (poppyworks.itch.io/silver), CC BY 4.0". Poppy Works also asks to be told by email when a game uses the font (courtesy, not a license condition).
 
 ## Tools and middleware (courtesy credits)
 

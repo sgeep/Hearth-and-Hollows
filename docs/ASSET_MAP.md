@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-03 (4c step 3: dish icons)_
+_Last updated: 2026-10-04 (end of 4c)_
 
 ## How art gets into the project
 
@@ -225,6 +225,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 |---|---|---|
 | `UIOverhaul/Bubble.png` (UI Overhaul, `Character_Emotions/Bubble_Only.png`, 280×72) | `Bubble_Body` 31,7 10×10 (9-sliced, 3 px border); `Bubble_Tail` 33,17 4×3 | Speech bubble. The sheet holds the same bubble with its tail on each side, in two sizes. `_Emotions.png` holds faces only (no "!"); not imported. |
 | `UIOverhaul/ClassicUI.png` (UI Overhaul, `Classic_Minifantasy_UI/_Classic_UI.png`, 1872×848; built from 16 px pieces) | `ClassicUI_Panel` 64,48 48×48 (9-sliced, 8 px); `ClassicUI_Bar` 64,16 48×16 (9-sliced, 6 px); `ClassicUI_Slot` 561,30 14×17; `ClassicUI_SlotSelected` 593,30 14×17; `ClassicUI_BarTrough` 208,562 48×12; `ClassicUI_BarFillBlue` 596,709 40×6; `ClassicUI_BarFillRed` 340,709 40×6 | Parchment panel with a red inner border (the swap prompt), a pill bar (its button), and a 14×14 slot, plus the same slot with a ▼ marker tab above it for the selected one (selection that doesn't rely on colour). The Essence bar is the dark trough with the blue fill inside it (red when low); the sheet has troughs in four heights and fills in red, blue and yellow, each in four thicknesses. The sheet also has Grim and Stylized versions, scroll and book panels, bars and frames. |
+| (buttons) | — | Since 4c step 6, text buttons are a plain parchment face with a one-pixel dark edge (`DungeonUI.ButtonFace`, drawn from a white pixel), because the pill bar's art fought with the text. `ClassicUI_Bar` stays imported. |
 | `UserInterface/GuiEmoticons.png` (User Interface pack, `Miscellany/Emoticons/Minifantasy_GuiEmoticons.png`, 176×160, 16 px cells) | `GuiEmoticons_AlertRed` 22,116 5×10 | The red "!" shown over an enemy winding up an attack. Rows 7 and 8 (from 0) hold "!", "?" and "X" marks in six colours. The rest of the sheet is faces. Drawn with the **unlit** sprite material so it reads in the dark. |
 
 ## Icons
@@ -252,7 +253,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 ## Known gaps
 
 - **No rat with an attack** (the reason the Giant Rat was replaced).
-- **No pixel font.** Text uses Unity's built-in font through Super Text Mesh. It is sharp but not pixel art.
+- **No pixel font in Minifantasy.** Resolved in 4c with **Silver** by Poppy Works (not a Minifantasy asset; `Assets/_Project/Fonts/silver/`, license in `docs/THIRD_PARTY.md`). The 4a look scenes keep the built-in font as baselines.
 - **No audio of any kind.** Sounds are generated placeholders (`Assets/_Project/Audio/SFX/PH_*.wav`).
 - **No clothed carrying pose.** Carrying Animations (exclusive) has carry idle, walk and damage for six races, but only as unclothed base bodies with the load as a separate layer (wood, planks, ore, ingots; no plates). 4c draws the dish icon above the player's head instead (decision 2).
 - **No sitting pose** for customers: seated customers will use their idle pose at the chair.
@@ -260,6 +261,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **No clothing or hair layers for attack animations** (A Myriad of NPCs only layers idle, walk, damage and die).
 - **No mallet or frying-pan weapon.**
 - **No bat parts** on the Loot Icons sheet: the Bat Wing uses the vampire's cape icon.
+- **No Shroom Cap or Spore Sac icons** in use: they belong to the Mushroom People (deferred), so their slots show only count, quality and freshness.
 - **No rope-climb animation for a clothed body** (only the base bodies): extraction rises and fades.
 
 ## Portraits (planned for 4g; not yet inspected)

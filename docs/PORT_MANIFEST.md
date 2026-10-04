@@ -8,7 +8,7 @@ What happens to every file of the side-scroller prototype (tag `v0-sidescroller-
 
 The **Ported** column shows whether the file is already in this project. "Adapt" files marked as ported were copied unchanged so the tests could pass first; their changes happen in the sub-milestone named in the reason. Files are copied together with their `.meta` files so asset references survive.
 
-Totals for `Assets/_Project`: **93 Keep, 72 Adapt, 106 Drop** (271 files). The **Ported** column is current as of 4b (2026-10-03).
+Totals for `Assets/_Project`: **93 Keep, 72 Adapt, 106 Drop** (271 files). The **Ported** column is current as of the end of 4c (2026-10-04).
 
 Paths are relative to `Assets/_Project/`.
 
@@ -114,24 +114,24 @@ Paths are relative to `Assets/_Project/`.
 | `Minigames/GrillConfig.cs` | Keep | yes | Panel minigames don't depend on perspective |
 | `Minigames/GrillMinigame.cs` | Keep | yes | Panel minigames don't depend on perspective |
 | `Minigames/MinigameFactory.cs` | Keep | yes | Panel minigames don't depend on perspective |
-| `Minigames/ServingConfig.cs` | Adapt | yes | Ported as-is; tuning fields follow the 2D serving rules in 4c |
-| `Minigames/ServingMinigame.cs` | Adapt | yes | Ported as-is for now; 1D distance becomes 2D path length and real collisions in 4c |
+| `Minigames/ServingConfig.cs` | Adapt | yes | Kept; its tuning feeds the 2D serving rules (4c) |
+| `Minigames/ServingMinigame.cs` | Adapt | yes | Adapted in 4c: time and spill scored against par for the shortest walkable path |
 | `Minigames/TapConfig.cs` | Keep | yes | Panel minigames don't depend on perspective |
 | `Minigames/TapMinigame.cs` | Keep | yes | Panel minigames don't depend on perspective |
-| `Scene/CustomerAgent.cs` | Adapt | no | Floor walkers become TDE characters following A* paths to tables |
-| `Scene/StaffAgent.cs` | Adapt | no | Floor walkers become TDE characters following A* paths to tables |
-| `Scene/Station.cs` | Adapt | no | Same service orchestration in a top-down room |
-| `Scene/StewPotView.cs` | Adapt | no | Same service orchestration in a top-down room |
+| `Scene/CustomerAgent.cs` | Adapt | yes | Adapted in 4c: a TDE character following A* paths to tables |
+| `Scene/StaffAgent.cs` | Adapt | yes | Adapted in 4c: Pip as a TDE character on A* paths |
+| `Scene/Station.cs` | Adapt | no | Replaced in 4c by `TavernInteractable`, `TavernInteractor` and `InteractionRules` (stations in a top-down room) |
+| `Scene/StewPotView.cs` | Adapt | yes | Adapted in 4c for the top-down room |
 | `Scene/TavernContent.cs` | Keep | yes | Content list ScriptableObject unchanged |
-| `Scene/TavernDebugOverlay.cs` | Adapt | no | Rebuilt in 4c (same debug keys) |
-| `Scene/TavernDirector.cs` | Adapt | no | Same service orchestration in a top-down room |
-| `Scene/TavernLayout.cs` | Adapt | no | Seat, door and queue x-positions become 2D points on the pathfinding grid |
-| `Scene/TavernPlayer.cs` | Adapt | no | Station use, carrying and serving move onto the TDE character |
+| `Scene/TavernDebugOverlay.cs` | Adapt | no | Replaced in 4c by `TavernDebugKeys` (the debug keys, no overlay) |
+| `Scene/TavernDirector.cs` | Adapt | yes | Adapted in 4c: same service orchestration in a top-down room, phases driven by `GameFlow` |
+| `Scene/TavernLayout.cs` | Adapt | yes | Adapted in 4c: seats, door and queue are 2D points on the pathfinding grid |
+| `Scene/TavernPlayer.cs` | Adapt | no | Replaced in 4c: station use, carrying and serving live on the TDE character (`TavernInteractor`, `KeeperWork`, `CarryView`) |
 | `Service/ArrivalSchedule.cs` | Keep | yes | Service session, arrivals, stew pot and debug fill are unchanged |
 | `Service/DebugStockFiller.cs` | Keep | yes | Service session, arrivals, stew pot and debug fill are unchanged |
-| `Service/ServiceConfig.cs` | Adapt | yes | Ported as-is; walk speeds and reach become 2D values in 4c |
+| `Service/ServiceConfig.cs` | Adapt | yes | Kept unchanged in 4c: it holds no distances (walk speed is per `CustomerProfile` and drives TDE movement) |
 | `Service/ServiceSession.cs` | Keep | yes | Service session, arrivals, stew pot and debug fill are unchanged |
-| `Service/ServiceSettings.cs` | Adapt | yes | Ported as-is; walk speeds and reach become 2D values in 4c |
+| `Service/ServiceSettings.cs` | Adapt | yes | Kept unchanged in 4c: it holds no distances (walk speed is per `CustomerProfile` and drives TDE movement) |
 | `Service/StewConfig.cs` | Keep | yes | Service session, arrivals, stew pot and debug fill are unchanged |
 | `Service/StewPot.cs` | Keep | yes | Service session, arrivals, stew pot and debug fill are unchanged |
 | `Staff/StaffCook.cs` | Keep | yes | Staff auto-resolve logic is unchanged |
@@ -142,24 +142,24 @@ Paths are relative to `Assets/_Project/`.
 
 | File | Status | Ported | Reason |
 |---|---|---|---|
-| `Debug/GameFlowDebugOverlay.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Debug/GameFlowDebugOverlay.cs` | Drop | no | UI Toolkit screen; not rebuilt (developer-tooling gap, PROGRESS.md known issues) |
 | `Hearthdelve.UI.asmdef` | Adapt | yes | References Super Text Mesh and uGUI |
 | `Hud/DungeonHud.cs` | Drop | no | Rebuilt in 4b: `UI/Hud` (`EssenceBar`, `SatchelHud`, `HarvestFeed`) |
 | `Localization/Loc.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Localization/LoopLocKeys.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Localization/TavernLocKeys.cs` | Keep | yes | Localization lookup and key tables are UI-framework-neutral |
 | `Screens/DeathScreen.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/DeathScreen.cs` (with the Lockbox choice) and `DelveResultScreen.cs` |
-| `Screens/MainMenuScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Screens/MainMenuScreen.cs` | Drop | no | Rebuilt in 4c: `UI/Screens/MainMenuScreen.cs` (uGUI + STM), with `TransitionScreen` |
 | `Screens/SlotPickerScreen.cs` | Drop | no | Rebuilt in 4b as the death screen's Lockbox slot choice |
 | `Screens/SlotView.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/SatchelSlotView.cs` (icon, count, quality dots, freshness) |
 | `Screens/SwapPrompt.cs` | Drop | no | Rebuilt in 4b: `UI/Screens/SwapPromptScreen.cs` |
-| `Tavern/StationMinigamePanel.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernHud.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernMorningScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernNightScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernPrepScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernResultsScreen.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
-| `Tavern/TavernUI.cs` | Drop | no | UI Toolkit screen; rebuilt in uGUI + Super Text Mesh in 4b/4c, using this as the spec |
+| `Tavern/StationMinigamePanel.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/StationPanel.cs` |
+| `Tavern/TavernHud.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/TavernHud.cs` |
+| `Tavern/TavernMorningScreen.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/MorningScreen.cs` |
+| `Tavern/TavernNightScreen.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/NightScreen.cs` |
+| `Tavern/TavernPrepScreen.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/PrepScreen.cs` |
+| `Tavern/TavernResultsScreen.cs` | Drop | no | Rebuilt in 4c: `UI/Tavern/EveningResultsScreen.cs` |
+| `Tavern/TavernUI.cs` | Drop | no | Replaced in 4c by the generated tavern canvas (`TavernScreens`) and `TavernHintView` |
 
 ## Editor tools
 
@@ -203,7 +203,7 @@ Paths are relative to `Assets/_Project/`.
 | `SatchelAndDeathTests.cs` | Keep | yes | Covers kept pure logic |
 | `ScriptFileNameTests.cs` | Keep | yes | Covers kept pure logic |
 | `StoreroomAndRecipeTests.cs` | Keep | yes | Covers kept pure logic |
-| `TavernMinigameTests.cs` | Adapt | yes | Ported as-is; serving tests are rewritten for 2D in 4c |
+| `TavernMinigameTests.cs` | Adapt | yes | Serving tests rewritten for 2D in 4c |
 | `TavernServiceTests.cs` | Keep | yes | Covers kept pure logic |
 
 ## Tests: PlayMode
@@ -250,7 +250,7 @@ Paths are relative to `Assets/_Project/`.
 | `Staff/Staff_Pip.asset` | Keep | yes | Tuning and content lists carry over |
 | `Tavern/GrillConfig.asset` | Keep | yes | Tuning and content lists carry over |
 | `Tavern/ServiceConfig.asset` | Keep | yes | Tuning and content lists carry over |
-| `Tavern/ServingConfig.asset` | Adapt | yes | Ported as-is; tuning re-done for 2D serving in 4c |
+| `Tavern/ServingConfig.asset` | Adapt | yes | Retuned for 2D serving in 4c |
 | `Tavern/StewConfig.asset` | Keep | yes | Tuning and content lists carry over |
 | `Tavern/TapConfig.asset` | Keep | yes | Tuning and content lists carry over |
 | `Tavern/TavernContent.asset` | Keep | yes | Tuning and content lists carry over |
@@ -308,16 +308,16 @@ Paths are relative to `Assets/_Project/`.
 | `Enemies/TrainingDummy.prefab` | Drop | no | Side-view prefab; rebuilt on TDE |
 | `Pickups/IngredientPickup.prefab` | Drop | no | Side-view prefab; rebuilt on TDE |
 | `Player/Player.prefab` | Drop | no | Side-view prefab; rebuilt on TDE |
-| `Tavern/CustomerAgent.prefab` | Drop | no | Side-view prefab; rebuilt on TDE |
+| `Tavern/CustomerAgent.prefab` | Drop | no | Side-view prefab; rebuilt on TDE in 4c (`Prefabs/Tavern/Customer`, `Pip`, `Cook`; `Prefabs/Player/PlayerTavern`) |
 
 ## Scenes
 
 | File | Status | Ported | Reason |
 |---|---|---|---|
-| `Boot.unity` | Drop | no | Side-view scene; new top-down scenes replace it |
+| `Boot.unity` | Drop | no | Replaced in 4c by a new `Boot` (GameFlow, the entry point) |
 | `CombatGreybox.unity` | Drop | no | Side-view scene; new top-down scenes replace it |
-| `MainMenu.unity` | Drop | no | Side-view scene; new top-down scenes replace it |
-| `TavernGreybox.unity` | Drop | no | Side-view scene; new top-down scenes replace it |
+| `MainMenu.unity` | Drop | no | Replaced in 4c by a new `MainMenu` |
+| `TavernGreybox.unity` | Drop | no | Replaced in 4c by the top-down `Tavern` scene |
 
 ## Placeholder art
 
@@ -379,3 +379,4 @@ Paths are relative to `Assets/_Project/`.
 - Retired with the code they covered: 24 platformer-motor tests and 4 hit-stop tests.
 - **209 project EditMode tests are ported and pass** in batch mode on Unity 6000.6.4f1.
 - The 21 PlayMode tests are not ported; new ones are written against the top-down scenes as each sub-milestone builds them.
+- **At the end of 4c:** 369 EditMode tests (including the ported ones) and 110 PlayMode tests, plus 2 explicit capture tests run on demand.

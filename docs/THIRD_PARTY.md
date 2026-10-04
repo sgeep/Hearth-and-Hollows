@@ -20,6 +20,7 @@ Rules for working with these are in `CLAUDE.md` ("Third-party code"). The repo s
 | Nice Vibrations (Lofelt) | 4.1.2, Lofelt Studio SDK 1.3.4 | `Assets/Feel/NiceVibrations` | Unity Asset Store EULA (obtained as part of Feel), plus `3RD-PARTY-LICENSES.md` in its folder | Gamepad rumble |
 | Feel (More Mountains) | 6.1 | not imported | Unity Asset Store EULA | **Licensed, but only its `NiceVibrations` folder is imported.** Never import Feel's `MMFeedbacks`, `MMTools` or demo folders. |
 | Super Text Mesh (Kai Clavier) | version not stated in the package | `Assets/Clavian/SuperTextMesh` | Unity Asset Store EULA, plus `3rdPartyComponentLicense.txt` | All player-facing text (uGUI and world space), Ultra shader under URP |
+| Silver font (Poppy Works) | font version field "Version 1.0", copyright "2019 Poppy Works" (the release date of our copy isn't recorded) | `Assets/_Project/Fonts/silver/Silver.ttf` | CC BY 4.0, with a budget condition (see license notes) | All player-facing text (the only game font) |
 | Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, Crafting And Professions II 1.0, Dwarven Kingdom 1.0, and the Tavern Indoor, Loot Icons, Giant Spider and Hole Entrances And Ropes exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
 
 ### Licensed or planned, not imported
@@ -37,6 +38,7 @@ Listed so nobody mistakes them for missing installs. Versions and license notes 
 
 - **TopDown Engine:** code and visual assets may be used in our game; nothing may be redistributed. Its music is demo-only and must not be reused. The license does not grant reuse of its sound effects either, so we don't ship any TDE audio.
 - **Minifantasy:** assets may be used and edited in a commercial game. They must not be redistributed or resold as assets. We must **credit Krishna Palacio** in the game's credits and **send him a link to the project on completion**.
+- **Silver (font):** verified 2026-10-04 from the official page, https://poppyworks.itch.io/silver (the font's own name table gives only the copyright, the designers and http://poppy.works/; no license file came with it). Terms: Creative Commons **Attribution 4.0 International (CC BY 4.0)**, so commercial use and adaptation are allowed with attribution to Poppy Works (credit line in `docs/CREDITS.md`). The page adds: *if the production's budget exceeds $100,000 USD in total spend or earnings, contact hello@poppy.works to license the font.* That threshold is an open item for the project owner before release (PROGRESS.md, open questions); it doesn't affect development.
 - **Super Text Mesh:** two sample fonts (Itim, Walibi) carry their own licenses; we removed the samples and don't use those fonts.
 
 ## Our additions inside vendor folders
