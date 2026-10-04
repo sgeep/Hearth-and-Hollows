@@ -251,12 +251,16 @@ namespace Hearthdelve.Tests.PlayMode
         /// <summary>Goes on through fights, preferring one whose reward is the given kind, until standing in such a room.</summary>
         IEnumerator WalkToReward(RewardKind kind)
         {
-            for (int guard = 0; guard < 12 && !(Node.Kind == RoomKind.Combat && Node.Reward.Kind == kind); guard++)
+            for (int guard = 0; guard < 20 && !(Node.Kind == RoomKind.Combat && Node.Reward.Kind == kind); guard++)
             {
                 if (Runner.Encounter.IsSealed) yield return ClearRoom();
-                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat && n.Reward.Kind == kind) ?? ExitTo(n => n.Kind == RoomKind.Combat));
+                RoomExit fight = ExitTo(n => n.Kind == RoomKind.Combat && n.Reward.Kind == kind) ?? ExitTo(n => n.Kind == RoomKind.Combat);
+                if (fight != null) yield return TakeExit(fight);
+                // The end of the floor without one: down the hole to the next.
+                else if (Node.Kind == RoomKind.Descent) yield return Descend();
+                else yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Descent));
             }
-            Assert.That(Node.Reward.Kind, Is.EqualTo(kind), $"a {kind} room on the first floor");
+            Assert.That(Node.Reward.Kind, Is.EqualTo(kind), $"a {kind} room on the way down");
         }
 
         [UnityTest]
@@ -274,7 +278,7 @@ namespace Hearthdelve.Tests.PlayMode
                         RoomKind.Extraction => "ArrowUp",
                         RoomKind.Descent => "ArrowDown",
                         RoomKind.Arena => "Swords",
-                        _ => target.Reward.Kind == RewardKind.Gold ? "GoldCoin" : "Food",
+                        _ => target.Reward.Kind switch { RewardKind.Gold => "GoldCoin", RewardKind.Power => "Lightning", _ => "Food" },
                     };
                     Assert.That(exit.Marker, Is.Not.Null, $"{Node.RoomId} exit {exit.Index}");
                     Assert.That(exit.Marker.name, Does.Contain(expected), $"{Node.RoomId} exit {exit.Index} leads to {target.Kind} {target.Reward}");
@@ -314,6 +318,96 @@ namespace Hearthdelve.Tests.PlayMode
             IngredientPickup[] drops = Object.FindObjectsByType<IngredientPickup>();
             Assert.That(drops.Any(p => p.Stack.Item.Definition.id == reward.ItemId && p.Stack.Item.Quality == reward.Quality && p.Stack.Count == reward.Amount),
                 $"the reward {reward} on the floor");
+        }
+
+        /// <summary>Clears a power room and steps onto its spark.</summary>
+        IEnumerator TouchASpark()
+        {
+            yield return WalkToReward(RewardKind.Power);
+            yield return ClearRoom();
+            var spark = Room.GetComponentInChildren<Hearthdelve.Dungeon.Powers.PowerPickup>();
+            Assert.That(spark, Is.Not.Null, "a spark appears when the room is clear");
+            Teleport(Player, spark.transform.position);
+        }
+
+        [UnityTest]
+        public IEnumerator APowerRoom_OffersThreePowers_AndTheChoiceLastsTheRun()
+        {
+            yield return LoadRun();
+            var screen = Object.FindAnyObjectByType<RunPowerScreen>(FindObjectsInactive.Include);
+            var hud = Object.FindAnyObjectByType<Hearthdelve.UI.Hud.RunPowersHud>();
+            var essence = Player.GetComponent<EssenceHealth>();
+            yield return TouchASpark();
+            yield return WaitUntil(() => screen.IsOpen, 3f, "the choice of powers");
+            Assert.That(Hearthdelve.Shared.Engine.MenuPause.IsPaused, "the run waits");
+            Assert.That(screen.Options, Has.Count.EqualTo(3));
+            Assert.That(screen.Options.Select(p => p.id).Distinct().Count(), Is.EqualTo(3));
+            foreach (RunPowerScreen.Card card in screen.Cards)
+                Assert.That(card.icon.sprite, Is.Not.Null, "every card has its icon");
+
+            // Take Deep Reserves if it's offered (its effect is easy to see), otherwise the first.
+            int pick = Mathf.Max(0, screen.Options.ToList().FindIndex(p => p.effect == RunPowerEffect.MaxEssence));
+            RunPowerDefinition chosen = screen.Options[pick];
+            float max = essence.Essence.Max;
+            screen.Choose(pick);
+            yield return null;
+            Assert.That(Hearthdelve.Shared.Engine.MenuPause.IsPaused, Is.False, "the run goes on");
+            Assert.That(DelveRunController.Active.Powers.Has(chosen));
+            Assert.That(hud.Shown, Is.EqualTo(1), "its icon on the HUD");
+            Assert.That(Room.GetComponentInChildren<Hearthdelve.Dungeon.Powers.PowerPickup>() == null, "the spark is used up");
+            if (chosen.effect == RunPowerEffect.MaxEssence) Assert.That(essence.Essence.Max, Is.EqualTo(max + chosen.amount).Within(1e-3f));
+        }
+
+        [UnityTest]
+        public IEnumerator BackingOut_LeavesTheSpark_ToComeBackTo()
+        {
+            yield return LoadRun();
+            var screen = Object.FindAnyObjectByType<RunPowerScreen>(FindObjectsInactive.Include);
+            yield return TouchASpark();
+            yield return WaitUntil(() => screen.IsOpen, 3f, "the choice of powers");
+            string[] first = screen.Options.Select(p => p.id).ToArray();
+            screen.Choose(-1);
+            yield return null;
+            var spark = Room.GetComponentInChildren<Hearthdelve.Dungeon.Powers.PowerPickup>();
+            Assert.That(spark, Is.Not.Null, "still there");
+            Assert.That(DelveRunController.Active.Powers.Taken, Is.Empty);
+            Assert.That(screen.IsOpen, Is.False, "standing on it doesn't reopen the choice");
+            Teleport(Player, Room.Arrival.position);
+            yield return new WaitForSeconds(0.2f);
+            Teleport(Player, spark.transform.position);
+            yield return WaitUntil(() => screen.IsOpen, 3f, "the choice again");
+            Assert.That(screen.Options.Select(p => p.id), Is.EqualTo(first), "the same three");
+            screen.Choose(0);
+        }
+
+        [UnityTest]
+        public IEnumerator Powers_ChangeTheirTuning()
+        {
+            yield return LoadRun();
+            RunSettings settings = Runner.Settings;
+            RunPowerDefinition Find(RunPowerEffect effect) => settings.tuning.powers.First(p => p.effect == effect);
+            var essence = Player.GetComponent<EssenceHealth>();
+            var dash = Player.GetComponent<CharacterDash2D>();
+            float cooldown = dash.Cooldown.RefillDuration;
+            DelveRunController run = DelveRunController.Active;
+
+            Assert.That(run.TakePower(Find(RunPowerEffect.FasterDodge)));
+            Assert.That(dash.Cooldown.RefillDuration, Is.EqualTo(cooldown * (1f - Find(RunPowerEffect.FasterDodge).amount)).Within(1e-4f), "a quicker roll");
+
+            Assert.That(run.TakePower(Find(RunPowerEffect.LighterHits)));
+            essence.GodMode = false;
+            float before = essence.Essence.Current;
+            essence.Essence.TakeDamage(10f);
+            Assert.That(before - essence.Essence.Current, Is.EqualTo(10f * (1f - Find(RunPowerEffect.LighterHits).amount)).Within(1e-3f), "hits cost less");
+
+            // Second wind: Essence back as the next room is cleared.
+            Assert.That(run.TakePower(Find(RunPowerEffect.EssenceOnClear)));
+            essence.Essence.TakeDamage(30f);
+            essence.GodMode = true;
+            if (!Runner.Encounter.IsSealed) yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat));
+            float low = essence.Essence.Current;
+            yield return ClearRoom();
+            Assert.That(essence.Essence.Current, Is.GreaterThan(low + Find(RunPowerEffect.EssenceOnClear).amount - 1f), "Essence back on the clear");
         }
 
         [UnityTest]

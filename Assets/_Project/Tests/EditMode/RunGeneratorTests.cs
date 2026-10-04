@@ -192,6 +192,7 @@ namespace Hearthdelve.Tests
                     }
                     RoomReward reward = node.Reward;
                     if (reward.Kind == RewardKind.Gold) Assert.That(reward.Amount, Is.InRange(t.minGold, t.maxGold), at);
+                    else if (reward.Kind == RewardKind.Power) Assert.That(reward.Amount, Is.EqualTo(1), at);
                     else
                     {
                         Assert.That(reward.Kind, Is.EqualTo(RewardKind.Ingredient), at);
@@ -233,13 +234,40 @@ namespace Hearthdelve.Tests
                             gold[f].Add(node.Reward.Amount);
                             golds++;
                         }
-                        else ingredients++;
+                        else if (node.Reward.Kind == RewardKind.Ingredient) ingredients++;
                     }
             }
             Assert.That(gold[1].Average(), Is.GreaterThan(gold[0].Average()));
             Assert.That(gold[2].Average(), Is.GreaterThan(gold[1].Average()));
             Assert.That(ingredients, Is.GreaterThan(golds / 3), "ingredient rooms are common");
             Assert.That(golds, Is.GreaterThan(ingredients / 3), "Gold rooms are common");
+        }
+
+        [Test]
+        public void PowerRooms_TurnUp_ButNotTooOften()
+        {
+            Assert.That(Settings.tuning.powers, Has.Length.EqualTo(8), "the eight run powers");
+            int fights = 0, powers = 0, runsWithNone = 0;
+            foreach (int seed in k_Seeds)
+            {
+                List<FloorNode> combat = Generate(seed).Floors.SelectMany(f => f.Nodes).Where(n => n.Kind == RoomKind.Combat).ToList();
+                fights += combat.Count;
+                int here = combat.Count(n => n.Reward.Kind == RewardKind.Power);
+                powers += here;
+                if (here == 0) runsWithNone++;
+            }
+            float share = powers / (float)fights;
+            Assert.That(share, Is.InRange(0.12f, 0.35f), "about one fight in five");
+            Assert.That(runsWithNone, Is.LessThan(30), "nearly every run offers a power somewhere");
+        }
+
+        [Test]
+        public void WithoutPowers_ThereAreNoPowerRooms()
+        {
+            RunTuning tuning = UnityEngine.JsonUtility.FromJson<RunTuning>(UnityEngine.JsonUtility.ToJson(Settings.tuning));
+            tuning.powers = System.Array.Empty<Hearthdelve.Shared.Run.RunPowerDefinition>();
+            foreach (int seed in k_Seeds.Take(100))
+                Assert.That(RunGenerator.Generate(seed, tuning, Settings.Catalog()).Floors.SelectMany(f => f.Nodes).Any(n => n.Reward.Kind == RewardKind.Power), Is.False);
         }
 
         [Test]

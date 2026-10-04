@@ -43,7 +43,10 @@ namespace Hearthdelve.Tests.PlayMode
 
         IEnumerator Go(System.Func<FloorNode, bool> wanted)
         {
-            RoomExit exit = Runner.Current.Exits.Where(e => e.Index < Node.Next.Count).FirstOrDefault(e => wanted(Runner.Floor.Node(Node.Next[e.Index])))
+            RoomExit Match(System.Func<FloorNode, bool> test) =>
+                Runner.Current.Exits.Where(e => e.Index < Node.Next.Count).FirstOrDefault(e => test(Runner.Floor.Node(Node.Next[e.Index])));
+            // Power rooms first, to see their choice.
+            RoomExit exit = Match(n => n.Kind == RoomKind.Combat && n.Reward.Kind == RewardKind.Power) ?? Match(wanted)
                             ?? Runner.Current.Exits.First(e => e.Index < Node.Next.Count);
             int entered = Runner.RoomsEntered;
             Teleport(Player, (Vector2)exit.transform.position + new Vector2(0f, 0.3f));
@@ -71,6 +74,20 @@ namespace Hearthdelve.Tests.PlayMode
                     {
                         Shot($"{Node.RoomId}_sealed");
                         yield return Clear();
+                        var spark = Runner.Current.GetComponentInChildren<Hearthdelve.Dungeon.Powers.PowerPickup>();
+                        if (spark != null)
+                        {
+                            var screen = Object.FindAnyObjectByType<Hearthdelve.UI.Screens.RunPowerScreen>(FindObjectsInactive.Include);
+                            Teleport(Player, (Vector2)spark.transform.position + new Vector2(0f, -2f));
+                            yield return Settle();
+                            Shot($"{Node.RoomId}_spark");
+                            Teleport(Player, spark.transform.position);
+                            yield return WaitUntil(() => screen.IsOpen, 3f, "the choice of powers");
+                            yield return Settle();
+                            Shot($"{Node.RoomId}_power_choice");
+                            screen.Choose(0);
+                            yield return Settle();
+                        }
                         // Near the exits, to see the gates and their signs.
                         Teleport(Player, (Vector2)Runner.Current.Exits[0].transform.position + new Vector2(0f, -3f));
                         yield return Settle();
