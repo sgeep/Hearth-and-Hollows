@@ -203,6 +203,8 @@ namespace Hearthdelve.Editor
             // The way out: a rope hanging from a hole in the ceiling, with its coil's shadow (Hole Entrances And Ropes).
             sheets.Add(new Sheet { Source = $"{k_Ropes}/Ropes.png", Pack = Dungeon, File = "Ropes", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Hanging", 12, 8, 9, 27) } });
             sheets.Add(new Sheet { Source = $"{k_Ropes}/RopesShadows.png", Pack = Dungeon, File = "RopesShadows", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Hanging", 11, 30, 7, 5) } });
+            // The way down to the next floor (4d): the hole with a wooden ladder frame, pivoted at its centre.
+            sheets.Add(new Sheet { Source = $"{k_Ropes}/HoleEntrances.png", Pack = Dungeon, File = "Holes", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Ladder", 177, 14, 15, 11, new Vector2(0.5f, 0.5f)) } });
 
             // Tavern NPC.
             sheets.Add(Character($"{k_Cooker}/Minifantasy_NPCsCookerIdle.png", MyriadOfNPCs, "CookerIdle"));
@@ -346,7 +348,14 @@ namespace Hearthdelve.Editor
             sheets.Add(new Sheet
             {
                 Source = $"{k_UiIcons}/Icons_Only.png", Pack = UIOverhaul, File = "Icons", Mode = SliceMode.Rects,
-                Rects = new[] { new SheetRect("MagicSpark", 488, 40, 8, 8, k_Centre) },
+                Rects = new[]
+                {
+                    new SheetRect("MagicSpark", 488, 40, 8, 8, k_Centre),
+                    // 4d step 2's temporary route markers over room exits: out (up), deeper (down), the arena (crossed swords).
+                    new SheetRect("ArrowUp", 32, 64, 8, 8, k_Centre),
+                    new SheetRect("ArrowDown", 64, 64, 8, 8, k_Centre),
+                    new SheetRect("Swords", 392, 40, 8, 8, k_Centre),
+                },
             });
 
             // UI and icons.

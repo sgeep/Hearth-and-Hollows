@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1c50ed356fefa749b6d1f14be9c4681, type: 3}
+  m_Name: RunSettings
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Rooms.RunSettings
+  tuning:
+    floors:
+    - minFights: 3
+      maxFights: 4
+      maxWidth: 2
+      branchChance: 0.6
+      crossChance: 0.35
+      earlyExtractionChance: 0.3
+      minEnemies: 2
+      maxEnemies: 3
+      slimeWeight: 1
+      batWeight: 0.25
+      spiderWeight: 0.1
+    - minFights: 3
+      maxFights: 4
+      maxWidth: 2
+      branchChance: 0.6
+      crossChance: 0.35
+      earlyExtractionChance: 0.3
+      minEnemies: 3
+      maxEnemies: 4
+      slimeWeight: 1
+      batWeight: 0.4
+      spiderWeight: 0.35
+    - minFights: 3
+      maxFights: 4
+      maxWidth: 2
+      branchChance: 0.6
+      crossChance: 0.35
+      earlyExtractionChance: 0.3
+      minEnemies: 4
+      maxEnemies: 5
+      slimeWeight: 0.8
+      batWeight: 0.5
+      spiderWeight: 0.6
+    arenaPlaceholder:
+      slimes: 4
+      bats: 2
+      spiders: 2
+  rooms:
+  - {fileID: 11400000, guid: 645b66fa9145d694d9da33450c3433ed, type: 2}
+  - {fileID: 11400000, guid: d2e1fd55c1813264cbd4c0f3405df7b5, type: 2}
+  - {fileID: 11400000, guid: 0f92224bfb7a2244ab35a4b2fa3306c1, type: 2}
+  - {fileID: 11400000, guid: ab0b2751cad186c449d992226b0788e9, type: 2}
+  - {fileID: 11400000, guid: 68d81e63d2715364da8549dd46ce363e, type: 2}
+  - {fileID: 11400000, guid: e5061075314ebfd46812caa3f9ac49d4, type: 2}
+  - {fileID: 11400000, guid: e863d1457018479459e116a0c4f87a8a, type: 2}
+  - {fileID: 11400000, guid: 509f2755032833747b2b3c13fdce54fc, type: 2}
+  - {fileID: 11400000, guid: 35658343deb451141ad791ded772ce02, type: 2}
+  - {fileID: 11400000, guid: e100cf17513cbee4c94c3f36726ec21f, type: 2}
+  - {fileID: 11400000, guid: e7760e09ebae07d41924235e7ec597b0, type: 2}
+  - {fileID: 11400000, guid: 91210f7b41a511742a2dc51e6ffc6770, type: 2}
+  - {fileID: 11400000, guid: 7a7b083d69a179c4aa2e74caac21375a, type: 2}
+  - {fileID: 11400000, guid: 436fd9d2acbc2a74395bb1604ace28cf, type: 2}
+  - {fileID: 11400000, guid: 53227f762d63de04db3bb745da4270a2, type: 2}
+  - {fileID: 11400000, guid: c6e394c3951e38242b60be8450139376, type: 2}
+  slime: {fileID: 5135240155563862973, guid: 040b79a3e7c39a641998300c6ee8b899, type: 3}
+  bat: {fileID: 9040731678127089465, guid: e60df2ef6faa82b43b5ac621cb0430a8, type: 3}
+  spider: {fileID: 7032119628774444274, guid: 682140b0d6791ff439cad7ec6a05f9a4, type: 3}
