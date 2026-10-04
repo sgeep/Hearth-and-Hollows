@@ -168,7 +168,12 @@ namespace Hearthdelve.UI.Tavern
             if (m_NothingBanner != null) m_NothingBanner.SetActive(nothing);
 
             if (!wasShown && EventSystem.current != null)
-                EventSystem.current.SetSelectedGameObject(m_Cards.Length > 0 ? m_Cards[0].button.gameObject : m_Open.gameObject);
+            {
+                // Never start on a disabled control (A / Enter would do nothing): with nothing to cook, closing for
+                // the night is the choice; otherwise the first dish that can be cooked.
+                Button first = nothing ? m_Close : m_Cards.Select(c => c.button).FirstOrDefault(b => b.interactable && b.gameObject.activeInHierarchy) ?? m_Open;
+                EventSystem.current.SetSelectedGameObject(first.gameObject);
+            }
         }
 
         /// <summary>"12 to serve", "2 pots", "0 to serve": the count even when it's none (the card dims as well).</summary>
