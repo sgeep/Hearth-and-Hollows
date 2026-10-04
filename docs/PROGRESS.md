@@ -1,6 +1,6 @@
 # Hearthdelve — Progress
 
-_Last updated: 2026-10-04 (4d step 4: run powers)_
+_Last updated: 2026-10-04 (4d step 5: the generated run in the day loop, the new day order, Essence tuning, web; 4d awaiting your sign-off)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -28,7 +28,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 | **4a** | Integration and look test (**complete**, 2026-10-02) | Project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline. One dungeon room and one tavern corner with real art at 320×180: TDE player with Essence, dodge and a melee combo; one enemy; one harvest drop; one combined hit feedback (visual + sound + haptic); one STM speech bubble; Y-sorting. `docs/ASSET_MAP.md`. |
 | 4b | Dungeon migration (**complete**, 2026-10-03) | Phase 1 and 3 dungeon gameplay rebuilt on TDE (combat, harvest, Essence, death and Lockbox, extraction), with the dungeon haptics. Dungeon-only: ends on a result screen with restart. |
 | 4c | Tavern and UI migration (**complete**, 2026-10-04) | Top-down tavern, customers pathing to tables, 2D serving, Grill/Tap/Serving with their haptics, all UI rebuilt in uGUI + STM. **Acceptance criterion: the complete top-down day loop is restored through `GameFlow` (Tavern → Dungeon → Tavern, Morning to Night, saves).** |
-| 4d | Biome 1 runs (**in progress**: steps 1–3 approved; step 4, run powers, awaiting playtest) | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. The reward architecture must leave room for future persistent reward kinds (customization discoveries, GDD §6.6; quest objects, GDD §4.8) without building any, and ingredient rewards must not assume monster parts are the only ingredients (GDD §5.5). Scope otherwise unchanged by v0.5; no farming, fishing or ranching. *Proposed:* step 5 integrates the run into `GameFlow` in the new day order (evening → delve → sleep, the Morning panel standing in for daytime). |
+| 4d | Biome 1 runs (**done, awaiting your full-loop playtest and sign-off**: steps 1–4 approved; step 5 put the run in the day loop in the new order) | Room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. The reward architecture must leave room for future persistent reward kinds (customization discoveries, GDD §6.6; quest objects, GDD §4.8) without building any, and ingredient rewards must not assume monster parts are the only ingredients (GDD §5.5). Scope otherwise unchanged by v0.5; no farming, fishing or ranching. Step 5 adopted the new day order (daytime placeholder → evening → the night's delve → night → sleep). |
 | 4e | Combat depth and boss | Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. Boss rewards are designed so a unique boss furnishing can plug in later. |
 | 4f | Tavern Stage 1 content | *Proposed additions (v0.5):* the customization foundation handles several areas from the start, proven with one small guest room as a second decoratable area (no guests yet); the recipe rework follows the surface and dungeon ingredient model with a few bought surface staples. Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gundra, and **a real customization foundation** (revised 2026-10-04): Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated Minifantasy catalog (visibly different taverns, not a token handful), one proven recolouring workflow, controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, growing through Phase 5. Then **one small end-to-end reward loop in Biome 1** (added 2026-10-04): fight → a furnishing discovery drops → pick it up → extract → permanently owned → placed through Decorate Mode; a small real drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under the rule approved when it is designed. An integration slice, not the production loot catalog. Customization may take more of 4f's budget than first planned (a learning priority). |
 | 4g | Story, quests and character creation | *Proposed additions (v0.5):* the representative NPC quest is a villager's errand into the dungeon that returns a quest object; the dialogue adapters are designed for villagers, Visitors and generated residents; Act I written for the village. Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is decided when 4g is planned (in 4g or later, depending on whether it has been bought and suits the slice). (Locked 2026-10-03; Dialogue System replaces Yarn Spinner entirely.) |
@@ -620,7 +620,47 @@ The experience: clear a room, see the rewards behind the exits, choose what you 
 - **Not changed:** `GameFlow` and the day loop (step 5).
 - Tests: `RunPowersTests` (each effect, once a run, stacking and the floor, offers of three distinct untaken powers that follow the seed and cover the pool, the pool running out, the shown amounts, the meter's raised max and multipliers); generator (power rooms about one fight in five, nearly every run has one, none without powers); in PlayMode, the lightning sign, the choice of three with icons, taking one (paused, then resumed, held, on the HUD, the spark gone, deep reserves raising max Essence), backing out and coming back to the same three, and light feet, thick hide and second wind changing their tuning in play. The run capture now photographs each spark and choice.
 
-**Step 5 note (for its plan).** Integrating the run into the day loop is the natural point to adopt the new order (evening service → delve → sleep, with the Morning panel standing in for the daytime). Moving the delve after service means deciding where the Night upgrade screen's functions and the breakfast buff go, and that dungeon parts now wait a day in the storeroom before they're cooked (freshness tuning). Proposed, to be decided when step 5 is planned.
+**Step 4 approved (2026-10-04).** The run powers, reward choices, room flow and three-floor run felt good; the step 3/4 systems and tuning structure are kept.
+
+**Step 5: the generated run in the day loop, in the new day order (2026-10-04).** The experience: the tavern is closed, now I'm heading below; and in the dungeon, "I could push another room, but I'm risking what I've already found."
+- **The day order (GDD §3.1, v0.5):** Boot → main menu → **daytime** → **evening** (Prep → service → Results → close up) → **the night's delve** (the generated Cellars run) → delve result → **night** (summary, upgrades) → **sleep** → the next daytime. `DayPhase` is now Daytime, Evening, Delve, Night; `DayCycle` enforces the order (no delve before the evening). Saves name phases; a pre-v0.5 save's "Morning" loads as Daytime (`DayCycle.Parse`).
+- **The daytime placeholder:** the old morning panel, evolved (`MorningScreen`, "daytime · day N"): the storeroom, tonight's delve meal, what tonight's delve starts with (upgrades and the meal), and **open for the evening**. No village systems. The free-roaming day replaces it later by calling `GameFlow.StartEvening()` when its day ends; nothing else in the flow changes.
+- **The delve meal** (was breakfast): the same mechanics (one Grill or Tap dish a day, cooked at its station, quality scales the buff), cooked in the daytime and kept until tonight's delve, used up when the delve ends. Player-facing text says "delve meal" and "tonight's delve"; code identifiers were renamed to match.
+- **Tavern → dungeon:** Results' button reads **close up and head below** (Prep's reads **stay shut tonight**); either banks the evening, saves, and fades to "closing time · the Cellars" and the generated run. No sleep before the dungeon.
+- **The generated run replaces the test floor in the loop** (`GameScenes.Dungeon` = `Dungeon`). `Dungeon_TestFloor` stays a standalone combat bed; the LookTest scenes are untouched; Boot stays the entry point. Coming home goes to the tavern at Night.
+- **What the delve receives:** max Essence and satchel upgrades and the delve meal, through the existing `DelveLoadout` (checked in play and on the web: a bought +20 Essence starts the next delve at 120/120). **Run powers** live on the delve's `DelveRunController`: they start empty every delve, end with it (death, extraction, completion or quitting), and are never saved.
+- **Rewards in the real loop:** extraction moves the satchel into the storeroom once (quality and freshness kept) and banks the run's Gold; death applies the Lockbox and loses the run's Gold; banked Gold is never touched. The delve result says "+N Gold to the purse" or "N Gold left in the dark"; the night's summary now reads evening, delve, parts home, **banked today** (takings plus the delve's Gold), purse, Renown.
+- **Saves (versioned JSON, `SaveSystem` only, no mid-run saving):** new game; **after the evening** (phase Delve: the takings banked, before the run); **as soon as the delve ends** (phase Night: the haul and the run's Gold applied once, then saved, so a reload can neither apply them again nor lose them); after each upgrade; and on sleeping. Quitting mid-delve and continuing starts the night's delve from the top: the abandoned run's satchel, Gold and powers are gone, and nothing was banked from it. The day's story (what was served, what the delve did) isn't saved: a resumed night shows only what it knows.
+- **Debug:** F8/F9 still work only in development builds; in the dungeon F8 extracts. The `Dungeon` scene has no look-test overlay, so no key can send a day into a look-test scene. The seed line shows only in development builds. A **run log** (development builds, in the console) prints the time, room and Essence at each room, each fight's length, and the run's end, for tuning from real play.
+
+**Essence tuning (step 5).** The mismatch was drain alone lasting ~200 s against a full run estimated at 6–9 minutes. Settled values (`EssenceConfig`, `Power_*.asset`), with the reasoning:
+- **Base max Essence 100 (unchanged), drain 0.5 → 0.15/s.** Drain alone now lasts about 11 minutes. A competent full run (about 6–7 minutes, below) costs about 60 Essence in drain, leaving about 40 for hits: a slime hit costs 10, a spider's bite 14. So a full run at base progression is possible with clean play, two hits a floor puts the third floor out of reach (the floor 2 rope becomes the sensible choice), and a bad first floor makes an early extraction rational. Hits and route choices, not the clock, spend most of the budget. `damageMultiplier` stays 1, so hit costs read as the enemies' damage.
+- **Slow burn 30% → 50%:** at the lower drain, 30% saved only about 12 Essence over a run.
+- **Second wind 10 → 4 per cleared room:** at 10 it more than repaid the drain of every room (about 5 a room), making drain irrelevant.
+- **Unchanged:** deep reserves (+25), thick hide (30%), keen edge (+25%), heavy hand (+40%), light feet (40%), butcher's eye (50%); upgrades (+20 max Essence a level); meals (+15 to +25 max Essence, or 20–30% slower drain, by quality). The drain meals and slow burn are worth less now that drain is lower; a playtest question.
+- `EssenceTuningTests` guards the budget: drain alone must outlast a full run by 1.3–2.2×, leave 20–60 Essence for hits, base Essence ≤ 120, hits at ≥ 75% of damage, and no single power may cover a run's whole drain.
+
+**Expected run length (estimates from the combat data, not yet measured in play).** Effective player damage about 15/s once approach and dodging are counted (the light combo deals 36 in 0.83 s); slimes 34 health, spiders 36, bats 14; floors bring 2–3, 3–4 and 4–5 enemies. A fight takes about 10–20 s on floor 1 and 25–35 s on floor 3; crossing a room and collecting its reward about 8–12 s; quiet rooms about 5 s; a route crosses 3–4 rooms a floor. So: **floor 2 at about 2–2.5 minutes, floor 3 at about 4–4.5, a full run about 6–7 minutes**. Essence for a clean run (about one hit a floor): about 70 on reaching floor 2, 40 on reaching floor 3, 10 at the end; at two hits a floor, about 60, 20 and out. The run log measures all of this in play; the first full-loop playtest should replace these estimates.
+
+**Rewards and powers (first balance pass):** no values changed beyond the two powers above. Gold 10–18, 18–30, 30–45 by floor; ingredient rewards 1–2, 1–2, 2–3 parts, fine 20%, 45%, 70%, slime core and venom sac from floor 2; reward kinds Gold 1 : ingredient 1 : power 0.6 (about one fight in five offers a power; nearly every run sees one). Gold and ingredients stay comparable (a reward of 1–3 parts is 1–2 dishes, worth about what a Gold room pays on the same floor, more when fine); deeper floors pay roughly twice to three times floor 1. Nothing obviously broken found from the numbers; the playtest decides.
+
+**Found and fixed in step 5:**
+- (Web smoke) **Every room load logged an error per wall-tile sprite** ("Sprite outline generation failed"): a tilemap collider instantiated at runtime asks each tile for a physics shape, and the tileset had none, so the player tried to trace it from an unreadable texture. The Dungeon tileset now bakes its physics shape at import (`MinifantasyImportPostprocessor`, version 2); no textures were made readable.
+- (Web smoke) **The main menu showed "day 3, #phase.morning":** the phase word was looked up before the web's string tables had loaded. It now waits for them.
+- (Web smoke) **A night resumed from a mid-delve save showed "served 0"** for an evening played before the reload: the evening (and today's takings) now show only when this session played it.
+- The daytime button and the delve-result line were reworded to fit ("open for the evening"; "no parts brought home." when Gold came home without parts).
+
+**Tests (step 5):** day order, the old "Morning" name, staying shut, today's banked total, the delve meal's lifetime, save round trips in the new order, and the Essence budget (EditMode); in PlayMode, from Boot: a whole day in the new order (the meal, service, closing to the generated run with its caption, a power and run Gold, extraction, the haul and Gold once, the night and an upgrade, sleep, reload, Continue, the upgrade in the next delve and no powers), quitting mid-delve, upgrades reaching the next day, dying (the Lockbox, the run's Gold lost, banked Gold safe), staying shut, a resumed night, and no look-test keys in the loop's dungeon. **EditMode 424/424, PlayMode 126/126**, explicit captures passing.
+
+**Web (development build, 129 MB):** smoke-tested in Chrome: the menu, new game over a 4c save, daytime, evening prep, staying shut, the caption, the generated run, the run log, F8 extraction, the delve result, night, buying an upgrade, sleep, day 2, reload and Continue (daytime and mid-delve), the upgrade reaching the delve (120/120), keyboard and mouse. No console errors or warnings beyond the template's missing `productVersion`. Not driven in the browser (synthetic input can't fight): combat, power choices, the death screen, the satchel swap and a controller. They're covered by PlayMode tests and left for your web playtest.
+
+### 4d status: complete pending your full-loop playtest
+
+All of 4d's criteria are met in the editor and, where the browser could drive it, on the web: generated three-floor Cellars runs with branching, rewards, door previews and powers; extraction from each floor, death with the Lockbox, the arena placeholder at the end; the run in the real loop in the tavern-before-dungeon order; rewards and run Gold reaching the save once; powers reset every delve. What's left is your judgement of the Essence tension and the run length in play.
+
+**Deferred:** the Biome 1 boss, Delve Marks, more weapons, the Harvest Finisher and Kitchen Arts (4e; the arena's elite wave is a placeholder until then); furnishing discoveries and quest objects as rewards (4f, 4g; the extension points exist); the village day that replaces the daytime placeholder, and where upgrades are bought in a life-sim day (village milestones); whether the delve can be skipped and a ticking clock (GDD §13 Open 10).
+
+**Next: your full-loop playtest and sign-off, then the 4e plan.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
@@ -654,16 +694,20 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
 - **The main menu is a plain panel** on a dark background (no art yet); settings come in 4h.
-- **The day loop starts from `Boot`.** Playing `Tavern` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.
+- **The day loop starts from `Boot`.** Playing `Tavern`, `Dungeon` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.
 - **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
 - **Silver doesn't cover Arabic or Hebrew** (it does cover Latin, Greek, Cyrillic, CJK and Thai). There is deliberately no fallback font; `TextStyleTests` checks every string against the font. A decision for when localization is planned.
 - **Silver's license has a budget condition:** CC BY 4.0 (attribution to Poppy Works), but productions over $100,000 USD in total spend or earnings are asked to contact Poppy Works to license it (`docs/THIRD_PARTY.md`). Owner decision before release; no effect on development.
-- **A coin icon** (Minifantasy Miscellany Icons, row 1) could replace "Gold" in tight spots later; not imported in step 6.
 - **The delve's controls line overlaps the satchel row** for its first few seconds, then fades (as designed in 4b; cosmetic).
 - **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
-- **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f).
+- **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f). It passed in all four complete PlayMode runs during 4d step 5.
+- **Run length and the Essence budget are estimates** (4d step 5): the run log (development builds) measures them; your playtest should replace them.
+- **The delve meal's drain drinks and slow burn are worth less** now that drain is 0.15/s; a playtest question, not changed.
+- **The day's story isn't saved:** a night resumed from a save shows only what that session played (the purse and Renown always).
+- **Quitting mid-delve** loses that run (by design: no mid-run saves); Continue starts the night's delve again.
+- **Not driven in the web smoke test:** combat, power choices, the death screen, the satchel swap and a controller (synthetic input can't fight); PlayMode tests cover them.
 - **All sound is placeholder** (`PH_…`, generated), including the tavern feedback pass's moments. Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)
@@ -743,32 +787,33 @@ Tests: **237 project EditMode tests + 21 PlayMode tests, all passing, 0 compiler
 
 ## How a day works
 
+The order since 4d step 5 (GDD §3.1): daytime → evening (the tavern) → the night's delve → night → sleep.
+
 1. **Start:** open `Assets/_Project/Scenes/Boot.unity` (or `MainMenu`, which opens Boot) and press Play.
    - **New Game** starts Day 1 with an empty storeroom and no gold.
-   - **Continue** loads the one save slot and resumes where it was saved (Night, or Morning after you slept).
-2. **Morning (tavern):**
-   - The storeroom and today's delve bonuses are shown.
-   - **Breakfast (optional, one dish):** pick a Grill or Tap dish the storeroom can make, then play its minigame. It uses one serving's ingredients.
+   - **Continue** loads the one save slot and resumes where it was saved: daytime (after sleeping), the night's delve (saved when the evening ended; the run starts again from the top), or night (saved when the delve ended).
+2. **Daytime (tavern, a placeholder for the village day):**
+   - The storeroom and tonight's delve bonuses are shown.
+   - **Delve meal (optional, one dish):** pick a Grill or Tap dish the storeroom can make, then play its minigame. It uses one serving's ingredients, and its buff waits for tonight's delve.
      - Grill dishes add max Essence; Tap drinks slow Essence drain.
      - The dish's quality scales the buff. Stews aren't offered.
      - Esc puts the ingredients back.
-   - **Descend into the dungeon.**
-3. **Delve (dungeon):**
-   - Satchel slots and max Essence include your upgrades and breakfast.
-   - Carried parts lose freshness over time; the bar under each satchel slot shows it.
-   - **The exit** is the door on the raised block at the far right end. Stand at it and press **E** to go home with the whole satchel.
-   - If Essence runs out, pick one Lockbox slot on the death screen. Only that stack goes home, and the day still continues to Evening.
-4. **Evening (tavern):**
+   - **Open for the evening.**
+3. **Evening (tavern):**
    - The usual prep screen and service, cooking from the storeroom.
-   - If nothing can be cooked (or you'd rather not open), **Close for the night** goes straight to Night.
-   - On the results screen, **Close up for the night** banks the takings (payments + tips).
+   - If nothing can be cooked (or you'd rather not open), **stay shut tonight** goes straight to the delve.
+   - On the results screen, **close up and head below** banks the takings (payments + tips), saves, and goes down to the Cellars.
+4. **The night's delve (the generated Cellars run, `Dungeon`):**
+   - Satchel slots and max Essence include your upgrades and the delve meal; run powers start empty.
+   - Rooms, rewards, door signs, powers, the hole down and the rope out as in steps 1–4.
+   - **Extract** at a rope room (stand at the rope, press **E**): the whole satchel and the run's Gold go home.
+   - If Essence runs out, pick one Lockbox slot on the death screen. Only that stack goes home; the run's Gold is lost.
 5. **Night (tavern):**
-   - Gold and renown, and the three **upgrades**, each with a few levels at rising cost.
-   - The **debug day summary** (F10): parts brought back and lost, dishes sold, gold and tips earned, and the cheapest next upgrade.
-   - The game **autosaves** when Night starts and after each purchase.
-   - **Sleep:** storeroom stock loses a little freshness overnight, then it's the next Morning (and another autosave).
+   - The day's summary (the evening, the delve, parts home, banked today), the purse and Renown, and the three **upgrades**, each with a few levels at rising cost.
+   - The game **autosaved** as the delve ended, and saves after each purchase.
+   - **Sleep:** storeroom stock loses a little freshness overnight, then it's the next daytime (and another autosave).
 
-When `TavernGreybox` or `CombatGreybox` is played on its own (no Boot), it behaves as before: a single evening with the debug fill, or a dungeon run that restarts.
+When `Tavern` or `Dungeon_TestFloor` (or `Dungeon`) is played on its own (no Boot), it behaves as before: a single evening with the debug fill, or a dungeon run that restarts.
 
 ## How a service works
 
