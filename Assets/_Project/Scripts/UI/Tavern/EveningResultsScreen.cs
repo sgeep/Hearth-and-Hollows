@@ -22,6 +22,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText[] m_Lines = Array.Empty<LocalizedSuperText>();
         [SerializeField] LocalizedSuperText m_Takings;
         [SerializeField] Button m_Done;
+        [SerializeField] LocalizedSuperText m_DoneLabel;
         [SerializeField, Min(0.05f), Tooltip("Seconds between lines.")] float m_LineGap = 0.3f;
         [SerializeField, Min(0.05f), Tooltip("Seconds a number takes to count up.")] float m_CountTime = 0.35f;
 
@@ -32,8 +33,9 @@ namespace Hearthdelve.UI.Tavern
         public bool IsRevealing => m_Reveal != null;
         public Button DoneButton => m_Done;
 
-        public void Configure(GameObject root, LocalizedSuperText note, LocalizedSuperText[] lines, LocalizedSuperText takings, Button done)
+        public void Configure(GameObject root, LocalizedSuperText note, LocalizedSuperText[] lines, LocalizedSuperText takings, Button done, LocalizedSuperText doneLabel)
         {
+            m_DoneLabel = doneLabel;
             m_Root = root;
             m_Note = note;
             m_Lines = lines;
@@ -67,6 +69,8 @@ namespace Hearthdelve.UI.Tavern
             else if (report.ClosedEarly) m_Note.Set(TavernLocKeys.ResultsClosedEarly);
             foreach (LocalizedSuperText line in m_Lines) line.gameObject.SetActive(false);
             m_Takings.gameObject.SetActive(false);
+            // In the day loop the evening ends in Night (the takings are banked there); on its own, another evening.
+            if (m_DoneLabel != null) m_DoneLabel.Set(m_Director.InDayLoop ? LoopLocKeys.ResultsToNight : TavernLocKeys.ResultsAgain);
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(m_Done.gameObject);
             m_Reveal = StartCoroutine(Reveal(report));
         }

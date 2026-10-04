@@ -52,6 +52,27 @@ namespace Hearthdelve.UI.Localization
         public const string SummaryEarned = "summary.earned";
         public const string SummaryNextUpgrade = "summary.next_upgrade";
         public const string SummaryAllBought = "summary.all_bought";
+        public const string SummaryShut = "summary.shut";
+        public const string NightBanked = "night.banked";
+        public const string NightRenownToday = "night.renown_today";
+        public const string NightBuyCost = "night.buy_cost";
+        public const string NightNextTime = "night.next_time";
+        public const string MorningBonuses = "morning.bonuses";
+        public const string MorningNoBonuses = "morning.no_bonuses";
+        public const string BonusSatchel = "bonus.satchel";
+        public const string BonusEssence = "bonus.essence";
+        public const string BonusDrain = "bonus.drain";
+        public const string BonusJoin = "bonus.join";
+        public const string MorningCookAt = "morning.cook_at";
+        public const string TransitionDelve = "transition.delve";
+        public const string TransitionEvening = "transition.evening";
+        public const string MenuContinueFrom = "menu.continue_from";
+        public const string PhaseMorning = "phase.morning";
+        public const string PhaseEvening = "phase.evening";
+        public const string PhaseNight = "phase.night";
+        public const string MenuConfirm = "menu.confirm";
+        public const string MenuConfirmYes = "menu.confirm_yes";
+        public const string MenuConfirmNo = "menu.confirm_no";
 
         public static readonly (string key, string english)[] English =
         {
@@ -94,16 +115,37 @@ namespace Hearthdelve.UI.Localization
             (UpgradeEssence, "+{0} max Essence"),
             (UpgradeSeats, "+{0} seat"),
 
-            (SummaryTitle, "Today (debug)"),
+            (SummaryTitle, "Today"),
             (SummaryDelve, "Delve: {0}"),
             (SummaryExtracted, "made it out"),
             (SummaryDied, "Essence ran out"),
             (SummarySkipped, "skipped"),
             (SummaryParts, "Parts brought back: {0} (lost: {1})"),
-            (SummaryDishes, "Dishes sold: {0} · walkouts: {1}"),
+            (SummaryDishes, "Dishes served: {0} · walkouts: {1}"),
             (SummaryEarned, "Earned: {0} gold + {1} tips = {2}"),
             (SummaryNextUpgrade, "Cheapest next upgrade: {0} gold"),
             (SummaryAllBought, "Every upgrade is bought."),
+            (SummaryShut, "The doors stayed shut tonight."),
+            (NightBanked, "Banked tonight: {0} gold"),
+            (NightRenownToday, "Renown today: {0}"),
+            (NightBuyCost, "{0} gold"),
+            (NightNextTime, "Next: {0}"),
+            (MorningBonuses, "Today's delve: {0}"),
+            (MorningNoBonuses, "Today's delve: no bonuses yet. Upgrades and breakfast add them."),
+            (BonusSatchel, "satchel +{0}"),
+            (BonusEssence, "Essence +{0}"),
+            (BonusDrain, "drain -{0}%"),
+            (BonusJoin, "{0} · {1}"),
+            (MorningCookAt, "Cook at the {0}"),
+            (TransitionDelve, "Into the dungeon"),
+            (TransitionEvening, "Evening · Day {0}"),
+            (MenuContinueFrom, "Day {0}, {1}"),
+            (PhaseMorning, "morning"),
+            (PhaseEvening, "evening"),
+            (PhaseNight, "night"),
+            (MenuConfirm, "Start a new game? Your saved game will be replaced."),
+            (MenuConfirmYes, "Start over"),
+            (MenuConfirmNo, "Back"),
         };
     }
 }

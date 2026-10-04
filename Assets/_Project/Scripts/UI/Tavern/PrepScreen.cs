@@ -91,7 +91,7 @@ namespace Hearthdelve.UI.Tavern
             m_Staff.onClick.AddListener(NextJob);
             m_Close.onClick.AddListener(() => m_Director.CloseForTheNight());
             m_Open.onClick.AddListener(() => m_Director.OpenService());
-            if (m_FillHint != null) m_FillHint.SetActive(Debug.isDebugBuild);
+            if (m_FillHint != null) m_FillHint.SetActive(m_Director.CanDebugFill);
             m_Director.PhaseChanged += Refresh;
             m_Director.PrepChanged += Refresh;
             Refresh();

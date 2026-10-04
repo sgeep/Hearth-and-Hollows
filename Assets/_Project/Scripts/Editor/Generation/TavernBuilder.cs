@@ -96,6 +96,7 @@ namespace Hearthdelve.Editor
             Canvas ui = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
             TavernStationContent.BuildStationPanel(ui);
             TavernScreens.Rebuild(ui);
+            AddMood();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log("[Hearthdelve] Tavern updated.");
@@ -163,10 +164,11 @@ namespace Hearthdelve.Editor
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
             TavernStationContent.BuildStationPanel(canvas);
-            TavernScreens.Rebuild(canvas);
             LocalizedSuperText controls = LookTestBuilder.Text(canvas.transform, "Controls", TavernLocKeys.TavernControls, 6f, new Color(0.95f, 0.92f, 0.85f),
                 TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(310f, 10f));
             controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
+            TavernScreens.Rebuild(canvas);
+            AddMood();
 
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorSceneManager.SaveScene(scene, EditorPaths.TavernScene);
@@ -574,6 +576,14 @@ namespace Hearthdelve.Editor
             Light(lights, "Kitchen Fire", k_Kitchen + new Vector2(1f, 1.5f), Light2D.LightType.Point, k_Warm, 0.7f, 4.5f);
             Light(lights, "Stew Fire", k_StewPot + new Vector2(0f, 0.25f), Light2D.LightType.Point, k_Warm, 0.6f, 3f);
             Light(lights, "Bar Lamp", k_Bar + new Vector2(3.5f, 2f), Light2D.LightType.Point, new Color(1f, 0.8f, 0.55f), 0.6f, 6f);
+        }
+
+        /// <summary>The ambient light follows the day (4c step 5): morning daylight, the evening as built, night.</summary>
+        static void AddMood()
+        {
+            GameObject lights = GameObject.Find("Lights");
+            Light2D ambient = lights.transform.Find("Ambient").GetComponent<Light2D>();
+            Replace<TavernMood>(lights).Configure(ambient, k_Ambient, 0.72f);
         }
 
         static void Light(Transform parent, string name, Vector2 position, Light2D.LightType type, Color color, float intensity, float radius)
