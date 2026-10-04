@@ -138,4 +138,43 @@ namespace Hearthdelve.Shared.Run
         public readonly DeathPenaltyResult Result;
         public DelveEnded(DeathPenaltyResult result) => Result = result;
     }
+
+    /// <summary>The run is leaving the current room (4d): the screen covers over <see cref="FadeSeconds"/>.</summary>
+    public readonly struct RoomTransitionStarted : IEvent
+    {
+        public readonly float FadeSeconds;
+        public RoomTransitionStarted(float fadeSeconds) => FadeSeconds = fadeSeconds;
+    }
+
+    /// <summary>A room has loaded and the player stands in it; the screen uncovers over <see cref="FadeSeconds"/>.</summary>
+    public readonly struct RoomEntered : IEvent
+    {
+        /// <summary>How many rooms this run has entered before this one.</summary>
+        public readonly int Index;
+        public readonly string RoomId;
+        /// <summary>True when the room has enemies, so its exits are sealing.</summary>
+        public readonly bool Sealed;
+        public readonly float FadeSeconds;
+
+        public RoomEntered(int index, string roomId, bool @sealed, float fadeSeconds)
+        {
+            Index = index;
+            RoomId = roomId;
+            Sealed = @sealed;
+            FadeSeconds = fadeSeconds;
+        }
+    }
+
+    /// <summary>The last enemy in the room fell and its exits are opening.</summary>
+    public readonly struct RoomCleared : IEvent
+    {
+        public readonly int Index;
+        public readonly string RoomId;
+
+        public RoomCleared(int index, string roomId)
+        {
+            Index = index;
+            RoomId = roomId;
+        }
+    }
 }
