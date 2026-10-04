@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Linq;
+using Hearthdelve.Core.Movement;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Tavern.Scene;
@@ -65,6 +66,33 @@ namespace Hearthdelve.Tests.PlayMode
             yield return HoldStick(Vector2.zero, 0.2f);
             Assert.That(keeper.MovementState.CurrentState, Is.EqualTo(CharacterStates.MovementStates.Idle));
             Assert.That(animator.Current, Is.EqualTo(CharacterAnim.Idle));
+        }
+
+        /// <summary>
+        /// Flicking the stick and letting go: it springs back past centre for a frame or two, the other way. That
+        /// must not turn the keeper round (the step 5 playtest: a flick down-left could end facing up-right).
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AFlickReleased_SpringingBackPastCentre_KeepsTheFacing()
+        {
+            yield return Load("Tavern");
+            TavernDirector.Instance.OpenDebugEvening();
+            TavernDirector.Instance.ArrivalsPaused = true;
+            yield return null;
+            Character keeper = Object.FindAnyObjectByType<TavernInteractor>().GetComponent<Character>();
+            var animator = keeper.GetComponentInChildren<CharacterSpriteAnimator>();
+
+            yield return HoldStick(new Vector2(-0.75f, -0.66f), 0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "facing the flick");
+            // Let go: an overshoot up-right for two frames, then rest.
+            yield return Stick(new Vector2(0.3f, 0.28f), 2);
+            yield return Stick(new Vector2(0.06f, 0.04f), 2);
+            yield return HoldStick(Vector2.zero, 0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "the spring-back doesn't turn them round");
+
+            // A real turn still turns them, at once.
+            yield return HoldStick(new Vector2(0.7f, 0.7f), 0.1f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackRight), "pushing the other way turns them");
         }
 
         [UnityTest]

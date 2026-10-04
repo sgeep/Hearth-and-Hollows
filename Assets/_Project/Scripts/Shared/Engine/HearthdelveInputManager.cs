@@ -21,8 +21,13 @@ namespace Hearthdelve.Shared.Engine
         [Tooltip("Which of our action maps drives the TDE character in this scene.")]
         public GameplayMap Map = GameplayMap.Dungeon;
 
+        [Tooltip("Ignores a released stick springing back past centre, so the character doesn't turn round as it stops.")]
+        public StickReleaseSettings StickRelease = StickReleaseSettings.Default;
+
         readonly List<Action> m_Unbind = new();
         InputAction m_AimPoint;
+        StickReleaseFilter m_StickRelease;
+        Vector2 m_RawMovement;
 
         public string MapName => Map == GameplayMap.Dungeon ? InputMaps.Dungeon : InputMaps.Tavern;
 
@@ -58,7 +63,8 @@ namespace Hearthdelve.Shared.Engine
             _primaryMovementAction = _playerControlsMap.FindAction(DungeonActions.Move, false);
             BindValue(_primaryMovementAction, context =>
             {
-                _primaryMovementInput = context.ReadValue<Vector2>();
+                m_RawMovement = context.ReadValue<Vector2>();
+                _primaryMovementInput = FilteredMovement();
                 NoteDevice(context);
             });
 
@@ -126,8 +132,16 @@ namespace Hearthdelve.Shared.Engine
             else if (device is Mouse || device is Keyboard) PointerAim = true;
         }
 
+        Vector2 FilteredMovement()
+        {
+            m_StickRelease ??= new StickReleaseFilter(StickRelease);
+            return m_StickRelease.Filter(m_RawMovement, Time.unscaledTime);
+        }
+
         protected override void Update()
         {
+            // Every frame, not only when the stick moves: a weak push held still passes once the window is over.
+            _primaryMovementInput = FilteredMovement();
             base.Update();
             if (Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > 4f) PointerAim = true;
         }
@@ -138,6 +152,7 @@ namespace Hearthdelve.Shared.Engine
 
         protected override void OnDisable()
         {
+            m_RawMovement = Vector2.zero;
             _primaryMovementInput = Vector2.zero;
         }
 
