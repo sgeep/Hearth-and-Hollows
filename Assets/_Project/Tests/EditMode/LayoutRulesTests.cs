@@ -32,7 +32,10 @@ namespace Hearthdelve.Tests
                 Reserved = new HashSet<Vector2Int> { new(13, 2), new(13, 3) },
                 Door = new Vector2(13.5f, 2.4f),
                 Rest = new Vector2(25.5f, 5.5f),
+                // The stairs up to the guest room: back-right corner, their flight solid, their cells and foot kept clear.
+                Fixtures = { new Rect(26f, 12f, 1f, 2f) },
             };
+            shape.Reserved.UnionWith(new[] { new Vector2Int(26, 11), new Vector2Int(26, 12), new Vector2Int(26, 13) });
             for (int i = 0; i < 6; i++) shape.Queue.Add(new Vector2(12.25f - i, 2.6f));
             return shape;
         }

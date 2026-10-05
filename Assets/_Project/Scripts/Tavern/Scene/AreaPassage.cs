@@ -24,8 +24,8 @@ namespace Hearthdelve.Tavern.Scene
     }
 
     /// <summary>
-    /// A fixed way between two areas of the property (4f step 6; plan §8): for now only the guest room's door back down
-    /// (the tavern's staircase was removed after the Checkpoint B playtest; the guest room is reached from Decorate Mode).
+    /// A fixed way between two areas of the property (4f step 6; plan §8): the slim stairs in the tavern's back-right
+    /// corner up to the guest room, and the guest room's door back down.
     /// Walking onto it fades the screen, moves the keeper to the other area's arrival point and the camera onto that area,
     /// and fades back. It works whenever the keeper walks (Prep and service until the village milestone); when the
     /// evening ends with the keeper still upstairs, they're brought back down. Not while decorating, which switches areas itself.

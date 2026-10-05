@@ -895,16 +895,16 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 
 **Step 6, the guest room.**
 - A second area beside the tavern in the Tavern scene (18×13 cells, 16×8 of floor), cut from the Shop Indoor add-on's cream-walled premade room. It starts with a double bed, a nightstand with a candle, a chest, a rug and a picture.
-- Decorate Mode switches between the tavern and the guest room with G / left stick press, with one storage for the whole property; the camera holds on the room being decorated. (A staircase on the tavern's back wall led up to it at first; it was removed after your first look, see below.) The guest room's door still leads down to the tavern.
+- Decorate Mode switches between the tavern and the guest room with G / left stick press, with one storage for the whole property; the camera holds on the room being decorated. Slim wooden stairs in the tavern's back-right corner (Medieval City's interior flight, against the right wall) lead up to it with a fade, and its door leads back down to their foot. (A wide stucco staircase on the back wall came first; it was replaced after your first look, see below.)
 - Its check is only its doorway (no service checks). Bedroom pieces work in the tavern and tavern pieces upstairs.
 
 **Also changed:**
 - Stools seat whoever sits at whichever table is beside them; every seat now picks an approach that can be walked to (a chair facing down in a row is stepped onto from behind), the same way in the check and in the room.
 - Surface items on a table sort just in front of it. Tables have surface anchors (candles, tankards, small plants, bottles, books, jack-o'-lanterns).
-- A room's fixed parts (none now that the stairs are gone) block the check's walkable grid like furniture.
+- A room's fixed parts (the stairs' flight) block the check's walkable grid like furniture; the stairs' cells and the tile in front of their foot are kept clear of furniture.
 - Direction input keeps taps that start and end within one frame (the web build lost them in menus).
 - **Save version 6:** each piece's colourway and palette, each area's floor and wall, finishes owned, the tier announced. A version 5 save (your Checkpoint A playtest) loads as it was, gains the guest room furnished, and hears about tiers it has already reached at its next Night.
-- The starting tavern is unchanged from Checkpoint A (`TavernStarting.txt` is the Checkpoint A baseline again).
+- The starting tavern differs from Checkpoint A only by the corner stairs (their art, solid flight, foot, and two grid cells in column 26); `TavernStarting.txt` was re-recorded and the differences checked line by line.
 
 **Tests:** EditMode 504/504 (new `CatalogueTests`: the generated catalogue and stable ids, every drawing per facing and colourway, the collections across four tiers, buying, uniques, selling, finishes, tier announcements, palette parsing and the remap, the baked recolour cache, finishes' patterns, property-wide storage, granting the guest room to an old save, the guest room's check, fixtures, stools, surface sorting, version 6 and the v5 migration). PlayMode 178/178 plus 7 explicit captures (new `CheckpointBTests`: buying onto the cursor, storing and selling; a tier opening with Renown; recolouring and undo; the colour panel and matching every copy; the panels and a one-frame tap from the keyboard; a floor finish and putting it back; decorating the guest room; the stairs and the door, also mid-service; a service in a tavern refurnished as a dwarven hall; and in `DayLoopTests` a tier announced once with both rooms' looks surviving Continue).
 
@@ -914,7 +914,7 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 
 **Deviations from the plan:**
 - The guest room's shell is Shop Indoor's cream-walled room, not the Towns II plank interior: the plank tileset is a dark modular exterior-style set; the shop room matches the tavern's cell geometry (so the same cutting works) and reads as a warm inn room. It's 18×13 cells rather than about 12×9, which looked lost on screen.
-- There's no way up to the guest room on foot yet: the staircase was removed at your request, so the guest room is decorated from Decorate Mode only. A real way up belongs with the Inn.
+- The stairs work during service: until the village milestone the keeper walks only during service (the daytime, Prep and Night are panels), so blocking them then would make them unreachable. Customers keep waiting while you're upstairs, and the end of the evening brings you back down.
 - The old storage panel became the catalogue's first page.
 - The Animated UI Book wasn't used: the parchment panel keeps the list and details readable at 320×180.
 - The catalogue's hand-coded pieces (the stations, the 4e tables, chairs, barrels and back-wall pieces) stay in `FurnitureContent` because of their use points, posts and overlays; their prices, themes, descriptions and palette channels are set there too.
@@ -932,6 +932,8 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 - Tests: EditMode 504/504, PlayMode 179 passed plus 7 explicit captures. Web build rebuilt.
 
 **American spelling (2026-10-05):** all player-facing English now uses American spelling: catalog, gray, harbor, traveling trunk, checkered, pale checkerboard, paneling (and colors, above). Ids and saved values are unchanged (`grey`, `chequered`, `harbour`, `wall_panelling…`), so saves are unaffected. `TextStyleTests.EnglishStrings_UseAmericanSpelling` checks every English string; the localization builder now removes colorway name keys (`look.…`) that are no longer generated, so a renamed colorway leaves no stale entry. EditMode 505/505, PlayMode 179 passed plus 7 explicit captures.
+
+**Corner stairs (2026-10-05):** your choice after the first look: a smaller staircase in a corner. Medieval City's slim wooden flight (9×17 px, about a third the size of the stucco one) stands in the back-right corner against the right wall, rising into the back wall, mirrored so its handrail faces the room. Walking onto its foot (column 26, row 11) fades up to the guest room; the guest room's door brings you down just below it. A Decorate test that carried a barrel to (26, 12) now carries it to (26, 10). EditMode 505/505, PlayMode 179 passed plus 7 explicit captures. Web build rebuilt.
 
 **Checkpoint B is waiting for your playtest.**
 

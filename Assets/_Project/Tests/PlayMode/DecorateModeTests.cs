@@ -166,15 +166,15 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Enter();
             yield return null;
             Mode.SetCursor(new Vector2Int(23, 9));
-            // To the barrel at (26, 9): three right with the d-pad, then A, three up, A.
+            // To the barrel at (26, 9): three right with the d-pad, then A, one up, A (the stairs stand above that).
             for (int i = 0; i < 3; i++) yield return Pad(GamepadButton.DpadRight);
             Assert.That(Mode.HoveredPiece?.definition, Is.EqualTo("cellar_barrel"));
             yield return Pad(GamepadButton.South);
             Assert.That(Mode.Carried, Is.Not.Null);
-            for (int i = 0; i < 3; i++) yield return Pad(GamepadButton.DpadUp);
+            yield return Pad(GamepadButton.DpadUp);
             yield return Pad(GamepadButton.South);
             Assert.That(Mode.Carried, Is.Null);
-            Assert.That(At("cellar_barrel", 26, 12), Is.Not.Null);
+            Assert.That(At("cellar_barrel", 26, 10), Is.Not.Null);
             InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftTrigger = 1f });
             yield return null;
             InputSystem.QueueStateEvent(m_Pad, new GamepadState());

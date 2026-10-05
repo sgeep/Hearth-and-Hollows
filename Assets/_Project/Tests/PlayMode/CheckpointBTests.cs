@@ -17,7 +17,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4f Checkpoint B in the tavern scene: buying from the catalogue onto the cursor, storing and selling; tiers opening
     /// with Renown; recolouring a piece (and undoing it), the colour panel and matching every copy; laying a floor finish
-    /// and putting it back; decorating the guest room by switching areas; no stairs, and the guest room's door; and a
+    /// and putting it back; decorating the guest room by switching areas; the corner stairs and the guest room's door; and a
     /// service in a tavern furnished quite differently from the start.
     /// </summary>
     public class CheckpointBTests : LookTestFixture
@@ -329,38 +329,45 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator TheTavernHasNoStairs_AndTheGuestRoomsDoorLeadsBackDown()
+        public IEnumerator TheCornerStairs_LeadUpToTheGuestRoom_AndItsDoorLeadsBackDown()
         {
             yield return LoadTavern();
             Rigidbody2D keeper = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-            Assert.That(Tavern.transform.Find("Stairs"), Is.Null, "no staircase in the tavern");
-            Assert.That(Tavern.GetComponentsInChildren<AreaPassage>(), Is.Empty);
-            Assert.That(Tavern.Area.Fixtures, Is.Empty);
+            AreaPassage up = Tavern.GetComponentsInChildren<AreaPassage>().Single();
             AreaPassage down = Guest.GetComponentsInChildren<AreaPassage>().Single();
+            Assert.That(up.To, Is.SameAs(Guest.Area));
             Assert.That(down.To, Is.SameAs(Tavern.Area));
+            Assert.That(up.transform.position.x, Is.GreaterThan(26f), "in the back-right corner");
+            Assert.That(Tavern.Area.Fixtures.Single(), Is.EqualTo(new Rect(26f, 12f, 1f, 2f)));
 
-            // Decorating the guest room and leaving keeps the keeper (and the camera) in the tavern.
+            // Walked onto the stairs' foot: the screen fades, and the keeper is upstairs.
+            keeper.position = up.transform.position;
+            yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "the guest room");
+            yield return WaitUntil(() => !up.Busy, 3f, "the fade back in");
+            Assert.That(Vector2.Distance(keeper.position, Guest.Area.Arrival), Is.LessThan(0.6f));
+            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Guest.Area.CameraPoint));
+
+            // Decorating from upstairs decorates the guest room.
             Mode.Enter();
-            yield return null;
-            Mode.SwitchArea();
             yield return null;
             Assert.That(Mode.Area, Is.SameAs(Guest));
             Mode.Leave();
-            yield return null;
-            Assert.That(PropertyArea.Current, Is.SameAs(Tavern.Area));
-            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
 
-            // If the keeper is ever upstairs, the door brings them down, and so does the end of the evening.
-            Director.OpenDebugEvening();
-            yield return null;
-            PropertyArea.Current = Guest.Area;
-            TavernView.Show(Guest.Area);
+            // Down through the door: the keeper stands just below the stairs' foot, clear of it.
             keeper.position = down.transform.position;
             yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 3f, "down through the door");
             yield return WaitUntil(() => !down.Busy, 3f, "the fade back in");
             Assert.That(Vector2.Distance(keeper.position, Tavern.Area.Arrival), Is.LessThan(0.6f));
             Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
-            PropertyArea.Current = Guest.Area;
+            yield return new WaitForSeconds(0.5f);
+            Assert.That(PropertyArea.Current, Is.SameAs(Tavern.Area), "arriving doesn't send the keeper straight back up");
+
+            // Mid-service the stairs work, and the end of the evening brings the keeper back down.
+            Director.OpenDebugEvening();
+            yield return null;
+            keeper.position = up.transform.position;
+            yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "upstairs mid-service");
+            yield return WaitUntil(() => !up.Busy, 3f, "the fade");
             Director.EndServiceNow();
             yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 5f, "back down when the evening ends");
         }

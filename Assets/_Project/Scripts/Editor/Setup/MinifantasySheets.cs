@@ -102,7 +102,7 @@ namespace Hearthdelve.Editor
         public const string TavernIndoor = "TavernIndoor";
         public const string ShopIndoor = "ShopIndoor";
         public const string CastlesAndStrongholds = "CastlesAndStrongholds";
-        public const string TownsII = "TownsII";
+        public const string MedievalCity = "MedievalCity";
         public const string UIOverhaul = "UIOverhaul";
         public const string LootIcons = "LootIcons";
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
@@ -314,6 +314,13 @@ namespace Hearthdelve.Editor
             foreach (string layer in new[] { "basebuilding", "wall", "floor" })
                 sheets.Add(new Sheet { Source = $"{k_Shop}/ShopIndoor_{layer}.png", Pack = ShopIndoor, File = $"ShopIndoor_{layer}", Mode = SliceMode.Rects, Rects = ShopCells(layer), Readable = layer == "wall" });
             sheets.Add(new Sheet { Source = k_CastleIndoor, Pack = CastlesAndStrongholds, File = "CastleIndoorTileset", Mode = SliceMode.Rects, Rects = k_CastleFloorCells });
+            // The stairs up to the guest room: Medieval City's slim wooden flight with its handrail, drawn against a left wall
+            // (mirrored for the tavern's back-right corner).
+            sheets.Add(new Sheet
+            {
+                Source = "Minifantasy_Medieval_City_v1.1/Minifantasy_Medieval_City_Assets/Premade/Premade_Interior/Separate_Layers/Premade_Interior_c-stairs.png",
+                Pack = MedievalCity, File = "InteriorStairs", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("WoodenFlight", 16, 23, 9, 17, k_BottomLeft) },
+            });
             sheets.Add(Tavern("shadows", new[] { new SheetRect("Shadows", 224, 8, 88, 88, k_BottomLeft) }));
             sheets.Add(Tavern("props", new[]
             {

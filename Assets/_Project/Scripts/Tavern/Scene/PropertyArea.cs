@@ -33,7 +33,7 @@ namespace Hearthdelve.Tavern.Scene
         Vector2 m_Arrival;
         [SerializeField, Tooltip("Localization key (UI table) of its name.")]
         string m_NameKey;
-        [SerializeField, Tooltip("Fixed solid parts that aren't furniture (none yet), in area tiles: the layout check walks round them.")]
+        [SerializeField, Tooltip("Fixed solid parts that aren't furniture (the stairs' flight), in area tiles: the layout check walks round them.")]
         Rect[] m_Fixtures = System.Array.Empty<Rect>();
 
         static readonly List<PropertyArea> s_All = new();
@@ -54,7 +54,7 @@ namespace Hearthdelve.Tavern.Scene
 
         public void SetFixtures(params Rect[] fixtures) => m_Fixtures = fixtures ?? System.Array.Empty<Rect>();
 
-        /// <summary>The area the keeper is in now (the tavern, unless a passage says otherwise).</summary>
+        /// <summary>The area the keeper is in now (the tavern until the stairs say otherwise).</summary>
         public static PropertyArea Current
         {
             get
