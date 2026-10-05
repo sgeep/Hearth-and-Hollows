@@ -371,8 +371,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728559
-  - rid: 2696332444289728560
+  - rid: 2696332481779728435
+  - rid: 2696332481779728436
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -388,11 +388,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728559
+    - rid: 2696332481779728435
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1304992936
+        UniqueID: 202817627
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -466,11 +466,11 @@ MonoBehaviour:
         Target: {fileID: 5975640196474401046}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332444289728560
+    - rid: 2696332481779728436
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 887484133
+        UniqueID: 630769455
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -728,7 +728,7 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728558
+  - rid: 2696332481779728434
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -744,11 +744,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728558
+    - rid: 2696332481779728434
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -1424294736
+        UniqueID: 1411484862
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -1050,7 +1050,7 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728561
+  - rid: 2696332481779728437
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1066,11 +1066,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728561
+    - rid: 2696332481779728437
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -789001752
+        UniqueID: -821684325
         Label: Haptic Cue.Threshold
         OriginalLabel: 
         ChannelMode: 0
@@ -1273,6 +1273,98 @@ MonoBehaviour:
   HitAnythingEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &6940894934615147682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7674679344364774678}
+  - component: {fileID: 7877331047729107334}
+  m_Layer: 0
+  m_Name: FinisherPrompt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &7674679344364774678
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6940894934615147682}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.55, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2978905457675795777}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &7877331047729107334
+SpriteRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6940894934615147682}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 47421343
+  m_SortingLayer: 4
+  m_SortingOrder: 6
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 56035651, guid: ae89ae0a042004d4db55cc328f570702, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 1
+  m_BlendShapeWeights: []
 --- !u!1 &7032119628774444274
 GameObject:
   m_ObjectHideFlags: 0
@@ -1293,6 +1385,7 @@ GameObject:
   - component: {fileID: 2482691555582124959}
   - component: {fileID: 978737511728270812}
   - component: {fileID: 5929903269824309014}
+  - component: {fileID: 2201055465762592096}
   - component: {fileID: 4187038990441964661}
   - component: {fileID: 3295703405781406975}
   - component: {fileID: 2454716939500684150}
@@ -1330,6 +1423,7 @@ Transform:
   - {fileID: 6517813713823540353}
   - {fileID: 5347400472433777326}
   - {fileID: 5963727095816298941}
+  - {fileID: 7674679344364774678}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &4696962551445791429
@@ -1429,7 +1523,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f84d05edfb6afb540aa851d5aab6c295, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: MoreMountains.TopDownEngine::MoreMountains.TopDownEngine.TopDownController2D
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Engine.FloorController2D
   Gravity: 40
   GravityActive: 1
   CrouchedRaycastLengthMultiplier: 1
@@ -1594,6 +1688,7 @@ MonoBehaviour:
   m_Body: {fileID: 3178352170411956414}
   m_TelegraphCue: {fileID: 6152618245234116988}
   m_CueRange: 6
+  m_ImpactFeedback: {fileID: 0}
 --- !u!114 &978737511728270812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1614,6 +1709,7 @@ MonoBehaviour:
   m_Body: {fileID: 3178352170411956414}
   m_TelegraphCue: {fileID: 6152618245234116988}
   m_CueRange: 6
+  m_ImpactFeedback: {fileID: 0}
 --- !u!114 &5929903269824309014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1626,6 +1722,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2228745b70783504480718722f5b0ebb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.HitReaction
+--- !u!114 &2201055465762592096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032119628774444274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c1dd63d1984d0343903315c8a69c634, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Harvest.FinisherTarget
+  m_Rules: {fileID: 11400000, guid: 1c3cbdaf69646f4458e49b0711e303b1, type: 2}
+  m_Prompt: {fileID: 6940894934615147682}
 --- !u!114 &4187038990441964661
 MonoBehaviour:
   m_ObjectHideFlags: 0

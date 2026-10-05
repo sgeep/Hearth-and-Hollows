@@ -73,7 +73,17 @@ MonoBehaviour:
     projectileSpeed: 7
     projectileRange: 8
     projectileSpawnOffset: {x: 0.5, y: 0.3}
-  harvest: []
+  harvest:
+  - ingredient: {fileID: 11400000, guid: 62cb142cf19470742bd2a4d436de2451, type: 2}
+    baseQuality: 2
+    dropChance: 1
+    minCount: 1
+    maxCount: 1
+  - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
+    baseQuality: 2
+    dropChance: 1
+    minCount: 1
+    maxCount: 1
   placeholderColor: {r: 0.45, g: 0.5, b: 0.2, a: 1}
   references:
     version: 2
