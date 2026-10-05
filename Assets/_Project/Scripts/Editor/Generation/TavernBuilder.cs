@@ -85,6 +85,9 @@ namespace Hearthdelve.Editor
             tavernCamera.transform.position = new Vector3(CameraCentre.x, CameraCentre.y, -10f);
             Camera.main.transform.position = tavernCamera.transform.position;
             SetUpBar(GameObject.Find("Furniture/Bar").GetComponent<SpriteRenderer>());
+            // 4e playtest: the lone stool right of the bar read as a stray; removed.
+            GameObject stool = GameObject.Find("Furniture/Stool");
+            if (stool != null) Object.DestroyImmediate(stool);
             SetUpPass(GameObject.Find("Pass").GetComponent<SpriteRenderer>());
             SetUpKitchen(GameObject.Find("Kitchen").GetComponent<SpriteRenderer>());
             // Step 2 playtest: the stew pot moves half a tile off the wall, so it can be walked behind.
@@ -321,10 +324,9 @@ namespace Hearthdelve.Editor
                 }
             }
 
-            // Decor: barrels by the east wall and a few stools near the bar.
+            // Decor: barrels by the east wall. (The lone stool right of the bar was removed after the 4e playtest.)
             foreach (Vector2 at in new[] { new Vector2(26.25f, 8f), new Vector2(26.25f, 9f), new Vector2(25.25f, 8f) })
                 FullFootprint(Piece(furniture, MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Props", "Barrel"), "Barrel", at));
-            FullFootprint(Piece(furniture, Tavern("props", "StoolRedA"), "Stool", new Vector2(11.5f, 11.5f)));
         }
 
         /// <summary>The bar, used at its taps from the customer side.</summary>
