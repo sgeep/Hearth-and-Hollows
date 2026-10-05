@@ -178,17 +178,28 @@ namespace Hearthdelve.UI.Tavern
                 recorded ? (LoopLocKeys.NightRenownToday, LoopLocKeys.NightRenownValue, new object[] { state.Renown, change })
                          : (LoopLocKeys.NightRenownToday, TavernLocKeys.Plain, new object[] { state.Renown }),
             };
-            for (int i = 0; i < m_Summary.Length; i++)
+            // What a save resumed mid-day (or a new game's first night) doesn't know: the evening (0) if the game was loaded
+            // after it, the delve (1-2) if loaded after that too, and today's takings (3) unless both were played. The purse
+            // and Renown always. Known lines move up within their column (the day 0-2, the money 3-5), leaving no gaps.
+            bool evening = today.EveningRecorded;
+            bool Known(int line) => line switch { 0 => evening, 1 or 2 => recorded, 3 => evening && recorded, _ => true };
+            for (int column = 0; column < 2; column++)
             {
-                // What a save resumed mid-day doesn't know: the evening (0) if the game was loaded after it, the delve (1-2)
-                // if loaded after that too, and today's takings (3) unless both were played. The purse and Renown always.
-                bool evening = today.EveningRecorded;
-                bool has = i < lines.Length && (i switch { 0 => evening, 1 or 2 => recorded, 3 => evening && recorded, _ => true });
-                m_Summary[i].gameObject.SetActive(has);
-                if (i < m_SummaryLabels.Length) m_SummaryLabels[i].gameObject.SetActive(has);
-                if (!has) continue;
-                if (i < m_SummaryLabels.Length) m_SummaryLabels[i].Set(lines[i].label);
-                m_Summary[i].Set(lines[i].value, lines[i].args);
+                int slot = column * 3;
+                for (int line = column * 3; line < column * 3 + 3 && line < lines.Length; line++)
+                {
+                    if (!Known(line) || slot >= m_Summary.Length) continue;
+                    if (slot < m_SummaryLabels.Length) m_SummaryLabels[slot].Set(lines[line].label);
+                    m_Summary[slot].Set(lines[line].value, lines[line].args);
+                    m_Summary[slot].gameObject.SetActive(true);
+                    if (slot < m_SummaryLabels.Length) m_SummaryLabels[slot].gameObject.SetActive(true);
+                    slot++;
+                }
+                for (; slot < column * 3 + 3 && slot < m_Summary.Length; slot++)
+                {
+                    m_Summary[slot].gameObject.SetActive(false);
+                    if (slot < m_SummaryLabels.Length) m_SummaryLabels[slot].gameObject.SetActive(false);
+                }
             }
             if (m_Purse != null) m_Purse.Set(LoopLocKeys.NightPurse, state.Gold, state.Renown);
 

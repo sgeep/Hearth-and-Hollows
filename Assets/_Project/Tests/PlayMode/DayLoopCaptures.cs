@@ -49,6 +49,18 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/day_menu.png");
 
             Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            // A new game starts with a delve: home with nothing, sleep, and day 2's daytime.
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance && LevelManager.Instance.Players.Count > 0, 30f, "the first delve");
+            yield return null;
+            FreezeEnemies();
+            var first = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            DelveRunController.Active.Extract();
+            yield return WaitUntil(() => first.IsOpen, 5f, "result");
+            first.Proceed();
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the first night");
+            yield return new WaitForSeconds(0.6f);
+            TavernEveningCaptures.Capture("BatchLogs/day_first_night.png");
+            Object.FindAnyObjectByType<NightScreen>().SleepButton.onClick.Invoke();
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime, 30f, "morning");
             IngredientDefinition leg = Flow.Database.Ingredient("spider_leg");
             Flow.State.Storeroom.Add(new IngredientStack(new IngredientItem(leg, Quality.Fine), 2, 0.9f));

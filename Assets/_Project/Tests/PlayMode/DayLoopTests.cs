@@ -31,7 +31,7 @@ namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
     /// The whole day through <see cref="GameFlow"/>, from the Boot scene, with saves in a temp folder (4c step 5;
-    /// reordered in 4d step 5): Boot → New Game → daytime (the delve meal) → evening (serve, Results, close up) → the
+    /// reordered in 4d step 5): Boot → New Game → the first delve → night → sleep → daytime (the delve meal) → evening (serve, Results, close up) → the
     /// generated delve (a power, run Gold, a haul, extract) → Night (bank, buy, save) → Sleep → day 2 → boot again →
     /// Continue; and the other ways a day goes (dying with the Lockbox, staying shut, quitting mid-delve).
     /// </summary>
@@ -114,14 +114,20 @@ namespace Hearthdelve.Tests.PlayMode
             yield return InDungeon();
         }
 
-        /// <summary>A new game, its first daytime, the evening kept shut, and the night's delve.</summary>
+        /// <summary>A new game: it starts with a delve into the Hollows (the 4d playtest).</summary>
         IEnumerator NewGameToTheDelve()
         {
             yield return BootToMenu();
             Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the first daytime");
-            yield return OpenForTheEvening();
-            yield return StayShutAndDelve();
+            yield return InDungeon();
+        }
+
+        /// <summary>Home from a delve with nothing, then sleep into the next daytime.</summary>
+        IEnumerator HomeAndSleep(string what)
+        {
+            yield return ExtractAndGoHome();
+            Object.FindAnyObjectByType<NightScreen>().SleepButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Daytime, what);
         }
 
         /// <summary>One customer, one dish, cooked and served through the session; returns once they've paid.</summary>
@@ -168,17 +174,28 @@ namespace Hearthdelve.Tests.PlayMode
             menu.NewGameButton.onClick.Invoke();
             Assert.That(menu.IsConfirming, Is.False, "nothing to replace, so no question");
 
-            // Daytime, day 1: tonight's delve meal from a spider leg in the storeroom.
-            yield return InTavern(TavernPhase.Daytime, "the first daytime");
-            Assert.That(Flow.State.Day, Is.EqualTo(1));
+            // Day 1 starts with a delve into the Hollows: the storeroom is empty, so the first job is something to cook.
+            var transition = Object.FindAnyObjectByType<TransitionScreen>();
+            yield return WaitUntil(() => transition.IsCovering, 3f, "the way down");
+            Assert.That(transition.CaptionKey, Is.EqualTo(LoopLocKeys.TransitionFirstDelve), "straight into the Hollows");
+            yield return InDungeon();
+            Assert.That((Flow.State.Day, Flow.State.Phase), Is.EqualTo((1, DayPhase.Delve)));
             Assert.That(File.Exists(Path.Combine(m_SaveDir, SaveStore.FileName)), "a new game is saved at once");
+            Assert.That(SavedGame().phase, Is.EqualTo(nameof(DayPhase.Delve)));
+            PlayerSatchel.Add(new IngredientItem(Leg, Quality.Standard), 2);
+            yield return ExtractAndGoHome();
+            Assert.That(Legs(Flow.State.Storeroom), Is.EqualTo(2), "the first haul");
+            Object.FindAnyObjectByType<NightScreen>().SleepButton.onClick.Invoke();
+
+            // Daytime, day 2: tonight's delve meal from a spider leg in the storeroom.
+            yield return InTavern(TavernPhase.Daytime, "the first daytime");
+            Assert.That(Flow.State.Day, Is.EqualTo(2));
             Assert.That(Director.InDayLoop);
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
             yield return null;
             Assert.That(daytime.IsShown);
-            Assert.That(ShownText(daytime), Has.Some.EqualTo("daytime · day 1").And.Some.EqualTo("open for the evening"));
+            Assert.That(ShownText(daytime), Has.Some.EqualTo("daytime · day 2").And.Some.EqualTo("open for the evening"));
             Assert.That(GameObject.Find("Controls"), Is.Null, "no walking controls over the daytime panel");
-            Flow.State.Storeroom.Add(new IngredientStack(new IngredientItem(Leg, Quality.Standard), 2, 1f));
             int card = daytime.Options.ToList().IndexOf(GrilledLeg);
             Assert.That(card, Is.GreaterThanOrEqualTo(0), "grilled spider leg makes a delve meal");
             daytime.Cook(card);
@@ -205,7 +222,6 @@ namespace Hearthdelve.Tests.PlayMode
             int takings = ledger.Gold + ledger.Tips;
             Director.EndServiceNow();
             yield return WaitUntil(() => Director.Phase == TavernPhase.Results, 10f, "results");
-            var transition = Object.FindAnyObjectByType<TransitionScreen>();
             yield return CloseResults();
             yield return WaitUntil(() => transition.IsCovering, 3f, "the way down");
             Assert.That(transition.CaptionKey, Is.EqualTo(LoopLocKeys.TransitionDelve), "the tavern closes; down to the Cellars");
@@ -229,7 +245,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
 
             // Night: the haul and the run's Gold home once, saved; the meal used up; an upgrade bought (and saved).
-            Assert.That(Legs(Flow.State.Storeroom), Is.EqualTo(3), "the haul came home, once");
+            Assert.That(Legs(Flow.State.Storeroom), Is.EqualTo(3), "the haul came home, once (the first night's two were eaten and served)");
             Assert.That(Flow.State.Gold, Is.EqualTo(takings + 25), "the run's Gold is banked");
             Assert.That(Flow.State.Meal.IsActive, Is.False, "the meal is used up");
             SaveData atNight = SavedGame();
@@ -254,16 +270,16 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Gold, Is.EqualTo(gold - satchelUpgrade.levels[0].cost));
             Assert.That(SavedGame().upgrades.Single(u => u.id == satchelUpgrade.id).level, Is.EqualTo(1), "saved after buying");
 
-            // Sleep: overnight freshness, day 2's daytime, saved.
+            // Sleep: overnight freshness, day 3's daytime, saved.
             int legsLeft = Legs(Flow.State.Storeroom);
             float freshness = Flow.State.Storeroom.Stacks.First(st => st.Item.Definition == Leg).Freshness;
             night.SleepButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the second daytime");
-            Assert.That(Flow.State.Day, Is.EqualTo(2));
+            yield return InTavern(TavernPhase.Daytime, "the third daytime");
+            Assert.That(Flow.State.Day, Is.EqualTo(3));
             float overnight = Flow.State.Storeroom.Stacks.First(st => st.Item.Definition == Leg).Freshness;
             Assert.That(overnight, Is.LessThan(freshness), "the storeroom lost a little freshness overnight");
             SaveData daySave = SavedGame();
-            Assert.That(daySave.day, Is.EqualTo(2));
+            Assert.That(daySave.day, Is.EqualTo(3));
             Assert.That(daySave.phase, Is.EqualTo(nameof(DayPhase.Daytime)));
             int goldBefore = Flow.State.Gold;
             int renownBefore = Flow.State.Renown;
@@ -272,10 +288,10 @@ namespace Hearthdelve.Tests.PlayMode
             yield return BootToMenu();
             menu = Object.FindAnyObjectByType<MainMenuScreen>();
             Assert.That(menu.ContinueButton.gameObject.activeSelf);
-            Assert.That(ShownText(menu), Has.Some.EqualTo("day 2, daytime"));
+            Assert.That(ShownText(menu), Has.Some.EqualTo("day 3, daytime"));
             menu.ContinueButton.onClick.Invoke();
             yield return InTavern(TavernPhase.Daytime, "the daytime, continued");
-            Assert.That(Flow.State.Day, Is.EqualTo(2));
+            Assert.That(Flow.State.Day, Is.EqualTo(3));
             Assert.That(Flow.State.Gold, Is.EqualTo(goldBefore));
             Assert.That(Flow.State.Renown, Is.EqualTo(renownBefore));
             Assert.That(Flow.State.UpgradeLevel(satchelUpgrade.id), Is.EqualTo(1));
@@ -342,7 +358,7 @@ namespace Hearthdelve.Tests.PlayMode
             for (int i = 0; i < night.Definitions[seatsRow].levels.Count; i++) night.Buy(seatsRow);
             Assert.That(Flow.State.UpgradeLevel(night.Definitions[seatsRow].id), Is.EqualTo(night.Definitions[seatsRow].levels.Count), "seating maxed");
             night.SleepButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the second daytime");
+            yield return InTavern(TavernPhase.Daytime, "the next daytime");
 
             float bonus = Flow.Loadout.MaxEssenceBonus;
             Assert.That(bonus, Is.GreaterThan(0f), "no delve meal today: the bonus is the upgrade's");
@@ -383,7 +399,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
             var night = Object.FindAnyObjectByType<NightScreen>();
             yield return null;
-            Assert.That(ShownText(night), Has.Some.EqualTo("made it out").And.Some.EqualTo("kept shut"), "played through: the day is told");
+            Assert.That(ShownText(night), Has.Some.EqualTo("made it out"), "played through: the delve is told");
+            Assert.That(ShownText(night), Has.None.EqualTo("kept shut").And.None.EqualTo("served"), "the first night had no evening");
 
             yield return BootToMenu();
             Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
@@ -400,12 +417,8 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Dying_TheLockboxStackComesHome_TheRunsGoldIsLost_AndNightFollows()
         {
-            yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the first daytime");
+            yield return NewGameToTheDelve();
             Flow.DebugAddGold(60);
-            yield return OpenForTheEvening();
-            yield return StayShutAndDelve();
             PlayerSatchel.Add(new IngredientItem(Leg, Quality.Standard), 2);
             PlayerSatchel.Add(new IngredientItem(Leg, Quality.Fine), 3);
             DelveRunController.Active.Loot.AddGold(30);
@@ -435,9 +448,8 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator NothingToCook_StayShut_GoesStraightToTheDelve_ThenNight_AndSleeps()
         {
-            yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the first daytime");
+            yield return NewGameToTheDelve();
+            yield return HomeAndSleep("the second daytime");
             yield return OpenForTheEvening();
 
             var prep = Object.FindAnyObjectByType<PrepScreen>();
@@ -455,7 +467,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(ShownText(night), Has.Some.EqualTo("kept shut"));
             night.SleepButton.onClick.Invoke();
             yield return InTavern(TavernPhase.Daytime, "the next daytime");
-            Assert.That(Flow.State.Day, Is.EqualTo(2));
+            Assert.That(Flow.State.Day, Is.EqualTo(3));
         }
 
         /// <summary>
@@ -485,7 +497,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return BootToMenu();
             Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the first daytime");
+            yield return InDungeon();
             Flow.DebugAddGold(50);
             Flow.Save();
 
@@ -498,7 +510,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().gold, Is.EqualTo(50), "Back keeps it");
             menu.NewGameButton.onClick.Invoke();
             menu.ConfirmYes.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "a new first daytime");
+            yield return InDungeon();
             Assert.That(SavedGame().gold, Is.Zero, "started over");
         }
     }

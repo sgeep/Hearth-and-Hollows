@@ -69,6 +69,8 @@ namespace Hearthdelve.UI.Localization
         public const string BonusJoin = "bonus.join";
         public const string MorningCookAt = "morning.cook_at";
         public const string TransitionDelve = "transition.delve";
+        /// <summary>A delve with no evening before it this session: a new game's first, or one resumed from a save.</summary>
+        public const string TransitionFirstDelve = "transition.first_delve";
         public const string TransitionEvening = "transition.evening";
         public const string MenuContinueFrom = "menu.continue_from";
         public const string PhaseMorning = "phase.morning";
@@ -147,6 +149,7 @@ namespace Hearthdelve.UI.Localization
             (BonusJoin, "{0} · {1}"),
             (MorningCookAt, "cook at the {0}"),
             (TransitionDelve, "closing time · the Cellars"),
+            (TransitionFirstDelve, "night · into the Hollows"),
             (TransitionEvening, "evening · day {0}"),
             (MenuContinueFrom, "day {0}, {1}"),
             (PhaseMorning, "daytime"),

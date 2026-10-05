@@ -110,10 +110,15 @@ namespace Hearthdelve.Shared.Game
             }
         }
 
-        /// <summary>Starts day 1. It's saved at once, so Continue never brings back a game the player started over from.</summary>
+        /// <summary>
+        /// Starts day 1 with a delve into the Hollows: the storeroom starts empty, so the first thing to do is go down for
+        /// something to cook (after the 4d playtest: an empty first daytime and a shut first evening were dead time). The
+        /// first night, sleep, and the second day begins in the daytime. Saved at once, so Continue never brings back a
+        /// game the player started over from.
+        /// </summary>
         public void NewGame()
         {
-            State = new GameState { Gold = m_Database != null ? m_Database.newGameGold : 0 };
+            State = new GameState(1, DayPhase.Delve) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
             Save();
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));

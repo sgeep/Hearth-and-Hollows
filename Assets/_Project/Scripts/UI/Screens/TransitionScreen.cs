@@ -75,7 +75,8 @@ namespace Hearthdelve.UI.Screens
             CaptionKey = state == null ? null : state.Phase switch
             {
                 DayPhase.Daytime => LoopLocKeys.MorningTitle,
-                DayPhase.Delve => LoopLocKeys.TransitionDelve,
+                // After an evening, the tavern closes; otherwise (a new game, a resumed save) straight into the Hollows.
+                DayPhase.Delve => state.Today.EveningRecorded ? LoopLocKeys.TransitionDelve : LoopLocKeys.TransitionFirstDelve,
                 DayPhase.Evening => LoopLocKeys.TransitionEvening,
                 _ => LoopLocKeys.NightTitle,
             };
