@@ -93,6 +93,37 @@ namespace Hearthdelve.Tests
             Assert.That(bad, Is.Empty, string.Join("\n", bad) + "\nIf one of these is a proper noun, add it to the list (and say so in review).");
         }
 
+        /// <summary>Player-facing English uses American spelling (the owner's call, 2026-10-05): color, catalog, gray, harbor.</summary>
+        static readonly Regex k_British = new(
+            @"\b(\w*colour\w*|catalogue\w*|\w*(?<!f)(?<!y)our(ed|ing|ite|ites|able|ful)?|grey\w*|cheque\w*|chequer\w*|centre\w*|metre\w*|theatre\w*|" +
+            @"travell\w*|cancell\w*|labell\w*|modell\w*|levell\w*|marvell\w*|fuelled|fuelling|panell\w*|signall\w*|quarrell\w*|jewellery|counsellor\w*|" +
+            @"channelled|tunnelled|totalled|dialled|woollen|\w+ise|\w+ised|\w+ises|\w+ising|\w+isation|defence|offence|licence|cosy|cosier|mould\w*|" +
+            @"plough\w*|draught\w*|fulfil|enrol|skilful|whilst|amongst)\b",
+            RegexOptions.IgnoreCase);
+
+        /// <summary>Words that match a British pattern but are American spellings too.</summary>
+        static readonly HashSet<string> k_AmericanToo = new(System.StringComparer.OrdinalIgnoreCase)
+        {
+            "your", "yours", "pour", "poured", "pouring", "pours", "hour", "hours", "our", "ours", "flour", "sour", "tour", "detour", "scour", "devour",
+            "devoured", "contour", "troubadour", "rise", "rises", "arise", "wise", "otherwise", "likewise", "clockwise", "noise", "poise", "praise",
+            "praised", "raise", "raised", "raises", "rising", "raising", "bruise", "bruised", "cruise", "promise", "promised", "premise", "expertise",
+            "exercise", "advertise", "surprise", "surprised", "surprises", "compromise", "disguise", "disguised", "merchandise", "concise", "precise",
+            "despise", "chastise", "supervise", "revise", "revised", "advise", "advised", "devise", "televise", "improvise", "comprise", "enterprise",
+            "franchise", "treatise", "demise", "excise", "incise", "anise", "valise", "reprise", "chemise", "paradise", "porpoise", "tortoise",
+            "turquoise", "mortise",
+        };
+
+        [Test]
+        public void EnglishStrings_UseAmericanSpelling()
+        {
+            var bad = new List<string>();
+            foreach (var (key, text) in CodeEnglish)
+            foreach (Match word in k_British.Matches(text))
+                if (!k_AmericanToo.Contains(word.Value))
+                    bad.Add($"{key}: \"{word.Value}\" in \"{text}\"");
+            Assert.That(bad, Is.Empty, string.Join("\n", bad) + "\nIf one of these is American too, add it to the list.");
+        }
+
         [Test]
         public void ImportantStrings_HaveTheirAuthoredCasing()
         {

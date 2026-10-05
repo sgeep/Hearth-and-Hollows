@@ -931,6 +931,8 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 - Player-facing "colours" is now "colors" (the controls line, the panel title, "use last colors", and two descriptions).
 - Tests: EditMode 504/504, PlayMode 179 passed plus 7 explicit captures. Web build rebuilt.
 
+**American spelling (2026-10-05):** all player-facing English now uses American spelling: catalog, gray, harbor, traveling trunk, checkered, pale checkerboard, paneling (and colors, above). Ids and saved values are unchanged (`grey`, `chequered`, `harbour`, `wall_panelling…`), so saves are unaffected. `TextStyleTests.EnglishStrings_UseAmericanSpelling` checks every English string; the localization builder now removes colorway name keys (`look.…`) that are no longer generated, so a renamed colorway leaves no stale entry. EditMode 505/505, PlayMode 179 passed plus 7 explicit captures.
+
 **Checkpoint B is waiting for your playtest.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.

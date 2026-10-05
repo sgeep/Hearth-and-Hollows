@@ -121,7 +121,7 @@ namespace Hearthdelve.UI.Localization
             (Carrying, "carrying: {0}"),
             (CantGo, "{0} can't go there: {1}"),
             (Empty, "an empty spot"),
-            (Controls, "{0} pick up · {1} turn · {2} flip · {3} put away · {4} undo · {5} catalogue · {6} colors · {7} other room · {8} check · {9} done"),
+            (Controls, "{0} pick up · {1} turn · {2} flip · {3} put away · {4} undo · {5} catalog · {6} colors · {7} other room · {8} check · {9} done"),
             (CarryControls, "{0} put down · {1} turn · {2} flip · {3} put away · {4} put back · hold {5}: free placement"),
             (Storage, "in storage"),
             (StorageEmpty, "nothing in storage"),

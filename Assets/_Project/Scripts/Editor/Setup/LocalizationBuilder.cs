@@ -90,23 +90,36 @@ namespace Hearthdelve.Editor
             // The furniture catalogue's names, descriptions and colourways, and the palette ramps, tiers and finishes, come from
             // their own tables (4f Checkpoint B).
             FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English)
-                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()));
+                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()), k_GeneratedPrefixes);
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();
         }
 
-        static void FillTable(string tableName, IEnumerable<(string key, string english)> entries)
+        /// <summary>
+        /// Key prefixes whose keys are made from names by a generator (a colorway's "look." key comes from its name): a key
+        /// under one of them that's no longer generated is removed, so a renamed colorway leaves no stale entry behind.
+        /// </summary>
+        static readonly string[] k_GeneratedPrefixes = { "look." };
+
+        static void FillTable(string tableName, IEnumerable<(string key, string english)> entries, string[] prunePrefixes = null)
         {
             var collection = LocalizationEditorSettings.GetStringTableCollection(tableName)
                 ?? LocalizationEditorSettings.CreateStringTableCollection(tableName, EditorPaths.Localization + "/Tables");
             var table = collection.GetTable(k_English) as StringTable ?? collection.AddNewTable(k_English) as StringTable;
 
+            var keys = new HashSet<string>();
             foreach (var (key, text) in entries)
             {
+                keys.Add(key);
                 var entry = table.GetEntry(key);
                 if (entry == null) table.AddEntry(key, text);
                 else if (entry.Value != text) entry.Value = text;
             }
+
+            if (prunePrefixes != null)
+                foreach (string stale in collection.SharedData.Entries.Select(e => e.Key)
+                             .Where(k => prunePrefixes.Any(k.StartsWith) && !keys.Contains(k)).ToList())
+                    collection.RemoveEntry(stale);
 
             EditorUtility.SetDirty(table);
             EditorUtility.SetDirty(table.SharedData);

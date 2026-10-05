@@ -38,7 +38,7 @@ namespace Hearthdelve.Editor
             ("birch", "wood", "birch", new[] { "#685d4b", "#81786a", "#988f80", "#aea496", "#c3bda8" }),
             ("pine", "wood", "pine", new[] { "#564d27", "#816d41", "#b58f5c", "#cca36d" }),
             ("slate", "wood", "slate black", new[] { "#1c1c1c", "#2c2c2c", "#464646", "#656565" }),
-            ("stonewood", "wood", "grey stone", new[] { "#6e6e6e", "#878787", "#9a9a9a", "#aeaeae" }),
+            ("stonewood", "wood", "gray stone", new[] { "#6e6e6e", "#878787", "#9a9a9a", "#aeaeae" }),
             ("teal", "cushion", "teal", new[] { "#1b5b7a", "#1b7873", "#2c917b", "#4fae8f" }),
             ("green", "cushion", "green", new[] { "#1a6740", "#3a781b", "#5e8f2c", "#7fa83c" }),
             ("plum", "cushion", "plum", new[] { "#411c70", "#5a2177", "#7c2487", "#9a3aa0" }),
@@ -54,7 +54,7 @@ namespace Hearthdelve.Editor
             ("elven_glade", "elven glade", new[] { ("wood", "olive"), ("cushion", "green") }),
             ("castle_feast", "castle feast", new[] { ("wood", "walnut"), ("cushion", "rose") }),
             ("haunted_den", "haunted den", new[] { ("wood", "ash"), ("cushion", "plum") }),
-            ("harbour", "harbour", new[] { ("wood", "birch"), ("cushion", "navy") }),
+            ("harbour", "harbor", new[] { ("wood", "birch"), ("cushion", "navy") }),
             ("hearth", "hearth", new[] { ("wood", "rosewood"), ("cushion", "amber") }),
         };
 
@@ -78,16 +78,16 @@ namespace Hearthdelve.Editor
             ("floor_diamonds", "green diamonds", FinishKind.Floor, FurnitureTheme.Tavern, 0, 0, true),
             ("floor_teal", "teal tiles", FinishKind.Floor, FurnitureTheme.Village, 0, 0, true),
             ("floor_plum", "plum tiles", FinishKind.Floor, FurnitureTheme.Village, 0, 40, false),
-            ("floor_chequer", "pale chequer", FinishKind.Floor, FurnitureTheme.Village, 1, 60, false),
+            ("floor_chequer", "pale checkerboard", FinishKind.Floor, FurnitureTheme.Village, 1, 60, false),
             ("floor_parquet", "parquet", FinishKind.Floor, FurnitureTheme.Castle, 1, 70, false),
             ("floor_blue_tiles", "blue castle tiles", FinishKind.Floor, FurnitureTheme.Castle, 2, 90, false),
             ("floor_sage_tiles", "sage castle tiles", FinishKind.Floor, FurnitureTheme.Castle, 2, 90, false),
-            ("wall_panelling", "dark panelling", FinishKind.Wall, FurnitureTheme.Tavern, 0, 0, true),
+            ("wall_panelling", "dark paneling", FinishKind.Wall, FurnitureTheme.Tavern, 0, 0, true),
             ("wall_cream", "cream plaster", FinishKind.Wall, FurnitureTheme.Village, 0, 0, true),
             ("wall_green", "green plaster", FinishKind.Wall, FurnitureTheme.Village, 0, 40, false),
-            ("wall_panelling_walnut", "walnut panelling", FinishKind.Wall, FurnitureTheme.Tavern, 0, 50, false),
-            ("wall_panelling_birch", "birch panelling", FinishKind.Wall, FurnitureTheme.Elven, 2, 70, false),
-            ("wall_panelling_ash", "ash panelling", FinishKind.Wall, FurnitureTheme.Haunted, 3, 70, false),
+            ("wall_panelling_walnut", "walnut paneling", FinishKind.Wall, FurnitureTheme.Tavern, 0, 50, false),
+            ("wall_panelling_birch", "birch paneling", FinishKind.Wall, FurnitureTheme.Elven, 2, 70, false),
+            ("wall_panelling_ash", "ash paneling", FinishKind.Wall, FurnitureTheme.Haunted, 3, 70, false),
         };
 
         /// <summary>The English of ramps, presets, tiers and finishes (UI table).</summary>
