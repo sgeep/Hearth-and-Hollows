@@ -63,8 +63,15 @@ namespace Hearthdelve.Editor
             // Rebuilding the shared prefabs recreates the tavern player without what the tavern adds to it.
             TavernBuilder.AddCarryViewToPlayer();
             BuildSounds();
+            Hearthdelve.Dungeon.Bosses.BossDefinition boss = BossContent.BuildLarderTroll();
             Dictionary<string, RoomDefinition> rooms = RoomContent.Build(content);
             RunSettings settings = BuildSettings(content, rooms);
+            // The arena's encounter (4e): the Larder Troll replaces 4d's stand-in fight. Set once; a later edit is kept.
+            if (settings.tuning.boss == null)
+            {
+                settings.tuning.boss = boss;
+                EditorUtility.SetDirty(settings);
+            }
             bool exists = System.IO.File.Exists(EditorPaths.DungeonScene);
             if (!exists || rebuildSceneApproved && LookTestBuilder.MayWrite(EditorPaths.DungeonScene, true)) BuildScene(content, settings);
             else UpdateRun(settings);
@@ -320,7 +327,14 @@ namespace Hearthdelve.Editor
             // A power taken: a rising shimmer.
             LookTestContent.WriteWav("PH_PowerUp", 0.6f, (t, n) =>
                 (Sin(t, 520f + 700f * t) * 0.5f + Sin(t, 1040f + 1400f * t) * 0.25f) * Mathf.Sin(t / 0.6f * Mathf.PI) * 0.35f);
-            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp" })
+            // The Larder Troll (4e): a low roar, the slam's thud, and a heavier thud for running into a wall.
+            LookTestContent.WriteWav("PH_TrollRoar", 0.9f, (t, n) =>
+                (LookTestContent.Noise(n) * 0.35f + Sin(t, 70f + 25f * Mathf.Sin(t * 9f)) * 0.8f) * Mathf.Sin(t / 0.9f * Mathf.PI) * 0.7f);
+            LookTestContent.WriteWav("PH_TrollSlam", 0.4f, (t, n) =>
+                (LookTestContent.Noise(n) * 0.6f + Sin(t, 55f - 25f * t) * 0.9f) * Mathf.Exp(-t * 9f) * 0.9f);
+            LookTestContent.WriteWav("PH_TrollThud", 0.55f, (t, n) =>
+                (LookTestContent.Noise(n) * 0.7f + Sin(t, 45f - 20f * t) * 1f) * Mathf.Exp(-t * 6f) * 0.95f);
+            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp", "PH_TrollRoar", "PH_TrollSlam", "PH_TrollThud" })
                 AssetDatabase.ImportAsset($"{EditorPaths.Audio}/{name}.wav");
         }
 

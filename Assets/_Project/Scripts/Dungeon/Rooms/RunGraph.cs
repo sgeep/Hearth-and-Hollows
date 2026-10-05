@@ -10,6 +10,8 @@ namespace Hearthdelve.Dungeon.Rooms
         Slime,
         Bat,
         Spider,
+        /// <summary>The floor's boss (4e): the arena's encounter, standing at the arena's boss point.</summary>
+        Boss,
     }
 
     /// <summary>One enemy of a room's encounter: what it is and which spawn point (ground or perch, by kind) it stands on.</summary>

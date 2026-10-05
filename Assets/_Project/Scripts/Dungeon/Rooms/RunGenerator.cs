@@ -91,7 +91,7 @@ namespace Hearthdelve.Dungeon.Rooms
 
             var onThisFloor = new HashSet<string>();
             foreach (FloorNode node in nodes) AssignRoom(node, rooms, random, used, onThisFloor);
-            foreach (FloorNode node in nodes) AssignEncounter(node, t, tuning.arenaPlaceholder, rooms, random);
+            foreach (FloorNode node in nodes) AssignEncounter(node, t, tuning, tuning.arenaPlaceholder, rooms, random);
             foreach (FloorNode node in nodes)
                 if (node.Kind == RoomKind.Combat) node.Reward = RollReward(PickRewardKind(t, tuning, random), index + 1, t, tuning, random);
             VaryChoices(nodes, index + 1, t, tuning, random);
@@ -142,7 +142,7 @@ namespace Hearthdelve.Dungeon.Rooms
             onThisFloor.Add(room.Id);
         }
 
-        static void AssignEncounter(FloorNode node, FloorTuning tuning, ArenaPlaceholder arena, IReadOnlyList<RoomCatalogEntry> rooms, SeededRandom random)
+        static void AssignEncounter(FloorNode node, FloorTuning tuning, RunTuning run, ArenaPlaceholder arena, IReadOnlyList<RoomCatalogEntry> rooms, SeededRandom random)
         {
             if (node.Kind is not (RoomKind.Combat or RoomKind.Arena)) return;
             RoomCatalogEntry room = rooms.First(r => r.Id == node.RoomId);
@@ -156,9 +156,15 @@ namespace Hearthdelve.Dungeon.Rooms
                 points.RemoveAt(0);
             }
 
+            if (node.Kind == RoomKind.Arena && run.boss != null && run.boss.prefab != null)
+            {
+                // The boss stands at the arena's boss point (the room places it), not at a shuffled spawn.
+                node.Encounter.Add(new EncounterSpawn(EnemyKind.Boss, 0));
+                return;
+            }
             if (node.Kind == RoomKind.Arena)
             {
-                // TEMPORARY (4d): the arena's stand-in fight; the 4e boss replaces it.
+                // The stand-in fight from 4d, for settings without a boss.
                 for (int i = 0; i < arena.spiders; i++) Place(EnemyKind.Spider);
                 for (int i = 0; i < arena.bats; i++) Place(EnemyKind.Bat);
                 for (int i = 0; i < arena.slimes; i++) Place(EnemyKind.Slime);

@@ -200,6 +200,8 @@ namespace Hearthdelve.UI.Localization
         public const string PowerTitle = "power.title";
         public const string PowerFooter = "power.footer";
         public static string PowerName(string id) => $"power.{id}";
+        /// <summary>4e: a boss's name, by its id.</summary>
+        public static string BossName(string id) => $"boss.{id}";
         public static string PowerDescription(string id) => $"power.{id}.desc";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
@@ -266,6 +268,7 @@ namespace Hearthdelve.UI.Localization
             (ResultGoldSecured, "+{0} Gold to the purse"),
             (ResultGoldLost, "{0} Gold left in the dark"),
             (PowerTitle, "choose a power"),
+            ("boss.larder_troll", "the Larder Troll"),
             (PowerFooter, "it lasts until you leave the Hollows"),
             ("power.deep_reserves", "deep reserves"),
             ("power.deep_reserves.desc", "+{0} max Essence, filled at once"),

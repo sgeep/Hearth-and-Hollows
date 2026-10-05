@@ -58,6 +58,8 @@ namespace Hearthdelve.Dungeon.Enemies
         [Header("Leap / Swoop")]
         [Min(0), Tooltip("Leap: the most ground covered. Swoop: speed is distance over the active time.")]
         public float travelDistance = 4f;
+        [Min(0f), Tooltip("Swoop only: run into a wall or pillar and be stunned this long (0 = never). 4e, the Larder Troll's charge.")]
+        public float stunOnBlock;
         [Min(0), Tooltip("Leap: how high the body arcs, in tiles (visual only).")]
         public float arcHeight = 0.8f;
 

@@ -33,6 +33,7 @@ namespace Hearthdelve.Dungeon.Rooms
         {
             EnemyKind.Slime => slime,
             EnemyKind.Bat => bat,
+            EnemyKind.Boss => tuning.boss != null ? tuning.boss.prefab : null,
             _ => spider,
         };
 

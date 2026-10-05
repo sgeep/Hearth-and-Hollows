@@ -328,8 +328,8 @@ namespace Hearthdelve.Editor
             };
         }
 
-        static GameObject BuildEnemy(string name, string path, EnemyDefinition definition, SpriteAnimationSet set, SpriteAnimationSet shadowSet,
-            Vector2 colliderSize, Vector2 colliderOffset, float alertHeight, WebProjectile web)
+        internal static GameObject BuildEnemy(string name, string path, EnemyDefinition definition, SpriteAnimationSet set, SpriteAnimationSet shadowSet,
+            Vector2 colliderSize, Vector2 colliderOffset, float alertHeight, WebProjectile web, System.Action<GameObject> extras = null)
         {
             GameObject root = LookTestContent.CharacterRoot(name, Layers.Enemies, colliderSize, colliderOffset);
             LookTestContent.AddModel(root, set, shadowSet, out SpriteRenderer body);
@@ -381,6 +381,8 @@ namespace Hearthdelve.Editor
             }
             root.AddComponent<HitReaction>();
             character.CharacterBrain = Brain(root, definition, attacks, settings.Select(a => a.debugName).ToList());
+            // A boss's own parts (4e): its encounter, its stun, its ground marks.
+            extras?.Invoke(root);
             return LookTestContent.SavePrefab(root, path);
         }
 

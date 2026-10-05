@@ -71,6 +71,17 @@ namespace Hearthdelve.Editor
             }
             powers.gameObject.AddComponent<Hearthdelve.UI.Hud.RunPowersHud>().Configure(powerIcons);
 
+            // A boss's name and health across the top (4e), while its encounter runs.
+            RectTransform boss = LookTestBuilder.UIRect(root, "BossBar", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -4f), new Vector2(164f, 22f));
+            LocalizedSuperText bossName = LookTestBuilder.Text(boss, "Name", LocKeys.BossName("larder_troll"), 6f, k_Light, TextAnchor.UpperCenter,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(164f, 12f));
+            RectTransform bossBack = LookTestBuilder.UIRect(boss, "Back", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -13f), new Vector2(162f, 6f));
+            AddImage(bossBack, Pixel(), new Color(0.12f, 0.06f, 0.05f, 0.9f));
+            RectTransform bossFillRect = LookTestBuilder.UIRect(bossBack, "Fill", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(160f, 4f));
+            Image bossFill = AddImage(bossFillRect, Pixel(), new Color(0.78f, 0.16f, 0.12f), Image.Type.Filled);
+            bossFill.fillMethod = Image.FillMethod.Horizontal;
+            root.gameObject.AddComponent<Hearthdelve.UI.Hud.BossHealthBar>().Configure(boss.gameObject, bossName, bossFill);
+
             RectTransform satchel = LookTestBuilder.UIRect(root, "Satchel", Vector2.zero, Vector2.zero, new Vector2(4f, 8f), new Vector2(94f, 17f));
             var slots = new SatchelSlotView[6];
             for (int i = 0; i < slots.Length; i++)

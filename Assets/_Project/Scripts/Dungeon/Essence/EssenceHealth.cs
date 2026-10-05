@@ -37,6 +37,12 @@ namespace Hearthdelve.Dungeon.Essence
             set => m_GodMode = value;
         }
 
+        /// <summary>An encounter's drain rule (4e: a boss fight pauses it): 1 = normal. Kept apart from <see cref="DrainPaused"/>.</summary>
+        public void SetEncounterDrain(float multiplier)
+        {
+            if (m_Meter != null) m_Meter.EncounterDrainMultiplier = Mathf.Max(0f, multiplier);
+        }
+
         /// <summary>Stops the time drain (menus, safe rooms). Damage still applies.</summary>
         public bool DrainPaused
         {

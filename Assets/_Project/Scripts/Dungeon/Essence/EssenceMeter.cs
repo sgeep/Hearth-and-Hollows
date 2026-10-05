@@ -60,7 +60,11 @@ namespace Hearthdelve.Dungeon.Essence
         public float Normalized => Current / Max;
         public bool IsLow => Normalized <= m_Settings.lowThreshold;
         public bool IsDepleted { get; private set; }
-        public float DrainPerSecond => m_Settings.drainPerSecond * Math.Max(0f, m_Modifiers.DrainMultiplier) * Math.Max(0f, RunDrainMultiplier);
+        public float DrainPerSecond => m_Settings.drainPerSecond * Math.Max(0f, m_Modifiers.DrainMultiplier) * Math.Max(0f, RunDrainMultiplier)
+                                       * Math.Max(0f, EncounterDrainMultiplier);
+
+        /// <summary>An encounter's rule (4e: a boss fight pauses drain): 1 = normal, 0 = no passive drain. Hits still cost.</summary>
+        public float EncounterDrainMultiplier { get; set; } = 1f;
 
         /// <summary>The run's powers (4d step 4): 1 = normal drain.</summary>
         public float RunDrainMultiplier { get; set; } = 1f;

@@ -79,6 +79,7 @@ namespace Hearthdelve.Editor
         const string k_Npcs = "Minifantasy_AMyriadOfNPCs_v.1.0/Minifantasy_NPCs_Assets";
         const string k_Bat = k_Creatures + "/Beasts/Bat";
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
+        const string k_Troll = "All_Exclusives_20261002/Creatures/Ancient_Troll";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
         const string k_Cooking = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Cooking";
         const string k_DishIcons = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Craftable_Item_Icons";
@@ -97,6 +98,7 @@ namespace Hearthdelve.Editor
         public const string LootIcons = "LootIcons";
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
         public const string GiantSpider = "GiantSpider";
+        public const string AncientTroll = "AncientTroll";
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         public const string DwarvenKingdom = "DwarvenKingdom";
@@ -191,6 +193,12 @@ namespace Hearthdelve.Editor
                 sheets.Add(Character($"{k_Spider}/Minifantasy_GiantSpider{anim}.png", GiantSpider, $"GiantSpider{anim}"));
             foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Die", "WebShot" })
                 sheets.Add(Character($"{k_Spider}/Shadows/Minifantasy_GiantSpider{anim}Shadow.png", GiantSpider, $"GiantSpider{anim}Shadow"));
+            // The Ancient Troll (exclusive): the Larder Troll, the Cellars' boss (4e). 32-pixel frames like the others.
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Die", "Eat" })
+            {
+                sheets.Add(Character($"{k_Troll}/Minifantasy_AncientTroll{anim}.png", AncientTroll, $"AncientTroll{anim}"));
+                sheets.Add(Character($"{k_Troll}/Shadows/Minifantasy_AncientTroll{anim}Shadow.png", AncientTroll, $"AncientTroll{anim}Shadow"));
+            }
             // The web projectile, drawn once per direction (rectangles measured from the sheet).
             sheets.Add(new Sheet
             {

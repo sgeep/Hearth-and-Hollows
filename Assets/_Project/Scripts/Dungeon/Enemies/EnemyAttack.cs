@@ -37,6 +37,8 @@ namespace Hearthdelve.Dungeon.Enemies
         MMF_Player m_TelegraphCue;
         [SerializeField, Min(0f), Tooltip("The cue only plays within this distance of the player, in tiles.")]
         float m_CueRange = 6f;
+        [SerializeField, Tooltip("Optional: played as the attack lands (a boss's ground slam: the thud and a shake).")]
+        MMF_Player m_ImpactFeedback;
 
         EnemyAttack[] m_Siblings;
         Character m_Character;
@@ -62,6 +64,8 @@ namespace Hearthdelve.Dungeon.Enemies
         public GameObject Alert => m_Alert;
         public Vector2 Direction => m_Direction;
         public event Action<EnemyAttackPhase> PhaseChanged;
+
+        public void ConfigureImpact(MMF_Player impact) => m_ImpactFeedback = impact;
 
         public void Configure(int attackIndex, GameObject hitbox, GameObject alert, MMF_Player telegraphFeedback, WebProjectile projectile, Transform body, MMF_Player telegraphCue = null)
         {
@@ -212,6 +216,7 @@ namespace Hearthdelve.Dungeon.Enemies
 
         void StartActive()
         {
+            m_ImpactFeedback?.PlayFeedbacks(transform.position);
             switch (Settings.kind)
             {
                 case EnemyAttackKind.Leap:

@@ -26,6 +26,8 @@ namespace Hearthdelve.Shared.Animation
         Sleep,
         /// <summary>Waking up.</summary>
         Wake,
+        /// <summary>Eating (the Larder Troll, 4e).</summary>
+        Eat,
     }
 
     /// <summary>One action's frames, for each of the four drawn facings.</summary>

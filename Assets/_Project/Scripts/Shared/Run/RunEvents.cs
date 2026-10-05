@@ -205,6 +205,46 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
+    /// <summary>A boss encounter began (4e): its id (the name is the UI string boss.&lt;id&gt;) and its health.</summary>
+    public readonly struct BossEncounterStarted : IEvent
+    {
+        public readonly string BossId;
+        public readonly float Health;
+        public readonly float MaxHealth;
+
+        public BossEncounterStarted(string bossId, float health, float maxHealth)
+        {
+            BossId = bossId;
+            Health = health;
+            MaxHealth = maxHealth;
+        }
+    }
+
+    public readonly struct BossHealthChanged : IEvent
+    {
+        public readonly float Health;
+        public readonly float MaxHealth;
+
+        public BossHealthChanged(float health, float maxHealth)
+        {
+            Health = health;
+            MaxHealth = maxHealth;
+        }
+    }
+
+    /// <summary>A boss encounter ended: defeated, or not (the player died, or the room went away).</summary>
+    public readonly struct BossEncounterEnded : IEvent
+    {
+        public readonly string BossId;
+        public readonly bool Defeated;
+
+        public BossEncounterEnded(string bossId, bool defeated)
+        {
+            BossId = bossId;
+            Defeated = defeated;
+        }
+    }
+
     /// <summary>The last enemy in the room fell and its exits are opening.</summary>
     public readonly struct RoomCleared : IEvent
     {

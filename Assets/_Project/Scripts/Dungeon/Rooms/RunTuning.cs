@@ -82,6 +82,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public Hearthdelve.Shared.Run.RunPowerDefinition[] powers = Array.Empty<Hearthdelve.Shared.Run.RunPowerDefinition>();
         [Tooltip("TEMPORARY: the arena's stand-in fight until the 4e boss.")]
         public ArenaPlaceholder arenaPlaceholder = new();
+        [Tooltip("The Cellars' boss (4e): the arena's encounter. Without one, the stand-in fight above.")]
+        public Hearthdelve.Dungeon.Bosses.BossDefinition boss;
 
         public const int Floors = 3;
 

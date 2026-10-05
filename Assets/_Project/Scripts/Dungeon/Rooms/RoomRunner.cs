@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Hearthdelve.Core;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
@@ -29,6 +30,8 @@ namespace Hearthdelve.Dungeon.Rooms
         [SerializeField] RunSettings m_Settings;
         [SerializeField, Tooltip("0: a new seed every run. Any other number replays that run (for bug reports).")]
         int m_Seed;
+        [SerializeField, Tooltip("Development only: start the run in the boss arena (the last floor), to practise the boss. Ignored in release builds and the day loop.")]
+        bool m_StartInArena;
         [SerializeField, Tooltip("Rooms are loaded under this.")]
         Transform m_RoomRoot;
         [SerializeField] NavGrid m_Nav;
@@ -60,6 +63,8 @@ namespace Hearthdelve.Dungeon.Rooms
 
         /// <summary>Tests: the seed the next run uses (0 = none).</summary>
         public static int SeedOverride { get; set; }
+        /// <summary>Tests: start the next run in the arena (as the development toggle does).</summary>
+        public static bool StartInArenaOverride { get; set; }
         public static RoomRunner Active { get; private set; }
 
         public RunGraph Graph { get; private set; }
@@ -111,7 +116,21 @@ namespace Hearthdelve.Dungeon.Rooms
             int seed = SeedOverride != 0 ? SeedOverride : m_Seed != 0 ? m_Seed : new System.Random().Next(1, int.MaxValue);
             Graph = RunGenerator.Generate(seed, m_Settings.tuning, m_Settings.Catalog());
             Debug.Log($"[Hearthdelve] Delve seed {seed} (set it on the RoomRunner to replay this run).\n{Graph.Describe()}");
-            Load(Graph.Floors[0], Graph.Floors[0].Start);
+            FloorGraph first = Graph.Floors[0];
+            FloorNode start = first.Start;
+            // Development: straight to the arena, to practise the boss (never in the day loop or a release build).
+            bool inDayLoop = Hearthdelve.Shared.Game.GameFlow.Instance != null && Hearthdelve.Shared.Game.GameFlow.Instance.InGame;
+            if (StartInArenaOverride || (m_StartInArena && Debug.isDebugBuild && !inDayLoop))
+            {
+                FloorGraph last = Graph.Floors[^1];
+                FloorNode arena = last.Nodes.FirstOrDefault(n => n.Kind == RoomKind.Arena);
+                if (arena != null)
+                {
+                    first = last;
+                    start = arena;
+                }
+            }
+            Load(first, start);
             PublishEntered(0f);
             if (m_Encounter.IsSealed) Seal();
         }

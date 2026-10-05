@@ -53,10 +53,25 @@ namespace Hearthdelve.Dungeon.Rooms
         public GameObject Spawn(EncounterSpawn spawn, GameObject prefab)
         {
             Transform[] points = spawn.Kind == EnemyKind.Bat ? m_PerchSpawns : m_GroundSpawns;
-            if (prefab == null || spawn.Point < 0 || spawn.Point >= points.Length) return null;
-            GameObject enemy = Instantiate(prefab, points[spawn.Point].position, Quaternion.identity, m_Enemies);
+            if (prefab == null) return null;
+            Vector3 at;
+            if (spawn.Kind == EnemyKind.Boss) at = BossPoint();
+            else if (spawn.Point >= 0 && spawn.Point < points.Length) at = points[spawn.Point].position;
+            else return null;
+            GameObject enemy = Instantiate(prefab, at, Quaternion.identity, m_Enemies);
             enemy.name = prefab.name;
             return enemy;
+        }
+
+        /// <summary>Where a boss stands: the ground spawn nearest the middle of the room's far end, facing the way in.</summary>
+        public Vector3 BossPoint()
+        {
+            Vector2 wanted = (Vector2)transform.position + new Vector2(Size.x / 2f, Size.y - 7f);
+            Transform best = null;
+            foreach (Transform point in m_GroundSpawns)
+                if (point != null && (best == null || Vector2.Distance(point.position, wanted) < Vector2.Distance(best.position, wanted)))
+                    best = point;
+            return best != null ? best.position : (Vector3)wanted;
         }
 
         /// <summary>Shows what waits for the room to be clear (the arena's rope), or hides it.</summary>

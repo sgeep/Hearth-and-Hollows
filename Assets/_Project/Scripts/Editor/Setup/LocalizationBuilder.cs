@@ -38,6 +38,7 @@ namespace Hearthdelve.Editor
             ("weapon.butchers_cleaver", "butcher's cleaver"),
             ("enemy.bat", "bat"),
             ("enemy.green_slime", "green slime"),
+            ("enemy.larder_troll", "the Larder Troll"),
             ("enemy.giant_spider", "giant spider"),
             ("enemy.training_dummy", "training dummy"),
             ("recipe.grilled_spider_leg", "grilled spider leg"),
