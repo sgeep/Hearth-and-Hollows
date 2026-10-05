@@ -95,6 +95,36 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(animator.Facing, Is.EqualTo(Facing4.BackRight), "pushing the other way turns them");
         }
 
+        /// <summary>4e playtest: in the Hollows the right stick aims and turns the character; centred, aim follows the walk.</summary>
+        [UnityTest]
+        public IEnumerator TheRightStick_AimsAndTurnsTheDelver_AndCentred_AimFollowsTheWalk()
+        {
+            yield return Load("Dungeon_TestFloor");
+            foreach (var enemy in Object.FindObjectsByType<Hearthdelve.Dungeon.Enemies.EnemyIdentity>()) Object.Destroy(enemy.gameObject);
+            var handle = Player.GetComponent<CharacterHandleWeapon>();
+            var animator = Player.GetComponentInChildren<CharacterSpriteAnimator>();
+            Vector3 start = Player.transform.position;
+
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { rightStick = new Vector2(-1f, 0.1f) });
+            yield return new WaitForSeconds(0.15f);
+            Assert.That(handle.WeaponAimComponent.AimControl, Is.EqualTo(WeaponAim.AimControls.SecondaryThenPrimaryMovement));
+            Assert.That(handle.WeaponAimComponent.CurrentAim.x, Is.LessThan(-0.9f), "aims left");
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackLeft).Or.EqualTo(Facing4.FrontLeft), "and faces left");
+            Assert.That(Vector2.Distance(Player.transform.position, start), Is.LessThan(0.05f), "without moving");
+
+            // Walking right while aiming left: faces the aim.
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftStick = new Vector2(1f, 0f), rightStick = new Vector2(-1f, 0.1f) });
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackLeft).Or.EqualTo(Facing4.FrontLeft), "walking right, still facing the aim");
+
+            // The right stick let go: aim follows the walk.
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftStick = new Vector2(0f, 1f) });
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(handle.WeaponAimComponent.CurrentAim.y, Is.GreaterThan(0.9f), "aims up, the way it walks");
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState());
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator EveryCharacterPrefab_UsesTheFloorController()
         {

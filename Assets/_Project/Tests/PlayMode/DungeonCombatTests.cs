@@ -9,6 +9,7 @@ using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
 using MoreMountains.Tools;
+using Hearthdelve.Core.Movement;
 using MoreMountains.TopDownEngine;
 using NUnit.Framework;
 using UnityEngine;
@@ -231,6 +232,78 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(hurtAt - telegraphAt, Is.GreaterThanOrEqualTo(attack.Settings.telegraph - 0.02f), "hurt only after the full telegraph");
             // Read from the hit itself: Essence also drains over time.
             Assert.That(damaged.First(d => d.TargetIsPlayer).Damage, Is.EqualTo(attack.Settings.damage).Within(0.01f), "the attack's damage, from its data");
+        }
+
+        /// <summary>4e playtest (web): mashing the dodge rolled again and again; the cooldown now holds.</summary>
+        [UnityTest]
+        public IEnumerator MashingDodge_StillWaitsOutTheCooldown()
+        {
+            yield return Setup("green_slime", new Vector2(8f, 6f));
+            int rolls = 0;
+            bool wasRolling = false;
+            float until = Time.time + 0.45f;
+            int frame = 0;
+            while (Time.time < until)
+            {
+                // Two frames down, two up: as fast as a thumb.
+                if (frame++ % 4 < 2) Hold(Key.W, Key.Space);
+                else Hold(Key.W);
+                yield return null;
+                bool rolling = Player.MovementState.CurrentState == CharacterStates.MovementStates.Dashing;
+                if (rolling && !wasRolling) rolls++;
+                wasRolling = rolling;
+            }
+            ReleaseKeys();
+            Assert.That(rolls, Is.EqualTo(1), "one roll inside the cooldown, however fast the button is pressed");
+        }
+
+        /// <summary>4e playtest: on keyboard and mouse the character faces the mouse, standing or walking, and attacks that way.</summary>
+        [UnityTest]
+        public IEnumerator TheCharacter_FacesTheMouse()
+        {
+            yield return Setup("green_slime", new Vector2(8f, 6f));
+            Player.GetComponent<AimControlSwitcher>().enabled = true;
+            var handle = Player.GetComponent<CharacterHandleWeapon>();
+            var animator = Player.GetComponentInChildren<CharacterSpriteAnimator>();
+            Camera camera = Camera.main;
+            Vector2 Screen(Vector2 offset) => camera.WorldToScreenPoint((Vector2)Player.transform.position + offset);
+
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(-4f, -1f)), delta = new Vector2(20f, 0f) });
+            for (int i = 0; i < 4; i++) yield return null;
+            Assert.That(handle.WeaponAimComponent.AimControl, Is.EqualTo(WeaponAim.AimControls.Mouse));
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "standing: faces the mouse");
+
+            // Walking right while the mouse is up and to the left: still faces the mouse.
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(-3f, 3f)), delta = new Vector2(20f, 0f) });
+            Hold(Key.D);
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackLeft), "walking: still faces the mouse");
+            Assert.That(handle.WeaponAimComponent.CurrentAim.x, Is.LessThan(0f), "and aims there");
+            ReleaseKeys();
+        }
+
+        /// <summary>4e playtest: the roll still faces the way it rolls, whatever the aim.</summary>
+        [UnityTest]
+        public IEnumerator TheRoll_FacesTheWayItRolls_NotTheMouse()
+        {
+            yield return Setup("green_slime", new Vector2(8f, 6f));
+            Player.GetComponent<AimControlSwitcher>().enabled = true;
+            var animator = Player.GetComponentInChildren<CharacterSpriteAnimator>();
+            Camera camera = Camera.main;
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = camera.WorldToScreenPoint((Vector2)Player.transform.position + new Vector2(-4f, -1f)), delta = new Vector2(20f, 0f) });
+            Hold(Key.D);
+            yield return null;
+            yield return null;
+            Hold(Key.D, Key.Space);
+            bool facedRoll = false;
+            for (int i = 0; i < 8; i++)
+            {
+                yield return null;
+                if (Player.MovementState.CurrentState == CharacterStates.MovementStates.Dashing)
+                    facedRoll |= animator.Facing == Facing4.FrontRight || animator.Facing == Facing4.BackRight;
+            }
+            ReleaseKeys();
+            Assert.That(facedRoll, "rolled facing right, the way it went");
         }
 
         /// <summary>4e playtest: the roll goes through an enemy in the way instead of shoving it.</summary>
