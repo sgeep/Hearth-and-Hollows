@@ -794,6 +794,8 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - **Renown:** gets its **first tangible gameplay use in 4f** (ideally a small tavern or customer-content unlock); 4g may also use it in story and dialogue conditions. Not built in 4e.
 - Tests: the new finisher thresholds, the entrance's length by the clear record, the final campfire, refill and feeding values, the first meeting's full reveal, the frenzy's caption and swell, the campfire prompt (near, warming, gone when spent) and the result's boss line. **EditMode 443/443, PlayMode 153/153**, and all four captures pass (the troll, the full run, the day screens, the evening).
 
+- **Web:** rebuilt (clean) and smoke-tested: the menu, Continue and a delve, with no console errors. A browser that cached an earlier build's string-table bundles before the local server sent no-cache headers can still show raw keys once; a hard refresh (Ctrl+Shift+R) clears it. (Unity's `Caching` API, which could have cleared bundles at startup, doesn't exist on the web in Unity 6.)
+
 **4e is complete. Next: the 4f plan (not started).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
