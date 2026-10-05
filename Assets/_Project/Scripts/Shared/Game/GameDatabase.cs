@@ -22,6 +22,12 @@ namespace Hearthdelve.Shared.Game
         public List<FurnitureDefinition> furniture = new();
         [Tooltip("What a new game's property starts with; also granted to saves from before furniture.")]
         public FurnitureStartingLayout startingFurniture;
+        [Tooltip("Floor and wall finishes (4f, D5).")]
+        public List<FinishDefinition> finishes = new();
+        [Tooltip("Palette ramps and presets for recolouring (D11).")]
+        public PaletteLibrary palettes;
+        [Tooltip("The catalogue's Renown tiers (D14).")]
+        public CatalogSettings catalog;
 
         [Header("New game")]
         [Min(0)] public int newGameGold;
@@ -57,6 +63,16 @@ namespace Hearthdelve.Shared.Game
             }
             return m_FurnitureById.TryGetValue(id, out var found) ? found : null;
         }
+
+        public FinishDefinition Finish(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            foreach (var f in finishes) if (f != null && f.id == id) return f;
+            return null;
+        }
+
+        /// <summary>The Renown each catalogue tier needs.</summary>
+        public int[] CatalogThresholds() => catalog != null ? catalog.Thresholds() : new[] { 0, 25, 60, 100 };
 
         public UpgradeEffects Effects(GameState state) => Upgrades.Effects(upgrades, state.UpgradeLevel);
 

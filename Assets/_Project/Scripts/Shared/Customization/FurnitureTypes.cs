@@ -78,6 +78,28 @@ namespace Hearthdelve.Shared.Customization
         Story = 1 << 4,
     }
 
+    /// <summary>
+    /// The collection a piece belongs to (4f plan §10): what a catalogue page groups by, and which Renown tier usually opens
+    /// it (D14). A look, not a rule: a dwarven stool goes anywhere.
+    /// </summary>
+    public enum FurnitureTheme
+    {
+        Tavern,
+        Village,
+        Dwarven,
+        Elven,
+        Castle,
+        Haunted,
+        Curio,
+    }
+
+    /// <summary>An area-wide finish (D5): the whole floor, or the whole back wall.</summary>
+    public enum FinishKind
+    {
+        Floor,
+        Wall,
+    }
+
     /// <summary>The kind of property area: it decides which layout checks apply (4f plan §6, §8).</summary>
     public enum AreaKind
     {

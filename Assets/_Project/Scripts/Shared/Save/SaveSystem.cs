@@ -17,7 +17,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 5;
+        public const int CurrentVersion = 6;
 
         /// <summary>The seat upgrade retired in 4f (D16): seating comes from placed tables and chairs.</summary>
         public const string RetiredSeatUpgrade = "tavern_seats";
@@ -64,7 +64,9 @@ namespace Hearthdelve.Shared.Save
             data.bosses.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
 
             FurnitureState furniture = state.Furniture;
-            data.furniture = new FurnitureSaveData { initialized = furniture.Initialized, nextUid = furniture.NextUid };
+            data.furniture = new FurnitureSaveData { initialized = furniture.Initialized, nextUid = furniture.NextUid, tierAnnounced = furniture.AnnouncedTier };
+            data.furniture.finishes.AddRange(furniture.OwnedFinishes);
+            data.furniture.finishes.Sort(string.CompareOrdinal);
             foreach (var pair in furniture.Owned)
                 data.furniture.owned.Add(new OwnedPieceData { id = pair.Key, count = pair.Value });
             data.furniture.owned.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
@@ -72,12 +74,13 @@ namespace Hearthdelve.Shared.Save
             areas.Sort(string.CompareOrdinal);
             foreach (string area in areas)
             {
-                var saved = new AreaSaveData { id = area };
+                var saved = new AreaSaveData { id = area, floor = furniture.Finish(area, FinishKind.Floor), wall = furniture.Finish(area, FinishKind.Wall) };
                 foreach (PlacedFurniture p in furniture.Layout(area))
                     saved.pieces.Add(new PieceData
                     {
                         uid = p.uid, def = p.definition, x = p.cell.x, y = p.cell.y, turns = p.turns, flip = p.flipped,
-                        nx = p.nudge.x, ny = p.nudge.y, host = p.host, anchor = p.anchor,
+                        nx = p.nudge.x, ny = p.nudge.y, host = p.host, anchor = p.anchor, variant = p.variant ?? string.Empty,
+                        palette = p.palette ?? string.Empty,
                     });
                 data.furniture.areas.Add(saved);
             }
@@ -147,6 +150,7 @@ namespace Hearthdelve.Shared.Save
                 furniture.GrantStarter(startingFurniture);
                 return;
             }
+            var finishAreas = new List<(string, string, string)>();
             var owned = new List<(string, int)>();
             foreach (OwnedPieceData o in data.owned)
             {
@@ -172,12 +176,17 @@ namespace Hearthdelve.Shared.Save
                     pieces.Add(new PlacedFurniture
                     {
                         uid = p.uid, definition = p.def, cell = new Vector2Int(p.x, p.y), turns = p.turns, flipped = p.flip,
-                        nudge = new Vector2Int(p.nx, p.ny), host = p.host, anchor = p.anchor,
+                        nudge = new Vector2Int(p.nx, p.ny), host = p.host, anchor = p.anchor, variant = p.variant ?? string.Empty,
+                        palette = p.palette ?? string.Empty,
                     });
                 }
                 areas.Add((a.id, pieces));
+                finishAreas.Add((a.id, a.floor, a.wall));
             }
             furniture.Restore(owned, areas, data.nextUid);
+            furniture.RestoreFinishes(data.finishes ?? new List<string>(), finishAreas, data.tierAnnounced);
+            // Areas and starter finishes added since the save was made (the guest room) arrive with their starting furniture.
+            furniture.GrantMissing(startingFurniture);
         }
 
         public static GameState Restore(SaveData data, GameDatabase database, List<string> warnings = null) =>
@@ -198,6 +207,7 @@ namespace Hearthdelve.Shared.Save
             if (data.version == 2) data = MigrateV2(data);
             if (data.version == 3) data = MigrateV3(data);
             if (data.version == 4) data = MigrateV4(data);
+            if (data.version == 5) data = MigrateV5(data);
             return data;
         }
 
@@ -206,6 +216,20 @@ namespace Hearthdelve.Shared.Save
         /// tile west of their cell's middle, so each saved barrel gains the 2 pixels back in its nudge; and the row of glasses
         /// is a surface item, so a saved row standing on a low shelf goes onto that shelf's surface (otherwise to storage).
         /// </summary>
+        /// <summary>
+        /// v5 → v6 (4f Checkpoint B): new fields only, all empty in a version 5 save: pieces as drawn, areas with their
+        /// starting finishes and areas new since (the guest room) granted on restore (<see cref="FurnitureState.GrantMissing"/>),
+        /// and no tier announced yet, so tiers already reached are announced on the next Night.
+        /// </summary>
+        static SaveData MigrateV5(SaveData v5)
+        {
+            v5.version = 6;
+            v5.furniture ??= new FurnitureSaveData();
+            v5.furniture.finishes ??= new List<string>();
+            v5.furniture.tierAnnounced = 0;
+            return v5;
+        }
+
         static SaveData MigrateV4(SaveData v4)
         {
             v4.version = 5;

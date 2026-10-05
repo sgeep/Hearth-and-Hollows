@@ -56,21 +56,31 @@ namespace Hearthdelve.Shared.Customization
         }
     }
 
-    /// <summary>One art layer as placed in the room: where its pivot is, how it's turned and mirrored.</summary>
+    /// <summary>
+    /// One art layer as placed in the room: where its pivot is, how it's turned and mirrored, and its drawing in the
+    /// piece's colourway (<see cref="Sprite"/>, and <see cref="Frames"/> when it's animated). Recolouring by palette
+    /// (D11) is applied on top when it's drawn.
+    /// </summary>
     public readonly struct PlacedArt
     {
         public readonly FurnitureArt Art;
         public readonly Vector2 Position;
         public readonly float Degrees;
         public readonly bool FlipX;
+        public readonly Sprite Sprite;
+        public readonly Sprite[] Frames;
 
-        public PlacedArt(FurnitureArt art, Vector2 position, float degrees, bool flipX)
+        public PlacedArt(FurnitureArt art, Vector2 position, float degrees, bool flipX, int variant = 0)
         {
             Art = art;
             Position = position;
             Degrees = degrees;
             FlipX = flipX;
+            Frames = art != null ? art.FramesFor(variant) : System.Array.Empty<Sprite>();
+            Sprite = art != null ? art.SpriteFor(variant) : null;
         }
+
+        public bool Animated => Frames != null && Frames.Length > 0;
     }
 
     /// <summary>A seat as placed: its point, where to step from, and the way the sitter faces.</summary>
@@ -125,6 +135,9 @@ namespace Hearthdelve.Shared.Customization
         public readonly List<PlacedLight> Lights = new();
         public readonly List<Vector2> Slots = new();
         public Vector2 StatusPoint;
+        /// <summary>A surface item draws in its host's sorting layer, above it (null: each layer's own).</summary>
+        public string SortingLayer;
+        public int MinOrder;
     }
 
     /// <summary>
@@ -176,8 +189,9 @@ namespace Hearthdelve.Shared.Customization
                 StatusPoint = P(facing.statusPoint),
             };
             foreach (Rect body in facing.bodies) resolved.Bodies.Add(R(body));
+            int variant = definition.VariantIndex(placement.variant);
             foreach (FurnitureArt art in facing.art)
-                if (art != null) resolved.Art.Add(new PlacedArt(art, P(art.position), t.Degrees, t.Flip));
+                if (art != null) resolved.Art.Add(new PlacedArt(art, P(art.position), t.Degrees, t.Flip, variant));
             foreach (FurnitureSeat seat in facing.seats) resolved.Seats.Add(new PlacedSeat(P(seat.position), P(seat.approach), t.Direction(seat.facing)));
             foreach (Vector2 use in facing.usePoints) resolved.UsePoints.Add(P(use));
             resolved.StaffPost = facing.hasStaffPost ? P(facing.staffPost) : resolved.UsePoints.Count > 0 ? resolved.UsePoints[0] : resolved.InteractPoint;
@@ -204,7 +218,7 @@ namespace Hearthdelve.Shared.Customization
             Rect union = default;
             foreach (PlacedArt art in r.Art)
             {
-                Sprite sprite = art.Art.frames != null && art.Art.frames.Length > 0 ? art.Art.frames[0] : art.Art.sprite;
+                Sprite sprite = art.Sprite;
                 if (sprite == null) continue;
                 Bounds b = sprite.bounds;
                 float x0 = b.min.x, x1 = b.max.x;

@@ -40,9 +40,61 @@ namespace Hearthdelve.Shared.Customization
             {
                 if (p.Definition.function != FurnitureFunction.Seat) continue;
                 foreach (PlacedSeat seat in p.Seats)
-                    if (FacesTable(seat, tables)) seats.Add((p, seat));
+                {
+                    if (seat.Facing == Vector2Int.zero)
+                    {
+                        if (TryFaceAny(seat, tables, out PlacedSeat faced)) seats.Add((p, faced));
+                    }
+                    else if (FacesTable(seat, tables)) seats.Add((p, seat));
+                }
             }
             return seats;
         }
+
+        /// <summary>
+        /// The usable seats, each with an approach someone can actually reach (<paramref name="reachable"/>): its drawn one if
+        /// it's clear, otherwise the first clear of beside it (left, right), behind the sitter, or in front. A chair facing
+        /// down in a row of chairs, whose drawn approach is the next chair, is stepped onto from behind instead.
+        /// </summary>
+        public static List<(ResolvedFurniture piece, PlacedSeat seat)> UsableSeats(IReadOnlyList<ResolvedFurniture> pieces, System.Func<Vector2, bool> reachable)
+        {
+            List<(ResolvedFurniture, PlacedSeat)> seats = UsableSeats(pieces);
+            if (reachable == null) return seats;
+            for (int i = 0; i < seats.Count; i++) seats[i] = (seats[i].Item1, WithApproach(seats[i].Item2, reachable));
+            return seats;
+        }
+
+        public static PlacedSeat WithApproach(PlacedSeat seat, System.Func<Vector2, bool> reachable)
+        {
+            if (reachable(seat.Approach)) return seat;
+            // The seat point is the chair's foot: behind a chair facing down is past its own tile, a tile and a bit up.
+            Vector2 p = seat.Position;
+            Vector2 behind = seat.Facing == Vector2Int.down ? new Vector2(0f, 1.4f) : -(Vector2)seat.Facing * 0.9f;
+            foreach (Vector2 candidate in new[] { p + new Vector2(-0.9f, 0f), p + new Vector2(0.9f, 0f), p + behind, p + new Vector2(0f, -0.9f) })
+                if (reachable(candidate)) return new PlacedSeat(seat.Position, candidate, seat.Facing);
+            return seat;
+        }
+
+        static readonly Vector2Int[] k_AnyWay = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
+
+        /// <summary>
+        /// A seat without a back (a stool) faces whichever table stands beside it, trying east, west, north, then south;
+        /// it's stepped onto from below, or from the side when the table is below it.
+        /// </summary>
+        public static bool TryFaceAny(PlacedSeat seat, IReadOnlyList<Rect> tables, out PlacedSeat faced)
+        {
+            foreach (Vector2Int dir in k_AnyWay)
+            {
+                var candidate = new PlacedSeat(seat.Position, ApproachFor(seat.Position, dir), dir);
+                if (!FacesTable(candidate, tables)) continue;
+                faced = candidate;
+                return true;
+            }
+            faced = seat;
+            return false;
+        }
+
+        /// <summary>Where a sitter facing <paramref name="dir"/> steps on from: below the seat, or beside it when facing down.</summary>
+        public static Vector2 ApproachFor(Vector2 seat, Vector2Int dir) => dir == Vector2Int.down ? seat + new Vector2(0.9f, 0f) : seat + new Vector2(0f, -0.9f);
     }
 }

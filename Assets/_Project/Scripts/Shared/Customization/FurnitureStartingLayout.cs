@@ -10,6 +10,10 @@ namespace Hearthdelve.Shared.Customization
     {
         public string area;
         public List<PlacedFurniture> pieces = new();
+        [Tooltip("The area's floor finish (D5) when it's new.")]
+        public string floor;
+        [Tooltip("The area's wall finish when it's new.")]
+        public string wall;
     }
 
     /// <summary>Copies owned beyond those placed (in storage from the start).</summary>
@@ -29,6 +33,10 @@ namespace Hearthdelve.Shared.Customization
     {
         public List<AreaLayoutData> areas = new();
         public List<OwnedFurnitureData> storage = new();
+        [Tooltip("Finishes owned from the start (each area's own).")]
+        public List<string> finishes = new();
+
+        public AreaLayoutData Area(string area) => areas.Find(a => a != null && a.area == area);
 
         public IReadOnlyList<PlacedFurniture> Layout(string area)
         {

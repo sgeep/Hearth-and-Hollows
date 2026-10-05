@@ -145,5 +145,8 @@ namespace Hearthdelve.Shared.Game
 
         /// <summary>Debug: add gold (negative removes, never below zero).</summary>
         public void AddGold(int amount) => Gold = Mathf.Max(0, Gold + amount);
+
+        /// <summary>Debug and tests: add Renown (negative removes, never below zero). Renown is earned, never spent.</summary>
+        public void AddRenown(int amount) => Renown = Mathf.Max(0, Renown + amount);
     }
 }

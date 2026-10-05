@@ -24,6 +24,10 @@ namespace Hearthdelve.Shared.Customization
         public int host = -1;
         [Tooltip("Which of the host's surface anchors it sits on (Surface items).")]
         public int anchor;
+        [Tooltip("Its authored colourway (a variant id; empty: the default).")]
+        public string variant = string.Empty;
+        [Tooltip("Its palette ramps, per channel: \"wood=walnut;cushion=teal\" (empty: as drawn).")]
+        public string palette = string.Empty;
 
         public PlacedFurniture Clone() => (PlacedFurniture)MemberwiseClone();
     }

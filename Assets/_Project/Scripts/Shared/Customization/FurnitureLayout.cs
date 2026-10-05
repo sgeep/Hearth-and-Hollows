@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Hearthdelve.Core;
 using UnityEngine;
 
 namespace Hearthdelve.Shared.Customization
@@ -17,8 +18,10 @@ namespace Hearthdelve.Shared.Customization
         public RectInt Floor;
         /// <summary>Where wall pieces hang.</summary>
         public RectInt WallBand;
-        /// <summary>Tiles nothing standing may cover (the entrance and the tile inside it).</summary>
+        /// <summary>Tiles nothing standing may cover (the entrance and the tile inside it, the stairs).</summary>
         public HashSet<Vector2Int> Reserved = new();
+        /// <summary>The room's fixed solid parts that aren't furniture (the stairs' flight), in world tiles: they block like bodies.</summary>
+        public List<Rect> Fixtures = new();
         /// <summary>The service's points, in world tiles: inside the door, the queue spots front first, where staff rest.</summary>
         public Vector2 Door;
         public List<Vector2> Queue = new();
@@ -98,7 +101,18 @@ namespace Hearthdelve.Shared.Customization
             PlacedFurniture host = Find(p.host);
             ResolvedFurniture h = host != null && host.uid != p.uid && m_Lookup(host.definition)?.layer != FurnitureLayer.Surface ? Resolve(host) : null;
             if (h == null || p.anchor < 0 || p.anchor >= h.Surfaces.Count) return null;
-            return FurnitureGeometry.Resolve(d, p, m_Shape.Origin, h.Surfaces[p.anchor]);
+            ResolvedFurniture r = FurnitureGeometry.Resolve(d, p, m_Shape.Origin, h.Surfaces[p.anchor]);
+            if (r == null || h.Art.Count == 0) return r;
+            // Drawn with its host: on a wall shelf in the shelf's layer above it; on a table, sorted as one just in front of
+            // the table, so it's never hidden behind it and characters still pass in front of both.
+            r.SortingLayer = h.Art[0].Art.sortingLayer;
+            foreach (PlacedArt art in h.Art) r.MinOrder = Mathf.Max(r.MinOrder, art.Art.order + 1);
+            if (r.SortingLayer == SortingLayers.YSorted)
+            {
+                r.Grouped = true;
+                r.GroupPoint = (h.Grouped ? h.GroupPoint : h.Art[0].Position) - new Vector2(0f, 0.002f);
+            }
+            return r;
         }
 
         public List<ResolvedFurniture> ResolveAll()

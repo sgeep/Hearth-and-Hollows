@@ -23,6 +23,45 @@ namespace Hearthdelve.Shared.Customization
         public Vector2 position;
         public string sortingLayer = "Characters";
         public int order;
+        [Tooltip("The drawing in each of the definition's variants (index 0 is the default: empty means the sprite above).")]
+        public Sprite[] variantSprites = Array.Empty<Sprite>();
+        [Tooltip("An animated layer's frames in each variant (index 0: the frames above).")]
+        public List<SpriteList> variantFrames = new();
+
+        /// <summary>The still drawing in a variant (the default where that variant draws nothing different).</summary>
+        public Sprite SpriteFor(int variant)
+        {
+            Sprite[] f = FramesFor(variant);
+            if (f.Length > 0) return f[0];
+            if (variant > 0 && variant < variantSprites.Length && variantSprites[variant] != null) return variantSprites[variant];
+            return sprite;
+        }
+
+        /// <summary>An animated layer's frames in a variant (empty for a still layer).</summary>
+        public Sprite[] FramesFor(int variant)
+        {
+            if (variant > 0 && variant < variantFrames.Count && variantFrames[variant]?.frames is { Length: > 0 } v) return v;
+            return frames ?? Array.Empty<Sprite>();
+        }
+    }
+
+    /// <summary>A list of frames (Unity can't serialize arrays of arrays).</summary>
+    [Serializable]
+    public sealed class SpriteList
+    {
+        public Sprite[] frames = Array.Empty<Sprite>();
+    }
+
+    /// <summary>One of Minifantasy's authored colourways of a piece (D11): offered in the colour panel beside palette ramps.</summary>
+    [Serializable]
+    public sealed class FurnitureVariant
+    {
+        [Tooltip("Stable id, saved with each placed copy.")]
+        public string id;
+        [Tooltip("Localization key (UI table) of its name.")]
+        public string nameKey;
+        [Tooltip("The swatch shown for it.")]
+        public Color swatch = Color.white;
     }
 
     /// <summary>Where a customer sits, where they step from, and the way they face (towards the table).</summary>

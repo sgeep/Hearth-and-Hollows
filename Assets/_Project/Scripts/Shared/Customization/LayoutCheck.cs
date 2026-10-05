@@ -87,6 +87,7 @@ namespace Hearthdelve.Shared.Customization
             for (int y = 0; y < map.Height; y++)
             for (int x = 0; x < map.Width; x++)
                 map.SetBlocked(x, y, !shape.Floor.Contains(new Vector2Int(x + shape.Bounds.xMin, y + shape.Bounds.yMin)));
+            foreach (Rect fixture in shape.Fixtures) Block(map, shape, fixture);
             foreach (ResolvedFurniture p in pieces)
             {
                 if (!p.Definition.BlocksMovement) continue;
@@ -153,6 +154,14 @@ namespace Hearthdelve.Shared.Customization
             return false;
         }
 
+        /// <summary>Whether a point's cell can be walked to from the area's door (seat approaches are chosen by it).</summary>
+        public static System.Func<Vector2, bool> ReachableFromDoor(AreaShape shape, IReadOnlyList<ResolvedFurniture> pieces)
+        {
+            GridMap map = Walkable(shape, pieces);
+            bool[,] fromDoor = Reachable(map, Cell(shape, shape.Door));
+            return p => At(fromDoor, Cell(shape, p));
+        }
+
         /// <summary>The tavern's check: can an evening's service run in this layout?</summary>
         public static LayoutReport Tavern(AreaShape shape, IReadOnlyList<ResolvedFurniture> pieces)
         {
@@ -181,7 +190,7 @@ namespace Hearthdelve.Shared.Customization
             if (pass == null) report.Issues.Add(new LayoutIssue(LayoutIssueKind.PassMissing, true));
             else if (!CanUse(shape, fromDoor, pass)) report.Issues.Add(new LayoutIssue(LayoutIssueKind.PassUnreachable, true, uid: pass.Placement.uid));
 
-            var seats = FurnitureRules.UsableSeats(pieces);
+            var seats = FurnitureRules.UsableSeats(pieces, p => At(fromDoor, Cell(shape, p)));
             report.Seats = seats.Count;
             int firstUnreached = -1;
             foreach (var (piece, seat) in seats)

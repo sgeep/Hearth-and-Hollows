@@ -228,6 +228,14 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
+        /// <summary>Furniture bought, sold or restyled (4f): the screens refresh and the game saves (autosave after purchases).</summary>
+        public void FurnitureChanged()
+        {
+            if (!InGame) return;
+            StateChanged?.Invoke();
+            Save();
+        }
+
         /// <summary>Sleep: overnight freshness loss, the next day's daytime, autosave, fresh tavern scene.</summary>
         public void Sleep()
         {

@@ -69,6 +69,10 @@ namespace Hearthdelve.Core.Input
         public const string Wheel = "Wheel";
         /// <summary>Held: free placement, to the pixel (the owner's request, amending D1).</summary>
         public const string Free = "Free";
+        /// <summary>Opens the colour panel for the piece under the cursor or carried (4f step 5).</summary>
+        public const string Style = "Style";
+        /// <summary>Goes to the property's next area (the tavern, the guest room) without walking (4f step 6).</summary>
+        public const string Area = "Area";
     }
 
     public static class MinigameActions

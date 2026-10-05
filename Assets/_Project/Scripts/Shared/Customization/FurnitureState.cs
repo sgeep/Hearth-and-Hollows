@@ -12,6 +12,9 @@ namespace Hearthdelve.Shared.Customization
     {
         readonly Dictionary<string, int> m_Owned = new();
         readonly Dictionary<string, List<PlacedFurniture>> m_Areas = new();
+        readonly Dictionary<string, string> m_Floors = new();
+        readonly Dictionary<string, string> m_Walls = new();
+        readonly HashSet<string> m_OwnedFinishes = new();
 
         /// <summary>False until the starting furniture is granted (a new game, or an old save meeting furniture for the first time).</summary>
         public bool Initialized { get; private set; }
@@ -20,6 +23,27 @@ namespace Hearthdelve.Shared.Customization
 
         public IReadOnlyDictionary<string, int> Owned => m_Owned;
         public IEnumerable<string> AreaIds => m_Areas.Keys;
+        public IEnumerable<string> OwnedFinishes => m_OwnedFinishes;
+        /// <summary>The highest catalogue tier the Night screen has announced (D14): each opening is announced once.</summary>
+        public int AnnouncedTier { get; set; }
+
+        public bool OwnsFinish(string id) => !string.IsNullOrEmpty(id) && m_OwnedFinishes.Contains(id);
+        public void OwnFinish(string id)
+        {
+            if (!string.IsNullOrEmpty(id)) m_OwnedFinishes.Add(id);
+        }
+
+        /// <summary>An area's floor or wall finish (null: never set, so the room as built).</summary>
+        public string Finish(string area, FinishKind kind) =>
+            area != null && (kind == FinishKind.Floor ? m_Floors : m_Walls).TryGetValue(area, out string id) ? id : null;
+
+        public void SetFinish(string area, FinishKind kind, string id)
+        {
+            if (string.IsNullOrEmpty(area)) return;
+            Dictionary<string, string> finishes = kind == FinishKind.Floor ? m_Floors : m_Walls;
+            if (string.IsNullOrEmpty(id)) finishes.Remove(area);
+            else finishes[area] = id;
+        }
 
         public int OwnedCount(string definition) => definition != null && m_Owned.TryGetValue(definition, out int n) ? n : 0;
 
@@ -43,6 +67,10 @@ namespace Hearthdelve.Shared.Customization
         {
             m_Owned.Clear();
             m_Areas.Clear();
+            m_Floors.Clear();
+            m_Walls.Clear();
+            m_OwnedFinishes.Clear();
+            AnnouncedTier = 0;
             NextUid = 1;
             if (start != null)
             {
@@ -59,11 +87,62 @@ namespace Hearthdelve.Shared.Customization
                         NextUid = Math.Max(NextUid, copy.uid + 1);
                     }
                     m_Areas[area.area] = pieces;
+                    SetFinish(area.area, FinishKind.Floor, area.floor);
+                    SetFinish(area.area, FinishKind.Wall, area.wall);
                 }
                 foreach (OwnedFurnitureData extra in start.storage)
                     if (extra != null) AddOwned(extra.definition, extra.count);
+                foreach (string finish in start.finishes) OwnFinish(finish);
             }
             Initialized = true;
+        }
+
+        /// <summary>
+        /// Brings a save up to the property as it now is (any version): an area the save has never seen (the guest room,
+        /// for a save from Checkpoint A) arrives with its starting furniture, owned and placed (uids renumbered to stay
+        /// unique), and its starting finishes; the starter finishes are owned. Running it again changes nothing.
+        /// </summary>
+        public void GrantMissing(FurnitureStartingLayout start)
+        {
+            if (start == null) return;
+            foreach (AreaLayoutData area in start.areas)
+            {
+                if (area == null || string.IsNullOrEmpty(area.area)) continue;
+                if (!m_Areas.ContainsKey(area.area))
+                {
+                    var uids = new Dictionary<int, int>();
+                    var pieces = new List<PlacedFurniture>();
+                    foreach (PlacedFurniture p in area.pieces)
+                    {
+                        if (p == null || string.IsNullOrEmpty(p.definition)) continue;
+                        PlacedFurniture copy = p.Clone();
+                        uids[p.uid] = copy.uid = TakeUid();
+                        pieces.Add(copy);
+                        AddOwned(copy.definition, 1);
+                    }
+                    foreach (PlacedFurniture p in pieces)
+                        if (p.host >= 0) p.host = uids.TryGetValue(p.host, out int h) ? h : -1;
+                    m_Areas[area.area] = pieces;
+                }
+                if (Finish(area.area, FinishKind.Floor) == null) SetFinish(area.area, FinishKind.Floor, area.floor);
+                if (Finish(area.area, FinishKind.Wall) == null) SetFinish(area.area, FinishKind.Wall, area.wall);
+            }
+            foreach (string finish in start.finishes) OwnFinish(finish);
+        }
+
+        /// <summary>Restores the finishes and the announced tier (SaveSystem; after <see cref="Restore"/>).</summary>
+        public void RestoreFinishes(IEnumerable<string> owned, IEnumerable<(string area, string floor, string wall)> areas, int announcedTier)
+        {
+            m_OwnedFinishes.Clear();
+            m_Floors.Clear();
+            m_Walls.Clear();
+            foreach (string id in owned) OwnFinish(id);
+            foreach (var (area, floor, wall) in areas)
+            {
+                SetFinish(area, FinishKind.Floor, floor);
+                SetFinish(area, FinishKind.Wall, wall);
+            }
+            AnnouncedTier = Math.Max(0, announcedTier);
         }
 
         /// <summary>Restores saved state (SaveSystem). Pieces whose definitions are owned fewer times than placed gain the missing copies.</summary>
@@ -102,6 +181,9 @@ namespace Hearthdelve.Shared.Customization
         }
 
         public int TakeUid() => NextUid++;
+
+        /// <summary>Gives (or, negative, takes away) owned copies outside the shop: the developer sandbox, later discoveries.</summary>
+        public void AddOwnedCopies(string definition, int count) => AddOwned(definition, count);
 
         internal void AddOwned(string definition, int count)
         {

@@ -6,7 +6,11 @@ namespace Hearthdelve.Shared.Save
     // JSON shapes (JsonUtility). Content is stored by stable id; enums by name so reordering
     // them never corrupts a save. Change these only together with a version bump + migration.
 
-    /// <summary>Current save format (version 5: as 4, with 4f's barrel offset and surface glasses; 4 added furniture, 3 the bosses defeated).</summary>
+    /// <summary>
+    /// Current save format (version 6: 4f Checkpoint B's looks and finishes: each piece's colourway and palette, each area's
+    /// floor and wall finish, owned finishes and the catalogue tier last announced; 5 moved 4f's barrels and glasses, 4
+    /// added furniture, 3 the bosses defeated).
+    /// </summary>
     [Serializable]
     public sealed class SaveData
     {
@@ -35,6 +39,10 @@ namespace Hearthdelve.Shared.Save
         public int nextUid = 1;
         public List<OwnedPieceData> owned = new();
         public List<AreaSaveData> areas = new();
+        /// <summary>Version 6: finishes owned (D5).</summary>
+        public List<string> finishes = new();
+        /// <summary>Version 6: the highest catalogue tier announced (D14).</summary>
+        public int tierAnnounced;
     }
 
     [Serializable]
@@ -49,6 +57,9 @@ namespace Hearthdelve.Shared.Save
     {
         public string id;
         public List<PieceData> pieces = new();
+        /// <summary>Version 6: the area's floor and wall finishes (empty: as first built).</summary>
+        public string floor;
+        public string wall;
     }
 
     /// <summary>A placed piece: definition id, footprint cell, quarter turns, mirror, nudge in art pixels, host uid.</summary>
@@ -65,6 +76,9 @@ namespace Hearthdelve.Shared.Save
         public int ny;
         public int host = -1;
         public int anchor;
+        /// <summary>Version 6: its colourway and palette choices (empty: as drawn).</summary>
+        public string variant;
+        public string palette;
     }
 
     [Serializable]
