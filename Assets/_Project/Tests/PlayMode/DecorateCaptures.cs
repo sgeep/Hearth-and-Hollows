@@ -28,6 +28,15 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             TavernEveningCaptures.Capture("BatchLogs/decorate_browse.png");
 
+            // A chair carried over open floor: the corners should hug the chair as drawn.
+            Mode.SetCursor(new Vector2Int(3, 7));
+            Mode.PickUp();
+            Mode.SetCursor(new Vector2Int(13, 5));
+            yield return null;
+            yield return null;
+            TavernEveningCaptures.Capture("BatchLogs/decorate_chair.png");
+            Mode.PutBack();
+
             Mode.SetCursor(new Vector2Int(26, 9));
             Mode.PickUp();
             Mode.SetCursor(new Vector2Int(4, 7));

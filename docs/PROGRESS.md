@@ -866,7 +866,9 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 - **The charged attack always faced one way** (not 4f, but the locked aim rule): Minifantasy's charged-attack sheet is drawn only facing front-right (its rows are the wind-up, the charged loop and the spin). Facing already followed the mouse or stick while charging; the drawing didn't. The three stages are now mirrored for left-facing aims, as the dodge is, so the charge turns with the aim while held (back facings keep the front pose). The heavy itself is a spin with a round hit area, so it hits all round whichever way you face.
 - Tests: EditMode 479/479 (new: barrels side by side, the glasses riding on their shelf and needing a surface, picking by what's drawn, the version 4 save keeping barrels and glasses); PlayMode 167/167 (new: the mouse picking a chair by its drawing and free mode placing to the pixel, the glasses riding on their shelf, the charge turning with the mouse). The web build wasn't rebuilt for these fixes; it will be at the next checkpoint.
 
-**Checkpoint A is waiting for your second look.**
+**Second look (2026-10-05):** the green tiles under a carried piece looked offset, most of all on chairs: they marked the floor tile, and a chair is drawn a quarter tile off its tile. A carried piece now shows green or red **corners round its drawing** while snapping; in **free mode there's no outline**: the piece itself turns red where it can't go (with the reason on the line at the top, and the buzz if you try). Also fixed: the previous ghost lingered for a frame when it was redrawn. Test: the ghost framed while snapping, unframed and tinted in free mode (Decorate tests 10/10).
+
+**Checkpoint A is waiting for your next look.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

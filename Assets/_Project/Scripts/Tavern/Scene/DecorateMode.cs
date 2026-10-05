@@ -173,7 +173,11 @@ namespace Hearthdelve.Tavern.Scene
             ReadCursor();
             // Holding or letting go of the free key re-places the carried piece under the mouse at once.
             bool free = FreeMode;
-            if (free != m_WasFree && Carried != null && m_Pointing) FollowPointer();
+            if (free != m_WasFree && Carried != null)
+            {
+                if (m_Pointing) FollowPointer();
+                else Refresh();
+            }
             m_WasFree = free;
             if (Pressed(m_Select)) PickOrPlace();
             else if (Pressed(m_Click)) PickOrPlace();
@@ -616,6 +620,9 @@ namespace Hearthdelve.Tavern.Scene
         void ClearGhost()
         {
             if (m_Ghost == null) return;
+            // Out of sight at once (it's destroyed at the frame's end).
+            m_Ghost.gameObject.SetActive(false);
+            m_Ghost.SetParent(null, false);
             Destroy(m_Ghost.gameObject);
             m_Ghost = null;
         }
@@ -636,12 +643,12 @@ namespace Hearthdelve.Tavern.Scene
                                       (surface ? FurnitureGeometry.Resolve(m_Layout.Definition(Carried.definition), Carried, m_Layout.Shape.Origin, m_SurfacePoint) : null);
                 if (r != null)
                 {
-                    Color tile = CarriedCheck.IsValid ? m_Fits : m_Blocked;
-                    if (surface) Corners(look, FurnitureGeometry.ArtBounds(r), new Color(tile.r, tile.g, tile.b, 1f));
-                    else
-                        for (int x = r.Footprint.xMin; x < r.Footprint.xMax; x++)
-                        for (int y = r.Footprint.yMin; y < r.Footprint.yMax; y++)
-                            Tile(look, new Vector2(x, y) + m_Layout.Shape.Origin, tile);
+                    // Snapping: green or red corners round the drawing (not the floor tiles, which a chair or barrel is
+                    // drawn a quarter tile off). Free placement: no outline, the piece itself turns red where it can't go
+                    // (Checkpoint A playtest).
+                    bool fits = CarriedCheck.IsValid;
+                    Color tile = fits ? m_Fits : m_Blocked;
+                    if (!FreeMode) Corners(look, FurnitureGeometry.ArtBounds(r), new Color(tile.r, tile.g, tile.b, 1f));
                     foreach (PlacedArt art in r.Art)
                     {
                         var go = new GameObject(art.Art.name);
@@ -653,7 +660,7 @@ namespace Hearthdelve.Tavern.Scene
                         sprite.flipX = art.FlipX;
                         sprite.sortingLayerName = SortingLayers.Above;
                         sprite.sortingOrder = 10 + art.Art.order;
-                        sprite.color = new Color(1f, 1f, 1f, m_GhostAlpha);
+                        sprite.color = fits ? new Color(1f, 1f, 1f, m_GhostAlpha) : new Color(1f, 0.45f, 0.4f, m_GhostAlpha);
                         if (look != null && look.overlayMaterial != null) sprite.sharedMaterial = look.overlayMaterial;
                     }
                 }
@@ -664,20 +671,6 @@ namespace Hearthdelve.Tavern.Scene
             ResolvedFurniture h = hovered != null ? m_Layout.Resolve(hovered) : null;
             // Round what's drawn (a chair sits a quarter tile off its cell), or the tile under the cursor.
             Corners(look, h != null ? FurnitureGeometry.ArtBounds(h) : new Rect(Cursor + m_Layout.Shape.Origin, Vector2.one), look != null ? look.highlightColor : Color.white);
-        }
-
-        void Tile(FurniturePresentation look, Vector2 cell, Color color)
-        {
-            var go = new GameObject("Tile");
-            go.transform.SetParent(m_Ghost, false);
-            go.transform.position = cell + new Vector2(0.5f, 0.5f);
-            go.transform.localScale = new Vector3(8f, 8f, 1f);
-            var sprite = go.AddComponent<SpriteRenderer>();
-            sprite.sprite = look != null ? look.pixel : null;
-            sprite.sortingLayerName = SortingLayers.Above;
-            sprite.sortingOrder = 9;
-            sprite.color = color;
-            if (look != null && look.overlayMaterial != null) sprite.sharedMaterial = look.overlayMaterial;
         }
 
         void Corners(FurniturePresentation look, Rect frame, Color color)

@@ -238,6 +238,31 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Vector2.Distance(chair.Art[0].Position, new Vector2(13.25f + 0.25f, 5.25f - 0.125f)), Is.LessThan(1e-4f), "where it was put");
         }
 
+        /// <summary>Checkpoint A playtest: corners round the drawing while snapping; in free mode no outline, the piece turns red where it can't go.</summary>
+        [UnityTest]
+        public IEnumerator TheGhost_IsFramedWhenSnapping_AndJustTintedInFreeMode()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            Transform Ghost() => Mode.transform.Find("Decorate Ghost");
+            Mode.SetCursor(new Vector2Int(26, 9));
+            Mode.PickUp();
+            Mode.SetCursor(new Vector2Int(12, 10));
+            Assert.That(Ghost().GetComponentsInChildren<SpriteRenderer>().Count(r => r.name == "Corner"), Is.EqualTo(4), "snapping: corners round it");
+            Mode.ForceFree = true;
+            yield return null;
+            Assert.That(Ghost().GetComponentsInChildren<SpriteRenderer>().Count(r => r.name == "Corner"), Is.Zero, "free: no outline");
+            SpriteRenderer barrel = Ghost().GetComponentsInChildren<SpriteRenderer>().Single();
+            Assert.That(barrel.color.g, Is.GreaterThan(0.9f), "where it fits, drawn as it is");
+            Mode.SetCursor(new Vector2Int(4, 7));
+            barrel = Ghost().GetComponentsInChildren<SpriteRenderer>().Single();
+            Assert.That(barrel.color.g, Is.LessThan(0.6f), "where it can't go, red");
+            Mode.ForceFree = false;
+            Mode.PutBack();
+            Mode.Leave();
+        }
+
         [UnityTest]
         public IEnumerator TheGlasses_RideOnTheirShelf()
         {
