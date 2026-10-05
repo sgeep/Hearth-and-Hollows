@@ -40,12 +40,16 @@ namespace Hearthdelve.Tests.EditMode
         public void TheFinisher_TakesALowFreshlyHitEnemy_Only()
         {
             var s = Hearthdelve.Dungeon.Harvest.FinisherSettings.Default;
-            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(10f, 34f, 0.5f, s), "low (35% or 20 health) and just hit");
-            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(18f, 34f, 0.5f, s), "20 health counts as low for small enemies");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(8f, 34f, 0.5f, s), "low (25% or 15 health) and just hit");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(15f, 34f, 0.5f, s), "15 health counts as low for small enemies");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(18f, 34f, 0.5f, s), Is.False, "18 of 34 is not low (4e sign-off)");
             Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(30f, 34f, 0.5f, s), Is.False, "not low");
             Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(10f, 34f, 2f, s), Is.False, "the moment passed");
             Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(0f, 34f, 0.5f, s), Is.False, "already dead");
-            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.IsLow(300f, 900f, s), Is.True, "a big enemy's 35%");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.IsLow(225f, 900f, s), Is.True, "a big enemy's 25%");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.IsLow(300f, 900f, s), Is.False);
+            Assert.That(s.reach, Is.EqualTo(1.8f));
+            Assert.That(s.bossDownedSeconds, Is.EqualTo(3f), "the troll's optional window");
         }
 
         [Test]
@@ -147,6 +151,33 @@ namespace Hearthdelve.Tests.EditMode
             Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(50f, 50f, 2.5f, 0.5f, 3f), Is.EqualTo(3f).Within(1e-4f), "what's missing, the rest kept");
             Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(0f, 50f, 2.5f, 0.5f, 30f), Is.Zero, "spent");
             Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(20f, 50f, 2.5f, 0.5f, 0f), Is.Zero, "full");
+        }
+
+        [Test]
+        public void TheEntrance_IsTheFullRevealUntilFirstBeaten_ThenShorter()
+        {
+            var boss = ScriptableObject.CreateInstance<BossDefinition>();
+            try
+            {
+                Assert.That(BossEncounter.EntranceLength(boss, 0), Is.EqualTo(1.6f).Within(1e-4f), "the first meeting: the full reveal");
+                Assert.That(BossEncounter.EntranceLength(boss, 1), Is.InRange(0.7f, 1f), "after its first defeat: shorter");
+                Assert.That(BossEncounter.EntranceLength(boss, 5), Is.EqualTo(BossEncounter.EntranceLength(boss, 1)));
+                Assert.That(BossEncounter.EntranceLength(null, 0), Is.Zero);
+            }
+            finally
+            {
+                Object.DestroyImmediate(boss);
+            }
+        }
+
+        [Test]
+        public void TheCampfires_GiveAQuarterEach_AndTheBossTheRest()
+        {
+            var settings = AssetDatabase.LoadAssetAtPath<RunSettings>("Assets/_Project/Data/Dungeon/RunSettings.asset");
+            Assert.That(settings.tuning.campfire.restoreFraction, Is.EqualTo(0.25f), "before the boss");
+            Assert.That(settings.tuning.floorCampfire.restoreFraction, Is.EqualTo(0.25f), "by each hole down");
+            Assert.That(settings.tuning.boss.essenceOnDefeat, Is.EqualTo(1f), "a full refill when it falls");
+            Assert.That(settings.tuning.boss.feeding.healFraction, Is.EqualTo(0.08f));
         }
     }
 }

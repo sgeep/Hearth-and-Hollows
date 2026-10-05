@@ -252,7 +252,7 @@ namespace Hearthdelve.Tests.PlayMode
         /// gives back half the delver's Essence, then it burns low.
         /// </summary>
         [UnityTest]
-        public IEnumerator TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackHalfYourEssence()
+        public IEnumerator TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackAQuarter_WithItsPrompt()
         {
             yield return LoadRun();
             yield return WalkTo(RoomKind.Descent);
@@ -276,9 +276,21 @@ namespace Hearthdelve.Tests.PlayMode
             essence.SetEncounterDrain(0f);
             essence.SetHealth(essence.MaximumHealth * 0.2f);
             float before = essence.CurrentHealth;
+            var hint = Object.FindAnyObjectByType<Hearthdelve.UI.Screens.CampfireHintView>();
+            Assert.That(hint, Is.Not.Null, "the HUD has the campfire's prompt");
+            // Coming near: what it's for.
+            Teleport(Player, (Vector2)fire.transform.position + new Vector2(0f, -2.8f));
+            yield return null;
+            yield return null;
+            Assert.That(hint.IsShown && !hint.IsWarming, "near the fire: the prompt says to stand by it");
             Teleport(Player, (Vector2)fire.transform.position + new Vector2(0f, -1.2f));
+            yield return null;
+            yield return null;
+            Assert.That(hint.IsShown && hint.IsWarming, "by it: it says it's working");
             yield return WaitUntil(() => fire.IsSpent, 5f, "the fire to give all it has");
-            Assert.That(essence.CurrentHealth - before, Is.EqualTo(essence.MaximumHealth * 0.5f).Within(1.5f), "half the delver's Essence back");
+            Assert.That(essence.CurrentHealth - before, Is.EqualTo(essence.MaximumHealth * 0.25f).Within(1.5f), "a quarter of the delver's Essence back (4e sign-off)");
+            yield return null;
+            Assert.That(hint.IsShown, Is.False, "burnt low: the prompt goes");
             essence.SetEncounterDrain(1f);
         }
 

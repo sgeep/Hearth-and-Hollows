@@ -99,6 +99,14 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator TheFirstMeeting_GetsTheFullReveal()
+        {
+            yield return LoadArena();
+            yield return WaitUntil(() => Encounter.State == BossEncounterState.Entrance, 4f, "the entrance");
+            Assert.That(Encounter.EntranceSeconds, Is.EqualTo(1.6f).Within(0.01f), "never beaten in this save: the full ~1.6 s");
+        }
+
+        [UnityTest]
         public IEnumerator TheEntrance_ShowsTheTroll_AndHoldsThePlayer_ThenHandsBack()
         {
             yield return LoadArena();
@@ -219,6 +227,16 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             yield return null;
             Assert.That(frenzy.IsFrenzied && frenzy.IsRoaring, "it roars");
+            // Not colour alone (4e sign-off): the bar says so, and it swells as it roars.
+            Assert.That(Object.FindAnyObjectByType<BossHealthBar>().ShowsFrenzy, "the bar says it rages");
+            Transform model = Troll.GetComponentInChildren<Hearthdelve.Shared.Animation.CharacterSpriteAnimator>().transform;
+            float biggest = 1f;
+            for (float t = 0f; t < 0.5f; t += Time.unscaledDeltaTime)
+            {
+                biggest = Mathf.Max(biggest, model.localScale.x);
+                yield return null;
+            }
+            Assert.That(biggest, Is.GreaterThan(1.1f), "it swells up");
             float during = health.CurrentHealth;
             health.Damage(100f, Player.gameObject, 0f, 0f, Vector3.zero);
             Assert.That(health.CurrentHealth, Is.EqualTo(during), "it can't be hurt while it roars");

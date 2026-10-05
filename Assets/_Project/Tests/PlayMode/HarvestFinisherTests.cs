@@ -155,6 +155,12 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Hearthdelve.Dungeon.Run.DelveRunController.Active.Loot.BossesDefeated, Is.EqualTo(new[] { "larder_troll" }));
             Assert.That(boss.trophyId, Is.Not.Null, "4f's hook is there, empty until then");
             Assert.That(essence.CurrentHealth, Is.EqualTo(essence.MaximumHealth).Within(1f), "its fall fills the delver's Essence");
+
+            // The delve result acknowledges it (4e sign-off).
+            var result = Object.FindAnyObjectByType<Hearthdelve.UI.Screens.DelveResultScreen>(FindObjectsInactive.Include);
+            Assert.That(Hearthdelve.Dungeon.Run.DelveRunController.Active.Extract(), "climbed out");
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
+            Assert.That(result.ShowsBoss, "the result says it was felled");
         }
 
         [UnityTest]
