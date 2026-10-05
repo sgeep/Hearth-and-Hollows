@@ -316,7 +316,7 @@ namespace Hearthdelve.Editor
             var left = new Vector2(0f, 0.5f);
             RectTransform iconRect = Rect(rect, "Icon", left, left, new Vector2(1f, 0f), new Vector2(8f, 8f));
             Image icon = DungeonUI.AddImage(iconRect, null, Color.white);
-            // Every pixel counts: the longest pair ("offal pottage", "8 Gold/bowl") leaves a two-pixel gap.
+            // Every pixel counts: the longest pair ("offal pottage", "8 gold/bowl") leaves a two-pixel gap.
             float x = -k_CardWidth / 2f + 11f, right = k_CardWidth / 2f - 1f;
             LocalizedSuperText name = TextLine(rect, "Name", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, x, Line, 98f);
             LocalizedSuperText detail = TextLine(rect, "Detail", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperRight, right, Line, 70f);

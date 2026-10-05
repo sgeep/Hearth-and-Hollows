@@ -73,7 +73,7 @@ namespace Hearthdelve.Tests
         static readonly HashSet<string> k_Capitalised = new()
         {
             "Hearth", "Hollows", "Pip", "Cellars", "Larder", "Troll",
-            "Essence", "Gold", "Renown", "Morale", "Cheer", "Delve", "Marks",
+            "Essence", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };
 
@@ -106,7 +106,7 @@ namespace Hearthdelve.Tests
             Assert.That(english["ingredient.spider_leg"], Is.EqualTo("spider leg"));
             Assert.That(english["staff.pip"], Is.EqualTo("Pip"), "a proper noun keeps its capital");
             Assert.That(english[LoopLocKeys.MenuTitle], Is.EqualTo("Hearth & Hollows"));
-            Assert.That(english[TavernLocKeys.PrepValue], Is.EqualTo("{0} Gold"), "resource names are capitalised");
+            Assert.That(english[TavernLocKeys.PrepValue], Is.EqualTo("{0} gold"), "gold is written in lower case, unlike the other resource names");
             Assert.That(english[LoopLocKeys.BuffMaxEssence], Is.EqualTo("+{0} max Essence"));
             Assert.That(english[TavernLocKeys.GrillPrompt], Does.Contain("gold band"), "gold the colour isn't the resource");
             Assert.That(english[TavernLocKeys.TavernControls], Does.Contain("WASD").And.Contain("E / A"), "control labels keep their casing");
