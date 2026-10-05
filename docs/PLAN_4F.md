@@ -1,6 +1,6 @@
 # 4f plan: Tavern Stage 1 content and the customization foundation
 
-_Proposed 2026-10-05, awaiting approval. Nothing is built. When approved, the plan and its decisions move into `docs/PROGRESS.md` as the earlier milestone plans did._
+_Proposed and **approved 2026-10-05**, with the decisions in §22 locked (D2 and D20 changed by you, D22 chosen). Work proceeds in four checkpoints (§20); `docs/PROGRESS.md` records progress._
 
 **The experience 4f targets:** *"This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done"* (GDD §6.6). Around that sits a richer evening: a menu that mixes everyday food from the market with strange food from the Hollows, a butcher's block that turns a good monster part into several portions, a cook and a server who feel like people, and patrons who sometimes want something particular.
 
@@ -35,24 +35,25 @@ Smaller findings that shape the plan:
 
 - **Two of the seven ingredients can't be found.** Shroom Cap and Spore Sac lost their monster in 4b, so Shroom Skewer, Cellar Kebab, Cellar Stew and Offal Pottage can't be cooked from a delve (Known issues). The recipe rework fixes this (§18).
 - **The Bat Wing is in no recipe** except as "any meat" in the Cellar Kebab.
-- **Pip has a stand-in look** (the premade Butcher), accepted in 4c until 4f. There is no dwarf body in A Myriad Of NPCs (dwarves are stocky humans with beards), and none is needed for Gundra in the same way.
+- **Pip has a stand-in look** (the premade Butcher), accepted in 4c until 4f. There is no dwarf body in A Myriad Of NPCs (dwarves are stocky humans with beards), and none is needed for Gunta in the same way.
 - **A flaky tavern test** (`Pip_OnServing_CarriesPlatesToWhoeverOrderedThem`) was deferred "to the tavern work (4f)". It gets fixed in step 1.
 
 ## 2. Customization data architecture
 
-All names below are proposals.
+Names below are the ones Step 1 builds; later steps may add fields.
 
 **`FurnitureDefinition`** (ScriptableObject, one per catalog piece; generated from a source table, §9):
 
 - `id` (stable, saved), localized name and description key, `category` (Seating, Tables, Bar and storage, Lighting, Wall decor, Floor decor, Plants, Curios, Bedroom, Stations), theme tags (tavern, dwarven, elven, castle, haunted, Cellars…).
-- **Art per facing:** a list of `FurnitureFacing` entries, each with its sprite (or animation frames), pivot at the sort point, **footprint in whole tiles** (an offset and a size in cells), and its own seat anchors and use offsets. A piece with one facing can't rotate.
+- **Geometry, in the piece's own footprint space** (tiles, origin at the footprint's bottom-left corner, as the piece stands unrotated): the **footprint** (whole tiles: what snaps and what may not overlap another blocking piece), the **bodies** (pixel-exact collider rectangles: what physically blocks and what the walkable grid bakes, as in 4e), **seat anchors** (sit point, approach point, facing), **use points** (where people stand to use a station; the first is the staff post), **surface anchors** (where Surface items sit), **light points**, and the **art layers** (sprite or animation frames, offset, sorting order, sorting layer). One pure transform (`FurnitureGeometry`) rotates and flips all of it together, EditMode-tested.
+- **Rotation mode (D2):** `None` (never turns: most wall-bound pieces and art whose baked light or perspective would look wrong), `AuthoredFacings` (each quarter turn that Minifantasy drew is its own entry with its own art and geometry; turns that weren't drawn are skipped), or `QuarterTurnSprite` (one drawing, really rotated to 0°, 90°, 180° or 270°; footprint, bodies, anchors, use points, surface anchors and lights rotate with it). Where Minifantasy drew a better facing, the piece uses `AuthoredFacings`. Orientation is saved as quarter turns counter-clockwise: 0 = facing the camera (south), 1 = east, 2 = north, 3 = west.
 - `layer`: **Floor** (rugs: never block, drawn under everything), **Standing** (blocks its footprint, Y-sorted), **Wall** (hangs on the back wall band, never blocks), **Surface** (small things on a table or shelf; see D4).
-- `flippable` (D3), `blocksMovement`, `light` (optional `Light2D` settings: candles, braziers, fireplaces light the room).
+- `flippable` (D3: opt-in per piece, off by default; flipping mirrors the geometry before rotation), `light` (optional `Light2D` settings: candles, braziers, fireplaces light the room).
 - `function`: None, **Seat** (one or more seat anchors with facing), **Table** (a surface seats face), **Station** (Grill, Tap, StewPot, ButcherBlock, with use offsets), **Pass**, **Storeroom** (later), and `wallBound` (a station that must stand against the back wall, like the kitchen range).
 - **Economy and ownership:** `price` (0 = not for sale), `sellBack` share, `rarity`, `unique` (at most one owned), `catalogTier` (the Renown unlock, §13), `source` flags (Bought, Hollows discovery, Boss, Story, Starter).
 - **Recolouring:** `paletteGroup` (which channels it has: wood, cloth, metal, accent…) and authored `variants` (§11).
 
-**`PlacedFurniture`** (plain data, saved): `definitionId`, `cell` (x, y in the area's tiles), `facing`, `flipped`, `palette` (a palette id per channel, or a variant id), and an instance id.
+**`PlacedFurniture`** (plain data, saved): `definitionId`, `cell` (the footprint's bottom-left tile in the area), `turns` (0–3), `flipped`, `nudge` (a pixel offset of up to half a tile, −4…+3 px per axis: quarter-tile steps for non-blocking decor under D1, and the exact 4e positions in the starting layout; blocking pieces placed in Decorate Mode snap to whole tiles with no nudge), `palette` (a palette id per channel, or a variant id), `host` (the piece a Surface item sits on), and an instance id.
 
 **`PropertyArea`** (scene component plus `AreaDefinition` data): an area id (`tavern`, `guest_room_1`), its floor rectangle, its back-wall band, its doors and **reserved tiles** (the entrance and the tile inside it, stairs), its `NavGrid`, and its finishes (floor and wall style, if D5 is approved). The tavern and the guest room are two areas; Bram's quarters and later rooms are more of the same.
 
@@ -68,10 +69,10 @@ All names below are proposals.
 
 **Recommended: a cursor-based Decorate Mode, controller first, with the keeper present but not carrying.**
 
-- **Why not carrying furniture by hand?** It's the more immersive option, and I'd normally prefer it, but rearranging twenty pieces by walking to each, lifting and walking back is clearly slower and more repetitive. Animal Crossing started with only the hands-on version and later added a cursor mode for exactly that reason. **Flagged tradeoff:** I recommend the cursor. Immersion stays in the presentation: pieces lift with a little hop and shadow, settle with a thud and dust, the room stays lit and alive, and Pip or Gundra might glance over.
+- **Why not carrying furniture by hand?** It's the more immersive option, and I'd normally prefer it, but rearranging twenty pieces by walking to each, lifting and walking back is clearly slower and more repetitive. Animal Crossing started with only the hands-on version and later added a cursor mode for exactly that reason. **Flagged tradeoff:** I recommend the cursor. Immersion stays in the presentation: pieces lift with a little hop and shadow, settle with a thud and dust, the room stays lit and alive, and Pip or Gunta might glance over.
 - **The room fits one screen** (decided in 4c), so the cursor never needs a camera pan in the tavern. The guest room is smaller still.
 - **Controls** (all rebindable through the UI map):
-  - Gamepad: stick or d-pad moves the tile cursor (with key-repeat); **A** picks up or places; **B** cancels (the piece goes back where it was); **X** rotates through drawn facings; **Y** flips (where allowed); **LB/RB** cycle what's under the cursor (rug, table, candle on it); **Start** opens the catalogue and storage; **Select** shows the layout check.
+  - Gamepad: stick or d-pad moves the tile cursor (with key-repeat); **A** picks up or places; **B** cancels (the piece goes back where it was); **X** rotates (to the next drawn facing, or a real quarter turn); **Y** flips (where allowed); **LB/RB** cycle what's under the cursor (rug, table, candle on it); **Start** opens the catalogue and storage; **Select** shows the layout check.
   - Keyboard: WASD or arrows, E place, Q/R rotate, F flip, Delete to storage, Tab catalogue.
   - Mouse: the cursor follows the pointer's tile; click picks and places; the wheel rotates; right-click cancels.
 - **The ghost:** the carried piece drawn over the room at its placement, with its footprint tiles tinted (green fits, red doesn't) and the reason in a line of text. Invalid placement is never silent.
@@ -104,7 +105,7 @@ Functional pieces are ordinary furniture definitions with a `function` (§2), so
 
 - **One of each station** in 4f. The data allows more later (a second Grill as an upgrade), but staffing and the prep screen assume one per kind today.
 - **Stations can go to storage.** The layout check then refuses to open the doors ("there's no Grill out"). That's clearer than forbidding the action.
-- Staff posts and use points move with their station, so Pip and Gundra keep working wherever things stand.
+- Staff posts and use points move with their station, so Pip and Gunta keep working wherever things stand.
 
 ## 6. Service-validation approach
 
@@ -171,7 +172,7 @@ I searched the catalog (393 "Buildings and props" families, plus the prop sheets
 
 **Two findings that shape the design:**
 
-1. **Minifantasy draws each facing separately and doesn't draw every facing for every piece.** Rotation is "cycle the facings that exist" (D2).
+1. **Minifantasy draws each facing separately and doesn't draw every facing for every piece.** Pieces with drawn facings use them; others can still turn through real quarter-turn rotation where the art reads well turned (D2, as locked).
 2. **Minifantasy already ships many authored colourways** (pots ×8, chests ×8, candles ×8, Dwarven tables ×6, Elven sets ×5, Towns II rugs ×5, Castles ×2, beds ×3). A large share of "recolouring" can be curated variants of real art, which keeps the look coherent. A true palette swap is still worth proving where no variants exist (§11).
 
 **Gaps:** no mounted troll head or troll-sized trophy (§16 composes one); little tabletop clutter sized for the tables.
@@ -278,9 +279,8 @@ Thresholds are tunable. Today's numbers (about +2 Renown for a delighted custome
 **The experience:** "I beat that thing, and now my tavern remembers it."
 
 - **The piece:** Minifantasy has no troll trophy, so it's a **composite of existing pixels**, recorded in `ASSET_MAP.md` as derived art:
-  - **Recommended:** *the Larder Troll's tusks*: the great curved horns from Giant Bones, recoloured to the troll's yellowed ivory, mounted on the wooden plaque of the Castles antler head. A **Wall** piece, about 3×2 tiles, unique.
-  - *Alternative:* *the Larder Troll in stone*: the troll's own idle frame, desaturated to the Dungeon statues' stone palette, on a statue plinth. A **Standing** piece, 2×2. More recognisable as *that* troll; less "trophy".
-  - Or both: tusks as the first-clear trophy, the statue for, say, the fifth clear (`BossClears` already counts).
+  - **Chosen (D22):** *the Larder Troll's tusks*: the great curved horns from Giant Bones, recoloured to the troll's yellowed ivory, mounted on the wooden plaque of the Castles antler head. A **Wall** piece, about 3×2 tiles, unique.
+  - *(Not in 4f, by decision D22: a stone troll statue for repeated clears.)*
 - **Wiring:** `BossDefinition.trophyId = "trophy_larder_troll"`. On `BossFirstCleared` the furniture inventory grants it (unique, Boss source) and the delve result announces it. The furniture database is in Shared, so Dungeon never references Tavern.
 - **The homecoming moment:** the first time the player opens Decorate Mode after earning it, the trophy is already **on the cursor**, with a line ("the Larder Troll's tusks: where should they hang?"). Placing it gets a bigger feedback beat (thud, dust, a warm flash, a satisfied rumble).
 - **Reactivity:** contextual barks belong to Dialogue System (4g), so 4f doesn't write lines about the trophy. It **publishes the facts** (`FurniturePlaced`, which pieces are in the room, `TrophyDisplayed(bossId)`) for 4g's adapters. Patrons give a wordless **emote** (UI Overhaul "!" or a heart) on noticing it, as presentation only (D18).
@@ -295,7 +295,7 @@ Thresholds are tunable. Today's numbers (about +2 Renown for a delighted custome
 - **Why before service:** it adds a skill-based, tactile step with a real payoff (yield) without crowding the service rush, where the Grill, Tap, Stew and serving already compete. It also creates a choice: which parts to break down, and whether to spend a Premium leg on yield or keep it whole for a better dish.
 - **The rule:** a butcherable part (Spider Leg, Bat Wing; later the troll-size parts) becomes **1–3 portions** depending on accuracy (a clean cut gives 3, a ragged one 1). Portions keep the part's quality and freshness. In data: `IngredientDefinition.butchering` (the portion ingredient, the yield curve). **Portions are their own ingredients** ("spider leg cuts"), so recipes ask for cuts or whole parts explicitly, and storage needs no new state.
 - **Recipes:** a few dishes use cuts (§18). Whole-part dishes stay valid, so butchering is an investment, never a gate.
-- **The minigame (`IMinigame`, Begin/Tick/Evaluate 0–1):** the part shown large on the panel (its 8×8 icon at 4×, or a drawn panel sprite), dotted cut lines; the knife follows the line under the stick or mouse while a pressure bar asks for steady speed. Accuracy along each line and the number of clean cuts set the score; score → yield. Five to ten seconds, like the others. Staff auto-resolve it at their cap (Gundra, §19).
+- **The minigame (`IMinigame`, Begin/Tick/Evaluate 0–1):** the part shown large on the panel (its 8×8 icon at 4×, or a drawn panel sprite), dotted cut lines; the knife follows the line under the stick or mouse while a pressure bar asks for steady speed. Accuracy along each line and the number of clean cuts set the score; score → yield. Five to ten seconds, like the others. Staff auto-resolve it at their cap (Gunta, §19).
 - **Feedback:** the existing `Haptic_Cut_Ragged` and a new "clean cut" pattern, a thunk per cut, flecks, the portions sliding apart, the yield shown as pieces appearing.
 - **The station:** the C&P II preparation table, movable (§5), with its working animation while used.
 - **Tests:** score → yield mapping, cuts per part, staff resolution (EditMode); the station flow (PlayMode).
@@ -339,15 +339,15 @@ Thresholds are tunable. Today's numbers (about +2 Renown for a delighted custome
 
 Values follow the tiers (everyday about 5–8, better 9–16, signature 20–30), all on the assets. The delve meal keeps working: Grill and Tap dishes keep their buffs, re-tuned for the new list.
 
-## 19. Pip, Gundra and customer-request scope
+## 19. Pip, Gunta and customer-request scope
 
-**Pip Marrowby (halfling, server and bookkeeper)** and **Gundra Ashbelly (dwarf, head cook)**, Stage 1. Dialogue, portraits and their story intros are 4g; 4f gives them presence, roles and personality through behaviour:
+**Pip Marrowby (halfling, server and bookkeeper)** and **Gunta Ashbelly (dwarf, head cook)**, Stage 1. Dialogue, portraits and their story intros are 4g; 4f gives them presence, roles and personality through behaviour:
 
-- **Looks:** Pip gets a halfling-proportioned look from A Myriad Of NPCs layers (smaller and rounder than the customers, a waistcoat and apron, a ledger tone), replacing the Butcher stand-in. Gundra gets a stocky bearded dwarf look in cook's whites and a red apron (the pack has no dwarf body; customers' dwarves already use this approach). Both are canonical: fixed names, not renameable.
-- **Roles:** Pip serves (as now) and **keeps the books**: the Results screen's takings come "from Pip's ledger" (a small framing line and an icon). Gundra **cooks**: at Prep you choose her station (Grill, Stew Pot, or the Butcher Block during mise en place), and she runs it at her skill and quality cap, like Pip's serving. A **staff assignment row** on the Prep screen shows who's where.
-- **Personality in behaviour (no dialogue):** Gundra tastes the stew and nods or frowns (an emote after a good or poor pot); Pip wipes a table after a guest leaves and straightens chairs; both react to a dropped plate. Idle beats use their animations plus UI Overhaul emotes.
+- **Looks:** Pip gets a halfling-proportioned look from A Myriad Of NPCs layers (smaller and rounder than the customers, a waistcoat and apron, a ledger tone), replacing the Butcher stand-in. Gunta gets a stocky bearded dwarf look in cook's whites and a red apron (the pack has no dwarf body; customers' dwarves already use this approach). Both are canonical: fixed names, not renameable.
+- **Roles:** Pip serves (as now) and **keeps the books**: the Results screen's takings come "from Pip's ledger" (a small framing line and an icon). Gunta **cooks**: at Prep you choose her station (Grill, Stew Pot, or the Butcher Block during mise en place), and she runs it at her skill and quality cap, like Pip's serving. A **staff assignment row** on the Prep screen shows who's where.
+- **Personality in behaviour (no dialogue):** Gunta tastes the stew and nods or frowns (an emote after a good or poor pot); Pip wipes a table after a guest leaves and straightens chairs; both react to a dropped plate. Idle beats use their animations plus UI Overhaul emotes.
 - **Arrival:** both are present from a new game's first evening. Their story introductions come with the Act I opening in 4g (D20).
-- **Hooks for 4g:** stable character ids (`pip`, `gundra`), the facts published as events (a dish served by Gundra, a perfect pot, a request met) for the dialogue adapters later.
+- **Hooks for 4g:** stable character ids (`pip`, `gunta`), the facts published as events (a dish served by Gunta, a perfect pot, a request met) for the dialogue adapters later.
 
 **Customer requests (D21), recommended: in-evening special requests only, owned by the tavern service.** Persistent "bring me X" requests are quests and wait for Quest Machine in 4g (the open question from 4c, settled this way).
 
@@ -357,7 +357,14 @@ Values follow the tiers (everyday about 5–8, better 9–16, signature 20–30)
 
 ## 20. Proposed playtestable 4f steps
 
-Each step ends with tests, a playtest by you and your approval before the next. The web build is checked at steps 2, 6 and 10, and at any step that changes saves.
+**Checkpoints (2026-10-05).** The ten steps are grouped into four checkpoints, each ending with your playtest and approval:
+
+- **Checkpoint A, the customization foundation (steps 1–2):** furniture as data and Decorate Mode; it locks the expensive architecture (placement, rotation, footprints, saves, validation, nav, movable stations).
+- **Checkpoint B, rich customization (steps 3–6):** the catalogue pipeline and the large first import, buying, storage and Renown tiers, recolouring, the guest room. The question: can I meaningfully personalize the Sunken Flagon and another room?
+- **Checkpoint C, the loop (steps 7–9):** discoveries and the Larder Troll's trophy, the market and recipe rework, the Butcher Block, Gunta and Pip. The question: delve → bring strange things home → cook and use them → improve the tavern.
+- **Checkpoint D, sign-off (step 10):** requests, integration, balance, saves, web and regression testing.
+
+Within a checkpoint I go on from one step to the next when its tests pass and the work stays inside the approved plan. I stop early only if an approved expensive decision needs to change, the work reveals a major architectural problem, scope would grow materially, saves or existing gameplay regress, or a subjective art or UX judgment from you blocks further work. The web build is checked at the end of each checkpoint, and at any step that changes saves.
 
 | Step | Contents | You playtest |
 |---|---|---|
@@ -369,7 +376,7 @@ Each step ends with tests, a playtest by you and your approval before the next. 
 | **6. The guest room** | A second area, its shell, the stairs and fade, area switching in Decorate Mode, its validation profile, its starting layout, saves | Decorating the guest room with the same tools |
 | **7. Discoveries and the troll trophy** | Curio drops, the curio room reward, run HUD, result and death screens, ownership on extraction, the Cellars pool, the trophy composite and first-clear grant, the homecoming moment, feedback pass | A delve that brings something home, then placing it; beating the troll and hanging its tusks |
 | **8. Recipes and the market** | Staples, the market, sources, mushrooms as forage, the new menu and values, delve-meal re-tune | An evening that mixes market and Hollows food |
-| **9. Butcher Block and Gundra** | The minigame, butchering at Prep, cuts and yields, the station, Gundra's look, role and staffing, Pip's look and ledger, their idle behaviours | Mise en place and a service with both staff |
+| **9. Butcher Block and Gunta** | The minigame, butchering at Prep, cuts and yields, the station, Gunta's look, role and staffing, Pip's look and ledger, their idle behaviours | Mise en place and a service with both staff |
 | **10. Requests and integration** | Customer requests, the reactivity facts for 4g, the full loop through `GameFlow`, balance pass, web build, docs | A full day or two of play; sign-off |
 
 Steps 3–5 are the biggest; if the catalogue import runs long I'll split step 3 (pipeline first, the import second) rather than shrink the catalogue.
@@ -397,7 +404,7 @@ Steps 3–5 are the biggest; if the catalogue import runs long I'll split step 3
 - A curio picked up in the dungeon, extracted and found in storage; one lost on death.
 - The troll trophy granted on first clear.
 - The Butcher Block panel giving portions.
-- Gundra working her station.
+- Gunta working her station.
 - A full day through `GameFlow`.
 
 **Captures:** two contrasting taverns and the guest room at 320×180, for the review.
@@ -406,34 +413,34 @@ Steps 3–5 are the biggest; if the catalogue import runs long I'll split step 3
 
 **Save:** **v4**, adding `furniture` (owned counts, unlocked, discovered), `areas` (per area: placed pieces, finishes) and `market` state if any. `SaveSystem` stays the only save; layouts autosave on leaving Decorate Mode, after purchases and at the existing boundaries.
 
-## 22. Decisions requiring your approval
+## 22. Decisions (locked 2026-10-05)
 
-The ones marked **expensive** are hard to change once content is authored against them.
+| # | Decision | Locked |
+|---|---|---|
+| D1 | Grid and snapping | Blocking furniture snaps to whole tiles with whole-tile footprints; non-blocking decor may use quarter-tile snapping. (Bodies stay pixel-exact, and the starting layout keeps 4e's exact positions through each piece's nudge.) |
+| D2 | Rotation | **Changed:** explicit rotation modes per piece: `None`, `AuthoredFacings`, `QuarterTurnSprite` (real 0°/90°/180°/270°). Rotation turns the footprint, bodies, seat anchors, use points, surface anchors and lights together. Authored facings are used where Minifantasy drew better ones; pieces that would look wrong turned (wall-bound pieces, strong baked light or perspective) opt out individually. Not limited globally to drawn facings |
+| D3 | Flipping | Per-piece opt-in, off by default; only where mirrored art still reads correctly |
+| D4 | Surface items | The simple Surface layer is in 4f (candles, bottles, tabletop clutter) |
+| D5 | Walls, floors, doors | Area-wide floor and wall finishes; no per-tile painting; structure, doors and the entrance fixed in 4f |
+| D6 | Functional furniture | All stations movable where practical; the Grill wall-bound; one of each station; stations may be stored; the layout check refuses to open without the required stations reachable |
+| D7 | Ownership | Owned copies, not unlimited-after-unlock; uniques capped at one |
+| D8 | Duplicate discoveries | Copies where useful; owned uniques excluded; exhausted pool → run Gold; first-copy bias ×3, tunable |
+| D9 | Normal discoveries on death | Run-bound; kept on extraction; lost on death; not part of the Lockbox |
+| D10 | Boss trophy | Granted when the boss falls; never lost afterwards |
+| D11 | Recolouring | Authored palette-channel remapping, baked and cached textures; Minifantasy colourways as variants in the same UI; the lit sprite material and lighting path unchanged |
+| D12 | Storage and removal | Property-wide unlimited storage; removing never destroys; bought pieces sell back at half price; discoveries and uniques can't be sold |
+| D13 | Validation | Block only layouts that make service impossible; warn about partial problems; no aisle-width or style rules |
+| D14 | Renown | Unlocks furniture catalogue tiers in 4f; 25 / 60 / 100 are tuning values; customer tiers wait for the village and Visitor work |
+| D15 | Stat bonuses | None in 4f |
+| D16 | Seat upgrade | `Upgrade_TavernSeats` retired; seating comes from placed, usable seating; bought levels refunded cleanly; every save gets the starting layout |
+| D17 | Butcher Block | A Prep (mise en place) activity, not a mid-service stage; portions are ordinary ingredient data so later recipe stages can reuse them |
+| D18 | Patron reactions before 4g | Wordless emotes only; no decor dialogue or barks until Dialogue System owns them |
+| D19 | Surface staples | A temporary Brackenford market list in the daytime panel: Standard quality, full freshness, immediate delivery, normal ageing; `SupplySource` so village shops, farming, ranching and fishing replace or supplement it later; the Grain category |
+| D20 | **Gunta Ashbelly** | **Changed:** Gundra Ashbelly is renamed **Gunta Ashbelly**, stable id `gunta` (nothing in code, data or saves used the old name, so there is no legacy id). Present from the first evening; her story introduction comes with Act I in 4g |
+| D21 | Customer requests | Short in-evening service requests; persistent authored requests wait for Quest Machine in 4g; only requests tonight's menu can satisfy; failing one is never a punitive dead end |
+| D22 | Larder Troll trophy | **The Larder Troll's tusks:** the Giant Bones horns on the Castles antler plaque, the unique first-clear Wall trophy, recorded as derived art in `ASSET_MAP.md`. No repeated-clear statue in 4f |
+| D23 | `Tavern.unity` | Modified only through the in-place updater: never regenerated; idempotent (re-running never duplicates layout roots, furniture, guest-room structures or anything else it makes); unrelated hand-made scene changes preserved |
 
-| # | Decision | Recommendation | Tradeoff |
-|---|---|---|---|
-| D1 | **Grid or free snapping** (expensive) | **Blocking pieces snap to whole tiles with whole-tile footprints** (art may overhang). Non-blocking decor (rugs, wall pieces, surface items) snaps to **quarter tiles** (2 px) | Whole tiles keep nav and validation exact and predictable; quarter tiles give decor the finesse the art wants. Fully free placement would make footprints and pathing fuzzy |
-| D2 | **Rotation** | **Cycle the facings Minifantasy drew** (a piece with one facing doesn't rotate); no sprite rotation | Honest to the art; some pieces simply don't turn |
-| D3 | **Flipping** | **Per-piece opt-in**, off by default; turned on where mirrored shading reads fine (most rugs, plants, many props), off where the light direction or text would look wrong | Mirroring baked light breaks the look on some pieces |
-| D4 | **Surface items** (candles on tables, bottles on shelves) | **Include a simple version:** a Surface layer that snaps onto any table or shelf top and moves with it | Small extra work; a lot of expressive value. Can be cut to Phase 5 if step 2 runs long |
-| D5 | **Walls, floors and doors** (expensive) | **Floor and wall *finishes* per area** (choose from the authored shells: Tavern Indoor's two floors, Shop Indoor's walls and floors, Towns II's brick, stucco and plank); **structure, doors and the entrance stay fixed** in 4f | A big visual change for modest cost; per-tile painting and moving walls stay out (and aren't designed out) |
-| D6 | **Which stations move** (expensive) | **All of them**, the Grill along the back wall only; one of each in 4f; stations can be stored, and the check then refuses to open | Moving functional pieces is what makes it "my tavern"; the wall rule respects the art |
-| D7 | **Ownership quantities** (expensive) | **Owned copies**, not unlimited-after-unlock; uniques capped at one | Gold keeps mattering; duplicates mean something |
-| D8 | **Duplicate discoveries** | Copies allowed where useful; owned uniques excluded; exhausted pool → run Gold; first-copy bias ×3 | No new currency; no frustrating repeats |
-| D9 | **Normal discovery death rule** (expensive) | **Curio channel:** run-bound, kept on extraction, lost on death (like run Gold); not part of the Lockbox | Real extraction tension; occasional sting |
-| D10 | **Boss trophy death rule** | **Never lost:** granted when the boss falls, like the first-clear record | Removes risk from the climax, deliberately |
-| D11 | **Recolouring technique** (expensive) | **Palette channels remapping the sprite's own colours, baked into cached textures** (keeps `Sprite-Lit-Default`), plus Minifantasy's authored colourways as variants in the same UI | No shader work and no lighting change; texture memory grows with unique combinations (small at tavern scale) |
-| D12 | **Storage and removal** | Property-wide, unlimited storage; removing never destroys; sell-back at half price for bought pieces; discoveries and uniques can't be sold | Simple and forgiving |
-| D13 | **Validation rules** | Block only what makes service impossible (entrance, each station, the pass, one reachable seat); warn about the rest; dynamic queue | Generous placement, clear problems |
-| D14 | **Renown's first unlock** | **Catalogue tiers** (Dwarven at 25, Elven and Castle at 60, Haunted and great pieces at 100) | Customer tiers wait for 4h's villagers and Visitors |
-| D15 | **Furniture stat bonuses** | **None in 4f** (expression only); revisit with the Inn and villagers | Keeps decorating about taste, not optimisation |
-| D16 | **The seat upgrade** (expensive) | **Retire `Upgrade_TavernSeats`**: seating comes from placed tables and chairs. Saves that bought levels are **refunded** their Gold, and every save gets the full starting layout | Removes a working upgrade; customization does its job better |
-| D17 | **Where the Butcher Block sits** | **Mise en place at Prep**, giving portions (cuts as their own ingredients); not a mid-service stage in 4f | Rich skill and choice without crowding service; the multi-stage dish waits |
-| D18 | **Patron reactions before 4g** | **Wordless emotes only**; no lines about decor until Dialogue System owns barks | Keeps the middleware boundary clean |
-| D19 | **How bought staples enter** | **A market list in the daytime panel**, Standard quality, immediate, ageing like other stock; `source` on ingredients and `SupplySource` assets so farming and shops plug in later. New category **Grain** (bread, malt) | Simple now; the village shop replaces the list in 4h |
-| D20 | **Gundra's arrival** (story) | **Present from the first evening**; her story introduction comes with Act I in 4g | Avoids writing story ahead of 4g |
-| D21 | **Customer requests** | **In-evening special requests owned by the tavern**; persistent ones are quests in 4g | Settles the open question from 4c |
-| D22 | **The troll trophy art** | **The Larder Troll's tusks** (Giant Bones horns on the Castles antler plaque, recoloured), a unique Wall piece; optionally the stone troll statue later | A composite of existing pixels (derived art, recorded in the asset map) |
-| D23 | **Changing `Tavern.unity` in place** | The furniture currently baked into the scene is removed and a layout root added by an **in-place updater** (as `UpdateTavern` does), not a regeneration. The guest room is added to the same scene the same way | The scene changes, which CLAUDE.md asks me to clear with you first |
+**Also confirmed:** the ~70-piece / ~170-entry first catalogue (not a token proof); the guest room as a proof of one architecture across areas (no guests, ratings, occupancy, recruitment or hotel systems); the loop Hollows drop → pickup → extract → ownership → Decorate Mode → placement; the six-slot Satchel ingredient-only; the troll trophy as the guaranteed first-clear reward; customer and decor dialogue deferred to 4g.
 
-**What I'll need from you in the editor** (as each step lands): playtesting each step; judging the recolours and the trophy composite by eye; checking Decorate Mode on a real controller with rumble; and, at step 3, a quick review of the catalogue contact sheets (which pieces read well at 320×180).
+**What I'll need from you in the editor** (at each checkpoint): playtesting; judging the recolours and the trophy composite by eye; checking Decorate Mode on a real controller with rumble; and, in Checkpoint B, a quick review of the catalogue contact sheets (which pieces read well at 320×180).
