@@ -733,7 +733,14 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - Tunable in `HarvestRulesConfig` (finisher section). The prompt is unlit, like the "!" alert, so it reads in the dark.
 - Tests: the rules (EditMode); finishing a low, freshly hit slime (committed, then free; Premium parts), the moment passing and a healthy enemy never eligible, the troll brought down then finished (no early execution, can't be hurt while down, Premium), and left down to fall with its ordinary harvest. **EditMode 435/435, PlayMode 140/140.**
 
-**Next: step 4 (rewards, the first-clear record, feel).**
+**Step 4: the troll's reward, the first-clear record, feel and tuning (2026-10-05).**
+- **The reward, where it falls** (`BossDefinition` reward section, granted by `RoomRunner` on its defeat): **120 run Gold** (unbanked until the delve ends well, like any other) and a **Premium larder cache**: 2 slime cores and 2 venom sacs (the deeper Cellars' pool), as ordinary parts for the satchel. Plus its own harvest (step 3) and the rope out. No boss-only ingredient (decision 8).
+- **The first-clear record** (decision 3): `GameState.BossClears` (stable boss id → times defeated), recorded from the delve report (`DelveReport.BossesDefeated`, gathered in `RunLoot`) whatever the delve's end: a victory is a victory, even if the player dies on the way out (the haul still follows the death rule). Saved as **version 3** (`SaveData.bosses`); version 2 saves migrate with no bosses. On a boss's **first** defeat `GameFlow` publishes **`BossFirstCleared(id)`**: the hook for first-clear rewards, story reactions and **4f's trophy**, whose id goes in `BossDefinition.trophyId` (empty until 4f).
+- **Feedback pass** (named patterns only; the web no-ops): entrance `Boss.Telegraph`; its telegraphs, when aimed at a close player, now the `Boss.Telegraph` rumble (scaled 0.6) instead of an ordinary enemy's cue; slam `Bump.Soft`; wall `Bump.Hard`; frenzy `Boss.PhaseChange`; spoiled meal `Tap.Firm`; finisher `Finisher.Harvest` with a 0.14 s freeze; defeat `Hit.Heavy` with slow motion; hits on the player `Hit.Taken` as ever.
+- **Cleaver tuned for the boss:** the charged heavy's middle and full stages 22 → **26** and 34 → **40** damage, so a full charge in the troll's daze is a real payoff (it also makes overkill likelier on small enemies: the harvest tension stays). The Cellars' slime, bat and spider are unchanged: no playtest showed a need.
+- Tests: boss clears recorded by id and count through death and extraction and the save; a version 2 save migrating; the troll's Gold and Premium cache where it falls and its defeat on the run's record; and in the real day loop, defeating it recorded once, announced once, kept across a reload. **EditMode 437/437**; PlayMode below.
+
+**Next: step 5 (closeout).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
