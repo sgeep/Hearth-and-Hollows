@@ -696,7 +696,19 @@ The experience: delve through the Cellars, make reward and build choices, reach 
 4. **Rewards and feel:** the Gold and larder cache, the first-clear record (save version 3), the 4f hook, the boss feedback and haptics pass, cleaver and enemy tuning where full runs show a need.
 5. **Closeout:** full-run balance, web, tests, captures, docs.
 
-**Next: 4e step 1.**
+### 4e status
+
+**Step 1: the Larder Troll's foundation and first patterns (2026-10-05).** The experience: walking into the arena and finding something big at its meal; then a lumbering fight with two patterns you learn to read, step out of and punish.
+- **The troll** (Minifantasy's Ancient Troll, about 15×16 pixels): idle, walk, a two-handed ground slam, damage, a 21-frame death, and eat. Idle has only front rows; its back facings use the walk's first frame. Enemy data `Enemy_LarderTroll` (500 health; no knockback, no stagger from hits: its opening is earned), boss data `Boss_LarderTroll` (stable id `larder_troll`).
+- **The encounter** (`BossEncounter`, any boss): the troll waits **eating** until the player is in the sealed arena, then a 1.6 s entrance (a roar, a shake, the `Boss.Telegraph` rumble) names it on a **boss bar** across the top, then it fights. From the entrance until victory, the player's death or the room going away, the boss's drain rule applies (`BossDefinition.drainMultiplierWhileActive`, 0 for the troll: **passive drain paused**, hits still cost). It's a separate multiplier on the meter, so the transitions' own pause can't undo it. No restore on entry.
+- **Ground slam** (in range): arms up over 0.95 s while a red **mark on the floor** fills in where it will land (3 × 2.4 tiles in front), then both fists down (18 Essence in the mark, a thud and a shake), then a 1 s recovery to punish.
+- **Lumbering charge** (at 4–16 tiles, with a clear line): 0.9 s wind-up with a red **line on the floor** to the first wall or pillar in its way, then a 13-tile run (16 Essence if it catches you). If a pillar or wall stops it short, it **stands dazed for 2.4 s** (its hurt pose; a heavier thud, a bigger shake, a hard bump): the window for a full charged heavy (`ChargeStun`, `ChargeRules.IsBlocked`).
+- **The arena hosts the troll** instead of 4d's mixed wave (`RunTuning.boss`; settings without a boss keep the stand-in). It stands at the arena's far end (`RoomInstance.BossPoint`). The rope still appears when it falls.
+- **Practising the boss:** tick **Start In Arena** on the `RoomRunner` in `Dungeon.unity` (development builds only; ignored in the day loop) and press Play.
+- Placeholder sounds `PH_TrollRoar`, `PH_TrollSlam`, `PH_TrollThud`. Not yet: eating the drops, the enrage, the full entrance and defeat presentation (step 2); the finisher (step 3); the reward and the first-clear record (step 4). The troll drops nothing yet.
+- Tests: EditMode (the charge's blocked rule, the encounter's drain multiplier, the troll's data and prefab, the arena's encounter across 50 seeds, the stand-in without a boss); PlayMode (found eating, then the entrance with the bar and no acting, then the fight; drain paused while it fights, hits still cost, drain back after; the slam's mark and its cost; the charge's line, the wall, the stun and the recovery; a full run ending at the troll). **EditMode 431/431, PlayMode 131/131**; the troll capture (`LarderTrollCaptures`) and the run capture pass.
+
+**Next: your step 1 playtest, then step 2 (eating the drops, escalation, defeat).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

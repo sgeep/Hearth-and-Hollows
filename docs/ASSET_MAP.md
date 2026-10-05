@@ -122,6 +122,16 @@ Cells are (column, row) from the top-left.
 
 Source: `All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate/Gate_open_close.png`, 128×48: 8 frames of 32×24 (4 per row), a portcullis in a sandstone arch. Frame 0 closed, 1–3 the bars sinking, 3 open (only the tips show), 4–7 rising again, 7 closed. Only each frame's **barred interior** is imported (`Gate0`–`Gate7`, 16×15 at frame (8, 9), pivot bottom centre): it fills a two-tile doorway cut through the Cellars' own grey north wall, so the sandstone arch never shows. The bars are copper on a transparent ground. Also in the folder: `Gate_shadows_in_exteriors.png` and `Gate_shadows_towards_indoor.png` (not imported) and `GIFs/Gate.gif`. The Dungeon tileset's own archway (cells 13–15, 5–6) has a one-tile opening, too narrow for these bars.
 
+### Ancient Troll (exclusive → `AncientTroll/`): the Larder Troll, 4e
+
+Source: `All_Exclusives_20261002/Creatures/Ancient_Troll/`, 32×32 frames, shadows in `Shadows/`. No timing notes in the pack (100 ms used; idle 150 ms, walk 120 ms). Body about 15×16 pixels.
+- `AncientTrollIdle` 576×64: 18 frames, **two rows, front-right and front-left only**; the back facings use the walk's first frame.
+- `AncientTrollWalk` 192×128: 6 frames, four facings.
+- `AncientTrollAttack` 224×128: 7 frames, four facings: arms up (0–3), both fists into the floor with an impact ring (4), dust (5–6). Used for the ground slam, released on frame 4.
+- `AncientTrollDmg` 128×128: 4 frames, four facings, red outline on frames 0 and 2. Held as the dazed pose after a charge into a wall.
+- `AncientTrollDie` 672×32: 21 frames, one row.
+- `AncientTrollEat` 352×32: 11 frames, one row (front): looped while it's found eating; step 2's eat-the-drops.
+
 ### True Heroes I & II skill icons (exclusive → `SkillIcons/SkillIcons.png`)
 
 Source: `All_Exclusives_20261002/Icons/16x16px/True_Heroes_I&II_16x16px_Skill_Icons/16x16px_Skill_Icons.png` (208×336): 37 icons of 16×16 on a dark tile, 32 px apart starting at 16,16, one row per hero (barbarian, druid with its shape-shift pairs on a second row, rogue, bard with its four enhancement songs in a column on the right, cleric, paladin), listed in the pack's `Info.txt` and `_Guide.png`. A version without the dark tile sits beside it. The run powers (4d step 4), by top-left corner: deep reserves `BardBallad` (heart) 112,144; slow burn `ClericDivineFire` 48,272; thick hide `BardDefense` (shield) 176,176; keen edge `BardMelee` (sword) 176,144; heavy hand `PaladinHolyHammer` 112,304; light feet `RogueDodge` 80,112; second wind `ClericHealingWords` (green cross) 80,272; butcher's eye `RogueAttack` (dagger) 16,112. The True Heroes III & IV and True Villains sets in the same folder are uninspected.
