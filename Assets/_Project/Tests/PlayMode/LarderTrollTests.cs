@@ -84,8 +84,10 @@ namespace Hearthdelve.Tests.PlayMode
             essence.Essence.TakeDamage(10f);
             Assert.That(essence.Essence.Current, Is.EqualTo(before - 10f).Within(1e-3f), "hits still cost");
 
-            var health = Troll.GetComponent<Health>();
+            var health = Troll.GetComponent<BossHealth>();
             health.Damage(health.CurrentHealth + 100f, Player.gameObject, 0f, 0f, Vector3.zero);
+            // Brought down (step 3), then let fall without the finisher.
+            health.FinishOff(Player.gameObject, finisher: false);
             yield return WaitUntil(() => Encounter == null || Encounter.State == BossEncounterState.Defeated, 3f, "the troll to fall");
             var bar = Object.FindAnyObjectByType<BossHealthBar>();
             Assert.That(bar.IsCaption && bar.IsShown, $"the bar says it fell (state {(Encounter != null ? Encounter.State.ToString() : "gone")}, shown {bar.IsShown}, caption {bar.IsCaption}, health {health.CurrentHealth})");

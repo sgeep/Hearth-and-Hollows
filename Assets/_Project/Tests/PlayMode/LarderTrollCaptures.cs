@@ -96,8 +96,12 @@ namespace Hearthdelve.Tests.PlayMode
                 yield return new WaitForSeconds(1.2f);
                 FreezeEnemies();
                 health.Damage(health.CurrentHealth + 10f, Player.gameObject, 0f, 0f, Vector3.zero);
+                Teleport(Player, (Vector2)troll.transform.position + new Vector2(0f, -1.6f));
+                yield return new WaitForSeconds(0.4f);
+                TavernEveningCaptures.Capture("BatchLogs/troll_8_downed.png");
+                Player.GetComponent<Hearthdelve.Dungeon.Harvest.PlayerFinisher>().TryFinish();
                 yield return new WaitForSecondsRealtime(1.2f);
-                TavernEveningCaptures.Capture("BatchLogs/troll_8_falls.png");
+                TavernEveningCaptures.Capture("BatchLogs/troll_9_falls.png");
             }
             finally
             {

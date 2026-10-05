@@ -37,6 +37,18 @@ namespace Hearthdelve.Tests.EditMode
         }
 
         [Test]
+        public void TheFinisher_TakesALowFreshlyHitEnemy_Only()
+        {
+            var s = Hearthdelve.Dungeon.Harvest.FinisherSettings.Default;
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(10f, 34f, 0.5f, s), "low (35% or 20 health) and just hit");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(18f, 34f, 0.5f, s), "20 health counts as low for small enemies");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(30f, 34f, 0.5f, s), Is.False, "not low");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(10f, 34f, 2f, s), Is.False, "the moment passed");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.Eligible(0f, 34f, 0.5f, s), Is.False, "already dead");
+            Assert.That(Hearthdelve.Dungeon.Harvest.FinisherRules.IsLow(300f, 900f, s), Is.True, "a big enemy's 35%");
+        }
+
+        [Test]
         public void ACooldown_CanBeSkipped_ButNothingElse()
         {
             var cycle = new AttackCycle(0.1f, 0.1f, 0.1f, 5f);
