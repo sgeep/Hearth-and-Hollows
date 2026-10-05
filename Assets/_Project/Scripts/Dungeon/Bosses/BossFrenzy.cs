@@ -74,6 +74,8 @@ namespace Hearthdelve.Dungeon.Bosses
                 return;
             }
             if (IsFrenzied || m_Encounter == null || m_Encounter.State != BossEncounterState.Fighting) return;
+            // Brought down by a killing blow: no frenzy now, only the end.
+            if (m_Health is BossHealth { IsDowned: true }) return;
             if (m_Health.CurrentHealth > 0f && m_Health.CurrentHealth <= m_Health.MaximumHealth * m_Boss.frenzy.atHealth) BeginRoar();
         }
 

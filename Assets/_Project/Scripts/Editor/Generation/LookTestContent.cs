@@ -175,6 +175,10 @@ namespace Hearthdelve.Editor
             WriteWav("PH_Dodge", 0.14f, (t, n) => Noise(n) * Mathf.Sin(t / 0.14f * Mathf.PI) * 0.35f);
             // The heavy reaching a stronger level: a short high tick.
             WriteWav("PH_ChargeTick", 0.06f, (t, n) => Mathf.Sin(t * 2f * Mathf.PI * 1500f) * Mathf.Exp(-t * 60f) * 0.45f);
+            // The Harvest Finisher (4e): a heavy chop, then a bright ring (a clean harvest).
+            WriteWav("PH_Finisher", 0.45f, (t, n) => (t < 0.08f ? Noise(n) * 0.8f + Mathf.Sin(t * 2f * Mathf.PI * 90f) * 0.6f
+                : Mathf.Sin(t * 2f * Mathf.PI * 880f) * 0.4f + Mathf.Sin(t * 2f * Mathf.PI * 1320f) * 0.2f) * Mathf.Exp(-t * 6f));
+            UnityEditor.AssetDatabase.ImportAsset($"{EditorPaths.Audio}/PH_Finisher.wav");
         }
 
         internal static float Noise(int n)
@@ -459,6 +463,11 @@ namespace Hearthdelve.Editor
                 root.AddComponent<LowEssenceWarning>().Configure(Feedback(root.transform, "Feedback_Heartbeat", null, 0f, Sfx("PH_Heartbeat"), Pattern(HapticIds.HeartbeatWarning)));
                 var carrier = root.AddComponent<SatchelCarrier>();
                 carrier.Configure(delveConfig);
+                // The Harvest Finisher (4e step 3): a freeze, a shake, its sound and the Finisher.Harvest rumble together.
+                MMF_Player finish = Feedback(root.transform, "Feedback_Finisher", null, 0.4f, Sfx("PH_Finisher"), Pattern(HapticIds.FinisherHarvest));
+                finish.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.14f });
+                root.AddComponent<PlayerFinisher>().Configure(
+                    AssetDatabase.LoadAssetAtPath<HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset"), finish);
                 carrier.ConfigureFeedback(Feedback(root.transform, "Feedback_SatchelFull", null, 0f, Sfx("PH_SatchelFull"), Pattern(HapticIds.BuzzFailure)));
             }
             else

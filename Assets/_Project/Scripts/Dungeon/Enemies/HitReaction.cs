@@ -35,6 +35,8 @@ namespace Hearthdelve.Dungeon.Enemies
 
         /// <summary>The most recent player hit, if any.</summary>
         public HitContext? LastHit { get; private set; }
+        /// <summary>When the player last hit it (the Harvest Finisher's window, 4e).</summary>
+        public float LastHitTime { get; private set; } = float.NegativeInfinity;
         public bool IsStaggered => m_Staggered;
 
         void Awake()
@@ -52,6 +54,7 @@ namespace Hearthdelve.Dungeon.Enemies
         public void ReceiveHit(in HitContext hit)
         {
             LastHit = hit;
+            LastHitTime = Time.time;
             if (m_Health != null && m_Health.CurrentHealth <= 0f) return;
             EnemyDefinition definition = m_Identity.Definition;
             bool attacking = false;

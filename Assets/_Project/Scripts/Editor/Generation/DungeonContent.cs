@@ -329,7 +329,7 @@ namespace Hearthdelve.Editor
         }
 
         internal static GameObject BuildEnemy(string name, string path, EnemyDefinition definition, SpriteAnimationSet set, SpriteAnimationSet shadowSet,
-            Vector2 colliderSize, Vector2 colliderOffset, float alertHeight, WebProjectile web, System.Action<GameObject> extras = null)
+            Vector2 colliderSize, Vector2 colliderOffset, float alertHeight, WebProjectile web, System.Action<GameObject> extras = null, bool boss = false)
         {
             GameObject root = LookTestContent.CharacterRoot(name, Layers.Enemies, colliderSize, colliderOffset);
             LookTestContent.AddModel(root, set, shadowSet, out SpriteRenderer body);
@@ -340,7 +340,10 @@ namespace Hearthdelve.Editor
             character.CharacterModel = body.transform.parent.gameObject;
             root.AddComponent<CharacterMovement>();
 
-            var health = root.AddComponent<Health>();
+            // A boss is brought down by lethal damage, for its optional finishing moment (4e step 3).
+            Health health = boss ? root.AddComponent<Hearthdelve.Dungeon.Bosses.BossHealth>() : root.AddComponent<Health>();
+            var rules = AssetDatabase.LoadAssetAtPath<Hearthdelve.Dungeon.Harvest.HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset");
+            if (health is Hearthdelve.Dungeon.Bosses.BossHealth bossHealth) bossHealth.ConfigureDowned(rules);
             health.DestroyOnDeath = true;
             SpriteAnim die = set.Find(CharacterAnim.Die);
             health.DelayBeforeDestruction = die != null ? die.frameDuration * die.frontRight.Length : 0.9f;
@@ -380,6 +383,12 @@ namespace Hearthdelve.Editor
                 root.AddComponent<EnemyPerch>().Configure(shadow);
             }
             root.AddComponent<HitReaction>();
+            // The Harvest Finisher (4e step 3): a drumstick over its head while it can be finished (unlit, to read in the dark).
+            SpriteRenderer prompt = LookTestContent.AddSprite(root.transform, "FinisherPrompt",
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Food"), SortingLayers.YSorted, 6, new Vector3(0f, alertHeight + 0.15f, 0f));
+            if (unlit != null) prompt.sharedMaterial = unlit;
+            prompt.gameObject.SetActive(false);
+            root.AddComponent<Hearthdelve.Dungeon.Harvest.FinisherTarget>().Configure(rules, prompt.gameObject);
             character.CharacterBrain = Brain(root, definition, attacks, settings.Select(a => a.debugName).ToList());
             // A boss's own parts (4e): its encounter, its stun, its ground marks.
             extras?.Invoke(root);

@@ -6,5 +6,7 @@ namespace Hearthdelve.Dungeon.Harvest
     public sealed class HarvestRulesConfig : ScriptableObject
     {
         public HarvestRuleSettings rules = HarvestRuleSettings.Default;
+        [Tooltip("The Harvest Finisher (4e step 3).")]
+        public FinisherSettings finisher = FinisherSettings.Default;
     }
 }

@@ -134,7 +134,8 @@ namespace Hearthdelve.Dungeon.Harvest
                 CleanKillCategories = weapon != null ? weapon.cleanKillCategories : default,
                 Overkill = e.Overkill,
                 MaxHealth = e.MaxHealth,
-                IsFinisher = false,
+                // The Harvest Finisher (4e): its kill guarantees Premium parts and is never an overkill.
+                IsFinisher = e.Target.TryGetComponent(out FinisherTarget finisher) && finisher.FinishingBlow,
             };
             EventBus<EnemyKilled>.Publish(new EnemyKilled(definition, kill, e.Position));
 

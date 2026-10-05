@@ -31,6 +31,18 @@ namespace Hearthdelve.Editor
         {
             BuildAnimationSets(out SpriteAnimationSet set, out SpriteAnimationSet shadow);
             EnemyDefinition enemy = LookTestContent.LoadOrCreate<EnemyDefinition>(EnemyPath, Defaults);
+            // What it carried (step 3): a couple of the deeper Cellars' parts, Fine, or Premium to the finisher. Set once.
+            if (enemy.harvest == null || enemy.harvest.Count == 0)
+            {
+                var core = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/Ingredient_SlimeCore.asset");
+                var venom = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/Ingredient_VenomSac.asset");
+                enemy.harvest = new List<Hearthdelve.Dungeon.Harvest.HarvestPart>
+                {
+                    new() { ingredient = core, baseQuality = Hearthdelve.Shared.Ingredients.Quality.Fine, dropChance = 1f, minCount = 1, maxCount = 1 },
+                    new() { ingredient = venom, baseQuality = Hearthdelve.Shared.Ingredients.Quality.Fine, dropChance = 1f, minCount = 1, maxCount = 1 },
+                };
+                EditorUtility.SetDirty(enemy);
+            }
             if (enemy.displayName == null || enemy.displayName.IsEmpty)
             {
                 enemy.displayName = LocalizationBuilder.ContentString("enemy.larder_troll", "the Larder Troll");
@@ -53,7 +65,7 @@ namespace Hearthdelve.Editor
             }
 
             GameObject prefab = DungeonContent.BuildEnemy("LarderTroll", PrefabPath, enemy, set, shadow, new Vector2(1.3f, 0.7f), new Vector2(0f, 0.3f), 2.4f, null,
-                root => AddBossParts(root, boss));
+                root => AddBossParts(root, boss), boss: true);
             boss.prefab = prefab;
             EditorUtility.SetDirty(boss);
             AssetDatabase.SaveAssets();
