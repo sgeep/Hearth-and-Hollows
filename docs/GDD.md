@@ -293,7 +293,7 @@ For now the sequence is fixed as **tavern → delve → sleep**. Whether the pla
 
 - *Accepting requests* happens in the daytime, by talking to villagers (and in the evening, from people in the tavern).
 - *Setting the menu* happens at evening Prep, as it already does in the 4c build.
-- *Spending* (gear, upgrades, furnishings) moves to the daytime (shops, the Delver's Board, the tavern's own ledger) and to whenever the tavern is closed; where the old Night upgrade screen's functions end up is decided at the GameFlow integration step.
+- *Spending* (gear, upgrades, furnishings) moves to the daytime (shops, the tavern's own ledger; *(4e plan, 2026-10-05)* a "Delver's Board" may return as a diegetic village quest and request board, never as a Delve Marks upgrade tree) and to whenever the tavern is closed; where the old Night upgrade screen's functions end up is decided at the GameFlow integration step.
 - *The pre-delve meal* (the breakfast buff in the 4c build) no longer sits right before the delve. Whether it becomes a late meal after service, before descending, or something else, is decided at the GameFlow integration step.
 - *Story scenes* can happen at any point of the day where they fit, most naturally in the daytime village and in the tavern.
 
@@ -366,7 +366,7 @@ A signature flavor hook: many weapons are culinary, which ties weapon choice to 
 | Frying Pan | Iron Skillet | Guard (buckler) | Parry/block weapon; counter hits sear enemies. No pan art exists; needs a small edit of the buckler. |
 | Traditional | Sword, longsword, flail, whip, bow, slingshot | Slash, two-handed, swing, ranged | Standard harvest; wider combat variety |
 
-Weapons have rarity tiers (Common → Fine → Masterwork → Legendary) and random affixes per run. Permanent unlocks add weapons to the drop pool. Elemental variants use the effect layers from *Magic Weapons And Effects*.
+~~Weapons have rarity tiers (Common → Fine → Masterwork → Legendary) and random affixes per run.~~ *(4e plan, 2026-10-05: randomized rarity and affixes are removed from the roadmap; run powers already give per-run variety, and long-term progression lives in the tavern, village and relationships. New weapons wait for the protagonist body decision in 4g, because the Weapons pack's attack animations come as base bodies with weapon layers.)* Permanent unlocks add weapons to the drop pool. Elemental variants use the effect layers from *Magic Weapons And Effects*.
 
 ### 4.3 The Harvest System
 
@@ -385,7 +385,7 @@ The heart of the fantasy. How a monster dies influences what it drops. Unchanged
 - **Extraction:** the player can return via exit points (a rope or lift back to the tavern). Leaving early keeps everything; continuing deeper risks it.
 - **Death:** the player loses the entire haul except one satchel slot they choose to keep (the Lockbox, the whole stack in it), and loses the day's unspent run currency. Permanent unlocks are never lost.
 
-### 4.5 Field Cooking (Optional Mechanic)
+### 4.5 Field Cooking (Optional Mechanic; deferred in the 4e plan, 2026-10-05: a second cooking context competing with the tavern; if it returns, it needs one specific purpose)
 
 At campfire rooms, the player can cook a quick meal from carried parts to restore Essence or grant a buff. This sacrifices ingredients that could be sold, creating a meaningful choice, and echoes the *Delicious in Dungeon* spirit.
 
@@ -402,7 +402,7 @@ Room rewards:
 
 - **Ingredients** (a guaranteed part, or a room with a particular monster)
 - **Gold**
-- **Delve Marks**
+- ~~**Delve Marks**~~ *(removed in the 4e plan, 2026-10-05)*
 - **A weapon**
 - **A run power-up**, chosen from three
 
@@ -414,12 +414,12 @@ Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floo
 
 | # | Biome | Theme | Environment packs | Creature candidates | Boss candidate |
 |---|---|---|---|---|---|
-| 1 | The Cellars | Old cellars and tunnels | Dungeon, More Dungeons, Dungeon Traps | Green Slime, Bat, Giant Spider, Skeleton, Mushroom People; Slime Cube as elite | Mother Slime |
+| 1 | The Cellars | Old cellars and tunnels | Dungeon, More Dungeons, Dungeon Traps | Green Slime, Bat, Giant Spider, Skeleton, Mushroom People; Slime Cube as elite | **The Larder Troll** (Ancient Troll art; chosen 2026-10-05, replacing the Mother Slime candidate): a troll that raided the tavern's stores and eats dropped parts to recover |
 | 2 | Fungal Warrens | Glowing fungal caves | Deep Caves, Glowing Mushrooms, Giant Mushrooms | Mushroom People, Blue Slime, Giant Snail, Necrofungus risen corpses | Open (no fungal boss found yet) |
 | 3 | Goblin Sprawl | Goblin shanty-town and mines | Deep Caves, Old Mine Addon, Gold And Rock Nodes | Goblin, Goblin Raider, Goblin Sapper, Warg, Trasgo | Goblin King |
 | 4 | Drowned Halls | Sunken dwarven ruins | Dwarven Kingdom, Shallow Water, Cenote | Frogfolk, Naga, Water Elemental, Octopurr | Kraken |
 | 5 | Ember Forge | Volcanic dwarven forge | Lava Forge, Dungeon Lava Pit, Volcano | Magma Hound, Magma Golem, Fire Elemental, Imp, Burning Skull | Dragon or Balrog |
-| 6 | Frostvault | Frozen crypts | Icy Wilderness, Ice Dungeon (More Dungeons) | Yeti, Wraith, Spectre, Skeleton, Evil Snowman | Lich or Ancient Troll |
+| 6 | Frostvault | Frozen crypts | Icy Wilderness, Ice Dungeon (More Dungeons) | Yeti, Wraith, Spectre, Skeleton, Evil Snowman | TBD (the Ancient Troll became the Cellars' Larder Troll, 2026-10-05; a Lich remains a candidate) |
 | 7 | The Rootdeep | Living, pulsing underworld | Lost Civilization, The Void, Chamber Of Secrets | Tree Spirits, Beholder, Alien Bio Horror, Shoggoth's Avatar | The King In Yellow |
 | — | The Heart | Final area, the deepest point of the Hollows | To be chosen | — | Demon Lord (as The Warden Below) |
 
@@ -713,14 +713,14 @@ This gives the player influence over part of the village's population. The three
 |---|---|---|
 | **Gold** | Service, selling surplus ingredients, gold rooms, *(v0.5)* surplus produce and errands where they fit | Gear, tavern upgrades, recipes, staff wages, *(v0.4)* furnishings, *(v0.5)* seeds, animals, supplies and village shops |
 | **Renown** | Customer satisfaction, story | Unlocks tiers of customers, story progress (not spent) |
-| **Delve Marks** | Found on delves (lost on death if unspent) | Permanent combat unlocks at the "Delver's Board" |
-| **Relics** | Bosses, secrets | Major permanent abilities |
+| ~~**Delve Marks**~~ | *(removed in the 4e plan, 2026-10-05: a second permanent currency beside Gold and tavern upgrades)* | |
+| ~~**Relics**~~ | *(removed for now in the 4e plan, 2026-10-05: run powers and upgrades cover abilities, boss trophies (4f) give bosses their permanent reward)* | |
 
 ### 7.2 Upgrade Tracks
 
-- **Combat:** weapon blueprints (added to drop pools), armor, satchel size, preservation tools, Essence Tonics.
+- **Combat:** weapon blueprints (added to drop pools), armor, satchel size, preservation tools, Essence Tonics *(deferred in the 4e plan: revisited only if the run needs another recovery tool after the boss playtest)*.
 - **Run power-ups:** *(v0.2)* temporary boons chosen one-of-three in power-up rooms; they last for the run.
-- **Relics:** permanent abilities that open shortcuts and hidden rooms. *(v0.2: no longer platforming abilities such as double jump.)*
+- ~~**Relics:**~~ permanent abilities that open shortcuts and hidden rooms. *(v0.2: no longer platforming abilities such as double jump.)* *(Removed for now in the 4e plan, 2026-10-05.)*
 - **Tavern:** stations, furniture, seating capacity, decor, new areas. *(v0.4)* Furnishings are bought with Gold or discovered (Section 6.6).
 - **Property and life** *(v0.5)*: Inn rooms, farming, ranching and fishing capability (tools, plots, animals, gear). Not designed yet.
 - **Staff:** hire and train residents; staff skill levels affect auto-complete quality.
@@ -785,7 +785,7 @@ Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifan
 | Dodge roll | B / Circle | Space |
 | Interact / pick up / use station / serve | A / Cross | E |
 | Skills 1 and 2 | LB / RB | 1 / 2 |
-| Kitchen Arts special | RT | Q |
+| Kitchen Arts special *(deferred, 4e plan)* | RT | Q |
 | Harvest Finisher | LT | F |
 | Pause | Start | Esc |
 
@@ -983,7 +983,7 @@ Assets/
 - **4b Dungeon migration:** Phase 1 and 3 dungeon gameplay rebuilt on TDE, with the dungeon haptics.
 - **4c Tavern and UI migration:** top-down tavern, customer pathing, 2D serving, Grill/Tap/Serving with haptics, all UI in uGUI + STM.
 - **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. *(v0.4)* The reward architecture leaves room for future persistent reward kinds (customization discoveries) without building any. *(v0.5)* Scope unchanged and the completed step 1 and 2 work stands. Step 3's rewards are designed knowing a larger ingredient ecosystem exists: ingredient rewards don't assume monster parts are the only ingredients, and the reward model stays open to dungeon ingredients, quest objects, customization discoveries and future weapons and currencies (ingredient and Gold rewards remain the prototype's focus). No farming, fishing or ranching in 4d. Step 5 (day-loop integration) is where the run joins `GameFlow`; **proposed:** it adopts the new order there (evening service → delve → sleep, with the existing Morning panel standing in for the daytime until 4h), so the integration isn't done twice. How the Night upgrade screen and the breakfast buff are rehomed is decided when step 5 is planned. *(4d step 5, 2026-10-04: adopted. The old morning panel is the daytime placeholder; the breakfast became the **delve meal**, cooked in the daytime and kept until that night's delve; the Night screen keeps the upgrades, after the delve.)* *(4d playtest, 2026-10-05: a new game opens with the first night's delve, since the storeroom starts empty; base Essence is tuned so a full run of the Cellars needs some gear.)*
-- **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. *(v0.4)* Boss rewards are designed so a unique boss furnishing can plug in later. *(v0.5)* Unchanged: the roadmap review found no reason to move it.
+- **4e Combat depth and boss:** *(revised in the 4e plan, 2026-10-05)* **the Larder Troll** (the Cellars boss), the **Harvest Finisher** (a small version, and an optional finishing moment on the defeated boss), the boss's rewards (Gold, a Premium larder cache, a persistent first-clear record, a hook for 4f's trophy), and tuning the cleaver and the Cellars' enemies for it. Deferred: more weapons (until 4g's protagonist decision), Kitchen Arts, field cooking, Essence Tonics. Removed: weapon rarity and affixes, Delve Marks, relics. *(Originally: Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.)* *(v0.4)* Boss rewards are designed so a unique boss furnishing can plug in later. *(v0.5)* Unchanged: the roadmap review found no reason to move it.
 - **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5. Once that foundation exists, 4f also proves **one small end-to-end reward loop in Biome 1**: fight → a furnishing discovery drops → pick it up → extract → it is permanently owned → place it through Decorate Mode. That means a small real furnishing drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under whichever rule is approved when the feature is designed. It is an integration slice, not the production loot catalog: it proves that finding strange things in the Hollows and bringing them home is fun. *(v0.5, proposed)* The customization foundation is built for **several areas from the start** and proves it with **one small guest room** as a second decoratable area with its own saved layout (no guests or Inn rules yet), so the Inn never needs a second decorating system. The Biome 1 recipe rework follows the surface and dungeon ingredient model (Section 5.5): a few everyday surface staples, bought until farming exists, alongside the dungeon's parts.
 - **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later. *(v0.5, proposed)* The representative NPC quest is a villager's errand into the Hollows that returns a **quest object** (the first non-ingredient, non-Gold reward kind in real use), and the dialogue adapters are built knowing villagers, Visitors and generated residents will use them. Act I is written for the village direction.
 - **4h Village and daytime slice** *(v0.5, proposed; new)*: a small part of Brackenford and the tavern's grounds, walkable in the daytime, replacing the Morning panel; a prototype of the daytime time model (a ticking clock or player-controlled phases, chosen by playtesting both cheaply); 3–4 named villagers with homes, simple presence or schedules, dialogue and relationship hooks; named villagers chosen into evening service alongside Visitors (today's generated customers become the Visitors); one small farm plot with a handful of crops feeding the storeroom (the smallest test of "I grew part of tonight's menu"); the full new day loop working through `GameFlow`. Not in 4h: ranching, fishing, Inn guests, Visitor promotion, resident recruitment.
@@ -1104,7 +1104,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 - **Essence:** the delve timer and the player's only health pool.
 - **Haul:** ingredients carried back from a delve.
 - **Harvest Finisher:** a special kill move that guarantees a premium part.
-- **Kitchen Arts:** the player's special meter attack.
+- **Kitchen Arts:** the player's special meter attack *(deferred in the 4e plan)*.
 - **Cheer:** buffs during a delve, granted by the village's Morale *(v0.5; was stronghold morale)*.
 - **Renown:** the tavern's reputation, driving customer tiers and story.
 - **Morale:** the state of the village community; it produces Cheer *(v0.5, reinterpreted from the Sanctuary/Stronghold community; Section 6.4)*.

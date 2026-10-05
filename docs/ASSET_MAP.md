@@ -260,7 +260,7 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | Green Slime | Creatures | Imported; leap attack (4b) |
 | Bat | Creatures (Beasts) | Imported; sleeps, wakes, swoops (4b) |
 | Giant Spider | Exclusive (`Giant_Spider`) | Imported; bite and web (4b). Huntsman Spider and Spider Queen exist too (same sheet set). |
-| Mother Slime (boss) | Creatures (Slimes, green and blue) | Not imported |
+| Larder Troll (boss, 4e) | Exclusive (`Ancient_Troll`) | Imported in 4e step 1 (see below). Replaces the Mother Slime candidate (2026-10-05). |
 | Mushroom People | Creatures (exclusive) | Deferred (4b decision): it has idle, jump, damage and die, but **no attack animation**. |
 
 ## Known gaps
