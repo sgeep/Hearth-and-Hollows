@@ -97,11 +97,48 @@ namespace Hearthdelve.Dungeon.Rooms
             m_MarkerPower = markerPower;
         }
 
-        void OnEnable() => Active = this;
+        void OnEnable()
+        {
+            Active = this;
+            EventBus<BossEncounterEnded>.Subscribe(OnBossEnded);
+        }
 
         void OnDisable()
         {
             if (Active == this) Active = null;
+            EventBus<BossEncounterEnded>.Unsubscribe(OnBossEnded);
+        }
+
+        // The boss's reward (4e step 4): its Gold and its larder cache, where it fell.
+        void OnBossEnded(BossEncounterEnded e)
+        {
+            if (!e.Defeated || Current == null) return;
+            Hearthdelve.Dungeon.Bosses.BossDefinition boss = m_Settings != null ? m_Settings.tuning.boss : null;
+            if (boss == null || boss.id != e.BossId) return;
+            var encounter = FindAnyObjectByType<Hearthdelve.Dungeon.Bosses.BossEncounter>();
+            Vector2 at = encounter != null ? (Vector2)encounter.transform.position : (Vector2)Current.BossPoint();
+            GrantBossReward(boss, at);
+        }
+
+        /// <summary>Drops a boss's Gold and larder cache around <paramref name="at"/>.</summary>
+        public void GrantBossReward(Hearthdelve.Dungeon.Bosses.BossDefinition boss, Vector2 at)
+        {
+            if (boss.gold > 0 && m_Settings.goldPickup != null)
+            {
+                GoldPickup coin = Instantiate(m_Settings.goldPickup, at + new Vector2(0f, -1.2f), Quaternion.identity, Current.transform);
+                coin.SetAmount(boss.gold);
+            }
+            if (HarvestSystem.Instance == null || boss.cache == null) return;
+            int index = 0;
+            foreach (Hearthdelve.Dungeon.Bosses.CacheEntry entry in boss.cache)
+            {
+                if (entry?.ingredient == null || entry.count <= 0) continue;
+                var stack = new Hearthdelve.Shared.Inventory.IngredientStack(new Hearthdelve.Shared.Ingredients.IngredientItem(entry.ingredient, entry.quality), entry.count, 1f);
+                Hearthdelve.Dungeon.Harvest.IngredientPickup pickup = HarvestSystem.Instance.Drop(stack, at, null);
+                float angle = (200f + 140f * (boss.cache.Length > 1 ? index / (float)(boss.cache.Length - 1) : 0.5f)) * Mathf.Deg2Rad;
+                pickup?.PopTo(at + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * 1.8f, 0.4f);
+                index++;
+            }
         }
 
         IEnumerator Start()

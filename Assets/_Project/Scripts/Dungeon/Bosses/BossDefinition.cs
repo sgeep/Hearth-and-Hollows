@@ -25,6 +25,23 @@ namespace Hearthdelve.Dungeon.Bosses
 
         [Header("Frenzy: the second phase")]
         public FrenzySettings frenzy = new();
+
+        [Header("Reward (4e step 4): dropped where it falls")]
+        [Min(0), Tooltip("Run Gold: unbanked until the delve ends well, like any other.")]
+        public int gold = 120;
+        [Tooltip("The larder cache: guaranteed parts (ordinary parts for the satchel), from the deeper Cellars.")]
+        public CacheEntry[] cache = System.Array.Empty<CacheEntry>();
+        [Tooltip("4f's hook: the unique trophy or furnishing a first clear grants. Empty until 4f.")]
+        public string trophyId = "";
+    }
+
+    /// <summary>One stack of a boss's cache.</summary>
+    [System.Serializable]
+    public sealed class CacheEntry
+    {
+        public Hearthdelve.Shared.Ingredients.IngredientDefinition ingredient;
+        [Min(1)] public int count = 2;
+        public Hearthdelve.Shared.Ingredients.Quality quality = Hearthdelve.Shared.Ingredients.Quality.Premium;
     }
 
     /// <summary>A boss that eats the parts on the floor (4e step 2). The player can take them first, or hit it hard to spoil the meal.</summary>

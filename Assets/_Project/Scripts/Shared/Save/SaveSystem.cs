@@ -16,7 +16,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
         public static SaveData Capture(GameState state)
         {
@@ -45,6 +45,9 @@ namespace Hearthdelve.Shared.Save
             foreach (var pair in state.UpgradeLevels)
                 data.upgrades.Add(new UpgradeData { id = pair.Key, level = pair.Value });
             data.upgrades.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
+            foreach (var pair in state.BossClears)
+                data.bosses.Add(new BossClearData { id = pair.Key, clears = pair.Value });
+            data.bosses.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
             return data;
         }
 
@@ -88,6 +91,11 @@ namespace Hearthdelve.Shared.Save
                 state.SetUpgradeLevel(u.id, u.level);
             }
 
+            // Kept even for a boss no longer in the game: the record is story state (4e).
+            if (data.bosses != null)
+                foreach (var b in data.bosses)
+                    if (b != null && !string.IsNullOrEmpty(b.id) && b.clears > 0) state.SetBossClears(b.id, b.clears);
+
             if (data.meal != null && Enum.TryParse(data.meal.kind, out MealBuffKind kind))
                 state.Meal = new MealBuff(kind, data.meal.amount, data.meal.recipe);
             return state;
@@ -107,12 +115,22 @@ namespace Hearthdelve.Shared.Save
             {
                 case CurrentVersion:
                     return JsonUtility.FromJson<SaveData>(json);
+                case 2:
+                    return MigrateV2(JsonUtility.FromJson<SaveData>(json));
                 case 1:
                     return MigrateV1(JsonUtility.FromJson<SaveDataV1>(json));
                 default:
                     if (version > CurrentVersion) throw new NotSupportedException($"The save is from a newer version ({version}) of the game.");
                     throw new FormatException($"Unknown save version {version}.");
             }
+        }
+
+        /// <summary>v2 → v3: the same, with no bosses defeated yet (4e).</summary>
+        static SaveData MigrateV2(SaveData v2)
+        {
+            v2.version = CurrentVersion;
+            v2.bosses ??= new List<BossClearData>();
+            return v2;
         }
 
         /// <summary>v1 → v2: parts gain prep state (Raw) and full freshness; renown, upgrades and a pending meal start empty; resume in the daytime.</summary>

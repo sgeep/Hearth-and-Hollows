@@ -5,6 +5,7 @@ using Hearthdelve.Dungeon.Bosses;
 using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Haptics;
 using System.Linq;
 using MoreMountains.Feedbacks;
 using MoreMountains.Tools;
@@ -55,6 +56,16 @@ namespace Hearthdelve.Editor
                 b.drainMultiplierWhileActive = 0f;
                 b.entranceSeconds = 1.6f;
             });
+            // The reward (step 4): Gold and a Premium larder cache of the deeper Cellars' parts. Set once; edits are kept.
+            if (boss.cache == null || boss.cache.Length == 0)
+            {
+                boss.cache = new[] { "SlimeCore", "VenomSac" }
+                    .Select(a => AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/Ingredient_{a}.asset"))
+                    .Where(i => i != null)
+                    .Select(i => new CacheEntry { ingredient = i, count = 2, quality = Hearthdelve.Shared.Ingredients.Quality.Premium })
+                    .ToArray();
+                EditorUtility.SetDirty(boss);
+            }
             // What its slams shake loose (step 2): the Cellars' everyday parts, as ordinary parts. Set once; edits are kept.
             if (boss.feeding.scraps == null || boss.feeding.scraps.Length == 0)
             {
@@ -76,6 +87,13 @@ namespace Hearthdelve.Editor
         {
             SpriteRenderer body = root.GetComponentInChildren<CharacterSpriteAnimator>().GetComponent<SpriteRenderer>();
             EnemyAttack[] attacks = root.GetComponents<EnemyAttack>();
+            // Step 4: its telegraphs are felt as the boss's (a heavier rumble than an ordinary enemy's cue).
+            MMF_HapticPattern cue = root.transform.Find("Feedback_TelegraphCue")?.GetComponent<MMF_Player>()?.GetFeedbackOfType<MMF_HapticPattern>();
+            if (cue != null)
+            {
+                cue.Pattern = LookTestContent.Pattern(HapticIds.BossTelegraph);
+                cue.Scale = 0.6f;
+            }
             // The slam lands with a thud and a shake (felt lightly even on a miss: the floor shakes).
             attacks[0].ConfigureImpact(LookTestContent.Feedback(root.transform, "Feedback_Slam", null, 0.45f,
                 LookTestContent.Sfx("PH_TrollSlam"), LookTestContent.Pattern(HapticIds.BumpSoft)));

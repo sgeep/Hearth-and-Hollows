@@ -106,6 +106,7 @@ namespace Hearthdelve.Shared.Game
     public sealed class GameState
     {
         readonly Dictionary<string, int> m_UpgradeLevels = new();
+        readonly Dictionary<string, int> m_BossClears = new();
 
         public GameState(int day = 1, DayPhase phase = DayPhase.Daytime) => Cycle = new DayCycle(day, phase);
 
@@ -120,6 +121,17 @@ namespace Hearthdelve.Shared.Game
         public DaySummary Today { get; } = new();
 
         public int UpgradeLevel(string id) => id != null && m_UpgradeLevels.TryGetValue(id, out int level) ? level : 0;
+
+        /// <summary>Each boss defeated, by stable id, and how many times (4e): story reactions, first-clear rewards, 4f's trophies.</summary>
+        public IReadOnlyDictionary<string, int> BossClears => m_BossClears;
+        public int TimesDefeated(string bossId) => bossId != null && m_BossClears.TryGetValue(bossId, out int n) ? n : 0;
+
+        internal void SetBossClears(string id, int clears)
+        {
+            if (string.IsNullOrEmpty(id)) return;
+            if (clears <= 0) m_BossClears.Remove(id);
+            else m_BossClears[id] = clears;
+        }
 
         internal void SetUpgradeLevel(string id, int level)
         {

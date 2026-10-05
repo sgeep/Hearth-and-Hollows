@@ -57,6 +57,11 @@ namespace Hearthdelve.Dungeon.Run
             return true;
         }
 
+        void OnBossEnded(BossEncounterEnded e)
+        {
+            if (e.Defeated) Loot.AddBossDefeated(e.BossId);
+        }
+
         // Second wind: Essence back as each room is cleared.
         void OnRoomCleared(RoomCleared _)
         {
@@ -114,6 +119,7 @@ namespace Hearthdelve.Dungeon.Run
             Loot.GoldChanged += PublishGold;
             EventBus<RoomCleared>.Subscribe(OnRoomCleared);
             EventBus<RoomEntered>.Subscribe(LogRoomEntered);
+            EventBus<BossEncounterEnded>.Subscribe(OnBossEnded);
             EventBus<PlayerDefeated>.Subscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
         }
@@ -123,6 +129,7 @@ namespace Hearthdelve.Dungeon.Run
             Loot.GoldChanged -= PublishGold;
             EventBus<RoomCleared>.Unsubscribe(OnRoomCleared);
             EventBus<RoomEntered>.Unsubscribe(LogRoomEntered);
+            EventBus<BossEncounterEnded>.Unsubscribe(OnBossEnded);
             EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
             EventBus<DebugSkipPhaseRequested>.Unsubscribe(OnDebugSkip);
         }
@@ -149,7 +156,7 @@ namespace Hearthdelve.Dungeon.Run
             if (IsEnding) return false;
             IsEnding = true;
             Satchel satchel = PlayerSatchel();
-            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold) : DelveReport.Empty;
+            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold, Loot.BossesDefeated) : DelveReport.Empty;
             satchel?.Clear();
             End(report);
             return true;
@@ -178,7 +185,7 @@ namespace Hearthdelve.Dungeon.Run
             DeathPenaltyResult result = DeathPenalty.Resolve(satchel, keepSlot, RunCurrency);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
-            End(DelveReport.Death(result, Loot.Gold));
+            End(DelveReport.Death(result, Loot.Gold, Loot.BossesDefeated));
         }
 
         void End(DelveReport report)

@@ -9,8 +9,9 @@ namespace Hearthdelve.Shared.Game
     /// <summary>What a delve brought back.</summary>
     public sealed class DelveReport
     {
-        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost)
+        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost, IEnumerable<string> bosses = null)
         {
+            BossesDefeated = bosses != null ? new List<string>(bosses) : new List<string>();
             Outcome = outcome;
             Haul = haul;
             PartsLost = partsLost;
@@ -25,6 +26,8 @@ namespace Hearthdelve.Shared.Game
         public int GoldSecured { get; }
         /// <summary>Run Gold left in the dungeon (death). Gold already banked is never lost.</summary>
         public int GoldLost { get; }
+        /// <summary>Bosses defeated on the delve (4e). A victory is a victory: recorded even if the delve then ends in death.</summary>
+        public IReadOnlyList<string> BossesDefeated { get; }
 
         public int PartsBroughtBack
         {
@@ -37,21 +40,21 @@ namespace Hearthdelve.Shared.Game
         }
 
         /// <summary>Left through the exit: everything in the satchel comes home (freshness as it is now), and the run's Gold with it.</summary>
-        public static DelveReport Extraction(Satchel satchel, int runGold = 0)
+        public static DelveReport Extraction(Satchel satchel, int runGold = 0, IEnumerable<string> bosses = null)
         {
             var haul = new List<IngredientStack>();
             if (satchel != null)
                 foreach (var slot in satchel.Slots)
                     if (!slot.IsEmpty) haul.Add(slot);
-            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0);
+            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0, bosses);
         }
 
         /// <summary>Died: only the Lockbox stack comes home; the run's Gold is lost.</summary>
-        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0)
+        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0, IEnumerable<string> bosses = null)
         {
             var haul = new List<IngredientStack>();
             if (result.KeptSomething) haul.Add(result.Kept);
-            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold));
+            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold), bosses);
         }
 
         /// <summary>Debug skip: nothing brought back.</summary>
@@ -102,6 +105,7 @@ namespace Hearthdelve.Shared.Game
             state.Today.PartsLost += report.PartsLost;
             state.Today.DelveGold += report.GoldSecured;
             state.Today.DelveGoldLost += report.GoldLost;
+            foreach (string boss in report.BossesDefeated) state.SetBossClears(boss, state.TimesDefeated(boss) + 1);
             state.Meal = MealBuff.None;
             state.Cycle.AdvanceTo(DayPhase.Night);
         }

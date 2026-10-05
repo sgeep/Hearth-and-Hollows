@@ -50,8 +50,8 @@ namespace Hearthdelve.Editor
                 cleaver.heavy = new List<HeavyChargeStep>
                 {
                     Heavy(0f, "Heavy tap", 14f, 2.2f, 7f, 0.35f, 0.07f),
-                    Heavy(0.45f, "Heavy charged", 22f, 2.6f, 9f, 0.5f, 0.09f),
-                    Heavy(0.9f, "Heavy full", 34f, 3.0f, 11f, 0.7f, 0.12f),
+                    Heavy(0.45f, "Heavy charged", 26f, 2.6f, 9f, 0.5f, 0.09f),
+                    Heavy(0.9f, "Heavy full", 40f, 3.0f, 11f, 0.7f, 0.12f),
                 };
                 EditorUtility.SetDirty(cleaver);
             }

@@ -29,6 +29,16 @@ namespace Hearthdelve.Shared.Game
         IEnumerator Reveal();
     }
 
+    /// <summary>
+    /// A boss was defeated for the first time (4e), published once its delve is recorded. The hook for first-clear rewards,
+    /// story reactions and 4f's boss trophy (keyed by the boss's stable id).
+    /// </summary>
+    public readonly struct BossFirstCleared : IEvent
+    {
+        public readonly string BossId;
+        public BossFirstCleared(string bossId) => BossId = bossId;
+    }
+
     /// <summary>Debug: skip to the next phase. The loaded scene finishes its phase properly if it can.</summary>
     public readonly struct DebugSkipPhaseRequested : IEvent { }
 
@@ -194,6 +204,9 @@ namespace Hearthdelve.Shared.Game
         public void CompleteDelve(DelveReport report)
         {
             DayRules.CompleteDelve(State, report);
+            // A boss's first defeat (4e): the hook for first-clear rewards, story reactions and 4f's trophy.
+            foreach (string boss in report.BossesDefeated)
+                if (State.TimesDefeated(boss) == 1) EventBus<BossFirstCleared>.Publish(new BossFirstCleared(boss));
             PhaseChanged?.Invoke();
             Save();
             Load(GameScenes.Tavern);
