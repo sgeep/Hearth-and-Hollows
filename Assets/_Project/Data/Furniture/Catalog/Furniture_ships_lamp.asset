@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_ships_lamp
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: ships_lamp
+  nameKey: furniture.ships_lamp
+  descriptionKey: furniture.ships_lamp.description
+  category: 3
+  theme: 6
+  layer: 2
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 45
+  unique: 0
+  catalogTier: 1
+  sources: 2
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 1, y: 2}
+    art:
+    - name: Art
+      sprite: {fileID: 0}
+      frames:
+      - {fileID: -1000653473, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: -106338869, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: -554174005, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: -1055698047, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: 227428054, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: -1765631410, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: 1256292908, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      - {fileID: 1173342564, guid: 4bdf8695106f919439f4e6802439bb98, type: 3}
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0}
+      sortingLayer: Ground
+      order: 3
+      variantSprites: []
+      variantFrames:
+      - frames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies: []
+    seats: []
+    interactPoint: {x: 0.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights:
+    - position: {x: 0.5, y: 0.5}
+      color: {r: 0.627451, g: 0.78431374, b: 1, a: 1}
+      intensity: 0.55
+      innerRadius: 0.6
+      outerRadius: 3
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

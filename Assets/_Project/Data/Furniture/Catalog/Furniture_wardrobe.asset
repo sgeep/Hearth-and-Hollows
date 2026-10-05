@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_wardrobe
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: wardrobe
+  nameKey: furniture.wardrobe
+  descriptionKey: furniture.wardrobe.description
+  category: 8
+  theme: 1
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 60
+  unique: 0
+  catalogTier: 0
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: carved
+    nameKey: look.carved
+    swatch: {r: 0.627451, g: 0.3764706, b: 0.22745098, a: 1}
+  - id: plain
+    nameKey: look.plain
+    swatch: {r: 0.5411765, g: 0.3137255, b: 0.1882353, a: 1}
+  - id: drawers
+    nameKey: look.with_drawers
+    swatch: {r: 0.41568628, g: 0.2509804, b: 0.15686275, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 2, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: -1758220332, guid: 9032b9b4f09a49e418d35cebb7e38241, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: 1427572759, guid: 9032b9b4f09a49e418d35cebb7e38241, type: 3}
+      - {fileID: 949477129, guid: 9032b9b4f09a49e418d35cebb7e38241, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 2
+      height: 0.75
+    seats: []
+    interactPoint: {x: 1, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_floor_blue_tiles
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: floor_blue_tiles
+  nameKey: finish.floor_blue_tiles
+  kind: 0
+  theme: 4
+  price: 90
+  catalogTier: 2
+  sources: 2
+  pattern: {x: 1, y: 1}
+  tiles:
+  - {fileID: 11400000, guid: 97ff3e66ce7ed254baaabe0a6f72d0a2, type: 2}
+  leftEdge: []
+  rightEdge: []
+  swatch: {fileID: -1450608373, guid: f7c9e0eed31723f44b60ae223bddd0a3, type: 3}
+  channels: []
+  palette: 

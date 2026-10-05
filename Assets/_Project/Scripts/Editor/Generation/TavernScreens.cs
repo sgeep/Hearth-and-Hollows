@@ -190,11 +190,14 @@ namespace Hearthdelve.Editor
             }
 
             LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, new Color(0.25f, 0.45f, 0.2f), TextAnchor.UpperLeft, -150f, -64f, 76f);
+            // A new catalogue tier opened (4f, D14): one line under the upgrades.
+            LocalizedSuperText word = TextLine(panel, "Word", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperCenter, 0f, -51f, 300f);
             Button sleep = BottomButton(panel, "Sleep", LoopLocKeys.NightSleep, 0f, 120f, out _);
             UiFeedbackContent.Commit(sleep);
             Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 110f, 70f, out _);
-            root.gameObject.AddComponent<NightScreen>().Configure(panel.gameObject, title, labels, summary, null, rows, saved, sleep, decorate);
+            root.gameObject.AddComponent<NightScreen>().Configure(panel.gameObject, title, labels, summary, null, rows, saved, sleep, decorate, word);
             saved.gameObject.SetActive(false);
+            word.gameObject.SetActive(false);
             panel.gameObject.SetActive(false);
         }
 
@@ -215,7 +218,7 @@ namespace Hearthdelve.Editor
             var strip = new Color(0.08f, 0.06f, 0.06f, 0.8f);
 
             RectTransform top = Rect(content, "Top", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(320f, 14f), strip);
-            Label(top, "Title", DecorateLocKeys.Title, 6f, k_Light, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(5f, 0f), new Vector2(170f, 12f));
+            LocalizedSuperText title = Label(top, "Title", DecorateLocKeys.Title, 6f, k_Light, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(5f, 0f), new Vector2(170f, 12f));
             LocalizedSuperText status = Label(top, "Status", DecorateLocKeys.StatusReady, 6f, new Color(0.55f, 0.9f, 0.5f), TextAnchor.MiddleRight,
                 new Vector2(1f, 0.5f), new Vector2(-5f, 0f), new Vector2(140f, 12f));
             RectTransform pieceBar = Rect(content, "PieceBar", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(320f, 13f),
@@ -226,16 +229,8 @@ namespace Hearthdelve.Editor
             LocalizedSuperText controls = Label(bottom, "Controls", DecorateLocKeys.Controls, 6f, new Color(0.85f, 0.8f, 0.7f), TextAnchor.MiddleCenter,
                 new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(312f, 2f * Line));
 
-            // Storage: what's owned and not placed; choosing one puts it on the cursor.
-            RectTransform storage = DungeonUI.Panel(content, new Vector2(170f, 128f), Vector2.zero);
-            storage.name = "Storage";
-            DungeonUI.Title(storage, DecorateLocKeys.Storage);
-            var rows = new Button[7];
-            var labels = new LocalizedSuperText[rows.Length];
-            for (int i = 0; i < rows.Length; i++)
-                rows[i] = SmallButton(storage, $"Row{i + 1}", DecorateLocKeys.StorageRow, new Vector2(0.5f, 1f), new Vector2(0f, -22f - i * 15f), 150f, out labels[i]);
-            LocalizedSuperText empty = Label(storage, "Empty", DecorateLocKeys.StorageEmpty, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
-                new Vector2(150f, 12f));
+            DecorateCatalogue catalogue = BuildCatalogue(content);
+            DecorateStyle style = BuildStyle(content);
 
             // The layout check: each problem in words, blocking ones in red; put it all back; done.
             RectTransform check = DungeonUI.Panel(content, new Vector2(220f, 112f), Vector2.zero);
@@ -249,11 +244,129 @@ namespace Hearthdelve.Editor
             Button done = BottomButton(check, "Done", DecorateLocKeys.Done, 64f, 70f, out _);
             UiFeedbackContent.Commit(done);
 
-            root.gameObject.AddComponent<DecorateScreen>().Configure(content.gameObject, status, piece, controls, storage.gameObject, rows, labels, empty,
-                check.gameObject, issues, putAllBack, done);
-            storage.gameObject.SetActive(false);
+            root.gameObject.AddComponent<DecorateScreen>().Configure(content.gameObject, title, status, piece, controls, catalogue, style, check.gameObject, issues,
+                putAllBack, done);
             check.gameObject.SetActive(false);
             content.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// The catalogue (4f step 4): its page's name and the purse along the top, a list of eight on the left (name, then the
+        /// price or what's stored), and the chosen piece on the right (drawing, description, tier and price, counts, where
+        /// copies come from, its colourways), with its actions along the bottom.
+        /// </summary>
+        static DecorateCatalogue BuildCatalogue(RectTransform content)
+        {
+            RectTransform panel = DungeonUI.Panel(content, new Vector2(304f, 172f), Vector2.zero);
+            panel.name = "Catalogue";
+            LocalizedSuperText tab = DungeonUI.Title(panel, DecorateLocKeys.TabStorage);
+            var topLeft = new Vector2(0f, 1f);
+            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, 6f, k_Note, TextAnchor.MiddleRight, new Vector2(1f, 1f), new Vector2(-8f, -10f),
+                new Vector2(110f, Line));
+
+            // The list (left, 170 wide): a name, and the price or what's stored, per row.
+            var rows = new CatalogueRow[8];
+            for (int i = 0; i < rows.Length; i++)
+            {
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(6f, -22f - i * Line), new Vector2(170f, Line), new Color(0f, 0f, 0f, 0f));
+                var button = row.gameObject.AddComponent<Button>();
+                button.transition = Selectable.Transition.None;
+                var navigation = button.navigation;
+                navigation.mode = Navigation.Mode.None;
+                button.navigation = navigation;
+                rows[i] = new CatalogueRow
+                {
+                    button = button,
+                    background = row.GetComponent<Image>(),
+                    name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(2f, 0f), new Vector2(110f, Line)),
+                    info = Label(row, "Info", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-2f, 0f), new Vector2(60f, Line)),
+                };
+            }
+            LocalizedSuperText empty = Label(panel, "Empty", DecorateLocKeys.EmptyTab, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -40f), new Vector2(166f, Line));
+            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, new Color(0.62f, 0.2f, 0.12f), TextAnchor.MiddleLeft, topLeft,
+                new Vector2(8f, -120f), new Vector2(166f, Line));
+            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.CatalogControls, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -134f),
+                new Vector2(166f, Line));
+
+            // The chosen piece (right, 116 wide): its drawing, name, description, price and tier, counts, where copies come from.
+            RectTransform iconBox = Rect(panel, "IconBox", topLeft, new Vector2(0.5f, 0.5f), new Vector2(240f, -40f), new Vector2(40f, 40f));
+            Image icon = DungeonUI.AddImage(Rect(iconBox, "Icon", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(16f, 16f)), null, Color.white);
+            icon.preserveAspect = true;
+            LocalizedSuperText Detail(string name, float top, int lines, Color color) =>
+                Label(panel, name, TavernLocKeys.Plain, 6f, color, lines > 1 ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, topLeft,
+                    new Vector2(182f, top), new Vector2(116f, Line * lines));
+            LocalizedSuperText name = Detail("Name", -60f, 1, k_Title);
+            LocalizedSuperText description = Detail("Description", -72f, 3, k_Ink);
+            LocalizedSuperText tier = Detail("Tier", -108f, 1, k_Ink);
+            LocalizedSuperText counts = Detail("Counts", -120f, 1, k_Note);
+            LocalizedSuperText source = Detail("Source", -132f, 1, k_Note);
+            var swatches = new Image[8];
+            for (int i = 0; i < swatches.Length; i++)
+            {
+                RectTransform swatch = Rect(panel, $"Swatch{i + 1}", topLeft, topLeft, new Vector2(184f + i * 9f, -144f), new Vector2(7f, 5f), Color.white);
+                swatches[i] = swatch.GetComponent<Image>();
+            }
+
+            Button primary = SmallButton(panel, "Primary", DecorateLocKeys.ActionPlace, new Vector2(0.5f, 0f), new Vector2(-100f, 4f), 96f, out LocalizedSuperText primaryLabel);
+            Button secondary = SmallButton(panel, "Secondary", DecorateLocKeys.ActionBuy, new Vector2(0.5f, 0f), new Vector2(0f, 4f), 96f, out LocalizedSuperText secondaryLabel);
+            Button tertiary = SmallButton(panel, "Tertiary", DecorateLocKeys.ActionSell, new Vector2(0.5f, 0f), new Vector2(100f, 4f), 96f, out LocalizedSuperText tertiaryLabel);
+            UiFeedbackContent.Commit(primary);
+
+            var catalogue = panel.gameObject.AddComponent<DecorateCatalogue>();
+            catalogue.Configure(panel.gameObject, tab, purse, empty, controls, rows, icon, name, description, tier, counts, source, message, swatches,
+                primary, primaryLabel, secondary, secondaryLabel, tertiary, tertiaryLabel);
+            panel.gameObject.SetActive(false);
+            return catalogue;
+        }
+
+        /// <summary>
+        /// The colour panel (4f step 5): a row per choice (style, wood, cushion…, schemes) with its swatches and the chosen
+        /// name, and the two actions (use the last colours, colour every copy here) at the bottom.
+        /// </summary>
+        static DecorateStyle BuildStyle(RectTransform content)
+        {
+            RectTransform panel = DungeonUI.Panel(content, new Vector2(248f, 120f), Vector2.zero);
+            panel.name = "Colours";
+            LocalizedSuperText title = DungeonUI.Title(panel, DecorateLocKeys.StyleTitle);
+            var topLeft = new Vector2(0f, 1f);
+            Sprite marker = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Selectors", "Marker");
+            var rows = new StyleRow[4];
+            for (int i = 0; i < rows.Length; i++)
+            {
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(12f, -24f - i * 16f), new Vector2(226f, 14f));
+                var r = new StyleRow
+                {
+                    root = row.gameObject,
+                    label = Label(row, "Label", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(50f, Line)),
+                    value = Label(row, "Value", TavernLocKeys.Plain, 6f, k_Note, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-30f, 0f), new Vector2(60f, Line)),
+                    swatches = new Image[9],
+                    buttons = new Button[9],
+                };
+                for (int s = 0; s < r.swatches.Length; s++)
+                {
+                    RectTransform swatch = Rect(row, $"Swatch{s + 1}", new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(58f + s * 12f, 0f), new Vector2(9f, 9f),
+                        Color.white);
+                    r.swatches[s] = swatch.GetComponent<Image>();
+                    r.buttons[s] = swatch.gameObject.AddComponent<Button>();
+                    r.buttons[s].transition = Selectable.Transition.None;
+                    var navigation = r.buttons[s].navigation;
+                    navigation.mode = Navigation.Mode.None;
+                    r.buttons[s].navigation = navigation;
+                }
+                RectTransform mark = Rect(row, "Marker", new Vector2(0f, 0.5f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(8f, 5f));
+                r.marker = DungeonUI.AddImage(mark, marker, k_Gold);
+                rows[i] = r;
+            }
+            LocalizedSuperText nothing = Label(panel, "Nothing", DecorateLocKeys.StyleNothing, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(220f, Line));
+            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.StyleControls, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
+                new Vector2(0f, 20f), new Vector2(232f, Line));
+            Button copy = SmallButton(panel, "Copy", DecorateLocKeys.StyleCopy, new Vector2(0.5f, 0f), new Vector2(-60f, 4f), 112f, out LocalizedSuperText copyLabel);
+            Button applyAll = SmallButton(panel, "ApplyAll", DecorateLocKeys.StyleApplyAll, new Vector2(0.5f, 0f), new Vector2(60f, 4f), 112f, out LocalizedSuperText applyAllLabel);
+            var style = panel.gameObject.AddComponent<DecorateStyle>();
+            style.Configure(panel.gameObject, title, controls, nothing, rows, copy, copyLabel, applyAll, applyAllLabel);
+            panel.gameObject.SetActive(false);
+            return style;
         }
 
         // ------------------------------------------------------------------ HUD

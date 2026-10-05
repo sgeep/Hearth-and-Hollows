@@ -100,6 +100,8 @@ namespace Hearthdelve.Editor
         public static DecorateFeedback BuildDecorate(Transform parent)
         {
             BuildSounds();
+            // Restyling: a short soft brush of noise (4f step 5).
+            LookTestContent.WriteWav("PH_Brush", 0.2f, (t, n) => LookTestContent.Noise(n) * Mathf.Sin(t / 0.2f * Mathf.PI) * 0.22f);
             var root = new GameObject("Feedback").transform;
             root.SetParent(parent, false);
             var moments = new DecorateMoments
@@ -115,6 +117,11 @@ namespace Hearthdelve.Editor
                 fromStorage = Moment(root, "Feedback_FromStorage", "PH_FurnitureLift", HapticIds.TapLight),
                 undo = Moment(root, "Feedback_Undo", "PH_FurnitureUndo", null),
                 putBack = Moment(root, "Feedback_PutBack", "PH_FurniturePlace", HapticIds.TapLight),
+                buy = Moment(root, "Feedback_Buy", "PH_UiBuy", HapticIds.PulseSuccess),
+                sell = Moment(root, "Feedback_Sell", "PH_Coin", HapticIds.TapLight),
+                restyle = Moment(root, "Feedback_Restyle", "PH_Brush", HapticIds.TapLight),
+                finish = Moment(root, "Feedback_Finish", "PH_Brush", HapticIds.TapFirm),
+                area = Moment(root, "Feedback_Area", "PH_Whoosh", null),
             };
             var feedback = root.gameObject.AddComponent<DecorateFeedback>();
             feedback.Configure(moments);

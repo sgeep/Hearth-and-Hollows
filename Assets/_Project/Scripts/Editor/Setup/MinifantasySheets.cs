@@ -45,6 +45,8 @@ namespace Hearthdelve.Editor
         public Vector2Int Cell;
         public Vector2 Pivot = new(0.5f, 0.5f);
         public SheetRect[] Rects;
+        /// <summary>Imported readable: furniture recoloured at runtime (D11) reads its pixels.</summary>
+        public bool Readable;
 
         public string AssetPath => $"{EditorPaths.Minifantasy}/{Pack}/{File}.png";
     }
@@ -71,6 +73,9 @@ namespace Hearthdelve.Editor
         const string k_Slime = k_Creatures + "/Slimes/Green_Slime";
         const string k_Dungeon = "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets";
         const string k_Tavern = "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers";
+        const string k_Shop = "All_Exclusives_20261002/Addons/Towns_I_II/Shop_Indoor/Separate_Layers";
+        const string k_CastleIndoor = "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Tileset/Indoor/IndoorTileset.png";
+
         const string k_Ropes = "All_Exclusives_20261002/Addons/_Miscellany/Hole_Entrances_And_Ropes";
         const string k_ClassicUI = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/Classic_Minifantasy_UI";
         const string k_Emotions = "Minifantasy_UI _Overhaul_v1.0/_Minifantasy_UI_Overhaul_Assets/_General_UI_Resources/Character_Emotions";
@@ -95,6 +100,9 @@ namespace Hearthdelve.Editor
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
         public const string TavernIndoor = "TavernIndoor";
+        public const string ShopIndoor = "ShopIndoor";
+        public const string CastlesAndStrongholds = "CastlesAndStrongholds";
+        public const string TownsII = "TownsII";
         public const string UIOverhaul = "UIOverhaul";
         public const string LootIcons = "LootIcons";
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
@@ -160,6 +168,44 @@ namespace Hearthdelve.Editor
             ("base_building", new[] { 0, 2, 5, 10 }, new[] { 0, 1, 2, 5, 9, 10 }),
             ("wall", new[] { 0, 2, 10 }, new[] { 0, 1, 2 }),
             ("floor2", new[] { 0, 2, 10 }, new[] { 5 }),
+            // 4f: the other floor (pale chequer), a finish (D5).
+            ("floor", new[] { 0, 2, 10 }, new[] { 5 }),
+        };
+
+        /// <summary>
+        /// The Shop Indoor add-on's two premade rooms (17×15 cells of 8 px; the left room green-walled with a plum floor, the
+        /// right cream-walled with a teal floor), cut by cell like the tavern's (4f): floors and walls are finishes (D5), and
+        /// the right room is the guest room's shell. The door is the bottom row's column 8.
+        /// </summary>
+        public static readonly Vector2Int ShopRoomLeft = new(48, 128), ShopRoomRight = new(272, 128);
+        public const int ShopRoomWidth = 17, ShopRoomHeight = 15, ShopDoorColumn = 8;
+        static readonly (string layer, int[] columns, int[] rows)[] k_ShopCells =
+        {
+            ("basebuilding", new[] { 0, 2, ShopDoorColumn, 16 }, new[] { 0, 1, 2, 5, 13, 14 }),
+            ("wall", new[] { 0, 2, 16 }, new[] { 0, 1, 2 }),
+            ("floor", new[] { 0, 2, 16 }, new[] { 5 }),
+        };
+
+        static SheetRect[] ShopCells(string layer)
+        {
+            var all = new List<SheetRect>();
+            foreach (var (cellLayer, columns, rows) in k_ShopCells)
+            {
+                if (cellLayer != layer) continue;
+                foreach (var (room, origin) in new[] { ("L", ShopRoomLeft), ("R", ShopRoomRight) })
+                foreach (int c in columns)
+                foreach (int r in rows)
+                    all.Add(new SheetRect($"{room}_{c}_{r}", origin.x + c * Tile, origin.y + r * Tile, Tile, Tile, k_Centre));
+            }
+            return all.ToArray();
+        }
+
+        /// <summary>Single floor tiles from the Castles indoor tileset that repeat as a whole floor (4f finishes).</summary>
+        static readonly SheetRect[] k_CastleFloorCells =
+        {
+            new("BlueTiles", 24, 24, Tile, Tile, new Vector2(0.5f, 0.5f)),
+            new("SageTiles", 24, 72, Tile, Tile, new Vector2(0.5f, 0.5f)),
+            new("Parquet", 48, 144, Tile, Tile, new Vector2(0.5f, 0.5f)),
         };
 
         static readonly Vector2 k_BottomLeft = Vector2.zero;
@@ -264,6 +310,16 @@ namespace Hearthdelve.Editor
             sheets.Add(Tavern("base_building", WithRoomCells("base_building", new SheetRect("Room", 224, 8, 88, 88, k_BottomLeft))));
             sheets.Add(Tavern("floor2", WithRoomCells("floor2", new SheetRect("Floor", 228, 32, 80, 64, k_BottomLeft))));
             sheets.Add(Tavern("wall", WithRoomCells("wall", new SheetRect("Wall", 228, 12, 80, 20, k_BottomLeft))));
+            sheets.Add(Tavern("floor", WithRoomCells("floor")));
+            foreach (string layer in new[] { "basebuilding", "wall", "floor" })
+                sheets.Add(new Sheet { Source = $"{k_Shop}/ShopIndoor_{layer}.png", Pack = ShopIndoor, File = $"ShopIndoor_{layer}", Mode = SliceMode.Rects, Rects = ShopCells(layer), Readable = layer == "wall" });
+            sheets.Add(new Sheet { Source = k_CastleIndoor, Pack = CastlesAndStrongholds, File = "CastleIndoorTileset", Mode = SliceMode.Rects, Rects = k_CastleFloorCells });
+            // The stairs up to the guest room (4f step 6): the Towns II stucco interior's staircase, rising to the left.
+            sheets.Add(new Sheet
+            {
+                Source = "Minifantasy_Towns2_v1.5/Minifantasy_Towns2_Assets/Buildings/Stucco_Building/Indoor/Minifantasy_TownsIIStuccoBuildingIndoorTileset.png",
+                Pack = TownsII, File = "StuccoIndoorTileset", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("StairsUpLeft", 88, 99, 26, 21, k_BottomLeft) },
+            });
             sheets.Add(Tavern("shadows", new[] { new SheetRect("Shadows", 224, 8, 88, 88, k_BottomLeft) }));
             sheets.Add(Tavern("props", new[]
             {
@@ -458,13 +514,15 @@ namespace Hearthdelve.Editor
         static Sheet Character(string source, string pack, string file) =>
             new() { Source = source, Pack = pack, File = file, Mode = SliceMode.Grid, Cell = new Vector2Int(CharacterFrame, CharacterFrame), Pivot = FeetPivot };
 
+        // Readable: the tavern's tables, chairs and the rest are recoloured from these drawings (D11).
         static Sheet Tavern(string layer, SheetRect[] rects) =>
-            new() { Source = $"{k_Tavern}/TavernIndoor_{layer}.png", Pack = TavernIndoor, File = $"TavernIndoor_{layer}", Mode = SliceMode.Rects, Rects = rects };
+            new() { Source = $"{k_Tavern}/TavernIndoor_{layer}.png", Pack = TavernIndoor, File = $"TavernIndoor_{layer}", Mode = SliceMode.Rects, Rects = rects, Readable = layer.StartsWith("props") || layer == "wall" };
 
         public static Sheet Find(string assetPath)
         {
             foreach (Sheet sheet in All) if (sheet.AssetPath == assetPath) return sheet;
-            return null;
+            // The furniture catalogue's copies, sliced as the catalogue says (4f step 3).
+            return FurnitureCatalog.FindSheet(assetPath);
         }
     }
 }

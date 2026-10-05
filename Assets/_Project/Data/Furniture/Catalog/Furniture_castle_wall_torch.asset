@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_castle_wall_torch
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: castle_wall_torch
+  nameKey: furniture.castle_wall_torch
+  descriptionKey: furniture.castle_wall_torch.description
+  category: 3
+  theme: 4
+  layer: 2
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 35
+  unique: 0
+  catalogTier: 2
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: gold
+    nameKey: look.gold
+    swatch: {r: 0.9098039, g: 0.627451, b: 0.17254902, a: 1}
+  - id: iron
+    nameKey: look.iron
+    swatch: {r: 0.4392157, g: 0.4392157, b: 0.5019608, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 1, y: 2}
+    art:
+    - name: Art
+      sprite: {fileID: 0}
+      frames:
+      - {fileID: 1498185822, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: 381569803, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: -518026180, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: 218458749, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: -1635490646, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: 412507296, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: 1260256816, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      - {fileID: 86780349, guid: 4db326e85aceaba4e9873431881baa8d, type: 3}
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0}
+      sortingLayer: Ground
+      order: 3
+      variantSprites: []
+      variantFrames:
+      - frames: []
+      - frames:
+        - {fileID: 1139683063, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: -568400847, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: -698064696, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: 1036698289, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: 2096759218, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: -1183242750, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: -1801066114, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+        - {fileID: 1319115476, guid: 2a20d132708dd644ab12dac1026d5e5e, type: 3}
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies: []
+    seats: []
+    interactPoint: {x: 0.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights:
+    - position: {x: 0.5, y: 1.5}
+      color: {r: 1, g: 0.627451, b: 0.3137255, a: 1}
+      intensity: 0.7
+      innerRadius: 0.8
+      outerRadius: 4
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

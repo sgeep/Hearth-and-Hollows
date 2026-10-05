@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a62f49c0392331948ba88d846bb00b2a, type: 3}
+  m_Name: CatalogSettings
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.CatalogSettings
+  tiers:
+  - renown: 0
+    nameKey: catalog.tier.0
+    announceKey: 
+  - renown: 25
+    nameKey: catalog.tier.1
+    announceKey: catalog.tier.1.announce
+  - renown: 60
+    nameKey: catalog.tier.2
+    announceKey: catalog.tier.2.announce
+  - renown: 100
+    nameKey: catalog.tier.3
+    announceKey: catalog.tier.3.announce

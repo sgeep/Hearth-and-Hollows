@@ -17,7 +17,7 @@ namespace Hearthdelve.Editor
     public sealed class MinifantasyImportPostprocessor : AssetPostprocessor
     {
         /// <summary>Bumped when the settings below change, so Unity reimports the sheets.</summary>
-        public override uint GetVersion() => 2;
+        public override uint GetVersion() => 3;
 
         void OnPreprocessTexture()
         {
@@ -34,7 +34,7 @@ namespace Hearthdelve.Editor
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.npotScale = TextureImporterNPOTScale.None;
-            importer.isReadable = false;
+            importer.isReadable = sheet != null && sheet.Readable;
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);

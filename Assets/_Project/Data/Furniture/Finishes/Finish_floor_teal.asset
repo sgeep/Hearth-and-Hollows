@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_floor_teal
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: floor_teal
+  nameKey: finish.floor_teal
+  kind: 0
+  theme: 1
+  price: 0
+  catalogTier: 0
+  sources: 1
+  pattern: {x: 1, y: 1}
+  tiles:
+  - {fileID: 11400000, guid: c882b71f097b8db4a933a40966a57f60, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: 3d6426fd1428e8d489669cc453777925, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: 236d5382cffb697488e698d7753449c9, type: 2}
+  swatch: {fileID: 1557285686, guid: 901d572ea4342e14b9c12126412722b9, type: 3}
+  channels: []
+  palette: 

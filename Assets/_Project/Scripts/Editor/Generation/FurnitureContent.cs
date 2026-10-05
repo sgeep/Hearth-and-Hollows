@@ -100,12 +100,20 @@ namespace Hearthdelve.Editor
 
         static Rect Offset(Rect r, Vector2 by) => new(r.position + by, r.size);
 
+        static PaletteChannel Channel(string kind, IEnumerable<string> colors) => new() { kind = kind, source = colors.Select(FurnitureLooks.Hex).ToArray() };
+
         static FurnitureDefinition Define(string id, string nameKey, FurnitureCategory category, Action<FurnitureDefinition> apply) =>
             LookTestContent.CreateOrUpdate<FurnitureDefinition>($"{Folder}/Furniture_{id}.asset", d =>
             {
                 d.id = id;
                 d.nameKey = nameKey;
+                d.descriptionKey = DecorateLocKeys.FurnitureDescription(id);
                 d.category = category;
+                d.theme = FurnitureTheme.Tavern;
+                d.variants = new List<FurnitureVariant>();
+                d.paletteChannels = new List<PaletteChannel>();
+                d.sellBack = 0.5f;
+                d.price = 0;
                 d.layer = FurnitureLayer.Standing;
                 d.rotation = RotationMode.None;
                 d.flippable = false;
@@ -235,9 +243,11 @@ namespace Hearthdelve.Editor
                     d.function = FurnitureFunction.Table;
                     d.price = 40;
                     d.sources = FurnitureSource.Starter | FurnitureSource.Bought;
+                    d.paletteChannels.Add(Channel("wood", FurnitureLooks.TavernWood));
                     Sprite table = Tavern("props", sprite);
                     var at = new Vector2(0.5f, 0f);
-                    d.facings.Add(new FurnitureFacing { size = Vector2Int.one, art = { Art("Table", table, at) }, bodies = { FullBody(table, at) } });
+                    // A surface in the middle: a candle, a tankard or a pot of flowers stands on it (D4).
+                    d.facings.Add(new FurnitureFacing { size = Vector2Int.one, art = { Art("Table", table, at) }, bodies = { FullBody(table, at) }, surfaces = { at + new Vector2(0f, 0.75f) } });
                 });
 
             // The tavern chair: Minifantasy drew all four facings, so it turns through them (D2: authored facings). A
@@ -251,6 +261,9 @@ namespace Hearthdelve.Editor
                 d.rotation = RotationMode.AuthoredFacings;
                 d.price = 15;
                 d.sources = FurnitureSource.Starter | FurnitureSource.Bought;
+                // The prototype palette group (D11): its wood and its cushion recolour separately.
+                d.paletteChannels.Add(Channel("wood", FurnitureLooks.TavernWood));
+                d.paletteChannels.Add(Channel("cushion", FurnitureLooks.TavernCushion));
                 foreach (var (turns, sprite, facing, at, approach) in new[]
                          {
                              (0, "ChairFacingS", new Vector2Int(0, -1), new Vector2(0.5f, 0f), new Vector2(1.4f, 0f)),
@@ -355,10 +368,27 @@ namespace Hearthdelve.Editor
             Place("low_shelf", 24, 14);
             pieces.Add(new PlacedFurniture { uid = pieces.Count + 1, definition = "shelf_glasses", host = pieces.Count, anchor = 0 });
 
+            // The guest room (4f step 6): a bed, a nightstand with a candle, a chest, a rug and a picture. Its uids start at 101
+            // so they never meet the tavern's.
+            var guest = new List<PlacedFurniture>();
+            void Guest(string id, int x, int y, int turns = 0, string variant = "", int host = -1) =>
+                guest.Add(new PlacedFurniture { uid = 101 + guest.Count, definition = id, cell = new Vector2Int(x, y), turns = turns, variant = variant, host = host });
+            Guest("rug_village", 5, 5, variant: "maroon");
+            Guest("bed_double", 2, 7);
+            Guest("nightstand", 4, 8, variant: "brown");
+            Guest("candle", 0, 0, host: guest[guest.Count - 1].uid);
+            Guest("chest", 13, 8, variant: "wood");
+            Guest("picture", 3, 10, variant: "hills");
+
             return LookTestContent.CreateOrUpdate<FurnitureStartingLayout>(StartingLayoutPath, s =>
             {
-                s.areas = new List<AreaLayoutData> { new() { area = PropertyArea.TavernId, pieces = pieces } };
+                s.areas = new List<AreaLayoutData>
+                {
+                    new() { area = PropertyArea.TavernId, pieces = pieces, floor = "floor_diamonds", wall = "wall_panelling" },
+                    new() { area = PropertyArea.GuestRoomId, pieces = guest, floor = "floor_teal", wall = "wall_cream" },
+                };
                 s.storage = new List<OwnedFurnitureData>();
+                s.finishes = FurnitureLooks.StarterFinishes.ToList();
             });
         }
 

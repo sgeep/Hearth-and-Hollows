@@ -1,0 +1,248 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ead3fb98a3c353448b4b07db631c117c, type: 3}
+  m_Name: PaletteLibrary
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.PaletteLibrary
+  ramps:
+  - id: walnut
+    kind: wood
+    nameKey: palette.walnut
+    colors:
+    - serializedVersion: 2
+      rgba: 4278661163
+    - serializedVersion: 2
+      rgba: 4278795332
+    - serializedVersion: 2
+      rgba: 4278794841
+    - serializedVersion: 2
+      rgba: 4278729074
+    - serializedVersion: 2
+      rgba: 4279128970
+  - id: rosewood
+    kind: wood
+    nameKey: palette.rosewood
+    colors:
+    - serializedVersion: 2
+      rgba: 4279049527
+    - serializedVersion: 2
+      rgba: 4279446094
+    - serializedVersion: 2
+      rgba: 4280495966
+    - serializedVersion: 2
+      rgba: 4281483384
+    - serializedVersion: 2
+      rgba: 4283657114
+  - id: olive
+    kind: wood
+    nameKey: palette.olive
+    colors:
+    - serializedVersion: 2
+      rgba: 4278792738
+    - serializedVersion: 2
+      rgba: 4279780673
+    - serializedVersion: 2
+      rgba: 4280571235
+    - serializedVersion: 2
+      rgba: 4281362295
+    - serializedVersion: 2
+      rgba: 4282417299
+  - id: ash
+    kind: wood
+    nameKey: palette.ash
+    colors:
+    - serializedVersion: 2
+      rgba: 4278984227
+    - serializedVersion: 2
+      rgba: 4279512371
+    - serializedVersion: 2
+      rgba: 4280630092
+    - serializedVersion: 2
+      rgba: 4282535525
+    - serializedVersion: 2
+      rgba: 4283919489
+  - id: birch
+    kind: wood
+    nameKey: palette.birch
+    colors:
+    - serializedVersion: 2
+      rgba: 4283129192
+    - serializedVersion: 2
+      rgba: 4285167745
+    - serializedVersion: 2
+      rgba: 4286615448
+    - serializedVersion: 2
+      rgba: 4288062638
+    - serializedVersion: 2
+      rgba: 4289248707
+  - id: pine
+    kind: wood
+    nameKey: palette.pine
+    colors:
+    - serializedVersion: 2
+      rgba: 4280765782
+    - serializedVersion: 2
+      rgba: 4282477953
+    - serializedVersion: 2
+      rgba: 4284256181
+    - serializedVersion: 2
+      rgba: 4285375436
+  - id: slate
+    kind: wood
+    nameKey: palette.slate
+    colors:
+    - serializedVersion: 2
+      rgba: 4280032284
+    - serializedVersion: 2
+      rgba: 4281084972
+    - serializedVersion: 2
+      rgba: 4282795590
+    - serializedVersion: 2
+      rgba: 4284835173
+  - id: stonewood
+    kind: wood
+    nameKey: palette.stonewood
+    colors:
+    - serializedVersion: 2
+      rgba: 4285427310
+    - serializedVersion: 2
+      rgba: 4287072135
+    - serializedVersion: 2
+      rgba: 4288322202
+    - serializedVersion: 2
+      rgba: 4289638062
+  - id: teal
+    kind: cushion
+    nameKey: palette.teal
+    colors:
+    - serializedVersion: 2
+      rgba: 4286208795
+    - serializedVersion: 2
+      rgba: 4285757467
+    - serializedVersion: 2
+      rgba: 4286288172
+    - serializedVersion: 2
+      rgba: 4287606351
+  - id: green
+    kind: cushion
+    nameKey: palette.green
+    colors:
+    - serializedVersion: 2
+      rgba: 4282410778
+    - serializedVersion: 2
+      rgba: 4279990330
+    - serializedVersion: 2
+      rgba: 4281110366
+    - serializedVersion: 2
+      rgba: 4282165375
+  - id: plum
+    kind: cushion
+    nameKey: palette.plum
+    colors:
+    - serializedVersion: 2
+      rgba: 4285537345
+    - serializedVersion: 2
+      rgba: 4285997402
+    - serializedVersion: 2
+      rgba: 4287046780
+    - serializedVersion: 2
+      rgba: 4288690842
+  - id: amber
+    kind: cushion
+    nameKey: palette.amber
+    colors:
+    - serializedVersion: 2
+      rgba: 4278860163
+    - serializedVersion: 2
+      rgba: 4279391640
+    - serializedVersion: 2
+      rgba: 4279596465
+    - serializedVersion: 2
+      rgba: 4280982223
+  - id: rose
+    kind: cushion
+    nameKey: palette.rose
+    colors:
+    - serializedVersion: 2
+      rgba: 4282651255
+    - serializedVersion: 2
+      rgba: 4282000268
+    - serializedVersion: 2
+      rgba: 4282335151
+    - serializedVersion: 2
+      rgba: 4284506320
+  - id: gold
+    kind: cushion
+    nameKey: palette.gold
+    colors:
+    - serializedVersion: 2
+      rgba: 4279205043
+    - serializedVersion: 2
+      rgba: 4279536840
+    - serializedVersion: 2
+      rgba: 4279740111
+    - serializedVersion: 2
+      rgba: 4280075494
+  - id: navy
+    kind: cushion
+    nameKey: palette.navy
+    colors:
+    - serializedVersion: 2
+      rgba: 4282787878
+    - serializedVersion: 2
+      rgba: 4283512883
+    - serializedVersion: 2
+      rgba: 4284240198
+    - serializedVersion: 2
+      rgba: 4286605914
+  presets:
+  - id: dwarven_hall
+    nameKey: palette.preset.dwarven_hall
+    picks:
+    - kind: wood
+      ramp: slate
+    - kind: cushion
+      ramp: gold
+  - id: elven_glade
+    nameKey: palette.preset.elven_glade
+    picks:
+    - kind: wood
+      ramp: olive
+    - kind: cushion
+      ramp: green
+  - id: castle_feast
+    nameKey: palette.preset.castle_feast
+    picks:
+    - kind: wood
+      ramp: walnut
+    - kind: cushion
+      ramp: rose
+  - id: haunted_den
+    nameKey: palette.preset.haunted_den
+    picks:
+    - kind: wood
+      ramp: ash
+    - kind: cushion
+      ramp: plum
+  - id: harbour
+    nameKey: palette.preset.harbour
+    picks:
+    - kind: wood
+      ramp: birch
+    - kind: cushion
+      ramp: navy
+  - id: hearth
+    nameKey: palette.preset.hearth
+    picks:
+    - kind: wood
+      ramp: rosewood
+    - kind: cushion
+      ramp: amber

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_floor_plum
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: floor_plum
+  nameKey: finish.floor_plum
+  kind: 0
+  theme: 1
+  price: 40
+  catalogTier: 0
+  sources: 2
+  pattern: {x: 1, y: 1}
+  tiles:
+  - {fileID: 11400000, guid: 435ca941c400ddc4888860de18705fbd, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: 5321ef6d62f0e2141a710b7bcac9f357, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: d5adb223dea3a0f42bd12aa07ad4b52f, type: 2}
+  swatch: {fileID: 1819839836, guid: 901d572ea4342e14b9c12126412722b9, type: 3}
+  channels: []
+  palette: 

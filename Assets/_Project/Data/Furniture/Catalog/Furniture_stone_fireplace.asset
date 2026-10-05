@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_stone_fireplace
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: stone_fireplace
+  nameKey: furniture.stone_fireplace
+  descriptionKey: furniture.stone_fireplace.description
+  category: 3
+  theme: 1
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 1
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 200
+  unique: 1
+  catalogTier: 3
+  sources: 2
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 5, y: 2}
+    art:
+    - name: Art
+      sprite: {fileID: 0}
+      frames:
+      - {fileID: 662616543, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: -114183792, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: -803555367, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: 1489518498, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: -1330416693, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: 572949273, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: 1327477571, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      - {fileID: 326971497, guid: 4f722198612de474fbc65a238656448c, type: 3}
+      frameSeconds: 0.2
+      workingFrames: []
+      position: {x: 2.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites: []
+      variantFrames:
+      - frames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 1.125
+      y: 0
+      width: 2.75
+      height: 1.25
+    seats: []
+    interactPoint: {x: 2.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights:
+    - position: {x: 2.5, y: 0.75}
+      color: {r: 1, g: 0.6039216, b: 0.3137255, a: 1}
+      intensity: 0.95
+      innerRadius: 1.4
+      outerRadius: 7
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

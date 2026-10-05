@@ -87,7 +87,10 @@ namespace Hearthdelve.Editor
                 LocalizationEditorSettings.AddLocale(english);
             }
 
-            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English));
+            // The furniture catalogue's names, descriptions and colourways, and the palette ramps, tiers and finishes, come from
+            // their own tables (4f Checkpoint B).
+            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English)
+                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()));
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();
         }

@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_tavern_table_small
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: tavern_table_small
+  nameKey: furniture.tavern_table_small
+  descriptionKey: furniture.tavern_table_small.description
+  category: 1
+  theme: 0
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 2
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 20
+  unique: 0
+  catalogTier: 0
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: light
+    nameKey: look.light
+    swatch: {r: 0.8352941, g: 0.40784314, b: 0.14509805, a: 1}
+  - id: dark
+    nameKey: look.dark
+    swatch: {r: 0.58431375, g: 0.21568628, b: 0.07058824, a: 1}
+  paletteChannels:
+  - kind: wood
+    source:
+    - serializedVersion: 2
+      rgba: 4279110200
+    - serializedVersion: 2
+      rgba: 4278913864
+    - serializedVersion: 2
+      rgba: 4279575645
+    - serializedVersion: 2
+      rgba: 4279053172
+    - serializedVersion: 2
+      rgba: 4278527350
+    - serializedVersion: 2
+      rgba: 4279383957
+    - serializedVersion: 2
+      rgba: 4279714217
+    - serializedVersion: 2
+      rgba: 4278996147
+    - serializedVersion: 2
+      rgba: 4280641749
+  facings:
+  - turns: 0
+    size: {x: 1, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: 1833989907, guid: ee31c07757b02f34d9e3dadcc647f2b7, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: -1004459308, guid: ee31c07757b02f34d9e3dadcc647f2b7, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    seats: []
+    interactPoint: {x: 0.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces:
+    - {x: 0.5, y: 0.5}
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

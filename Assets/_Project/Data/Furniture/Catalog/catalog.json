@@ -1,0 +1,4551 @@
+{
+ "sheets": [
+  {
+   "key": "tavern",
+   "source": "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers/TavernIndoor_props.png"
+  },
+  {
+   "key": "tavern2",
+   "source": "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers/TavernIndoor_props2.png"
+  },
+  {
+   "key": "pots",
+   "source": "All_Exclusives_20261002/Addons/Towns_I_II/Plant_Pots/PlantPots.png"
+  },
+  {
+   "key": "dwarven",
+   "source": "Minifantasy_DwarvenKingdom_v1.0/Minifantasy_DwarvenKingdom_Assets/Props/Decoration/Props.png"
+  },
+  {
+   "key": "elven",
+   "source": "Minifantasy_ElvenKingdom_v.1.0/Minifantasy_ElvenKingdom_Assets/Props/Props.png"
+  },
+  {
+   "key": "castle",
+   "source": "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Props/Props.png"
+  },
+  {
+   "key": "castle_torch_gold",
+   "source": "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Props/Torch/Torch_standgold.png"
+  },
+  {
+   "key": "castle_torch_iron",
+   "source": "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Props/Torch/Torch_standiron.png"
+  },
+  {
+   "key": "castle_walltorch_gold",
+   "source": "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Props/Torch/Torch_wallgold.png"
+  },
+  {
+   "key": "castle_walltorch_iron",
+   "source": "Minifantasy_CastlesAndStrongholds_v.2.0/Minifantasy_CastlesAndStrongholds_Assets/Props/Torch/Torch_walliron.png"
+  },
+  {
+   "key": "haunted",
+   "source": "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Haunted_House_v1.0/Minifantasy_Haunted_House_Assets/Props/HauntedHouseProps.png"
+  },
+  {
+   "key": "towns",
+   "source": "Minifantasy_Towns_v3.0/Minifantasy_Towns_Assets/Props/Minifantasy_TownsProps.png"
+  },
+  {
+   "key": "towns2",
+   "source": "Minifantasy_Towns2_v1.5/Minifantasy_Towns2_Assets/Props/Minifantasy_TownsIIProps.png"
+  },
+  {
+   "key": "medieval",
+   "source": "Minifantasy_Medieval_City_v1.1/Minifantasy_Medieval_City_Assets/Props/Props.png"
+  },
+  {
+   "key": "fireplace",
+   "source": "Minifantasy_Medieval_City_v1.1/Minifantasy_Medieval_City_Assets/Props/Animated_Props/Fireplace/Fireplace.png"
+  },
+  {
+   "key": "chests",
+   "source": "All_Exclusives_20261002/Addons/_Miscellany/Chests/Chests.png"
+  },
+  {
+   "key": "observatory",
+   "source": "All_Exclusives_20261002/Addons/_Miscellany/Astronomical_Observatory/Props/Props.png"
+  },
+  {
+   "key": "wizard",
+   "source": "All_Exclusives_20261002/Addons/_Miscellany/Wizard_Tower/Props/Wizard_Tower_Props.png"
+  },
+  {
+   "key": "lunar",
+   "source": "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Lunar_New_Year_Festival_v1.0/Tiles And Props/LunarNewYear_props.png"
+  },
+  {
+   "key": "dungeon",
+   "source": "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets/Props/Props.png"
+  },
+  {
+   "key": "candle",
+   "source": "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets/Props/Animated_Props/Candle.png"
+  },
+  {
+   "key": "church_rack",
+   "source": "All_Exclusives_20261002/Addons/Towns_I_II/Church/Church_Indoor/Candles/Candles.png"
+  },
+  {
+   "key": "church_stand",
+   "source": "All_Exclusives_20261002/Addons/Towns_I_II/Church/Church_Indoor/Candles/CandleStand.png"
+  },
+  {
+   "key": "ships_lamp",
+   "source": "Minifantasy_Ships And Docks v1.1/Minifantasy_ShipsAndDocks_Assets/Tileset/Props/Lamp/Lamp.png"
+  }
+ ],
+ "variantSets": [
+  {
+   "id": "dwarven_material",
+   "variants": [
+    {
+     "id": "wood",
+     "name": "pine",
+     "swatch": "#b58f5c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "stone",
+     "name": "stone",
+     "swatch": "#9a9a9a",
+     "dx": 104,
+     "dy": 0
+    },
+    {
+     "id": "violet",
+     "name": "violet stone",
+     "swatch": "#72729a",
+     "dx": 0,
+     "dy": 72
+    },
+    {
+     "id": "slate",
+     "name": "slate",
+     "swatch": "#464646",
+     "dx": 104,
+     "dy": 72
+    },
+    {
+     "id": "ice",
+     "name": "frost",
+     "swatch": "#a0c0c8",
+     "dx": 0,
+     "dy": 144
+    },
+    {
+     "id": "moss",
+     "name": "moss",
+     "swatch": "#8c9c26",
+     "dx": 104,
+     "dy": 144
+    }
+   ]
+  },
+  {
+   "id": "dwarven_chest",
+   "variants": [
+    {
+     "id": "wood",
+     "name": "pine",
+     "swatch": "#b58f5c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "stone",
+     "name": "stone",
+     "swatch": "#9a9a9a",
+     "dx": 40,
+     "dy": 0
+    },
+    {
+     "id": "violet",
+     "name": "violet stone",
+     "swatch": "#72729a",
+     "dx": 0,
+     "dy": 16
+    },
+    {
+     "id": "slate",
+     "name": "slate",
+     "swatch": "#464646",
+     "dx": 40,
+     "dy": 16
+    },
+    {
+     "id": "ice",
+     "name": "frost",
+     "swatch": "#a0c0c8",
+     "dx": 0,
+     "dy": 32
+    },
+    {
+     "id": "moss",
+     "name": "moss",
+     "swatch": "#8c9c26",
+     "dx": 40,
+     "dy": 32
+    }
+   ]
+  },
+  {
+   "id": "dwarven_rug",
+   "variants": [
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#b03a2e",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "ochre",
+     "name": "ochre",
+     "swatch": "#c8952e",
+     "dx": 24,
+     "dy": 0
+    },
+    {
+     "id": "teal",
+     "name": "teal",
+     "swatch": "#3a8a7e",
+     "dx": 48,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "dwarven_cot",
+   "variants": [
+    {
+     "id": "tan",
+     "name": "tan",
+     "swatch": "#c8a070",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#b03a2e",
+     "dx": 0,
+     "dy": 24
+    },
+    {
+     "id": "teal",
+     "name": "teal",
+     "swatch": "#3a8a7e",
+     "dx": 0,
+     "dy": 48
+    }
+   ]
+  },
+  {
+   "id": "elven",
+   "variants": [
+    {
+     "id": "green",
+     "name": "green",
+     "swatch": "#3a781b",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "blue",
+     "name": "blue",
+     "swatch": "#1b7873",
+     "dx": 0,
+     "dy": 64
+    },
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#8c233a",
+     "dx": 0,
+     "dy": 128
+    },
+    {
+     "id": "purple",
+     "name": "purple",
+     "swatch": "#5a2177",
+     "dx": 0,
+     "dy": 192
+    },
+    {
+     "id": "gold",
+     "name": "gold",
+     "swatch": "#985512",
+     "dx": 0,
+     "dy": 256
+    }
+   ]
+  },
+  {
+   "id": "castle",
+   "variants": [
+    {
+     "id": "gold",
+     "name": "gold and red",
+     "swatch": "#e8a02c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "silver",
+     "name": "silver and red",
+     "swatch": "#b4b4c8",
+     "dx": 0,
+     "dy": 128
+    }
+   ]
+  },
+  {
+   "id": "pots",
+   "variants": [
+    {
+     "id": "terracotta",
+     "name": "terracotta",
+     "swatch": "#b0503a",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "brown",
+     "name": "brown",
+     "swatch": "#8a6a3a",
+     "dx": 144,
+     "dy": 0
+    },
+    {
+     "id": "blue",
+     "name": "blue",
+     "swatch": "#5a8ab0",
+     "dx": 0,
+     "dy": 72
+    },
+    {
+     "id": "purple",
+     "name": "purple",
+     "swatch": "#8a4a8a",
+     "dx": 144,
+     "dy": 72
+    },
+    {
+     "id": "sage",
+     "name": "sage",
+     "swatch": "#8a9a6a",
+     "dx": 0,
+     "dy": 144
+    },
+    {
+     "id": "green",
+     "name": "green",
+     "swatch": "#3a7a5a",
+     "dx": 144,
+     "dy": 144
+    }
+   ]
+  },
+  {
+   "id": "chests",
+   "variants": [
+    {
+     "id": "wood",
+     "name": "wood",
+     "swatch": "#a0603a",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#c03030",
+     "dx": 72,
+     "dy": 0
+    },
+    {
+     "id": "blue",
+     "name": "blue",
+     "swatch": "#3070c0",
+     "dx": 144,
+     "dy": 0
+    },
+    {
+     "id": "green",
+     "name": "green",
+     "swatch": "#309040",
+     "dx": 216,
+     "dy": 0
+    },
+    {
+     "id": "purple",
+     "name": "purple",
+     "swatch": "#8040b0",
+     "dx": 0,
+     "dy": 144
+    },
+    {
+     "id": "white",
+     "name": "white",
+     "swatch": "#e0d8c8",
+     "dx": 72,
+     "dy": 144
+    },
+    {
+     "id": "slate",
+     "name": "slate",
+     "swatch": "#5a6070",
+     "dx": 144,
+     "dy": 144
+    },
+    {
+     "id": "teal",
+     "name": "teal",
+     "swatch": "#40a090",
+     "dx": 216,
+     "dy": 144
+    }
+   ]
+  },
+  {
+   "id": "rug_village",
+   "variants": [
+    {
+     "id": "ochre",
+     "name": "ochre",
+     "swatch": "#8f6e23",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "green",
+     "name": "green",
+     "swatch": "#5b7342",
+     "dx": 0,
+     "dy": 24
+    },
+    {
+     "id": "navy",
+     "name": "navy",
+     "swatch": "#46515c",
+     "dx": 0,
+     "dy": 48
+    },
+    {
+     "id": "maroon",
+     "name": "maroon",
+     "swatch": "#4c3434",
+     "dx": 0,
+     "dy": 72
+    },
+    {
+     "id": "grey",
+     "name": "grey",
+     "swatch": "#777777",
+     "dx": 0,
+     "dy": 96
+    }
+   ]
+  },
+  {
+   "id": "medieval_wood",
+   "variants": [
+    {
+     "id": "blue",
+     "name": "blue",
+     "swatch": "#4a6aa0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "brown",
+     "name": "brown",
+     "swatch": "#8a5030",
+     "dx": 80,
+     "dy": 0
+    },
+    {
+     "id": "pink",
+     "name": "pink",
+     "swatch": "#c08a90",
+     "dx": 160,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "bed_double",
+   "variants": [
+    {
+     "id": "linen",
+     "name": "linen",
+     "swatch": "#e0d0c8",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "brown",
+     "name": "brown blanket",
+     "swatch": "#a06030",
+     "dx": 64,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "bed_single",
+   "variants": [
+    {
+     "id": "linen",
+     "name": "linen",
+     "swatch": "#e0d0c8",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "brown",
+     "name": "brown blanket",
+     "swatch": "#a06030",
+     "dx": 56,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "stone3",
+   "variants": [
+    {
+     "id": "marble",
+     "name": "marble",
+     "swatch": "#e0e0e0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "bluestone",
+     "name": "bluestone",
+     "swatch": "#6070a0",
+     "dx": 56,
+     "dy": 0
+    },
+    {
+     "id": "greenstone",
+     "name": "greenstone",
+     "swatch": "#6a8a70",
+     "dx": 112,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "torch",
+   "variants": [
+    {
+     "id": "gold",
+     "name": "gold",
+     "swatch": "#e8a02c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "iron",
+     "name": "iron",
+     "swatch": "#707080",
+     "dx": 0,
+     "dy": 0,
+     "sheet": "castle_torch_iron"
+    }
+   ]
+  },
+  {
+   "id": "walltorch",
+   "variants": [
+    {
+     "id": "gold",
+     "name": "gold",
+     "swatch": "#e8a02c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "iron",
+     "name": "iron",
+     "swatch": "#707080",
+     "dx": 0,
+     "dy": 0,
+     "sheet": "castle_walltorch_iron"
+    }
+   ]
+  }
+ ],
+ "pieces": [
+  {
+   "id": "tavern_stool",
+   "name": "tavern stool",
+   "description": "a three-legged stool with a red cushion. it sits beside whichever table is nearest.",
+   "category": "Seating",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 10,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      178,
+      25,
+      5,
+      6
+     ],
+     "anySeat": true
+    }
+   ],
+   "sheet": "tavern",
+   "function": "Seat",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    },
+    {
+     "kind": "cushion",
+     "source": [
+      "#7f092f",
+      "#9b0e27",
+      "#c01515",
+      "#e6513f"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tavern_bench",
+   "name": "tavern bench",
+   "description": "a long bench for two. friendlier than chairs, and harder to leave.",
+   "category": "Seating",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      51,
+      17,
+      18,
+      7
+     ],
+     "seats": [
+      -5,
+      0,
+      4,
+      0
+     ],
+     "approaches": [
+      -14,
+      0,
+      13,
+      0
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      42,
+      26,
+      5,
+      22
+     ],
+     "seats": [
+      0,
+      3,
+      0,
+      13
+     ],
+     "approaches": [
+      -7,
+      3,
+      -7,
+      13
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      51,
+      49,
+      18,
+      7
+     ],
+     "seats": [
+      -5,
+      0,
+      4,
+      0
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      73,
+      26,
+      5,
+      22
+     ],
+     "seats": [
+      0,
+      3,
+      0,
+      13
+     ],
+     "approaches": [
+      7,
+      3,
+      7,
+      13
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "function": "Seat",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tavern_table_small",
+   "name": "small round table",
+   "description": "room for one plate and one elbow.",
+   "category": "Tables",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 20,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      88,
+      24,
+      8,
+      8
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "function": "Table",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    }
+   ],
+   "variants": [
+    {
+     "id": "light",
+     "name": "light",
+     "swatch": "#d56825",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "dark",
+     "name": "dark",
+     "swatch": "#953712",
+     "dx": 16,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "tavern_table_square",
+   "name": "big square table",
+   "description": "a heavy table for a whole party, with room for candles and spilled ale.",
+   "category": "Tables",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      50,
+      25,
+      20,
+      23
+     ],
+     "surfaces": [
+      -5,
+      8,
+      5,
+      8,
+      -5,
+      16,
+      5,
+      16
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "function": "Table",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tavern_table_long",
+   "name": "long table",
+   "description": "a trestle table, long enough for a row of regulars.",
+   "category": "Tables",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      130,
+      40,
+      28,
+      8
+     ],
+     "surfaces": [
+      -8,
+      4,
+      0,
+      4,
+      8,
+      4
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      169,
+      34,
+      6,
+      22
+     ],
+     "surfaces": [
+      0,
+      4,
+      0,
+      11,
+      0,
+      18
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "function": "Table",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tavern_shelf_tall",
+   "name": "tall shelf",
+   "description": "open shelves for jugs, crocks and things you meant to sort.",
+   "category": "BarAndStorage",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      44,
+      64,
+      16,
+      14
+     ],
+     "depth": 5,
+     "surfaces": [
+      0,
+      10
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "palette": [
+    {
+     "kind": "wood",
+     "source": [
+      "#380a0e",
+      "#480b0b",
+      "#5d2415",
+      "#742b0d",
+      "#762505",
+      "#953712",
+      "#a94117",
+      "#b34c0c",
+      "#d56825"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "shelf_bottles",
+   "name": "row of bottles",
+   "description": "a row of bottles to stand on a shelf or a table.",
+   "category": "BarAndStorage",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 15,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      93,
+      66,
+      13,
+      5
+     ],
+     "variantRects": [
+      {
+       "variant": "mixed",
+       "rect": [
+        117,
+        66,
+        14,
+        5
+       ]
+      },
+      {
+       "variant": "blue",
+       "rect": [
+        141,
+        66,
+        13,
+        5
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "tavern2",
+   "layer": "Surface",
+   "variants": [
+    {
+     "id": "amber",
+     "name": "amber",
+     "swatch": "#c08030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "mixed",
+     "name": "mixed",
+     "swatch": "#80a060",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "blue",
+     "name": "blue",
+     "swatch": "#6090c0",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "tavern_sign_small",
+   "name": "small sign",
+   "description": "a little painted board for the wall.",
+   "category": "WallDecor",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 15,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      185,
+      65,
+      14,
+      6
+     ]
+    }
+   ],
+   "sheet": "tavern",
+   "layer": "Wall"
+  },
+  {
+   "id": "candle",
+   "name": "candle",
+   "description": "a stub of tallow on a dish. it makes a corner feel lived in.",
+   "category": "Lighting",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 8,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      8,
+      16
+     ],
+     "frames": 8,
+     "frameSeconds": 0.12,
+     "light": {
+      "at": [
+       0,
+       9
+      ],
+      "color": "#ffb060",
+      "intensity": 0.55,
+      "radius": 2.5
+     }
+    }
+   ],
+   "sheet": "candle",
+   "layer": "Surface"
+  },
+  {
+   "id": "candle_stand",
+   "name": "tall candle",
+   "description": "a church candle on an iron stand.",
+   "category": "Lighting",
+   "theme": "Tavern",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      8,
+      16
+     ],
+     "frames": 4,
+     "frameSeconds": 0.15,
+     "depth": 3,
+     "light": {
+      "at": [
+       0,
+       12
+      ],
+      "color": "#ffb868",
+      "intensity": 0.6,
+      "radius": 3
+     }
+    }
+   ],
+   "sheet": "church_stand"
+  },
+  {
+   "id": "rug_village",
+   "name": "woven rug",
+   "description": "a plain woven rug that makes any floor kinder to bare feet.",
+   "category": "FloorDecor",
+   "theme": "Village",
+   "tier": 0,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      124,
+      4,
+      16,
+      16
+     ]
+    }
+   ],
+   "sheet": "towns2",
+   "layer": "Floor",
+   "variantSet": "rug_village"
+  },
+  {
+   "id": "plant_posy",
+   "name": "potted posy",
+   "description": "a little pot of red and white flowers.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 10,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      8,
+      11,
+      7,
+      10
+     ]
+    }
+   ],
+   "sheet": "pots",
+   "layer": "Surface",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_violets",
+   "name": "potted violets",
+   "description": "violets, if you squint.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 10,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      24,
+      11,
+      7,
+      10
+     ]
+    }
+   ],
+   "sheet": "pots",
+   "layer": "Surface",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_daisies",
+   "name": "potted daisies",
+   "description": "a pot of white daisies.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 10,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      72,
+      9,
+      8,
+      12
+     ]
+    }
+   ],
+   "sheet": "pots",
+   "layer": "Surface",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_sprig",
+   "name": "potted sprig",
+   "description": "a sprig of something green that refuses to die.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 10,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      116,
+      8,
+      9,
+      13
+     ]
+    }
+   ],
+   "sheet": "pots",
+   "layer": "Surface",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_roses",
+   "name": "potted roses",
+   "description": "red roses in a heavy pot.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      123,
+      29,
+      10,
+      16
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "pots",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_goldenrod",
+   "name": "potted goldenrod",
+   "description": "a pot of goldenrod, bright as a lamp.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      99,
+      31,
+      9,
+      14
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "pots",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_lilies",
+   "name": "potted lilies",
+   "description": "white lilies, faintly smug.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      53,
+      34,
+      7,
+      11
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "pots",
+   "variantSet": "pots"
+  },
+  {
+   "id": "plant_moss",
+   "name": "moss bowl",
+   "description": "a wide bowl of moss with a single pink flower.",
+   "category": "Plants",
+   "theme": "Village",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      27,
+      34,
+      10,
+      11
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "pots",
+   "variantSet": "pots"
+  },
+  {
+   "id": "bed_single",
+   "name": "single bed",
+   "description": "a narrow bed with a straw mattress.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 0,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      336,
+      132,
+      8,
+      14
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      352,
+      119,
+      13,
+      9
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "depth": 8
+    },
+    {
+     "turns": 2,
+     "rect": [
+      336,
+      109,
+      8,
+      11
+     ],
+     "size": [
+      1,
+      2
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      315,
+      119,
+      13,
+      9
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "depth": 8
+    }
+   ],
+   "sheet": "medieval",
+   "variantSet": "bed_single"
+  },
+  {
+   "id": "bed_double",
+   "name": "double bed",
+   "description": "a proper bed, for a guest who pays properly.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 0,
+   "price": 90,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      200,
+      140,
+      16,
+      14
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      224,
+      112,
+      13,
+      16
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      200,
+      93,
+      16,
+      11
+     ],
+     "size": [
+      2,
+      2
+     ]
+    }
+   ],
+   "sheet": "medieval",
+   "variantSet": "bed_double"
+  },
+  {
+   "id": "nightstand",
+   "name": "nightstand",
+   "description": "a small cabinet for a candle and a book nobody finishes.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 0,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      177,
+      69,
+      6,
+      7
+     ],
+     "surfaces": [
+      0,
+      5
+     ]
+    }
+   ],
+   "sheet": "medieval",
+   "variantSet": "medieval_wood"
+  },
+  {
+   "id": "dresser",
+   "name": "chest of drawers",
+   "description": "four drawers, one of which sticks.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 0,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      230,
+      49,
+      12,
+      11
+     ],
+     "depth": 6,
+     "surfaces": [
+      0,
+      9
+     ]
+    }
+   ],
+   "sheet": "medieval",
+   "variantSet": "medieval_wood"
+  },
+  {
+   "id": "wardrobe",
+   "name": "wardrobe",
+   "description": "a tall wardrobe with carved doors.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 0,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      216,
+      21,
+      16,
+      16
+     ],
+     "depth": 6,
+     "variantRects": [
+      {
+       "variant": "plain",
+       "rect": [
+        264,
+        21,
+        16,
+        16
+       ]
+      },
+      {
+       "variant": "drawers",
+       "rect": [
+        288,
+        21,
+        16,
+        16
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "medieval",
+   "variants": [
+    {
+     "id": "carved",
+     "name": "carved",
+     "swatch": "#a0603a",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "plain",
+     "name": "plain",
+     "swatch": "#8a5030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "drawers",
+     "name": "with drawers",
+     "swatch": "#6a4028",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "washstand",
+   "name": "washstand",
+   "description": "a basin and a jug of cold water.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 1,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      169,
+      30,
+      7,
+      12
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "towns2"
+  },
+  {
+   "id": "standing_mirror",
+   "name": "standing mirror",
+   "description": "a tall mirror, honest to a fault.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      164,
+      4,
+      8,
+      17
+     ],
+     "depth": 3
+    }
+   ],
+   "sheet": "towns2",
+   "flippable": true
+  },
+  {
+   "id": "bathtub",
+   "name": "bathtub",
+   "description": "a copper-bound tub. somebody has to carry the water.",
+   "category": "Bedroom",
+   "theme": "Village",
+   "tier": 1,
+   "price": 80,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      184,
+      12,
+      15,
+      9
+     ]
+    }
+   ],
+   "sheet": "towns2",
+   "flippable": true
+  },
+  {
+   "id": "chest",
+   "name": "chest",
+   "description": "a sturdy chest with an iron lock.",
+   "category": "BarAndStorage",
+   "theme": "Village",
+   "tier": 0,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      5,
+      86,
+      14,
+      10
+     ],
+     "surfaces": [
+      0,
+      7
+     ]
+    }
+   ],
+   "sheet": "chests",
+   "variantSet": "chests"
+  },
+  {
+   "id": "trunk",
+   "name": "travelling trunk",
+   "description": "a long trunk that has seen more roads than you.",
+   "category": "BarAndStorage",
+   "theme": "Village",
+   "tier": 0,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      3,
+      104,
+      18,
+      8
+     ]
+    }
+   ],
+   "sheet": "chests",
+   "variantSet": "chests"
+  },
+  {
+   "id": "picture",
+   "name": "framed picture",
+   "description": "a small painting in a wooden frame.",
+   "category": "WallDecor",
+   "theme": "Village",
+   "tier": 0,
+   "price": 20,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      10,
+      184,
+      12,
+      7
+     ],
+     "variantRects": [
+      {
+       "variant": "lady",
+       "rect": [
+        31,
+        184,
+        9,
+        8
+       ]
+      },
+      {
+       "variant": "sage",
+       "rect": [
+        48,
+        184,
+        8,
+        8
+       ]
+      },
+      {
+       "variant": "noble",
+       "rect": [
+        64,
+        184,
+        8,
+        8
+       ]
+      },
+      {
+       "variant": "flowers",
+       "rect": [
+        80,
+        184,
+        8,
+        6
+       ]
+      },
+      {
+       "variant": "night",
+       "rect": [
+        10,
+        192,
+        12,
+        7
+       ]
+      },
+      {
+       "variant": "sea",
+       "rect": [
+        10,
+        200,
+        12,
+        7
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "towns",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "hills",
+     "name": "hills",
+     "swatch": "#6a9a50",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "lady",
+     "name": "a lady",
+     "swatch": "#c08060",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "sage",
+     "name": "a sage",
+     "swatch": "#8080a0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "noble",
+     "name": "a noble",
+     "swatch": "#a06040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "flowers",
+     "name": "flowers",
+     "swatch": "#c05080",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "night",
+     "name": "night sky",
+     "swatch": "#304070",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "sea",
+     "name": "the sea",
+     "swatch": "#4080b0",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "cupboard",
+   "name": "cupboard",
+   "description": "a tall cupboard. what's inside depends on the day.",
+   "category": "BarAndStorage",
+   "theme": "Village",
+   "tier": 0,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      34,
+      244,
+      11,
+      15
+     ],
+     "depth": 5
+    }
+   ],
+   "sheet": "towns",
+   "variants": [
+    {
+     "id": "closed",
+     "name": "closed",
+     "swatch": "#a0603a",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "dishes",
+     "name": "dishes",
+     "swatch": "#c0b090",
+     "dx": 16,
+     "dy": 0
+    },
+    {
+     "id": "jars",
+     "name": "jars",
+     "swatch": "#a08040",
+     "dx": 32,
+     "dy": 0
+    },
+    {
+     "id": "potions",
+     "name": "potions",
+     "swatch": "#80a0c0",
+     "dx": 48,
+     "dy": 0
+    },
+    {
+     "id": "books",
+     "name": "books",
+     "swatch": "#a04040",
+     "dx": 64,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "bookcase",
+   "name": "bookcase",
+   "description": "a bookcase, for the look of a learned establishment.",
+   "category": "BarAndStorage",
+   "theme": "Village",
+   "tier": 0,
+   "price": 50,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      128,
+      340,
+      16,
+      15
+     ],
+     "depth": 5,
+     "variantRects": [
+      {
+       "variant": "crammed",
+       "rect": [
+        200,
+        340,
+        16,
+        15
+       ]
+      },
+      {
+       "variant": "sparse",
+       "rect": [
+        56,
+        341,
+        16,
+        14
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "towns",
+   "variants": [
+    {
+     "id": "books",
+     "name": "books",
+     "swatch": "#a05040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "crammed",
+     "name": "crammed",
+     "swatch": "#806040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "sparse",
+     "name": "sparse",
+     "swatch": "#a0603a",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "cloth_table",
+   "name": "cloth-covered table",
+   "description": "a round table under a white cloth. instantly respectable.",
+   "category": "Tables",
+   "theme": "Village",
+   "tier": 0,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      75,
+      227,
+      11,
+      11
+     ]
+    }
+   ],
+   "sheet": "towns",
+   "function": "Table",
+   "variants": [
+    {
+     "id": "plain",
+     "name": "plain",
+     "swatch": "#f0f0f0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "set",
+     "name": "set for two",
+     "swatch": "#e0e0e8",
+     "dx": 16,
+     "dy": 0
+    },
+    {
+     "id": "flowers",
+     "name": "with flowers",
+     "swatch": "#f0e0e8",
+     "dx": 32,
+     "dy": 0
+    },
+    {
+     "id": "candle",
+     "name": "with a candle",
+     "swatch": "#f0e8d0",
+     "dx": 48,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "shop_sign",
+   "name": "hanging sign",
+   "description": "a painted sign: the tavern's, or someone else's.",
+   "category": "WallDecor",
+   "theme": "Village",
+   "tier": 0,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      9,
+      86,
+      23,
+      17
+     ]
+    }
+   ],
+   "sheet": "towns",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "tankard",
+     "name": "tankard",
+     "swatch": "#c08030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "potion",
+     "name": "potion",
+     "swatch": "#c04040",
+     "dx": 24,
+     "dy": 0
+    },
+    {
+     "id": "arms",
+     "name": "crossed swords",
+     "swatch": "#a0a0b0",
+     "dx": 48,
+     "dy": 0
+    },
+    {
+     "id": "helm",
+     "name": "helm",
+     "swatch": "#808090",
+     "dx": 72,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "book_stack",
+   "name": "stack of books",
+   "description": "a tottering pile of books.",
+   "category": "Curios",
+   "theme": "Village",
+   "tier": 0,
+   "price": 12,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      25,
+      152,
+      6,
+      8
+     ]
+    }
+   ],
+   "sheet": "wizard",
+   "layer": "Surface"
+  },
+  {
+   "id": "round_table_large",
+   "name": "large round table",
+   "description": "a big round table where everyone can see everyone.",
+   "category": "Tables",
+   "theme": "Village",
+   "tier": 0,
+   "price": 50,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      320,
+      168,
+      16,
+      17
+     ],
+     "surfaces": [
+      0,
+      9
+     ]
+    }
+   ],
+   "sheet": "medieval",
+   "function": "Table"
+  },
+  {
+   "id": "sofa_leather",
+   "name": "leather sofa",
+   "description": "a deep leather sofa that has swallowed several coins.",
+   "category": "Seating",
+   "theme": "Village",
+   "tier": 1,
+   "price": 90,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      10,
+      11,
+      27,
+      9
+     ],
+     "seats": [
+      -9,
+      0,
+      0,
+      0,
+      9,
+      0
+     ],
+     "approaches": [
+      -19,
+      0,
+      -19,
+      0,
+      19,
+      0
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      44,
+      10,
+      6,
+      26
+     ],
+     "seats": [
+      0,
+      3,
+      0,
+      12,
+      0,
+      21
+     ],
+     "approaches": [
+      -7,
+      3,
+      -7,
+      12,
+      -7,
+      21
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      62,
+      10,
+      6,
+      26
+     ],
+     "seats": [
+      0,
+      3,
+      0,
+      12,
+      0,
+      21
+     ],
+     "approaches": [
+      7,
+      3,
+      7,
+      12,
+      7,
+      21
+     ]
+    }
+   ],
+   "sheet": "towns2",
+   "function": "Seat"
+  },
+  {
+   "id": "armchair_leather",
+   "name": "leather armchair",
+   "description": "an armchair for a long evening.",
+   "category": "Seating",
+   "theme": "Village",
+   "tier": 1,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      10,
+      43,
+      12,
+      9
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      44,
+      82,
+      6,
+      10
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      62,
+      82,
+      6,
+      10
+     ]
+    }
+   ],
+   "sheet": "towns2",
+   "function": "Seat"
+  },
+  {
+   "id": "dwarven_chair",
+   "name": "dwarven chair",
+   "description": "square, heavy and impossible to tip.",
+   "category": "Seating",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 18,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      201,
+      16,
+      6,
+      8
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      201,
+      8,
+      6,
+      8
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      209,
+      18,
+      6,
+      6
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      209,
+      8,
+      6,
+      8
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "function": "Seat",
+   "variantSet": "dwarven_material"
+  },
+  {
+   "id": "dwarven_table_round",
+   "name": "dwarven round table",
+   "description": "cut from one block, as dwarves cut everything.",
+   "category": "Tables",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      178,
+      10,
+      12,
+      13
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "function": "Table",
+   "variantSet": "dwarven_material"
+  },
+  {
+   "id": "dwarven_table_small",
+   "name": "dwarven side table",
+   "description": "a small square table, solid as a doorstep.",
+   "category": "Tables",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      176,
+      32,
+      8,
+      8
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "function": "Table",
+   "variantSet": "dwarven_material"
+  },
+  {
+   "id": "dwarven_table_long",
+   "name": "dwarven long table",
+   "description": "a long hall table for long hall evenings.",
+   "category": "Tables",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      192,
+      32,
+      24,
+      8
+     ],
+     "surfaces": [
+      -8,
+      4,
+      0,
+      4,
+      8,
+      4
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      176,
+      48,
+      8,
+      24
+     ],
+     "surfaces": [
+      0,
+      4,
+      0,
+      12,
+      0,
+      20
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "function": "Table",
+   "variantSet": "dwarven_material"
+  },
+  {
+   "id": "dwarven_table_great",
+   "name": "dwarven great table",
+   "description": "a great square table for a clan and its arguments.",
+   "category": "Tables",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 110,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      192,
+      48,
+      24,
+      24
+     ],
+     "surfaces": [
+      -6,
+      6,
+      6,
+      6,
+      -6,
+      16,
+      6,
+      16
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "function": "Table",
+   "variantSet": "dwarven_material"
+  },
+  {
+   "id": "dwarven_tankards",
+   "name": "dwarven tankard",
+   "description": "a stone tankard. it's always half full, somehow.",
+   "category": "Curios",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 8,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      249,
+      10,
+      5,
+      4
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      258,
+      17,
+      5,
+      5
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      257,
+      9,
+      5,
+      5
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      250,
+      18,
+      5,
+      4
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "layer": "Surface"
+  },
+  {
+   "id": "dwarven_keg",
+   "name": "keg",
+   "description": "a small keg of something dwarvish.",
+   "category": "BarAndStorage",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 20,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      96,
+      8,
+      8,
+      8
+     ]
+    }
+   ],
+   "sheet": "dwarven"
+  },
+  {
+   "id": "dwarven_barrel_stack",
+   "name": "stacked barrels",
+   "description": "three barrels stacked the dwarven way: carefully.",
+   "category": "BarAndStorage",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      96,
+      33,
+      16,
+      13
+     ],
+     "depth": 8
+    }
+   ],
+   "sheet": "dwarven"
+  },
+  {
+   "id": "dwarven_great_tun",
+   "name": "great tun",
+   "description": "an enormous cask with a tap. a statement of intent.",
+   "category": "BarAndStorage",
+   "theme": "Dwarven",
+   "tier": 3,
+   "price": 180,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      120,
+      8,
+      16,
+      24
+     ],
+     "depth": 10
+    }
+   ],
+   "sheet": "dwarven"
+  },
+  {
+   "id": "dwarven_barrel_pyramid",
+   "name": "barrel pyramid",
+   "description": "a mountain of barrels. please don't take one from the bottom.",
+   "category": "BarAndStorage",
+   "theme": "Dwarven",
+   "tier": 3,
+   "price": 150,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      120,
+      34,
+      32,
+      28
+     ],
+     "depth": 12
+    }
+   ],
+   "sheet": "dwarven"
+  },
+  {
+   "id": "dwarven_chest",
+   "name": "dwarven chest",
+   "description": "a chest with a lid that could stop an axe.",
+   "category": "BarAndStorage",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      9,
+      12,
+      14,
+      9
+     ],
+     "surfaces": [
+      0,
+      7
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "variantSet": "dwarven_chest"
+  },
+  {
+   "id": "dwarven_rug",
+   "name": "dwarven rug",
+   "description": "a thick rug with a stitched border.",
+   "category": "FloorDecor",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      88,
+      168,
+      24,
+      24
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "layer": "Floor",
+   "variantSet": "dwarven_rug"
+  },
+  {
+   "id": "dwarven_banner",
+   "name": "dwarven banner",
+   "description": "a clan banner with a hammer on it. which clan is a delicate question.",
+   "category": "WallDecor",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      385,
+      208,
+      7,
+      13
+     ]
+    }
+   ],
+   "sheet": "dwarven",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "amber",
+     "name": "amber",
+     "swatch": "#c08030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "teal",
+     "name": "teal",
+     "swatch": "#3a8a7e",
+     "dx": 32,
+     "dy": 0
+    },
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#b03a2e",
+     "dx": 64,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "dwarven_lantern",
+   "name": "dwarven lantern",
+   "description": "a lantern on an iron base, built to last a thousand years.",
+   "category": "Lighting",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      8,
+      123,
+      15,
+      21
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "depth": 4,
+     "light": {
+      "at": [
+       0,
+       12
+      ],
+      "color": "#ffc070",
+      "intensity": 0.6,
+      "radius": 3.5
+     }
+    }
+   ],
+   "sheet": "dwarven",
+   "variants": [
+    {
+     "id": "amber",
+     "name": "amber",
+     "swatch": "#e0a050",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "red",
+     "name": "red",
+     "swatch": "#c04040",
+     "dx": 0,
+     "dy": 24
+    },
+    {
+     "id": "teal",
+     "name": "teal",
+     "swatch": "#40a090",
+     "dx": 0,
+     "dy": 48
+    }
+   ]
+  },
+  {
+   "id": "dwarven_cot",
+   "name": "dwarven cot",
+   "description": "a short, sturdy bed. dwarf-sized, but nobody's complained.",
+   "category": "Bedroom",
+   "theme": "Dwarven",
+   "tier": 1,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      35,
+      130,
+      13,
+      10
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "depth": 8
+    }
+   ],
+   "sheet": "dwarven",
+   "flippable": true,
+   "variantSet": "dwarven_cot"
+  },
+  {
+   "id": "elven_chair",
+   "name": "elven chair",
+   "description": "a chair grown, not made.",
+   "category": "Seating",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      209,
+      16,
+      6,
+      7
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      193,
+      16,
+      5,
+      7
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      217,
+      18,
+      6,
+      5
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      202,
+      16,
+      5,
+      7
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "function": "Seat",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_table",
+   "name": "elven ring table",
+   "description": "a table cut across a tree's rings. you can count them, if you have time.",
+   "category": "Tables",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      177,
+      17,
+      14,
+      15
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "function": "Table",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_side_table",
+   "name": "elven stump table",
+   "description": "a polished stump.",
+   "category": "Tables",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      164,
+      20,
+      8,
+      9
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "function": "Table",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_bookcase",
+   "name": "elven bookcase",
+   "description": "a curved bookcase full of slim volumes.",
+   "category": "BarAndStorage",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 70,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      89,
+      8,
+      22,
+      14
+     ],
+     "depth": 5
+    }
+   ],
+   "sheet": "elven",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_rug",
+   "name": "elven rug",
+   "description": "a rug patterned like moss and sunlight.",
+   "category": "FloorDecor",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      210,
+      26,
+      20,
+      20
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "layer": "Floor",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_bunting",
+   "name": "elven bunting",
+   "description": "a string of pennants for a festive wall.",
+   "category": "WallDecor",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      11,
+      9,
+      26,
+      14
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "layer": "Wall",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_planter",
+   "name": "elven planter",
+   "description": "a tall vase of reeds that rustle in no wind.",
+   "category": "Plants",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      192,
+      30,
+      8,
+      17
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "elven",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_lamp",
+   "name": "elven lamp",
+   "description": "a slender lamp post with a soft glow.",
+   "category": "Lighting",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      8,
+      34,
+      8,
+      21
+     ],
+     "depth": 3,
+     "light": {
+      "at": [
+       0,
+       18
+      ],
+      "color": "#d8f0ff",
+      "intensity": 0.55,
+      "radius": 3.5
+     }
+    }
+   ],
+   "sheet": "elven",
+   "variantSet": "elven"
+  },
+  {
+   "id": "elven_tree_banner",
+   "name": "tree banner",
+   "description": "a standard with a little tree on top. it is a real tree.",
+   "category": "Curios",
+   "theme": "Elven",
+   "tier": 2,
+   "price": 90,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      240,
+      19,
+      18,
+      29
+     ],
+     "depth": 5,
+     "size": [
+      3,
+      1
+     ]
+    }
+   ],
+   "sheet": "elven",
+   "variantSet": "elven"
+  },
+  {
+   "id": "castle_chair",
+   "name": "banquet chair",
+   "description": "a gilded chair with a red cushion.",
+   "category": "Seating",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      89,
+      56,
+      6,
+      8
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      105,
+      56,
+      6,
+      8
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      73,
+      58,
+      6,
+      6
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      121,
+      56,
+      6,
+      8
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "function": "Seat",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_throne",
+   "name": "high-backed chair",
+   "description": "a chair fit for whoever's paying.",
+   "category": "Seating",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 70,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      80,
+      36,
+      8,
+      12
+     ],
+     "depth": 6
+    }
+   ],
+   "sheet": "castle",
+   "function": "Seat",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_table",
+   "name": "banquet table",
+   "description": "a table with a runner, for feasts and grudges.",
+   "category": "Tables",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 75,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      213,
+      13,
+      14,
+      15
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      149,
+      13,
+      14,
+      15
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "function": "Table",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_banner",
+   "name": "castle banner",
+   "description": "a long banner in house colours.",
+   "category": "WallDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      8,
+      8,
+      8,
+      15
+     ],
+     "variantRects": [
+      {
+       "variant": "chequered",
+       "rect": [
+        24,
+        8,
+        8,
+        15
+       ]
+      },
+      {
+       "variant": "gilded",
+       "rect": [
+        40,
+        8,
+        8,
+        15
+       ]
+      },
+      {
+       "variant": "crimson_silver",
+       "rect": [
+        8,
+        136,
+        8,
+        15
+       ]
+      },
+      {
+       "variant": "chequered_silver",
+       "rect": [
+        24,
+        136,
+        8,
+        15
+       ]
+      },
+      {
+       "variant": "gilded_silver",
+       "rect": [
+        40,
+        136,
+        8,
+        15
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "crimson",
+     "name": "crimson",
+     "swatch": "#c03030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "chequered",
+     "name": "chequered",
+     "swatch": "#e08030",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "gilded",
+     "name": "gilded",
+     "swatch": "#e8a02c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "crimson_silver",
+     "name": "crimson, silver",
+     "swatch": "#b04050",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "chequered_silver",
+     "name": "chequered, silver",
+     "swatch": "#c0a0a0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "gilded_silver",
+     "name": "gilded, silver",
+     "swatch": "#b4b4c8",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "castle_portrait",
+   "name": "noble portrait",
+   "description": "someone important. nobody remembers who.",
+   "category": "WallDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      11,
+      34,
+      10,
+      12
+     ],
+     "variantRects": [
+      {
+       "variant": "lady",
+       "rect": [
+        27,
+        34,
+        10,
+        12
+       ]
+      },
+      {
+       "variant": "couple",
+       "rect": [
+        42,
+        34,
+        20,
+        12
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "lord",
+     "name": "a lord",
+     "swatch": "#c08040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "lady",
+     "name": "a lady",
+     "swatch": "#c06060",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "couple",
+     "name": "a couple",
+     "swatch": "#a07050",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "castle_arms",
+   "name": "wall arms",
+   "description": "weapons on the wall: decorative, mostly.",
+   "category": "WallDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      27,
+      58,
+      10,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "shield",
+       "rect": [
+        9,
+        58,
+        6,
+        10
+       ]
+      },
+      {
+       "variant": "axe",
+       "rect": [
+        17,
+        58,
+        7,
+        10
+       ]
+      },
+      {
+       "variant": "bows",
+       "rect": [
+        44,
+        58,
+        10,
+        10
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "swords",
+     "name": "crossed swords",
+     "swatch": "#e0c060",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "shield",
+     "name": "shield",
+     "swatch": "#e8a02c",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "axe",
+     "name": "axe",
+     "swatch": "#d09040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "bows",
+     "name": "crossed bows",
+     "swatch": "#c09050",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "mounted_antlers",
+   "name": "mounted antlers",
+   "description": "a stag's head on a plaque. it judges your guests.",
+   "category": "WallDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      12,
+      82,
+      14,
+      14
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Wall",
+   "flippable": true,
+   "variantSet": "castle"
+  },
+  {
+   "id": "mounted_bear",
+   "name": "mounted bear head",
+   "description": "a bear's head, mid-growl.",
+   "category": "WallDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      11,
+      110,
+      12,
+      10
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Wall",
+   "flippable": true,
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_rug",
+   "name": "castle rug",
+   "description": "a fringed rug in house colours.",
+   "category": "FloorDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 60,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      90,
+      98,
+      20,
+      20
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Floor",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_runner",
+   "name": "castle runner",
+   "description": "a cross-shaped runner, for processions.",
+   "category": "FloorDecor",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      112,
+      104,
+      24,
+      16
+     ]
+    }
+   ],
+   "sheet": "castle",
+   "layer": "Floor",
+   "rotation": "QuarterTurnSprite",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_candlestick",
+   "name": "candlestick",
+   "description": "a tall candlestick in polished metal.",
+   "category": "Lighting",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      76,
+      92,
+      7,
+      15
+     ],
+     "depth": 3,
+     "light": {
+      "at": [
+       0,
+       13
+      ],
+      "color": "#ffb868",
+      "intensity": 0.55,
+      "radius": 3
+     }
+    }
+   ],
+   "sheet": "castle",
+   "variantSet": "castle"
+  },
+  {
+   "id": "castle_torch",
+   "name": "standing torch",
+   "description": "a torch on a metal stand.",
+   "category": "Lighting",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      16,
+      24
+     ],
+     "frames": 8,
+     "frameSeconds": 0.12,
+     "depth": 3,
+     "light": {
+      "at": [
+       0,
+       17
+      ],
+      "color": "#ffa050",
+      "intensity": 0.75,
+      "radius": 4
+     }
+    }
+   ],
+   "sheet": "castle_torch_gold",
+   "variantSet": "torch"
+  },
+  {
+   "id": "castle_wall_torch",
+   "name": "wall torch",
+   "description": "a torch in a bracket on the wall.",
+   "category": "Lighting",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 35,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      16,
+      24
+     ],
+     "frames": 8,
+     "frameSeconds": 0.12,
+     "light": {
+      "at": [
+       0,
+       12
+      ],
+      "color": "#ffa050",
+      "intensity": 0.7,
+      "radius": 4
+     }
+    }
+   ],
+   "sheet": "castle_walltorch_gold",
+   "layer": "Wall",
+   "variantSet": "walltorch"
+  },
+  {
+   "id": "royal_bed",
+   "name": "royal bed",
+   "description": "a canopied bed. guests will expect breakfast.",
+   "category": "Bedroom",
+   "theme": "Castle",
+   "tier": 2,
+   "price": 160,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      112,
+      9,
+      16,
+      22
+     ],
+     "depth": 16
+    }
+   ],
+   "sheet": "castle",
+   "variantSet": "castle"
+  },
+  {
+   "id": "haunted_armchair",
+   "name": "wingback armchair",
+   "description": "a wingback armchair. it is warm when you sit down, every time.",
+   "category": "Seating",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      26,
+      170,
+      11,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "torn",
+       "rect": [
+        26,
+        186,
+        13,
+        10
+       ]
+      }
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      11,
+      170,
+      8,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "torn",
+       "rect": [
+        10,
+        186,
+        10,
+        10
+       ]
+      }
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      58,
+      170,
+      11,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "torn",
+       "rect": [
+        58,
+        186,
+        13,
+        10
+       ]
+      }
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      45,
+      170,
+      8,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "torn",
+       "rect": [
+        44,
+        186,
+        11,
+        10
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "function": "Seat",
+   "variants": [
+    {
+     "id": "whole",
+     "name": "whole",
+     "swatch": "#d07070",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "torn",
+     "name": "clawed",
+     "swatch": "#a05050",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "haunted_sofa",
+   "name": "faded sofa",
+   "description": "a sofa in a pattern nobody would choose twice.",
+   "category": "Seating",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 85,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      77,
+      171,
+      22,
+      11
+     ],
+     "seats": [
+      -6,
+      0,
+      5,
+      0
+     ],
+     "approaches": [
+      -15,
+      0,
+      15,
+      0
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      107,
+      173,
+      10,
+      23
+     ],
+     "seats": [
+      0,
+      4,
+      0,
+      14
+     ],
+     "approaches": [
+      -8,
+      4,
+      -8,
+      14
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      123,
+      172,
+      12,
+      25
+     ],
+     "seats": [
+      0,
+      4,
+      0,
+      14
+     ],
+     "approaches": [
+      8,
+      4,
+      8,
+      14
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "function": "Seat"
+  },
+  {
+   "id": "haunted_chair",
+   "name": "creaking chair",
+   "description": "a chair that creaks a moment after you sit on it.",
+   "category": "Seating",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 25,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      109,
+      202,
+      6,
+      9
+     ]
+    },
+    {
+     "turns": 1,
+     "rect": [
+      93,
+      202,
+      6,
+      9
+     ]
+    },
+    {
+     "turns": 2,
+     "rect": [
+      141,
+      202,
+      6,
+      9
+     ]
+    },
+    {
+     "turns": 3,
+     "rect": [
+      125,
+      202,
+      6,
+      9
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "function": "Seat"
+  },
+  {
+   "id": "haunted_portrait",
+   "name": "haunted portrait",
+   "description": "a portrait whose eyes follow you, and occasionally the rest of it.",
+   "category": "WallDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 50,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      8,
+      151,
+      10,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "pumpkin",
+       "rect": [
+        32,
+        150,
+        10,
+        11
+       ]
+      },
+      {
+       "variant": "shade",
+       "rect": [
+        56,
+        148,
+        11,
+        13
+       ]
+      },
+      {
+       "variant": "skull",
+       "rect": [
+        88,
+        151,
+        10,
+        10
+       ]
+      },
+      {
+       "variant": "goblin",
+       "rect": [
+        111,
+        151,
+        11,
+        10
+       ]
+      },
+      {
+       "variant": "lady",
+       "rect": [
+        135,
+        149,
+        10,
+        12
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "ghoul",
+     "name": "a ghoul",
+     "swatch": "#a0a080",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "pumpkin",
+     "name": "a pumpkin head",
+     "swatch": "#e07020",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "shade",
+     "name": "a shade",
+     "swatch": "#503070",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "skull",
+     "name": "a skull",
+     "swatch": "#e0e0d0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "goblin",
+     "name": "a goblin",
+     "swatch": "#50a050",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "lady",
+     "name": "a pale lady",
+     "swatch": "#e0c0b0",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "cobweb",
+   "name": "cobweb",
+   "description": "a corner cobweb. do not dust it; it's load-bearing.",
+   "category": "WallDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 5,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      14,
+      13,
+      10,
+      10
+     ],
+     "variantRects": [
+      {
+       "variant": "right",
+       "rect": [
+        32,
+        13,
+        10,
+        10
+       ]
+      },
+      {
+       "variant": "wide",
+       "rect": [
+        50,
+        13,
+        19,
+        10
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Wall",
+   "variants": [
+    {
+     "id": "left",
+     "name": "left corner",
+     "swatch": "#d0d0d0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "right",
+     "name": "right corner",
+     "swatch": "#d0d0d0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "wide",
+     "name": "wide",
+     "swatch": "#c0c0c0",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "cobweb_great",
+   "name": "great web",
+   "description": "a whole web. something made it. something large.",
+   "category": "WallDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 15,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      122,
+      21,
+      19,
+      19
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Wall"
+  },
+  {
+   "id": "haunted_carpet",
+   "name": "threadbare carpet",
+   "description": "an old carpet, worn through where something paced.",
+   "category": "FloorDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      10,
+      82,
+      20,
+      20
+     ],
+     "variantRects": [
+      {
+       "variant": "square",
+       "rect": [
+        8,
+        104,
+        16,
+        16
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Floor",
+   "variants": [
+    {
+     "id": "tattered",
+     "name": "tattered",
+     "swatch": "#704050",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "square",
+     "name": "square",
+     "swatch": "#604060",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "haunted_mirror",
+   "name": "gilt mirror",
+   "description": "an oval mirror. your reflection is a little late.",
+   "category": "WallDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      9,
+      123,
+      6,
+      9
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Wall",
+   "flippable": true
+  },
+  {
+   "id": "jack_o_lantern",
+   "name": "jack-o'-lantern",
+   "description": "a carved pumpkin with a candle inside.",
+   "category": "Lighting",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 15,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      120,
+      79,
+      8,
+      9
+     ],
+     "variantRects": [
+      {
+       "variant": "grin",
+       "rect": [
+        136,
+        79,
+        8,
+        9
+       ]
+      },
+      {
+       "variant": "frown",
+       "rect": [
+        120,
+        95,
+        8,
+        9
+       ]
+      },
+      {
+       "variant": "fangs",
+       "rect": [
+        136,
+        95,
+        8,
+        9
+       ]
+      }
+     ],
+     "light": {
+      "at": [
+       0,
+       4
+      ],
+      "color": "#ff9030",
+      "intensity": 0.5,
+      "radius": 2.5
+     }
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Surface",
+   "variants": [
+    {
+     "id": "smile",
+     "name": "smiling",
+     "swatch": "#e07020",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "grin",
+     "name": "grinning",
+     "swatch": "#e08020",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "frown",
+     "name": "frowning",
+     "swatch": "#d06020",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "fangs",
+     "name": "fanged",
+     "swatch": "#c05020",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "mimic_chest",
+   "name": "mimic chest",
+   "description": "a chest with teeth. it's very well behaved. probably.",
+   "category": "Curios",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 120,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      6,
+      119,
+      12,
+      17
+     ],
+     "depth": 6
+    }
+   ],
+   "sheet": "chests",
+   "variantSet": "chests",
+   "unique": true
+  },
+  {
+   "id": "ghostly_curtains",
+   "name": "tattered curtains",
+   "description": "curtains that sway when the doors are shut.",
+   "category": "WallDecor",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      26,
+      205,
+      35,
+      19
+     ]
+    }
+   ],
+   "sheet": "haunted",
+   "layer": "Wall"
+  },
+  {
+   "id": "gothic_bookcase",
+   "name": "grimoire shelf",
+   "description": "a pointed bookcase of books that whisper when closed.",
+   "category": "BarAndStorage",
+   "theme": "Haunted",
+   "tier": 3,
+   "price": 80,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      7,
+      32,
+      10,
+      16
+     ],
+     "depth": 5,
+     "variantRects": [
+      {
+       "variant": "skulls",
+       "rect": [
+        31,
+        32,
+        10,
+        16
+       ]
+      },
+      {
+       "variant": "empty",
+       "rect": [
+        55,
+        32,
+        10,
+        16
+       ]
+      }
+     ]
+    }
+   ],
+   "sheet": "wizard",
+   "variants": [
+    {
+     "id": "books",
+     "name": "books",
+     "swatch": "#a04040",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "skulls",
+     "name": "skulls",
+     "swatch": "#e0e0d0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "empty",
+     "name": "empty",
+     "swatch": "#704030",
+     "dx": 0,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "globe",
+   "name": "globe",
+   "description": "a globe of a world that's mostly the wrong shape.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      155,
+      174,
+      11,
+      15
+     ],
+     "depth": 3
+    }
+   ],
+   "sheet": "observatory"
+  },
+  {
+   "id": "telescope",
+   "name": "brass telescope",
+   "description": "a small telescope. the ceiling is very interesting.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 40,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      152,
+      127,
+      9,
+      13
+     ],
+     "depth": 3
+    }
+   ],
+   "sheet": "observatory",
+   "flippable": true
+  },
+  {
+   "id": "star_chart",
+   "name": "star chart",
+   "description": "a chart of the stars on an easel, with notes in the margins.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 2,
+   "price": 55,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      178,
+      160,
+      15,
+      15
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "observatory"
+  },
+  {
+   "id": "gold_orrery",
+   "name": "golden orrery",
+   "description": "a clockwork model of the heavens. one planet is missing.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 2,
+   "price": 85,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      49,
+      146,
+      14,
+      14
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "wizard"
+  },
+  {
+   "id": "lucky_cat",
+   "name": "lucky cat",
+   "description": "a ceramic cat that brings luck to whoever owns it, allegedly.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 30,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      10,
+      74,
+      20,
+      11
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "depth": 6
+    }
+   ],
+   "sheet": "lunar",
+   "flippable": true,
+   "variants": [
+    {
+     "id": "grey",
+     "name": "grey",
+     "swatch": "#8090a0",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "tabby",
+     "name": "tabby",
+     "swatch": "#a07050",
+     "dx": 0,
+     "dy": 32
+    },
+    {
+     "id": "ginger",
+     "name": "ginger",
+     "swatch": "#e09040",
+     "dx": 72,
+     "dy": 0
+    },
+    {
+     "id": "marmalade",
+     "name": "marmalade",
+     "swatch": "#e0a060",
+     "dx": 72,
+     "dy": 32
+    }
+   ]
+  },
+  {
+   "id": "knight_statue",
+   "name": "knight statue",
+   "description": "a stone knight. someone keeps putting a hat on it.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 2,
+   "price": 90,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      24,
+      48,
+      8,
+      12
+     ],
+     "depth": 4
+    },
+    {
+     "turns": 1,
+     "rect": [
+      40,
+      58,
+      8,
+      12
+     ],
+     "depth": 4
+    },
+    {
+     "turns": 2,
+     "rect": [
+      24,
+      72,
+      8,
+      12
+     ],
+     "depth": 4
+    },
+    {
+     "turns": 3,
+     "rect": [
+      8,
+      58,
+      8,
+      12
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "dungeon",
+   "variantSet": "stone3"
+  },
+  {
+   "id": "candle_rack",
+   "name": "candle rack",
+   "description": "a rack of votive candles, for wishes and drafts.",
+   "category": "Lighting",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      24,
+      24
+     ],
+     "frames": 4,
+     "frameSeconds": 0.15,
+     "depth": 6,
+     "light": {
+      "at": [
+       0,
+       10
+      ],
+      "color": "#ffc070",
+      "intensity": 0.65,
+      "radius": 3.5
+     }
+    }
+   ],
+   "sheet": "church_rack"
+  },
+  {
+   "id": "ships_lamp",
+   "name": "ship's lamp",
+   "description": "a blue-glassed lamp from a ship that sank somewhere dry.",
+   "category": "Lighting",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 45,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      32,
+      32
+     ],
+     "frames": 8,
+     "frameSeconds": 0.12,
+     "light": {
+      "at": [
+       0,
+       4
+      ],
+      "color": "#a0c8ff",
+      "intensity": 0.55,
+      "radius": 3
+     }
+    }
+   ],
+   "sheet": "ships_lamp",
+   "layer": "Wall"
+  },
+  {
+   "id": "paper_lantern",
+   "name": "paper lanterns",
+   "description": "a stand of red paper lanterns from a festival far away.",
+   "category": "Lighting",
+   "theme": "Curio",
+   "tier": 1,
+   "price": 50,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      233,
+      48,
+      21,
+      22
+     ],
+     "size": [
+      3,
+      1
+     ],
+     "depth": 4,
+     "light": {
+      "at": [
+       0,
+       14
+      ],
+      "color": "#ff7050",
+      "intensity": 0.55,
+      "radius": 3.5
+     }
+    }
+   ],
+   "sheet": "lunar"
+  },
+  {
+   "id": "stone_fireplace",
+   "name": "stone fireplace",
+   "description": "a great stone fireplace with a chimney. the heart of a proper tavern.",
+   "category": "Lighting",
+   "theme": "Village",
+   "tier": 3,
+   "price": 200,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      40,
+      48
+     ],
+     "frames": 8,
+     "frameSeconds": 0.2,
+     "size": [
+      5,
+      2
+     ],
+     "depth": 10,
+     "light": {
+      "at": [
+       0,
+       6
+      ],
+      "color": "#ff9a50",
+      "intensity": 0.95,
+      "radius": 7
+     }
+    }
+   ],
+   "sheet": "fireplace",
+   "wallBound": true,
+   "unique": true
+  }
+ ]
+}

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
   id: table_round_a
   nameKey: furniture.table_round_a
+  descriptionKey: furniture.table_round_a.description
   category: 1
+  theme: 0
   layer: 1
   rotation: 0
   flippable: 0
@@ -27,6 +29,29 @@ MonoBehaviour:
   unique: 0
   catalogTier: 0
   sources: 3
+  sellBack: 0.5
+  variants: []
+  paletteChannels:
+  - kind: wood
+    source:
+    - serializedVersion: 2
+      rgba: 4279110200
+    - serializedVersion: 2
+      rgba: 4278913864
+    - serializedVersion: 2
+      rgba: 4279575645
+    - serializedVersion: 2
+      rgba: 4279053172
+    - serializedVersion: 2
+      rgba: 4278527350
+    - serializedVersion: 2
+      rgba: 4279383957
+    - serializedVersion: 2
+      rgba: 4279714217
+    - serializedVersion: 2
+      rgba: 4278996147
+    - serializedVersion: 2
+      rgba: 4280641749
   facings:
   - turns: 0
     size: {x: 1, y: 1}
@@ -39,6 +64,8 @@ MonoBehaviour:
       position: {x: 0.5, y: 0}
       sortingLayer: Characters
       order: 0
+      variantSprites: []
+      variantFrames: []
     grouped: 0
     groupPoint: {x: 0, y: 0}
     bodies:
@@ -58,7 +85,8 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-    surfaces: []
+    surfaces:
+    - {x: 0.5, y: 0.75}
     lights: []
     slots: []
     statusPoint: {x: 0, y: 0}

@@ -76,7 +76,7 @@ namespace Hearthdelve.Editor
             if (tavernCamera == null) throw new InvalidOperationException("The tavern scene has no Tavern Camera.");
             tavernCamera.transform.position = new Vector3(CameraCentre.x, CameraCentre.y, -10f);
             Camera.main.transform.position = tavernCamera.transform.position;
-            FurnitureContent.Built furniture = FurnitureContent.Build();
+            FurnitureContent.Built furniture = BuildFurniture();
             RemoveSceneFurniture();
             AddService(npcs);
             AddArea(furniture);
@@ -86,6 +86,7 @@ namespace Hearthdelve.Editor
             TavernStationContent.BuildStationPanel(ui);
             BuildHint(ui);
             TavernScreens.Rebuild(ui);
+            GuestRoomBuilder.BuildFade(ui);
             AddMood();
             GameFonts.ApplyToOpenScene();
             EditorSceneManager.MarkSceneDirty(scene);
@@ -149,7 +150,7 @@ namespace Hearthdelve.Editor
             BuildRoom();
             BuildLights();
             AddService(npcs);
-            AddArea(FurnitureContent.Build());
+            AddArea(BuildFurniture());
             AddDecorate();
             TavernFeedbackContent.Build(GameObject.Find("Service").transform);
 
@@ -307,6 +308,19 @@ namespace Hearthdelve.Editor
         /// The tavern's area and its furniture builder, under <c>Areas/Tavern</c>: added once, then only reconfigured
         /// (D23). Pieces built in the editor (capture tools) are cleared, since the game builds them as the scene loads.
         /// </summary>
+        /// <summary>
+        /// The furniture content: the 4e pieces and the starting layout (FurnitureContent), the palettes, tiers and finishes
+        /// (FurnitureLooks) and the catalogue from its table (FurnitureCatalog; 4f Checkpoint B), all in the game database.
+        /// </summary>
+        static FurnitureContent.Built BuildFurniture()
+        {
+            FurnitureContent.Built furniture = FurnitureContent.Build();
+            FurnitureLooks.Build(furniture.Database);
+            FurnitureCatalog.Built catalogue = FurnitureCatalog.Build(furniture.Database, furniture.Definitions.Keys);
+            if (catalogue.Warnings.Count > 0) Debug.LogWarning($"[Hearthdelve] The furniture catalogue has {catalogue.Warnings.Count} warnings.");
+            return furniture;
+        }
+
         static void AddArea(FurnitureContent.Built furniture)
         {
             Transform areas = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include).FirstOrDefault(t => t.parent == null && t.name == "Areas");
@@ -320,17 +334,26 @@ namespace Hearthdelve.Editor
             PropertyArea area = tavern.GetComponent<PropertyArea>() ?? tavern.gameObject.AddComponent<PropertyArea>();
             // The floor inside the half-tile side walls, from the front wall's top to the back wall's foot; the back wall's
             // band above it; the doorway and the tile inside it kept clear.
+            // The stairs up to the guest room (4f step 6) are kept clear too.
+            var reserved = new List<Vector2Int> { new(DoorColumn, (int)FloorBottom), new(DoorColumn, (int)FloorBottom + 1) };
+            for (int x = GuestRoomBuilder.TavernStairs.xMin; x < GuestRoomBuilder.TavernStairs.xMax; x++)
+            for (int y = GuestRoomBuilder.TavernStairs.yMin; y < GuestRoomBuilder.TavernStairs.yMax; y++)
+                reserved.Add(new Vector2Int(x, y));
             area.Configure(AreaId, Hearthdelve.Shared.Customization.AreaKind.Tavern, Vector2.zero, new RectInt(0, 0, Width, Height),
                 new RectInt(1, (int)FloorBottom, Width - 2, (int)(FloorTop - FloorBottom)), new RectInt(1, (int)FloorTop, Width - 2, Height - (int)FloorTop),
-                new[] { new Vector2Int(DoorColumn, (int)FloorBottom), new Vector2Int(DoorColumn, (int)FloorBottom + 1) });
+                reserved.ToArray());
+            area.SetView(CameraCentre, GuestRoomBuilder.TavernArrival, DecorateLocKeys.AreaTavern);
+            AreaFinishes finishes = GuestRoomBuilder.TavernFinishes(tavern);
             AreaFurniture builder = tavern.GetComponent<AreaFurniture>() ?? tavern.gameObject.AddComponent<AreaFurniture>();
-            builder.Configure(area, furniture.Database, furniture.Presentation, AssetDatabase.LoadAssetAtPath<TavernContent>(k_ContentPath));
+            var content = AssetDatabase.LoadAssetAtPath<TavernContent>(k_ContentPath);
+            builder.Configure(area, furniture.Database, furniture.Presentation, content, finishes);
             Transform built = tavern.Find("Placed Furniture");
             while (built != null)
             {
                 Object.DestroyImmediate(built.gameObject);
                 built = tavern.Find("Placed Furniture");
             }
+            GuestRoomBuilder.Build(area, furniture, content);
         }
 
         /// <summary>Decorate Mode (4f step 2) and its feedback, rebuilt each time (one object, replaced, never doubled).</summary>

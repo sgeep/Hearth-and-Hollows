@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_wall_panelling
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: wall_panelling
+  nameKey: finish.wall_panelling
+  kind: 1
+  theme: 0
+  price: 0
+  catalogTier: 0
+  sources: 1
+  pattern: {x: 1, y: 3}
+  tiles:
+  - {fileID: 11400000, guid: 0a170bc054a005d4ab50c37d1a1f895d, type: 2}
+  - {fileID: 11400000, guid: 5cf5067e3ca243845a52080b1d50a84b, type: 2}
+  - {fileID: 11400000, guid: 48e65c24e4f78b24792f3a352ba0dad1, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: efda528388a6f844ebd2e6f52e088395, type: 2}
+  - {fileID: 11400000, guid: 9c7ec3e9bd8dcc145b2528f3d9b56bd9, type: 2}
+  - {fileID: 11400000, guid: 7f25b802556479c419e3cccde86726f7, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: 66c726f7721d498489c52bbd0e016c46, type: 2}
+  - {fileID: 11400000, guid: 2e72e313775492b448c463809db92b72, type: 2}
+  - {fileID: 11400000, guid: c0b0495c6a82dbd42937e827c7db9068, type: 2}
+  swatch: {fileID: -441899076, guid: a54715e49b9beda44b7c6c34effde3c7, type: 3}
+  channels: []
+  palette: 

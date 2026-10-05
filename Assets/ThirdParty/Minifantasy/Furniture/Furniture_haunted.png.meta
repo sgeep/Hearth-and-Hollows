@@ -1,0 +1,930 @@
+fileFormatVersion: 2
+guid: d3621c2c4a1ec66498d706dd5ba415c1
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 0
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 8
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Furniture_haunted_cobweb_0_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 217
+        width: 10
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4dfb224c210577177e7f5f57141afd7
+      internalID: 774971625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_cobweb_0_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 217
+        width: 10
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 44595334ed3ebee4a594dc2681e94595
+      internalID: -433725568
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_cobweb_0_2
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 217
+        width: 19
+        height: 10
+      alignment: 9
+      pivot: {x: 0.47368422, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 751d8a3d6e7a00a6aaa3da700b745902
+      internalID: -1709059433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_cobweb_great_0_0
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 200
+        width: 19
+        height: 19
+      alignment: 9
+      pivot: {x: 0.47368422, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 125dd896a128c53b42bd62724ac42753
+      internalID: 1695451271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_ghostly_curtains_0_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 16
+        width: 35
+        height: 19
+      alignment: 9
+      pivot: {x: 0.4857143, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bcf5eae04daebd13e8eef6280b4ecd5a
+      internalID: 632953645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_0_0
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 60
+        width: 11
+        height: 10
+      alignment: 9
+      pivot: {x: 0.45454547, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 876bba9635bbdc969bc5b0175a385a2d
+      internalID: -2028807205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_0_1
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 44
+        width: 13
+        height: 10
+      alignment: 9
+      pivot: {x: 0.46153846, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43326730035f8abb2a6d307b5c464452
+      internalID: 2968363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_1_0
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 60
+        width: 8
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87b04dadcd7f99646652e79a4c69fcf8
+      internalID: 945423534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_1_1
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 44
+        width: 10
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bdffc3cf8e41f4620d8178b449312754
+      internalID: 1141484683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_2_0
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 60
+        width: 11
+        height: 10
+      alignment: 9
+      pivot: {x: 0.45454547, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a6a5fad23ebd216207ee8db354406f1
+      internalID: -762457246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_2_1
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 44
+        width: 13
+        height: 10
+      alignment: 9
+      pivot: {x: 0.46153846, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51f64f3b1f9c53c04fc173cc205cbd9d
+      internalID: 1158538246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_3_0
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 60
+        width: 8
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1d7b0db6613e4222f5bae9b7dbfafb1
+      internalID: 1212507495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_armchair_3_1
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 44
+        width: 11
+        height: 10
+      alignment: 9
+      pivot: {x: 0.45454547, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4f4f5877ebc7a1c0102bc0f49b2d71db
+      internalID: 1016697294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_carpet_0_0
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 138
+        width: 20
+        height: 20
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bba26d832e89fbd438edfcf2d9fa045d
+      internalID: -1812536913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_carpet_0_1
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 120
+        width: 16
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1786e164ece29c42421c909f6aaeb04f
+      internalID: 1426026097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_chair_0_0
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 29
+        width: 6
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d45436abe2f23300a2bc40e3f8edb4be
+      internalID: -1673958542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_chair_1_0
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 29
+        width: 6
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d61057b598c737578b128fd4deb6c83
+      internalID: -1132969665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_chair_2_0
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 29
+        width: 6
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2af50574f07f1423baa0bd3019522512
+      internalID: 1609343555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_chair_3_0
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 29
+        width: 6
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58f4b788356e7195fa2108058a49c724
+      internalID: -1426957399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_mirror_0_0
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 108
+        width: 6
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f6c6b9a7cd6f9900a7d15961f62222a
+      internalID: 686988097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 79
+        width: 10
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96137514487870e47ce6ded290ca5776
+      internalID: 1595508379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 79
+        width: 10
+        height: 11
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7651ebef7fe886fd7bd1e4e4ca6823c8
+      internalID: -1462799037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_2
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 79
+        width: 11
+        height: 13
+      alignment: 9
+      pivot: {x: 0.45454547, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89688e4a5eed3ec3002dedf416c2342a
+      internalID: -625364732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_3
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 79
+        width: 10
+        height: 10
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c56e88af47d0922b8f7fcc76f02b3881
+      internalID: -1645265393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_4
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 79
+        width: 11
+        height: 10
+      alignment: 9
+      pivot: {x: 0.45454547, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dffe92288b13b082a9ffff6cbe656081
+      internalID: -2012478624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_portrait_0_5
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 79
+        width: 10
+        height: 12
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a26d9b726a71a78f32392233cee56426
+      internalID: -1909474361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_sofa_0_0
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 58
+        width: 22
+        height: 11
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d608be419baeaf6476af2932668f840
+      internalID: 1424130668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_sofa_1_0
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 44
+        width: 10
+        height: 23
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3020b01dc864277444725cfdcc80b9fa
+      internalID: 296152483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_haunted_sofa_2_0
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 43
+        width: 12
+        height: 25
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 57c6f3d1935e8ff97187bfd21e4a1dd4
+      internalID: 1916130258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_jack_o_lantern_0_0
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 152
+        width: 8
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7bd16e70e9c11dc230f4e5cd9ebb8bec
+      internalID: 1599480387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_jack_o_lantern_0_1
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 152
+        width: 8
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2615dc70a4af8c9906b1a362944a8a55
+      internalID: 2039610393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_jack_o_lantern_0_2
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 136
+        width: 8
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b9cfc3b57d2ae881782fd82b5277caa
+      internalID: 1634485918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Furniture_haunted_jack_o_lantern_0_3
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 136
+        width: 8
+        height: 9
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 88027b8b858dec4ad1fdadc74cc01efc
+      internalID: 46822477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 14676af1d8d84cf408bd7d1959751590
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Furniture_haunted_cobweb_0_0: 774971625
+      Furniture_haunted_cobweb_0_1: -433725568
+      Furniture_haunted_cobweb_0_2: -1709059433
+      Furniture_haunted_cobweb_great_0_0: 1695451271
+      Furniture_haunted_ghostly_curtains_0_0: 632953645
+      Furniture_haunted_haunted_armchair_0_0: -2028807205
+      Furniture_haunted_haunted_armchair_0_1: 2968363
+      Furniture_haunted_haunted_armchair_1_0: 945423534
+      Furniture_haunted_haunted_armchair_1_1: 1141484683
+      Furniture_haunted_haunted_armchair_2_0: -762457246
+      Furniture_haunted_haunted_armchair_2_1: 1158538246
+      Furniture_haunted_haunted_armchair_3_0: 1212507495
+      Furniture_haunted_haunted_armchair_3_1: 1016697294
+      Furniture_haunted_haunted_carpet_0_0: -1812536913
+      Furniture_haunted_haunted_carpet_0_1: 1426026097
+      Furniture_haunted_haunted_chair_0_0: -1673958542
+      Furniture_haunted_haunted_chair_1_0: -1132969665
+      Furniture_haunted_haunted_chair_2_0: 1609343555
+      Furniture_haunted_haunted_chair_3_0: -1426957399
+      Furniture_haunted_haunted_mirror_0_0: 686988097
+      Furniture_haunted_haunted_portrait_0_0: 1595508379
+      Furniture_haunted_haunted_portrait_0_1: -1462799037
+      Furniture_haunted_haunted_portrait_0_2: -625364732
+      Furniture_haunted_haunted_portrait_0_3: -1645265393
+      Furniture_haunted_haunted_portrait_0_4: -2012478624
+      Furniture_haunted_haunted_portrait_0_5: -1909474361
+      Furniture_haunted_haunted_sofa_0_0: 1424130668
+      Furniture_haunted_haunted_sofa_1_0: 296152483
+      Furniture_haunted_haunted_sofa_2_0: 1916130258
+      Furniture_haunted_jack_o_lantern_0_0: 1599480387
+      Furniture_haunted_jack_o_lantern_0_1: 2039610393
+      Furniture_haunted_jack_o_lantern_0_2: 1634485918
+      Furniture_haunted_jack_o_lantern_0_3: 46822477
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

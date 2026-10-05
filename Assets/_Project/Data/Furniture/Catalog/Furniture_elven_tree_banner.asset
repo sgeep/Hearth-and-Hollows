@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_elven_tree_banner
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: elven_tree_banner
+  nameKey: furniture.elven_tree_banner
+  descriptionKey: furniture.elven_tree_banner.description
+  category: 7
+  theme: 3
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 90
+  unique: 0
+  catalogTier: 2
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: green
+    nameKey: look.green
+    swatch: {r: 0.22745098, g: 0.47058824, b: 0.105882354, a: 1}
+  - id: blue
+    nameKey: look.blue
+    swatch: {r: 0.105882354, g: 0.47058824, b: 0.4509804, a: 1}
+  - id: red
+    nameKey: look.red
+    swatch: {r: 0.54901963, g: 0.13725491, b: 0.22745098, a: 1}
+  - id: purple
+    nameKey: look.purple
+    swatch: {r: 0.3529412, g: 0.12941177, b: 0.46666667, a: 1}
+  - id: gold
+    nameKey: look.gold
+    swatch: {r: 0.59607846, g: 0.33333334, b: 0.07058824, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 3, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: 1980493296, guid: 445acf88ba846384ebb1cf05cf0a6ed2, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: -766480202, guid: 445acf88ba846384ebb1cf05cf0a6ed2, type: 3}
+      - {fileID: 103380531, guid: 445acf88ba846384ebb1cf05cf0a6ed2, type: 3}
+      - {fileID: 1913117962, guid: 445acf88ba846384ebb1cf05cf0a6ed2, type: 3}
+      - {fileID: -781702725, guid: 445acf88ba846384ebb1cf05cf0a6ed2, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.375
+      y: 0
+      width: 2.25
+      height: 0.625
+    seats: []
+    interactPoint: {x: 1.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

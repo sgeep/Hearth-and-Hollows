@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_lucky_cat
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: lucky_cat
+  nameKey: furniture.lucky_cat
+  descriptionKey: furniture.lucky_cat.description
+  category: 7
+  theme: 6
+  layer: 1
+  rotation: 0
+  flippable: 1
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 30
+  unique: 0
+  catalogTier: 1
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: grey
+    nameKey: look.grey
+    swatch: {r: 0.5019608, g: 0.5647059, b: 0.627451, a: 1}
+  - id: tabby
+    nameKey: look.tabby
+    swatch: {r: 0.627451, g: 0.4392157, b: 0.3137255, a: 1}
+  - id: ginger
+    nameKey: look.ginger
+    swatch: {r: 0.8784314, g: 0.5647059, b: 0.2509804, a: 1}
+  - id: marmalade
+    nameKey: look.marmalade
+    swatch: {r: 0.8784314, g: 0.627451, b: 0.3764706, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 3, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: -889627834, guid: a1ec793781a424e41b921c3fe384db81, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: -1147808077, guid: a1ec793781a424e41b921c3fe384db81, type: 3}
+      - {fileID: 412823049, guid: a1ec793781a424e41b921c3fe384db81, type: 3}
+      - {fileID: -1805092030, guid: a1ec793781a424e41b921c3fe384db81, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 2.5
+      height: 0.75
+    seats: []
+    interactPoint: {x: 1.5, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

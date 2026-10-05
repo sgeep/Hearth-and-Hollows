@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
   id: tavern_bar
   nameKey: furniture.tavern_bar
+  descriptionKey: furniture.tavern_bar.description
   category: 9
+  theme: 0
   layer: 1
   rotation: 0
   flippable: 0
@@ -27,6 +29,9 @@ MonoBehaviour:
   unique: 0
   catalogTier: 0
   sources: 1
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
   facings:
   - turns: 0
     size: {x: 8, y: 3}
@@ -39,6 +44,8 @@ MonoBehaviour:
       position: {x: 0.5, y: 0}
       sortingLayer: Characters
       order: 0
+      variantSprites: []
+      variantFrames: []
     - name: Taps
       sprite: {fileID: 1936658009, guid: 5a88c2cc8eeb9f84cbae63c0f21a5b24, type: 3}
       frames: []
@@ -47,6 +54,8 @@ MonoBehaviour:
       position: {x: 0.75, y: 1.125}
       sortingLayer: Characters
       order: 1
+      variantSprites: []
+      variantFrames: []
     grouped: 1
     groupPoint: {x: 0.5, y: 0}
     bodies:

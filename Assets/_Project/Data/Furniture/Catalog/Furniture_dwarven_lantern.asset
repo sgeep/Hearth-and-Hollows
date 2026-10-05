@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_dwarven_lantern
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: dwarven_lantern
+  nameKey: furniture.dwarven_lantern
+  descriptionKey: furniture.dwarven_lantern.description
+  category: 3
+  theme: 2
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 40
+  unique: 0
+  catalogTier: 1
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: amber
+    nameKey: look.amber
+    swatch: {r: 0.8784314, g: 0.627451, b: 0.3137255, a: 1}
+  - id: red
+    nameKey: look.red
+    swatch: {r: 0.7529412, g: 0.2509804, b: 0.2509804, a: 1}
+  - id: teal
+    nameKey: look.teal
+    swatch: {r: 0.2509804, g: 0.627451, b: 0.5647059, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 2, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: 1096916576, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: 2118505658, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      - {fileID: 1839447756, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.125
+      y: 0
+      width: 1.875
+      height: 0.5
+    seats: []
+    interactPoint: {x: 1, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights:
+    - position: {x: 1, y: 1.5}
+      color: {r: 1, g: 0.7529412, b: 0.4392157, a: 1}
+      intensity: 0.6
+      innerRadius: 0.7
+      outerRadius: 3.5
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

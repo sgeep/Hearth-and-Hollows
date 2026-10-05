@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
   id: kitchen_range
   nameKey: furniture.kitchen_range
+  descriptionKey: furniture.kitchen_range.description
   category: 9
+  theme: 0
   layer: 1
   rotation: 0
   flippable: 0
@@ -27,6 +29,9 @@ MonoBehaviour:
   unique: 0
   catalogTier: 0
   sources: 1
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
   facings:
   - turns: 0
     size: {x: 4, y: 2}
@@ -47,6 +52,8 @@ MonoBehaviour:
       position: {x: 0, y: -0.375}
       sortingLayer: Characters
       order: 0
+      variantSprites: []
+      variantFrames: []
     - name: Shadow
       sprite: {fileID: 21300000, guid: 8eeba7b87fa6a804685de6d0358b91e8, type: 3}
       frames: []
@@ -55,6 +62,8 @@ MonoBehaviour:
       position: {x: 0, y: -0.375}
       sortingLayer: Ground
       order: 5
+      variantSprites: []
+      variantFrames: []
     grouped: 0
     groupPoint: {x: 0, y: 0}
     bodies:

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
   id: cellar_barrel
   nameKey: furniture.cellar_barrel
+  descriptionKey: furniture.cellar_barrel.description
   category: 2
+  theme: 0
   layer: 1
   rotation: 0
   flippable: 0
@@ -27,6 +29,9 @@ MonoBehaviour:
   unique: 0
   catalogTier: 0
   sources: 3
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
   facings:
   - turns: 0
     size: {x: 1, y: 1}
@@ -39,6 +44,8 @@ MonoBehaviour:
       position: {x: 0.25, y: 0}
       sortingLayer: Characters
       order: 0
+      variantSprites: []
+      variantFrames: []
     grouped: 0
     groupPoint: {x: 0, y: 0}
     bodies:

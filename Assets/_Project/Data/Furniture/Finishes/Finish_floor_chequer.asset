@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_floor_chequer
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: floor_chequer
+  nameKey: finish.floor_chequer
+  kind: 0
+  theme: 1
+  price: 60
+  catalogTier: 1
+  sources: 2
+  pattern: {x: 1, y: 1}
+  tiles:
+  - {fileID: 11400000, guid: a725ab9128092314d8d7b3b4c7f5d236, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: 556a38c48d255304080d7159bed5c839, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: 36550920a65c2dd4a8353092d5c7ef05, type: 2}
+  swatch: {fileID: -53117462, guid: acbfb6d51b6c28a488d89a732e178467, type: 3}
+  channels: []
+  palette: 

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_wall_green
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: wall_green
+  nameKey: finish.wall_green
+  kind: 1
+  theme: 1
+  price: 40
+  catalogTier: 0
+  sources: 2
+  pattern: {x: 1, y: 3}
+  tiles:
+  - {fileID: 11400000, guid: da324a3c198741c46b724870c41e5f2c, type: 2}
+  - {fileID: 11400000, guid: 455e72b43e70b474bab51447e342c191, type: 2}
+  - {fileID: 11400000, guid: 76b7c6a287db52a459345483cdb65f54, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: cb941a4329fed4a4280bbace258e7215, type: 2}
+  - {fileID: 11400000, guid: a2c7704c164539447873463328500f79, type: 2}
+  - {fileID: 11400000, guid: 9d148df604871d540b5db8bde7be18cf, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: 64f67673c755e924eb89c7d4ad55c852, type: 2}
+  - {fileID: 11400000, guid: 1d8276b97e5c682428f1927c348b6db8, type: 2}
+  - {fileID: 11400000, guid: 97118cae7192f5a40a9cb3c73891ec25, type: 2}
+  swatch: {fileID: -633708081, guid: 334efe681db461044ad2d503ba347e63, type: 3}
+  channels: []
+  palette: 

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ee10b49ec533a9458959c2391d5a466, type: 3}
+  m_Name: Finish_wall_cream
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FinishDefinition
+  id: wall_cream
+  nameKey: finish.wall_cream
+  kind: 1
+  theme: 1
+  price: 0
+  catalogTier: 0
+  sources: 1
+  pattern: {x: 1, y: 3}
+  tiles:
+  - {fileID: 11400000, guid: 865c145d73a4d9b41a76f061d41bd505, type: 2}
+  - {fileID: 11400000, guid: 5353b34f083d1c745b84496f8b70d0f6, type: 2}
+  - {fileID: 11400000, guid: 356435a5961946646ad1021eb5d3fa69, type: 2}
+  leftEdge:
+  - {fileID: 11400000, guid: eb6edbdaff3a5374f83307166e45b21d, type: 2}
+  - {fileID: 11400000, guid: 358fc17f5896dee4b870f861f2e6f4c7, type: 2}
+  - {fileID: 11400000, guid: 26c7d4e2c96c01442ba4ceb40206171c, type: 2}
+  rightEdge:
+  - {fileID: 11400000, guid: 1f9ca43285cde6348807c39f5c06e18b, type: 2}
+  - {fileID: 11400000, guid: 6a3d6bcd7765d284f8d74eac2956fb17, type: 2}
+  - {fileID: 11400000, guid: d66eb9f6d6238c24eb92f24270fcfcc3, type: 2}
+  swatch: {fileID: -117360232, guid: 334efe681db461044ad2d503ba347e63, type: 3}
+  channels: []
+  palette: 

@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_cupboard
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: cupboard
+  nameKey: furniture.cupboard
+  descriptionKey: furniture.cupboard.description
+  category: 2
+  theme: 1
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 45
+  unique: 0
+  catalogTier: 0
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: closed
+    nameKey: look.closed
+    swatch: {r: 0.627451, g: 0.3764706, b: 0.22745098, a: 1}
+  - id: dishes
+    nameKey: look.dishes
+    swatch: {r: 0.7529412, g: 0.6901961, b: 0.5647059, a: 1}
+  - id: jars
+    nameKey: look.jars
+    swatch: {r: 0.627451, g: 0.5019608, b: 0.2509804, a: 1}
+  - id: potions
+    nameKey: look.potions
+    swatch: {r: 0.5019608, g: 0.627451, b: 0.7529412, a: 1}
+  - id: books
+    nameKey: look.books
+    swatch: {r: 0.627451, g: 0.2509804, b: 0.2509804, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 2, y: 1}
+    art:
+    - name: Art
+      sprite: {fileID: 1946320919, guid: a3c543ec7f0c10f429682471af3ccd6d, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: -1975918041, guid: a3c543ec7f0c10f429682471af3ccd6d, type: 3}
+      - {fileID: -300102508, guid: a3c543ec7f0c10f429682471af3ccd6d, type: 3}
+      - {fileID: -1273196435, guid: a3c543ec7f0c10f429682471af3ccd6d, type: 3}
+      - {fileID: 1336220569, guid: a3c543ec7f0c10f429682471af3ccd6d, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.375
+      y: 0
+      width: 1.375
+      height: 0.625
+    seats: []
+    interactPoint: {x: 1, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

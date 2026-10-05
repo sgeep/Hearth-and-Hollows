@@ -23,6 +23,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 2
       definition: kitchen_range
       cell: {x: 19, y: 12}
@@ -31,6 +33,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 3
       definition: stew_pot
       cell: {x: 24, y: 11}
@@ -39,6 +43,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 4
       definition: pass_table
       cell: {x: 20, y: 8}
@@ -47,6 +53,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 5
       definition: table_round_a
       cell: {x: 4, y: 7}
@@ -55,6 +63,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 6
       definition: tavern_chair
       cell: {x: 3, y: 7}
@@ -63,6 +73,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 7
       definition: tavern_chair
       cell: {x: 5, y: 7}
@@ -71,6 +83,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 8
       definition: table_round_b
       cell: {x: 9, y: 7}
@@ -79,6 +93,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 9
       definition: tavern_chair
       cell: {x: 8, y: 7}
@@ -87,6 +103,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 10
       definition: tavern_chair
       cell: {x: 10, y: 7}
@@ -95,6 +113,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 11
       definition: table_round_a
       cell: {x: 18, y: 4}
@@ -103,6 +123,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 12
       definition: tavern_chair
       cell: {x: 17, y: 4}
@@ -111,6 +133,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 13
       definition: tavern_chair
       cell: {x: 19, y: 4}
@@ -119,6 +143,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 14
       definition: cellar_barrel
       cell: {x: 26, y: 8}
@@ -127,6 +153,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 15
       definition: cellar_barrel
       cell: {x: 26, y: 9}
@@ -135,6 +163,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 16
       definition: cellar_barrel
       cell: {x: 25, y: 8}
@@ -143,6 +173,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 17
       definition: bottle_shelves
       cell: {x: 2, y: 14}
@@ -151,6 +183,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 18
       definition: wall_sign
       cell: {x: 11, y: 15}
@@ -159,6 +193,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 19
       definition: wall_fireplace
       cell: {x: 14, y: 14}
@@ -167,6 +203,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 20
       definition: low_shelf
       cell: {x: 24, y: 14}
@@ -175,6 +213,8 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: -1
       anchor: 0
+      variant: 
+      palette: 
     - uid: 21
       definition: shelf_glasses
       cell: {x: 0, y: 0}
@@ -183,4 +223,77 @@ MonoBehaviour:
       nudge: {x: 0, y: 0}
       host: 20
       anchor: 0
+      variant: 
+      palette: 
+    floor: floor_diamonds
+    wall: wall_panelling
+  - area: guest_room
+    pieces:
+    - uid: 101
+      definition: rug_village
+      cell: {x: 5, y: 5}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: maroon
+      palette: 
+    - uid: 102
+      definition: bed_double
+      cell: {x: 2, y: 7}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 103
+      definition: nightstand
+      cell: {x: 4, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: brown
+      palette: 
+    - uid: 104
+      definition: candle
+      cell: {x: 0, y: 0}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: 103
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 105
+      definition: chest
+      cell: {x: 13, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: wood
+      palette: 
+    - uid: 106
+      definition: picture
+      cell: {x: 3, y: 10}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: hills
+      palette: 
+    floor: floor_teal
+    wall: wall_cream
   storage: []
+  finishes:
+  - floor_diamonds
+  - floor_teal
+  - wall_panelling
+  - wall_cream

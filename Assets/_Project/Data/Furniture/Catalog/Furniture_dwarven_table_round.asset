@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_dwarven_table_round
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: dwarven_table_round
+  nameKey: furniture.dwarven_table_round
+  descriptionKey: furniture.dwarven_table_round.description
+  category: 1
+  theme: 2
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 2
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 45
+  unique: 0
+  catalogTier: 1
+  sources: 2
+  sellBack: 0.5
+  variants:
+  - id: wood
+    nameKey: look.pine
+    swatch: {r: 0.70980394, g: 0.56078434, b: 0.36078432, a: 1}
+  - id: stone
+    nameKey: look.stone
+    swatch: {r: 0.6039216, g: 0.6039216, b: 0.6039216, a: 1}
+  - id: violet
+    nameKey: look.violet_stone
+    swatch: {r: 0.44705883, g: 0.44705883, b: 0.6039216, a: 1}
+  - id: slate
+    nameKey: look.slate
+    swatch: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
+  - id: ice
+    nameKey: look.frost
+    swatch: {r: 0.627451, g: 0.7529412, b: 0.78431374, a: 1}
+  - id: moss
+    nameKey: look.moss
+    swatch: {r: 0.54901963, g: 0.6117647, b: 0.14901961, a: 1}
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 2, y: 2}
+    art:
+    - name: Art
+      sprite: {fileID: -1701821502, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1, y: 0}
+      sortingLayer: Characters
+      order: 0
+      variantSprites:
+      - {fileID: 0}
+      - {fileID: -727156805, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      - {fileID: 886714818, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      - {fileID: -1033354675, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      - {fileID: -1736614499, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      - {fileID: 872262109, guid: a1c23f672963cb842b7de31a7a17705c, type: 3}
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 1.5
+      height: 1.625
+    seats: []
+    interactPoint: {x: 1, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces:
+    - {x: 1, y: 0.8125}
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

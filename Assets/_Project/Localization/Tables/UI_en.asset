@@ -911,7 +911,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2160222283247616
-    m_Localized: decorating the Sunken Flagon
+    m_Localized: decorating {0}
     m_Metadata:
       m_Items: []
   - m_Id: 2160222325190656
@@ -951,7 +951,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2160222325190665
-    m_Localized: "{0} pick up \xB7 {1} turn \xB7 {2} flip \xB7 {3} put away \xB7 {4} undo \xB7 {5} storage \xB7 {6} check \xB7 {7} done"
+    m_Localized: "{0} pick up \xB7 {1} turn \xB7 {2} flip \xB7 {3} put away \xB7 {4} undo \xB7 {5} catalogue \xB7 {6} colours \xB7 {7} other room \xB7 {8} check \xB7 {9} done"
     m_Metadata:
       m_Items: []
   - m_Id: 2160222325190666
@@ -1128,6 +1128,1646 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2160222325190709
     m_Localized: wall fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625125150720
+    m_Localized: all good
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482368
+    m_Localized: the Sunken Flagon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482369
+    m_Localized: the guest room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482370
+    m_Localized: "{0} gold \xB7 Renown {1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482371
+    m_Localized: in storage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482372
+    m_Localized: walls and floors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482373
+    m_Localized: '{0} gold'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482374
+    m_Localized: '{0} stored'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482375
+    m_Localized: Renown {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482376
+    m_Localized: not for sale
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482377
+    m_Localized: in use
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482378
+    m_Localized: owned
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482379
+    m_Localized: "{1} placed \xB7 {2} stored"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482380
+    m_Localized: opens at Renown {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482381
+    m_Localized: '{1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482382
+    m_Localized: one of a kind
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482383
+    m_Localized: '{0} looks'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482384
+    m_Localized: from the start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482385
+    m_Localized: made in Brackenford
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482386
+    m_Localized: found in the Hollows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482387
+    m_Localized: a trophy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482388
+    m_Localized: a gift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482389
+    m_Localized: '{0} place one'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482390
+    m_Localized: '{0} buy and place'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482391
+    m_Localized: '{0} buy one'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482392
+    m_Localized: '{0} sell: {1} gold'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482393
+    m_Localized: '{0} use here'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482394
+    m_Localized: "{0} next page \xB7 {1} close"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482395
+    m_Localized: nothing here yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482396
+    m_Localized: not enough gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482397
+    m_Localized: needs Renown {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482398
+    m_Localized: you have one already
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482399
+    m_Localized: 'bought: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482400
+    m_Localized: 'sold: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482401
+    m_Localized: floor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482402
+    m_Localized: wall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482403
+    m_Localized: '{0}, {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482404
+    m_Localized: seating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482405
+    m_Localized: tables
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482406
+    m_Localized: bar and storage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482407
+    m_Localized: lighting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482408
+    m_Localized: on the walls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482409
+    m_Localized: rugs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482410
+    m_Localized: plants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482411
+    m_Localized: curios
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482412
+    m_Localized: bedroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482413
+    m_Localized: stations
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482414
+    m_Localized: 'colours: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482415
+    m_Localized: style
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482416
+    m_Localized: schemes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482417
+    m_Localized: as drawn
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482418
+    m_Localized: use last colours
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482419
+    m_Localized: match every copy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482420
+    m_Localized: "{0} choose \xB7 {1} use \xB7 {2} done"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482421
+    m_Localized: '{0} comes in one look'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482422
+    m_Localized: '{0}: {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482423
+    m_Localized: wood
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482424
+    m_Localized: cushion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482425
+    m_Localized: the bar, the taps and the stools drawn up to it. where every evening starts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482426
+    m_Localized: the kitchen range. it stands against the back wall, where its chimney goes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482427
+    m_Localized: a cauldron over a floor fire. the stew in it has opinions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482428
+    m_Localized: the pass, where plates wait to be carried out.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482429
+    m_Localized: a round tavern table with room for two chairs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482430
+    m_Localized: a round tavern table in a darker wood.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482431
+    m_Localized: a sturdy tavern chair with a red cushion.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482432
+    m_Localized: a barrel from the cellar. full of something.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482433
+    m_Localized: shelves of bottles behind the bar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482434
+    m_Localized: the tavern's painted sign.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482435
+    m_Localized: a low shelf for glasses and odds and ends.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482436
+    m_Localized: a row of glasses, mostly clean.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625175482437
+    m_Localized: a small fire in the wall. warm, and nearly safe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065280
+    m_Localized: tavern stool
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065281
+    m_Localized: a three-legged stool with a red cushion. it sits beside whichever table is nearest.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065282
+    m_Localized: tavern bench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065283
+    m_Localized: a long bench for two. friendlier than chairs, and harder to leave.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065284
+    m_Localized: small round table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625188065285
+    m_Localized: room for one plate and one elbow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259584
+    m_Localized: light
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259585
+    m_Localized: dark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259586
+    m_Localized: big square table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259587
+    m_Localized: a heavy table for a whole party, with room for candles and spilled ale.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259588
+    m_Localized: long table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259589
+    m_Localized: a trestle table, long enough for a row of regulars.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259590
+    m_Localized: tall shelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259591
+    m_Localized: open shelves for jugs, crocks and things you meant to sort.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259592
+    m_Localized: row of bottles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259593
+    m_Localized: a row of bottles to stand on a shelf or a table.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259594
+    m_Localized: amber
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259595
+    m_Localized: mixed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259596
+    m_Localized: blue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259597
+    m_Localized: small sign
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259598
+    m_Localized: a little painted board for the wall.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259599
+    m_Localized: candle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259600
+    m_Localized: a stub of tallow on a dish. it makes a corner feel lived in.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259601
+    m_Localized: tall candle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259602
+    m_Localized: a church candle on an iron stand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259603
+    m_Localized: woven rug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259604
+    m_Localized: a plain woven rug that makes any floor kinder to bare feet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259605
+    m_Localized: ochre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259606
+    m_Localized: green
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259607
+    m_Localized: navy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259608
+    m_Localized: maroon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259609
+    m_Localized: grey
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259610
+    m_Localized: potted posy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259611
+    m_Localized: a little pot of red and white flowers.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259612
+    m_Localized: terracotta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259613
+    m_Localized: brown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259614
+    m_Localized: purple
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259615
+    m_Localized: sage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259616
+    m_Localized: potted violets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259617
+    m_Localized: violets, if you squint.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259618
+    m_Localized: potted daisies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259619
+    m_Localized: a pot of white daisies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259620
+    m_Localized: potted sprig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259621
+    m_Localized: a sprig of something green that refuses to die.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259622
+    m_Localized: potted roses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259623
+    m_Localized: red roses in a heavy pot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259624
+    m_Localized: potted goldenrod
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259625
+    m_Localized: a pot of goldenrod, bright as a lamp.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259626
+    m_Localized: potted lilies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259627
+    m_Localized: white lilies, faintly smug.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259628
+    m_Localized: moss bowl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259629
+    m_Localized: a wide bowl of moss with a single pink flower.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259630
+    m_Localized: single bed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259631
+    m_Localized: a narrow bed with a straw mattress.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259632
+    m_Localized: linen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259633
+    m_Localized: brown blanket
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259634
+    m_Localized: double bed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259635
+    m_Localized: a proper bed, for a guest who pays properly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259636
+    m_Localized: nightstand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259637
+    m_Localized: a small cabinet for a candle and a book nobody finishes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259638
+    m_Localized: pink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259639
+    m_Localized: chest of drawers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259640
+    m_Localized: four drawers, one of which sticks.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259641
+    m_Localized: wardrobe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259642
+    m_Localized: a tall wardrobe with carved doors.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259643
+    m_Localized: carved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259644
+    m_Localized: plain
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259645
+    m_Localized: with drawers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259646
+    m_Localized: washstand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259647
+    m_Localized: a basin and a jug of cold water.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259648
+    m_Localized: standing mirror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259649
+    m_Localized: a tall mirror, honest to a fault.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259650
+    m_Localized: bathtub
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259651
+    m_Localized: a copper-bound tub. somebody has to carry the water.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259652
+    m_Localized: chest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259653
+    m_Localized: a sturdy chest with an iron lock.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259654
+    m_Localized: wood
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259655
+    m_Localized: red
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259656
+    m_Localized: white
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259657
+    m_Localized: slate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259658
+    m_Localized: teal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259659
+    m_Localized: travelling trunk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259660
+    m_Localized: a long trunk that has seen more roads than you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259661
+    m_Localized: framed picture
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259662
+    m_Localized: a small painting in a wooden frame.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259663
+    m_Localized: hills
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259664
+    m_Localized: a lady
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259665
+    m_Localized: a sage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259666
+    m_Localized: a noble
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259667
+    m_Localized: flowers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259668
+    m_Localized: night sky
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259669
+    m_Localized: the sea
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259670
+    m_Localized: cupboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259671
+    m_Localized: a tall cupboard. what's inside depends on the day.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259672
+    m_Localized: closed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259673
+    m_Localized: dishes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259674
+    m_Localized: jars
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259675
+    m_Localized: potions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259676
+    m_Localized: books
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259677
+    m_Localized: bookcase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625192259678
+    m_Localized: a bookcase, for the look of a learned establishment.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453888
+    m_Localized: crammed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453889
+    m_Localized: sparse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453890
+    m_Localized: cloth-covered table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453891
+    m_Localized: a round table under a white cloth. instantly respectable.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453892
+    m_Localized: set for two
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453893
+    m_Localized: with flowers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453894
+    m_Localized: with a candle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453895
+    m_Localized: hanging sign
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453896
+    m_Localized: 'a painted sign: the tavern''s, or someone else''s.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453897
+    m_Localized: tankard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453898
+    m_Localized: potion
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453899
+    m_Localized: crossed swords
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453900
+    m_Localized: helm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453901
+    m_Localized: stack of books
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453902
+    m_Localized: a tottering pile of books.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453903
+    m_Localized: large round table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453904
+    m_Localized: a big round table where everyone can see everyone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453905
+    m_Localized: leather sofa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453906
+    m_Localized: a deep leather sofa that has swallowed several coins.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453907
+    m_Localized: leather armchair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453908
+    m_Localized: an armchair for a long evening.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453909
+    m_Localized: dwarven chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453910
+    m_Localized: square, heavy and impossible to tip.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453911
+    m_Localized: pine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453912
+    m_Localized: stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453913
+    m_Localized: violet stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453914
+    m_Localized: frost
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453915
+    m_Localized: moss
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453916
+    m_Localized: dwarven round table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453917
+    m_Localized: cut from one block, as dwarves cut everything.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453918
+    m_Localized: dwarven side table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453919
+    m_Localized: a small square table, solid as a doorstep.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453920
+    m_Localized: dwarven long table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453921
+    m_Localized: a long hall table for long hall evenings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453922
+    m_Localized: dwarven great table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453923
+    m_Localized: a great square table for a clan and its arguments.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453924
+    m_Localized: dwarven tankard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453925
+    m_Localized: a stone tankard. it's always half full, somehow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453926
+    m_Localized: keg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453927
+    m_Localized: a small keg of something dwarvish.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453928
+    m_Localized: stacked barrels
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453929
+    m_Localized: 'three barrels stacked the dwarven way: carefully.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453930
+    m_Localized: great tun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453931
+    m_Localized: an enormous cask with a tap. a statement of intent.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453932
+    m_Localized: barrel pyramid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453933
+    m_Localized: a mountain of barrels. please don't take one from the bottom.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453934
+    m_Localized: dwarven chest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453935
+    m_Localized: a chest with a lid that could stop an axe.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453936
+    m_Localized: dwarven rug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453937
+    m_Localized: a thick rug with a stitched border.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453938
+    m_Localized: dwarven banner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453939
+    m_Localized: a clan banner with a hammer on it. which clan is a delicate question.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453940
+    m_Localized: dwarven lantern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453941
+    m_Localized: a lantern on an iron base, built to last a thousand years.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453942
+    m_Localized: dwarven cot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453943
+    m_Localized: a short, sturdy bed. dwarf-sized, but nobody's complained.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453944
+    m_Localized: tan
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453945
+    m_Localized: elven chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453946
+    m_Localized: a chair grown, not made.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453947
+    m_Localized: gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453948
+    m_Localized: elven ring table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453949
+    m_Localized: a table cut across a tree's rings. you can count them, if you have time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453950
+    m_Localized: elven stump table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453951
+    m_Localized: a polished stump.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453952
+    m_Localized: elven bookcase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453953
+    m_Localized: a curved bookcase full of slim volumes.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453954
+    m_Localized: elven rug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453955
+    m_Localized: a rug patterned like moss and sunlight.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453956
+    m_Localized: elven bunting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453957
+    m_Localized: a string of pennants for a festive wall.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453958
+    m_Localized: elven planter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453959
+    m_Localized: a tall vase of reeds that rustle in no wind.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453960
+    m_Localized: elven lamp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453961
+    m_Localized: a slender lamp post with a soft glow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453962
+    m_Localized: tree banner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453963
+    m_Localized: a standard with a little tree on top. it is a real tree.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453964
+    m_Localized: banquet chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453965
+    m_Localized: a gilded chair with a red cushion.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453966
+    m_Localized: gold and red
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453967
+    m_Localized: silver and red
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453968
+    m_Localized: high-backed chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453969
+    m_Localized: a chair fit for whoever's paying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453970
+    m_Localized: banquet table
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453971
+    m_Localized: a table with a runner, for feasts and grudges.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453972
+    m_Localized: castle banner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453973
+    m_Localized: a long banner in house colours.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453974
+    m_Localized: crimson
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453975
+    m_Localized: chequered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453976
+    m_Localized: gilded
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453977
+    m_Localized: crimson, silver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453978
+    m_Localized: chequered, silver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453979
+    m_Localized: gilded, silver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453980
+    m_Localized: noble portrait
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453981
+    m_Localized: someone important. nobody remembers who.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453982
+    m_Localized: a lord
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453983
+    m_Localized: a couple
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453984
+    m_Localized: wall arms
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453985
+    m_Localized: 'weapons on the wall: decorative, mostly.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453986
+    m_Localized: shield
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453987
+    m_Localized: axe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453988
+    m_Localized: crossed bows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453989
+    m_Localized: mounted antlers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453990
+    m_Localized: a stag's head on a plaque. it judges your guests.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453991
+    m_Localized: mounted bear head
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453992
+    m_Localized: a bear's head, mid-growl.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453993
+    m_Localized: castle rug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453994
+    m_Localized: a fringed rug in house colours.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453995
+    m_Localized: castle runner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453996
+    m_Localized: a cross-shaped runner, for processions.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453997
+    m_Localized: candlestick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453998
+    m_Localized: a tall candlestick in polished metal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196453999
+    m_Localized: standing torch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454000
+    m_Localized: a torch on a metal stand.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454001
+    m_Localized: iron
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454002
+    m_Localized: wall torch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454003
+    m_Localized: a torch in a bracket on the wall.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454004
+    m_Localized: royal bed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454005
+    m_Localized: a canopied bed. guests will expect breakfast.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454006
+    m_Localized: wingback armchair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454007
+    m_Localized: a wingback armchair. it is warm when you sit down, every time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454008
+    m_Localized: whole
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454009
+    m_Localized: clawed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454010
+    m_Localized: faded sofa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454011
+    m_Localized: a sofa in a pattern nobody would choose twice.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454012
+    m_Localized: creaking chair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454013
+    m_Localized: a chair that creaks a moment after you sit on it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454014
+    m_Localized: haunted portrait
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454015
+    m_Localized: a portrait whose eyes follow you, and occasionally the rest of it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454016
+    m_Localized: a ghoul
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454017
+    m_Localized: a pumpkin head
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454018
+    m_Localized: a shade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454019
+    m_Localized: a skull
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454020
+    m_Localized: a goblin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454021
+    m_Localized: a pale lady
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454022
+    m_Localized: cobweb
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454023
+    m_Localized: a corner cobweb. do not dust it; it's load-bearing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454024
+    m_Localized: left corner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454025
+    m_Localized: right corner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454026
+    m_Localized: wide
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454027
+    m_Localized: great web
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454028
+    m_Localized: a whole web. something made it. something large.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454029
+    m_Localized: threadbare carpet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454030
+    m_Localized: an old carpet, worn through where something paced.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454031
+    m_Localized: tattered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454032
+    m_Localized: square
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454033
+    m_Localized: gilt mirror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454034
+    m_Localized: an oval mirror. your reflection is a little late.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454035
+    m_Localized: jack-o'-lantern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454036
+    m_Localized: a carved pumpkin with a candle inside.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454037
+    m_Localized: smiling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454038
+    m_Localized: grinning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454039
+    m_Localized: frowning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454040
+    m_Localized: fanged
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454041
+    m_Localized: mimic chest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454042
+    m_Localized: a chest with teeth. it's very well behaved. probably.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454043
+    m_Localized: tattered curtains
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454044
+    m_Localized: curtains that sway when the doors are shut.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454045
+    m_Localized: grimoire shelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454046
+    m_Localized: a pointed bookcase of books that whisper when closed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454047
+    m_Localized: skulls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454048
+    m_Localized: empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454049
+    m_Localized: globe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454050
+    m_Localized: a globe of a world that's mostly the wrong shape.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454051
+    m_Localized: brass telescope
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454052
+    m_Localized: a small telescope. the ceiling is very interesting.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454053
+    m_Localized: star chart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454054
+    m_Localized: a chart of the stars on an easel, with notes in the margins.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454055
+    m_Localized: golden orrery
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454056
+    m_Localized: a clockwork model of the heavens. one planet is missing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454057
+    m_Localized: lucky cat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454058
+    m_Localized: a ceramic cat that brings luck to whoever owns it, allegedly.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454059
+    m_Localized: tabby
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454060
+    m_Localized: ginger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454061
+    m_Localized: marmalade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454062
+    m_Localized: knight statue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454063
+    m_Localized: a stone knight. someone keeps putting a hat on it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454064
+    m_Localized: marble
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454065
+    m_Localized: bluestone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454066
+    m_Localized: greenstone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454067
+    m_Localized: candle rack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454068
+    m_Localized: a rack of votive candles, for wishes and drafts.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454069
+    m_Localized: ship's lamp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454070
+    m_Localized: a blue-glassed lamp from a ship that sank somewhere dry.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454071
+    m_Localized: paper lanterns
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454072
+    m_Localized: a stand of red paper lanterns from a festival far away.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454073
+    m_Localized: stone fireplace
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454074
+    m_Localized: a great stone fireplace with a chimney. the heart of a proper tavern.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454075
+    m_Localized: walnut
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454076
+    m_Localized: rosewood
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454077
+    m_Localized: olive wood
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454078
+    m_Localized: ash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454079
+    m_Localized: birch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454080
+    m_Localized: pine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454081
+    m_Localized: slate black
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454082
+    m_Localized: grey stone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454083
+    m_Localized: teal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454084
+    m_Localized: green
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454085
+    m_Localized: plum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454086
+    m_Localized: amber
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454087
+    m_Localized: rose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454088
+    m_Localized: gold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454089
+    m_Localized: navy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454090
+    m_Localized: dwarven hall
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454091
+    m_Localized: elven glade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454092
+    m_Localized: castle feast
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454093
+    m_Localized: haunted den
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454094
+    m_Localized: harbour
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454095
+    m_Localized: hearth
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625196454096
+    m_Localized: the village joiner
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648192
+    m_Localized: the dwarven masons
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648193
+    m_Localized: 'word is spreading: the dwarven masons will take your orders.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648194
+    m_Localized: the elven and castle workshops
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648195
+    m_Localized: 'word is spreading: the elven carvers and the castle''s suppliers will take your orders.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648196
+    m_Localized: the strange and the grand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648197
+    m_Localized: 'word is spreading: dealers in strange and grand things will call on the Sunken Flagon.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648198
+    m_Localized: green diamond tiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648199
+    m_Localized: teal tiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648200
+    m_Localized: plum tiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648201
+    m_Localized: pale chequer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648202
+    m_Localized: parquet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648203
+    m_Localized: blue castle tiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648204
+    m_Localized: sage castle tiles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648205
+    m_Localized: dark panelling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648206
+    m_Localized: cream plaster
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648207
+    m_Localized: green plaster
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648208
+    m_Localized: walnut panelling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648209
+    m_Localized: birch panelling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2198625200648210
+    m_Localized: ash panelling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320603668480
+    m_Localized: seating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805824
+    m_Localized: tables
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805825
+    m_Localized: bar and storage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805826
+    m_Localized: lighting
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805827
+    m_Localized: on the walls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805828
+    m_Localized: rugs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805829
+    m_Localized: plants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805830
+    m_Localized: curios
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805831
+    m_Localized: bedroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2199320649805832
+    m_Localized: stations
     m_Metadata:
       m_Items: []
   references:

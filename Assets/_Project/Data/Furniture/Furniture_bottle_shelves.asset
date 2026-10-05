@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
   id: bottle_shelves
   nameKey: furniture.bottle_shelves
+  descriptionKey: furniture.bottle_shelves.description
   category: 2
+  theme: 0
   layer: 2
   rotation: 0
   flippable: 0
@@ -27,6 +29,9 @@ MonoBehaviour:
   unique: 0
   catalogTier: 0
   sources: 1
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
   facings:
   - turns: 0
     size: {x: 6, y: 2}
@@ -39,6 +44,8 @@ MonoBehaviour:
       position: {x: 0.75, y: 0.25}
       sortingLayer: Ground
       order: 3
+      variantSprites: []
+      variantFrames: []
     - name: Bottles
       sprite: {fileID: -1297760185, guid: 5a88c2cc8eeb9f84cbae63c0f21a5b24, type: 3}
       frames: []
@@ -47,6 +54,8 @@ MonoBehaviour:
       position: {x: 0.75, y: 0.125}
       sortingLayer: Ground
       order: 4
+      variantSprites: []
+      variantFrames: []
     grouped: 0
     groupPoint: {x: 0, y: 0}
     bodies: []
