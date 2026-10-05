@@ -54,6 +54,7 @@ namespace Hearthdelve.Editor
             // --- Tavern (stub for Phase 2) ---
             var t = asset.AddActionMap(InputMaps.Tavern);
             AddMove(t, "Move");
+            AddRightStick(t, TavernActions.LookStick);
             Button(t, "Interact", ("<Keyboard>/e", KM), ("<Keyboard>/space", KM), ("<Gamepad>/buttonSouth", GP));
             Button(t, "MinigameAction", ("<Keyboard>/j", KM), ("<Gamepad>/buttonWest", GP));
             Button(t, "MinigameAlt", ("<Keyboard>/k", KM), ("<Gamepad>/buttonNorth", GP));
@@ -118,6 +119,12 @@ namespace Hearthdelve.Editor
                 AddAimStick(dungeon);
                 changed = true;
             }
+            var tavern = asset.FindActionMap(InputMaps.Tavern);
+            if (tavern != null && tavern.FindAction(TavernActions.LookStick) == null)
+            {
+                AddRightStick(tavern, TavernActions.LookStick);
+                changed = true;
+            }
             var minigame = asset.FindActionMap(InputMaps.Minigame);
             if (minigame != null && minigame.FindAction(MinigameActions.Point) == null)
             {
@@ -152,9 +159,12 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>The right stick aims on a gamepad (4e playtest).</summary>
-        static void AddAimStick(InputActionMap map)
+        static void AddAimStick(InputActionMap map) => AddRightStick(map, DungeonActions.AimStick);
+
+        /// <summary>The right stick, for aiming (the Hollows) or looking (the tavern).</summary>
+        static void AddRightStick(InputActionMap map, string name)
         {
-            var stick = map.AddAction(DungeonActions.AimStick, InputActionType.Value, expectedControlLayout: "Vector2");
+            var stick = map.AddAction(name, InputActionType.Value, expectedControlLayout: "Vector2");
             stick.AddBinding("<Gamepad>/rightStick", groups: GP, processors: "StickDeadzone(min=0.25)");
         }
 

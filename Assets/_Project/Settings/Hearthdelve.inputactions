@@ -95,6 +95,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "LookStick",
+                    "type": "Value",
+                    "id": "4029fcb9-7f71-4eaf-b58f-3a6b3353246f",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -414,6 +424,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "95981e1a-353f-4e11-bf66-e7f0c7576e33",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "StickDeadzone(min=0.25)",
+                    "groups": "Gamepad",
+                    "action": "LookStick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

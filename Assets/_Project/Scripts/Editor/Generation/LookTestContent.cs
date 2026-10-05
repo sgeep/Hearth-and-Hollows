@@ -484,6 +484,9 @@ namespace Hearthdelve.Editor
                 character.CharacterHealth = health;
                 // Uses stations, the pass and seats (4c).
                 root.AddComponent<Hearthdelve.Tavern.Scene.TavernInteractor>();
+                // The keeper looks toward the mouse or along the right stick, as in the Hollows (4e playtest).
+                root.AddComponent<PlayerLook>();
+                root.GetComponentInChildren<CharacterSpriteAnimator>().FaceAim = true;
             }
             return SavePrefab(root, dungeon ? PlayerPrefab : TavernPlayerPrefab);
         }

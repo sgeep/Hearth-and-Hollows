@@ -34,6 +34,9 @@ namespace Hearthdelve.Shared.Engine
         /// <summary>True while the mouse was used more recently than a gamepad (aim follows the pointer).</summary>
         public bool PointerAim { get; private set; } = true;
 
+        /// <summary>Whether this scene's gameplay map is on (not a menu, a station or a minigame).</summary>
+        public bool GameplayMapActive => _playerControlsMap != null && _playerControlsMap.enabled;
+
         public override Vector2 MousePosition
         {
             get
@@ -85,6 +88,12 @@ namespace Hearthdelve.Shared.Engine
             }
             else
             {
+                // The right stick: where the keeper looks (4e playtest).
+                BindValue(_playerControlsMap.FindAction(TavernActions.LookStick, false), context =>
+                {
+                    _secondaryMovementInput = context.ReadValue<Vector2>();
+                    if (_secondaryMovementInput.sqrMagnitude > 0.04f) NoteDevice(context);
+                });
                 BindButton(TavernActions.Interact, InteractButton);
                 BindButton(TavernActions.Pause, PauseButton);
             }

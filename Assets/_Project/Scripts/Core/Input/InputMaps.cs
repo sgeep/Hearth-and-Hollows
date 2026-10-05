@@ -36,6 +36,8 @@ namespace Hearthdelve.Core.Input
     {
         public const string Move = "Move";
         public const string Interact = "Interact";
+        /// <summary>The right stick: where the keeper looks on a gamepad (4e playtest).</summary>
+        public const string LookStick = "LookStick";
         public const string Cancel = "Cancel";
         public const string Pause = "Pause";
     }

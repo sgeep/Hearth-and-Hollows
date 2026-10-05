@@ -19,8 +19,10 @@ namespace Hearthdelve.Shared.Animation
         [SerializeField] SpriteAnimationSet m_ShadowSet;
         [SerializeField] SpriteRenderer m_ShadowRenderer;
         [SerializeField] Facing4 m_InitialFacing = Facing4.FrontRight;
-        [SerializeField, Tooltip("Faces where its weapon aims (the player: the mouse or the right stick), except while rolling. Off: faces where it moves.")]
+        [SerializeField, Tooltip("Faces where its weapon aims, or where it looks without one (the player: the mouse or the right stick), except while rolling. Off: faces where it moves.")]
         bool m_FaceAim;
+
+        Hearthdelve.Shared.Engine.PlayerLook m_Look;
 
         Character m_Character;
         TopDownController m_Controller;
@@ -75,6 +77,7 @@ namespace Hearthdelve.Shared.Animation
             m_Character = GetComponentInParent<Character>();
             if (m_Character == null) return;
             m_Controller = m_Character.GetComponent<TopDownController>();
+            m_Look = m_Character.GetComponent<Hearthdelve.Shared.Engine.PlayerLook>();
             m_Health = m_Character.GetComponent<Health>();
             // The secondary handle (the heavy attack) is a subclass of the primary one.
             foreach (CharacterHandleWeapon handle in m_Character.GetComponents<CharacterHandleWeapon>())
@@ -245,6 +248,8 @@ namespace Hearthdelve.Shared.Animation
             else if ((attacking || m_FaceAim && !Rolling) && m_HandleWeapon != null && m_HandleWeapon.WeaponAimComponent != null &&
                      m_HandleWeapon.WeaponAimComponent.CurrentAim.sqrMagnitude > 0.01f)
                 direction = m_HandleWeapon.WeaponAimComponent.CurrentAim;
+            else if (m_FaceAim && !Rolling && m_Look != null && m_Look.Direction != Vector2.zero)
+                direction = m_Look.Direction;
             else if (m_Controller != null && m_Controller.CurrentMovement.sqrMagnitude > 0.01f)
                 direction = m_Controller.CurrentMovement.normalized;
             Facing = FacingLogic.FromDirection(direction.x, direction.y, Facing);
