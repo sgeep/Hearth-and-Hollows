@@ -55,14 +55,14 @@ MonoBehaviour:
       cell: {x: 3, y: 7}
       turns: 1
       flipped: 0
-      nudge: {x: -2, y: 2}
+      nudge: {x: 0, y: 0}
       host: -1
     - uid: 7
       definition: tavern_chair
       cell: {x: 5, y: 7}
       turns: 3
       flipped: 0
-      nudge: {x: 2, y: 2}
+      nudge: {x: 0, y: 0}
       host: -1
     - uid: 8
       definition: table_round_b
@@ -76,14 +76,14 @@ MonoBehaviour:
       cell: {x: 8, y: 7}
       turns: 1
       flipped: 0
-      nudge: {x: -2, y: 2}
+      nudge: {x: 0, y: 0}
       host: -1
     - uid: 10
       definition: tavern_chair
       cell: {x: 10, y: 7}
       turns: 3
       flipped: 0
-      nudge: {x: 2, y: 2}
+      nudge: {x: 0, y: 0}
       host: -1
     - uid: 11
       definition: table_round_a
@@ -94,17 +94,17 @@ MonoBehaviour:
       host: -1
     - uid: 12
       definition: tavern_chair
-      cell: {x: 16, y: 4}
+      cell: {x: 17, y: 4}
       turns: 1
       flipped: 0
-      nudge: {x: 2, y: 2}
+      nudge: {x: -4, y: 0}
       host: -1
     - uid: 13
       definition: tavern_chair
       cell: {x: 19, y: 4}
       turns: 3
       flipped: 0
-      nudge: {x: -2, y: 2}
+      nudge: {x: -4, y: 0}
       host: -1
     - uid: 14
       definition: cellar_barrel

@@ -44,6 +44,18 @@ namespace Hearthdelve.Tavern.Scene
             foreach (var pair in posts) m_Posts[pair.Key] = pair.Value;
         }
 
+        /// <summary>The queue spots, front first, and where staff rest (the area's layout check uses them).</summary>
+        public IEnumerable<Vector2> QueueSpots
+        {
+            get
+            {
+                foreach (Transform spot in m_Queue)
+                    if (spot != null) yield return spot.position;
+            }
+        }
+
+        public Vector2 RestPost => m_RestPost != null ? (Vector2)m_RestPost.position : Door;
+
         public TavernSeat Seat(int index) => index >= 0 && index < m_Seats.Count ? m_Seats[index] : null;
 
         /// <summary>Where the customer in queue place <paramref name="place"/> (0 = front) stands. Extra people stand at the last spot.</summary>

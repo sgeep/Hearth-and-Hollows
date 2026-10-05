@@ -18,6 +18,8 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] AreaKind m_Kind = AreaKind.Tavern;
         [SerializeField, Tooltip("The area's (0, 0) cell in world tiles.")]
         Vector2 m_Origin;
+        [SerializeField, Tooltip("The whole area in cells: the walkable grid's extent.")]
+        RectInt m_Bounds = new(0, 0, 28, 17);
         [SerializeField, Tooltip("Cells standing and floor pieces may use, in area cells.")]
         RectInt m_Floor = new(1, 2, 26, 12);
         [SerializeField, Tooltip("Cells wall pieces hang on, in area cells.")]
@@ -32,15 +34,17 @@ namespace Hearthdelve.Tavern.Scene
         public string Id => m_Id;
         public AreaKind Kind => m_Kind;
         public Vector2 Origin => m_Origin;
+        public RectInt Bounds => m_Bounds;
         public RectInt Floor => m_Floor;
         public RectInt WallBand => m_WallBand;
         public IReadOnlyList<Vector2Int> Reserved => m_Reserved;
 
-        public void Configure(string id, AreaKind kind, Vector2 origin, RectInt floor, RectInt wallBand, Vector2Int[] reserved)
+        public void Configure(string id, AreaKind kind, Vector2 origin, RectInt bounds, RectInt floor, RectInt wallBand, Vector2Int[] reserved)
         {
             m_Id = id;
             m_Kind = kind;
             m_Origin = origin;
+            m_Bounds = bounds;
             m_Floor = floor;
             m_WallBand = wallBand;
             m_Reserved = reserved ?? System.Array.Empty<Vector2Int>();

@@ -93,6 +93,7 @@ namespace Hearthdelve.Editor
             ui.AddAction("MiddleClick", InputActionType.PassThrough, "<Mouse>/middleButton", expectedControlLayout: "Button");
             ui.AddAction("ScrollWheel", InputActionType.PassThrough, "<Mouse>/scroll", expectedControlLayout: "Vector2");
 
+            AddDecorateMap(asset);
             return asset;
         }
 
@@ -131,6 +132,11 @@ namespace Hearthdelve.Editor
                 AddPoint(minigame);
                 changed = true;
             }
+            if (asset.FindActionMap(InputMaps.Decorate) == null)
+            {
+                AddDecorateMap(asset);
+                changed = true;
+            }
             if (changed)
             {
                 File.WriteAllText(EditorPaths.InputActions, asset.ToJson());
@@ -156,6 +162,26 @@ namespace Hearthdelve.Editor
             Button(d, DungeonActions.KitchenArts, ("<Keyboard>/q", KM), ("<Gamepad>/rightTrigger", GP));
             Button(d, DungeonActions.Finisher, ("<Keyboard>/f", KM), ("<Gamepad>/leftTrigger", GP));
             Button(d, DungeonActions.Pause, ("<Keyboard>/escape", KM), ("<Gamepad>/start", GP));
+        }
+
+        /// <summary>Decorate Mode (4f step 2): controller first, every action on the keyboard too, the mouse pointing at tiles.</summary>
+        static void AddDecorateMap(InputActionAsset asset)
+        {
+            var d = asset.AddActionMap(InputMaps.Decorate);
+            AddMove(d, DecorateActions.Move);
+            var point = d.AddAction(DecorateActions.Point, InputActionType.PassThrough, expectedControlLayout: "Vector2");
+            point.AddBinding("<Pointer>/position", groups: KM);
+            Button(d, DecorateActions.Select, ("<Keyboard>/e", KM), ("<Keyboard>/enter", KM), ("<Keyboard>/space", KM), ("<Gamepad>/buttonSouth", GP));
+            Button(d, DecorateActions.Click, ("<Mouse>/leftButton", KM));
+            Button(d, DecorateActions.Cancel, ("<Keyboard>/escape", KM), ("<Mouse>/rightButton", KM), ("<Gamepad>/buttonEast", GP));
+            Button(d, DecorateActions.Turn, ("<Keyboard>/r", KM), ("<Gamepad>/buttonWest", GP));
+            Button(d, DecorateActions.Flip, ("<Keyboard>/f", KM), ("<Gamepad>/buttonNorth", GP));
+            Button(d, DecorateActions.Store, ("<Keyboard>/delete", KM), ("<Keyboard>/backspace", KM), ("<Gamepad>/rightTrigger", GP));
+            Button(d, DecorateActions.Undo, ("<Keyboard>/z", KM), ("<Gamepad>/leftTrigger", GP));
+            Button(d, DecorateActions.Cycle, ("<Keyboard>/q", KM), ("<Gamepad>/rightShoulder", GP), ("<Gamepad>/leftShoulder", GP));
+            Button(d, DecorateActions.Storage, ("<Keyboard>/tab", KM), ("<Gamepad>/start", GP));
+            Button(d, DecorateActions.Check, ("<Keyboard>/c", KM), ("<Gamepad>/select", GP));
+            d.AddAction(DecorateActions.Wheel, InputActionType.PassThrough, "<Mouse>/scroll", expectedControlLayout: "Vector2");
         }
 
         /// <summary>The right stick aims on a gamepad (4e playtest).</summary>

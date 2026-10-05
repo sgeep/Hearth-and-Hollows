@@ -85,8 +85,12 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>The evening's outcome, once it's over (Results).</summary>
         public EveningReport Report { get; private set; }
         public int MaxMenuSize => m_Content.service.service.maxMenuSize;
-        /// <summary>A menu is set and the storeroom can make at least one dish on it.</summary>
-        public bool CanOpen => Phase == TavernPhase.Prep && PrepRules.CanOpen(m_Menu, Storeroom);
+        /// <summary>What the furniture's layout check says about service (D13: problems that make it impossible keep the doors shut).</summary>
+        public Hearthdelve.Shared.Customization.LayoutReport Furnishing =>
+            AreaFurniture.Tavern != null ? AreaFurniture.Tavern.Report : Hearthdelve.Shared.Customization.LayoutReport.Clear;
+
+        /// <summary>A menu is set, the storeroom can make at least one dish on it, and the layout lets service run.</summary>
+        public bool CanOpen => Phase == TavernPhase.Prep && PrepRules.CanOpen(m_Menu, Storeroom) && Furnishing.CanOpen;
 
         public event Action ServiceOpened;
         public event Action ServiceEnded;
@@ -297,7 +301,7 @@ namespace Hearthdelve.Tavern.Scene
 
         public void OpenService()
         {
-            if (IsServing || !PrepRules.CanOpen(m_Menu, Storeroom)) return;
+            if (IsServing || !PrepRules.CanOpen(m_Menu, Storeroom) || !Furnishing.CanOpen) return;
             var economy = m_Content.economy;
             Session = new ServiceSession(m_Content.service.service, economy.dishScoring, economy.service, Storeroom, m_Menu, ActiveSeats, m_Random,
                 m_Content.stew != null ? m_Content.stew.pot : StewPotSettings.Default);

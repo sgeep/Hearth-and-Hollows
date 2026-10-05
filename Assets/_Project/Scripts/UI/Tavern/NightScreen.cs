@@ -38,6 +38,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] UpgradeRow[] m_Upgrades = Array.Empty<UpgradeRow>();
         [SerializeField] LocalizedSuperText m_Saved;
         [SerializeField] Button m_Sleep;
+        [SerializeField, Tooltip("Decorate Mode (4f).")] Button m_Decorate;
         [SerializeField, Min(0f), Tooltip("Seconds the saved note stays up.")] float m_SavedSeconds = 2.5f;
         [SerializeField, Min(0.01f), Tooltip("Seconds a bought row glows.")] float m_BoughtSeconds = 0.6f;
         [SerializeField] Color m_BoughtColour = new(1f, 0.85f, 0.4f);
@@ -54,11 +55,13 @@ namespace Hearthdelve.UI.Tavern
         public IReadOnlyList<UpgradeRow> Upgrades => m_Upgrades;
         public IReadOnlyList<TavernUpgradeDefinition> Definitions => m_Defs;
         public Button SleepButton => m_Sleep;
+        public Button DecorateButton => m_Decorate;
         public bool SavedNoteShown => m_Saved != null && m_Saved.gameObject.activeSelf;
 
         public void Configure(GameObject root, LocalizedSuperText title, LocalizedSuperText[] summaryLabels, LocalizedSuperText[] summary, LocalizedSuperText purse,
-            UpgradeRow[] upgrades, LocalizedSuperText saved, Button sleep)
+            UpgradeRow[] upgrades, LocalizedSuperText saved, Button sleep, Button decorate = null)
         {
+            m_Decorate = decorate;
             m_SummaryLabels = summaryLabels;
             m_Root = root;
             m_Title = title;
@@ -84,6 +87,8 @@ namespace Hearthdelve.UI.Tavern
                 m_Upgrades[i].buy.onClick.AddListener(() => Buy(index));
             }
             m_Sleep.onClick.AddListener(() => m_Director.Sleep());
+            if (m_Decorate != null) m_Decorate.onClick.AddListener(() => DecorateMode.Instance?.Enter());
+            if (DecorateMode.Instance != null) DecorateMode.Instance.Changed += OnPhase;
             m_Director.PhaseChanged += OnPhase;
             m_Flow.StateChanged += Refresh;
             OnPhase();
@@ -92,6 +97,7 @@ namespace Hearthdelve.UI.Tavern
         void OnDestroy()
         {
             if (m_Director != null) m_Director.PhaseChanged -= OnPhase;
+            if (DecorateMode.Instance != null) DecorateMode.Instance.Changed -= OnPhase;
             if (m_Flow != null) m_Flow.StateChanged -= Refresh;
         }
 
@@ -108,7 +114,7 @@ namespace Hearthdelve.UI.Tavern
 
         void OnPhase()
         {
-            bool shown = m_Director.Phase == TavernPhase.Night;
+            bool shown = m_Director.Phase == TavernPhase.Night && !DecorateScreen.IsDecorating;
             bool was = m_Root.activeSelf;
             m_Root.SetActive(shown);
             if (!shown) return;

@@ -50,7 +50,7 @@ namespace Hearthdelve.Editor
             UiFeedbackContent.Ensure(canvas);
             Transform controls = canvas.transform.Find("Controls") ?? canvas.transform.Find("TavernHud/Content/Controls");
             if (controls != null) controls.SetParent(canvas.transform, false);
-            foreach (string name in new[] { "TavernHud", "Prep", "Results", "Morning", "Night" })
+            foreach (string name in new[] { "TavernHud", "Prep", "Results", "Morning", "Night", "Decorate" })
             {
                 Transform old = canvas.transform.Find(name);
                 if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -62,6 +62,7 @@ namespace Hearthdelve.Editor
             BuildResults(canvas);
             BuildMorning(canvas);
             BuildNight(canvas);
+            BuildDecorate(canvas);
         }
 
         /// <summary>A text button anywhere (the plain parchment face, gold when selected).</summary>
@@ -148,7 +149,8 @@ namespace Hearthdelve.Editor
             LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, new Color(0.3f, 0.2f, 0.45f), TextAnchor.UpperCenter, 0f, -49f, 296f);
             Button descend = BottomButton(panel, "Descend", LoopLocKeys.MorningDescend, 0f, 156f, out _);
             UiFeedbackContent.Commit(descend);
-            root.gameObject.AddComponent<MorningScreen>().Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend);
+            Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 117f, 70f, out _);
+            root.gameObject.AddComponent<MorningScreen>().Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend, decorate);
             panel.gameObject.SetActive(false);
         }
 
@@ -190,9 +192,68 @@ namespace Hearthdelve.Editor
             LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, new Color(0.25f, 0.45f, 0.2f), TextAnchor.UpperLeft, -150f, -64f, 76f);
             Button sleep = BottomButton(panel, "Sleep", LoopLocKeys.NightSleep, 0f, 120f, out _);
             UiFeedbackContent.Commit(sleep);
-            root.gameObject.AddComponent<NightScreen>().Configure(panel.gameObject, title, labels, summary, null, rows, saved, sleep);
+            Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 110f, 70f, out _);
+            root.gameObject.AddComponent<NightScreen>().Configure(panel.gameObject, title, labels, summary, null, rows, saved, sleep, decorate);
             saved.gameObject.SetActive(false);
             panel.gameObject.SetActive(false);
+        }
+
+        // ------------------------------------------------------------------ Decorate (4f step 2)
+
+        /// <summary>
+        /// Decorate Mode over the room: a strip at the top (what you're doing; whether the doors could open), the piece
+        /// under the cursor or carried with the reason it won't go, the controls at the bottom, and the storage and
+        /// layout-check panels. No panel over the room itself: it's what you're looking at.
+        /// </summary>
+        static void BuildDecorate(Canvas canvas)
+        {
+            RectTransform root = DungeonUI.FullScreen(canvas, "Decorate");
+            RectTransform content = Rect(root, "Content", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            content.anchorMin = Vector2.zero;
+            content.anchorMax = Vector2.one;
+            content.sizeDelta = Vector2.zero;
+            var strip = new Color(0.08f, 0.06f, 0.06f, 0.8f);
+
+            RectTransform top = Rect(content, "Top", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(320f, 14f), strip);
+            Label(top, "Title", DecorateLocKeys.Title, 6f, k_Light, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(5f, 0f), new Vector2(170f, 12f));
+            LocalizedSuperText status = Label(top, "Status", DecorateLocKeys.StatusReady, 6f, new Color(0.55f, 0.9f, 0.5f), TextAnchor.MiddleRight,
+                new Vector2(1f, 0.5f), new Vector2(-5f, 0f), new Vector2(140f, 12f));
+            RectTransform pieceBar = Rect(content, "PieceBar", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(320f, 13f),
+                new Color(0.08f, 0.06f, 0.06f, 0.55f));
+            LocalizedSuperText piece = Label(pieceBar, "Piece", DecorateLocKeys.Empty, 6f, k_Light, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(310f, 12f));
+            RectTransform bottom = Rect(content, "Bottom", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(320f, 2f * Line + 3f), strip);
+            LocalizedSuperText controls = Label(bottom, "Controls", DecorateLocKeys.Controls, 6f, new Color(0.85f, 0.8f, 0.7f), TextAnchor.MiddleCenter,
+                new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(312f, 2f * Line));
+
+            // Storage: what's owned and not placed; choosing one puts it on the cursor.
+            RectTransform storage = DungeonUI.Panel(content, new Vector2(170f, 128f), Vector2.zero);
+            storage.name = "Storage";
+            DungeonUI.Title(storage, DecorateLocKeys.Storage);
+            var rows = new Button[7];
+            var labels = new LocalizedSuperText[rows.Length];
+            for (int i = 0; i < rows.Length; i++)
+                rows[i] = SmallButton(storage, $"Row{i + 1}", DecorateLocKeys.StorageRow, new Vector2(0.5f, 1f), new Vector2(0f, -22f - i * 15f), 150f, out labels[i]);
+            LocalizedSuperText empty = Label(storage, "Empty", DecorateLocKeys.StorageEmpty, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(150f, 12f));
+
+            // The layout check: each problem in words, blocking ones in red; put it all back; done.
+            RectTransform check = DungeonUI.Panel(content, new Vector2(220f, 112f), Vector2.zero);
+            check.name = "Check";
+            DungeonUI.Title(check, DecorateLocKeys.Check);
+            var issues = new LocalizedSuperText[5];
+            for (int i = 0; i < issues.Length; i++)
+                issues[i] = Label(check, $"Issue{i + 1}", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.UpperLeft, new Vector2(0.5f, 1f), new Vector2(0f, -22f - i * Line),
+                    new Vector2(204f, Line));
+            Button putAllBack = BottomButton(check, "PutAllBack", DecorateLocKeys.PutAllBack, -48f, 104f, out _);
+            Button done = BottomButton(check, "Done", DecorateLocKeys.Done, 64f, 70f, out _);
+            UiFeedbackContent.Commit(done);
+
+            root.gameObject.AddComponent<DecorateScreen>().Configure(content.gameObject, status, piece, controls, storage.gameObject, rows, labels, empty,
+                check.gameObject, issues, putAllBack, done);
+            storage.gameObject.SetActive(false);
+            check.gameObject.SetActive(false);
+            content.gameObject.SetActive(false);
         }
 
         // ------------------------------------------------------------------ HUD
@@ -281,13 +342,17 @@ namespace Hearthdelve.Editor
             for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, k_CardsTop), 66f);
             // When nothing can be cooked: a banner over the (dimmed) cards, so closing for the night is the clear choice.
             RectTransform banner = Rect(panel, "NothingBanner", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(296f, Line + 6f), new Color(0.95f, 0.85f, 0.62f));
-            LocalizedSuperText nothing = TextLine(banner, "Nothing", TavernLocKeys.PrepNothingCookable, new Color(0.6f, 0.15f, 0.1f), TextAnchor.UpperCenter, 0f, Line / 2f + 1f, 290f);
+            LocalizedSuperText nothing = TextLine(banner, "Nothing", TavernLocKeys.PrepNothingCookable, new Color(0.6f, 0.15f, 0.1f), TextAnchor.UpperCenter, -32f, Line / 2f + 1f, 226f);
+            // 4f: when the layout keeps the doors shut, the banner says why and offers Decorate Mode.
+            Button decorate = SmallButton(banner, "Decorate", DecorateLocKeys.Button, new Vector2(1f, 0.5f), new Vector2(-3f, 0f), 60f, out _);
 
             Button staff = BottomButton(panel, "Staff", TavernLocKeys.PrepStaffJob, -107f, 80f, out LocalizedSuperText staffLabel);
             Button close = BottomButton(panel, "Close", LoopLocKeys.PrepClose, -6f, 114f, out _);
             Button open = BottomButton(panel, "Open", TavernLocKeys.PrepOpen, 101f, 92f, out _);
             UiFeedbackContent.Commit(open);
-            root.gameObject.AddComponent<PrepScreen>().Configure(panel.gameObject, stock, empty, tonight, cards, staff, staffLabel, close, open, nothing, fill.gameObject, banner.gameObject);
+            root.gameObject.AddComponent<PrepScreen>().Configure(panel.gameObject, stock, empty, tonight, cards, staff, staffLabel, close, open, nothing, fill.gameObject, banner.gameObject,
+                decorate);
+            decorate.gameObject.SetActive(false);
             // The screen object stays active (it listens); the panel shows and hides.
             panel.gameObject.SetActive(false);
         }

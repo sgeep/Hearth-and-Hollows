@@ -242,19 +242,21 @@ namespace Hearthdelve.Editor
 
             // The tavern chair: Minifantasy drew all four facings, so it turns through them (D2: authored facings). A
             // customer steps on from below, except facing the camera, where the table is below: then from the side.
+            // Facing east or west, the chair sits a quarter tile back from the table it faces and a quarter tile up, as
+            // 4e placed them: so chair, round table, chair in three neighbouring cells keep 4e's spacing (a pixel apart),
+            // which whole-tile snapping (D1) couldn't do with the chair centred.
             yield return Define("tavern_chair", "furniture.tavern_chair", FurnitureCategory.Seating, d =>
             {
                 d.function = FurnitureFunction.Seat;
                 d.rotation = RotationMode.AuthoredFacings;
                 d.price = 15;
                 d.sources = FurnitureSource.Starter | FurnitureSource.Bought;
-                var at = new Vector2(0.5f, 0f);
-                foreach (var (turns, sprite, facing, approach) in new[]
+                foreach (var (turns, sprite, facing, at, approach) in new[]
                          {
-                             (0, "ChairFacingS", new Vector2Int(0, -1), new Vector2(1.4f, 0f)),
-                             (1, "ChairFacingE", new Vector2Int(1, 0), new Vector2(0.5f, -0.9f)),
-                             (2, "ChairFacingN", new Vector2Int(0, 1), new Vector2(0.5f, -0.9f)),
-                             (3, "ChairFacingW", new Vector2Int(-1, 0), new Vector2(0.5f, -0.9f)),
+                             (0, "ChairFacingS", new Vector2Int(0, -1), new Vector2(0.5f, 0f), new Vector2(1.4f, 0f)),
+                             (1, "ChairFacingE", new Vector2Int(1, 0), new Vector2(0.25f, 0.25f), new Vector2(0.25f, -0.65f)),
+                             (2, "ChairFacingN", new Vector2Int(0, 1), new Vector2(0.5f, 0f), new Vector2(0.5f, -0.9f)),
+                             (3, "ChairFacingW", new Vector2Int(-1, 0), new Vector2(0.75f, 0.25f), new Vector2(0.75f, -0.65f)),
                          })
                 {
                     Sprite chair = Tavern("props", sprite);
@@ -322,16 +324,17 @@ namespace Hearthdelve.Editor
             Place("kitchen_range", 19, 12);
             Place("stew_pot", 24, 11);
             Place("pass_table", 20, 8);
-            // Tables at (4.5, 7), (9.5, 7) and (18, 4), with a chair 1.25 tiles either side, a quarter tile up.
+            // Tables at (4.5, 7), (9.5, 7) and (18, 4), with a chair 1.25 tiles either side, a quarter tile up (the chairs'
+            // own offset). 4e set the third table's group half a tile off the grid: all three pieces carry the nudge.
             Place("table_round_a", 4, 7);
-            Place("tavern_chair", 3, 7, turns: 1, nx: -2, ny: 2);
-            Place("tavern_chair", 5, 7, turns: 3, nx: 2, ny: 2);
+            Place("tavern_chair", 3, 7, turns: 1);
+            Place("tavern_chair", 5, 7, turns: 3);
             Place("table_round_b", 9, 7);
-            Place("tavern_chair", 8, 7, turns: 1, nx: -2, ny: 2);
-            Place("tavern_chair", 10, 7, turns: 3, nx: 2, ny: 2);
+            Place("tavern_chair", 8, 7, turns: 1);
+            Place("tavern_chair", 10, 7, turns: 3);
             Place("table_round_a", 18, 4, nx: -4);
-            Place("tavern_chair", 16, 4, turns: 1, nx: 2, ny: 2);
-            Place("tavern_chair", 19, 4, turns: 3, nx: -2, ny: 2);
+            Place("tavern_chair", 17, 4, turns: 1, nx: -4);
+            Place("tavern_chair", 19, 4, turns: 3, nx: -4);
             // Barrels by the east wall.
             Place("cellar_barrel", 26, 8, nx: -2);
             Place("cellar_barrel", 26, 9, nx: -2);

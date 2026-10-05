@@ -12,6 +12,8 @@ namespace Hearthdelve.Core.Input
         public const string Tavern = "Tavern";
         public const string Minigame = "Minigame";
         public const string UI = "UI";
+        /// <summary>Decorate Mode (4f): the cursor, picking up, turning, putting away.</summary>
+        public const string Decorate = "Decorate";
 
         /// <summary>Enables <paramref name="mapName"/> and disables the other gameplay maps. UI stays enabled.</summary>
         public static void Activate(string mapName)
@@ -40,6 +42,31 @@ namespace Hearthdelve.Core.Input
         public const string LookStick = "LookStick";
         public const string Cancel = "Cancel";
         public const string Pause = "Pause";
+    }
+
+    /// <summary>Decorate Mode (4f): controller first; the mouse points at tiles.</summary>
+    public static class DecorateActions
+    {
+        /// <summary>Moves the cursor a tile at a time (held: it repeats).</summary>
+        public const string Move = "Move";
+        /// <summary>Mouse / pointer position in screen pixels: the cursor follows it.</summary>
+        public const string Point = "Point";
+        /// <summary>Pick up, or put down.</summary>
+        public const string Select = "Select";
+        public const string Click = "Click";
+        /// <summary>Put the carried piece back, or leave Decorate Mode.</summary>
+        public const string Cancel = "Cancel";
+        public const string Turn = "Turn";
+        public const string Flip = "Flip";
+        /// <summary>To storage.</summary>
+        public const string Store = "Store";
+        public const string Undo = "Undo";
+        /// <summary>Picks the next piece under the cursor (a rug under a table).</summary>
+        public const string Cycle = "Cycle";
+        public const string Storage = "Storage";
+        public const string Check = "Check";
+        /// <summary>Mouse wheel: turns the carried piece.</summary>
+        public const string Wheel = "Wheel";
     }
 
     public static class MinigameActions

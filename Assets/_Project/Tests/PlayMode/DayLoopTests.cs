@@ -10,6 +10,7 @@ using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Haptics;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
+using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Shared.Save;
@@ -552,6 +553,42 @@ namespace Hearthdelve.Tests.PlayMode
             menu.ConfirmYes.onClick.Invoke();
             yield return InDungeon();
             Assert.That(SavedGame().gold, Is.Zero, "started over");
+        }
+        /// <summary>
+        /// 4f step 2: decorating at night is kept in the save (leaving Decorate Mode saves) and comes back on Continue, built
+        /// in the room where it was put.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator DecoratingAtNight_IsSaved_AndComesBackOnContinue()
+        {
+            yield return NewGameToTheDelve();
+            yield return ExtractAndGoHome();
+            var night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            night.DecorateButton.onClick.Invoke();
+            yield return null;
+            DecorateMode mode = DecorateMode.Instance;
+            Assert.That(mode.IsActive, "the night's decorate button");
+            Assert.That(night.IsShown, Is.False, "the night panel steps aside");
+            mode.SetCursor(new Vector2Int(26, 9));
+            mode.PickUp();
+            mode.SetCursor(new Vector2Int(12, 10));
+            mode.Place();
+            mode.Leave();
+            yield return null;
+            Assert.That(night.IsShown, "and comes back");
+
+            AreaSaveData tavern = SavedGame().furniture.areas.Single(a => a.id == "tavern");
+            Assert.That(tavern.pieces.Any(p => p.def == "cellar_barrel" && p.x == 12 && p.y == 10), "leaving saved the layout");
+
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Night, "the night, continued");
+            Assert.That(Flow.State.Furniture.Layout("tavern").Any(p => p.definition == "cellar_barrel" && p.cell == new Vector2Int(12, 10)));
+            Assert.That(Object.FindObjectsByType<FurnitureView>().Any(v => v.Definition == "cellar_barrel" && v.Resolved.Placement.cell == new Vector2Int(12, 10)),
+                "and the room is built with it");
+            NavGrid grid = NavGrid.Current;
+            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(new Vector2(12.5f, 10.5f))), Is.False, "where it stands is blocked");
         }
     }
 }

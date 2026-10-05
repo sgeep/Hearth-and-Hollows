@@ -48,6 +48,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_Nothing;
         [SerializeField] GameObject m_FillHint;
         [SerializeField, Tooltip("Behind the nothing-cookable message.")] GameObject m_NothingBanner;
+        [SerializeField, Tooltip("In the banner when the layout keeps the doors shut (4f): Decorate Mode, to fix it.")] Button m_Decorate;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("A chosen dish's tile, with gold corners as well.")] Color m_ChosenColour = new(0.98f, 0.86f, 0.5f);
 
@@ -61,12 +62,15 @@ namespace Hearthdelve.UI.Tavern
         public Button OpenButton => m_Open;
         public Button CloseButton => m_Close;
         public Button StaffButton => m_Staff;
+        public Button DecorateButton => m_Decorate;
         /// <summary>The recipe each card shows, in order.</summary>
         public IReadOnlyList<RecipeDefinition> Recipes => m_Recipes;
 
         public void Configure(GameObject root, SatchelSlotView[] stock, LocalizedSuperText stockEmpty, LocalizedSuperText tonight, DishCard[] cards,
-            Button staff, LocalizedSuperText staffLabel, Button close, Button open, LocalizedSuperText nothing, GameObject fillHint, GameObject nothingBanner = null)
+            Button staff, LocalizedSuperText staffLabel, Button close, Button open, LocalizedSuperText nothing, GameObject fillHint, GameObject nothingBanner = null,
+            Button decorate = null)
         {
+            m_Decorate = decorate;
             m_NothingBanner = nothingBanner;
             m_Root = root;
             m_Stock = stock;
@@ -95,13 +99,16 @@ namespace Hearthdelve.UI.Tavern
             m_Close.onClick.AddListener(() => m_Director.CloseForTheNight());
             m_Open.onClick.AddListener(() => m_Director.OpenService());
             if (m_FillHint != null) m_FillHint.SetActive(m_Director.CanDebugFill);
+            if (m_Decorate != null) m_Decorate.onClick.AddListener(() => DecorateMode.Instance?.Enter());
             m_Director.PhaseChanged += Refresh;
             m_Director.PrepChanged += Refresh;
+            if (DecorateMode.Instance != null) DecorateMode.Instance.Changed += Refresh;
             Refresh();
         }
 
         void OnDestroy()
         {
+            if (DecorateMode.Instance != null) DecorateMode.Instance.Changed -= Refresh;
             if (m_Director == null) return;
             m_Director.PhaseChanged -= Refresh;
             m_Director.PrepChanged -= Refresh;
@@ -120,7 +127,7 @@ namespace Hearthdelve.UI.Tavern
 
         void Refresh()
         {
-            bool shown = m_Director.Phase == TavernPhase.Prep;
+            bool shown = m_Director.Phase == TavernPhase.Prep && !DecorateScreen.IsDecorating;
             bool wasShown = m_Root.activeSelf;
             m_Root.SetActive(shown);
             if (!shown) return;
@@ -164,14 +171,21 @@ namespace Hearthdelve.UI.Tavern
             m_Staff.gameObject.SetActive(pip != null);
             if (pip != null) m_StaffLabel.Set(TavernLocKeys.PrepStaffJob, Loc.Get(pip.displayName), Loc.UI(JobKey(m_Director.StaffAssignment)));
             m_Open.interactable = m_Director.CanOpen;
-            m_Nothing.gameObject.SetActive(nothing);
-            if (m_NothingBanner != null) m_NothingBanner.SetActive(nothing);
+            // The banner says why the doors can't open: nothing to cook, or (4f, D13) the layout makes service impossible.
+            Hearthdelve.Shared.Customization.LayoutReport layout = m_Director.Furnishing;
+            bool layoutShut = !nothing && !layout.CanOpen;
+            if (layoutShut) m_Nothing.Set(DecorateLocKeys.PrepCantOpen, DecorateScreen.IssueText(layout.Issues.First(i => i.Blocking)));
+            else m_Nothing.Set(TavernLocKeys.PrepNothingCookable);
+            m_Nothing.gameObject.SetActive(nothing || layoutShut);
+            if (m_NothingBanner != null) m_NothingBanner.SetActive(nothing || layoutShut);
+            if (m_Decorate != null) m_Decorate.gameObject.SetActive(layoutShut);
 
             if (!wasShown && EventSystem.current != null)
             {
                 // Never start on a disabled control (A / Enter would do nothing): with nothing to cook, closing for
                 // the night is the choice; otherwise the first dish that can be cooked.
-                Button first = nothing ? m_Close : m_Cards.Select(c => c.button).FirstOrDefault(b => b.interactable && b.gameObject.activeInHierarchy) ?? m_Open;
+                Button first = layoutShut && m_Decorate != null ? m_Decorate
+                    : nothing ? m_Close : m_Cards.Select(c => c.button).FirstOrDefault(b => b.interactable && b.gameObject.activeInHierarchy) ?? m_Open;
                 EventSystem.current.SetSelectedGameObject(first.gameObject);
             }
         }

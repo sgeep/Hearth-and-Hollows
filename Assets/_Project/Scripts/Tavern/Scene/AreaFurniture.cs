@@ -37,6 +37,7 @@ namespace Hearthdelve.Tavern.Scene
         readonly List<ResolvedFurniture> m_Resolved = new();
         readonly List<TavernSeat> m_Seats = new();
         Transform m_Root;
+        FurnitureState m_LocalState;
 
         static readonly List<AreaFurniture> s_All = new();
 
@@ -47,6 +48,20 @@ namespace Hearthdelve.Tavern.Scene
         public IReadOnlyList<ResolvedFurniture> Pieces => m_Resolved;
         public IReadOnlyList<TavernSeat> Seats => m_Seats;
         public FurniturePresentation Presentation => m_Presentation;
+
+        /// <summary>What service needs from this layout, checked after every build (D13).</summary>
+        public LayoutReport Report { get; private set; } = LayoutReport.Clear;
+
+        /// <summary>The tavern's area, if one is loaded.</summary>
+        public static AreaFurniture Tavern
+        {
+            get
+            {
+                foreach (AreaFurniture a in s_All)
+                    if (a.m_Area != null && a.m_Area.Kind == AreaKind.Tavern) return a;
+                return null;
+            }
+        }
 
         /// <summary>Raised after every build.</summary>
         public event Action Built;
@@ -64,16 +79,55 @@ namespace Hearthdelve.Tavern.Scene
 
         public FurnitureDefinition Definition(string id) => Database != null ? Database.Furniture(id) : null;
 
-        /// <summary>The area's layout now: the game's, or the starting layout played on its own.</summary>
-        public IReadOnlyList<PlacedFurniture> CurrentLayout()
+        /// <summary>
+        /// The property's furniture: the game's, or, played on its own, a copy of the starting furniture that lasts as
+        /// long as the scene (so Decorate Mode works there too).
+        /// </summary>
+        public FurnitureState State
         {
-            GameFlow flow = Flow;
-            if (flow != null)
+            get
             {
-                if (!flow.State.Furniture.Initialized) flow.State.Furniture.GrantStarter(Database != null ? Database.startingFurniture : null);
-                return flow.State.Furniture.Layout(m_Area.Id);
+                GameFlow flow = Flow;
+                FurnitureState state = flow != null ? flow.State.Furniture : m_LocalState ??= new FurnitureState();
+                if (!state.Initialized) state.GrantStarter(Database != null ? Database.startingFurniture : null);
+                return state;
             }
-            return m_Database != null && m_Database.startingFurniture != null ? m_Database.startingFurniture.Layout(m_Area.Id) : Array.Empty<PlacedFurniture>();
+        }
+
+        /// <summary>The area's layout now.</summary>
+        public IReadOnlyList<PlacedFurniture> CurrentLayout() => State.Layout(m_Area.Id);
+
+        /// <summary>The area's fixed shape and the service's points, for placement rules and the layout check.</summary>
+        public AreaShape Shape()
+        {
+            var shape = new AreaShape
+            {
+                Id = m_Area.Id,
+                Kind = m_Area.Kind,
+                Origin = m_Area.Origin,
+                Bounds = m_Area.Bounds,
+                Floor = m_Area.Floor,
+                WallBand = m_Area.WallBand,
+                Reserved = new HashSet<Vector2Int>(m_Area.Reserved),
+            };
+            TavernLayout layout = m_Area.Kind == AreaKind.Tavern ? FindInScene<TavernLayout>() : null;
+            if (layout != null)
+            {
+                shape.Door = layout.Door;
+                shape.Queue.AddRange(layout.QueueSpots);
+                shape.Rest = layout.RestPost;
+            }
+            return shape;
+        }
+
+        /// <summary>Decorate Mode's result: the layout is kept (and saved in the day loop), then built.</summary>
+        public void Commit(IReadOnlyList<PlacedFurniture> pieces)
+        {
+            var copies = new List<PlacedFurniture>();
+            foreach (PlacedFurniture p in pieces) copies.Add(p.Clone());
+            State.SetLayout(m_Area.Id, copies);
+            Flow?.Save();
+            Build(copies);
         }
 
         void OnEnable() => s_All.Add(this);
@@ -148,6 +202,7 @@ namespace Hearthdelve.Tavern.Scene
                         stations.GetValueOrDefault(StationKind.StewPot), pass, seatUses.ToArray());
             }
 
+            Report = LayoutCheck.For(Shape(), m_Resolved);
             EventBus<NavigationLayoutChanged>.Publish(new NavigationLayoutChanged());
             Built?.Invoke();
         }

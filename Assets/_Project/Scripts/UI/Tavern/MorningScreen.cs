@@ -29,6 +29,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField, UnityEngine.Serialization.FormerlySerializedAs("m_Breakfast")] LocalizedSuperText m_Meal;
         [SerializeField] LocalizedSuperText m_Bonuses;
         [SerializeField] Button m_Descend;
+        [SerializeField, Tooltip("Decorate Mode (4f).")] Button m_Decorate;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("The dish eaten this morning.")] Color m_EatenColour = new(0.98f, 0.86f, 0.5f);
         [SerializeField, Tooltip("The bonus line flashes this colour when delve meal adds to it.")] Color m_BonusFlash = new(0.85f, 0.55f, 0.1f);
@@ -47,10 +48,12 @@ namespace Hearthdelve.UI.Tavern
         public IReadOnlyList<DishCard> Cards => m_Cards;
         public IReadOnlyList<RecipeDefinition> Options => m_Options;
         public Button DescendButton => m_Descend;
+        public Button DecorateButton => m_Decorate;
 
         public void Configure(GameObject root, LocalizedSuperText title, SatchelSlotView[] stock, LocalizedSuperText stockEmpty, DishCard[] cards,
-            LocalizedSuperText meal, LocalizedSuperText bonuses, Button descend)
+            LocalizedSuperText meal, LocalizedSuperText bonuses, Button descend, Button decorate = null)
         {
+            m_Decorate = decorate;
             m_Root = root;
             m_Title = title;
             m_Stock = stock;
@@ -73,6 +76,7 @@ namespace Hearthdelve.UI.Tavern
                 m_Cards[i].button.onClick.AddListener(() => Cook(index));
             }
             m_Descend.onClick.AddListener(() => m_Director.OpenForEvening());
+            if (m_Decorate != null) m_Decorate.onClick.AddListener(() => DecorateMode.Instance?.Enter());
             m_Director.PhaseChanged += MarkDirty;
             m_Director.PrepChanged += MarkDirty;
         }
@@ -97,7 +101,8 @@ namespace Hearthdelve.UI.Tavern
         {
             if (m_Director == null) return;
             // Hidden while delve meal cooks: the station panel has the screen.
-            bool shown = m_Director.Phase == TavernPhase.Daytime && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null);
+            bool shown = m_Director.Phase == TavernPhase.Daytime && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null) &&
+                         !DecorateScreen.IsDecorating;
             if (shown != m_Root.activeSelf) m_Root.SetActive(shown);
             if (!shown)
             {

@@ -58,13 +58,14 @@ namespace Hearthdelve.Editor
         /// Applies builder changes to the existing tavern scene in place, without rebuilding it (D23):
         /// the camera's resting point; the furniture as data (4f step 1: the old scene pieces, seats and
         /// their lights are removed, and the area with its furniture builder is added once); the service
-        /// (the door, the queue, Pip, the keeper's work), rebuilt each time; the UI. Idempotent: running
+        /// (the door, the queue, Pip, the keeper's work) and Decorate Mode, rebuilt each time; the UI. Idempotent: running
         /// it again changes nothing it made, adds nothing twice, and leaves the rest of the scene alone.
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Tavern", priority = 3)]
         public static void UpdateTavern()
         {
             ProjectConfigurator.ConfigureAll();
+            InputActionsBuilder.Build(force: false);
             MinifantasyImporter.ImportAll();
             LocalizationBuilder.Build();
             TavernStationContent.AssignDishIcons();
@@ -79,6 +80,7 @@ namespace Hearthdelve.Editor
             RemoveSceneFurniture();
             AddService(npcs);
             AddArea(furniture);
+            AddDecorate();
             TavernFeedbackContent.Build(GameObject.Find("Service").transform);
             Canvas ui = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
             TavernStationContent.BuildStationPanel(ui);
@@ -148,6 +150,7 @@ namespace Hearthdelve.Editor
             BuildLights();
             AddService(npcs);
             AddArea(FurnitureContent.Build());
+            AddDecorate();
             TavernFeedbackContent.Build(GameObject.Find("Service").transform);
 
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
@@ -317,7 +320,7 @@ namespace Hearthdelve.Editor
             PropertyArea area = tavern.GetComponent<PropertyArea>() ?? tavern.gameObject.AddComponent<PropertyArea>();
             // The floor inside the half-tile side walls, from the front wall's top to the back wall's foot; the back wall's
             // band above it; the doorway and the tile inside it kept clear.
-            area.Configure(AreaId, Hearthdelve.Shared.Customization.AreaKind.Tavern, Vector2.zero,
+            area.Configure(AreaId, Hearthdelve.Shared.Customization.AreaKind.Tavern, Vector2.zero, new RectInt(0, 0, Width, Height),
                 new RectInt(1, (int)FloorBottom, Width - 2, (int)(FloorTop - FloorBottom)), new RectInt(1, (int)FloorTop, Width - 2, Height - (int)FloorTop),
                 new[] { new Vector2Int(DoorColumn, (int)FloorBottom), new Vector2Int(DoorColumn, (int)FloorBottom + 1) });
             AreaFurniture builder = tavern.GetComponent<AreaFurniture>() ?? tavern.gameObject.AddComponent<AreaFurniture>();
@@ -328,6 +331,16 @@ namespace Hearthdelve.Editor
                 Object.DestroyImmediate(built.gameObject);
                 built = tavern.Find("Placed Furniture");
             }
+        }
+
+        /// <summary>Decorate Mode (4f step 2) and its feedback, rebuilt each time (one object, replaced, never doubled).</summary>
+        static void AddDecorate()
+        {
+            foreach (Transform old in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include).Where(t => t.parent == null && t.name == "Decorate").ToList())
+                Object.DestroyImmediate(old.gameObject);
+            var root = new GameObject("Decorate");
+            root.AddComponent<DecorateMode>();
+            TavernFeedbackContent.BuildDecorate(root.transform);
         }
 
         static T Replace<T>(GameObject target) where T : Component

@@ -59,6 +59,13 @@ namespace Hearthdelve.Editor
             LookTestContent.WriteWav("PH_UiBuy", 0.4f, (t, n) => Sin(t, t < 0.12f ? 660f : 990f) * Mathf.Exp(-t * 7f) * 0.35f);
             LookTestContent.WriteWav("PH_UiTick", 0.04f, (t, n) => Sin(t, 1500f) * Mathf.Exp(-t * 90f) * 0.25f);
             LookTestContent.WriteWav("PH_UiChime", 0.5f, (t, n) => (Sin(t, 784f) + Sin(t, 1175f) * 0.6f) * Mathf.Exp(-t * 5f) * 0.3f);
+            // Decorating (4f): a soft lift, a wooden settle, a turning click, a dull "no", a shelf thunk, a short rewind.
+            LookTestContent.WriteWav("PH_FurnitureLift", 0.14f, (t, n) => Sin(t, 300f + 900f * t) * Mathf.Exp(-t * 25f) * 0.25f + noise(n) * Mathf.Exp(-t * 60f) * 0.08f);
+            LookTestContent.WriteWav("PH_FurniturePlace", 0.22f, (t, n) => (Sin(t, 120f) * 0.7f + noise(n) * 0.3f) * Mathf.Exp(-t * 28f) * 0.7f);
+            LookTestContent.WriteWav("PH_FurnitureTurn", 0.06f, (t, n) => Sin(t, 1300f) * Mathf.Exp(-t * 80f) * 0.25f);
+            LookTestContent.WriteWav("PH_FurnitureNo", 0.18f, (t, n) => (Sin(t, 160f) + Sin(t, 170f)) * Mathf.Exp(-t * 18f) * 0.25f);
+            LookTestContent.WriteWav("PH_FurnitureStore", 0.2f, (t, n) => (Sin(t, 220f - 120f * t) * 0.6f + noise(n) * 0.2f) * Mathf.Exp(-t * 20f) * 0.5f);
+            LookTestContent.WriteWav("PH_FurnitureUndo", 0.12f, (t, n) => Sin(t, 1200f - 3000f * t) * Mathf.Exp(-t * 25f) * 0.25f);
         }
 
         static HapticPattern Pattern(string id) => LookTestContent.Pattern(id);
@@ -84,6 +91,34 @@ namespace Hearthdelve.Editor
             source.playOnAwake = false;
             source.volume = 0f;
             return source;
+        }
+
+        /// <summary>
+        /// Decorate Mode's feedback under <paramref name="parent"/> (4f step 2): placing is the firm one; lifting, putting away
+        /// and taking out are light; a turn is only heard; "it won't go there" buzzes. Entering and leaving use the UI's sounds.
+        /// </summary>
+        public static DecorateFeedback BuildDecorate(Transform parent)
+        {
+            BuildSounds();
+            var root = new GameObject("Feedback").transform;
+            root.SetParent(parent, false);
+            var moments = new DecorateMoments
+            {
+                enter = Moment(root, "Feedback_Enter", "PH_UiConfirm", null),
+                leave = Moment(root, "Feedback_Leave", "PH_UiChime", null),
+                pickUp = Moment(root, "Feedback_PickUp", "PH_FurnitureLift", HapticIds.TapLight),
+                place = Moment(root, "Feedback_Place", "PH_FurniturePlace", HapticIds.TapFirm),
+                turn = Moment(root, "Feedback_Turn", "PH_FurnitureTurn", null),
+                flip = Moment(root, "Feedback_Flip", "PH_FurnitureTurn", null),
+                invalid = Moment(root, "Feedback_Invalid", "PH_FurnitureNo", HapticIds.BuzzFailure),
+                store = Moment(root, "Feedback_Store", "PH_FurnitureStore", HapticIds.TapLight),
+                fromStorage = Moment(root, "Feedback_FromStorage", "PH_FurnitureLift", HapticIds.TapLight),
+                undo = Moment(root, "Feedback_Undo", "PH_FurnitureUndo", null),
+                putBack = Moment(root, "Feedback_PutBack", "PH_FurniturePlace", HapticIds.TapLight),
+            };
+            var feedback = root.gameObject.AddComponent<DecorateFeedback>();
+            feedback.Configure(moments);
+            return feedback;
         }
 
         /// <summary>Builds (or rebuilds) the tavern's feedback object under <paramref name="parent"/>.</summary>
