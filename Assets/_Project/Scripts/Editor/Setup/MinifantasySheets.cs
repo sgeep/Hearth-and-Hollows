@@ -80,6 +80,7 @@ namespace Hearthdelve.Editor
         const string k_Bat = k_Creatures + "/Beasts/Bat";
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
         const string k_Troll = "All_Exclusives_20261002/Creatures/Ancient_Troll";
+        const string k_Campsite = "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Adventurer's_Campsite_v1.0/Minifantasy Adventurer's Campsite/Animations/Campfires";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
         const string k_Cooking = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Cooking";
         const string k_DishIcons = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Craftable_Item_Icons";
@@ -99,6 +100,7 @@ namespace Hearthdelve.Editor
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
         public const string GiantSpider = "GiantSpider";
         public const string AncientTroll = "AncientTroll";
+        public const string AdventurersCampsite = "AdventurersCampsite";
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         public const string DwarvenKingdom = "DwarvenKingdom";
@@ -199,6 +201,9 @@ namespace Hearthdelve.Editor
                 sheets.Add(Character($"{k_Troll}/Minifantasy_AncientTroll{anim}.png", AncientTroll, $"AncientTroll{anim}"));
                 sheets.Add(Character($"{k_Troll}/Shadows/Minifantasy_AncientTroll{anim}Shadow.png", AncientTroll, $"AncientTroll{anim}Shadow"));
             }
+            // The campfire before the boss (4e playtest): a stone ring, 8 frames of 16 pixels; pivot at the bottom of the stones.
+            sheets.Add(new Sheet { Source = $"{k_Campsite}/Minifantasy_AdventurersCampsitesBigCampFire.png", Pack = AdventurersCampsite, File = "CampfireBig",
+                Mode = SliceMode.Grid, Cell = new Vector2Int(16, 16), Pivot = new Vector2(0.5f, 0.125f) });
             // The web projectile, drawn once per direction (rectangles measured from the sheet).
             sheets.Add(new Sheet
             {

@@ -90,6 +90,7 @@ namespace Hearthdelve.Editor
             settings.spider = content.Spider;
             settings.goldPickup = BuildGoldPickup();
             settings.powerPickup = BuildPowerPickup();
+            settings.campfire = BuildCampfire();
             // Step 4's powers: the assets are refreshed (art) but their amounts are kept; the list is filled once.
             Hearthdelve.Shared.Run.RunPowerDefinition[] powers = BuildPowers();
             if (settings.tuning.powers == null || settings.tuning.powers.Length == 0) settings.tuning.powers = powers;
@@ -189,6 +190,36 @@ namespace Hearthdelve.Editor
             MMF_Player feedback = LookTestContent.Feedback(root.transform, "Feedback_Power", null, 0f, LookTestContent.Sfx("PH_PowerUp"), LookTestContent.Pattern(HapticIds.PulseSuccess));
             root.AddComponent<Hearthdelve.Dungeon.Powers.PowerPickup>().Configure(spark.transform, feedback);
             return LookTestContent.SavePrefab(root, PowerPickupPrefab).GetComponent<Hearthdelve.Dungeon.Powers.PowerPickup>();
+        }
+
+        public const string CampfirePrefab = EditorPaths.Prefabs + "/Dungeon/Campfire.prefab";
+
+        /// <summary>
+        /// The campfire before the boss (4e playtest): a crackling stone ring with a warm light, a solid ring of stones, and the
+        /// warmth's feedback (a crackle and a soft pulse) and its burning low.
+        /// </summary>
+        static Campfire BuildCampfire()
+        {
+            var root = new GameObject("Campfire");
+            Sprite[] frames = MinifantasyImporter.Row(MinifantasySheets.AdventurersCampsite, "CampfireBig", 0, 8);
+            SpriteRenderer fire = LookTestContent.AddSprite(root.transform, "Fire", frames.Length > 0 ? frames[0] : null, SortingLayers.YSorted, 0, Vector3.zero);
+            fire.gameObject.AddComponent<Hearthdelve.Shared.Animation.SpriteLoop>().Configure(frames, 0.12f);
+            var body = new GameObject("Stones") { layer = LayerMask.NameToLayer(Layers.Obstacles) };
+            body.transform.SetParent(root.transform, false);
+            var box = body.AddComponent<BoxCollider2D>();
+            // The ring's footprint, ending at the bottom of its art (the sort point).
+            box.size = new Vector2(1.2f, 0.6f);
+            box.offset = new Vector2(0f, 0.3f);
+            Light2D light = LookTestBuilder.Light("Firelight", new Vector3(0f, 0.6f, 0f), Light2D.LightType.Point);
+            light.transform.SetParent(root.transform, false);
+            light.color = new Color(1f, 0.62f, 0.3f);
+            light.intensity = 1.4f;
+            light.pointLightInnerRadius = 0.6f;
+            light.pointLightOuterRadius = 4.5f;
+            MMF_Player warm = LookTestContent.Feedback(root.transform, "Feedback_Warm", null, 0f, LookTestContent.Sfx("PH_Campfire"), LookTestContent.Pattern(HapticIds.PulseSuccess));
+            MMF_Player spent = LookTestContent.Feedback(root.transform, "Feedback_BurnLow", null, 0f, LookTestContent.Sfx("PH_CampfireLow"), LookTestContent.Pattern(HapticIds.TapLight));
+            root.AddComponent<Campfire>().Configure(light, fire, box, warm, spent);
+            return LookTestContent.SavePrefab(root, CampfirePrefab).GetComponent<Campfire>();
         }
 
         /// <summary>A room's Gold reward: a bobbing coin (unlit, so it reads on a dim floor, like the parts) that adds to the run's Gold.</summary>
@@ -339,8 +370,12 @@ namespace Hearthdelve.Editor
             LookTestContent.WriteWav("PH_TrollSpoil", 0.3f, (t, n) => (LookTestContent.Noise(n) * 0.7f + Sin(t, 120f) * 0.3f) * Mathf.Exp(-t * 10f) * 0.8f);
             LookTestContent.WriteWav("PH_TrollFall", 1.4f, (t, n) =>
                 (LookTestContent.Noise(n) * 0.4f + Sin(t, 60f - 25f * t) * 0.9f) * Mathf.Exp(-t * 1.8f) * 0.85f);
+            // The campfire (4e playtest): a soft crackle as it warms, a sigh of embers as it burns low.
+            LookTestContent.WriteWav("PH_Campfire", 0.9f, (t, n) =>
+                (LookTestContent.Noise(n) * (0.25f + 0.75f * Mathf.Pow(Mathf.Abs(Sin(t, 13f) * Sin(t, 7.3f)), 6f)) + Sin(t, 110f) * 0.15f) * Mathf.Sin(t / 0.9f * Mathf.PI) * 0.45f);
+            LookTestContent.WriteWav("PH_CampfireLow", 0.6f, (t, n) => LookTestContent.Noise(n) * Mathf.Exp(-t * 5f) * 0.3f);
             foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp", "PH_TrollRoar", "PH_TrollSlam", "PH_TrollThud",
-                         "PH_TrollGulp", "PH_TrollSpoil", "PH_TrollFall" })
+                         "PH_TrollGulp", "PH_TrollSpoil", "PH_TrollFall", "PH_Campfire", "PH_CampfireLow" })
                 AssetDatabase.ImportAsset($"{EditorPaths.Audio}/{name}.wav");
         }
 

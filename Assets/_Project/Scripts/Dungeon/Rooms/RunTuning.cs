@@ -84,6 +84,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public ArenaPlaceholder arenaPlaceholder = new();
         [Tooltip("The Cellars' boss (4e): the arena's encounter. Without one, the stand-in fight above.")]
         public Hearthdelve.Dungeon.Bosses.BossDefinition boss;
+        [Tooltip("The campfire lit in the room before the boss's arena (4e playtest).")]
+        public CampfireSettings campfire = new();
 
         public const int Floors = 3;
 

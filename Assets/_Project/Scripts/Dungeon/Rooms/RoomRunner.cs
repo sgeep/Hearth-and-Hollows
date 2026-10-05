@@ -118,6 +118,10 @@ namespace Hearthdelve.Dungeon.Rooms
             var encounter = FindAnyObjectByType<Hearthdelve.Dungeon.Bosses.BossEncounter>();
             Vector2 at = encounter != null ? (Vector2)encounter.transform.position : (Vector2)Current.BossPoint();
             GrantBossReward(boss, at);
+            // Its fall fills the delver's Essence: the way home is theirs (4e playtest).
+            Character player = Player;
+            if (boss.essenceOnDefeat > 0f && player != null && player.TryGetComponent(out Hearthdelve.Dungeon.Essence.EssenceHealth essence) && essence.CurrentHealth > 0f)
+                essence.Restore(essence.MaximumHealth * boss.essenceOnDefeat);
         }
 
         /// <summary>Drops a boss's Gold and larder cache around <paramref name="at"/>.</summary>
@@ -187,6 +191,7 @@ namespace Hearthdelve.Dungeon.Rooms
         void OnCleared()
         {
             GrantReward(Node.Reward);
+            LightCampfire();
             OpenUsedExits(instant: false);
             Current.SetRevealed(true);
             m_ClearFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
@@ -246,6 +251,25 @@ namespace Hearthdelve.Dungeon.Rooms
                         new Hearthdelve.Shared.Ingredients.IngredientItem(ingredient, reward.Quality), reward.Amount, 1f), at, null);
                     break;
             }
+        }
+
+        /// <summary>The room before the boss's arena gets a campfire once it's clear, apart from the room's reward (4e playtest).</summary>
+        void LightCampfire()
+        {
+            CampfireSettings settings = m_Settings != null ? m_Settings.tuning.campfire : null;
+            if (settings == null || !settings.enabled || m_Settings.campfire == null || Current == null) return;
+            if (!Node.Next.Any(id => Floor.Node(id).Kind == RoomKind.Arena)) return;
+            Vector2 reward = RewardPoint();
+            Vector2 middle = (Vector2)Current.transform.position + (Vector2)Current.Size / 2f;
+            Transform best = null;
+            foreach (Transform point in Current.GroundSpawns)
+            {
+                if (point == null || Vector2.Distance(point.position, reward) < 3f) continue;
+                if (best == null || Vector2.Distance(point.position, middle) < Vector2.Distance(best.position, middle)) best = point;
+            }
+            Vector2 at = best != null ? (Vector2)best.position : reward + new Vector2(3f, 0f);
+            Campfire fire = Instantiate(m_Settings.campfire, at, Quaternion.identity, Current.transform);
+            fire.Setup(settings);
         }
 
         /// <summary>The ground spawn point nearest the room's middle (spawn points are always reachable floor).</summary>
