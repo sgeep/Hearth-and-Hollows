@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-05 (4f Checkpoint A, steps 1–2: done, awaiting your playtest)_
+_Last updated: 2026-10-05 (4f Checkpoint B, steps 3–6: done, awaiting your playtest; Checkpoint A approved)_
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -833,7 +833,9 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 | Undo | Z | LT |
 | The next piece under the cursor | Q | RB |
 | Free placement, to the pixel (hold) | Shift | LB |
-| Storage (take a piece out) | Tab | Start |
+| The catalogue (storage, buying, walls and floors; Checkpoint B) | Tab | Start |
+| Colours (the piece carried or under the cursor; Checkpoint B) | V | Right stick press |
+| The other room (the tavern, the guest room; Checkpoint B) | G | Left stick press |
 | The layout check (problems, put it all back, done) | C | Select |
 | Put the carried piece back / done | Esc or right-click | B |
 
@@ -868,7 +870,62 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 
 **Second look (2026-10-05):** the green tiles under a carried piece looked offset, most of all on chairs: they marked the floor tile, and a chair is drawn a quarter tile off its tile. A carried piece now shows green or red **corners round its drawing** while snapping; in **free mode there's no outline**: the piece itself turns red where it can't go (with the reason on the line at the top, and the buzz if you try). Also fixed: the previous ghost lingered for a frame when it was redrawn. Test: the ghost framed while snapping, unframed and tinted in free mode (Decorate tests 10/10).
 
-**Checkpoint A is waiting for your next look.**
+**Checkpoint A approved (2026-10-05):** "Decorate Mode feels excellent now."
+
+### 4f Checkpoint B: catalogue, buying, colours and the guest room (2026-10-05, done; waiting for your playtest)
+
+Steps 3–6 as one package. The aim: from "I can move the existing tavern around" to "I can make the Sunken Flagon look like my own place". Commits `d2b9547`, `d3e7fae`, `b912161` and the web-test fixes after them.
+
+**Step 3, the catalogue pipeline and first import.**
+- The source table is `Assets/_Project/Data/Furniture/Catalog/catalog.json`: one entry per piece with its id, English name and description, category, theme, tier, price, sheet, a rect per drawn facing, layer, function, flip permission, uniqueness, sources, colourways (offsets or rects, or a shared variant set), palette channels, and per-facing overrides (footprint, body depth, seats and approaches, surfaces, light, animation frames). Adding a piece is an entry, not code.
+- *Hearthdelve → Generate → Furniture Catalog* (`FurnitureCatalog`, also run by the in-place updater) copies each source sheet with only the named drawings kept (`ThirdParty/Minifantasy/Furniture/Furniture_<sheet>.png`), trims animation strips, writes the slicing the import pipeline reads (`catalog_sprites.json`, so a fresh clone slices the same way), builds the `FurnitureDefinition`s by rule (footprint from the drawing, art centred on whole pixels, body the drawing or its bottom rows, seats facing the way each facing is drawn), and reports problems (unknown sheets, empty or out-of-sheet rects, duplicate ids or turns, colourway overrides for unknown colourways, bodies bigger than footprints, palette channels that match nothing). It runs with no warnings.
+- Review tools in `Tools/furniture/`: `islands.py` (numbered contact sheet of a raw sheet's drawings), `zoom.py` (a measured close-up), `contact.py` (every piece, facing and colourway by category, from the table and the raw sheets, with rect checks; `BatchLogs/catalog/contact_*.png`).
+- **The first catalogue: 98 pieces (394 placeable entries counting facings and colourways) from 24 sheets, plus the 13 starting pieces.** By category: seating 11 (80 entries), tables 12 (54), bar and storage 13 (46), lighting 12 (24), on the walls 15 (49), rugs 6 (19), plants 9 (53), bedroom 10 (31), curios 10 (38). Collections: village 29, Dwarven 15, castle 14, haunted 12, tavern 10, Elven 9, curios 9.
+- A developer sandbox (F10 in development builds): every piece open and free, for trying the whole catalogue in the room.
+
+**Step 4, buying, storage and Renown tiers.**
+- The catalogue opens from Decorate Mode (Tab / Start) on what's in storage, then a page per category and one for walls and floors (Q / RB next page, Shift / LB the previous one; the d-pad's left and right too). Each piece shows its drawing, name, description, price, Renown requirement when locked, placed and stored counts, where it comes from (starting furniture, a find, a trophy, a gift, one of a kind) and its colourways.
+- A (E): place one from storage, or buy one straight onto the cursor. X (R): buy one into storage. Y (F): sell one from storage for half its price (D12; bought pieces only, never uniques, discoveries or trophies). Uniques cap at one (D7). Delivery is immediate. A purchase plays a coin sound and a pulse; the game saves after each purchase.
+- **Renown opens catalogue tiers (D14), never spent:** 0 the village joiner (tavern basics, village pieces, rugs, plants, candles, basic bedroom), 25 the Dwarven masons (and the leather sofas, bathtub, washstand, globe, lucky cat, paper lanterns), 60 the Elven and castle workshops (and the knight statue, star chart, orrery), 100 the strange and the grand (the haunted collection, the great tun, the barrel pyramid, the stone fireplace). Tuning: `Data/Furniture/CatalogSettings.asset`. The Night screen announces a newly opened tier once ("word is spreading: the dwarven masons will take your orders."), with a chime and a pulse; the announcement is saved.
+
+**Step 5, colours.**
+- One colour panel (V / right stick press) for the piece carried or under the cursor: a "style" row for Minifantasy's own colourways (pots in six glazes, Dwarven pieces in six materials, Elven in five colours, castle gold or silver, chests in eight, rugs, beds…), a row per palette channel (the tavern's chairs, tables, benches and stools: wood and cushion), schemes setting several channels at once (dwarven hall, elven glade, castle feast, haunted den, harbour, hearth), "use last colours" (copies the last look given, by channel) and "match every copy" (this look for every copy in the room). Changes show at once and undo.
+- Recolouring remaps a channel's drawn colours onto a ramp by brightness rank and bakes the result once per drawing and choice (D11), so pieces keep the lit sprite material and lighting. The ramps are colours Minifantasy drew: woods from the Elven tables and the Dwarven materials, cushions from the Elven rugs.
+- **Walls and floors (D5):** area-wide finishes bought once for the whole property: floors green diamonds (the tavern's), teal tiles (the guest room's), plum tiles, pale chequer, parquet, blue and sage castle tiles; walls dark panelling (the tavern's), cream plaster (the guest room's), green plaster, and the panelling in walnut, birch and ash (the same ramps on the wall). No per-tile painting, and the structure stays fixed.
+
+**Step 6, the guest room.**
+- A second area beside the tavern in the Tavern scene (18×13 cells, 16×8 of floor), cut from the Shop Indoor add-on's cream-walled premade room. It starts with a double bed, a nightstand with a candle, a chest, a rug and a picture.
+- The stairs (the Towns II stucco staircase) stand against the tavern's back wall between the bar and the sign; walking onto their foot fades up to the guest room; its door fades back down. The camera holds on whichever room you're in. Decorate Mode decorates the room you're in and switches rooms with G / left stick press, with one storage for the whole property.
+- Its check is only its doorway (no service checks). Bedroom pieces work in the tavern and tavern pieces upstairs.
+
+**Also changed:**
+- Stools seat whoever sits at whichever table is beside them; every seat now picks an approach that can be walked to (a chair facing down in a row is stepped onto from behind), the same way in the check and in the room.
+- Surface items on a table sort just in front of it. Tables have surface anchors (candles, tankards, small plants, bottles, books, jack-o'-lanterns).
+- The room's fixed parts (the stairs' flight) block the check's walkable grid like furniture.
+- Direction input keeps taps that start and end within one frame (the web build lost them in menus).
+- **Save version 6:** each piece's colourway and palette, each area's floor and wall, finishes owned, the tier announced. A version 5 save (your Checkpoint A playtest) loads as it was, gains the guest room furnished, and hears about tiers it has already reached at its next Night.
+- The starting room changed only by the stairs (their art, solid flight, foot and the cells they keep clear); the baseline `TavernStarting.txt` was re-recorded and checked line by line.
+
+**Tests:** EditMode 504/504 (new `CatalogueTests`: the generated catalogue and stable ids, every drawing per facing and colourway, the collections across four tiers, buying, uniques, selling, finishes, tier announcements, palette parsing and the remap, the baked recolour cache, finishes' patterns, property-wide storage, granting the guest room to an old save, the guest room's check, fixtures, stools, surface sorting, version 6 and the v5 migration). PlayMode 178/178 plus 7 explicit captures (new `CheckpointBTests`: buying onto the cursor, storing and selling; a tier opening with Renown; recolouring and undo; the colour panel and matching every copy; the panels and a one-frame tap from the keyboard; a floor finish and putting it back; decorating the guest room; the stairs and the door, also mid-service; a service in a tavern refurnished as a dwarven hall; and in `DayLoopTests` a tier announced once with both rooms' looks surviving Continue).
+
+**Captures** (`CheckpointBCaptures`, explicit; `BatchLogs/checkpointB/`): the starting tavern, the tavern restyled through palettes alone, a dwarven hall, a castle banquet and a haunted den built from the catalogue, the guest room as it starts and furnished, every ramp on the tavern's chair and table, the catalogue and the colour panels.
+
+**Web (2026-10-05):** built and served without caching. Checked with your version 5 save: Continue (migrated, the guest room arrived furnished), Decorate with the mouse and keys, the catalogue (pages, buying a table onto the cursor, placing it), the colour panel (a teal cushion), switching to the guest room, laying a plum floor there, leaving (saved), reloading and Continue (all kept), sleeping into the next day, opening for the evening, walking up the stairs mid-service and back down through the guest room's door. No console errors were seen (the console was watched from part-way through).
+
+**Deviations from the plan:**
+- The guest room's shell is Shop Indoor's cream-walled room, not the Towns II plank interior: the plank tileset is a dark modular exterior-style set; the shop room matches the tavern's cell geometry (so the same cutting works) and reads as a warm inn room. It's 18×13 cells rather than about 12×9, which looked lost on screen.
+- The stairs work during service: until the village milestone the keeper walks only during service (the daytime, Prep and Night are panels), so blocking them then would have made them unreachable. Customers keep waiting while you're upstairs, and the evening's end brings you back down.
+- The old storage panel became the catalogue's first page.
+- The Animated UI Book wasn't used: the parchment panel keeps the list and details readable at 320×180.
+- The catalogue's hand-coded pieces (the stations, the 4e tables, chairs, barrels and back-wall pieces) stay in `FurnitureContent` because of their use points, posts and overlays; their prices, themes, descriptions and palette channels are set there too.
+
+**Known issues (Checkpoint B):**
+- A few wall pieces drawn over the stairs' top (x 9–12 of the back wall) are partly hidden by the staircase art.
+- The castle rugs' centring under 2×2 tables is half a tile off in the review capture (placement, not the art).
+- The wooden lantern and paper-lantern stands are large; judge them in the room.
+- The haunted den capture has one seat whose approach can't be reached (a warning, as designed).
+
+**Checkpoint B is waiting for your playtest.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
