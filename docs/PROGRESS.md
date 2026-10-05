@@ -660,6 +660,10 @@ All of 4d's criteria are met in the editor and, where the browser could drive it
 
 **Deferred:** the Biome 1 boss, Delve Marks, more weapons, the Harvest Finisher and Kitchen Arts (4e; the arena's elite wave is a placeholder until then); furnishing discoveries and quest objects as rewards (4f, 4g; the extension points exist); the village day that replaces the daytime placeholder, and where upgrades are bought in a life-sim day (village milestones); whether the delve can be skipped and a ticking clock (GDD §13 Open 10).
 
+**4d playtest (2026-10-04): the loop works.** Two changes from it:
+- **The dodge faced front-right whatever its direction.** The Townsfolk's jump (the dodge) has one row in the pack, front-right, so every facing reused it. A dodge to the left now shows it mirrored (`SpriteAnim.mirrorForLeft`, set only on that animation); up and down dodges keep the front-facing hop, as there's no back-facing jump art. Tested in EditMode and in play.
+- **Essence never pressed:** the arena was easy to reach with plenty left, so the run is shorter in play than the 6–7 minute estimate. **Drain 0.15 → 0.2/s**: drain alone now lasts about 8 minutes; a full run of about 6 minutes spends about 72 of 100 on drain, leaving about 28, two or three hits. Expect to reach the arena low, with a messy floor 2 making the rope tempting; upgrades (+20 a level) and the delve meal (+15 to +25) still buy real margin, and the drain-based meal and slow burn are worth a little more again. `EssenceTuningTests` now assumes a 6-minute run. If the run log's end-of-run lines (development builds, in the console) are shared after the next playtest, the next adjustment can come from measured times.
+
 **Next: your full-loop playtest and sign-off, then the 4e plan.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
@@ -704,7 +708,7 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 - **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
 - **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f). It passed in all four complete PlayMode runs during 4d step 5.
 - **Run length and the Essence budget are estimates** (4d step 5): the run log (development builds) measures them; your playtest should replace them.
-- **The delve meal's drain drinks and slow burn are worth less** now that drain is 0.15/s; a playtest question, not changed.
+- **The delve meal's drain drinks and slow burn are worth less** at a low drain (0.2/s since the playtest); a playtest question, not changed.
 - **The day's story isn't saved:** a night resumed from a save shows only what that session played (the purse and Renown always).
 - **Quitting mid-delve** loses that run (by design: no mid-run saves); Continue starts the night's delve again.
 - **Not driven in the web smoke test:** combat, power choices, the death screen, the satchel swap and a controller (synthetic input can't fight); PlayMode tests cover them.
