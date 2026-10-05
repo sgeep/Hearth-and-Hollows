@@ -27,6 +27,8 @@ namespace Hearthdelve.Dungeon.Bosses
         public FrenzySettings frenzy = new();
 
         [Header("Reward (4e step 4): dropped where it falls")]
+        [Range(0f, 1f), Tooltip("Essence restored when it falls, as a share of the player's maximum (4e playtest: all of it).")]
+        public float essenceOnDefeat = 1f;
         [Min(0), Tooltip("Run Gold: unbanked until the delve ends well, like any other.")]
         public int gold = 120;
         [Tooltip("The larder cache: guaranteed parts (ordinary parts for the satchel), from the deeper Cellars.")]
@@ -64,6 +66,10 @@ namespace Hearthdelve.Dungeon.Bosses
         public float spoilDamage = 40f;
         [Min(0f), Tooltip("Seconds after a meal before it goes for another part.")]
         public float eatCooldown = 2.5f;
+        [Min(0.5f), Tooltip("Seconds without getting closer to a part before it gives up on it (a part it can't reach, e.g. against a pillar).")]
+        public float giveUpSeconds = 2f;
+        [Min(0.05f), Tooltip("Getting this much closer, in tiles, counts as progress towards a part.")]
+        public float progressStep = 0.25f;
     }
 
     /// <summary>A boss's second phase: below a share of its health it roars and fights harder (4e step 2).</summary>

@@ -31,12 +31,19 @@ namespace Hearthdelve.Dungeon.Bosses
         float m_EatLeft;
         float m_HealthAtStart;
         float m_ReadyAt;
+        float m_Best;
+        float m_StuckFor;
+        // Parts it gave up on (out of its reach): never chased again.
+        readonly System.Collections.Generic.HashSet<IngredientPickup> m_Unreachable = new();
 
         public bool IsEating { get; private set; }
         /// <summary>The part it's going for or eating, if any.</summary>
         public IngredientPickup Food { get; private set; }
         public int Eaten { get; private set; }
         public int Spoiled { get; private set; }
+        public int GaveUp { get; private set; }
+        /// <summary>The walk to its part: the closest it has been, and how long since it got closer (for tests and tuning).</summary>
+        public Vector2 Approaching => new(m_Best, m_StuckFor);
 
         FeedingSettings Settings => m_Boss != null ? m_Boss.feeding : null;
 
@@ -61,6 +68,8 @@ namespace Hearthdelve.Dungeon.Bosses
             if (s == null || !s.enabled || m_Health.CurrentHealth <= 0f || Time.time < m_ReadyAt) return false;
             if (Food != null && Food.Count > 0 && Food.IsCollectable) return true;
             Food = Nearest();
+            m_Best = Food != null ? Vector2.Distance(transform.position, Food.transform.position) : 0f;
+            m_StuckFor = 0f;
             return Food != null;
         }
 
@@ -73,7 +82,7 @@ namespace Hearthdelve.Dungeon.Bosses
             float bestDistance = float.MaxValue;
             foreach (IngredientPickup pickup in FindObjectsByType<IngredientPickup>(FindObjectsSortMode.None))
             {
-                if (pickup.Count <= 0 || !pickup.IsCollectable) continue;
+                if (pickup.Count <= 0 || !pickup.IsCollectable || m_Unreachable.Contains(pickup)) continue;
                 float d = Vector2.Distance(transform.position, pickup.transform.position);
                 if (d < bestDistance)
                 {
@@ -82,6 +91,22 @@ namespace Hearthdelve.Dungeon.Bosses
                 }
             }
             return best;
+        }
+
+        /// <summary>
+        /// Called each frame it walks to its part (the Feed state). If it stops getting closer it gives up on that part, so it
+        /// never grinds against a pillar: back to the fight, and it won't try that part again.
+        /// </summary>
+        public void Approach(float deltaTime)
+        {
+            FeedingSettings s = Settings;
+            if (FoodGone || s == null || IsEating) return;
+            float distance = Vector2.Distance(transform.position, Food.transform.position);
+            if (!FeedingRules.Stalled(ref m_Best, ref m_StuckFor, distance, deltaTime, s.progressStep, s.giveUpSeconds)) return;
+            GaveUp++;
+            m_Unreachable.Add(Food);
+            Food = null;
+            m_ReadyAt = Time.time + s.eatCooldown;
         }
 
         /// <summary>Starts eating the part in reach (the AI's Eat state).</summary>

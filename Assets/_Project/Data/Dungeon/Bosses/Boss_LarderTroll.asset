@@ -29,6 +29,8 @@ MonoBehaviour:
     healFraction: 0.08
     spoilDamage: 40
     eatCooldown: 2.5
+    giveUpSeconds: 2
+    progressStep: 0.25
   frenzy:
     enabled: 1
     atHealth: 0.5
@@ -37,6 +39,7 @@ MonoBehaviour:
     chainSlams: 1
     chargesSpillScraps: 1
     tint: {r: 1, g: 0.72, b: 0.66, a: 1}
+  essenceOnDefeat: 1
   gold: 120
   cache:
   - ingredient: {fileID: 11400000, guid: 62cb142cf19470742bd2a4d436de2451, type: 2}
