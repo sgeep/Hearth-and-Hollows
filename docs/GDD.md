@@ -1,8 +1,10 @@
-# HEARTHDELVE — Project Design Document
+# HEARTH & HOLLOWS — Project Design Document
 
-*Working title. Version 0.5 (village life-sim direction: daily loop, Brackenford's villagers and Visitors, the Inn, farming, ranching and fishing, the surface and dungeon ingredient model; Stronghold and defense direction dropped, 2026-10-04; learning priorities, tavern customization, decor rewards, worker customization, 2026-10-04; design philosophy, tavern immersion, quests and relationships in v0.3, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
+*Working title: **Hearth & Hollows** (renamed from Hearthdelve on 2026-10-05). Version 0.5 (title and terminology pass, 2026-10-05: Hearth & Hollows, the Hollows, delves; village life-sim direction: daily loop, Brackenford's villagers and Visitors, the Inn, farming, ranching and fishing, the surface and dungeon ingredient model; Stronghold and defense direction dropped, 2026-10-04; learning priorities, tavern customization, decor rewards, worker customization, 2026-10-04; design philosophy, tavern immersion, quests and relationships in v0.3, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
 
 > **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections and lines added in v0.3 are marked **(added in v0.3)** or *(v0.3)*, those added in v0.4 **(added in v0.4)** or *(v0.4)*, and those added or rewritten in v0.5 **(added in v0.5)**, **(rewritten in v0.5)** or *(v0.5)*; they record design direction and do not widen any milestone's approved scope (the roadmap in Section 11.1 says what each milestone builds). Sections without a mark are unchanged from v0.1. Version 0.5 moves the game's identity toward a fantasy life sim centred on the tavern; the Stronghold direction and the old day order it replaces are kept in [Appendix C](#appendix-c-superseded-v04-stronghold-direction-and-day-order). Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
+>
+> **Names (2026-10-05).** The game's working title is **Hearth & Hollows** (it was Hearthdelve) and the underground world is **the Hollows** (it was "the Dungeons"). Current text uses the new names without per-line marks; appendices and historical notes keep the old ones. "Dungeon" remains the technical and genre term: the dungeon gameplay layer, its code, scenes and assets, and the repository, project and code name Hearthdelve, are unchanged (Section 14).
 
 ---
 
@@ -10,22 +12,24 @@
 
 ### 1.1 Elevator Pitch (rewritten in v0.5)
 
-**Experience target:** *Live in a strange fantasy village, grow and gather ingredients, run and personalize your tavern and inn, build relationships with villagers and visitors, and descend into the dungeon at night for things the surface world cannot provide.*
+**Experience target:** *Live in a strange fantasy village, grow and gather ingredients, run and personalize your tavern and inn, build relationships with villagers and visitors, and descend into the Hollows at night for things the surface world cannot provide.*
 
-You inherit the Sunken Flagon, a tavern and inn in the small frontier village of Brackenford, built over the mouth of an ancient dungeon. Your days are your own: tend a garden plot and a few animals, fish, shop, decorate the tavern and its guest rooms, run errands and get to know the odd, warm people who live here (the kind of village where an elderly skeleton might keep bees and nobody finds that strange). In the evening you open the doors, cook and serve: some of the faces at the tables are your neighbours, others are Visitors passing through, and a few of those Visitors may take a room upstairs and, if you help them, settle into one of the village's empty plots. When the tavern closes, you descend into **the Dungeons**, fighting room by room through top-down, hack-and-slash runs for monster parts, rare and magical ingredients, strange discoveries and things your neighbours asked you to find. Then you come home, sleep, and the next day begins.
+You inherit the Sunken Flagon, a tavern and inn in the small frontier village of Brackenford, built over a way down into **the Hollows**, the ancient underworld beneath the village. Your days are your own: tend a garden plot and a few animals, fish, shop, decorate the tavern and its guest rooms, run errands and get to know the odd, warm people who live here (the kind of village where an elderly skeleton might keep bees and nobody finds that strange). In the evening you open the doors, cook and serve: some of the faces at the tables are your neighbours, others are Visitors passing through, and a few of those Visitors may take a room upstairs and, if you help them, settle into one of the village's empty plots. When the tavern closes, you delve into the Hollows, fighting room by room through top-down, hack-and-slash runs for monster parts, rare and magical ingredients, strange discoveries and things your neighbours asked you to find. Then you come home, sleep, and the next day begins.
 
-The dungeon is still a major pillar, but it is one part of a broader daily life rather than the whole game with a tavern between runs. *(The v0.2 pitch, built around a home that grows into a fortified Stronghold, is in Appendix C.)*
+Delving into the Hollows is still a major pillar, but it is one part of a broader daily life rather than the whole game with a tavern between runs. *(The v0.2 pitch, built around a home that grows into a fortified Stronghold, is in Appendix C.)*
+
+**The title** *(added 2026-10-05)*. *Hearth & Hollows* names the game's two halves and the contrast between them: **warmth and community above; mystery and danger below.** The **Hearth** is home: the tavern and the Inn, cooking, the village and its people, relationships, farming, ranching and fishing, and a property the player makes their own. The **Hollows** are what lies beneath Brackenford: danger, monsters, mystery, rare ingredients, quests, strange discoveries, the rewards of the deep, and the ancient forces stirring below. The game is a life sim centred on the hearth, with the Hollows as one of its major pillars, not an action roguelite with a home attached.
 
 ### 1.2 Genre and Inspirations (rewritten in v0.5)
 
-Hybrid: a top-down fantasy life sim centred on owning and running a tavern and inn, with a top-down action roguelite dungeon beneath it.
+Hybrid: a top-down fantasy life sim centred on owning and running a tavern and inn, with a top-down action roguelite dungeon, the Hollows, beneath it.
 
 | Inspiration | What we take from it |
 |---|---|
 | *Stardew Valley* *(v0.5)* | The overall shape: a free daytime in a small village whose residents you come to know, growing and gathering your own ingredients, a day that ends in sleep. Not a template: its mechanics (crops, seasons, the clock, gifting) are not copied automatically (Section 13) |
 | *Cult of the Lamb* | Short top-down combat runs feeding a home that grows; residents with personalities. *(v0.5: no longer the overall shape; the home is a tavern, inn and village, not a cult compound or fortress)* |
 | *Hades* | Combat feel: 8-direction movement, dodge with i-frames, light combo plus a heavy/charged attack; room-by-room runs where you pick the next room by its reward |
-| *Moonlighter* | A shopkeeper who delves; what you carry out of the dungeon is what you sell. *(v0.5: the order is now tavern in the evening, dungeon at night)* |
+| *Moonlighter* | A shopkeeper who delves; what you carry out of the dungeon is what you sell. *(v0.5: the order is now tavern in the evening, the delve at night)* |
 | *Dave the Diver* | Minigame-driven cooking and service, a limited "oxygen" resource (our Essence), charming NPC cast |
 | *Delicious in Dungeon* | Monsters as food, the ecology and "cookability" of creatures, how you kill something affecting how it tastes |
 | *Warcraft / Lord of the Rings* | Classic high-fantasy world: humans, dwarves, elves, orcs, ancient evils, kingdoms under threat |
@@ -33,12 +37,12 @@ Hybrid: a top-down fantasy life sim centred on owning and running a tavern and i
 ### 1.3 Design Pillars
 
 1. **Every kill is a harvest.** Combat is not only about survival; *how* you fight determines what you bring home.
-2. **The surface and the depths, one life.** *(rewritten in v0.5)* Village life, the tavern and the dungeon feed each other. The surface provides dependable ingredients, people and a home; the dungeon provides what the surface can't: monster and magical ingredients, discoveries and stories. No part should feel like a detour from the "real" game.
+2. **The surface and the depths, one life.** *(rewritten in v0.5)* Village life, the tavern and the Hollows feed each other. The surface provides dependable ingredients, people and a home; the Hollows provide what the surface can't: monster and magical ingredients, discoveries and stories. No part should feel like a detour from the "real" game.
 3. **A home and a community that grow with you.** *(rewritten in v0.5)* The Sunken Flagon grows into a larger tavern, inn and home inside a village whose people know Bram, some of whom are there because of him. *(It no longer grows into a fortified Stronghold; Appendix C.)*
 4. **Cozy on the surface, dread below.** The warmth of the village and the tavern, warm, funny and a little strange, contrasts with the menace of the depths.
 5. **You can feel it.** *(added in v0.2)* Every important moment lands through visuals, sound and haptics together.
 6. **Your tavern, your hands.** *(added in v0.3)* Tavern immersion: running the Sunken Flagon should feel physical and present. You walk the room, work the stations, carry the plates and watch strange monster parts become recognizable dishes. Immersion serves the fun and is never an excuse for busywork (Section 6.5).
-7. **A home you made.** *(added in v0.4)* The Sunken Flagon increasingly becomes a place the player personally created: they choose how it looks and how it works, and fill it with things they bought, earned and dragged up from the dungeon. "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done" (Section 6.6).
+7. **A home you made.** *(added in v0.4)* The Sunken Flagon increasingly becomes a place the player personally created: they choose how it looks and how it works, and fill it with things they bought, earned and dragged up from the Hollows. "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done" (Section 6.6).
 
 ### 1.4 Target Platform and Audience
 
@@ -60,12 +64,12 @@ The goal is not systems that work correctly; it is the experience the player has
 - Does it support good pacing and flow?
 - Is the complexity producing interesting decisions, or merely more work?
 - Does the player get clear and satisfying feedback?
-- Does it reinforce Hearthdelve's theme, world and other systems?
+- Does it reinforce Hearth & Hollows' theme, world and other systems?
 - Can the idea be tested cheaply before we commit to a large build?
 
 **Lenses as perspectives, not rules.** Jesse Schell's *The Art of Game Design: A Book of Lenses* is the project's recurring vocabulary for questioning a design. Schell presents each lens as a different way of looking at a design, and that is how we use them: pick the lenses that reveal something about the problem in front of us. No feature has to satisfy every lens, and a lens is never a box to tick. When an important design choice is proposed, it states the player experience it targets and, where useful, the lens or principle behind it; but the argument has to stand on its own, and "Schell says so" is not a reason. (The book is reference material only and is not kept in the repository.)
 
-Where each lens most often matters in Hearthdelve:
+Where each lens most often matters in Hearth & Hollows:
 
 | Lens | Where it tends to bite |
 |---|---|
@@ -86,11 +90,11 @@ Where each lens most often matters in Hearthdelve:
 | Juiciness | Hits, flips, pours and plating that feel good simply to do |
 | Interest Curve | The shape of a delve, an evening and an act, with peaks for bosses and signature dishes |
 | Character / Character Web | Gundra, Pip, Ser Aldric, Sylvaris, Grukka and the regulars, and how they relate to Bram and each other (Section 2.7) |
-| World | Aldmere, Brackenford and the dungeons' ecology: why monsters are edible, who lives in the village, why Visitors come |
+| World | Aldmere, Brackenford and the Hollows' ecology: why monsters are edible, who lives in the village, why Visitors come |
 | Playtesting | The final judge (below) |
 | Technology | Choosing tools that serve the experience, and not letting a tool's shape dictate the design |
 
-**Playtesting over theory.** Hearthdelve keeps its prototype-and-playtest approach: every sub-milestone step is playtested before the next. A theoretically elegant design that feels bad in play is not a successful design. For uncertain or expensive ideas:
+**Playtesting over theory.** Hearth & Hollows keeps its prototype-and-playtest approach: every sub-milestone step is playtested before the next. A theoretically elegant design that feels bad in play is not a successful design. For uncertain or expensive ideas:
 
 1. identify the desired experience;
 2. identify the smallest version that can test it;
@@ -101,7 +105,7 @@ Where each lens most often matters in Hearthdelve:
 
 Player feedback is interpreted, not blindly obeyed. What players actually experience and do matters more than the solution they suggest.
 
-**Meaningful complexity over system count.** Hearthdelve is not judged by how many mechanics it has. It already combines action combat, roguelite runs, harvesting, inventory and freshness, cooking minigames, tavern service, economy and upgrades, quests, relationships and story, and the v0.5 direction adds village life, farming, ranching, fishing and the Inn, so a smaller number of systems that interact richly beats many isolated ones. Before adding a rule or subsystem, ask:
+**Meaningful complexity over system count.** Hearth & Hollows is not judged by how many mechanics it has. It already combines action combat, roguelite runs, harvesting, inventory and freshness, cooking minigames, tavern service, economy and upgrades, quests, relationships and story, and the v0.5 direction adds village life, farming, ranching, fishing and the Inn, so a smaller number of systems that interact richly beats many isolated ones. Before adding a rule or subsystem, ask:
 
 - Does it create new decisions?
 - Does it interact with existing systems?
@@ -113,7 +117,7 @@ Nothing is added only because another RPG or management game has it.
 
 **Immersion and convenience.** Tavern immersion is a pillar, but immersion is a preference, not permission to create tedium. When the two conflict, neither extreme wins automatically; the question is what experience the interaction actually produces. Section 6.5 has the details.
 
-**Learning priorities** *(added in v0.4)*. Hearthdelve is meant to become a finished, coherent game, and it is also a deliberate way for its designer to practise the parts of game development they most enjoy:
+**Learning priorities** *(added in v0.4)*. Hearth & Hollows is meant to become a finished, coherent game, and it is also a deliberate way for its designer to practise the parts of game development they most enjoy:
 
 1. interactive dialogue writing;
 2. building and tavern customization;
@@ -122,11 +126,11 @@ Nothing is added only because another RPG or management game has it.
 5. persistent NPC relationships and reactivity;
 6. top-down action combat.
 
-*(v0.5)* The village life-sim direction strengthens all six: daytime gives dialogue, relationships and funny NPC moments a place to live outside service, the Inn extends customization, farming and fishing feed the kitchen, and the dungeon keeps combat purposeful by sending the player down for things people actually want.
+*(v0.5)* The village life-sim direction strengthens all six: daytime gives dialogue, relationships and funny NPC moments a place to live outside service, the Inn extends customization, farming and fishing feed the kitchen, and the Hollows keep combat purposeful by sending the player down for things people actually want.
 
 This shapes where complexity and content budget go. In these areas the goal is **not always the smallest number of systems or pieces of content**: depth, iteration, experimentation and variety have value of their own. A large furnishing catalog, several distinct cooking minigames and elaborate premium recipes, substantial dialogue and reactivity for important characters, and lots of amusing contextual NPC moments are all welcome. When one of these pillars has two viable options, the smaller one is not chosen automatically for being smaller: prefer the option that makes the more useful and enjoyable design experiment while staying maintainable.
 
-The other rules still hold. "Meaningful complexity over system count" governs everything outside these pillars, and inside them every step, rule and piece of content still has to earn its place (no busywork, no stages that only add time, no feature because another game has it). Unrelated technical systems get the minimum that serves the game. Combat should be responsive, readable and satisfying, with interesting enemies and bosses worth fighting, but it is one pillar among six: it does not grow into a combat-engineering project that crowds out customization, cooking, dialogue, NPC interactions or relationships. The dungeon is as much a source of ingredients, stories, discoveries and objects for the player's home as it is a fight.
+The other rules still hold. "Meaningful complexity over system count" governs everything outside these pillars, and inside them every step, rule and piece of content still has to earn its place (no busywork, no stages that only add time, no feature because another game has it). Unrelated technical systems get the minimum that serves the game. Combat should be responsive, readable and satisfying, with interesting enemies and bosses worth fighting, but it is one pillar among six: it does not grow into a combat-engineering project that crowds out customization, cooking, dialogue, NPC interactions or relationships. The Hollows are as much a source of ingredients, stories, discoveries and objects for the player's home as they are a fight.
 
 ---
 
@@ -136,11 +140,13 @@ The other rules still hold. "Meaningful complexity over system count" governs ev
 
 The world of **Aldmere** is a traditional high-fantasy continent: human kingdoms, dwarven holds carved into mountains, elven forests, orcish clans of the steppes, and wild borderlands between them. Ages ago a civilization delved too deep and sealed what it found beneath the earth. Those seals are failing.
 
-**The Dungeons** are not ordinary caves. They are living, shifting underworlds that rearrange themselves (justifying procedural layouts). Each one grows outward and upward over time, and monsters from their depths are beginning to emerge onto the surface.
+**The Hollows** are the underground world beneath Brackenford, and they are not ordinary caves. They are a living, shifting underworld that rearranges itself (justifying procedural layouts), reaching down through distinct regions from the old cellars under the village to the Heart at the bottom (Section 4.6). The Hollows grow outward and upward over time, and monsters from their depths are beginning to emerge onto the surface. Villagers have their own stories about the Hollows, and some may have their own superstitions or slang for the different depths.
+
+*(2026-10-05)* The world's three main places are **Brackenford** (the village and its community), **the Sunken Flagon** (the player's tavern and inn) and **the Hollows** (the world below).
 
 ### 2.2 The Tavern
 
-**The Sunken Flagon** sits in the frontier village of **Brackenford**, built directly over a dungeon entrance that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the shallow floors. The player inherits the tavern at the start of the game (see Act I).
+**The Sunken Flagon** sits in the frontier village of **Brackenford**, built directly over an entrance to the Hollows that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the upper Hollows. The player inherits the tavern at the start of the game (see Act I).
 
 *(v0.5)* The Sunken Flagon is a tavern **and an inn**: guest rooms are part of the property and grow with it (Section 6.8). Brackenford is no longer only a name on the sign: it is a small, persistent village around the tavern that the player lives in (Section 2.8).
 
@@ -154,15 +160,15 @@ A retired (or reluctant) adventurer who has taken over the tavern. The protagoni
 
 > **(v0.5) Awaiting story revision.** The four acts below were written for the Sanctuary-to-Stronghold direction, which v0.5 drops. They are kept unchanged so no story material is silently lost, but Acts II–IV conflict with the village life-sim direction in places (refugees and a wall, a fortified Stronghold, a world war footing, "the whole stronghold rallies"). The conflicts are listed in Section 2.9; revising the acts is a story decision for the owner. Act I fits the new direction as written.
 
-The story unfolds in four acts, advanced by reaching dungeon depths and by tavern milestones (renown, sanctuary capacity).
+The story unfolds in four acts, advanced by reaching new depths of the Hollows and by tavern milestones (renown, sanctuary capacity).
 
-**Act I — The Inn (Biomes 1–2).** Bram inherits the Sunken Flagon from a mentor who vanished in the dungeon. Business is slow. A wandering dwarf cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the dungeon walls.
+**Act I — The Inn (Biomes 1–2).** Bram inherits the Sunken Flagon from a mentor who vanished in the Hollows. Business is slow. A wandering dwarf cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the walls of the Hollows.
 
-**Act II — The Sanctuary (Biomes 3–4).** Travelers bring news: other dungeons have opened across Aldmere. Monsters raid nearby farms. Refugees begin arriving at the tavern looking for food and safety. Bram expands the inn into a sanctuary with rooms, a wall, and space for newcomers. Some refugees have skills and join the tavern's workforce. The player learns the dungeons are connected beneath the world.
+**Act II — The Sanctuary (Biomes 3–4).** Travelers bring news: other openings into the deep have appeared across Aldmere. Monsters raid nearby farms. Refugees begin arriving at the tavern looking for food and safety. Bram expands the inn into a sanctuary with rooms, a wall, and space for newcomers. Some refugees have skills and join the tavern's workforce. The player learns these openings all lead down into the Hollows, which run beneath the world.
 
 **Act III — The Stronghold (Biomes 5–6).** A neighboring kingdom falls. The tavern becomes one of the last safe places on the frontier. Soldiers, a disgraced knight, an elven scout and an orc warband arrive, uneasy allies. The tavern is fortified. Patrons now watch Bram's delves with hope; their morale becomes a mechanical force (see Section 6.4). Bram discovers what happened to his mentor.
 
-**Act IV — The Champion (Biome 7 and the Heart).** The source of the dungeons is revealed at the deepest point beneath Brackenford. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post-game: endless/ascension mode and "legendary" ingredients.
+**Act IV — The Champion (Biome 7 and the Heart).** The source of what stirs in the Hollows is revealed at their deepest point beneath Brackenford. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post-game: endless/ascension mode and "legendary" ingredients.
 
 ### 2.5 Key Characters (Draft)
 
@@ -171,11 +177,11 @@ The story unfolds in four acts, advanced by reaching dungeon depths and by taver
 | **Bram Holloway** | Protagonist, tavern keeper and delver |
 | **Gundra Ashbelly** (dwarf) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
 | **Pip Marrowby** (halfling) | Server and bookkeeper; runs the floor during service |
-| **Old Tamsin** | Former owner/mentor, missing in the dungeon; central mystery |
+| **Old Tamsin** | Former owner/mentor, vanished in the Hollows; central mystery |
 | **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
 | **Sylvaris** (elf) | Herbalist and scout; unlocks herb garden and brewing depth *(v0.5: a natural fit for farming; Section 2.9)* |
 | **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder *(v0.5: the fortification role no longer has a home; Section 2.9)* |
-| **The Warden Below** | The intelligence behind the dungeons; antagonist |
+| **The Warden Below** | The intelligence behind the Hollows; antagonist |
 
 *(v0.3)* Gundra, Pip, Ser Aldric, Sylvaris, Grukka and other important characters are the obvious candidates for personal questlines (Section 2.6) and persistent relationship state (Section 2.7), and they speak with Portrait Generator portraits (Section 8.1). Their quest trees and relationship progressions are not designed yet.
 
@@ -189,7 +195,7 @@ A real, persistent quest and objective system is a required feature. **Quest Mac
 - personal questlines for important NPCs;
 - villager and resident questlines, including the requests that move a Visitor toward settling in the village (Sections 2.8, 6A.5); *(v0.5: these replace the refugee questlines of the Stronghold direction)*
 - meaningful requests from patrons and customers, including requests for particular monster parts or ingredients ("bring me cave troll liver");
-- exploration and discovery objectives, including villagers' errands that send Bram into the dungeon to retrieve something, find a rare ingredient, investigate a place, defeat a creature or bring back a strange object *(v0.5)*;
+- exploration and discovery objectives, including villagers' errands that send Bram into the Hollows to retrieve something, find a rare ingredient, investigate a place, defeat a creature or bring back a strange object *(v0.5)*;
 - onboarding and tutorial objectives, where they help;
 - multi-stage objectives and their rewards.
 
@@ -208,16 +214,16 @@ Three different things, kept separate:
 | Measure | What it describes | Drives |
 |---|---|---|
 | **Renown** | The reputation of the Sunken Flagon as a tavern | Customer tiers, story progress (Section 7.1) |
-| **Morale** | *(v0.5, reinterpreted)* The state of the village community as a whole | **Cheer** in the dungeon (Section 6.4) |
+| **Morale** | *(v0.5, reinterpreted)* The state of the village community as a whole | **Cheer** in the Hollows (Section 6.4) |
 | **Disposition** | What one named character, or a relevant faction, thinks of Bram | That character's dialogue, quests, help and reactions |
 
-**What characters remember.** Selected characters remember and react to meaningful things, such as: conversations; completing or failing their requests; favours; being served something they love or dislike in the tavern; gifts and food, where appropriate; Bram finding ingredients that matter to them; helping people they care about; major story choices; helping Visitors and residents; tavern and inn improvements or failures; dungeon accomplishments; events they witness in the tavern or the village; changes in the village, such as who has moved in; and repeated good or bad interactions.
+**What characters remember.** Selected characters remember and react to meaningful things, such as: conversations; completing or failing their requests; favours; being served something they love or dislike in the tavern; gifts and food, where appropriate; Bram finding ingredients that matter to them; helping people they care about; major story choices; helping Visitors and residents; tavern and inn improvements or failures; accomplishments in the Hollows; events they witness in the tavern or the village; changes in the village, such as who has moved in; and repeated good or bad interactions.
 
 *(v0.5)* **Relationships matter more under the village direction.** The persistent villagers (Section 2.8) are the main relationship cast alongside the canonical characters, and Visitors who become Inn guests or resident candidates can develop relationships too. Renown (the tavern), Morale (the village community) and disposition (one character or faction) stay separate. **Love/Hate** remains the planned individual and faction relationship system unless a later technical review changes that. Whether romance exists, and how far relationships go, is open (Section 13).
 
 **What relationships can change.** Dialogue and barks, personal quests, gifts and rewards, willingness to help, special services or discounts where appropriate, story reactions, how patrons and residents behave, and optional content.
 
-**Scope.** Hearthdelve is not a dating sim or a large social sim. The goal is that important characters feel as if they know Bram, remember what has happened and live in the same world. Relationship state is used selectively, where it creates meaningful character moments.
+**Scope.** Hearth & Hollows is not a dating sim or a large social sim. The goal is that important characters feel as if they know Bram, remember what has happened and live in the same world. Relationship state is used selectively, where it creates meaningful character moments.
 
 **Contextual reactivity** *(v0.4)*. Funny, strange and memorable NPC interactions are a learning priority (Section 1.5), so dialogue and relationship work is designed for reactivity, not only linear conversations. Recurring characters should be able to remember earlier conversations, have preferences, disagree, develop running jokes, surprise the player, react to other residents, and comment on the world they share with Bram, including the tavern itself: a patron noticing the absurd monster trophy placed beside their favourite table, a resident who hates the new rug, someone recognizing a boss trophy (Section 6.6). Hearthdelve publishes the facts (what is placed where, what was just bought or found) for the adapters to expose as dialogue conditions and variables; the dialogue decides what is funny about them. Whether decor affects disposition mechanically is open (Section 13).
 
@@ -229,7 +235,7 @@ Long-term design direction. Nothing here is in the current milestone's scope; th
 
 **The village.** Brackenford is a small, persistent village around the Sunken Flagon. It is small enough that players learn who lives there: a place where people know each other, and come to know Bram. Its exact size, layout and buildings are not designed yet (Section 13).
 
-**Who lives there.** The population is mostly human, but classic fantasy peoples are normal neighbours: dwarves, elves, orcs, goblins, halflings, skeletons, liches and other fitting folk. A skeleton, a goblin, a lich or an orc can simply be a member of the community, with a job, a garden and opinions about the new rug in the tavern, rather than an enemy archetype that happens to be friendly. The tone is a **cozy fantasy community with odd people and occasional absurdity**, contrasted against a dangerous ancient dungeon: warm, funny and strange on the surface; dangerous below (pillar 4).
+**Who lives there.** The population is mostly human, but classic fantasy peoples are normal neighbours: dwarves, elves, orcs, goblins, halflings, skeletons, liches and other fitting folk. A skeleton, a goblin, a lich or an orc can simply be a member of the community, with a job, a garden and opinions about the new rug in the tavern, rather than an enemy archetype that happens to be friendly. The tone is a **cozy fantasy community with odd people and occasional absurdity**, contrasted against the Hollows, a dangerous ancient underworld: warm, funny and strange on the surface; dangerous below (pillar 4).
 
 **Three kinds of people.** Identity is tiered so that continuity is spent where it creates value, and so that the save doesn't grow with every stranger who ever ordered a stew.
 
@@ -248,7 +254,7 @@ The path is: **ordinary transient Visitor → potentially interesting Visitor �
 
 **Recruited residents** become persistent villagers: their generated identity is permanent, and they take part in schedules, dialogue, relationships, tavern visits, quests and interactions with other villagers. This is where generated characters become meaningful rather than disposable, so they must not rely on procedural dialogue alone. They use the same dialogue architecture as everyone else (Section 10.3): authored modular dialogue, conditions on traits, race and background, contextual barks, relationship state and event-driven responses. How much bespoke writing a recruited resident gets is decided when the system is designed.
 
-**Reactivity and comedy.** Meaningful, funny and strange NPC interactions are a learning priority (Section 1.5), and the village gives them room. Characters should be able to react to food, relationships, other villagers, strange Visitors, the tavern's decorations, dungeon trophies, monster ingredients, quests, events and who has moved into town. Hearthdelve publishes the facts; the dialogue decides what is funny about them (Section 2.7).
+**Reactivity and comedy.** Meaningful, funny and strange NPC interactions are a learning priority (Section 1.5), and the village gives them room. Characters should be able to react to food, relationships, other villagers, strange Visitors, the tavern's decorations, trophies from the Hollows, monster ingredients, quests, events and who has moved into town. Hearthdelve publishes the facts; the dialogue decides what is funny about them (Section 2.7).
 
 ### 2.9 Story Conflicts from the v0.5 Direction (added in v0.5)
 
@@ -257,14 +263,15 @@ The village direction leaves parts of the story written for the Stronghold direc
 1. **Act II, the Sanctuary.** Refugees arriving for food and safety, and the inn expanding into "a sanctuary with rooms, a wall, and space for newcomers". Guest rooms survive as the Inn (Section 6.8) and newcomers can become Visitors and residents (Section 6A.5), but the wall, and refugees as the main way people arrive, belong to the old direction.
 2. **Act III, the Stronghold.** A neighbouring kingdom falls, the tavern becomes "one of the last safe places on the frontier", soldiers and an orc warband arrive, and "the tavern is fortified". The fortification and war-footing premise is gone; the act needs a new shape.
 3. **Act IV, the Champion.** "The whole stronghold rallies" and the people Bram sheltered support the final descent. The idea of a community rallying behind Bram survives (it is what Morale and Cheer express, Section 6.4) but the stronghold framing does not, and the elevator pitch's "rallying point of a world looking for a champion" is a larger, more martial scale than a village life sim.
-4. **Story gating.** Acts advance by dungeon depth and by "tavern milestones (renown, sanctuary capacity)". Sanctuary capacity no longer exists; village and inn milestones (residents settled, Inn rooms, relationships) are candidates.
-5. **The surface threat.** Monsters raiding farms and dungeons spilling onto the surface gave the Stronghold its purpose. Some surface stakes may still be useful, but escalating surface danger pulls against "cozy on the surface, dread below" (pillar 4). Decide how much of the menace reaches the village.
+4. **Story gating.** Acts advance by depth in the Hollows and by "tavern milestones (renown, sanctuary capacity)". Sanctuary capacity no longer exists; village and inn milestones (residents settled, Inn rooms, relationships) are candidates.
+5. **The surface threat.** Monsters raiding farms and the Hollows' creatures spilling onto the surface gave the Stronghold its purpose. Some surface stakes may still be useful, but escalating surface danger pulls against "cozy on the surface, dread below" (pillar 4). Decide how much of the menace reaches the village.
 6. **Grukka Stonejaw** is "warband chief; blacksmith and fortification builder" and arrives with a warband in Act III. The blacksmith survives; the fortification role and the warband arrival need revision.
 7. **Ser Aldric Vane** arrives in Act II (weapon training). Compatible, but his arrival was framed by the sanctuary.
 8. **Sylvaris** unlocks the herb garden; farming (Section 6A.2) may make Sylvaris its natural mentor, or a garden may now come earlier than Sylvaris.
 9. **Canonical characters and the village.** It is undecided which canonical characters are Brackenford villagers from the start and which arrive later, and whether a late arrival uses one of the three empty plots (which would reduce the player's influence over who settles there).
-10. **Rescued NPCs and refugee staff.** "Rescued NPCs join the tavern" and "refugee staff unlock new dungeon abilities" (Section 3.3) relied on refugees; people rescued in the dungeon could instead become Visitors or resident candidates.
+10. **Rescued NPCs and refugee staff.** "Rescued NPCs join the tavern" and "refugee staff unlock new dungeon abilities" (Section 3.3) relied on refugees; people rescued in the Hollows could instead become Visitors or resident candidates.
 11. **Customer types.** "Refugees, and eventually soldiers and heroes" as customer tiers (Section 6.3) came from the war arc.
+12. **How far the Hollows reach** *(2026-10-05)*. The Hollows are the world beneath Brackenford, but Act II's news of "other dungeons" opening across Aldmere, "connected beneath the world", is now worded as other openings that all lead into the Hollows. Whether the Hollows run beneath all of Aldmere or are local to Brackenford, and whether those other openings stay in the story at all, is for the story revision.
 
 ---
 
@@ -275,12 +282,12 @@ The village direction leaves parts of the story written for the Stronghold direc
 **Wake → free daytime → evening prep → tavern service → nighttime delve → return and sleep → next day.**
 
 1. **Wake.** A new day in the Sunken Flagon.
-2. **Free daytime (the village and the property).** The player is free to spend the day as they like. Long term this includes decorating and rearranging the tavern, decorating and managing the Inn, farming, ranching, fishing, talking to villagers, relationship moments, quests and errands, shopping, exploring the village, managing ingredients and resources, and preparing for the evening or the dungeon (Section 6A). Daytime is **not** a menu leading straight into the delve: it becomes a free-roaming life-sim part of the day.
+2. **Free daytime (the village and the property).** The player is free to spend the day as they like. Long term this includes decorating and rearranging the tavern, decorating and managing the Inn, farming, ranching, fishing, talking to villagers, relationship moments, quests and errands, shopping, exploring the village, managing ingredients and resources, and preparing for the evening or the night's delve (Section 6A). Daytime is **not** a menu leading straight into the delve: it becomes a free-roaming life-sim part of the day.
 3. **Evening: the tavern.** The player decides to prepare and open the tavern. The established flow stays: **Prep → open → cook and serve → Results → close.** The physical service gameplay remains central (Sections 6.1, 6.5). The crowd is a mix of named villagers and Visitors (Section 6.3).
-4. **Night: the delve.** After the tavern closes, the player may descend into the dungeon (Section 4). There is **no separate time-of-night limit:** Essence remains the dungeon's only health pool and its only time pressure (Section 4.4).
+4. **Night: the delve.** After the tavern closes, the player may delve into the Hollows (Section 4). There is **no separate time-of-night limit:** Essence remains the delve's only health pool and its only time pressure (Section 4.4).
 5. **Return and sleep.** Coming back from the delve, by extraction, death or Essence running out, ends the day and leads to sleep and the next morning. The day's autosave happens on sleeping.
 
-For now the sequence is fixed as **tavern → dungeon → sleep**. Whether the player may eventually skip the nightly delve and simply sleep (the life-sim side may make some days long) is an **open question**, not decided (Section 13).
+For now the sequence is fixed as **tavern → delve → sleep**. Whether the player may eventually skip the nightly delve and simply sleep (the life-sim side may make some days long) is an **open question**, not decided (Section 13).
 
 **What moved from the old day.** The v0.4 day ran Morning (a prep menu) → Delve → Evening service → Night (upgrades, story, save); it is kept in Appendix C. Under the new day:
 
@@ -292,11 +299,11 @@ For now the sequence is fixed as **tavern → dungeon → sleep**. Whether the p
 
 **Consequences worth designing for.**
 
-- **The dungeon answers tomorrow.** The haul comes home at night and is cooked the next evening, so freshness now matters across a whole day in the storeroom (overnight loss already exists since 4c). Preservation, and which parts keep, become part of planning; the freshness tuning will need revisiting.
-- **Day one doesn't need the dungeon.** Surface ingredients (Section 5.5) let the first evening open before the first delve.
+- **The Hollows answer tomorrow.** The haul comes home at night and is cooked the next evening, so freshness now matters across a whole day in the storeroom (overnight loss already exists since 4c). Preservation, and which parts keep, become part of planning; the freshness tuning will need revisiting.
+- **Day one doesn't need a delve.** Surface ingredients (Section 5.5) let the first evening open before the first delve.
 - **The day's length.** A full daytime, a service and a delve in one sitting may be long. This is the reason the skip question and the daytime time model (Section 13) stay open until they are prototyped.
 
-**What is built today.** The 4c build implements the old order (Morning → Delve → Evening → Night → Sleep) through `GameFlow`. It stays as it is until the GameFlow integration step that adopts the new order (Section 11.1); 4d's run is developed standalone until then.
+**What is built today.** Since 4d step 5, `GameFlow` runs the new order (daytime → evening → the night's delve → night → sleep), with a daytime placeholder (the old morning panel: storeroom, the delve meal, open for the evening) standing in for free daytime until the village milestone (Section 11.1). *(Updated 2026-10-05; until 4d step 5 the build ran the old order, Morning → Delve → Evening → Night → Sleep.)*
 
 ### 3.2 Loop Diagram (rewritten in v0.5)
 
@@ -304,7 +311,7 @@ For now the sequence is fixed as **tavern → dungeon → sleep**. Whether the p
 flowchart LR
     W[Wake] --> D[Free daytime: village, farm, Inn, decorating, people]
     D --> E[Evening: prep, open, cook and serve, results]
-    E --> N[Night: delve into the Dungeon]
+    E --> N[Night: delve into the Hollows]
     N --> S[Return and sleep]
     S --> W
     D -- surface ingredients, requests, furnishings placed --> E
@@ -315,23 +322,25 @@ flowchart LR
 
 ### 3.3 How the Surface and the Depths Feed Each Other (rewritten in v0.5)
 
-| From the dungeon to the surface | From the surface to the dungeon |
+| From the Hollows to the surface | From the surface to the Hollows |
 |---|---|
 | Monster, rare and magical ingredients for special dishes | Gold buys weapons, armour and tools |
 | Harvest quality affects dish quality | Meals grant run buffs |
 | Rare parts unlock new recipes | Villagers' quests and customers' requests point a delve at a monster, place or object |
-| Found recipe scraps and lore | Relationships and residents unlock help, services and new dungeon abilities *(replaces "refugee staff")* |
-| Furnishing discoveries and boss trophies for the tavern and inn | Village Morale grants in-dungeon "Cheer" |
-| Quest objects that move villagers' stories on | Surface ingredients keep the everyday menu running, so the dungeon can be about the unusual |
-| People met in the dungeon may come to the tavern as Visitors *(open; Section 2.9)* | |
+| Found recipe scraps and lore | Relationships and residents unlock help, services and new delving abilities *(replaces "refugee staff")* |
+| Furnishing discoveries and boss trophies for the tavern and inn | Village Morale grants "Cheer" in the Hollows |
+| Quest objects that move villagers' stories on | Surface ingredients keep the everyday menu running, so the Hollows can be about the unusual |
+| People met in the Hollows may come to the tavern as Visitors *(open; Section 2.9)* | |
 
 ### 3.4 Daytime Time Model (added in v0.5)
 
-How daytime passes is **open** and expensive to reverse, so it is prototyped before it is chosen (Section 13): a continuously ticking clock in the style of *Stardew Valley*, player-controlled phase transitions (the day lasts until the player chooses to go and open the tavern), or something between. The choice shapes NPC schedules, farming, how long a day feels, and how much pressure the daytime carries; the tavern and the dungeon do not depend on it.
+How daytime passes is **open** and expensive to reverse, so it is prototyped before it is chosen (Section 13): a continuously ticking clock in the style of *Stardew Valley*, player-controlled phase transitions (the day lasts until the player chooses to go and open the tavern), or something between. The choice shapes NPC schedules, farming, how long a day feels, and how much pressure the daytime carries; the tavern and the delve do not depend on it.
 
 ---
 
-## 4. Dungeon Gameplay
+## 4. Dungeon Gameplay: Delving the Hollows
+
+*(2026-10-05)* This section describes the dungeon gameplay layer: delves into the Hollows, one region (biome) at a time.
 
 ### 4.1 Combat Feel (rewritten in v0.2)
 
@@ -370,9 +379,9 @@ The heart of the fantasy. How a monster dies influences what it drops. Unchanged
 
 ### 4.4 Essence, Inventory, Freshness, and Extraction
 
-- **Essence:** delves are limited by Essence, which drains over time in the dungeon and drops when the player takes damage. At zero Essence the player is forced out (treated as a death). It is the only health pool. Max Essence and drain rate are upgradeable in the tavern. *(v0.5)* The delve happens at night, after service, and there is no separate time-of-night limit: Essence is the only time pressure.
+- **Essence:** delves are limited by Essence, which drains over time in the Hollows and drops when the player takes damage. At zero Essence the player is forced out (treated as a death). It is the only health pool. Max Essence and drain rate are upgradeable in the tavern. *(v0.5)* The delve happens at night, after service, and there is no separate time-of-night limit: Essence is the only time pressure.
 - **The Satchel:** limited carry slots for ingredients (6 by default, stacks of up to 3), upgradeable in the tavern. Forces choices about what to keep. When it is full, picking up a part opens a swap prompt.
-- **Freshness:** parts decay over time in the dungeon. Salt, ice runes, and preservation jars extend freshness.
+- **Freshness:** parts decay over time during a delve. Salt, ice runes, and preservation jars extend freshness.
 - **Extraction:** the player can return via exit points (a rope or lift back to the tavern). Leaving early keeps everything; continuing deeper risks it.
 - **Death:** the player loses the entire haul except one satchel slot they choose to keep (the Lockbox, the whole stack in it), and loses the day's unspent run currency. Permanent unlocks are never lost.
 
@@ -397,11 +406,11 @@ Room rewards:
 - **A weapon**
 - **A run power-up**, chosen from three
 
-*(v0.4)* The run's reward model must not assume these are the only kinds. Persistent **customization discoveries** (Section 6.6) are a planned future reward kind, from enemy drops and possibly from rooms, and must plug in later without rewriting the run reward system. *(v0.5)* So are **quest objects** (things villagers asked Bram to bring back, Section 4.8). Ingredient rewards must not assume monster parts will be the player's only cooking ingredients: the surface supplies the everyday ones (Section 5.5), so the dungeon's ingredient rewards lean toward the unusual, the rare and the magical.
+*(v0.4)* The run's reward model must not assume these are the only kinds. Persistent **customization discoveries** (Section 6.6) are a planned future reward kind, from enemy drops and possibly from rooms, and must plug in later without rewriting the run reward system. *(v0.5)* So are **quest objects** (things villagers asked Bram to bring back, Section 4.8). Ingredient rewards must not assume monster parts will be the player's only cooking ingredients: the surface supplies the everyday ones (Section 5.5), so the ingredient rewards of the Hollows lean toward the unusual, the rare and the magical.
 
 Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floors plus a boss arena. Special rooms: campfire (field cooking), shop, extraction point.
 
-**Biomes and their Minifantasy packs.** Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
+**Biomes and their Minifantasy packs.** *(2026-10-05)* The biomes are regions of the one Hollows at increasing depth, not separate dungeons: the Cellars lie just beneath Brackenford and the Heart at the bottom. Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
 
 | # | Biome | Theme | Environment packs | Creature candidates | Boss candidate |
 |---|---|---|---|---|---|
@@ -412,7 +421,7 @@ Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floo
 | 5 | Ember Forge | Volcanic dwarven forge | Lava Forge, Dungeon Lava Pit, Volcano | Magma Hound, Magma Golem, Fire Elemental, Imp, Burning Skull | Dragon or Balrog |
 | 6 | Frostvault | Frozen crypts | Icy Wilderness, Ice Dungeon (More Dungeons) | Yeti, Wraith, Spectre, Skeleton, Evil Snowman | Lich or Ancient Troll |
 | 7 | The Rootdeep | Living, pulsing underworld | Lost Civilization, The Void, Chamber Of Secrets | Tree Spirits, Beholder, Alien Bio Horror, Shoggoth's Avatar | The King In Yellow |
-| — | The Heart | Final area | To be chosen | — | Demon Lord (as The Warden Below) |
+| — | The Heart | Final area, the deepest point of the Hollows | To be chosen | — | Demon Lord (as The Warden Below) |
 
 Changes from v0.1 forced by the art: there is no rat with an attack, so the Giant Rat and the Cellar King are replaced in Biome 1; the Leviathan Eel becomes the Kraken; other v0.1 monsters without art (boar-riders, crab knights, salamanders, ice trolls) are replaced by the candidates above.
 
@@ -422,15 +431,15 @@ Branching between biomes lets players choose which ingredients to target on a gi
 
 Each enemy has a **combat profile** (behavior, attacks, telegraphs) and a **harvest profile** (parts, preferred kill method, freshness rate). Bosses drop signature ingredients that unlock "Legendary Dishes" and progress the story. *(v0.4)* Enemies may later also carry a **decor drop profile** (a small chance of customization discoveries, by enemy and biome), and bosses can award rare or unique furnishings (Section 6.6). Boss candidates per biome are in Section 4.6. Enemies are chosen from creatures that have idle, move, attack, damage and death animations.
 
-### 4.8 The Dungeon's Role (added in v0.5)
+### 4.8 The Role of the Hollows (added in v0.5)
 
-The dungeon remains a major pillar: it is **the source of what the village cannot provide.** Its rewards can ultimately include monster ingredients, rare ingredients, magical materials, unique furnishing and customization discoveries (Section 6.6), boss trophies, quest objects, weapons and combat progression, run power-ups and other unusual discoveries.
+The Hollows remain a major pillar: they are **the source of what the village cannot provide.** Their rewards can ultimately include monster ingredients, rare ingredients, magical materials, unique furnishing and customization discoveries (Section 6.6), boss trophies, quest objects, weapons and combat progression, run power-ups and other unusual discoveries.
 
-**People send you down.** Villagers' quests frequently point into the dungeon: retrieve something, find a rare ingredient, investigate a location, defeat a creature, bring back a strange object. This ties dialogue and relationships directly to combat and exploration: the delve is often *for someone*.
+**People send you down.** Villagers' quests frequently point into the Hollows: retrieve something, find a rare ingredient, investigate a location, defeat a creature, bring back a strange object. This ties dialogue and relationships directly to combat and exploration: the delve is often *for someone*.
 
 **It is one part of the day.** The delve happens at night, after the tavern closes, and returning ends the day (Section 3.1). The 4d room graph, extraction routes, floor transitions, arena, room loading and encounters are all compatible with this; only where the delve sits in the day changes.
 
-**It doesn't carry the whole kitchen.** Surface activities supply dependable everyday ingredients (Section 5.5). The dungeon is what makes special dishes, strange furnishings and stories possible; it should never feel like a chore the player does to restock onions, and farming should never make it unnecessary.
+**It doesn't carry the whole kitchen.** Surface activities supply dependable everyday ingredients (Section 5.5). The Hollows are what make special dishes, strange furnishings and stories possible; delving should never feel like a chore the player does to restock onions, and farming should never make it unnecessary.
 
 ---
 
@@ -441,7 +450,7 @@ The dungeon remains a major pillar: it is **the source of what the village canno
 Every ingredient is data-driven (ScriptableObject) with:
 
 - **Category:** Meat, Offal, Fish, Fungus, Plant, Egg, Spice, Liquid, Magical. *(v0.5: grains, fruit, dairy and other ordinary ingredients from farming and ranching may need categories when those are designed.)*
-- **Source** *(v0.5)*: where it comes from (the dungeon, the farm, the ranch, fishing, shops and trades, villagers). Sources overlap; Section 5.5.
+- **Source** *(v0.5)*: where it comes from (the Hollows, the farm, the ranch, fishing, shops and trades, villagers). Sources overlap; Section 5.5.
 - **Flavor Tags:** Savory, Sweet, Spicy, Sour, Bitter, Umami, Earthy, Arcane.
 - **Quality:** Poor / Standard / Fine / Premium (from the Harvest system).
 - **Freshness:** 0–100%, decays over time; affects dish score. Tracked per stack: when two stacks of the same part merge, freshness becomes the count-weighted average. Kitchens use the least-fresh stock first (on a tie, the lower quality first). Freshness is designed to also drop in the storeroom overnight, slowed by preservation upgrades (salt, ice runes, jars).
@@ -465,8 +474,8 @@ Every ingredient is data-driven (ScriptableObject) with:
 
 ### 5.3 Recipes
 
-- Recipes are discovered through NPCs, recipe scraps found in the dungeon, customer hints, and experimentation.
-- *(v0.5)* Recipes may combine surface and dungeon ingredients: everyday dishes can be made entirely from surface ingredients, while special dishes need something from below (Section 5.5).
+- Recipes are discovered through NPCs, recipe scraps found in the Hollows, customer hints, and experimentation.
+- *(v0.5)* Recipes may combine surface ingredients and ingredients from the Hollows: everyday dishes can be made entirely from surface ingredients, while special dishes need something from below (Section 5.5).
 - Each recipe has required ingredient slots (by category or specific item) and optional slots that add flavor tags and bonuses.
 - **Experimentation:** combining ingredients freely at the "Test Kitchen" can discover new recipes. Failed experiments produce funny "Questionable Stew".
 - Dish score = base recipe value × ingredient quality × freshness × minigame performance. *(v0.3)* For a dish with several stages, minigame performance combines the results of its stages; exactly how is decided with the first multi-stage dish.
@@ -476,7 +485,7 @@ Every ingredient is data-driven (ScriptableObject) with:
 
 Long-term design direction, not the scope of any current milestone.
 
-Preparation complexity is one way to communicate progression and value, and to make rare monster parts feel precious when they come back from the dungeon.
+Preparation complexity is one way to communicate progression and value, and to make rare monster parts feel precious when they come back from the Hollows.
 
 | Dish tier | Preparation |
 |---|---|
@@ -498,9 +507,9 @@ The shapes the design should allow include `raw monster part → preparation →
 
 ### 5.5 Where Ingredients Come From (added in v0.5)
 
-The ingredient economy distinguishes **surface sources** from **dungeon sources**. The intended relationship: **surface activities provide dependable ingredients; the dungeon provides unusual ingredients and discoveries that make special dishes and stories possible.**
+The ingredient economy distinguishes **surface sources** from **the Hollows**. The intended relationship: **surface activities provide dependable ingredients; the Hollows provide unusual ingredients and discoveries that make special dishes and stories possible.**
 
-| | Surface and village | Dungeon |
+| | Surface and village | The Hollows |
 |---|---|---|
 | **Sources** | Farming, ranching, fishing, shops and trades, villagers | Harvesting monsters, rooms and rewards, bosses, quest locations |
 | **Provides** | Many reliable, common ingredients: vegetables, herbs, grains, fruit, eggs, milk, fish, and other ordinary cooking ingredients | Monster ingredients, rare ingredients, magical ingredients, unusual ingredients, quest materials, rare customization objects, unique discoveries |
@@ -509,10 +518,10 @@ The ingredient economy distinguishes **surface sources** from **dungeon sources*
 
 Two guardrails, held together:
 
-- **Farming does not replace the dungeon.** If the surface can supply everything worth cooking, the dungeon loses its purpose.
-- **Not every basic recipe needs a dangerous dungeon ingredient.** If every stew needs a monster part, the dungeon becomes a grocery run and the surface loses its purpose.
+- **Farming does not replace the Hollows.** If the surface can supply everything worth cooking, delving loses its purpose.
+- **Not every basic recipe needs a dangerous ingredient from the Hollows.** If every stew needs a monster part, the delve becomes a grocery run and the surface loses its purpose.
 
-Overlaps are fine where they create decisions (a farmed mushroom against a far better dungeon mushroom; a fish caught in the village pond against a cave eel). Exact recipes, prices and balances are not set; the Biome 1 recipe rework in 4f is still the next recipe work.
+Overlaps are fine where they create decisions (a farmed mushroom against a far better mushroom from the Hollows; a fish caught in the village pond against a cave eel). Exact recipes, prices and balances are not set; the Biome 1 recipe rework in 4f is still the next recipe work.
 
 ---
 
@@ -583,13 +592,13 @@ Growth areas, none of them locked as stages or tied to particular acts yet:
 
 **Residents and staff.** *(v0.5, revised)* The people who live in the village are named villagers and recruited residents (Section 2.8); the people who work in the tavern are staff (Section 6.7). Whether recruited villagers can become employees, and whether Visitors are a natural recruitment source for staff, are open cross-system questions (Section 13). Selected residents carry personal questlines (Section 2.6) and relationship state (Section 2.7). *(The v0.2 refugee residents with roles such as gardener, smith and guard are in Appendix C.)*
 
-**Morale and Cheer** *(v0.5, reinterpreted; to confirm)*. Morale is the state of the **village community** as a whole, driven by things like how well the village eats, helping villagers, settling newcomers and story events. High Morale grants **Cheer** in the dungeon: temporary buffs, extra revives, or the village's encouragement powering up the Kitchen Arts meter. The idea that people who know and care about Bram rally behind him survives the change of direction; what replaces "the stronghold" is the village. Morale stays separate from the tavern's Renown and from any one character's disposition (Section 2.7). **Flag:** with persistent relationships now central, a separate Morale value may overlap with the sum of the villagers' dispositions; whether Morale stays its own measure or is derived from the community's relationships is open (Section 13).
+**Morale and Cheer** *(v0.5, reinterpreted; to confirm)*. Morale is the state of the **village community** as a whole, driven by things like how well the village eats, helping villagers, settling newcomers and story events. High Morale grants **Cheer** in the Hollows: temporary buffs, extra revives, or the village's encouragement powering up the Kitchen Arts meter. The idea that people who know and care about Bram rally behind him survives the change of direction; what replaces "the stronghold" is the village. Morale stays separate from the tavern's Renown and from any one character's disposition (Section 2.7). **Flag:** with persistent relationships now central, a separate Morale value may overlap with the sum of the villagers' dispositions; whether Morale stays its own measure or is derived from the community's relationships is open (Section 13).
 
 **Defense events: dropped** *(v0.5)*. Monsters breaching the surface to attack the tavern, and any tower-defense or Stronghold-defense mode, are no longer part of the design. (The Bouncer minigame, Section 6.2, is a service moment and is unaffected.)
 
 ### 6.5 Tavern Immersion (added in v0.3)
 
-Pillar 6. One of the most important parts of Hearthdelve is the feeling of actually running this fantasy tavern and preparing strange monster cuisine. When two otherwise viable designs are on the table, the one that gives a stronger sense of presence, physicality and immersion in the tavern is generally preferred.
+Pillar 6. One of the most important parts of Hearth & Hollows is the feeling of actually running this fantasy tavern and preparing strange monster cuisine. When two otherwise viable designs are on the table, the one that gives a stronger sense of presence, physicality and immersion in the tavern is generally preferred.
 
 **Physical and grounded.** The important actions should feel physical: walking to stations, carrying plates, pouring drinks, cooking, preparing ingredients, dealing with patrons, managing a busy room, and seeing ingredients become recognizable finished dishes. Animation, audio, haptics, movement, station interactions, visual feedback and NPC behaviour all reinforce it. (An early example from 4c: the stove and cauldron can be worked from behind, like a cook at a range.)
 
@@ -616,7 +625,7 @@ Long-term design direction (pillar 7, and a learning priority in Section 1.5). T
 
 **The essential experience.** "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done." *(v0.5)* And, for the Inn: "I decorated this room, someone interesting stayed here, and now I know them." Customization should create ownership, expression, visible progress, discovery, anticipation, meaningful choices, reward and storytelling, and give the cast something to react to (Section 2.7). It is not merely a level editor. The Stage 1 layout is only a starting arrangement.
 
-**Decorate Mode.** Over time, and where the art and technology allow, the player can move, remove and add furniture; rearrange tables, chairs, counters and bar pieces; move functional stations; position decorative props; swap variants; rotate or flip where supported; recolour compatible pieces; buy furnishings with Gold; unlock new collections; find unusual furnishings in the dungeon; and keep the whole layout persistently. Controller-first, like the rest of the game.
+**Decorate Mode.** Over time, and where the art and technology allow, the player can move, remove and add furniture; rearrange tables, chairs, counters and bar pieces; move functional stations; position decorative props; swap variants; rotate or flip where supported; recolour compatible pieces; buy furnishings with Gold; unlock new collections; find unusual furnishings in the Hollows; and keep the whole layout persistently. Controller-first, like the rest of the game.
 
 **Data-driven furniture.** Customization is built on reusable furniture definitions and placed instances, not layouts baked into the Tavern scene, and never duplicate scenes per layout. A definition may describe a stable id, display name, sprites and variants, category, footprint, collision, navigation blocking, wall or floor placement, orientation and flip support, functional type and interaction, Gold price, rarity, unlock source, biome or theme tags, palette channels, and whether owning duplicates is meaningful. A placed instance may store the furniture id, position, orientation, variant, palette choices and any instance state. These are guidelines, not class names. Registering many furnishings should be tooling and data, not bespoke code per chair, barrel or rug.
 
@@ -629,7 +638,7 @@ Long-term design direction (pillar 7, and a learning priority in Section 1.5). T
 | Source | Role |
 |---|---|
 | **Gold** | Ordinary and common furnishings: serve customers → earn Gold → improve and personalize the tavern |
-| **Dungeon discoveries** | Things that can't simply be bought: a second, emotional reward axis for delving beyond power and ingredients |
+| **Discoveries from the Hollows** | Things that can't simply be bought: a second, emotional reward axis for delving beyond power and ingredients |
 | **Bosses** | Rare or unique pieces that remember a victory |
 | **Story, quests, relationships** | Special furnishings tied to events and characters (an NPC's storyline ending with an object of theirs) |
 
@@ -672,7 +681,7 @@ Long-term design direction. None of these activities is built in 4d or any curre
 
 ### 6A.1 Daytime
 
-When the player wakes, the day is theirs (Section 3.1): around the tavern and inn (decorating, rearranging, managing guest rooms, sorting ingredients and the storeroom), on the grounds (farming, ranching), around the village (talking to villagers, relationship moments, quests and errands, shopping, exploring, fishing), and preparing for the evening or the dungeon. Daytime is where most dialogue, relationship and NPC comedy happens outside service. How time passes in the daytime is open (Section 3.4).
+When the player wakes, the day is theirs (Section 3.1): around the tavern and inn (decorating, rearranging, managing guest rooms, sorting ingredients and the storeroom), on the grounds (farming, ranching), around the village (talking to villagers, relationship moments, quests and errands, shopping, exploring, fishing), and preparing for the evening or the night's delve. Daytime is where most dialogue, relationship and NPC comedy happens outside service. How time passes in the daytime is open (Section 3.4).
 
 ### 6A.2 Farming
 
@@ -704,7 +713,7 @@ This gives the player influence over part of the village's population. The three
 |---|---|---|
 | **Gold** | Service, selling surplus ingredients, gold rooms, *(v0.5)* surplus produce and errands where they fit | Gear, tavern upgrades, recipes, staff wages, *(v0.4)* furnishings, *(v0.5)* seeds, animals, supplies and village shops |
 | **Renown** | Customer satisfaction, story | Unlocks tiers of customers, story progress (not spent) |
-| **Delve Marks** | Found in dungeon runs (lost on death if unspent) | Permanent combat unlocks at the "Delver's Board" |
+| **Delve Marks** | Found on delves (lost on death if unspent) | Permanent combat unlocks at the "Delver's Board" |
 | **Relics** | Bosses, secrets | Major permanent abilities |
 
 ### 7.2 Upgrade Tracks
@@ -721,13 +730,13 @@ This gives the player influence over part of the village's population. The three
 - A good delve should fund roughly one meaningful upgrade.
 - Selling raw ingredients should be viable but noticeably worse than cooking them.
 - Staff wages and running the property create light pressure without becoming a punishing survival mechanic. *(v0.5: "refugee upkeep" belonged to the Stronghold direction.)*
-- *(v0.5)* Surface and dungeon ingredients both pay their way (Section 5.5): surface food keeps everyday service viable; dungeon ingredients are worth noticeably more.
+- *(v0.5)* Surface ingredients and those from the Hollows both pay their way (Section 5.5): surface food keeps everyday service viable; ingredients from the Hollows are worth noticeably more.
 
 ### 7.4 Progression Philosophy (added in v0.5)
 
 The player should increasingly feel: **"This is my tavern, my inn, my village community, my menu, and the people here know me."**
 
-Progress should be visible through property customization, farming, ranching and fishing capability, recipes, villagers, recruited residents, relationships, Inn rooms, dungeon discoveries, equipment and story. Progression should **not** be primarily a sequence of numeric stat upgrades: upgrades that change numbers (Max Essence, drain rate, satchel size) still exist, but the progress the player notices and remembers is people, places and things.
+Progress should be visible through property customization, farming, ranching and fishing capability, recipes, villagers, recruited residents, relationships, Inn rooms, discoveries from the Hollows, equipment and story. Progression should **not** be primarily a sequence of numeric stat upgrades: upgrades that change numbers (Max Essence, drain rate, satchel size) still exist, but the progress the player notices and remembers is people, places and things.
 
 ---
 
@@ -740,7 +749,7 @@ All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×
 - **Resolution:** 320×180 reference at 8 pixels per unit; 1 world unit = 1 tile = 8 px. Pixel Perfect Camera with integer zoom and smooth scrolling (the view is not snapped to the art-pixel grid, so the camera and characters move in screen pixels). Resolution locked after the 4a look test; smooth scrolling chosen in 4b (2026-10-02).
 - **Characters:** 32×32 frames with a body of about 8×8, four diagonal facings.
 - **Sorting:** sprites sort by Y position, with pivots at the feet.
-- **Palette and lighting:** warm, saturated tavern (amber candlelight, wood, hearth) against cool, eerie dungeons (teal, violet, bioluminescence). Sprites are lit with URP 2D lights: this is the visual baseline. Each environment has an ambient light plus local lights (hearth and candles in the tavern; torches, and later bioluminescence, in the dungeon), always keeping characters, enemies and pickups readable. *(v0.5)* The daytime village adds a third look (open-air daylight, still warm), which the lighting baseline will need when village life is built.
+- **Palette and lighting:** warm, saturated tavern (amber candlelight, wood, hearth) against the cool, eerie Hollows (teal, violet, bioluminescence). Sprites are lit with URP 2D lights: this is the visual baseline. Each environment has an ambient light plus local lights (hearth and candles in the tavern; torches, and later bioluminescence, in the Hollows), always keeping characters, enemies and pickups readable. *(v0.5)* The daytime village adds a third look (open-air daylight, still warm), which the lighting baseline will need when village life is built.
 - **Food** should look appetizing even at this scale; dishes use the Minifantasy food icons, shown enlarged in menus and results.
 - **Content adapts to the art:** monsters, ingredients, dishes, stations, NPCs and bosses are chosen from what Minifantasy contains (`docs/ASSET_MAP.md`). *(v0.5)* So are the village, villagers' peoples, crops, animals and fish; those packs have not been inspected yet.
 - **Known gaps:** no rat with an attack, no mallet or frying pan weapon, no plate-carrying overlay, and no audio. *(v0.3)* The body font is Silver (Section 8.2).
@@ -748,7 +757,7 @@ All art is **Minifantasy** by Krishna Palacio: tiny top-down pixel art on an 8×
 
 ### 8.2 UI (rewritten in v0.2)
 
-Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD in the dungeon. All text is localized.
+Rustic fantasy UI built with uGUI, **Super Text Mesh** for all text, and Minifantasy UI sprites (*User Interface*, *UI Overhaul*: panels, speech bubbles, emotion icons, controller glyphs). Readable during fast combat, with a minimal HUD during a delve. All text is localized.
 
 *(v0.3)* **Text:** the body font is **Silver**, a pixel font drawn at the game's own pixel size so it sits with the Minifantasy art, with wide language coverage (our copy has plain single-pixel punctuation, *v0.4*); a decorative title font may follow in the menus and polish milestone (4h today; 4i under the v0.5 roadmap proposal). English is written in a lower-case style ("open the doors", "cellar stew", "last orders!"), with proper nouns, resource names (Essence, Gold, Renown) and control labels capitalised; the style lives in the written strings, and other languages follow their own conventions.
 
@@ -968,15 +977,15 @@ Assets/
 | **5. Production** | *(v0.5, proposed)* Prove the remaining life-sim systems, then build out content | First the Inn's guests and Visitor promotion, settling residents on the three plots, fishing, ranching and farming depth, each prototyped against its essential experience; then Biomes 2–7, all minigames, the growing property, the revised full story, more villagers and relationship content, Love/Hate if not earlier; *(v0.4)* the large furnishing catalog, many enemy- and biome-specific drop pools, more boss trophies and rewards, rarity tuning, customization of the whole property (tavern, Inn, own quarters), advanced customization content, worker customization |
 | **6. Polish and Launch** | Ship | Balance, accessibility, localization, performance, platform certification |
 
-**Phase 4 sub-milestones** *(v0.2; revised as a proposal in v0.5, pending the owner's approval)*. Each is planned, approved, built and playtested separately; the web build works at the end of each. The v0.5 proposal keeps 4d, 4e, 4f and 4g, inserts a village and daytime slice as 4h, and moves menus and polish to 4i. The slice proves that the new identity works (a day with people, a garden, a tavern and a dungeon) without building ranching, fishing, Inn guests or resident recruitment, which go to Phase 5.
+**Phase 4 sub-milestones** *(v0.2; revised as a proposal in v0.5, pending the owner's approval)*. Each is planned, approved, built and playtested separately; the web build works at the end of each. The v0.5 proposal keeps 4d, 4e, 4f and 4g, inserts a village and daytime slice as 4h, and moves menus and polish to 4i. The slice proves that the new identity works (a day with people, a garden, a tavern and a delve) without building ranching, fishing, Inn guests or resident recruitment, which go to Phase 5.
 
 - **4a Integration and look test:** project swap, port manifest, logic and tests ported, Nice Vibrations, Minifantasy import pipeline, one dungeon room and one tavern corner with real art, `docs/ASSET_MAP.md`.
 - **4b Dungeon migration:** Phase 1 and 3 dungeon gameplay rebuilt on TDE, with the dungeon haptics.
 - **4c Tavern and UI migration:** top-down tavern, customer pathing, 2D serving, Grill/Tap/Serving with haptics, all UI in uGUI + STM.
 - **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. *(v0.4)* The reward architecture leaves room for future persistent reward kinds (customization discoveries) without building any. *(v0.5)* Scope unchanged and the completed step 1 and 2 work stands. Step 3's rewards are designed knowing a larger ingredient ecosystem exists: ingredient rewards don't assume monster parts are the only ingredients, and the reward model stays open to dungeon ingredients, quest objects, customization discoveries and future weapons and currencies (ingredient and Gold rewards remain the prototype's focus). No farming, fishing or ranching in 4d. Step 5 (day-loop integration) is where the run joins `GameFlow`; **proposed:** it adopts the new order there (evening service → delve → sleep, with the existing Morning panel standing in for the daytime until 4h), so the integration isn't done twice. How the Night upgrade screen and the breakfast buff are rehomed is decided when step 5 is planned. *(4d step 5, 2026-10-04: adopted. The old morning panel is the daytime placeholder; the breakfast became the **delve meal**, cooked in the daytime and kept until that night's delve; the Night screen keeps the upgrades, after the delve.)*
 - **4e Combat depth and boss:** Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss. *(v0.4)* Boss rewards are designed so a unique boss furnishing can plug in later. *(v0.5)* Unchanged: the roadmap review found no reason to move it.
-- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5. Once that foundation exists, 4f also proves **one small end-to-end reward loop in Biome 1**: fight → a furnishing discovery drops → pick it up → extract → it is permanently owned → place it through Decorate Mode. That means a small real furnishing drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under whichever rule is approved when the feature is designed. It is an integration slice, not the production loot catalog: it proves that finding strange things in the dungeon and bringing them home is fun. *(v0.5, proposed)* The customization foundation is built for **several areas from the start** and proves it with **one small guest room** as a second decoratable area with its own saved layout (no guests or Inn rules yet), so the Inn never needs a second decorating system. The Biome 1 recipe rework follows the surface and dungeon ingredient model (Section 5.5): a few everyday surface staples, bought until farming exists, alongside the dungeon's parts.
-- **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later. *(v0.5, proposed)* The representative NPC quest is a villager's errand into the dungeon that returns a **quest object** (the first non-ingredient, non-Gold reward kind in real use), and the dialogue adapters are built knowing villagers, Visitors and generated residents will use them. Act I is written for the village direction.
+- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gundra, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5. Once that foundation exists, 4f also proves **one small end-to-end reward loop in Biome 1**: fight → a furnishing discovery drops → pick it up → extract → it is permanently owned → place it through Decorate Mode. That means a small real furnishing drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under whichever rule is approved when the feature is designed. It is an integration slice, not the production loot catalog: it proves that finding strange things in the Hollows and bringing them home is fun. *(v0.5, proposed)* The customization foundation is built for **several areas from the start** and proves it with **one small guest room** as a second decoratable area with its own saved layout (no guests or Inn rules yet), so the Inn never needs a second decorating system. The Biome 1 recipe rework follows the surface and dungeon ingredient model (Section 5.5): a few everyday surface staples, bought until farming exists, alongside the dungeon's parts.
+- **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later. *(v0.5, proposed)* The representative NPC quest is a villager's errand into the Hollows that returns a **quest object** (the first non-ingredient, non-Gold reward kind in real use), and the dialogue adapters are built knowing villagers, Visitors and generated residents will use them. Act I is written for the village direction.
 - **4h Village and daytime slice** *(v0.5, proposed; new)*: a small part of Brackenford and the tavern's grounds, walkable in the daytime, replacing the Morning panel; a prototype of the daytime time model (a ticking clock or player-controlled phases, chosen by playtesting both cheaply); 3–4 named villagers with homes, simple presence or schedules, dialogue and relationship hooks; named villagers chosen into evening service alongside Visitors (today's generated customers become the Visitors); one small farm plot with a handful of crops feeding the storeroom (the smallest test of "I grew part of tonight's menu"); the full new day loop working through `GameFlow`. Not in 4h: ranching, fishing, Inn guests, Visitor promotion, resident recruitment.
 - **4i Menus, options and polish** *(was 4h)*: settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
 
@@ -1024,21 +1033,21 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 11. **Persistent relationships with selected characters are required,** kept separate from Renown and Morale (Section 2.7) *(2026-10-03)*.
 12. **`SaveSystem` is the only authoritative save;** middleware state joins it through adapters (Section 10.6) *(2026-10-03)*.
 13. **Learning priorities** shape the content and complexity budget (Section 1.5) *(2026-10-04)*.
-14. **Tavern customization is a major pillar** (pillar 7, Section 6.6): data-driven furniture and layouts, functional furniture included where practical, a large Minifantasy catalog, Gold purchases plus dungeon, boss and story discoveries, one architecture for the whole property *(2026-10-04; "from the inn to the Stronghold" revised in v0.5)*.
+14. **Tavern customization is a major pillar** (pillar 7, Section 6.6): data-driven furniture and layouts, functional furniture included where practical, a large Minifantasy catalog, Gold purchases plus discoveries from the Hollows, bosses and story, one architecture for the whole property *(2026-10-04; "from the inn to the Stronghold" revised in v0.5)*.
 15. **Discoveries never use Satchel slots** (Section 6.6) *(2026-10-04)*.
 16. **Canonical story characters are not renameable;** hired and recruited workers carry full naming and appearance customization (Sections 2.5, 6.7) *(2026-10-04)*.
 17. **Font:** Silver, adapted with plain punctuation (Section 8.2) *(2026-10-04)*.
 
 *Recorded in v0.5 (2026-10-04), pending the owner's review of the v0.5 update:*
 
-18. **Identity:** a fantasy life sim centred on owning and running a tavern and inn in a strange village, with the dungeon as a major pillar inside that daily life (Section 1.1).
-19. **The day:** wake → free daytime → evening prep → tavern service → nighttime delve → return and sleep. Tavern before dungeon for now (Section 3.1).
+18. **Identity:** a fantasy life sim centred on owning and running a tavern and inn in a strange village, with delving into the Hollows as a major pillar inside that daily life (Section 1.1).
+19. **The day:** wake → free daytime → evening prep → tavern service → nighttime delve → return and sleep. Tavern before the delve for now (Section 3.1).
 20. **The Stronghold direction is dropped:** no fortified Stronghold as the late-game home, no tower defense and no defense events (Section 6.4; Appendix C).
 21. **Brackenford is a small persistent village** with a fixed authored cast of named villagers; tavern customers are named villagers plus generated Visitors; most Visitors are transient and only relevant ones are promoted to persistent identities (Sections 2.8, 6.3).
 22. **The Inn reuses the customization architecture;** no second decorating system (Section 6.8).
 23. **About three fixed residential plots** that settled Visitors can move into; fixed sites, not city-building (a current target, Section 6A.5).
-24. **Surface and dungeon ingredients:** the surface provides dependable ingredients, the dungeon unusual ones and discoveries; neither replaces the other (Section 5.5).
-25. **Essence is the dungeon's only time pressure;** there is no time-of-night limit (Section 4.4).
+24. **Surface ingredients and the Hollows:** the surface provides dependable ingredients, the Hollows unusual ones and discoveries; neither replaces the other (Section 5.5).
+25. **Essence is the delve's only time pressure;** there is no time-of-night limit (Section 4.4).
 
 **Open**
 
@@ -1079,20 +1088,24 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 11. **Questions the v0.5 direction raised** *(v0.5)*:
     - **Morale's purpose:** whether village Morale stays a separate measure or is derived from the villagers' relationships (Section 6.4);
     - where the old Night upgrade screen's functions and the pre-delve breakfast buff go in the new day (Section 3.1; decided when 4d step 5 is planned);
-    - freshness tuning now that dungeon parts wait a day before service (Section 3.1);
+    - freshness tuning now that parts from the Hollows wait a day before service (Section 3.1);
     - the story revision for Acts II–IV and the canonical cast (Section 2.9);
-    - whether people met or rescued in the dungeon can become Visitors (Section 3.3).
+    - whether people met or rescued in the Hollows can become Visitors (Section 3.3).
 
 ---
 
 ## 14. Appendix A: Glossary
 
-- **Delve:** a single roguelite run into the dungeon; *(v0.5)* it happens at night, after service.
+- **Hearth & Hollows:** the game's working title since 2026-10-05 (formerly Hearthdelve). Hearthdelve remains the repository, Unity project and code name.
+- **The Hollows:** the underground world beneath Brackenford, made of regions (biomes) at increasing depth from the Cellars to the Heart; the in-world proper name, always "the Hollows" *(2026-10-05; formerly "the Dungeons")*.
+- **Dungeon:** the technical and genre term for the gameplay layer set in the Hollows (the `Dungeon` assembly, scenes, input map and classes); not an in-world place name *(2026-10-05)*.
+- **Delve:** a single roguelite run into the Hollows; *(v0.5)* it happens at night, after service. To **delve**; a **delver** is someone who does.
+- **Brackenford:** the village above the Hollows; **the Sunken Flagon:** the player's tavern and inn.
 - **Essence:** the delve timer and the player's only health pool.
 - **Haul:** ingredients carried back from a delve.
 - **Harvest Finisher:** a special kill move that guarantees a premium part.
 - **Kitchen Arts:** the player's special meter attack.
-- **Cheer:** in-dungeon buffs granted by the village's Morale *(v0.5; was stronghold morale)*.
+- **Cheer:** buffs during a delve, granted by the village's Morale *(v0.5; was stronghold morale)*.
 - **Renown:** the tavern's reputation, driving customer tiers and story.
 - **Morale:** the state of the village community; it produces Cheer *(v0.5, reinterpreted from the Sanctuary/Stronghold community; Section 6.4)*.
 - **Disposition:** what one named character or faction thinks of Bram (Section 2.7).
