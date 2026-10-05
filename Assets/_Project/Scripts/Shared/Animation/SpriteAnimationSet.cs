@@ -39,6 +39,25 @@ namespace Hearthdelve.Shared.Animation
         public Sprite[] frontLeft = Array.Empty<Sprite>();
         public Sprite[] backRight = Array.Empty<Sprite>();
         public Sprite[] backLeft = Array.Empty<Sprite>();
+        [Tooltip("A single-row sheet drawn facing front-right: mirror it for the left facings instead of reusing it as drawn " +
+                 "(the Townsfolk's jump, used for the dodge, has no other rows).")]
+        public bool mirrorForLeft;
+
+        /// <summary>
+        /// Frames for a facing, and whether to draw them mirrored: a sheet missing a left facing's frames, with
+        /// <see cref="mirrorForLeft"/>, shows its front-right frames flipped.
+        /// </summary>
+        public Sprite[] For(Facing4 facing, out bool mirrored)
+        {
+            Sprite[] own = facing switch
+            {
+                Facing4.FrontLeft => frontLeft,
+                Facing4.BackLeft => backLeft,
+                _ => null,
+            };
+            mirrored = mirrorForLeft && (facing == Facing4.FrontLeft || facing == Facing4.BackLeft) && (own == null || own.Length == 0);
+            return mirrored ? frontRight : For(facing);
+        }
 
         /// <summary>Frames for a facing. Sheets with a single row (deaths) reuse it for every facing.</summary>
         public Sprite[] For(Facing4 facing)

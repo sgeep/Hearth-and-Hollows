@@ -188,5 +188,31 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(0.4f);
             Assert.That(m_Patterns, Is.Empty, "no haptic on a dodge");
         }
+
+        /// <summary>
+        /// The 4d playtest: every dodge showed the jump facing front-right. The Townsfolk's jump has one row, so a dodge
+        /// to the left now shows it mirrored, and one to the right as drawn.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheDodge_FacesTheWayItGoes()
+        {
+            yield return Setup("giant_spider", new Vector2(8f, 0f));
+            var body = Player.GetComponentInChildren<Hearthdelve.Shared.Animation.CharacterSpriteAnimator>();
+            SpriteRenderer renderer = body.Renderer;
+            Hold(Key.A, Key.Space);
+            yield return WaitUntil(() => Essence.Invulnerable, 1f, "a dodge to the left");
+            yield return null;
+            Assert.That(body.Facing, Is.EqualTo(Hearthdelve.Core.Movement.Facing4.FrontLeft));
+            Assert.That(renderer.flipX, "the jump, mirrored");
+            ReleaseKeys();
+            yield return new WaitForSeconds(0.8f);
+            Hold(Key.D, Key.Space);
+            yield return WaitUntil(() => Essence.Invulnerable, 1f, "a dodge to the right");
+            yield return null;
+            Assert.That(renderer.flipX, Is.False, "the jump as drawn");
+            ReleaseKeys();
+            yield return new WaitForSeconds(0.6f);
+            Assert.That(renderer.flipX, Is.False, "walking and standing are never mirrored");
+        }
     }
 }

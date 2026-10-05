@@ -10,6 +10,34 @@ using UnityEngine;
 
 namespace Hearthdelve.Tests
 {
+    /// <summary>The dodge's one-row jump sheet, mirrored for the left facings (the 4d playtest: every dodge faced right).</summary>
+    public class MirroredAnimationTests
+    {
+        [Test]
+        public void AOneRowSheet_IsMirroredForTheLeftFacings_Only()
+        {
+            var right = new[] { Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 1, 1), Vector2.zero) };
+            var anim = new SpriteAnim { frontRight = right, mirrorForLeft = true };
+            foreach (var (facing, mirrored) in new[] { (Hearthdelve.Core.Movement.Facing4.FrontRight, false), (Hearthdelve.Core.Movement.Facing4.BackRight, false),
+                         (Hearthdelve.Core.Movement.Facing4.FrontLeft, true), (Hearthdelve.Core.Movement.Facing4.BackLeft, true) })
+            {
+                Assert.That(anim.For(facing, out bool flip), Is.SameAs(right));
+                Assert.That(flip, Is.EqualTo(mirrored), facing.ToString());
+            }
+            anim.mirrorForLeft = false;
+            anim.For(Hearthdelve.Core.Movement.Facing4.FrontLeft, out bool plain);
+            Assert.That(plain, Is.False, "other one-row sheets (deaths) are reused as drawn");
+            Object.DestroyImmediate(right[0]);
+        }
+
+        [Test]
+        public void ThePlayersDodge_IsMirrored()
+        {
+            var set = AssetDatabase.LoadAssetAtPath<SpriteAnimationSet>("Assets/_Project/Data/Animations/Anim_HumanTownsfolk.asset");
+            Assert.That(set.Find(CharacterAnim.Dodge).mirrorForLeft);
+        }
+    }
+
     public class HeavyChargeTests
     {
         static readonly float[] k_Times = { 0f, 0.45f, 0.9f };

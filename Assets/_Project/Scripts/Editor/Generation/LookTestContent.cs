@@ -218,6 +218,13 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ animation sets
 
+        static SpriteAnim Mirrored(SpriteAnim anim)
+        {
+            anim.mirrorForLeft = true;
+            anim.frontLeft = anim.backLeft = System.Array.Empty<Sprite>();
+            return anim;
+        }
+
         internal static SpriteAnim Anim(CharacterAnim action, string pack, string file, int frames, int rows, float frameDuration, bool loop)
         {
             var anim = new SpriteAnim { action = action, frameDuration = frameDuration, loop = loop };
@@ -249,7 +256,8 @@ namespace Hearthdelve.Editor
                 Anim(CharacterAnim.Walk, c, "HumanTownsfolkWalk", 4, 4, 0.2f, true),
                 Anim(CharacterAnim.Attack, c, "HumanTownsfolkAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "HumanTownsfolkDmg", 4, 4, 0.1f, false),
-                Anim(CharacterAnim.Dodge, c, "HumanTownsfolkJump", 4, 1, 0.1f, false),
+                // One row in the pack (front-right): mirrored for dodges to the left (4d playtest).
+                Mirrored(Anim(CharacterAnim.Dodge, c, "HumanTownsfolkJump", 4, 1, 0.1f, false)),
                 Anim(CharacterAnim.Die, c, "HumanTownsfolkSpinDie", 12, 1, 0.1f, false),
                 // ChargedAttack's rows are stages, not facings: wind-up, charged loop, the spin.
                 AnimRow(CharacterAnim.Charge, c, "HumanTownsfolkChargedAttack", 6, 0, 0.1f, false),

@@ -84,6 +84,7 @@ MonoBehaviour:
     - {fileID: -1009090684, guid: d5b220eaa687c84459e7b64f105310a0, type: 3}
     - {fileID: 1759234969, guid: d5b220eaa687c84459e7b64f105310a0, type: 3}
     - {fileID: 1686405298, guid: d5b220eaa687c84459e7b64f105310a0, type: 3}
+    mirrorForLeft: 0
   - action: 1
     frameDuration: 0.2
     loop: 1
@@ -107,6 +108,7 @@ MonoBehaviour:
     - {fileID: 866751377, guid: 8fecc99125d00404d991b02befa0c0a0, type: 3}
     - {fileID: 1021419200, guid: 8fecc99125d00404d991b02befa0c0a0, type: 3}
     - {fileID: -816688636, guid: 8fecc99125d00404d991b02befa0c0a0, type: 3}
+    mirrorForLeft: 0
   - action: 2
     frameDuration: 0.1
     loop: 0
@@ -130,6 +132,7 @@ MonoBehaviour:
     - {fileID: -1366087993, guid: 3472a676795e2664aa07e736bed48d4e, type: 3}
     - {fileID: 774226589, guid: 3472a676795e2664aa07e736bed48d4e, type: 3}
     - {fileID: 1236514775, guid: 3472a676795e2664aa07e736bed48d4e, type: 3}
+    mirrorForLeft: 0
   - action: 4
     frameDuration: 0.1
     loop: 0
@@ -153,6 +156,7 @@ MonoBehaviour:
     - {fileID: -1074722882, guid: 17c0ac74eaebf524ab2e7c613bbd7036, type: 3}
     - {fileID: -1064032410, guid: 17c0ac74eaebf524ab2e7c613bbd7036, type: 3}
     - {fileID: 89071681, guid: 17c0ac74eaebf524ab2e7c613bbd7036, type: 3}
+    mirrorForLeft: 0
   - action: 3
     frameDuration: 0.1
     loop: 0
@@ -164,6 +168,7 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 1
   - action: 5
     frameDuration: 0.1
     loop: 0
@@ -183,6 +188,7 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 0
   - action: 6
     frameDuration: 0.1
     loop: 0
@@ -196,6 +202,7 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 0
   - action: 7
     frameDuration: 0.1
     loop: 1
@@ -209,6 +216,7 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 0
   - action: 8
     frameDuration: 0.1
     loop: 0
@@ -222,3 +230,4 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 0

@@ -46,6 +46,8 @@ namespace Hearthdelve.Shared.Animation
         CharacterAnim m_Held;
 
         public Facing4 Facing { get; private set; }
+        /// <summary>The body's renderer.</summary>
+        public SpriteRenderer Renderer => m_Renderer;
         public CharacterAnim Current => m_Current;
         public bool IsTelegraphing => m_TelegraphedActive;
 
@@ -251,6 +253,7 @@ namespace Hearthdelve.Shared.Animation
             if (anim == null) return;
             Sprite[] frames = anim.For(Facing);
             if (frames == null || frames.Length == 0) return;
+            target.flipX = false;
             target.sprite = frames[SpriteAnimationMath.TelegraphedFrame(elapsed, m_TelegraphTime, m_ReleaseFrame, frames.Length, anim.frameDuration)];
         }
 
@@ -258,8 +261,9 @@ namespace Hearthdelve.Shared.Animation
         {
             SpriteAnim anim = set.Find(m_Current) ?? set.Find(CharacterAnim.Idle);
             if (anim == null) return;
-            Sprite[] frames = anim.For(Facing);
+            Sprite[] frames = anim.For(Facing, out bool mirrored);
             if (frames == null || frames.Length == 0) return;
+            target.flipX = mirrored;
             target.sprite = frames[SpriteAnimationMath.FrameAt(m_Time, frames.Length, anim.frameDuration, anim.loop)];
         }
     }
