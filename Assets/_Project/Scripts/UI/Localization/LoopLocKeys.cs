@@ -11,6 +11,8 @@ namespace Hearthdelve.UI.Localization
 
         public const string HudDay = "hud.day";
         public const string HudExit = "hud.exit";
+        public const string HudCampfire = "hud.campfire";
+        public const string HudCampfireWarming = "hud.campfire_warming";
         public const string SlotFreshness = "slot.freshness";
 
         public const string MorningTitle = "morning.title";
@@ -91,6 +93,8 @@ namespace Hearthdelve.UI.Localization
 
             (HudDay, "day {0}"),
             (HudExit, "press {0} to climb back to the tavern"),
+            (HudCampfire, "stand by the fire to recover Essence"),
+            (HudCampfireWarming, "the fire warms you: Essence returning"),
             (SlotFreshness, "{0}% fresh"),
 
             (MorningTitle, "daytime · day {0}"),

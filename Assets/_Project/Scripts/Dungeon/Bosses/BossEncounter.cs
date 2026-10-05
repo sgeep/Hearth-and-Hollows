@@ -46,6 +46,15 @@ namespace Hearthdelve.Dungeon.Bosses
         float m_LastHealth;
 
         public BossDefinition Boss => m_Boss;
+        /// <summary>The length of this encounter's entrance, once it has begun.</summary>
+        public float EntranceSeconds { get; private set; }
+
+        /// <summary>
+        /// The full reveal until the boss has first been beaten (the save's boss-clear record), then a shorter intro
+        /// (4e sign-off).
+        /// </summary>
+        public static float EntranceLength(BossDefinition boss, int timesDefeated) =>
+            boss == null ? 0f : timesDefeated > 0 ? boss.repeatEntranceSeconds : boss.entranceSeconds;
         public BossEncounterState State { get; private set; } = BossEncounterState.Waiting;
 
         public void Configure(BossDefinition boss, MMF_Player entrance, MMF_Player defeat = null)
@@ -109,7 +118,10 @@ namespace Hearthdelve.Dungeon.Bosses
         void BeginEntrance()
         {
             State = BossEncounterState.Entrance;
-            m_EntranceLeft = m_Boss != null ? m_Boss.entranceSeconds : 0f;
+            int beaten = m_Boss != null && Hearthdelve.Shared.Game.GameFlow.Instance != null && Hearthdelve.Shared.Game.GameFlow.Instance.State != null
+                ? Hearthdelve.Shared.Game.GameFlow.Instance.State.TimesDefeated(m_Boss.id) : 0;
+            m_EntranceLeft = EntranceLength(m_Boss, beaten);
+            EntranceSeconds = m_EntranceLeft;
             m_LastHealth = m_Health.CurrentHealth;
             // The fight's rules start with the entrance: the gates have sealed and the boss is here.
             Character player = LevelManager.HasInstance && LevelManager.Instance.Players.Count > 0 ? LevelManager.Instance.Players[0] : null;

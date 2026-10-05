@@ -118,7 +118,7 @@ namespace Hearthdelve.Editor
         public static void RebuildScreens(Canvas canvas)
         {
             UiFeedbackContent.Ensure(canvas);
-            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "DeathScreen", "DelveResult", "RunPower", "PH_EssenceBar", "EssenceLabel" })
+            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "CampfireHint", "DeathScreen", "DelveResult", "RunPower", "PH_EssenceBar", "EssenceLabel" })
             {
                 Transform old = canvas.transform.Find(name);
                 if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -132,6 +132,7 @@ namespace Hearthdelve.Editor
             BuildHud(canvas);
             BuildSwapPrompt(canvas);
             BuildExitHint(canvas);
+            BuildCampfireHint(canvas);
             BuildDeathScreen(canvas);
             BuildResultScreen(canvas);
             BuildPowerScreen(canvas);
@@ -397,6 +398,17 @@ namespace Hearthdelve.Editor
             return view;
         }
 
+        /// <summary>The campfire's prompt (4e sign-off), where the way-out hint goes (they're never in the same room).</summary>
+        public static CampfireHintView BuildCampfireHint(Canvas canvas)
+        {
+            RectTransform root = FullScreen(canvas, "CampfireHint");
+            GameObject hint = Hint(root, LoopLocKeys.HudCampfire, k_HintY, out LocalizedSuperText text);
+            var view = root.gameObject.AddComponent<CampfireHintView>();
+            view.Configure(hint, text);
+            hint.SetActive(false);
+            return view;
+        }
+
         /// <summary>The death screen: why the delve ended, the satchel, and the Lockbox choice.</summary>
         public static DeathScreen BuildDeathScreen(Canvas canvas)
         {
@@ -445,12 +457,15 @@ namespace Hearthdelve.Editor
             // The run's Gold (4d step 3): brought home, or left behind.
             LocalizedSuperText gold = Line(panel, "Gold", LocKeys.ResultGoldSecured, -26f);
             gold.GetComponent<SuperTextMesh>().color = k_Accent;
+            // A boss felled on this delve (4e sign-off), under the title.
+            LocalizedSuperText boss = Line(panel, "Boss", LocKeys.ResultBoss, 22f);
+            boss.GetComponent<SuperTextMesh>().color = k_Accent;
             Button proceed = TextButton(panel, "Continue", LocKeys.ResultDelveAgain, new Vector2(0f, 7f), 112f, out LocalizedSuperText proceedLabel);
             UiFeedbackContent.Commit(proceed);
             proceed.navigation = new Navigation { mode = Navigation.Mode.None };
 
             var screen = root.gameObject.AddComponent<DelveResultScreen>();
-            screen.Configure(panel.gameObject, title, summary, slots, proceed, proceedLabel, gold);
+            screen.Configure(panel.gameObject, title, summary, slots, proceed, proceedLabel, gold, boss);
             panel.gameObject.SetActive(false);
             return screen;
         }

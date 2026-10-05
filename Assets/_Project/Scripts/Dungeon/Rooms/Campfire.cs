@@ -1,5 +1,7 @@
+using Hearthdelve.Core.Events;
 using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Run;
+using Hearthdelve.Shared.Run;
 using MoreMountains.Feedbacks;
 using MoreMountains.TopDownEngine;
 using UnityEngine;
@@ -27,6 +29,9 @@ namespace Hearthdelve.Dungeon.Rooms
         float m_Pool = -1f;
         float m_FullIntensity;
         bool m_Warmed;
+        // The prompt as last published: shown, and whether it said "warming".
+        bool m_HintShown;
+        bool m_HintWarming;
 
         /// <summary>Essence it still has to give, once someone has warmed by it (-1 before).</summary>
         public float Remaining => m_Pool;
@@ -49,6 +54,17 @@ namespace Hearthdelve.Dungeon.Rooms
             if (m_Body != null) m_Body.enabled = false;
         }
 
+        void OnDisable() => SetHint(false, false);
+
+        void SetHint(bool visible, bool warming)
+        {
+            warming &= visible;
+            if (visible == m_HintShown && warming == m_HintWarming) return;
+            m_HintShown = visible;
+            m_HintWarming = warming;
+            EventBus<CampfireHint>.Publish(new CampfireHint(visible, warming));
+        }
+
         void Update()
         {
             if (m_Light != null && !IsSpent)
@@ -56,20 +72,35 @@ namespace Hearthdelve.Dungeon.Rooms
 
             Character player = LevelManager.HasInstance && LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0
                 ? LevelManager.Instance.Players[0] : null;
-            if (player == null) return;
+            if (player == null)
+            {
+                SetHint(false, false);
+                return;
+            }
             Vector2 feet = player.transform.position;
             float distance = Vector2.Distance(feet, transform.position);
             // The stones turn solid once nobody is standing in them (it can appear under the player's feet).
             if (m_Body != null && !m_Body.enabled && distance > 1f) m_Body.enabled = true;
 
-            if (IsSpent || distance > m_Settings.radius) return;
             DelveRunController run = DelveRunController.Active;
-            if (run != null && run.IsEnding) return;
-            if (!player.TryGetComponent(out EssenceHealth essence) || essence.CurrentHealth <= 0f) return;
+            bool ending = run != null && run.IsEnding;
+            // The prompt: from a little further than its warmth reaches, while it has warmth left to give.
+            bool near = !IsSpent && !ending && distance <= m_Settings.radius + 1.5f;
+            if (IsSpent || ending || distance > m_Settings.radius)
+            {
+                SetHint(near, false);
+                return;
+            }
+            if (!player.TryGetComponent(out EssenceHealth essence) || essence.CurrentHealth <= 0f)
+            {
+                SetHint(false, false);
+                return;
+            }
             if (m_Pool < 0f) m_Pool = essence.MaximumHealth * m_Settings.restoreFraction;
 
             float missing = essence.MaximumHealth - essence.CurrentHealth;
             float amount = CampfireRules.Warm(m_Pool, essence.MaximumHealth * m_Settings.restoreFraction, m_Settings.restoreSeconds, Time.deltaTime, missing);
+            SetHint(true, amount > 0f);
             if (amount <= 0f) return;
             if (!m_Warmed)
             {
@@ -87,6 +118,7 @@ namespace Hearthdelve.Dungeon.Rooms
             if (m_Light != null) m_Light.intensity = m_FullIntensity * 0.35f;
             if (m_Fire != null) m_Fire.color = new Color(0.55f, 0.45f, 0.4f);
             m_SpentFeedback?.PlayFeedbacks(transform.position);
+            SetHint(false, false);
         }
     }
 
@@ -97,7 +129,7 @@ namespace Hearthdelve.Dungeon.Rooms
         [Tooltip("Lit in the room before the boss's arena once it's clear.")]
         public bool enabled = true;
         [Range(0f, 1f), Tooltip("Essence it gives back in all, as a share of the player's maximum.")]
-        public float restoreFraction = 0.5f;
+        public float restoreFraction = 0.25f;
         [Min(0.1f), Tooltip("Seconds of standing by it to receive all of it.")]
         public float restoreSeconds = 2.5f;
         [Min(0.5f), Tooltip("How close counts as by the fire, in tiles.")]

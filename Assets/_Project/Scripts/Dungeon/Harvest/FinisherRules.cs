@@ -24,8 +24,8 @@ namespace Hearthdelve.Dungeon.Harvest
 
         public static FinisherSettings Default => new()
         {
-            lowFraction = 0.35f,
-            lowHealth = 20f,
+            lowFraction = 0.25f,
+            lowHealth = 15f,
             window = 1.2f,
             reach = 1.8f,
             lockSeconds = 0.5f,

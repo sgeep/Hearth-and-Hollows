@@ -20,6 +20,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] LocalizedSuperText m_Summary;
         [SerializeField, Tooltip("The run's Gold: brought home, or lost.")]
         LocalizedSuperText m_Gold;
+        [SerializeField, Tooltip("A boss felled on the delve (4e sign-off).")]
+        LocalizedSuperText m_Boss;
         [SerializeField] SatchelSlotView[] m_Slots = Array.Empty<SatchelSlotView>();
         [SerializeField] Button m_Continue;
         [SerializeField] LocalizedSuperText m_ContinueLabel;
@@ -30,10 +32,13 @@ namespace Hearthdelve.UI.Screens
         public DelveReport Report { get; private set; }
         public SatchelSlotView[] Slots => m_Slots;
         public Button Continue => m_Continue;
+        /// <summary>The boss line, if a boss was felled on the delve shown.</summary>
+        public bool ShowsBoss => m_Boss != null && m_Boss.gameObject.activeSelf;
 
         public void Configure(GameObject panel, LocalizedSuperText title, LocalizedSuperText summary, SatchelSlotView[] slots, Button proceed, LocalizedSuperText proceedLabel,
-            LocalizedSuperText gold = null)
+            LocalizedSuperText gold = null, LocalizedSuperText boss = null)
         {
+            m_Boss = boss;
             m_Gold = gold;
             m_Panel = panel;
             m_Title = title;
@@ -69,6 +74,13 @@ namespace Hearthdelve.UI.Screens
                 m_Gold.gameObject.SetActive(any);
                 if (Report.GoldSecured > 0) m_Gold.Set(LocKeys.ResultGoldSecured, Report.GoldSecured);
                 else if (Report.GoldLost > 0) m_Gold.Set(LocKeys.ResultGoldLost, Report.GoldLost);
+            }
+            if (m_Boss != null)
+            {
+                // The victory stands whatever the delve's end, as in the save.
+                bool felled = Report.BossesDefeated.Count > 0;
+                m_Boss.gameObject.SetActive(felled);
+                if (felled) m_Boss.Set(LocKeys.ResultBoss, Loc.UI(LocKeys.BossName(Report.BossesDefeated[0])));
             }
             for (int i = 0; i < m_Slots.Length; i++)
             {

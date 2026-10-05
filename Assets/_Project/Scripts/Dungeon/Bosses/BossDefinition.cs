@@ -17,8 +17,10 @@ namespace Hearthdelve.Dungeon.Bosses
         [Header("The encounter")]
         [Range(0f, 1f), Tooltip("Passive Essence drain while the boss is active (0 = paused). Hits still cost Essence.")]
         public float drainMultiplierWhileActive;
-        [Min(0f), Tooltip("Seconds of entrance after the gates seal before the boss acts.")]
+        [Min(0f), Tooltip("Seconds of its entrance after the gates seal, until it has first been beaten: the full reveal.")]
         public float entranceSeconds = 1.6f;
+        [Min(0f), Tooltip("Seconds of its entrance once it has been beaten before (the save's boss-clear record): a shorter intro.")]
+        public float repeatEntranceSeconds = 0.85f;
 
         [Header("Feeding (the Larder Troll, 4e step 2): it eats parts left on the floor to recover")]
         public FeedingSettings feeding = new();

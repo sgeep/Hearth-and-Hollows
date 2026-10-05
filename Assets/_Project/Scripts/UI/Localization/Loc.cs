@@ -203,6 +203,10 @@ namespace Hearthdelve.UI.Localization
         /// <summary>4e: a boss's name, by its id.</summary>
         public static string BossName(string id) => $"boss.{id}";
         public const string BossDefeated = "boss.defeated";
+        /// <summary>The boss bar during its frenzy's roar (4e sign-off): a text cue besides the colour.</summary>
+        public const string BossFrenzy = "boss.frenzy";
+        /// <summary>The delve result's acknowledgement of a boss defeated on the delve.</summary>
+        public const string ResultBoss = "result.boss";
         public static string PowerDescription(string id) => $"power.{id}.desc";
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
@@ -271,6 +275,8 @@ namespace Hearthdelve.UI.Localization
             (PowerTitle, "choose a power"),
             ("boss.larder_troll", "the Larder Troll"),
             (BossDefeated, "{0} falls"),
+            (BossFrenzy, "{0} rages!"),
+            (ResultBoss, "you felled {0}"),
             (PowerFooter, "it lasts until you leave the Hollows"),
             ("power.deep_reserves", "deep reserves"),
             ("power.deep_reserves.desc", "+{0} max Essence, filled at once"),

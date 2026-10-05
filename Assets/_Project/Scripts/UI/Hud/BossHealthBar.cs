@@ -19,6 +19,9 @@ namespace Hearthdelve.UI.Hud
 
         Color m_Colour;
         float m_HideAt = -1f;
+        // The frenzy caption's end, after which the bar shows the boss's name again.
+        float m_NameAt = -1f;
+        string m_BossName;
 
         public bool IsShown => m_Root != null && m_Root.activeSelf;
         public float Fraction => m_Fill != null ? m_Fill.fillAmount : 0f;
@@ -38,8 +41,17 @@ namespace Hearthdelve.UI.Hud
             if (m_Fill != null) m_Colour = m_Fill.color;
         }
 
+        /// <summary>The bar says the boss is raging (its frenzy's roar).</summary>
+        public bool ShowsFrenzy { get; private set; }
+
         void Update()
         {
+            if (m_NameAt >= 0f && Time.unscaledTime >= m_NameAt)
+            {
+                m_NameAt = -1f;
+                ShowsFrenzy = false;
+                if (!IsCaption) m_Label?.Set(LocKeys.BossName(m_BossName));
+            }
             if (m_HideAt < 0f || Time.unscaledTime < m_HideAt) return;
             m_HideAt = -1f;
             IsCaption = false;
@@ -65,7 +77,10 @@ namespace Hearthdelve.UI.Hud
         void OnStarted(BossEncounterStarted e)
         {
             BossId = e.BossId;
+            m_BossName = e.BossId;
             IsCaption = false;
+            ShowsFrenzy = false;
+            m_NameAt = -1f;
             m_HideAt = -1f;
             if (m_Fill != null) m_Fill.color = m_Colour;
             m_Label?.Set(LocKeys.BossName(e.BossId));
@@ -77,7 +92,15 @@ namespace Hearthdelve.UI.Hud
 
         void OnPhase(BossPhaseChanged e)
         {
-            if (m_Fill != null && e.Phase >= 2) m_Fill.color = m_FrenzyColour;
+            if (e.Phase < 2) return;
+            if (m_Fill != null) m_Fill.color = m_FrenzyColour;
+            // Not colour alone (4e sign-off): the bar says so while it roars.
+            if (m_Label != null && !IsCaption && m_BossName != null)
+            {
+                m_Label.Set(LocKeys.BossFrenzy, Loc.UI(LocKeys.BossName(m_BossName)));
+                ShowsFrenzy = true;
+                m_NameAt = Time.unscaledTime + 2f;
+            }
         }
 
         // Defeated: "the Larder Troll falls" over an empty bar for a moment. Otherwise the bar simply goes.
@@ -89,6 +112,8 @@ namespace Hearthdelve.UI.Hud
                 return;
             }
             IsCaption = true;
+            ShowsFrenzy = false;
+            m_NameAt = -1f;
             Show(0f, 1f);
             m_Label.Set(LocKeys.BossDefeated, Loc.UI(LocKeys.BossName(e.BossId)));
             m_HideAt = Time.unscaledTime + m_CaptionSeconds;

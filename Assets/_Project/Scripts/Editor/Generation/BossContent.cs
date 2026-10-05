@@ -111,8 +111,24 @@ namespace Hearthdelve.Editor
                 LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossTelegraph)), defeat);
 
             // Step 2: the frenzy (a roar, a big shake, the phase-change rumble), its stolen larder, and its appetite.
-            root.AddComponent<BossFrenzy>().Configure(boss, LookTestContent.Feedback(root.transform, "Feedback_Frenzy", body, 0.7f,
-                LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossPhaseChange)));
+            MMF_Player frenzy = LookTestContent.Feedback(root.transform, "Feedback_Frenzy", body, 0.7f,
+                LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossPhaseChange));
+            // Non-colour cues (4e sign-off), besides the roar, the shake, the rumble and the held pose: it swells up as it
+            // roars, with a beat of hit-stop, and the bar says it rages.
+            var swell = new MMF_Scale
+            {
+                Label = "Swell",
+                AnimateScaleTarget = root.GetComponentInChildren<CharacterSpriteAnimator>().transform,
+                Mode = MMF_Scale.Modes.Absolute,
+                AnimateScaleDuration = 0.9f,
+                RemapCurveZero = 1f,
+                RemapCurveOne = 1.22f,
+                UniformScaling = true,
+            };
+            swell.AnimateScaleTweenX = new MMTweenType(new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.2f, 1f), new Keyframe(0.7f, 0.85f), new Keyframe(1f, 0f)));
+            frenzy.AddFeedback(swell);
+            frenzy.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.12f });
+            root.AddComponent<BossFrenzy>().Configure(boss, frenzy);
             root.AddComponent<LarderScraps>().Configure(boss);
             var eater = root.AddComponent<ScrapEater>();
             eater.Configure(boss,

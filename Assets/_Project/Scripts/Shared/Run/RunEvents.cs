@@ -60,6 +60,22 @@ namespace Hearthdelve.Shared.Run
     }
 
     /// <summary>Show/hide the "leave the dungeon" prompt while standing at the exit.</summary>
+    /// <summary>
+    /// The campfire's prompt (4e sign-off): shown while the player is near a fire that still has warmth to give, saying
+    /// to stand by it; <see cref="Warming"/> while it's giving Essence back.
+    /// </summary>
+    public readonly struct CampfireHint : IEvent
+    {
+        public readonly bool Visible;
+        public readonly bool Warming;
+
+        public CampfireHint(bool visible, bool warming)
+        {
+            Visible = visible;
+            Warming = warming;
+        }
+    }
+
     public readonly struct DelveExitHint : IEvent
     {
         public readonly bool Visible;
