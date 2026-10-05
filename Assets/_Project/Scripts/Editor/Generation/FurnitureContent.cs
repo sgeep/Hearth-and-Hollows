@@ -271,12 +271,14 @@ namespace Hearthdelve.Editor
                 }
             });
 
+            // A barrel stands a quarter tile west of its cell's middle, where 4e put the ones by the east wall: so barrels on
+            // neighbouring tiles touch, as 4e's did, and a moved one can stand beside them again.
             yield return Define("cellar_barrel", "furniture.cellar_barrel", FurnitureCategory.BarAndStorage, d =>
             {
                 d.price = 20;
                 d.sources = FurnitureSource.Starter | FurnitureSource.Bought;
                 Sprite barrel = MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Props", "Barrel");
-                var at = new Vector2(0.5f, 0f);
+                var at = new Vector2(0.25f, 0f);
                 d.facings.Add(new FurnitureFacing { size = Vector2Int.one, art = { Art("Barrel", barrel, at) }, bodies = { FullBody(barrel, at) } });
             });
 
@@ -287,10 +289,16 @@ namespace Hearthdelve.Editor
                 Art("Bottles", Tavern("props2", "ShelfGoods"), new Vector2(0.75f, 0.125f), SortingLayers.Floor, 4));
             yield return Wall("wall_sign", FurnitureCategory.WallDecor, new Vector2Int(2, 1),
                 Art("Sign", Tavern("props", "Sign"), new Vector2(0f, 0.25f), SortingLayers.Floor, 3));
-            yield return Wall("low_shelf", FurnitureCategory.BarAndStorage, new Vector2Int(2, 1),
+            // The low shelf has a surface: the row of glasses stands on it (D4), moves with it, and can go on another shelf.
+            FurnitureDefinition lowShelf = Wall("low_shelf", FurnitureCategory.BarAndStorage, new Vector2Int(2, 1),
                 Art("Shelf", Tavern("props", "ShelfLow"), new Vector2(0.5f, 0.75f), SortingLayers.Floor, 3));
-            yield return Wall("shelf_glasses", FurnitureCategory.BarAndStorage, new Vector2Int(2, 1),
-                Art("Glasses", Tavern("props2", "Glasses"), new Vector2(0.75f, 0.5f), SortingLayers.Floor, 4));
+            lowShelf.facings[0].surfaces.Add(new Vector2(0.75f, 1.5f));
+            yield return lowShelf;
+            yield return Define("shelf_glasses", "furniture.shelf_glasses", FurnitureCategory.BarAndStorage, d =>
+            {
+                d.layer = FurnitureLayer.Surface;
+                d.facings.Add(new FurnitureFacing { size = Vector2Int.one, art = { Art("Glasses", Tavern("props2", "Glasses"), Vector2.zero, SortingLayers.Floor, 4) } });
+            });
             FurnitureArt flame = Art("Fire", null, new Vector2(1.5f, 0f), SortingLayers.Floor, 3);
             flame.frames = MinifantasyImporter.Row(MinifantasySheets.DwarvenKingdom, "WallFireplace", 0, 8);
             flame.frameSeconds = 0.12f;
@@ -324,27 +332,28 @@ namespace Hearthdelve.Editor
             Place("kitchen_range", 19, 12);
             Place("stew_pot", 24, 11);
             Place("pass_table", 20, 8);
-            // Tables at (4.5, 7), (9.5, 7) and (18, 4), with a chair 1.25 tiles either side, a quarter tile up (the chairs'
-            // own offset). 4e set the third table's group half a tile off the grid: all three pieces carry the nudge.
+            // Tables at (4.5, 7), (9.5, 7) and (18.5, 4), with a chair 1.25 tiles either side, a quarter tile up (the chairs'
+            // own offset). (4e set the third table's group half a tile off the grid, at 18; after the Checkpoint A playtest it
+            // stands on the grid, so the set can be rebuilt by snapping.)
             Place("table_round_a", 4, 7);
             Place("tavern_chair", 3, 7, turns: 1);
             Place("tavern_chair", 5, 7, turns: 3);
             Place("table_round_b", 9, 7);
             Place("tavern_chair", 8, 7, turns: 1);
             Place("tavern_chair", 10, 7, turns: 3);
-            Place("table_round_a", 18, 4, nx: -4);
-            Place("tavern_chair", 17, 4, turns: 1, nx: -4);
-            Place("tavern_chair", 19, 4, turns: 3, nx: -4);
+            Place("table_round_a", 18, 4);
+            Place("tavern_chair", 17, 4, turns: 1);
+            Place("tavern_chair", 19, 4, turns: 3);
             // Barrels by the east wall.
-            Place("cellar_barrel", 26, 8, nx: -2);
-            Place("cellar_barrel", 26, 9, nx: -2);
-            Place("cellar_barrel", 25, 8, nx: -2);
+            Place("cellar_barrel", 26, 8);
+            Place("cellar_barrel", 26, 9);
+            Place("cellar_barrel", 25, 8);
             // The back wall.
             Place("bottle_shelves", 2, 14);
             Place("wall_sign", 11, 15);
             Place("wall_fireplace", 14, 14);
             Place("low_shelf", 24, 14);
-            Place("shelf_glasses", 24, 15);
+            pieces.Add(new PlacedFurniture { uid = pieces.Count + 1, definition = "shelf_glasses", host = pieces.Count, anchor = 0 });
 
             return LookTestContent.CreateOrUpdate<FurnitureStartingLayout>(StartingLayoutPath, s =>
             {

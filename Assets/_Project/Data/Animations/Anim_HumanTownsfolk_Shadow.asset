@@ -84,6 +84,8 @@ MonoBehaviour:
     - {fileID: 1553677907, guid: 2e0c975a2fc23d44da8d57734359b09d, type: 3}
     - {fileID: -2094392875, guid: 2e0c975a2fc23d44da8d57734359b09d, type: 3}
     - {fileID: 730870859, guid: 2e0c975a2fc23d44da8d57734359b09d, type: 3}
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 1
     frameDuration: 0.2
     loop: 1
@@ -107,6 +109,8 @@ MonoBehaviour:
     - {fileID: -833133829, guid: cf984b745f6f48547aebeddeddb12018, type: 3}
     - {fileID: -383952653, guid: cf984b745f6f48547aebeddeddb12018, type: 3}
     - {fileID: -1060300476, guid: cf984b745f6f48547aebeddeddb12018, type: 3}
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 2
     frameDuration: 0.1
     loop: 0
@@ -130,6 +134,8 @@ MonoBehaviour:
     - {fileID: 1148145569, guid: cbeb7583c06a5f2469ec424a02fce8a4, type: 3}
     - {fileID: -1487281328, guid: cbeb7583c06a5f2469ec424a02fce8a4, type: 3}
     - {fileID: -2134082910, guid: cbeb7583c06a5f2469ec424a02fce8a4, type: 3}
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 4
     frameDuration: 0.1
     loop: 0
@@ -153,6 +159,8 @@ MonoBehaviour:
     - {fileID: 897976098, guid: df84961ecb0b9f8479e42129ea8cc6a3, type: 3}
     - {fileID: -1920707176, guid: df84961ecb0b9f8479e42129ea8cc6a3, type: 3}
     - {fileID: -680237913, guid: df84961ecb0b9f8479e42129ea8cc6a3, type: 3}
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 3
     frameDuration: 0.1
     loop: 0
@@ -176,6 +184,8 @@ MonoBehaviour:
     - {fileID: -414849469, guid: f5005cda62b3b044ea0795013dad6f90, type: 3}
     - {fileID: -768477157, guid: f5005cda62b3b044ea0795013dad6f90, type: 3}
     - {fileID: 1601202185, guid: f5005cda62b3b044ea0795013dad6f90, type: 3}
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 5
     frameDuration: 0.1
     loop: 0
@@ -195,6 +205,8 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 0
+    walkForBack: 0
   - action: 6
     frameDuration: 0.1
     loop: 0
@@ -208,6 +220,8 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 1
+    walkForBack: 0
   - action: 7
     frameDuration: 0.1
     loop: 1
@@ -221,6 +235,8 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 1
+    walkForBack: 0
   - action: 8
     frameDuration: 0.1
     loop: 0
@@ -234,3 +250,5 @@ MonoBehaviour:
     frontLeft: []
     backRight: []
     backLeft: []
+    mirrorForLeft: 1
+    walkForBack: 0

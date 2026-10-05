@@ -230,6 +230,16 @@ namespace Hearthdelve.Editor
             return anim;
         }
 
+        /// <summary>
+        /// A one-row sheet drawn facing front-right, mirrored for the left facings: the charged attack's stages, so the
+        /// charge turns with the aim while it's held (Checkpoint A playtest; the back facings keep the front pose).
+        /// </summary>
+        static SpriteAnim MirrorLeft(SpriteAnim anim)
+        {
+            anim.mirrorForLeft = true;
+            return anim;
+        }
+
         internal static SpriteAnim Anim(CharacterAnim action, string pack, string file, int frames, int rows, float frameDuration, bool loop)
         {
             var anim = new SpriteAnim { action = action, frameDuration = frameDuration, loop = loop };
@@ -251,6 +261,28 @@ namespace Hearthdelve.Editor
         internal static SpriteAnimationSet Set(string name, params SpriteAnim[] animations) =>
             CreateOrUpdate<SpriteAnimationSet>($"{EditorPaths.Animations}/{name}.asset", set => set.animations = new List<SpriteAnim>(animations));
 
+        /// <summary>Rebuilds only the animation sets (their assets are updated in place, so references hold).</summary>
+        [MenuItem("Hearthdelve/Generate/Animation Sets", priority = 30)]
+        public static void RebuildAnimationSets()
+        {
+            BuildAnimationSets(out _, out _, out _, out _, out _);
+            AssetDatabase.SaveAssets();
+        }
+
+        public static void RebuildAnimationSetsBatch()
+        {
+            try
+            {
+                RebuildAnimationSets();
+                EditorApplication.Exit(0);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         public static void BuildAnimationSets(out SpriteAnimationSet human, out SpriteAnimationSet humanShadow,
             out SpriteAnimationSet slime, out SpriteAnimationSet slimeShadow, out SpriteAnimationSet cook)
         {
@@ -265,10 +297,11 @@ namespace Hearthdelve.Editor
                 // dodges away from the camera (4d playtest).
                 Mirrored(Anim(CharacterAnim.Dodge, c, "HumanTownsfolkJump", 4, 1, 0.1f, false)),
                 Anim(CharacterAnim.Die, c, "HumanTownsfolkSpinDie", 12, 1, 0.1f, false),
-                // ChargedAttack's rows are stages, not facings: wind-up, charged loop, the spin.
-                AnimRow(CharacterAnim.Charge, c, "HumanTownsfolkChargedAttack", 6, 0, 0.1f, false),
-                AnimRow(CharacterAnim.ChargeHold, c, "HumanTownsfolkChargedAttack", 6, 1, 0.1f, true),
-                AnimRow(CharacterAnim.HeavyAttack, c, "HumanTownsfolkChargedAttack", 6, 2, 0.1f, false));
+                // ChargedAttack's rows are stages, not facings: wind-up, charged loop, the spin. Drawn facing front-right
+                // only: mirrored when the aim is to the left.
+                MirrorLeft(AnimRow(CharacterAnim.Charge, c, "HumanTownsfolkChargedAttack", 6, 0, 0.1f, false)),
+                MirrorLeft(AnimRow(CharacterAnim.ChargeHold, c, "HumanTownsfolkChargedAttack", 6, 1, 0.1f, true)),
+                MirrorLeft(AnimRow(CharacterAnim.HeavyAttack, c, "HumanTownsfolkChargedAttack", 6, 2, 0.1f, false)));
             humanShadow = Set("Anim_HumanTownsfolk_Shadow",
                 Anim(CharacterAnim.Idle, c, "ShadowHumanoidIdle", 16, 4, 0.2f, true),
                 Anim(CharacterAnim.Walk, c, "ShadowHumanoidWalk", 4, 4, 0.2f, true),
@@ -276,9 +309,9 @@ namespace Hearthdelve.Editor
                 Anim(CharacterAnim.Hurt, c, "ShadowHumanoidDmg", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Dodge, c, "ShadowHumanoidJump", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Die, c, "ShadowHumanoidSpinDie", 12, 1, 0.1f, false),
-                AnimRow(CharacterAnim.Charge, c, "ShadowHumanoidChargedAttack", 6, 0, 0.1f, false),
-                AnimRow(CharacterAnim.ChargeHold, c, "ShadowHumanoidChargedAttack", 6, 1, 0.1f, true),
-                AnimRow(CharacterAnim.HeavyAttack, c, "ShadowHumanoidChargedAttack", 6, 2, 0.1f, false));
+                MirrorLeft(AnimRow(CharacterAnim.Charge, c, "ShadowHumanoidChargedAttack", 6, 0, 0.1f, false)),
+                MirrorLeft(AnimRow(CharacterAnim.ChargeHold, c, "ShadowHumanoidChargedAttack", 6, 1, 0.1f, true)),
+                MirrorLeft(AnimRow(CharacterAnim.HeavyAttack, c, "ShadowHumanoidChargedAttack", 6, 2, 0.1f, false)));
             slime = Set("Anim_GreenSlime",
                 Anim(CharacterAnim.Idle, c, "SlimeGreenIdle", 8, 4, 0.2f, true),
                 Anim(CharacterAnim.Walk, c, "SlimeGreenJumpAttack", 4, 4, 0.2f, true),

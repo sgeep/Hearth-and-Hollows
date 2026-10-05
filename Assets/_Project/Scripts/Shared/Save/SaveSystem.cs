@@ -17,7 +17,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 4;
+        public const int CurrentVersion = 5;
 
         /// <summary>The seat upgrade retired in 4f (D16): seating comes from placed tables and chairs.</summary>
         public const string RetiredSeatUpgrade = "tavern_seats";
@@ -77,7 +77,7 @@ namespace Hearthdelve.Shared.Save
                     saved.pieces.Add(new PieceData
                     {
                         uid = p.uid, def = p.definition, x = p.cell.x, y = p.cell.y, turns = p.turns, flip = p.flipped,
-                        nx = p.nudge.x, ny = p.nudge.y, host = p.host,
+                        nx = p.nudge.x, ny = p.nudge.y, host = p.host, anchor = p.anchor,
                     });
                 data.furniture.areas.Add(saved);
             }
@@ -172,7 +172,7 @@ namespace Hearthdelve.Shared.Save
                     pieces.Add(new PlacedFurniture
                     {
                         uid = p.uid, definition = p.def, cell = new Vector2Int(p.x, p.y), turns = p.turns, flipped = p.flip,
-                        nudge = new Vector2Int(p.nx, p.ny), host = p.host,
+                        nudge = new Vector2Int(p.nx, p.ny), host = p.host, anchor = p.anchor,
                     });
                 }
                 areas.Add((a.id, pieces));
@@ -197,7 +197,38 @@ namespace Hearthdelve.Shared.Save
             SaveData data = version == 1 ? MigrateV1(JsonUtility.FromJson<SaveDataV1>(json)) : JsonUtility.FromJson<SaveData>(json);
             if (data.version == 2) data = MigrateV2(data);
             if (data.version == 3) data = MigrateV3(data);
+            if (data.version == 4) data = MigrateV4(data);
             return data;
+        }
+
+        /// <summary>
+        /// v4 → v5 (after the 4f Checkpoint A playtest): pieces keep exactly where they stood. Barrels are now drawn a quarter
+        /// tile west of their cell's middle, so each saved barrel gains the 2 pixels back in its nudge; and the row of glasses
+        /// is a surface item, so a saved row standing on a low shelf goes onto that shelf's surface (otherwise to storage).
+        /// </summary>
+        static SaveData MigrateV4(SaveData v4)
+        {
+            v4.version = 5;
+            if (v4.furniture?.areas == null) return v4;
+            foreach (AreaSaveData area in v4.furniture.areas)
+            {
+                if (area?.pieces == null) continue;
+                foreach (PieceData p in area.pieces)
+                    if (p != null && p.def == "cellar_barrel") p.nx = Math.Min(p.nx + 2, FurnitureGeometry.NudgeMax);
+                for (int i = area.pieces.Count - 1; i >= 0; i--)
+                {
+                    PieceData glasses = area.pieces[i];
+                    if (glasses == null || glasses.def != "shelf_glasses" || glasses.host >= 0) continue;
+                    PieceData shelf = area.pieces.Find(p => p != null && p.def == "low_shelf" && p.x == glasses.x && p.y == glasses.y - 1 && p.nx == glasses.nx && p.ny == glasses.ny);
+                    if (shelf != null)
+                    {
+                        glasses.host = shelf.uid;
+                        glasses.anchor = 0;
+                    }
+                    else area.pieces.RemoveAt(i);
+                }
+            }
+            return v4;
         }
 
         /// <summary>

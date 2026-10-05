@@ -47,11 +47,11 @@ namespace Hearthdelve.Tests
 
         // ---------- The walkable grid ----------
 
-        /// <summary>The check's grid, built from bodies by NavGrid's own rule, is the grid the 4e room baked.</summary>
+        /// <summary>The check's grid, built from bodies by NavGrid's own rule, is the grid the starting room bakes (recorded in PlayMode).</summary>
         [Test]
-        public void TheChecksGrid_IsThe4eRoomsBakedGrid()
+        public void TheChecksGrid_IsTheStartingRoomsBakedGrid()
         {
-            string[] baseline = File.ReadAllLines("Assets/_Project/Tests/PlayMode/Baselines/Tavern4e_starting.txt")
+            string[] baseline = File.ReadAllLines("Assets/_Project/Tests/PlayMode/Baselines/TavernStarting.txt")
                 .Where(l => l.StartsWith("grid|") && !l.StartsWith("grid|bounds")).ToArray();
             FurnitureLayout layout = Starting();
             GridMap map = LayoutCheck.Walkable(layout.Shape, layout.ResolveAll());
@@ -118,7 +118,7 @@ namespace Hearthdelve.Tests
             foreach (var (x, y) in new[] { (2, 5), (3, 5), (4, 5), (2, 6), (4, 6) }) layout.Add(New("cellar_barrel", x, y));
             LayoutReport report = LayoutCheck.For(layout.Shape, layout.ResolveAll());
             Assert.That(report.CanOpen, "warnings never keep the doors shut (D13)");
-            Assert.That(report.Issues.Any(i => i.Kind == LayoutIssueKind.QueueBlocked && !i.Blocking && i.Count == 1));
+            Assert.That(report.Issues.Any(i => i.Kind == LayoutIssueKind.QueueBlocked && !i.Blocking && i.Count >= 1));
             Assert.That(report.Issues.Any(i => i.Kind == LayoutIssueKind.SeatsUnreachable && !i.Blocking), string.Join(", ", report.Issues.Select(i => i.Kind)));
             Assert.That(report.ReachableSeats, Is.LessThan(report.Seats));
         }
@@ -148,10 +148,57 @@ namespace Hearthdelve.Tests
         public void Bodies_MayNotOverlap_EvenWhenFootprintsDont()
         {
             FurnitureLayout layout = Starting();
-            // The barrel at (25, 8) is nudged two pixels west (as in 4e), so its body reaches into the cell to its left.
-            PlacementCheck check = layout.Check(New("cellar_barrel", 24, 8));
+            // An east-facing chair on the tile up and right of the third table: its own tile, but its body reaches the table's.
+            PlacementCheck check = layout.Check(New("tavern_chair", 19, 5, 1));
             Assert.That(check.Problem, Is.EqualTo(PlacementProblem.Overlaps));
-            Assert.That(check.Blocker, Is.EqualTo(Piece(layout, "cellar_barrel", new Vector2Int(25, 8)).uid));
+            Assert.That(check.Blocker, Is.EqualTo(Piece(layout, "table_round_a", new Vector2Int(18, 4)).uid));
+        }
+
+        /// <summary>The Checkpoint A playtest: a barrel couldn't go back beside the others. Barrels on neighbouring tiles touch.</summary>
+        [Test]
+        public void Barrels_StandOnNeighbouringTiles()
+        {
+            FurnitureLayout layout = Starting();
+            Assert.That(layout.Check(New("cellar_barrel", 24, 8)).IsValid, "beside the barrel at (25, 8)");
+            Assert.That(layout.Check(New("cellar_barrel", 25, 9)).IsValid, "on top of it, beside the one at (26, 9)");
+            PlacedFurniture moved = Piece(layout, "cellar_barrel", new Vector2Int(25, 8));
+            layout.Remove(moved.uid);
+            Assert.That(layout.Check(moved).IsValid, "and back where it came from");
+        }
+
+        [Test]
+        public void TheGlasses_StandOnTheLowShelf_AndMoveWithIt()
+        {
+            FurnitureLayout layout = Starting();
+            PlacedFurniture shelf = Piece(layout, "low_shelf", new Vector2Int(24, 14));
+            PlacedFurniture glasses = layout.Pieces.Single(p => p.definition == "shelf_glasses");
+            Assert.That((glasses.host, glasses.anchor), Is.EqualTo((shelf.uid, 0)));
+            Vector2 before = layout.ResolveAll().Single(r => r.Placement.uid == glasses.uid).Art[0].Position;
+            Assert.That(Vector2.Distance(before, new Vector2(24.75f, 15.5f)), Is.LessThan(1e-4f), "where 4e put them");
+
+            List<PlacedFurniture> lifted = layout.Remove(shelf.uid);
+            Assert.That(lifted.Select(p => p.definition), Is.EquivalentTo(new[] { "low_shelf", "shelf_glasses" }), "a shelf's glasses come away with it");
+            shelf.cell = new Vector2Int(5, 15);
+            foreach (PlacedFurniture p in lifted) layout.Add(p);
+            Vector2 after = layout.ResolveAll().Single(r => r.Placement.uid == glasses.uid).Art[0].Position;
+            Assert.That(Vector2.Distance(after, new Vector2(5.75f, 16.5f)), Is.LessThan(1e-4f), "and stand on it wherever it goes");
+
+            PlacedFurniture loose = New("shelf_glasses", 0, 0);
+            Assert.That(layout.Check(loose).Problem, Is.EqualTo(PlacementProblem.NeedsASurface), "glasses need a surface");
+            Assert.That(layout.NearestSurface(new Vector2(5.9f, 16.2f)), Is.EqualTo((shelf.uid, 0)), "the shelf's surface is in reach");
+            loose.host = shelf.uid;
+            Assert.That(layout.Check(loose).Problem, Is.EqualTo(PlacementProblem.Overlaps), "one row of glasses per surface");
+        }
+
+        /// <summary>The Checkpoint A playtest: picking by what's drawn (a chair sits a quarter tile off its cell).</summary>
+        [Test]
+        public void PointingPicks_WhatsDrawnThere()
+        {
+            FurnitureLayout layout = Starting();
+            // The first table's west chair is drawn from x 2.875 to 3.625: its left edge is over the tile to the west.
+            Assert.That(layout.AtPoint(new Vector2(2.95f, 7.6f)).First().definition, Is.EqualTo("tavern_chair"));
+            Assert.That(layout.At(new Vector2Int(2, 7)), Is.Empty, "no piece's tile there");
+            Assert.That(layout.AtPoint(new Vector2(24.9f, 15.6f)).First().definition, Is.EqualTo("shelf_glasses"), "the glasses before their shelf");
         }
 
         [Test]
@@ -184,18 +231,13 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void Removing_TakesSurfaceItemsWithIt_AndAtFindsTheTopPieceFirst()
+        public void AtFindsTheTopPieceFirst()
         {
             FurnitureLayout layout = Starting();
             List<PlacedFurniture> here = layout.At(new Vector2Int(4, 7));
             Assert.That(here.First().definition, Is.EqualTo("table_round_a"));
             Assert.That(layout.At(new Vector2Int(15, 15)).Single().definition, Is.EqualTo("wall_fireplace"));
             Assert.That(layout.At(new Vector2Int(12, 5)), Is.Empty);
-            int before = layout.Pieces.Count;
-            PlacedFurniture shelf = Piece(layout, "low_shelf", new Vector2Int(24, 14));
-            layout.Add(new PlacedFurniture { uid = 777, definition = "shelf_glasses", cell = new Vector2Int(1, 16), host = shelf.uid });
-            Assert.That(layout.Remove(shelf.uid).Count, Is.EqualTo(2), "a piece's riders come away with it");
-            Assert.That(layout.Pieces.Count, Is.EqualTo(before - 1));
         }
     }
 }

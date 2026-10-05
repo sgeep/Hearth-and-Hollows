@@ -6,7 +6,7 @@ namespace Hearthdelve.Shared.Save
     // JSON shapes (JsonUtility). Content is stored by stable id; enums by name so reordering
     // them never corrupts a save. Change these only together with a version bump + migration.
 
-    /// <summary>Current save format (version 4: version 3 plus furniture, 4f; version 3 added the bosses defeated, 4e).</summary>
+    /// <summary>Current save format (version 5: as 4, with 4f's barrel offset and surface glasses; 4 added furniture, 3 the bosses defeated).</summary>
     [Serializable]
     public sealed class SaveData
     {
@@ -64,6 +64,7 @@ namespace Hearthdelve.Shared.Save
         public int nx;
         public int ny;
         public int host = -1;
+        public int anchor;
     }
 
     [Serializable]

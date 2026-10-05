@@ -67,6 +67,8 @@ namespace Hearthdelve.Core.Input
         public const string Check = "Check";
         /// <summary>Mouse wheel: turns the carried piece.</summary>
         public const string Wheel = "Wheel";
+        /// <summary>Held: free placement, to the pixel (the owner's request, amending D1).</summary>
+        public const string Free = "Free";
     }
 
     public static class MinigameActions

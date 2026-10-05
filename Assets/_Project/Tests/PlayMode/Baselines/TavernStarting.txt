@@ -3,10 +3,10 @@ collider|BoxCollider2D|0.0000,0.0000..28.0000,2.0000|trigger False|layer Obstacl
 collider|BoxCollider2D|0.0000,14.0000..28.0000,17.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|1.5000,11.0000..2.1250,13.7500|trigger False|layer Obstacles
 collider|BoxCollider2D|10.3750,7.2500..11.1250,8.2500|trigger False|layer Obstacles
-collider|BoxCollider2D|16.3750,4.2500..17.1250,5.2500|trigger False|layer Obstacles
-collider|BoxCollider2D|17.2500,4.0000..18.7500,5.5000|trigger False|layer Obstacles
-collider|BoxCollider2D|18.8750,4.2500..19.6250,5.2500|trigger False|layer Obstacles
+collider|BoxCollider2D|16.8750,4.2500..17.6250,5.2500|trigger False|layer Obstacles
+collider|BoxCollider2D|17.7500,4.0000..19.2500,5.5000|trigger False|layer Obstacles
 collider|BoxCollider2D|19.1250,12.0000..20.5000,15.1250|trigger False|layer Obstacles
+collider|BoxCollider2D|19.3750,4.2500..20.1250,5.2500|trigger False|layer Obstacles
 collider|BoxCollider2D|19.7500,8.5000..23.2500,9.5000|trigger False|layer Obstacles
 collider|BoxCollider2D|2.0000,11.0000..8.8750,12.7500|trigger False|layer Obstacles
 collider|BoxCollider2D|2.8750,7.2500..3.6250,8.2500|trigger False|layer Obstacles
@@ -24,8 +24,8 @@ grid|00|############################
 grid|01|############################
 grid|02|#..........................#
 grid|03|#..........................#
-grid|04|#...............####.......#
-grid|05|#...............####.......#
+grid|04|#...............#####......#
+grid|05|#...............#####......#
 grid|06|#..........................#
 grid|07|#.##########...............#
 grid|08|#.##########.......#########
@@ -41,8 +41,8 @@ grid|bounds (x:0, y:0, width:28, height:17)
 interactable|Grill|station.grill|reach 1.5000|use 20.8125,11.4250;21.5000,13.5000|highlight CornerBL@19.0000,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@22.6250,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@19.0000,15.2500/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@22.6250,15.2500/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@20.8125,15.3750/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Pass|station.pass|reach 1.5000|use 21.5000,9.0000|highlight CornerBL@19.6250,8.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@23.3750,8.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@19.6250,9.6250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@23.3750,9.6250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@21.5000,9.7500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 10.7500,7.2500|highlight CornerBL@10.1250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@11.3750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@10.1250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@11.3750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@10.7500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
-interactable|Seat||reach 1.4000|use 16.7500,4.2500|highlight CornerBL@16.1250,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@17.3750,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@16.1250,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@17.3750,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@16.7500,6.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
-interactable|Seat||reach 1.4000|use 19.2500,4.2500|highlight CornerBL@18.6250,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@19.8750,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@18.6250,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@19.8750,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@19.2500,6.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
+interactable|Seat||reach 1.4000|use 17.2500,4.2500|highlight CornerBL@16.6250,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@17.8750,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@16.6250,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@17.8750,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@17.2500,6.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
+interactable|Seat||reach 1.4000|use 19.7500,4.2500|highlight CornerBL@19.1250,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@20.3750,4.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@19.1250,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@20.3750,6.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@19.7500,6.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 3.2500,7.2500|highlight CornerBL@2.6250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@3.8750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@2.6250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@3.8750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@3.2500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 5.7500,7.2500|highlight CornerBL@5.1250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@6.3750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@5.1250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@6.3750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@5.7500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 8.2500,7.2500|highlight CornerBL@7.6250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@8.8750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@7.6250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@8.8750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@8.2500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
@@ -73,11 +73,11 @@ seat order|0|3.2500,7.2300
 seat order|1|5.7500,7.2300
 seat order|2|8.2500,7.2300
 seat order|3|10.7500,7.2300
-seat order|4|16.7500,4.2300
-seat order|5|19.2500,4.2300
+seat order|4|17.2500,4.2300
+seat order|5|19.7500,4.2300
 seat|10.7500,7.2300|approach 10.7500,6.3500|FrontLeft
-seat|16.7500,4.2300|approach 16.7500,3.3500|FrontRight
-seat|19.2500,4.2300|approach 19.2500,3.3500|FrontLeft
+seat|17.2500,4.2300|approach 17.2500,3.3500|FrontRight
+seat|19.7500,4.2300|approach 19.7500,3.3500|FrontLeft
 seat|3.2500,7.2300|approach 3.2500,6.3500|FrontRight
 seat|5.7500,7.2300|approach 5.7500,6.3500|FrontLeft
 seat|8.2500,7.2300|approach 8.2500,6.3500|FrontRight
@@ -92,17 +92,17 @@ sprite|TavernIndoor_props2_BarTop|1.7500,12.1250|rot 0.0000|scale 1.0000,1.0000|
 sprite|TavernIndoor_props2_Glasses|24.7500,15.5000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/4|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props2_ShelfGoods|2.7500,14.1250|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/4|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_Bar|1.5000,11.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|group Characters/0@1.5000,11.0000
-sprite|TavernIndoor_props_ChairFacingE|16.7500,4.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
+sprite|TavernIndoor_props_ChairFacingE|17.2500,4.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_ChairFacingE|3.2500,7.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_ChairFacingE|8.2500,7.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_ChairFacingW|10.7500,7.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
-sprite|TavernIndoor_props_ChairFacingW|19.2500,4.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
+sprite|TavernIndoor_props_ChairFacingW|19.7500,4.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_ChairFacingW|5.7500,7.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_LongTableH|21.5000,8.5000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|group Characters/0@21.5000,8.5000
 sprite|TavernIndoor_props_ShelfLow|24.5000,14.7500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_Shelves|2.7500,14.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_Sign|11.0000,15.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
-sprite|TavernIndoor_props_TableRoundA|18.0000,4.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
+sprite|TavernIndoor_props_TableRoundA|18.5000,4.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_TableRoundA|4.5000,7.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_TableRoundB|9.5000,7.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|WallFireplace_0_0|15.5000,14.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped

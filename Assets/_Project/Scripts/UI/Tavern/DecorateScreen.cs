@@ -8,6 +8,7 @@ using Hearthdelve.UI.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 
 namespace Hearthdelve.UI.Tavern
@@ -132,11 +133,11 @@ namespace Hearthdelve.UI.Tavern
                 ClosePanels();
                 return;
             }
-            bool gamepad = Gamepad.current != null && Gamepad.current.wasUpdatedThisFrame;
-            bool keyboard = (Keyboard.current != null && Keyboard.current.wasUpdatedThisFrame) || (Mouse.current != null && Mouse.current.wasUpdatedThisFrame);
-            if (gamepad && !m_Gamepad || keyboard && m_Gamepad)
+            // Which prompts: the device last really used. Devices report idle updates every frame (a mouse its zero delta, a
+            // pad its sticks' noise), which made the prompts flicker between the two (Checkpoint A playtest).
+            if (!m_Gamepad && GamepadUsed() || m_Gamepad && KeyboardOrMouseUsed())
             {
-                m_Gamepad = gamepad;
+                m_Gamepad = !m_Gamepad;
                 RefreshControls();
             }
         }
@@ -183,6 +184,22 @@ namespace Hearthdelve.UI.Tavern
             if (StorageOpen) FillStorage();
         }
 
+        static bool GamepadUsed()
+        {
+            Gamepad pad = Gamepad.current;
+            if (pad == null) return false;
+            foreach (InputControl control in pad.allControls)
+                if (control is ButtonControl button && !button.synthetic && button.wasPressedThisFrame) return true;
+            return pad.leftStick.ReadValue().sqrMagnitude > 0.25f || pad.rightStick.ReadValue().sqrMagnitude > 0.25f;
+        }
+
+        static bool KeyboardOrMouseUsed()
+        {
+            if (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame) return true;
+            Mouse mouse = Mouse.current;
+            return mouse != null && (mouse.delta.ReadValue().sqrMagnitude > 4f || mouse.leftButton.wasPressedThisFrame || mouse.rightButton.wasPressedThisFrame);
+        }
+
         void RefreshControls()
         {
             DecorateMode mode = Mode();
@@ -197,7 +214,7 @@ namespace Hearthdelve.UI.Tavern
             }
             if (mode.Carried != null)
                 m_Controls.Set(DecorateLocKeys.CarryControls, B(DecorateActions.Select), B(DecorateActions.Turn), B(DecorateActions.Flip),
-                    B(DecorateActions.Store), B(DecorateActions.Cancel));
+                    B(DecorateActions.Store), B(DecorateActions.Cancel), B(DecorateActions.Free));
             else
                 m_Controls.Set(DecorateLocKeys.Controls, B(DecorateActions.Select), B(DecorateActions.Turn), B(DecorateActions.Flip), B(DecorateActions.Store),
                     B(DecorateActions.Undo), B(DecorateActions.Storage), B(DecorateActions.Check), B(DecorateActions.Cancel));

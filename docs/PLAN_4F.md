@@ -417,7 +417,7 @@ Steps 3–5 are the biggest; if the catalogue import runs long I'll split step 3
 
 | # | Decision | Locked |
 |---|---|---|
-| D1 | Grid and snapping | Blocking furniture snaps to whole tiles with whole-tile footprints; non-blocking decor may use quarter-tile snapping. (Bodies stay pixel-exact, and the starting layout keeps 4e's exact positions through each piece's nudge.) |
+| D1 | Grid and snapping | Blocking furniture snaps to whole tiles with whole-tile footprints; non-blocking decor may use quarter-tile snapping. (Bodies stay pixel-exact.) **Amended after the Checkpoint A playtest, at your request:** snapping by default; holding the free-placement key (Shift on keyboard, LB on a gamepad) places to the art pixel (the mouse, or a pixel per arrow or d-pad press), stored as the whole-tile cell plus a nudge of under half a tile, so the rules, the walkable grid and saves are unchanged |
 | D2 | Rotation | **Changed:** explicit rotation modes per piece: `None`, `AuthoredFacings`, `QuarterTurnSprite` (real 0°/90°/180°/270°). Rotation turns the footprint, bodies, seat anchors, use points, surface anchors and lights together. Authored facings are used where Minifantasy drew better ones; pieces that would look wrong turned (wall-bound pieces, strong baked light or perspective) opt out individually. Not limited globally to drawn facings |
 | D3 | Flipping | Per-piece opt-in, off by default; only where mirrored art still reads correctly |
 | D4 | Surface items | The simple Surface layer is in 4f (candles, bottles, tabletop clutter) |

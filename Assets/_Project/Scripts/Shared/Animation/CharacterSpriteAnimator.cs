@@ -53,6 +53,8 @@ namespace Hearthdelve.Shared.Animation
         /// <summary>The body's renderer.</summary>
         public SpriteRenderer Renderer => m_Renderer;
         public CharacterAnim Current => m_Current;
+        /// <summary>Whether the drawing is mirrored (a one-facing sheet shown for a left facing).</summary>
+        public bool Mirrored => m_Renderer != null && m_Renderer.flipX;
         public SpriteAnimationSet Set => m_Set;
         public bool IsTelegraphing => m_TelegraphedActive;
 

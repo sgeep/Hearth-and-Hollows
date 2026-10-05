@@ -4,6 +4,7 @@ using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Navigation;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
@@ -136,6 +137,7 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Enter();
             yield return null;
             Mode.SetCursor(new Vector2Int(25, 8));
+            PlacedFurniture original = Mode.HoveredPiece.Clone();
             Mode.PickUp();
             Assert.That(Mode.Carried?.definition, Is.EqualTo("cellar_barrel"));
             Mode.SetCursor(new Vector2Int(4, 7));
@@ -152,7 +154,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Mode.IsActive, "Esc while carrying puts the piece back, it doesn't leave");
             PlacedFurniture back = At("cellar_barrel", 25, 8);
             Assert.That(back, Is.Not.Null);
-            Assert.That(back.nudge, Is.EqualTo(new Vector2Int(-2, 0)), "exactly where it was");
+            Assert.That((back.nudge, back.turns), Is.EqualTo((original.nudge, original.turns)), "exactly where it was");
             Mode.Leave();
         }
 
@@ -208,6 +210,50 @@ namespace Hearthdelve.Tests.PlayMode
             InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(12.5f, 10.5f)) });
             yield return null;
             Assert.That(At("cellar_barrel", 12, 10), Is.Not.Null, "and another puts it down");
+            Mode.Leave();
+        }
+
+        /// <summary>The Checkpoint A playtest: the mouse picks a chair by what's drawn, carries it from where it was grabbed.</summary>
+        [UnityTest]
+        public IEnumerator TheMouse_PicksByWhatsDrawn_AndFreeModePlacesToThePixel()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            // The first table's west chair is drawn over the west edge of its tile: point there.
+            Mode.Point(new Vector2(2.95f, 7.6f));
+            Assert.That(Mode.HoveredPiece?.definition, Is.EqualTo("tavern_chair"));
+            Mode.PickUp();
+            Mode.Point(new Vector2(12.95f, 5.6f));
+            Assert.That((Mode.Carried.cell, Mode.Carried.nudge), Is.EqualTo((new Vector2Int(13, 5), Vector2Int.zero)), "snapped to the tile it's carried over");
+            Mode.ForceFree = true;
+            Mode.Point(new Vector2(12.95f + 0.25f, 5.6f - 0.125f));
+            Assert.That((Mode.Carried.cell, Mode.Carried.nudge), Is.EqualTo((new Vector2Int(13, 5), new Vector2Int(2, -1))), "free: to the pixel");
+            Mode.Place();
+            Mode.ForceFree = false;
+            Assert.That(Mode.Carried, Is.Null);
+            Mode.Leave();
+            yield return null;
+            ResolvedFurniture chair = Area.Pieces.First(p => p.Placement.cell == new Vector2Int(13, 5));
+            Assert.That(Vector2.Distance(chair.Art[0].Position, new Vector2(13.25f + 0.25f, 5.25f - 0.125f)), Is.LessThan(1e-4f), "where it was put");
+        }
+
+        [UnityTest]
+        public IEnumerator TheGlasses_RideOnTheirShelf()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            Mode.SetCursor(new Vector2Int(24, 14));
+            Mode.CycleHover();
+            while (Mode.HoveredPiece.definition != "low_shelf") Mode.CycleHover();
+            Mode.PickUp();
+            Assert.That(Mode.Layout.Pieces.Any(p => p.definition == "shelf_glasses"), Is.False, "the glasses come up with it");
+            Mode.SetCursor(new Vector2Int(8, 15));
+            Mode.Place();
+            Assert.That(Mode.Carried, Is.Null);
+            PlacedFurniture glasses = Mode.Layout.Pieces.Single(p => p.definition == "shelf_glasses");
+            Assert.That(Vector2.Distance(Mode.Layout.Resolve(glasses).Art[0].Position, new Vector2(8.75f, 16.5f)), Is.LessThan(1e-4f), "and stand on it where it went");
             Mode.Leave();
         }
 

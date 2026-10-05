@@ -282,6 +282,34 @@ namespace Hearthdelve.Tests.PlayMode
             ReleaseKeys();
         }
 
+        /// <summary>Checkpoint A playtest: holding a charge, the character turns with the mouse (the charge is drawn facing right, mirrored left). The heavy is a spin: it hits all round.</summary>
+        [UnityTest]
+        public IEnumerator TheCharge_TurnsWithTheMouse_WhileItsHeld()
+        {
+            yield return Setup("green_slime", new Vector2(8f, 6f));
+            Player.GetComponent<AimControlSwitcher>().enabled = true;
+            var animator = Player.GetComponentInChildren<CharacterSpriteAnimator>();
+            Camera camera = Camera.main;
+            Vector2 Screen(Vector2 offset) => camera.WorldToScreenPoint((Vector2)Player.transform.position + offset);
+
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(-4f, -1f)), delta = new Vector2(20f, 0f) });
+            yield return null;
+            yield return null;
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(-4f, -1f)) }.WithButton(MouseButton.Right));
+            yield return new WaitForSeconds(0.5f);
+            Assert.That(animator.Current, Is.EqualTo(CharacterAnim.Charge).Or.EqualTo(CharacterAnim.ChargeHold), "charging");
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "facing the mouse, to the left");
+            Assert.That(animator.Mirrored, "the charge, drawn facing right, mirrored");
+
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(4f, -1f)), delta = new Vector2(20f, 0f) }.WithButton(MouseButton.Right));
+            yield return null;
+            yield return null;
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontRight), "still charging, it turns with the mouse");
+            Assert.That(animator.Mirrored, Is.False);
+            InputSystem.QueueStateEvent(Pointer, new MouseState { position = Screen(new Vector2(4f, -1f)) });
+            yield return new WaitForSeconds(0.6f);
+        }
+
         /// <summary>4e playtest: the roll still faces the way it rolls, whatever the aim.</summary>
         [UnityTest]
         public IEnumerator TheRoll_FacesTheWayItRolls_NotTheMouse()

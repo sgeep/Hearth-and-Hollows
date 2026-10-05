@@ -831,7 +831,8 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 | Flip (D3: only pieces that allow it) | F | Y |
 | Put away in storage | Delete or Backspace | RT |
 | Undo | Z | LT |
-| The next piece under the cursor | Q | LB / RB |
+| The next piece under the cursor | Q | RB |
+| Free placement, to the pixel (hold) | Shift | LB |
 | Storage (take a piece out) | Tab | Start |
 | The layout check (problems, put it all back, done) | C | Select |
 | Put the carried piece back / done | Esc or right-click | B |
@@ -855,7 +856,17 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 
 **Web (development build, 130 MB), smoke-tested in Chrome:** a 4e save already in the browser (version 3, day 5, mid-delve) continued into the delve and came home through the migration with the starting tavern (three tables, six seats; the seat upgrade gone from the Night screen); Decorate Mode from the Night screen, a barrel picked up and put down with the mouse, its ghost following the pointer, "game saved." on leaving; a page reload and Continue brought the barrel back where it was put. No console errors. Not driven on the web: the gamepad (covered by PlayMode tests).
 
-**Checkpoint A (steps 1–2) is done and waiting for your playtest.**
+**Your Checkpoint A playtest (2026-10-05): "decorating works awesome"; the rumble feels great.** Fixed and changed:
+- **Grabbing felt off-centre, especially chairs.** The cursor picked by tile, and the highlight framed the tile, while a chair is drawn a quarter tile off its tile. Now the mouse picks by what's drawn under it (`FurnitureLayout.AtPoint`; a smaller piece wins over a larger one in the same layer, so a chair against a table's edge is picked before the table), the gold corners frame the drawing (`FurnitureGeometry.ArtBounds`), and a carried piece follows the mouse from the point it was grabbed. Keys and the d-pad still move a tile at a time.
+- **The glasses and their shelf couldn't be put back together.** The row of glasses is now a **surface item** (D4) on the low shelf's surface anchor: it moves, turns and goes to storage with the shelf, and when carried on its own it snaps to the nearest free table or shelf surface within a tile ("it needs a table or a shelf" otherwise). Surface items are picked before what they stand on.
+- **The prompts flickered between controller and keyboard.** Devices report idle updates every frame (a mouse's zero delta, a pad's stick noise); the prompts now switch only on a real press or movement.
+- **A barrel couldn't go back beside the others.** The 4e barrels stood two pixels off their tiles, so a barrel snapped to a whole tile overlapped its neighbour. The barrel is now drawn a quarter tile west of its tile's middle (where 4e's stood), so barrels on neighbouring tiles touch, as they did, and the starting layout needs no nudges. For the same reason **the third table and its chairs, which 4e set half a tile off the grid, now stand on it (4 px east)**: the only change to the starting room (`Tests/PlayMode/Baselines/TavernStarting.txt`; `Tavern4e.txt` is kept as the 4e record).
+- **Free placement (your request, amending D1):** snapping by default; **hold Shift (keyboard) or LB (gamepad)** to place to the pixel: the piece follows the mouse exactly, and the arrows or d-pad move it a pixel at a time. Stored as the cell plus a nudge of under half a tile, so the rules, the walkable grid and saves are unchanged. "Next piece under the cursor" is now RB (and Q) only.
+- **Save version 5:** keeps your playtest saves exactly as they were: each saved barrel gains the 2 pixels back in its nudge, and a saved row of glasses goes onto the shelf it stood on (otherwise to storage).
+- **The charged attack always faced one way** (not 4f, but the locked aim rule): Minifantasy's charged-attack sheet is drawn only facing front-right (its rows are the wind-up, the charged loop and the spin). Facing already followed the mouse or stick while charging; the drawing didn't. The three stages are now mirrored for left-facing aims, as the dodge is, so the charge turns with the aim while held (back facings keep the front pose). The heavy itself is a spin with a round hit area, so it hits all round whichever way you face.
+- Tests: EditMode 479/479 (new: barrels side by side, the glasses riding on their shelf and needing a surface, picking by what's drawn, the version 4 save keeping barrels and glasses); PlayMode 167/167 (new: the mouse picking a chair by its drawing and free mode placing to the pixel, the glasses riding on their shelf, the charge turning with the mouse). The web build wasn't rebuilt for these fixes; it will be at the next checkpoint.
+
+**Checkpoint A is waiting for your second look.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

@@ -41,6 +41,15 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] Color m_Blocked = new(1f, 0.35f, 0.3f, 0.4f);
 
         readonly Stack<List<PlacedFurniture>> m_Undo = new();
+        /// <summary>Surface items riding on the carried piece: they come back down with it.</summary>
+        readonly List<PlacedFurniture> m_Riders = new();
+        bool m_Pointing;
+        bool m_WasFree;
+        Vector2 m_PointerWorld;
+        /// <summary>Where the carried piece was grabbed, from its origin (world tiles): it follows the mouse from there.</summary>
+        Vector2 m_GrabWorld;
+        /// <summary>Where a carried surface item is being held (its ghost stands there when no surface is in reach).</summary>
+        Vector2 m_SurfacePoint;
         List<PlacedFurniture> m_Entered;
         FurnitureLayout m_Layout;
         PlacedFurniture m_From;
@@ -49,7 +58,7 @@ namespace Hearthdelve.Tavern.Scene
         float m_HeldFor, m_NextRepeat;
         Vector2 m_LastPointer;
         Transform m_Ghost;
-        InputAction m_Move, m_Point, m_Select, m_Click, m_Cancel, m_Turn, m_Flip, m_Store, m_Undoing, m_Cycle, m_Storage, m_Check, m_Wheel;
+        InputAction m_Move, m_Point, m_Select, m_Click, m_Cancel, m_Turn, m_Flip, m_Store, m_Undoing, m_Cycle, m_Storage, m_Check, m_Wheel, m_Free;
 
         public static DecorateMode Instance { get; private set; }
 
@@ -66,6 +75,17 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>A panel (storage or the check) has the controls; the room ignores them.</summary>
         public bool PanelOpen { get; set; }
         public bool CanUndo => m_Undo.Count > 0;
+        /// <summary>
+        /// Free placement (the owner's request after the Checkpoint A playtest, amending D1): while the free key is held,
+        /// the carried piece goes where the mouse puts it, to the art pixel, and the arrows or d-pad move it a pixel at a
+        /// time; otherwise standing pieces snap to whole tiles and decor to quarter tiles. It's stored as the piece's cell
+        /// and nudge, so the rules, the walkable grid and the saves are the same either way.
+        /// </summary>
+        public bool FreeMode => ForceFree || (m_Free != null && m_Free.IsPressed());
+        /// <summary>Tests: free placement without holding the key.</summary>
+        public bool ForceFree { get; set; }
+        /// <summary>The mouse is what's pointing (it picks by what's drawn under it); otherwise the tile cursor.</summary>
+        public bool Pointing => m_Pointing;
 
         /// <summary>Raised when anything shown changes (cursor, carried piece, layout).</summary>
         public event Action Changed;
@@ -99,6 +119,8 @@ namespace Hearthdelve.Tavern.Scene
             m_Undo.Clear();
             Carried = null;
             m_From = null;
+            m_Riders.Clear();
+            m_Pointing = false;
             PanelOpen = false;
             AreaShape shape = m_Layout.Shape;
             Cursor = new Vector2Int(shape.Floor.xMin + shape.Floor.width / 2, shape.Floor.yMin + shape.Floor.height / 2);
@@ -140,6 +162,7 @@ namespace Hearthdelve.Tavern.Scene
             m_Storage = A(DecorateActions.Storage);
             m_Check = A(DecorateActions.Check);
             m_Wheel = A(DecorateActions.Wheel);
+            m_Free = A(DecorateActions.Free);
         }
 
         static bool Pressed(InputAction a) => a != null && a.WasPressedThisFrame();
@@ -148,6 +171,10 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (!IsActive || PanelOpen) return;
             ReadCursor();
+            // Holding or letting go of the free key re-places the carried piece under the mouse at once.
+            bool free = FreeMode;
+            if (free != m_WasFree && Carried != null && m_Pointing) FollowPointer();
+            m_WasFree = free;
             if (Pressed(m_Select)) PickOrPlace();
             else if (Pressed(m_Click)) PickOrPlace();
             if (Pressed(m_Cancel))
@@ -173,15 +200,16 @@ namespace Hearthdelve.Tavern.Scene
             var step = new Vector2Int(Mathf.Abs(dir.x) > 0.5f ? (int)Mathf.Sign(dir.x) : 0, Mathf.Abs(dir.y) > 0.5f ? (int)Mathf.Sign(dir.y) : 0);
             if (step != Vector2Int.zero)
             {
+                m_Pointing = false;
                 if (dir != m_HeldDirection && m_HeldFor == 0f)
                 {
-                    MoveCursor(step);
+                    Step(step);
                     m_NextRepeat = m_RepeatDelay;
                 }
                 m_HeldFor += Time.unscaledDeltaTime;
                 if (m_HeldFor >= m_NextRepeat)
                 {
-                    MoveCursor(step);
+                    Step(step);
                     m_NextRepeat += m_RepeatRate;
                 }
                 m_HeldDirection = dir;
@@ -197,24 +225,110 @@ namespace Hearthdelve.Tavern.Scene
             if ((pointer - m_LastPointer).sqrMagnitude < 1f) return;
             m_LastPointer = pointer;
             Vector3 world = Camera.main.ScreenToWorldPoint(new Vector3(pointer.x, pointer.y, -Camera.main.transform.position.z));
-            SetCursor(m_Layout.Shape.CellOf(world));
+            Point(world);
         }
 
-        public void MoveCursor(Vector2Int step) => SetCursor(Cursor + step);
+        /// <summary>A key or d-pad step: a tile, or a pixel for the carried piece in free mode.</summary>
+        void Step(Vector2Int step)
+        {
+            if (Carried != null && FreeMode) NudgeCarried(step);
+            else MoveCursor(step);
+        }
+
+        public void MoveCursor(Vector2Int step)
+        {
+            m_Pointing = false;
+            SetCursor(Cursor + step);
+        }
+
+        /// <summary>The mouse at <paramref name="world"/>: hover by what's drawn there, or carry the held piece along.</summary>
+        public void Point(Vector2 world)
+        {
+            m_Pointing = true;
+            m_PointerWorld = world;
+            if (Carried != null)
+            {
+                FollowPointer();
+                return;
+            }
+            RectInt b = m_Layout.Shape.Bounds;
+            Vector2Int cell = m_Layout.Shape.CellOf(world);
+            Cursor = new Vector2Int(Mathf.Clamp(cell.x, b.xMin, b.xMax - 1), Mathf.Clamp(cell.y, b.yMin, b.yMax - 1));
+            Refresh();
+        }
+
+        Vector2 Origin(PlacedFurniture p) => m_Layout.Shape.Origin + p.cell + (Vector2)p.nudge / FurnitureGeometry.PixelsPerTile;
+
+        bool CarriedIsSurface => Carried != null && m_Layout.Definition(Carried.definition)?.layer == FurnitureLayer.Surface;
+
+        /// <summary>
+        /// Puts the carried piece's origin at <paramref name="world"/>: snapped to whole tiles for standing pieces (D1), to
+        /// quarter tiles for decor, or to the art pixel in free mode; stored as a cell and a nudge of under half a tile.
+        /// </summary>
+        void SetCarriedOrigin(Vector2 world, bool free)
+        {
+            FurnitureDefinition d = m_Layout.Definition(Carried.definition);
+            Vector2 local = world - m_Layout.Shape.Origin;
+            float step = free ? 1f / FurnitureGeometry.PixelsPerTile : d != null && d.BlocksMovement ? 1f : 0.25f;
+            local = new Vector2(Mathf.Round(local.x / step) * step, Mathf.Round(local.y / step) * step);
+            Vector2Int cell = Vector2Int.FloorToInt(local + new Vector2(0.5f, 0.5f));
+            Vector2 rest = (local - cell) * FurnitureGeometry.PixelsPerTile;
+            Carried.cell = cell;
+            Carried.nudge = new Vector2Int(Mathf.Clamp(Mathf.RoundToInt(rest.x), FurnitureGeometry.NudgeMin, FurnitureGeometry.NudgeMax),
+                Mathf.Clamp(Mathf.RoundToInt(rest.y), FurnitureGeometry.NudgeMin, FurnitureGeometry.NudgeMax));
+        }
+
+        void FollowPointer()
+        {
+            if (CarriedIsSurface) TargetSurface(m_PointerWorld);
+            else SetCarriedOrigin(m_PointerWorld - m_GrabWorld, FreeMode);
+            Cursor = m_Layout.Shape.CellOf(m_PointerWorld);
+            Refresh();
+        }
+
+        /// <summary>Free mode with keys or the d-pad: the carried piece moves a pixel.</summary>
+        void NudgeCarried(Vector2Int step)
+        {
+            if (CarriedIsSurface) return;
+            SetCarriedOrigin(Origin(Carried) + (Vector2)step / FurnitureGeometry.PixelsPerTile, true);
+            Cursor = Carried.cell + m_Grab;
+            Refresh();
+        }
+
+        /// <summary>A carried surface item goes on the nearest free table or shelf anchor within a tile, if there is one.</summary>
+        void TargetSurface(Vector2 world)
+        {
+            m_SurfacePoint = world;
+            (int host, int anchor) = m_Layout.NearestSurface(world);
+            Carried.host = host;
+            Carried.anchor = anchor;
+        }
 
         public void SetCursor(Vector2Int cell)
         {
             RectInt b = m_Layout.Shape.Bounds;
             cell = new Vector2Int(Mathf.Clamp(cell.x, b.xMin, b.xMax - 1), Mathf.Clamp(cell.y, b.yMin, b.yMax - 1));
-            if (cell == Cursor) return;
+            bool wasPointing = m_Pointing;
+            m_Pointing = false;
+            if (cell == Cursor && !wasPointing) return;
             Cursor = cell;
             HoverIndex = 0;
-            if (Carried != null) Carried.cell = Cursor - m_Grab;
+            if (Carried != null)
+            {
+                if (CarriedIsSurface) TargetSurface(m_Layout.Shape.Origin + Cursor + new Vector2(0.5f, 0.5f));
+                else
+                {
+                    FurnitureDefinition d = m_Layout.Definition(Carried.definition);
+                    Carried.cell = Cursor - m_Grab;
+                    if (d != null && d.BlocksMovement) Carried.nudge = Vector2Int.zero;
+                }
+            }
             Refresh();
         }
 
-        /// <summary>The pieces under the cursor, the one picked first first.</summary>
-        public List<PlacedFurniture> Hovered() => IsActive ? m_Layout.At(Cursor) : new List<PlacedFurniture>();
+        /// <summary>The pieces under the cursor (by what's drawn under the mouse, or what stands on the tile), the one picked first first.</summary>
+        public List<PlacedFurniture> Hovered() =>
+            !IsActive ? new List<PlacedFurniture>() : m_Pointing ? m_Layout.AtPoint(m_PointerWorld) : m_Layout.At(Cursor);
 
         public PlacedFurniture HoveredPiece
         {
@@ -245,17 +359,19 @@ namespace Hearthdelve.Tavern.Scene
             PlacedFurniture piece = HoveredPiece;
             if (piece == null || Carried != null) return;
             PushUndo();
+            ResolvedFurniture before = m_Layout.Resolve(piece);
+            Vector2 grabbedAt = m_Pointing ? m_PointerWorld : before != null ? FurnitureGeometry.ArtBounds(before).center : Origin(piece);
             List<PlacedFurniture> removed = m_Layout.Remove(piece.uid);
-            // Surface items on it go to storage with their host (they'd have nothing to stand on).
+            // Surface items on it ride along and come back down with it.
+            m_Riders.Clear();
+            for (int i = 1; i < removed.Count; i++) m_Riders.Add(removed[i]);
             m_From = piece.Clone();
             Carried = piece;
-            // D1: standing pieces move on whole tiles (putting it back restores its exact place).
-            FurnitureDefinition d = m_Layout.Definition(piece.definition);
-            if (d != null && d.BlocksMovement) Carried.nudge = Vector2Int.zero;
             m_Grab = Cursor - piece.cell;
+            m_GrabWorld = grabbedAt - Origin(piece);
+            m_SurfacePoint = grabbedAt;
             Rebuild();
             MomentPlayed?.Invoke(DecorateMoment.PickUp);
-            if (removed.Count > 1) MomentPlayed?.Invoke(DecorateMoment.Store);
         }
 
         public void Place()
@@ -269,6 +385,13 @@ namespace Hearthdelve.Tavern.Scene
                 return;
             }
             m_Layout.Add(Carried);
+            // Riders come down with their host; any its new facing has no anchor for go to storage.
+            foreach (PlacedFurniture rider in m_Riders)
+            {
+                m_Layout.Add(rider);
+                if (m_Layout.Resolve(rider) == null) m_Layout.Remove(rider.uid);
+            }
+            m_Riders.Clear();
             Carried = null;
             m_From = null;
             Rebuild();
@@ -279,7 +402,12 @@ namespace Hearthdelve.Tavern.Scene
         public void PutBack()
         {
             if (Carried == null) return;
-            if (m_From != null) m_Layout.Add(m_From);
+            if (m_From != null)
+            {
+                m_Layout.Add(m_From);
+                foreach (PlacedFurniture rider in m_Riders) m_Layout.Add(rider);
+            }
+            m_Riders.Clear();
             Carried = null;
             m_From = null;
             if (m_Undo.Count > 0) m_Undo.Pop();
@@ -365,6 +493,7 @@ namespace Hearthdelve.Tavern.Scene
             {
                 Carried = null;
                 m_From = null;
+                m_Riders.Clear();
                 Rebuild();
                 MomentPlayed?.Invoke(DecorateMoment.Store);
                 return;
@@ -418,7 +547,13 @@ namespace Hearthdelve.Tavern.Scene
             }
             Carried = new PlacedFurniture { uid = Area.State.TakeUid(), definition = definition, cell = Cursor, turns = turns };
             m_From = null;
+            m_Riders.Clear();
             m_Grab = Vector2Int.zero;
+            // Held by the middle of what's drawn.
+            ResolvedFurniture fresh = m_Layout.Resolve(Carried);
+            m_GrabWorld = fresh != null ? FurnitureGeometry.ArtBounds(fresh).center - Origin(Carried) : new Vector2(0.5f, 0.5f);
+            if (d.layer == FurnitureLayer.Surface) TargetSurface(m_Pointing ? m_PointerWorld : m_Layout.Shape.Origin + Cursor + new Vector2(0.5f, 0.5f));
+            else if (m_Pointing) SetCarriedOrigin(m_PointerWorld - m_GrabWorld, FreeMode);
             PushUndo();
             Refresh();
             MomentPlayed?.Invoke(DecorateMoment.FromStorage);
@@ -430,6 +565,7 @@ namespace Hearthdelve.Tavern.Scene
             if (m_Undo.Count == 0) return;
             Carried = null;
             m_From = null;
+            m_Riders.Clear();
             m_Layout.Restore(m_Undo.Pop());
             Rebuild();
             MomentPlayed?.Invoke(DecorateMoment.Undo);
@@ -441,6 +577,7 @@ namespace Hearthdelve.Tavern.Scene
             if (!IsActive) return;
             Carried = null;
             m_From = null;
+            m_Riders.Clear();
             m_Undo.Clear();
             m_Layout.Restore(m_Entered);
             Rebuild();
@@ -452,7 +589,9 @@ namespace Hearthdelve.Tavern.Scene
         {
             PlacedFurniture piece = m_Layout?.Find(uid);
             ResolvedFurniture r = piece != null ? m_Layout.Resolve(piece) : null;
-            if (r != null) SetCursor(r.Footprint.min);
+            if (r == null) return;
+            m_Pointing = false;
+            SetCursor(r.Footprint.min);
         }
 
         void PushUndo() => m_Undo.Push(m_Layout.Snapshot());
@@ -492,13 +631,17 @@ namespace Hearthdelve.Tavern.Scene
 
             if (Carried != null)
             {
-                ResolvedFurniture r = m_Layout.Resolve(Carried);
+                bool surface = CarriedIsSurface;
+                ResolvedFurniture r = m_Layout.Resolve(Carried) ??
+                                      (surface ? FurnitureGeometry.Resolve(m_Layout.Definition(Carried.definition), Carried, m_Layout.Shape.Origin, m_SurfacePoint) : null);
                 if (r != null)
                 {
                     Color tile = CarriedCheck.IsValid ? m_Fits : m_Blocked;
-                    for (int x = r.Footprint.xMin; x < r.Footprint.xMax; x++)
-                    for (int y = r.Footprint.yMin; y < r.Footprint.yMax; y++)
-                        Tile(look, new Vector2(x, y) + m_Layout.Shape.Origin, tile);
+                    if (surface) Corners(look, FurnitureGeometry.ArtBounds(r), new Color(tile.r, tile.g, tile.b, 1f));
+                    else
+                        for (int x = r.Footprint.xMin; x < r.Footprint.xMax; x++)
+                        for (int y = r.Footprint.yMin; y < r.Footprint.yMax; y++)
+                            Tile(look, new Vector2(x, y) + m_Layout.Shape.Origin, tile);
                     foreach (PlacedArt art in r.Art)
                     {
                         var go = new GameObject(art.Art.name);
@@ -519,8 +662,8 @@ namespace Hearthdelve.Tavern.Scene
 
             PlacedFurniture hovered = HoveredPiece;
             ResolvedFurniture h = hovered != null ? m_Layout.Resolve(hovered) : null;
-            RectInt frame = h != null ? h.Footprint : new RectInt(Cursor, Vector2Int.one);
-            Corners(look, new Rect(frame.position + m_Layout.Shape.Origin, frame.size));
+            // Round what's drawn (a chair sits a quarter tile off its cell), or the tile under the cursor.
+            Corners(look, h != null ? FurnitureGeometry.ArtBounds(h) : new Rect(Cursor + m_Layout.Shape.Origin, Vector2.one), look != null ? look.highlightColor : Color.white);
         }
 
         void Tile(FurniturePresentation look, Vector2 cell, Color color)
@@ -537,7 +680,7 @@ namespace Hearthdelve.Tavern.Scene
             if (look != null && look.overlayMaterial != null) sprite.sharedMaterial = look.overlayMaterial;
         }
 
-        void Corners(FurniturePresentation look, Rect frame)
+        void Corners(FurniturePresentation look, Rect frame, Color color)
         {
             if (look == null) return;
             Rect outer = new(frame.xMin - 0.125f, frame.yMin - 0.125f, frame.width + 0.25f, frame.height + 0.25f);
@@ -554,7 +697,7 @@ namespace Hearthdelve.Tavern.Scene
                 renderer.sprite = sprite;
                 renderer.sortingLayerName = SortingLayers.Above;
                 renderer.sortingOrder = 11;
-                renderer.color = look.highlightColor;
+                renderer.color = color;
                 if (look.overlayMaterial != null) renderer.sharedMaterial = look.overlayMaterial;
             }
         }

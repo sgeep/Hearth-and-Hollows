@@ -19,7 +19,8 @@ namespace Hearthdelve.Tests.PlayMode
     /// scale, sorting), every solid collider, the interactables with their use points and highlights, the seats, the
     /// door, queue and staff posts, the lights, the animated loops, the station views, and the baked walkable grid.
     /// Characters and UI are left out. 4f step 1 recorded it from the 4e scene (<c>Baselines/Tavern4e.txt</c>), so the
-    /// data-driven tavern can be checked against the room it replaced, line by line.
+    /// data-driven tavern could be checked against the room it replaced, line by line; <c>TavernStarting.txt</c> is the
+    /// starting room since the Checkpoint A playtest.
     /// </summary>
     public static class TavernSnapshot
     {

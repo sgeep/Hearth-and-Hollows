@@ -140,8 +140,7 @@ namespace Hearthdelve.Tavern.Scene
         }
 
         /// <summary>Resolves a placement in this area (null if its definition is unknown or it can't stand that way).</summary>
-        public ResolvedFurniture Resolve(PlacedFurniture placement) =>
-            FurnitureGeometry.Resolve(Definition(placement?.definition), placement, m_Area.Origin);
+        public ResolvedFurniture Resolve(PlacedFurniture placement) => new FurnitureLayout(Shape(), Definition, CurrentLayout()).Resolve(placement);
 
         /// <summary>Builds the pieces (replacing any built before) and hands the tavern its seats, posts and stations.</summary>
         public void Build(IReadOnlyList<PlacedFurniture> placements)
@@ -150,9 +149,11 @@ namespace Hearthdelve.Tavern.Scene
             m_Root = new GameObject(k_RootName).transform;
             m_Root.SetParent(transform, false);
 
-            foreach (PlacedFurniture placement in placements)
+            // Resolved together, so surface items stand on their hosts' anchors.
+            var resolver = new FurnitureLayout(Shape(), Definition, placements);
+            foreach (PlacedFurniture placement in resolver.Pieces)
             {
-                ResolvedFurniture resolved = Resolve(placement);
+                ResolvedFurniture resolved = resolver.Resolve(placement);
                 if (resolved == null)
                 {
                     Debug.LogWarning($"[Hearthdelve] Furniture '{placement?.definition}' can't be placed in {m_Area.Id} (unknown, or not at that turn or mirror).");

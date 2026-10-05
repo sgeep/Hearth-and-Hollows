@@ -132,8 +132,11 @@ namespace Hearthdelve.Editor
                 AddPoint(minigame);
                 changed = true;
             }
-            if (asset.FindActionMap(InputMaps.Decorate) == null)
+            InputActionMap decorate = asset.FindActionMap(InputMaps.Decorate);
+            if (decorate == null || decorate.FindAction(DecorateActions.Free) == null)
             {
+                // Ours since 4f step 2: rebuilt whole when it gains an action (free placement took LB from Cycle).
+                if (decorate != null) asset.RemoveActionMap(decorate);
                 AddDecorateMap(asset);
                 changed = true;
             }
@@ -178,7 +181,8 @@ namespace Hearthdelve.Editor
             Button(d, DecorateActions.Flip, ("<Keyboard>/f", KM), ("<Gamepad>/buttonNorth", GP));
             Button(d, DecorateActions.Store, ("<Keyboard>/delete", KM), ("<Keyboard>/backspace", KM), ("<Gamepad>/rightTrigger", GP));
             Button(d, DecorateActions.Undo, ("<Keyboard>/z", KM), ("<Gamepad>/leftTrigger", GP));
-            Button(d, DecorateActions.Cycle, ("<Keyboard>/q", KM), ("<Gamepad>/rightShoulder", GP), ("<Gamepad>/leftShoulder", GP));
+            Button(d, DecorateActions.Cycle, ("<Keyboard>/q", KM), ("<Gamepad>/rightShoulder", GP));
+            Button(d, DecorateActions.Free, ("<Keyboard>/leftShift", KM), ("<Keyboard>/rightShift", KM), ("<Gamepad>/leftShoulder", GP));
             Button(d, DecorateActions.Storage, ("<Keyboard>/tab", KM), ("<Gamepad>/start", GP));
             Button(d, DecorateActions.Check, ("<Keyboard>/c", KM), ("<Gamepad>/select", GP));
             d.AddAction(DecorateActions.Wheel, InputActionType.PassThrough, "<Mouse>/scroll", expectedControlLayout: "Vector2");

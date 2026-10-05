@@ -141,15 +141,22 @@ namespace Hearthdelve.Shared.Customization
         public static bool IsValidNudge(Vector2Int nudge) =>
             nudge.x >= NudgeMin && nudge.x <= NudgeMax && nudge.y >= NudgeMin && nudge.y <= NudgeMax;
 
-        /// <summary>Null when the piece can't stand at the placement's turns, or flipped when it can't flip.</summary>
-        public static ResolvedFurniture Resolve(FurnitureDefinition definition, PlacedFurniture placement, Vector2 areaOrigin = default)
+        /// <summary>
+        /// Null when the piece can't stand at the placement's turns, or flipped when it can't flip. A Surface item stands at
+        /// <paramref name="surfaceAnchor"/> (its host's anchor, in the world; null: it can't stand at all), and its art is
+        /// placed relative to it.
+        /// </summary>
+        public static ResolvedFurniture Resolve(FurnitureDefinition definition, PlacedFurniture placement, Vector2 areaOrigin = default,
+            Vector2? surfaceAnchor = null)
         {
             if (definition == null || placement == null) return null;
             if (!definition.TryGetFacing(placement.turns, out FurnitureFacing facing, out int rotate)) return null;
             if (placement.flipped && !definition.flippable) return null;
+            bool onSurface = definition.layer == FurnitureLayer.Surface;
+            if (onSurface && !surfaceAnchor.HasValue) return null;
 
             var t = new FurnitureTransform(facing.size, rotate, placement.flipped);
-            Vector2 offset = areaOrigin + (Vector2)placement.cell + (Vector2)placement.nudge / PixelsPerTile;
+            Vector2 offset = onSurface ? surfaceAnchor.Value : areaOrigin + (Vector2)placement.cell + (Vector2)placement.nudge / PixelsPerTile;
             Vector2 P(Vector2 local) => offset + t.Point(local);
             Rect R(Rect local)
             {
@@ -163,7 +170,7 @@ namespace Hearthdelve.Shared.Customization
                 Definition = definition,
                 Placement = placement,
                 Transform = t,
-                Footprint = new RectInt(placement.cell, t.TurnedSize),
+                Footprint = new RectInt(onSurface ? Vector2Int.FloorToInt(offset - areaOrigin) : placement.cell, t.TurnedSize),
                 InteractPoint = P(facing.interactPoint),
                 Highlight = R(facing.highlight),
                 StatusPoint = P(facing.statusPoint),
@@ -184,6 +191,38 @@ namespace Hearthdelve.Shared.Customization
             resolved.Grouped = facing.grouped || t.Turns != 0 || t.Flip;
             resolved.GroupPoint = facing.grouped && t.Turns == 0 && !t.Flip ? P(facing.groupPoint) : SortPoint(resolved, offset);
             return resolved;
+        }
+
+        /// <summary>
+        /// What the piece covers as drawn, in the world: the union of its art layers' sprite rectangles (turned and mirrored
+        /// as placed). Decorate Mode picks and frames pieces by it, so a chair drawn a quarter tile off its cell is picked
+        /// where it's seen.
+        /// </summary>
+        public static Rect ArtBounds(ResolvedFurniture r)
+        {
+            bool any = false;
+            Rect union = default;
+            foreach (PlacedArt art in r.Art)
+            {
+                Sprite sprite = art.Art.frames != null && art.Art.frames.Length > 0 ? art.Art.frames[0] : art.Art.sprite;
+                if (sprite == null) continue;
+                Bounds b = sprite.bounds;
+                float x0 = b.min.x, x1 = b.max.x;
+                if (art.FlipX) (x0, x1) = (-x1, -x0);
+                Vector2 Turn(Vector2 p)
+                {
+                    for (int i = 0; i < Mathf.RoundToInt(art.Degrees / 90f) % 4; i++) p = new Vector2(-p.y, p.x);
+                    return p;
+                }
+                Vector2 a = Turn(new Vector2(x0, b.min.y)), c = Turn(new Vector2(x1, b.max.y));
+                Rect rect = Rect.MinMaxRect(Mathf.Min(a.x, c.x), Mathf.Min(a.y, c.y), Mathf.Max(a.x, c.x), Mathf.Max(a.y, c.y));
+                rect.position += art.Position;
+                union = any ? Rect.MinMaxRect(Mathf.Min(union.xMin, rect.xMin), Mathf.Min(union.yMin, rect.yMin),
+                    Mathf.Max(union.xMax, rect.xMax), Mathf.Max(union.yMax, rect.yMax)) : rect;
+                any = true;
+            }
+            if (any) return union;
+            return new Rect(r.Footprint.position, r.Footprint.size);
         }
 
         /// <summary>The bottom-centre of a turned piece: centred on its footprint, at the lowest of its bodies (or the footprint's bottom, with none).</summary>

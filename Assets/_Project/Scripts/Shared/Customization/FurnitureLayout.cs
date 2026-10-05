@@ -89,7 +89,17 @@ namespace Hearthdelve.Shared.Customization
 
         public FurnitureDefinition Definition(string id) => m_Lookup(id);
 
-        public ResolvedFurniture Resolve(PlacedFurniture p) => FurnitureGeometry.Resolve(m_Lookup(p?.definition), p, m_Shape.Origin);
+        /// <summary>Resolves a piece; a Surface item resolves on its host's anchor (null without a host that has it).</summary>
+        public ResolvedFurniture Resolve(PlacedFurniture p)
+        {
+            FurnitureDefinition d = m_Lookup(p?.definition);
+            if (d == null) return null;
+            if (d.layer != FurnitureLayer.Surface) return FurnitureGeometry.Resolve(d, p, m_Shape.Origin);
+            PlacedFurniture host = Find(p.host);
+            ResolvedFurniture h = host != null && host.uid != p.uid && m_Lookup(host.definition)?.layer != FurnitureLayer.Surface ? Resolve(host) : null;
+            if (h == null || p.anchor < 0 || p.anchor >= h.Surfaces.Count) return null;
+            return FurnitureGeometry.Resolve(d, p, m_Shape.Origin, h.Surfaces[p.anchor]);
+        }
 
         public List<ResolvedFurniture> ResolveAll()
         {
@@ -133,13 +143,40 @@ namespace Hearthdelve.Shared.Customization
         }
 
         /// <summary>The pieces covering a cell, the one to pick first first: surface items, then standing, wall, floor.</summary>
-        public List<PlacedFurniture> At(Vector2Int cell)
+        public List<PlacedFurniture> At(Vector2Int cell) => Pick(r => r.Footprint.Contains(cell) ||
+            r.Definition.layer == FurnitureLayer.Surface && FurnitureGeometry.ArtBounds(r).Overlaps(new Rect(cell + m_Shape.Origin, Vector2.one)));
+
+        /// <summary>The pieces drawn under a point in the world (the mouse), the one to pick first first.</summary>
+        public List<PlacedFurniture> AtPoint(Vector2 world) => Pick(r => FurnitureGeometry.ArtBounds(r).Contains(world));
+
+        /// <summary>The surface anchor nearest <paramref name="world"/> within <paramref name="within"/> tiles: (host uid, anchor index), or (-1, 0).</summary>
+        public (int host, int anchor) NearestSurface(Vector2 world, float within = 1f)
         {
-            var found = new List<(int rank, PlacedFurniture piece)>();
+            (int, int) best = (-1, 0);
+            float bestDistance = within;
+            foreach (PlacedFurniture p in m_Pieces)
+            {
+                if (m_Lookup(p.definition)?.layer == FurnitureLayer.Surface) continue;
+                ResolvedFurniture r = Resolve(p);
+                if (r == null) continue;
+                for (int i = 0; i < r.Surfaces.Count; i++)
+                {
+                    float d = Vector2.Distance(r.Surfaces[i], world);
+                    if (d > bestDistance) continue;
+                    bestDistance = d;
+                    best = (p.uid, i);
+                }
+            }
+            return best;
+        }
+
+        List<PlacedFurniture> Pick(Func<ResolvedFurniture, bool> under)
+        {
+            var found = new List<(int rank, float area, PlacedFurniture piece)>();
             foreach (PlacedFurniture p in m_Pieces)
             {
                 ResolvedFurniture r = Resolve(p);
-                if (r == null || !r.Footprint.Contains(cell)) continue;
+                if (r == null || !under(r)) continue;
                 int rank = r.Definition.layer switch
                 {
                     FurnitureLayer.Surface => 0,
@@ -147,9 +184,11 @@ namespace Hearthdelve.Shared.Customization
                     FurnitureLayer.Wall => 2,
                     _ => 3,
                 };
-                found.Add((rank, p));
+                Rect drawn = FurnitureGeometry.ArtBounds(r);
+                found.Add((rank, drawn.width * drawn.height, p));
             }
-            found.Sort((a, b) => a.rank.CompareTo(b.rank));
+            // Within a layer, the smaller piece first: a chair tucked against a table's edge is picked over the table.
+            found.Sort((a, b) => a.rank != b.rank ? a.rank.CompareTo(b.rank) : a.area.CompareTo(b.area));
             return found.ConvertAll(f => f.piece);
         }
 
@@ -157,6 +196,19 @@ namespace Hearthdelve.Shared.Customization
         public PlacementCheck Check(PlacedFurniture candidate)
         {
             FurnitureDefinition d = m_Lookup(candidate?.definition);
+            if (d == null) return new PlacementCheck(PlacementProblem.CannotStandThatWay);
+            if (d.layer == FurnitureLayer.Surface)
+            {
+                // On a host's free surface anchor, or not at all.
+                if (Resolve(candidate) == null)
+                    return new PlacementCheck(FurnitureGeometry.Resolve(d, candidate, m_Shape.Origin, Vector2.zero) == null
+                        ? PlacementProblem.CannotStandThatWay : PlacementProblem.NeedsASurface);
+                foreach (PlacedFurniture other in m_Pieces)
+                    if (other.uid != candidate.uid && other.host == candidate.host && other.anchor == candidate.anchor &&
+                        m_Lookup(other.definition)?.layer == FurnitureLayer.Surface)
+                        return new PlacementCheck(PlacementProblem.Overlaps, other.uid);
+                return new PlacementCheck(PlacementProblem.None);
+            }
             ResolvedFurniture r = FurnitureGeometry.Resolve(d, candidate, m_Shape.Origin);
             if (r == null) return new PlacementCheck(PlacementProblem.CannotStandThatWay);
             RectInt f = r.Footprint;
@@ -165,12 +217,6 @@ namespace Hearthdelve.Shared.Customization
             {
                 case FurnitureLayer.Wall:
                     if (!Inside(m_Shape.WallBand, f)) return new PlacementCheck(PlacementProblem.NotOnTheWall);
-                    break;
-                case FurnitureLayer.Surface:
-                    PlacedFurniture host = Find(candidate.host);
-                    ResolvedFurniture hostResolved = host != null ? Resolve(host) : null;
-                    if (hostResolved == null || !hostResolved.Surfaces.Exists(s => CellAt(s) == candidate.cell))
-                        return new PlacementCheck(PlacementProblem.NeedsASurface);
                     break;
                 default:
                     if (!Inside(m_Shape.Floor, f)) return new PlacementCheck(PlacementProblem.OutsideTheRoom);
@@ -189,18 +235,11 @@ namespace Hearthdelve.Shared.Customization
                 if (od == null || od.layer != d.layer) continue;
                 ResolvedFurniture o = FurnitureGeometry.Resolve(od, other, m_Shape.Origin);
                 if (o == null) continue;
-                if (d.layer == FurnitureLayer.Surface)
-                {
-                    if (other.host == candidate.host && other.cell == candidate.cell) return new PlacementCheck(PlacementProblem.Overlaps, other.uid);
-                    continue;
-                }
                 if (o.Footprint.Overlaps(f)) return new PlacementCheck(PlacementProblem.Overlaps, other.uid);
                 if (d.layer == FurnitureLayer.Standing && BodiesOverlap(r, o)) return new PlacementCheck(PlacementProblem.Overlaps, other.uid);
             }
             return new PlacementCheck(PlacementProblem.None);
         }
-
-        Vector2Int CellAt(Vector2 world) => m_Shape.CellOf(world);
 
         static bool Inside(RectInt area, RectInt f) => f.xMin >= area.xMin && f.yMin >= area.yMin && f.xMax <= area.xMax && f.yMax <= area.yMax;
 

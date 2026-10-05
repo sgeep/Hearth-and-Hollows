@@ -243,7 +243,7 @@ namespace Hearthdelve.Tests
             var state = new GameState();
             state.Furniture.GrantStarter(Start());
             string json = SaveSystem.ToJson(SaveSystem.Capture(state));
-            Assert.That(json, Does.Contain("\"version\": 4"));
+            Assert.That(json, Does.Contain("\"version\": 5"));
             GameState loaded = Restore(json);
             Assert.That(loaded.Furniture.Initialized);
             Assert.That(loaded.Furniture.OwnedCount("chair"), Is.EqualTo(3));
@@ -268,6 +268,26 @@ namespace Hearthdelve.Tests
                                   "\"upgrades\":[{\"id\":\"max_essence\",\"level\":1},{\"id\":\"tavern_seats\",\"level\":LEVEL}]," +
                                   "\"meal\":{\"kind\":\"None\",\"amount\":0,\"recipe\":\"\"},\"bosses\":[{\"id\":\"larder_troll\",\"clears\":1}]}";
 
+        [Test]
+        public void AVersion4Save_KeepsItsBarrelsWhereTheyStood_AndPutsItsGlassesOnTheirShelf()
+        {
+            const string v4 = "{\"version\":4,\"day\":2,\"phase\":\"Night\",\"gold\":5,\"renown\":0,\"storeroom\":[],\"upgrades\":[],\"meal\":{\"kind\":\"None\"},\"bosses\":[]," +
+                              "\"furniture\":{\"initialized\":true,\"nextUid\":5,\"owned\":[{\"id\":\"cellar_barrel\",\"count\":2},{\"id\":\"low_shelf\",\"count\":1},{\"id\":\"shelf_glasses\",\"count\":2}]," +
+                              "\"areas\":[{\"id\":\"tavern\",\"pieces\":[" +
+                              "{\"uid\":1,\"def\":\"cellar_barrel\",\"x\":25,\"y\":8,\"nx\":-2,\"host\":-1}," +
+                              "{\"uid\":2,\"def\":\"cellar_barrel\",\"x\":12,\"y\":10,\"nx\":0,\"host\":-1}," +
+                              "{\"uid\":3,\"def\":\"low_shelf\",\"x\":6,\"y\":14,\"host\":-1}," +
+                              "{\"uid\":4,\"def\":\"shelf_glasses\",\"x\":6,\"y\":15,\"host\":-1}," +
+                              "{\"uid\":5,\"def\":\"shelf_glasses\",\"x\":20,\"y\":16,\"host\":-1}]}]}}";
+            SaveData data = SaveSystem.FromJson(v4);
+            Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
+            List<PieceData> pieces = data.furniture.areas.Single().pieces;
+            Assert.That(pieces.Single(p => p.uid == 1).nx, Is.Zero, "the 4e barrel: still at 25.25");
+            Assert.That(pieces.Single(p => p.uid == 2).nx, Is.EqualTo(2), "a moved barrel: still at 12.5");
+            Assert.That((pieces.Single(p => p.uid == 4).host, pieces.Single(p => p.uid == 4).anchor), Is.EqualTo((3, 0)), "glasses on their shelf");
+            Assert.That(pieces.Any(p => p.uid == 5), Is.False, "glasses on no shelf go to storage");
+        }
+
         [TestCase(0, 0)]
         [TestCase(1, 120)]
         [TestCase(2, 340)]
@@ -275,7 +295,7 @@ namespace Hearthdelve.Tests
         {
             string json = k_Version3.Replace("LEVEL", levels.ToString());
             SaveData data = SaveSystem.FromJson(json);
-            Assert.That(data.version, Is.EqualTo(4));
+            Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
             Assert.That(data.upgrades.Select(u => u.id), Is.EqualTo(new[] { "max_essence" }), "the retired seat upgrade is gone (D16)");
             Assert.That(data.gold, Is.EqualTo(50 + refund), "its Gold is back in the purse");
             GameState state = SaveSystem.Restore(data, _ => null, id => id == "max_essence", null, id => id is "table" or "chair", Start());
@@ -315,8 +335,9 @@ namespace Hearthdelve.Tests
             Assert.That(state.Storeroom.TotalCount, Is.EqualTo(parts));
             IReadOnlyList<PlacedFurniture> tavern = state.Furniture.Layout("tavern");
             Assert.That(tavern.Count, Is.EqualTo(database.startingFurniture.Layout("tavern").Count));
+            var layout = new FurnitureLayout(new AreaShape(), database.Furniture, tavern);
             foreach (PlacedFurniture p in tavern)
-                Assert.That(FurnitureGeometry.Resolve(database.Furniture(p.definition), p), Is.Not.Null, $"{p.definition}#{p.uid} resolves");
+                Assert.That(layout.Resolve(p), Is.Not.Null, $"{p.definition}#{p.uid} resolves");
             Assert.That(tavern.Count(p => p.definition == "tavern_chair"), Is.EqualTo(6), "six seats, as a new 4e game had");
             Assert.That(database.Upgrade(SaveSystem.RetiredSeatUpgrade), Is.Null, "the seat upgrade is gone from the game");
 
@@ -335,11 +356,14 @@ namespace Hearthdelve.Tests
             var floor = new RectInt(1, 2, 26, 12);
             var wall = new RectInt(1, 14, 26, 3);
             var standing = new List<RectInt>();
+            var layout = new FurnitureLayout(new AreaShape(), database.Furniture, tavern);
             foreach (PlacedFurniture p in tavern)
             {
                 FurnitureDefinition d = database.Furniture(p.definition);
                 Assert.That(d, Is.Not.Null, p.definition);
-                ResolvedFurniture r = FurnitureGeometry.Resolve(d, p);
+                ResolvedFurniture r = layout.Resolve(p);
+                Assert.That(r, Is.Not.Null, $"{p.definition}#{p.uid} resolves");
+                if (d.layer == FurnitureLayer.Surface) continue;
                 Assert.That(FurnitureGeometry.IsValidNudge(p.nudge), $"{p.definition}#{p.uid}: nudge within half a tile");
                 RectInt area = d.layer == FurnitureLayer.Wall ? wall : floor;
                 Assert.That(area.Contains(r.Footprint.min) && area.Contains(r.Footprint.max - Vector2Int.one), $"{p.definition}#{p.uid} stands inside its area");
@@ -354,7 +378,7 @@ namespace Hearthdelve.Tests
         [Test]
         public void ASaveFromANewerGame_IsRefused()
         {
-            Assert.Throws<System.NotSupportedException>(() => SaveSystem.FromJson("{\"version\":5}"));
+            Assert.Throws<System.NotSupportedException>(() => SaveSystem.FromJson("{\"version\":6}"));
         }
     }
 }

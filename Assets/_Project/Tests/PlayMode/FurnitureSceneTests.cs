@@ -14,19 +14,21 @@ using Object = UnityEngine.Object;
 namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
-    /// 4f step 1: the tavern's furniture is data, built as the scene loads. The starting layout must give back the 4e
-    /// room exactly (every sprite, body, use point, highlight, seat, post, light, loop, view and the walkable grid), and
-    /// a rebuilt layout must replace what was built, with the grid, seats and stations following.
+    /// 4f step 1: the tavern's furniture is data, built as the scene loads. The starting layout must build the recorded
+    /// starting room exactly (every sprite, body, use point, highlight, seat, post, light, loop, view and the walkable
+    /// grid): the 4e room (<c>Tavern4e.txt</c>) with the third table's group moved half a tile onto the grid after the
+    /// Checkpoint A playtest (<c>TavernStarting.txt</c>). A rebuilt layout must replace what was built, with the grid,
+    /// seats and stations following.
     /// </summary>
     public class FurnitureSceneTests : LookTestFixture
     {
         const string Scene = "Tavern";
-        static string Expected => Path.Combine(TavernBaselineCaptures.BaselineFolder, "Tavern4e_starting.txt");
+        static string Expected => Path.Combine(TavernBaselineCaptures.BaselineFolder, "TavernStarting.txt");
 
         static AreaFurniture TavernFurniture => AreaFurniture.All.Single(a => a.Area.Id == PropertyArea.TavernId);
 
         [UnityTest]
-        public IEnumerator TheStartingTavern_IsThe4eRoom()
+        public IEnumerator TheStartingTavern_IsTheRecordedRoom()
         {
             yield return Load(Scene);
             List<string> now = TavernSnapshot.Take();
@@ -34,7 +36,7 @@ namespace Hearthdelve.Tests.PlayMode
             var missing = expected.Except(now).ToList();
             var extra = now.Except(expected).ToList();
             Assert.That(missing.Count + extra.Count, Is.Zero,
-                "The tavern differs from the 4e room.\nMissing:\n" + string.Join("\n", missing) + "\nUnexpected:\n" + string.Join("\n", extra));
+                "The tavern differs from the recorded starting room.\nMissing:\n" + string.Join("\n", missing) + "\nUnexpected:\n" + string.Join("\n", extra));
         }
 
         [UnityTest]
