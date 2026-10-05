@@ -233,6 +233,30 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(damaged.First(d => d.TargetIsPlayer).Damage, Is.EqualTo(attack.Settings.damage).Within(0.01f), "the attack's damage, from its data");
         }
 
+        /// <summary>4e playtest: the roll goes through an enemy in the way instead of shoving it.</summary>
+        [UnityTest]
+        public IEnumerator Dodge_RollsThroughAnEnemy_WithoutPushingIt()
+        {
+            yield return Setup("green_slime", new Vector2(1.5f, 0f));
+            Vector2 slimeAt = Enemy.transform.position;
+            Hold(Key.D);
+            yield return null;
+            yield return null;
+            Hold(Key.D, Key.Space);
+            bool ghosted = false;
+            for (int i = 0; i < 8; i++)
+            {
+                yield return new WaitForFixedUpdate();
+                ghosted |= Player.GetComponent<Hearthdelve.Dungeon.Player.DodgeThroughEnemies>().IsGhosted;
+            }
+            ReleaseKeys();
+            yield return new WaitForSeconds(0.4f);
+            Assert.That(ghosted, "ghosted through the roll");
+            Assert.That(Player.transform.position.x, Is.GreaterThan(slimeAt.x + 0.5f), "came out the other side");
+            Assert.That(Vector2.Distance(Enemy.transform.position, slimeAt), Is.LessThan(0.2f), "the slime wasn't pushed");
+            Assert.That(Player.GetComponent<Hearthdelve.Dungeon.Player.DodgeThroughEnemies>().IsGhosted, Is.False, "solid again after");
+        }
+
         [UnityTest]
         public IEnumerator Dodge_AvoidsTheSlimesLeap()
         {

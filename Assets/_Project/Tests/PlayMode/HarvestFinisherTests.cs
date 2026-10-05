@@ -140,6 +140,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Fighting();
             var health = (BossHealth)Encounter.GetComponent<Health>();
             BossDefinition boss = Encounter.Boss;
+            var essence = Player.GetComponent<Hearthdelve.Dungeon.Essence.EssenceHealth>();
+            essence.SetHealth(essence.MaximumHealth * 0.25f);
             health.Damage(health.CurrentHealth + 50f, Player.gameObject, 0f, 0f, Vector3.zero);
             health.FinishOff(Player.gameObject, finisher: false);
             yield return new WaitForSeconds(0.7f);
@@ -152,6 +154,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(boss.cache.Select(c => c.ingredient.id), Is.EquivalentTo(new[] { "slime_core", "venom_sac" }), "the deeper Cellars' parts");
             Assert.That(Hearthdelve.Dungeon.Run.DelveRunController.Active.Loot.BossesDefeated, Is.EqualTo(new[] { "larder_troll" }));
             Assert.That(boss.trophyId, Is.Not.Null, "4f's hook is there, empty until then");
+            Assert.That(essence.CurrentHealth, Is.EqualTo(essence.MaximumHealth).Within(1f), "its fall fills the delver's Essence");
         }
 
         [UnityTest]

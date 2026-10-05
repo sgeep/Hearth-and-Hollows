@@ -151,6 +151,26 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(part == null, "eaten up");
         }
 
+        /// <summary>The playtest's stuck troll: a part it can't reach (here, past the arena's wall) is given up, not ground against.</summary>
+        [UnityTest]
+        public IEnumerator APartOutOfReach_IsGivenUp_AndItGoesBackToTheFight()
+        {
+            IngredientPickup part = null;
+            yield return AMealOnTheFloor(p => part = p);
+            // Straight there, before it can reach the part where it fell.
+            part.PopTo((Vector2)Room.transform.position + new Vector2(-2.5f, Room.Size.y / 2f), 0.05f);
+            var eater = Troll.GetComponent<ScrapEater>();
+            // It crosses most of the arena first (some 7 s), then grinds for its give-up time.
+            yield return KeepAway(15f, () => eater.GaveUp > 0);
+            Assert.That(eater.GaveUp, Is.EqualTo(1), $"gave up on it (state {Troll.CharacterBrain.CurrentState?.StateName}, food {(eater.Food != null ? eater.Food.name : "none")}, " +
+                $"eaten {eater.Eaten}, best/stuck {eater.Approaching}, eating {eater.IsEating}, part at {(part != null ? (Vector2)part.transform.position : Vector2.zero)}, troll at {(Vector2)Troll.transform.position}, room {(Vector2)Room.transform.position} size {Room.Size})");
+            Assert.That(eater.Eaten, Is.Zero);
+            Assert.That(part != null, "the part is left where it is");
+            yield return KeepAway(3.5f, () => false);
+            Assert.That(eater.Food, Is.Null, "and never goes back for it");
+            Assert.That(eater.GaveUp, Is.EqualTo(1));
+        }
+
         [UnityTest]
         public IEnumerator TakingThePartFirst_DeniesTheMeal_AndItGoesHomeInTheSatchel()
         {

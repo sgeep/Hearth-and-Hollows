@@ -126,5 +126,27 @@ namespace Hearthdelve.Tests.EditMode
                 Assert.That(arena.Encounter.Select(e => e.Kind), Is.EqualTo(new[] { EnemyKind.Boss }), $"seed {seed}");
             }
         }
+
+        [Test]
+        public void Feeding_GivesUp_OnAPartItStopsGettingCloserTo()
+        {
+            float best = 6f, stuck = 0f;
+            Assert.That(FeedingRules.Stalled(ref best, ref stuck, 5.5f, 0.5f, 0.25f, 2f), Is.False, "closer: progress");
+            Assert.That(best, Is.EqualTo(5.5f));
+            Assert.That(FeedingRules.Stalled(ref best, ref stuck, 5.4f, 1f, 0.25f, 2f), Is.False, "jittering in place is not progress");
+            Assert.That(stuck, Is.EqualTo(1f));
+            Assert.That(FeedingRules.Stalled(ref best, ref stuck, 5.6f, 1f, 0.25f, 2f), Is.True, "two seconds without progress: give up");
+        }
+
+        [Test]
+        public void Campfire_GivesItsShareOverTime_NeverMoreThanLeftOrMissing()
+        {
+            // 50 Essence over 2.5 s: 20 a second.
+            Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(50f, 50f, 2.5f, 0.5f, 100f), Is.EqualTo(10f).Within(1e-4f));
+            Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(4f, 50f, 2.5f, 0.5f, 100f), Is.EqualTo(4f).Within(1e-4f), "what it has left");
+            Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(50f, 50f, 2.5f, 0.5f, 3f), Is.EqualTo(3f).Within(1e-4f), "what's missing, the rest kept");
+            Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(0f, 50f, 2.5f, 0.5f, 30f), Is.Zero, "spent");
+            Assert.That(Hearthdelve.Dungeon.Rooms.CampfireRules.Warm(20f, 50f, 2.5f, 0.5f, 0f), Is.Zero, "full");
+        }
     }
 }

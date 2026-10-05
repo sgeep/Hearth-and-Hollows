@@ -247,6 +247,41 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Runner.RoomsEntered, Is.GreaterThanOrEqualTo(12), "a full run");
         }
 
+        /// <summary>
+        /// 4e playtest: the room before the arena lights a campfire once it's clear (no other room has one), and standing by it
+        /// gives back half the delver's Essence, then it burns low.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackHalfYourEssence()
+        {
+            yield return LoadRun();
+            yield return WalkTo(RoomKind.Descent);
+            yield return Descend();
+            yield return WalkTo(RoomKind.Descent);
+            yield return Descend();
+            for (int guard = 0; guard < 10 && !Node.Next.Any(id => Runner.Floor.Node(id).Kind == RoomKind.Arena); guard++)
+            {
+                if (Runner.Encounter.IsSealed) yield return ClearRoom();
+                Assert.That(Object.FindObjectsByType<Campfire>(), Is.Empty, $"{Node.RoomId}: no campfire before the last room");
+                yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat));
+            }
+            Assert.That(Object.FindObjectsByType<Campfire>(), Is.Empty, "not until it's clear");
+            yield return ClearRoom();
+            Campfire fire = Object.FindAnyObjectByType<Campfire>();
+            Assert.That(fire, Is.Not.Null, "lit once the room before the arena is clear");
+            Assert.That(fire.transform.IsChildOf(Room.transform), "in this room");
+
+            var essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            essence.SetEncounterDrain(0f);
+            essence.SetHealth(essence.MaximumHealth * 0.2f);
+            float before = essence.CurrentHealth;
+            Teleport(Player, (Vector2)fire.transform.position + new Vector2(0f, -1.2f));
+            yield return WaitUntil(() => fire.IsSpent, 5f, "the fire to give all it has");
+            Assert.That(essence.CurrentHealth - before, Is.EqualTo(essence.MaximumHealth * 0.5f).Within(1.5f), "half the delver's Essence back");
+            essence.SetEncounterDrain(1f);
+        }
+
         /// <summary>Goes on through fights, preferring one whose reward is the given kind, until standing in such a room.</summary>
         IEnumerator WalkToReward(RewardKind kind)
         {
