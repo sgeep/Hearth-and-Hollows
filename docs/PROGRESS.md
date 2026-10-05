@@ -761,7 +761,17 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 
 **Deferred (as planned):** more weapons (4g's protagonist decision), Kitchen Arts, field cooking, Essence Tonics (to revisit after this playtest), the troll's trophy furnishing and any signature ingredient and recipe (4f).
 
-**Next: your 4e playtest and sign-off, then the 4f plan.**
+**Your 4e playtest (2026-10-05): the balance "feels right: challenging, might fail if you're not careful, designed to help the player understand upgrades are needed".** Fixed and added:
+- **The troll stuck at a pillar** (seed 459145174): a part lying where its big body can't reach (against a pillar) had it grinding and turning on the spot. It now gives up on a part it hasn't got closer to in 2 s (`FeedingSettings.giveUpSeconds`, `progressStep`) and never chases that part again.
+- **The dodge rolls through enemies** (`DodgeThroughEnemies`): while rolling the player's body ignores enemy bodies, and stays ghosted until clear of them, so neither is shoved apart.
+- **Dodge mashing skipped the cooldown** (web): TDE's cooldown lets a new dash cut its refill short by default; `PlayerTuning` turns that off.
+- **A campfire before the boss** (`Campfire`, `RunTuning.campfire`): lit in the room that leads to the arena once it's clear; standing by it gives back **half your max Essence** over 2.5 s (only what's missing; the rest waits), then it burns low. Resting commits nothing: the rope is in the same choice. Art: Adventurer's Campsite big campfire, with a warm light; PH sounds.
+- **The boss's fall fills your Essence** (`BossDefinition.essenceOnDefeat`, 1).
+- **Aim and facing** (changes a locked decision, at your request; CLAUDE.md updated): the mouse aims on keyboard and mouse with the **system cursor visible** (TDE hid it for a reticle we don't draw, so it seemed to vanish), the **right stick** aims on a gamepad (new `Dungeon/AimStick` action; movement direction while centred), and the delver **faces where they aim**, except while rolling. Attacks go that way, as before.
+- **The stray stool** right of the bar is gone from the tavern (builder and in-place updater).
+- Tests: the give-up and campfire rules; the troll giving up on a part past the wall; the roll through a slime; mashing dodge; facing the mouse, walking or standing; the roll facing its way; the right stick aiming and turning, centred following the walk; the refill on victory; the campfire's room and its gift. **EditMode 439/439, PlayMode 149/149.**
+
+**Next: your check of these fixes, then 4e sign-off and the 4f plan.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
