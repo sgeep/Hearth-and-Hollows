@@ -2,7 +2,7 @@
 
 Which Minifantasy art the game uses, where it comes from, and what each sheet contains. Raw packs live outside the repo in `C:\Dev\Minifantasy`; only the files listed here are imported, into `Assets/ThirdParty/Minifantasy/<Pack>/`.
 
-_Last updated: 2026-10-04 (4d step 4: run power icons, lightning sign)_
+_Last updated: 2026-10-05 (4f planning: furniture and decor survey; tankards found in Miscellany Icons)_
 
 ## How art gets into the project
 
@@ -138,7 +138,7 @@ Source: `All_Exclusives_20261002/Icons/16x16px/True_Heroes_I&II_16x16px_Skill_Ic
 
 ### Miscellany Icons (exclusive → `MiscellanyIcons/Miscellany.png`)
 
-Source: `All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)/Miscellany_1.png` (72×136, 8×8 cells). Rows per the pack: 1 coins (gold, silver, copper; big and small; stacks), 2 torches (new, lit, used), 3 a pick-up animation, 4 a drink-potion animation, 5 party, 6 class icons (barbarian, druid, rogue), 7 woodwork, 8 log in/out and new character, 9 beer (full, half, empty), 10 card frames. Imported: `Miscellany_GoldCoin` 0,0 8×8 (the big gold coin): run Gold on the HUD, the Gold room door sign and the Gold pickup (4d step 3).
+Source: `All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)/Miscellany_1.png` (72×136, 8×8 cells). Rows per the pack: 1 coins (gold, silver, copper; big and small; stacks), 2 torches (new, lit, used), 3 a pick-up animation, 4 a drink-potion animation, 5 party, 6 class icons (barbarian, druid, rogue), 7 woodwork, 8 log in/out and new character, 9 beer (tankards: full, half, empty, each big and small, at y 64), 10 card frames. Imported: `Miscellany_GoldCoin` 0,0 8×8 (the big gold coin): run Gold on the HUD, the Gold room door sign and the Gold pickup (4d step 3).
 
 ### `Props.png` — 232×88
 
@@ -218,7 +218,7 @@ The pack's `Characters/KitchenWorking_<race>` sheets are unclothed base bodies w
 | Core Tonic | `BlueFlask` 72,40 | Crafting And Professions I `Craftable_Item_Icons/…PotionIcons.png` (216×152): vials, round flasks and gems in many colours |
 | Gelbrew | `GreenFlask` 72,56 | same |
 
-**No tankards or ale glasses** on any icon sheet: the Tap's drinks are potion flasks for now. (The Tavern Indoor `Glasses` row is decor, not an icon.) *More Food Recipes* (exclusive, 104×72) has more skewers, sushi and dishes.
+**Tankards exist** (corrected 2026-10-05): Miscellany Icons row 9 (`Miscellany_1.png`, pixel y 64) has a full, a half-full and an empty tankard, each big and small (x 0/8, 16/24, 32/40). The Tap's drinks are still potion flasks; the ale dishes in 4f use the tankards. (The Tavern Indoor `Glasses` row is decor, not an icon.) *More Food Recipes* (exclusive, 104×72) has more skewers, sushi and dishes.
 
 ## Fire (Dwarven Kingdom → `DwarvenKingdom/`)
 
@@ -226,6 +226,40 @@ The pack's `Characters/KitchenWorking_<race>` sheets are unclothed base bodies w
 |---|---|
 | `FloorFireplace` (128×16, 8 frames of 16×16) | A small floor fire: under the **Stew Pot** cauldron (Dungeon `Props_Cauldron`) |
 | `WallFireplace` (192×24, 8 frames of 24×24) | Despite the name, a small flame at the foot of a wall: one on the tavern's back wall, as a wall lamp |
+
+## Furniture and decor survey (4f planning, 2026-10-05; nothing imported yet)
+
+Inspected for the customization catalog (`docs/PLAN_4F.md` §9). Paths are under `C:\Dev\Minifantasy`; `AE` = `All_Exclusives_20261002`. Sizes are whole-sheet pixels. Nothing here is sliced or imported yet; the rects get measured when a piece enters the catalog.
+
+**A recurring pattern:** Minifantasy draws furniture in **authored colourways** (the same piece in several palettes), and draws **each facing as its own sprite** (chairs facing N/S/E/W, horizontal and vertical long tables, beds head-up and side-on). So "rotation" means switching between drawn facings, and many recolours already exist as art.
+
+| Sheet | Size | What's on it |
+|---|---|---|
+| `AE/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers/TavernIndoor_props.png` (+ `props2`) | 320×104 | Already in use and measured above: the L-bar, round, small round, square and long tables, benches, chairs by facing, stools, shelves, bottles, glasses, signs |
+| `AE/Addons/Towns_I_II/Shop_Indoor/Separate_Layers/ShopIndoor_props.png` (+ `counter`, `wall`, `floor`, `basebuilding`) | 456×256 | A second interior shell (green or cream walls; purple or teal floors), L-counters, banners in three colours, cupboards and crates, mannequins in six outfits, display tables and racks, **candles in eight colours** and several heights, potted plants, potion rows, a barrel |
+| `AE/Addons/Towns_I_II/Plant_Pots/PlantPots.png` | 288×224 | **Eight pot colours** × about sixteen plants (small, large, flowering, leafy, knocked over) |
+| `AE/Addons/_Miscellany/Barracks_Props/_Barrack_Props.png` | 776×760 | **Beds** in wooden and iron frames with red, blue and plain blankets, drawn side-on and head-on; weapon racks; armour stands; many training dummies; a roped ring |
+| `AE/Addons/Towns_I_II/Church/Church_Indoor/ChurchIndoor_props.png` (+ `Candles/`) | 544×272 | Pews, an organ, candle racks, a lectern, crosses, standing candles (animated, with light layers) |
+| `AE/Addons/_Miscellany/Astronomical_Observatory/Props/Props.png` | 296×232 | Wall and standing telescopes, a globe, a star chart, a star-map table, orreries, small lamps (curio material) |
+| `AE/Addons/_Miscellany/Wizard_Tower/Props/Wizard_Tower_Props.png` | 72×168 | Bookcases (full, half, empty), a round table, a padded bench, book stacks, scrolls, a gold orrery |
+| `AE/Addons/_Miscellany/Chests/Chests.png` | 288×285 | Chests and trunks in four sizes, in **eight colourways** |
+| `AE/Addons/_Miscellany/Piles_Of_Loot_And_Stuff/PilesOfLootAndStuff.png` | 112×200 | Gold hoards, crates spilling gold, scrap, rubble, **meat-and-bone piles**, bones, bloody bones, each in four sizes |
+| `Minifantasy_Medieval_City_v1.1/…/Props/Props.png` (+ `Animated_Props/Fireplace/`) | 432×192 | Wardrobes, dressers and chests of drawers in **blue, brown and pink**, beds, a **stone chimney fireplace** (animated version with a light layer), window flower boxes, street lamps, benches, barrels, crates |
+| `Minifantasy_CastlesAndStrongholds_v.2.0/…/Props/Props.png` | 264×256 | **Two colourways** (gold-and-red, silver-and-red): banners, framed paintings, crossed weapons, shields, **mounted antler heads**, thrones, banquet table and chairs (four facings), braziers, rugs, armour stands, a candlestick |
+| `Minifantasy_Towns2_v1.5/…/Props/Minifantasy_TownsIIProps.png` (+ three `…IndoorTileset.png`: brick, stucco, plank) | 264×120 | Sofas, room dividers, cabinets, **rugs in five colours** (with matching swatches), a mirror, a bathtub, a washstand, tableware, lamps. The indoor tilesets are further room shells |
+| `Minifantasy_Towns_v3.0/…/Props/Minifantasy_TownsProps.png` | 224×384 | Hanging shop signs (including a tankard sign), a forge, potted plants, framed pictures, wall-mounted weapons, shelves and **bookcases with many fills**, cupboards, dressers, beds with red blankets, round tables with white cloths, stools |
+| `AE/Seasonal_Content/Minifantasy_Haunted_House_v1.0/…/Props/HauntedHouseProps.png` | 160×240 | Cobwebs, pumpkins and jack-o'-lanterns, patterned carpets, mirrors, **six haunted portraits**, wingback armchairs, sofas, tall cabinets, curtains, chairs |
+| `Minifantasy_DwarvenKingdom_v1.0/…/Props/Decoration/Props.png` | 576×232 | Tables, stools and benches in **six materials** (wood, stone, violet, ice, slate, moss), barrels, kegs and a great tun, mine carts, lanterns in three colours, rugs (red, ochre, teal), statue niches, banners, rune panels |
+| `Minifantasy_ElvenKingdom_v.1.0/…/Props/Props.png` | 296×320 | **Five colourways** (green, blue, red, purple, gold): bunting, banners, chests and cabinets, lamps, round tables and stools, rugs, tree banners |
+| `AE/Seasonal_Content/Minifantasy_Lunar_New_Year_Festival_v1.0/Tiles And Props/LunarNewYear_props.png` | 376×144 | Paper lanterns and lantern stands, firecrackers, hangings, a gong, lucky-cat and tiger figures in four colours |
+| `AE/Addons/Desolate_Desert/Giant_Bones/Bones.png` | 136×80 | Great curved horns or tusks, a long bone, small bones |
+| `Minifantasy_CraftingAndProfessions2_v1.0/…/Food_Preparation/…PreparationTableProp.png` (+ `…Working.png`) | 32×32 | A preparation counter with vegetables and raw meat, with a working animation: the **Butcher Block** candidate |
+| `Minifantasy_CraftingAndProfessions2_v1.0/…/Craftable_Item_Icons/…PreparationTableIngredients.png` | 96×88 | 8×8 icons: onion, beet, tomato, herbs, bread, dough, fish, raw cuts (surface-staple icons) |
+| `AE/Icons/8x8px/Home_Icons/HomeIcons.png` | 88×112 | House icons only (map markers), not furniture |
+
+**Not yet opened, worth a look when the catalog grows:** Stained Glass Windows (seven colours), 8×8 Flags, Chamber Of Secrets, Skull Hideout, Lost Civilization crystals, Glowing Mushrooms, Deep Caves props, Spooky Graveyard, More Lovecraftian Statues, Painter Studio, Animated UI Book (a catalogue UI candidate).
+
+**Gaps found:** no mounted troll head or troll-sized trophy (the Larder Troll's trophy needs a composite, `docs/PLAN_4F.md` §16); no tabletop clutter sized for the round tables beyond candles and tableware. (Tankards do exist, as icons: Miscellany Icons row 9.)
 
 ## Selectors (UI Overhaul → `UIOverhaul/Selectors`)
 
