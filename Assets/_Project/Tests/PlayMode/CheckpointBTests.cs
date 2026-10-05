@@ -7,6 +7,7 @@ using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Tavern;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.TestTools;
 using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
@@ -146,6 +147,88 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Leave();
         }
 
+        /// <summary>The colour panel from the keyboard: down to the cushion, right through its ramps, and the catalogue's pages.</summary>
+        [UnityTest]
+        public IEnumerator ThePanels_WorkFromTheKeyboard()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            PlacedFurniture chair = Mode.Layout.Pieces.First(p => p.definition == "tavern_chair");
+            Mode.SetCursor(chair.cell);
+            yield return Press(UnityEngine.InputSystem.Key.V);
+            Assert.That(Screen.Style.IsOpen, "V opens the colours");
+            yield return Press(UnityEngine.InputSystem.Key.D);
+            Assert.That(Mode.StyleTarget.palette, Does.StartWith("wood="), "right: the next wood");
+            yield return Press(UnityEngine.InputSystem.Key.S);
+            yield return Press(UnityEngine.InputSystem.Key.D);
+            Assert.That(Mode.StyleTarget.palette, Does.Contain("cushion="), "down, then right: a cushion");
+            yield return Press(UnityEngine.InputSystem.Key.Escape);
+            Assert.That(Screen.Style.IsOpen, Is.False);
+            Assert.That(Mode.IsActive, "closing the panel isn't leaving");
+
+            // Pointing at another chair with the mouse, then the keys.
+            PlacedFurniture other = Mode.Layout.Pieces.Last(p => p.definition == "tavern_chair");
+            Vector2 at = FurnitureGeometry.ArtBounds(Mode.Layout.Resolve(other)).center;
+            InputSystem.QueueStateEvent(Pointer, new UnityEngine.InputSystem.LowLevel.MouseState { position = Camera.main.WorldToScreenPoint(at), delta = new Vector2(30f, 0f) });
+            yield return null;
+            yield return null;
+            Assert.That(Mode.Pointing && Mode.StyleTarget?.uid == other.uid, "the mouse is on the other chair");
+            yield return Press(UnityEngine.InputSystem.Key.V);
+            Assert.That(Screen.Style.IsOpen);
+            yield return Press(UnityEngine.InputSystem.Key.D);
+            yield return Press(UnityEngine.InputSystem.Key.D);
+            Assert.That(Mode.Layout.Find(other.uid).palette, Does.StartWith("wood="), "the pointed-at chair changes");
+            yield return Press(UnityEngine.InputSystem.Key.Escape);
+
+            yield return Press(UnityEngine.InputSystem.Key.Tab);
+            Assert.That(Screen.Catalogue.IsOpen);
+            string first = Screen.Catalogue.TabText;
+            yield return Press(UnityEngine.InputSystem.Key.Q);
+            Assert.That(Screen.Catalogue.TabText, Is.Not.EqualTo(first), "Q: the next page");
+            yield return Press(UnityEngine.InputSystem.Key.S);
+            Assert.That(Screen.Catalogue.Selected, Is.EqualTo(1), "down the list");
+            yield return Press(UnityEngine.InputSystem.Key.Escape);
+            Assert.That(Screen.Catalogue.IsOpen, Is.False);
+            Mode.Leave();
+        }
+
+        /// <summary>Web build: a key that goes down and up within one frame (as the browser can deliver them) still steps.</summary>
+        [UnityTest]
+        public IEnumerator ATapWithinOneFrame_StillSteps()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            Vector2Int before = Mode.Cursor;
+            Hold(UnityEngine.InputSystem.Key.RightArrow);
+            ReleaseKeys();
+            yield return null;
+            yield return null;
+            Assert.That(Mode.Cursor, Is.EqualTo(before + Vector2Int.right), "the cursor");
+            PlacedFurniture chair = Mode.Layout.Pieces.First(p => p.definition == "tavern_chair");
+            Mode.SetCursor(chair.cell);
+            Screen.OpenStyle();
+            yield return null;
+            Hold(UnityEngine.InputSystem.Key.D);
+            ReleaseKeys();
+            yield return null;
+            yield return null;
+            Assert.That(Mode.StyleTarget.palette, Does.StartWith("wood="), "the colour panel");
+            Screen.Style.Close();
+            Mode.Leave();
+        }
+
+        IEnumerator Press(UnityEngine.InputSystem.Key key)
+        {
+            Hold(key);
+            yield return null;
+            yield return null;
+            ReleaseKeys();
+            yield return null;
+            yield return null;
+        }
+
         [UnityTest]
         public IEnumerator AFloorFinish_CoversTheWholeFloor_AndPuttingItAllBackRestoresIt()
         {
@@ -225,6 +308,17 @@ namespace Hearthdelve.Tests.PlayMode
             down.Pass(keeper);
             Assert.That(PropertyArea.Current, Is.SameAs(Tavern.Area));
             Assert.That(Vector2.Distance(keeper.position, Tavern.Area.Arrival), Is.LessThan(0.01f));
+            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
+
+            // The keeper walks only during service until the village milestone: the stairs work then, and the end of the
+            // evening brings them back down.
+            Director.OpenDebugEvening();
+            yield return null;
+            keeper.position = up.transform.position;
+            yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "upstairs mid-service");
+            yield return WaitUntil(() => !up.Busy, 3f, "the fade");
+            Director.EndServiceNow();
+            yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 5f, "back down when the evening ends");
             Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
         }
 

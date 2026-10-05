@@ -69,6 +69,7 @@ namespace Hearthdelve.UI.Tavern
         int m_HeldStep;
         int m_OpenedFrame = -1;
         bool m_Gamepad;
+        DirectionReader m_MoveReader;
         InputAction m_Move, m_Select, m_Cancel, m_Buy, m_Sell, m_Next, m_Previous, m_Close, m_Wheel;
 
         public bool IsOpen => m_Root != null && m_Root.activeSelf;
@@ -109,6 +110,8 @@ namespace Hearthdelve.UI.Tavern
             m_Tertiary = tertiary;
             m_TertiaryLabel = tertiaryLabel;
         }
+
+        void OnDestroy() => m_MoveReader?.Dispose();
 
         void Start()
         {
@@ -173,6 +176,8 @@ namespace Hearthdelve.UI.Tavern
         {
             InputAction A(string name) => InputMaps.Find(InputMaps.Decorate, name);
             m_Move = A(DecorateActions.Move);
+            m_MoveReader?.Dispose();
+            m_MoveReader = new DirectionReader(m_Move);
             m_Select = A(DecorateActions.Select);
             m_Cancel = A(DecorateActions.Cancel);
             m_Buy = A(DecorateActions.Turn);
@@ -196,7 +201,11 @@ namespace Hearthdelve.UI.Tavern
                 Close();
                 return;
             }
-            if (Time.frameCount == m_OpenedFrame) return;
+            if (Time.frameCount == m_OpenedFrame)
+            {
+                m_MoveReader?.Clear();
+                return;
+            }
             if (Pressed(m_Cancel) || Pressed(m_Close))
             {
                 Close();
@@ -210,7 +219,7 @@ namespace Hearthdelve.UI.Tavern
             float wheel = m_Wheel != null ? m_Wheel.ReadValue<Vector2>().y : 0f;
             if (Mathf.Abs(wheel) > 0.1f) Select(m_Selected - (int)Mathf.Sign(wheel));
 
-            Vector2 move = m_Move != null ? m_Move.ReadValue<Vector2>() : Vector2.zero;
+            Vector2 move = m_MoveReader != null ? m_MoveReader.Read() : Vector2.zero;
             int step = Mathf.Abs(move.y) > 0.5f ? (move.y > 0f ? -1 : 1) : 0;
             int across = Mathf.Abs(move.x) > 0.5f && Mathf.Abs(move.x) > Mathf.Abs(move.y) ? (move.x > 0f ? 1 : -1) : 0;
             int held = step != 0 ? step : across * 100;
@@ -389,7 +398,8 @@ namespace Hearthdelve.UI.Tavern
                 if (CurrentPage == Page.Room)
                 {
                     FinishDefinition f = m_Finishes[index];
-                    row.name.Set(DecorateLocKeys.FinishRow, Loc.UI(f.kind == FinishKind.Floor ? DecorateLocKeys.FloorKind : DecorateLocKeys.WallKind), Loc.UI(f.nameKey));
+                    // Floors first, then walls (the detail says which); just the name, so it fits the row.
+                    row.name.Set(TavernLocKeys.Plain, Loc.UI(f.nameKey));
                     bool owned = mode.Area.State.OwnsFinish(f.id);
                     if (mode.Finish(f.kind) == f.id) row.info.Set(DecorateLocKeys.RowInUse);
                     else if (owned) row.info.Set(DecorateLocKeys.RowOwned);

@@ -26,8 +26,9 @@ namespace Hearthdelve.Tavern.Scene
     /// <summary>
     /// A fixed way between two areas of the property (4f step 6; plan §8): the stairs up to the guest room, the guest
     /// room's door back down. Walking onto it fades the screen, moves the keeper to the other area's arrival point and the
-    /// camera onto that area, and fades back. Not during service (the keeper is needed downstairs: if service starts while
-    /// they're upstairs, they come straight back down) and not while decorating, which switches areas itself.
+    /// camera onto that area, and fades back. Until the village milestone the keeper only walks during service, so the
+    /// stairs work then too (customers keep waiting while the keeper is upstairs); when the evening ends (results, night,
+    /// the next day) the keeper is brought back down. Not while decorating, which switches areas itself.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public sealed class AreaPassage : MonoBehaviour
@@ -49,9 +50,10 @@ namespace Hearthdelve.Tavern.Scene
             m_FadeSeconds = fadeSeconds;
         }
 
-        static bool Serving => TavernDirector.Instance != null && TavernDirector.Instance.Phase is TavernPhase.Service or TavernPhase.Results;
+        /// <summary>The parts of the day when the keeper is about the property on foot.</summary>
+        static bool OnFoot => TavernDirector.Instance == null || TavernDirector.Instance.Phase is TavernPhase.Service or TavernPhase.Prep;
 
-        public bool CanPass => m_To != null && !m_Busy && !Serving && (DecorateMode.Instance == null || !DecorateMode.Instance.IsActive);
+        public bool CanPass => m_To != null && !m_Busy && OnFoot && (DecorateMode.Instance == null || !DecorateMode.Instance.IsActive);
 
         void OnTriggerEnter2D(Collider2D other)
         {
@@ -61,8 +63,8 @@ namespace Hearthdelve.Tavern.Scene
 
         void Update()
         {
-            // Service starts while the keeper is upstairs: down they come.
-            if (m_Busy || m_From == null || m_To == null || PropertyArea.Current != m_From || m_From.Kind == Shared.Customization.AreaKind.Tavern || !Serving) return;
+            // The evening ends while the keeper is upstairs: down they come (the results and the night are the tavern's).
+            if (m_Busy || m_From == null || m_To == null || PropertyArea.Current != m_From || m_From.Kind == Shared.Customization.AreaKind.Tavern || OnFoot) return;
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null && player.TryGetComponent(out Rigidbody2D body)) Arrive(body);
         }

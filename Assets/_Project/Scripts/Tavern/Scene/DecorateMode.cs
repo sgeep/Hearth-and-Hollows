@@ -68,6 +68,7 @@ namespace Hearthdelve.Tavern.Scene
         float m_HeldFor, m_NextRepeat;
         Vector2 m_LastPointer;
         Transform m_Ghost;
+        DirectionReader m_MoveReader;
         InputAction m_Move, m_Point, m_Select, m_Click, m_Cancel, m_Turn, m_Flip, m_Store, m_Undoing, m_Cycle, m_Storage, m_Check, m_Wheel, m_Free, m_Style, m_AreaKey;
         /// <summary>Each area's finishes as they were on entering (put it all back restores them).</summary>
         readonly Dictionary<string, (string floor, string wall)> m_EnteredFinishes = new();
@@ -120,6 +121,7 @@ namespace Hearthdelve.Tavern.Scene
 
         void OnDestroy()
         {
+            m_MoveReader?.Dispose();
             if (Instance == this) Instance = null;
         }
 
@@ -211,6 +213,8 @@ namespace Hearthdelve.Tavern.Scene
         {
             InputAction A(string name) => InputMaps.Find(InputMaps.Decorate, name);
             m_Move = A(DecorateActions.Move);
+            m_MoveReader?.Dispose();
+            m_MoveReader = new DirectionReader(m_Move);
             m_Point = A(DecorateActions.Point);
             m_Select = A(DecorateActions.Select);
             m_Click = A(DecorateActions.Click);
@@ -232,7 +236,12 @@ namespace Hearthdelve.Tavern.Scene
 
         void Update()
         {
-            if (!IsActive || PanelOpen) return;
+            if (!IsActive || PanelOpen)
+            {
+                // A panel has the controls: its taps aren't the cursor's.
+                m_MoveReader?.Clear();
+                return;
+            }
             ReadCursor();
             // Holding or letting go of the free key re-places the carried piece under the mouse at once.
             bool free = FreeMode;
@@ -265,7 +274,7 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>The stick, d-pad or keys move a tile at a time (repeating while held); the mouse puts the cursor under it.</summary>
         void ReadCursor()
         {
-            Vector2 dir = m_Move != null ? m_Move.ReadValue<Vector2>() : Vector2.zero;
+            Vector2 dir = m_MoveReader != null ? m_MoveReader.Read() : Vector2.zero;
             var step = new Vector2Int(Mathf.Abs(dir.x) > 0.5f ? (int)Mathf.Sign(dir.x) : 0, Mathf.Abs(dir.y) > 0.5f ? (int)Mathf.Sign(dir.y) : 0);
             if (step != Vector2Int.zero)
             {

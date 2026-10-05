@@ -261,8 +261,9 @@ namespace Hearthdelve.Editor
             panel.name = "Catalogue";
             LocalizedSuperText tab = DungeonUI.Title(panel, DecorateLocKeys.TabStorage);
             var topLeft = new Vector2(0f, 1f);
-            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, 6f, k_Note, TextAnchor.MiddleRight, new Vector2(1f, 1f), new Vector2(-8f, -10f),
-                new Vector2(110f, Line));
+            // The purse at the top left, clear of the page's name in the middle.
+            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -4f),
+                new Vector2(104f, Line));
 
             // The list (left, 170 wide): a name, and the price or what's stored, per row.
             var rows = new CatalogueRow[8];
@@ -289,27 +290,28 @@ namespace Hearthdelve.Editor
                 new Vector2(166f, Line));
 
             // The chosen piece (right, 116 wide): its drawing, name, description, price and tier, counts, where copies come from.
-            RectTransform iconBox = Rect(panel, "IconBox", topLeft, new Vector2(0.5f, 0.5f), new Vector2(240f, -40f), new Vector2(40f, 40f));
+            RectTransform iconBox = Rect(panel, "IconBox", topLeft, new Vector2(0.5f, 0.5f), new Vector2(236f, -38f), new Vector2(40f, 40f));
             Image icon = DungeonUI.AddImage(Rect(iconBox, "Icon", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(16f, 16f)), null, Color.white);
             icon.preserveAspect = true;
             LocalizedSuperText Detail(string name, float top, int lines, Color color) =>
                 Label(panel, name, TavernLocKeys.Plain, 6f, color, lines > 1 ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, topLeft,
                     new Vector2(182f, top), new Vector2(116f, Line * lines));
-            LocalizedSuperText name = Detail("Name", -60f, 1, k_Title);
-            LocalizedSuperText description = Detail("Description", -72f, 3, k_Ink);
-            LocalizedSuperText tier = Detail("Tier", -108f, 1, k_Ink);
-            LocalizedSuperText counts = Detail("Counts", -120f, 1, k_Note);
-            LocalizedSuperText source = Detail("Source", -132f, 1, k_Note);
+            LocalizedSuperText name = Detail("Name", -58f, 1, k_Title);
+            LocalizedSuperText description = Detail("Description", -70f, 4, k_Ink);
+            LocalizedSuperText tier = Detail("Tier", -118f, 1, k_Ink);
+            LocalizedSuperText counts = Detail("Counts", -130f, 1, k_Note);
+            LocalizedSuperText source = Detail("Source", -142f, 1, k_Note);
+            // Its colourways: a column of swatches beside the drawing.
             var swatches = new Image[8];
             for (int i = 0; i < swatches.Length; i++)
             {
-                RectTransform swatch = Rect(panel, $"Swatch{i + 1}", topLeft, topLeft, new Vector2(184f + i * 9f, -144f), new Vector2(7f, 5f), Color.white);
+                RectTransform swatch = Rect(panel, $"Swatch{i + 1}", topLeft, topLeft, new Vector2(284f, -20f - i * 5f), new Vector2(8f, 4f), Color.white);
                 swatches[i] = swatch.GetComponent<Image>();
             }
 
-            Button primary = SmallButton(panel, "Primary", DecorateLocKeys.ActionPlace, new Vector2(0.5f, 0f), new Vector2(-100f, 4f), 96f, out LocalizedSuperText primaryLabel);
-            Button secondary = SmallButton(panel, "Secondary", DecorateLocKeys.ActionBuy, new Vector2(0.5f, 0f), new Vector2(0f, 4f), 96f, out LocalizedSuperText secondaryLabel);
-            Button tertiary = SmallButton(panel, "Tertiary", DecorateLocKeys.ActionSell, new Vector2(0.5f, 0f), new Vector2(100f, 4f), 96f, out LocalizedSuperText tertiaryLabel);
+            Button primary = SmallButton(panel, "Primary", DecorateLocKeys.ActionPlace, new Vector2(0.5f, 0f), new Vector2(-100f, 2f), 96f, out LocalizedSuperText primaryLabel);
+            Button secondary = SmallButton(panel, "Secondary", DecorateLocKeys.ActionBuy, new Vector2(0.5f, 0f), new Vector2(0f, 2f), 96f, out LocalizedSuperText secondaryLabel);
+            Button tertiary = SmallButton(panel, "Tertiary", DecorateLocKeys.ActionSell, new Vector2(0.5f, 0f), new Vector2(100f, 2f), 96f, out LocalizedSuperText tertiaryLabel);
             UiFeedbackContent.Commit(primary);
 
             var catalogue = panel.gameObject.AddComponent<DecorateCatalogue>();

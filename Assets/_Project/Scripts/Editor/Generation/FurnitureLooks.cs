@@ -75,7 +75,7 @@ namespace Hearthdelve.Editor
         /// <summary>The finishes: (id, name, kind, theme, tier, price, starter).</summary>
         static readonly (string id, string name, FinishKind kind, FurnitureTheme theme, int tier, int price, bool starter)[] k_Finishes =
         {
-            ("floor_diamonds", "green diamond tiles", FinishKind.Floor, FurnitureTheme.Tavern, 0, 0, true),
+            ("floor_diamonds", "green diamonds", FinishKind.Floor, FurnitureTheme.Tavern, 0, 0, true),
             ("floor_teal", "teal tiles", FinishKind.Floor, FurnitureTheme.Village, 0, 0, true),
             ("floor_plum", "plum tiles", FinishKind.Floor, FurnitureTheme.Village, 0, 40, false),
             ("floor_chequer", "pale chequer", FinishKind.Floor, FurnitureTheme.Village, 1, 60, false),

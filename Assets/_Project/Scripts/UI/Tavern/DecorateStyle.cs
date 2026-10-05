@@ -66,6 +66,7 @@ namespace Hearthdelve.UI.Tavern
         Vector2Int m_Held;
         float m_HeldFor, m_NextRepeat;
         bool m_Gamepad;
+        DirectionReader m_MoveReader;
         InputAction m_Move, m_Select, m_Cancel, m_Style, m_Click;
         FurnitureDefinition m_Piece;
 
@@ -89,6 +90,8 @@ namespace Hearthdelve.UI.Tavern
             m_ApplyAll = applyAll;
             m_ApplyAllLabel = applyAllLabel;
         }
+
+        void OnDestroy() => m_MoveReader?.Dispose();
 
         void Start()
         {
@@ -134,6 +137,8 @@ namespace Hearthdelve.UI.Tavern
         {
             InputAction A(string name) => InputMaps.Find(InputMaps.Decorate, name);
             m_Move = A(DecorateActions.Move);
+            m_MoveReader?.Dispose();
+            m_MoveReader = new DirectionReader(m_Move);
             m_Select = A(DecorateActions.Select);
             m_Cancel = A(DecorateActions.Cancel);
             m_Style = A(DecorateActions.Style);
@@ -151,7 +156,11 @@ namespace Hearthdelve.UI.Tavern
                 Close();
                 return;
             }
-            if (Time.frameCount == m_OpenedFrame) return;
+            if (Time.frameCount == m_OpenedFrame)
+            {
+                m_MoveReader?.Clear();
+                return;
+            }
             if (Pressed(m_Cancel) || Pressed(m_Style))
             {
                 Close();
@@ -162,7 +171,7 @@ namespace Hearthdelve.UI.Tavern
                 if (m_Lines[m_Focused].Kind == Kind.Copy) Copy();
                 else if (m_Lines[m_Focused].Kind == Kind.ApplyAll) ApplyAll();
             }
-            Vector2 move = m_Move != null ? m_Move.ReadValue<Vector2>() : Vector2.zero;
+            Vector2 move = m_MoveReader != null ? m_MoveReader.Read() : Vector2.zero;
             var step = new Vector2Int(Mathf.Abs(move.x) > 0.5f ? (int)Mathf.Sign(move.x) : 0, Mathf.Abs(move.y) > 0.5f ? (int)Mathf.Sign(move.y) : 0);
             if (step.x != 0 && step.y != 0) step.y = 0;
             if (step == Vector2Int.zero)
