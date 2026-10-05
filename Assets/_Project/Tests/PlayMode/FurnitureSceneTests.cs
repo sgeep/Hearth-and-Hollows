@@ -46,7 +46,7 @@ namespace Hearthdelve.Tests.PlayMode
             AreaFurniture area = TavernFurniture;
             int placed = area.CurrentLayout().Count;
             Assert.That(area.Pieces.Count, Is.EqualTo(placed), "every placement resolves");
-            Assert.That(Object.FindObjectsByType<FurnitureView>().Length, Is.EqualTo(placed), "and is built once");
+            Assert.That(area.GetComponentsInChildren<FurnitureView>().Length, Is.EqualTo(placed), "and is built once");
             Assert.That(area.Pieces.Select(p => p.Placement.uid).Distinct().Count(), Is.EqualTo(placed), "uids are unique");
         }
 

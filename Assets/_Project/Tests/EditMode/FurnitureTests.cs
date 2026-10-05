@@ -243,7 +243,7 @@ namespace Hearthdelve.Tests
             var state = new GameState();
             state.Furniture.GrantStarter(Start());
             string json = SaveSystem.ToJson(SaveSystem.Capture(state));
-            Assert.That(json, Does.Contain("\"version\": 5"));
+            Assert.That(json, Does.Contain("\"version\": 6"));
             GameState loaded = Restore(json);
             Assert.That(loaded.Furniture.Initialized);
             Assert.That(loaded.Furniture.OwnedCount("chair"), Is.EqualTo(3));
@@ -378,7 +378,7 @@ namespace Hearthdelve.Tests
         [Test]
         public void ASaveFromANewerGame_IsRefused()
         {
-            Assert.Throws<System.NotSupportedException>(() => SaveSystem.FromJson("{\"version\":6}"));
+            Assert.Throws<System.NotSupportedException>(() => SaveSystem.FromJson("{\"version\":7}"));
         }
     }
 }

@@ -33,11 +33,15 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] FurniturePresentation m_Presentation;
         [SerializeField, Tooltip("Serving reach, for the seats.")]
         TavernContent m_Content;
+        [SerializeField, Tooltip("Lays the area's floor and wall finishes (D5).")]
+        AreaFinishes m_Finishes;
 
         readonly List<ResolvedFurniture> m_Resolved = new();
         readonly List<TavernSeat> m_Seats = new();
         Transform m_Root;
-        FurnitureState m_LocalState;
+        /// <summary>Played without a game running: one property for every area, for as long as the scenes last.</summary>
+        static GameState s_LocalGame;
+        static UnityEngine.SceneManagement.SceneHandle s_LocalScene;
 
         static readonly List<AreaFurniture> s_All = new();
 
@@ -66,12 +70,23 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Raised after every build.</summary>
         public event Action Built;
 
-        public void Configure(PropertyArea area, GameDatabase database, FurniturePresentation presentation, TavernContent content)
+        public void Configure(PropertyArea area, GameDatabase database, FurniturePresentation presentation, TavernContent content, AreaFinishes finishes = null)
         {
             m_Area = area;
             m_Database = database;
             m_Presentation = presentation;
             m_Content = content;
+            m_Finishes = finishes;
+        }
+
+        public AreaFinishes Finishes => m_Finishes;
+
+        /// <summary>The area with this id, if loaded.</summary>
+        public static AreaFurniture Find(string id)
+        {
+            foreach (AreaFurniture a in s_All)
+                if (a.m_Area != null && a.m_Area.Id == id) return a;
+            return null;
         }
 
         static GameFlow Flow => GameFlow.Instance != null && GameFlow.Instance.InGame ? GameFlow.Instance : null;
@@ -79,20 +94,48 @@ namespace Hearthdelve.Tavern.Scene
 
         public FurnitureDefinition Definition(string id) => Database != null ? Database.Furniture(id) : null;
 
+        public GameDatabase Content => Database;
+
+        /// <summary>The palette ramps and presets (D11).</summary>
+        public PaletteLibrary Palettes => Database != null ? Database.palettes : null;
+
+        /// <summary>A placed layer's drawing in its piece's colourway and palette (shared baked copies, D11).</summary>
+        public Sprite Drawing(PlacedArt art, ResolvedFurniture piece) =>
+            FurnitureRecolour.Apply(art.Sprite, piece.Definition, piece.Placement.palette, Palettes);
+
+        public Sprite[] Frames(PlacedArt art, ResolvedFurniture piece) =>
+            FurnitureRecolour.Apply(art.Frames, piece.Definition, piece.Placement.palette, Palettes);
+
         /// <summary>
         /// The property's furniture: the game's, or, played on its own, a copy of the starting furniture that lasts as
         /// long as the scene (so Decorate Mode works there too).
         /// </summary>
-        public FurnitureState State
+        public FurnitureState State => Game.Furniture;
+
+        /// <summary>
+        /// The game's state (Gold and Renown for the catalogue, and the furniture), or, played on its own, one shared by every
+        /// area of the property for as long as the scenes last.
+        /// </summary>
+        public GameState Game
         {
             get
             {
                 GameFlow flow = Flow;
-                FurnitureState state = flow != null ? flow.State.Furniture : m_LocalState ??= new FurnitureState();
-                if (!state.Initialized) state.GrantStarter(Database != null ? Database.startingFurniture : null);
-                return state;
+                // Kept for as long as the scene: a fresh load starts from the starting furniture again.
+                if (flow == null && s_LocalScene != gameObject.scene.handle)
+                {
+                    s_LocalGame = null;
+                    s_LocalScene = gameObject.scene.handle;
+                }
+                GameState game = flow != null ? flow.State : s_LocalGame ??= new GameState();
+                if (!game.Furniture.Initialized) game.Furniture.GrantStarter(Database != null ? Database.startingFurniture : null);
+                else if (flow == null) game.Furniture.GrantMissing(Database != null ? Database.startingFurniture : null);
+                return game;
             }
         }
+
+        /// <summary>Tests: forget the property kept while played without a game.</summary>
+        public static void ResetLocal() => s_LocalGame = null;
 
         /// <summary>The area's layout now.</summary>
         public IReadOnlyList<PlacedFurniture> CurrentLayout() => State.Layout(m_Area.Id);
@@ -110,6 +153,7 @@ namespace Hearthdelve.Tavern.Scene
                 WallBand = m_Area.WallBand,
                 Reserved = new HashSet<Vector2Int>(m_Area.Reserved),
             };
+            foreach (Rect f in m_Area.Fixtures) shape.Fixtures.Add(new Rect(f.position + m_Area.Origin, f.size));
             TavernLayout layout = m_Area.Kind == AreaKind.Tavern ? FindInScene<TavernLayout>() : null;
             if (layout != null)
             {
@@ -117,6 +161,8 @@ namespace Hearthdelve.Tavern.Scene
                 shape.Queue.AddRange(layout.QueueSpots);
                 shape.Rest = layout.RestPost;
             }
+            // Other areas: their way in is where you arrive (the guest room's doorway).
+            else shape.Door = m_Area.Arrival;
             return shape;
         }
 
@@ -186,7 +232,9 @@ namespace Hearthdelve.Tavern.Scene
             var seatRoot = new GameObject("Seats").transform;
             seatRoot.SetParent(m_Root, false);
             int n = 0;
-            foreach (var (_, seat) in FurnitureRules.UsableSeats(m_Resolved))
+            // Each seat with an approach that can be walked to (the check chooses the same way).
+            AreaShape shape = Shape();
+            foreach (var (_, seat) in FurnitureRules.UsableSeats(m_Resolved, LayoutCheck.ReachableFromDoor(shape, m_Resolved)))
             {
                 TavernSeat built = BuildSeat(seatRoot, seat, ++n);
                 m_Seats.Add(built);
@@ -203,9 +251,18 @@ namespace Hearthdelve.Tavern.Scene
                         stations.GetValueOrDefault(StationKind.StewPot), pass, seatUses.ToArray());
             }
 
+            ApplyFinishes();
             Report = LayoutCheck.For(Shape(), m_Resolved);
             EventBus<NavigationLayoutChanged>.Publish(new NavigationLayoutChanged());
             Built?.Invoke();
+        }
+
+        /// <summary>Lays the area's floor and wall finishes, as chosen (or the room as built when never chosen).</summary>
+        public void ApplyFinishes()
+        {
+            if (m_Finishes == null || Database == null) return;
+            FurnitureState state = State;
+            m_Finishes.Apply(Database.Finish(state.Finish(m_Area.Id, FinishKind.Floor)), Database.Finish(state.Finish(m_Area.Id, FinishKind.Wall)), Database.palettes);
         }
 
         T FindInScene<T>() where T : Component
@@ -293,14 +350,15 @@ namespace Hearthdelve.Tavern.Scene
                 go.transform.position = placed.Position;
                 go.transform.rotation = Quaternion.Euler(0f, 0f, placed.Degrees);
                 var renderer = go.AddComponent<SpriteRenderer>();
-                bool animated = layer.frames != null && layer.frames.Length > 0;
-                renderer.sprite = animated ? layer.frames[0] : layer.sprite;
+                bool animated = placed.Animated;
+                Sprite[] frames = animated ? Frames(placed, piece) : null;
+                renderer.sprite = animated ? frames[0] : Drawing(placed, piece);
                 renderer.flipX = placed.FlipX;
-                renderer.sortingLayerName = layer.sortingLayer;
-                renderer.sortingOrder = layer.order;
+                renderer.sortingLayerName = piece.SortingLayer ?? layer.sortingLayer;
+                renderer.sortingOrder = piece.SortingLayer != null ? Mathf.Max(layer.order, piece.MinOrder) : layer.order;
                 renderer.spriteSortPoint = SpriteSortPoint.Pivot;
                 if (m_Presentation != null && m_Presentation.litMaterial != null) renderer.sharedMaterial = m_Presentation.litMaterial;
-                if (animated) go.AddComponent<SpriteLoop>().Configure(layer.frames, layer.frameSeconds);
+                if (animated) go.AddComponent<SpriteLoop>().Configure(frames, layer.frameSeconds);
                 renderers.Add((placed, renderer));
             }
 

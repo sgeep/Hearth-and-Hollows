@@ -30,7 +30,10 @@ namespace Hearthdelve.Tests.PlayMode
 
         static bool IsCharacterOrUi(Component c) =>
             c.GetComponentInParent<Character>(true) != null || c.GetComponentInParent<Canvas>(true) != null ||
-            c.gameObject.layer == LayerMask.NameToLayer("UI");
+            c.gameObject.layer == LayerMask.NameToLayer("UI") || OutsideTheTavern(c);
+
+        /// <summary>The snapshot is of the tavern room: other areas of the property (the guest room, 4f step 6) stand far to its right.</summary>
+        static bool OutsideTheTavern(Component c) => c.transform.position.x >= 40f;
 
         public static List<string> Take()
         {

@@ -1,0 +1,96 @@
+using System.Collections;
+using Hearthdelve.Core.Events;
+using UnityEngine;
+
+namespace Hearthdelve.Tavern.Scene
+{
+    /// <summary>Walking from one area of the property to another began: the screen fades out (4f step 6).</summary>
+    public readonly struct AreaPassageStarted : IEvent
+    {
+        public readonly float FadeSeconds;
+        public AreaPassageStarted(float fadeSeconds) => FadeSeconds = fadeSeconds;
+    }
+
+    /// <summary>The keeper is in the next area: the screen fades back in.</summary>
+    public readonly struct AreaPassageEnded : IEvent
+    {
+        public readonly float FadeSeconds;
+        public readonly string Area;
+        public AreaPassageEnded(float fadeSeconds, string area)
+        {
+            FadeSeconds = fadeSeconds;
+            Area = area;
+        }
+    }
+
+    /// <summary>
+    /// A fixed way between two areas of the property (4f step 6; plan §8): the stairs up to the guest room, the guest
+    /// room's door back down. Walking onto it fades the screen, moves the keeper to the other area's arrival point and the
+    /// camera onto that area, and fades back. Not during service (the keeper is needed downstairs: if service starts while
+    /// they're upstairs, they come straight back down) and not while decorating, which switches areas itself.
+    /// </summary>
+    [RequireComponent(typeof(Collider2D))]
+    public sealed class AreaPassage : MonoBehaviour
+    {
+        [SerializeField] PropertyArea m_To;
+        [SerializeField, Tooltip("The area this way leads out of.")] PropertyArea m_From;
+        [SerializeField, Min(0f)] float m_FadeSeconds = 0.25f;
+
+        bool m_Busy;
+
+        public PropertyArea To => m_To;
+        public PropertyArea From => m_From;
+        public bool Busy => m_Busy;
+
+        public void Configure(PropertyArea from, PropertyArea to, float fadeSeconds = 0.25f)
+        {
+            m_From = from;
+            m_To = to;
+            m_FadeSeconds = fadeSeconds;
+        }
+
+        static bool Serving => TavernDirector.Instance != null && TavernDirector.Instance.Phase is TavernPhase.Service or TavernPhase.Results;
+
+        public bool CanPass => m_To != null && !m_Busy && !Serving && (DecorateMode.Instance == null || !DecorateMode.Instance.IsActive);
+
+        void OnTriggerEnter2D(Collider2D other)
+        {
+            if (!CanPass || other.attachedRigidbody == null || !other.attachedRigidbody.CompareTag("Player")) return;
+            StartCoroutine(Go(other.attachedRigidbody));
+        }
+
+        void Update()
+        {
+            // Service starts while the keeper is upstairs: down they come.
+            if (m_Busy || m_From == null || m_To == null || PropertyArea.Current != m_From || m_From.Kind == Shared.Customization.AreaKind.Tavern || !Serving) return;
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null && player.TryGetComponent(out Rigidbody2D body)) Arrive(body);
+        }
+
+        /// <summary>Walks the keeper through at once (tests, and the return when service starts).</summary>
+        public void Pass(Rigidbody2D player)
+        {
+            if (player != null && m_To != null) Arrive(player);
+        }
+
+        IEnumerator Go(Rigidbody2D player)
+        {
+            m_Busy = true;
+            EventBus<AreaPassageStarted>.Publish(new AreaPassageStarted(m_FadeSeconds));
+            yield return new WaitForSecondsRealtime(m_FadeSeconds);
+            Arrive(player);
+            yield return new WaitForSecondsRealtime(m_FadeSeconds);
+            m_Busy = false;
+        }
+
+        void Arrive(Rigidbody2D player)
+        {
+            player.position = m_To.Arrival;
+            player.transform.position = new Vector3(m_To.Arrival.x, m_To.Arrival.y, player.transform.position.z);
+            player.linearVelocity = Vector2.zero;
+            PropertyArea.Current = m_To;
+            TavernView.Show(m_To);
+            EventBus<AreaPassageEnded>.Publish(new AreaPassageEnded(m_FadeSeconds, m_To.Id));
+        }
+    }
+}

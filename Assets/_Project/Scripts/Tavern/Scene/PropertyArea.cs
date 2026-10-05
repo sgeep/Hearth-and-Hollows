@@ -13,6 +13,7 @@ namespace Hearthdelve.Tavern.Scene
     public sealed class PropertyArea : MonoBehaviour
     {
         public const string TavernId = "tavern";
+        public const string GuestRoomId = "guest_room";
 
         [SerializeField] string m_Id = TavernId;
         [SerializeField] AreaKind m_Kind = AreaKind.Tavern;
@@ -26,6 +27,14 @@ namespace Hearthdelve.Tavern.Scene
         RectInt m_WallBand = new(1, 14, 26, 3);
         [SerializeField, Tooltip("Cells nothing may be placed on (the entrance, the tile inside it), in area cells.")]
         Vector2Int[] m_Reserved = System.Array.Empty<Vector2Int>();
+        [SerializeField, Tooltip("Where the camera holds while you're in this area (world).")]
+        Vector2 m_CameraPoint;
+        [SerializeField, Tooltip("Where you arrive when you come into this area (world).")]
+        Vector2 m_Arrival;
+        [SerializeField, Tooltip("Localization key (UI table) of its name.")]
+        string m_NameKey;
+        [SerializeField, Tooltip("Fixed solid parts that aren't furniture (the stairs' flight), in area tiles: the layout check walks round them.")]
+        Rect[] m_Fixtures = System.Array.Empty<Rect>();
 
         static readonly List<PropertyArea> s_All = new();
 
@@ -38,6 +47,34 @@ namespace Hearthdelve.Tavern.Scene
         public RectInt Floor => m_Floor;
         public RectInt WallBand => m_WallBand;
         public IReadOnlyList<Vector2Int> Reserved => m_Reserved;
+        public Vector2 CameraPoint => m_CameraPoint;
+        public Vector2 Arrival => m_Arrival;
+        public string NameKey => m_NameKey;
+        public IReadOnlyList<Rect> Fixtures => m_Fixtures;
+
+        public void SetFixtures(params Rect[] fixtures) => m_Fixtures = fixtures ?? System.Array.Empty<Rect>();
+
+        /// <summary>The area the keeper is in now (the tavern until the stairs say otherwise).</summary>
+        public static PropertyArea Current
+        {
+            get
+            {
+                if (s_Current != null && s_Current.isActiveAndEnabled) return s_Current;
+                foreach (PropertyArea a in s_All)
+                    if (a.Kind == AreaKind.Tavern) return a;
+                return s_All.Count > 0 ? s_All[0] : null;
+            }
+            set => s_Current = value;
+        }
+
+        static PropertyArea s_Current;
+
+        public void SetView(Vector2 cameraPoint, Vector2 arrival, string nameKey)
+        {
+            m_CameraPoint = cameraPoint;
+            m_Arrival = arrival;
+            m_NameKey = nameKey;
+        }
 
         public void Configure(string id, AreaKind kind, Vector2 origin, RectInt bounds, RectInt floor, RectInt wallBand, Vector2Int[] reserved)
         {

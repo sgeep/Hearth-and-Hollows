@@ -25,7 +25,8 @@ namespace Hearthdelve.Tests
         static Font Font => GameFonts.Load();
 
         static IEnumerable<(string key, string text)> CodeEnglish =>
-            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(LocalizationBuilder.ContentEnglish);
+            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
+                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English());
 
         /// <summary>Every string in every locale's tables, as stored.</summary>
         static IEnumerable<(string where, string text)> TableStrings()
@@ -72,7 +73,7 @@ namespace Hearthdelve.Tests
         /// <summary>Words that keep a capital in English: proper nouns, resource names and control labels (CLAUDE.md, Localization).</summary>
         static readonly HashSet<string> k_Capitalised = new()
         {
-            "Hearth", "Hollows", "Pip", "Cellars", "Larder", "Troll", "Sunken", "Flagon",
+            "Hearth", "Hollows", "Pip", "Brackenford", "Cellars", "Larder", "Troll", "Sunken", "Flagon",
             "Essence", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };

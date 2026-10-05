@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Progression;
 using UpgradeRules = Hearthdelve.Shared.Progression.Upgrades;
@@ -39,6 +40,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_Saved;
         [SerializeField] Button m_Sleep;
         [SerializeField, Tooltip("Decorate Mode (4f).")] Button m_Decorate;
+        [SerializeField, Tooltip("Word that a new catalogue tier has opened (D14).")] LocalizedSuperText m_Word;
         [SerializeField, Min(0f), Tooltip("Seconds the saved note stays up.")] float m_SavedSeconds = 2.5f;
         [SerializeField, Min(0.01f), Tooltip("Seconds a bought row glows.")] float m_BoughtSeconds = 0.6f;
         [SerializeField] Color m_BoughtColour = new(1f, 0.85f, 0.4f);
@@ -57,10 +59,12 @@ namespace Hearthdelve.UI.Tavern
         public Button SleepButton => m_Sleep;
         public Button DecorateButton => m_Decorate;
         public bool SavedNoteShown => m_Saved != null && m_Saved.gameObject.activeSelf;
+        public string WordText => m_Word != null && m_Word.gameObject.activeSelf ? m_Word.GetComponent<SuperTextMesh>()?.text : null;
 
         public void Configure(GameObject root, LocalizedSuperText title, LocalizedSuperText[] summaryLabels, LocalizedSuperText[] summary, LocalizedSuperText purse,
-            UpgradeRow[] upgrades, LocalizedSuperText saved, Button sleep, Button decorate = null)
+            UpgradeRow[] upgrades, LocalizedSuperText saved, Button sleep, Button decorate = null, LocalizedSuperText word = null)
         {
+            m_Word = word;
             m_Decorate = decorate;
             m_SummaryLabels = summaryLabels;
             m_Root = root;
@@ -123,8 +127,29 @@ namespace Hearthdelve.UI.Tavern
             {
                 // Night falls: the day is saved (GameFlow did it on the way here).
                 ShowSaved();
+                AnnounceTiers();
                 if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(m_Sleep.gameObject);
             }
+        }
+
+        /// <summary>
+        /// Renown has opened a new catalogue tier since the last Night (D14): word spreads, with a chime and a pulse, once per
+        /// tier (the announcement is saved).
+        /// </summary>
+        void AnnounceTiers()
+        {
+            if (m_Word == null) return;
+            m_Word.gameObject.SetActive(false);
+            GameDatabase database = m_Flow.Database;
+            if (database == null || database.catalog == null) return;
+            List<int> opened = FurnitureShop.Announce(m_Flow.State.Furniture, m_Flow.State.Renown, database.CatalogThresholds());
+            if (opened.Count == 0) return;
+            CatalogTier tier = database.catalog.tiers[opened[opened.Count - 1]];
+            if (tier == null || string.IsNullOrEmpty(tier.announceKey)) return;
+            m_Word.gameObject.SetActive(true);
+            m_Word.Set(tier.announceKey);
+            UiFeedback.Play(UiMoment.Buy);
+            m_Flow.Save();
         }
 
         void ShowSaved()

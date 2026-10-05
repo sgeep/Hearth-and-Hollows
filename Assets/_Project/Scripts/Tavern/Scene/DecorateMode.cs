@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Hearthdelve.Core;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Shared.Customization;
+using Hearthdelve.Shared.Game;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -22,6 +23,15 @@ namespace Hearthdelve.Tavern.Scene
         FromStorage,
         Undo,
         PutBack,
+        /// <summary>A piece bought from the catalogue (4f step 4).</summary>
+        Buy,
+        Sell,
+        /// <summary>A new colourway or palette (4f step 5).</summary>
+        Restyle,
+        /// <summary>A floor or wall finish laid.</summary>
+        Finish,
+        /// <summary>Off to another area of the property (4f step 6).</summary>
+        Area,
     }
 
     /// <summary>
@@ -58,7 +68,9 @@ namespace Hearthdelve.Tavern.Scene
         float m_HeldFor, m_NextRepeat;
         Vector2 m_LastPointer;
         Transform m_Ghost;
-        InputAction m_Move, m_Point, m_Select, m_Click, m_Cancel, m_Turn, m_Flip, m_Store, m_Undoing, m_Cycle, m_Storage, m_Check, m_Wheel, m_Free;
+        InputAction m_Move, m_Point, m_Select, m_Click, m_Cancel, m_Turn, m_Flip, m_Store, m_Undoing, m_Cycle, m_Storage, m_Check, m_Wheel, m_Free, m_Style, m_AreaKey;
+        /// <summary>Each area's finishes as they were on entering (put it all back restores them).</summary>
+        readonly Dictionary<string, (string floor, string wall)> m_EnteredFinishes = new();
 
         public static DecorateMode Instance { get; private set; }
 
@@ -92,6 +104,17 @@ namespace Hearthdelve.Tavern.Scene
         public event Action<DecorateMoment> MomentPlayed;
         /// <summary>The player asked for the storage panel or the check (the UI opens them).</summary>
         public event Action StorageRequested, CheckRequested;
+        /// <summary>The player asked for the colour panel (the UI opens it for <see cref="StyleTarget"/>).</summary>
+        public event Action StyleRequested;
+
+        /// <summary>
+        /// Developer sandbox (4f step 3; F8 with debug keys): the whole catalogue is open and free, so every piece can be
+        /// tried in the room. Never on in a normal game.
+        /// </summary>
+        public static bool Sandbox { get; set; }
+
+        /// <summary>The last look given to a piece (copy colours): its definition, colourway and palette.</summary>
+        public (string definition, string variant, string palette)? LastLook { get; private set; }
 
         void Awake() => Instance = this;
 
@@ -106,12 +129,30 @@ namespace Hearthdelve.Tavern.Scene
         public bool CanEnter => !IsActive && AreaFurniture.Tavern != null && (Director == null ||
             Director.Phase is TavernPhase.Daytime or TavernPhase.Prep or TavernPhase.Night) && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null);
 
-        public void Enter() => Enter(AreaFurniture.Tavern);
+        /// <summary>Decorates the area the keeper is in (the tavern, or the guest room when they've gone upstairs).</summary>
+        public void Enter()
+        {
+            PropertyArea here = PropertyArea.Current;
+            Enter(here != null ? AreaFurniture.Find(here.Id) ?? AreaFurniture.Tavern : AreaFurniture.Tavern);
+        }
 
         public void Enter(AreaFurniture area)
         {
             if (IsActive || area == null) return;
             if (Director != null && Director.IsServing) return;
+            m_EnteredFinishes.Clear();
+            Begin(area);
+            FindActions();
+            IsActive = true;
+            InputMaps.Activate(InputMaps.Decorate);
+            m_LastPointer = m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
+            Refresh();
+            MomentPlayed?.Invoke(DecorateMoment.Enter);
+        }
+
+        /// <summary>Starts working on an area: its layout copied, the cursor in the middle of its floor, the camera on it.</summary>
+        void Begin(AreaFurniture area)
+        {
             Area = area;
             m_Entered = new List<PlacedFurniture>();
             foreach (PlacedFurniture p in area.CurrentLayout()) m_Entered.Add(p.Clone());
@@ -124,12 +165,30 @@ namespace Hearthdelve.Tavern.Scene
             PanelOpen = false;
             AreaShape shape = m_Layout.Shape;
             Cursor = new Vector2Int(shape.Floor.xMin + shape.Floor.width / 2, shape.Floor.yMin + shape.Floor.height / 2);
-            FindActions();
-            IsActive = true;
-            InputMaps.Activate(InputMaps.Decorate);
-            m_LastPointer = m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
+            string id = area.Area.Id;
+            if (!m_EnteredFinishes.ContainsKey(id))
+                m_EnteredFinishes[id] = (area.State.Finish(id, FinishKind.Floor), area.State.Finish(id, FinishKind.Wall));
+            TavernView.Show(area.Area);
+        }
+
+        /// <summary>
+        /// Goes to the property's next area without walking (4f step 6): this one's layout is kept, the next one's opened, and
+        /// the camera moves there. Undo starts afresh in each.
+        /// </summary>
+        public void SwitchArea()
+        {
+            if (!IsActive) return;
+            var areas = new List<AreaFurniture>(AreaFurniture.All);
+            if (areas.Count < 2) return;
+            areas.Sort((a, b) => a.Area.Kind != b.Area.Kind ? a.Area.Kind.CompareTo(b.Area.Kind) : string.CompareOrdinal(a.Area.Id, b.Area.Id));
+            if (Carried != null) PutBack();
+            Area.Commit(m_Layout.Pieces);
+            AreaFurniture next = areas[(areas.IndexOf(Area) + 1) % areas.Count];
+            ClearGhost();
+            Begin(next);
+            m_Pointing = false;
             Refresh();
-            MomentPlayed?.Invoke(DecorateMoment.Enter);
+            MomentPlayed?.Invoke(DecorateMoment.Area);
         }
 
         /// <summary>Done: a carried piece goes back where it came from, the layout is kept and the room rebuilt.</summary>
@@ -141,6 +200,8 @@ namespace Hearthdelve.Tavern.Scene
             IsActive = false;
             PanelOpen = false;
             ClearGhost();
+            // Back to where the keeper is.
+            TavernView.Show(PropertyArea.Current);
             InputMaps.ActivateUIOnly();
             MomentPlayed?.Invoke(DecorateMoment.Leave);
             Changed?.Invoke();
@@ -163,6 +224,8 @@ namespace Hearthdelve.Tavern.Scene
             m_Check = A(DecorateActions.Check);
             m_Wheel = A(DecorateActions.Wheel);
             m_Free = A(DecorateActions.Free);
+            m_Style = A(DecorateActions.Style);
+            m_AreaKey = A(DecorateActions.Area);
         }
 
         static bool Pressed(InputAction a) => a != null && a.WasPressedThisFrame();
@@ -195,6 +258,8 @@ namespace Hearthdelve.Tavern.Scene
             if (Pressed(m_Cycle)) CycleHover();
             if (Pressed(m_Storage)) StorageRequested?.Invoke();
             if (Pressed(m_Check)) CheckRequested?.Invoke();
+            if (Pressed(m_Style)) StyleRequested?.Invoke();
+            if (Pressed(m_AreaKey)) SwitchArea();
         }
 
         /// <summary>The stick, d-pad or keys move a tile at a time (repeating while held); the mouse puts the cursor under it.</summary>
@@ -584,8 +649,187 @@ namespace Hearthdelve.Tavern.Scene
             m_Riders.Clear();
             m_Undo.Clear();
             m_Layout.Restore(m_Entered);
+            if (m_EnteredFinishes.TryGetValue(Area.Area.Id, out var finishes))
+            {
+                Area.State.SetFinish(Area.Area.Id, FinishKind.Floor, finishes.floor);
+                Area.State.SetFinish(Area.Area.Id, FinishKind.Wall, finishes.wall);
+            }
             Rebuild();
             MomentPlayed?.Invoke(DecorateMoment.Undo);
+        }
+
+        // ------------------------------------------------------------------ the catalogue (4f step 4)
+
+        public GameState Game => Area != null ? Area.Game : null;
+        public int[] Thresholds => Area != null && Area.Content != null ? Area.Content.CatalogThresholds() : new[] { 0, 25, 60, 100 };
+
+        /// <summary>Every piece in the game, in catalogue order (category, tier, price, name).</summary>
+        public List<FurnitureDefinition> Catalogue()
+        {
+            var all = new List<FurnitureDefinition>();
+            if (Area?.Content == null) return all;
+            foreach (FurnitureDefinition d in Area.Content.furniture)
+                if (d != null) all.Add(d);
+            all.Sort((a, b) => a.category != b.category ? a.category.CompareTo(b.category)
+                : a.catalogTier != b.catalogTier ? a.catalogTier.CompareTo(b.catalogTier)
+                : a.price != b.price ? a.price.CompareTo(b.price) : string.CompareOrdinal(a.id, b.id));
+            return all;
+        }
+
+        /// <summary>Copies of a piece in storage now (counting this area's working layout and what's carried).</summary>
+        public int Stored(string definition)
+        {
+            foreach (var (d, count) in Storage())
+                if (d.id == definition) return count;
+            return 0;
+        }
+
+        /// <summary>Copies placed anywhere, counting this area's working layout.</summary>
+        public int Placed(string definition)
+        {
+            if (!IsActive) return 0;
+            FurnitureState state = Area.State;
+            return state.PlacedCount(definition) - Count(state.Layout(Area.Area.Id), definition) + Count(m_Layout.Pieces, definition)
+                   + (Carried != null && Carried.definition == definition ? 1 : 0);
+        }
+
+        public PurchaseProblem CanBuy(FurnitureDefinition piece)
+        {
+            if (piece == null || Game == null) return PurchaseProblem.NotForSale;
+            if (Sandbox) return piece.unique && Area.State.OwnedCount(piece.id) > 0 ? PurchaseProblem.AlreadyOwned : PurchaseProblem.None;
+            return FurnitureShop.CanBuy(piece, Game, Thresholds);
+        }
+
+        /// <summary>Buys a copy (D7), into storage, or straight onto the cursor (<paramref name="place"/>). Delivery is immediate (4f).</summary>
+        public bool Buy(string definition, bool place = false)
+        {
+            FurnitureDefinition d = Area?.Definition(definition);
+            if (!IsActive || d == null || (place && Carried != null)) return false;
+            if (CanBuy(d) != PurchaseProblem.None)
+            {
+                MomentPlayed?.Invoke(DecorateMoment.Invalid);
+                return false;
+            }
+            if (Sandbox) Area.State.AddOwnedCopies(d.id, 1);
+            else FurnitureShop.Buy(Game, d, Thresholds);
+            GameFlow.Instance?.FurnitureChanged();
+            MomentPlayed?.Invoke(DecorateMoment.Buy);
+            if (place) TakeFromStorage(d.id);
+            else Refresh();
+            return true;
+        }
+
+        /// <summary>Sells one copy from storage for its sell-back price (D12: bought pieces only).</summary>
+        public bool Sell(string definition)
+        {
+            FurnitureDefinition d = Area?.Definition(definition);
+            if (!IsActive || d == null || !FurnitureShop.Sell(Game, d, Stored(definition)))
+            {
+                MomentPlayed?.Invoke(DecorateMoment.Invalid);
+                return false;
+            }
+            GameFlow.Instance?.FurnitureChanged();
+            MomentPlayed?.Invoke(DecorateMoment.Sell);
+            Refresh();
+            return true;
+        }
+
+        public string Finish(FinishKind kind) => IsActive ? Area.State.Finish(Area.Area.Id, kind) : null;
+
+        public PurchaseProblem CanBuy(FinishDefinition finish)
+        {
+            if (finish == null || Game == null) return PurchaseProblem.NotForSale;
+            if (Sandbox) return Area.State.OwnsFinish(finish.id) ? PurchaseProblem.AlreadyOwned : PurchaseProblem.None;
+            return FurnitureShop.CanBuy(finish, Game, Thresholds);
+        }
+
+        /// <summary>Lays a finish over this area's whole floor or wall (D5), buying it first if it isn't owned yet.</summary>
+        public bool UseFinish(FinishDefinition finish)
+        {
+            if (!IsActive || finish == null) return false;
+            FurnitureState state = Area.State;
+            if (!state.OwnsFinish(finish.id))
+            {
+                if (CanBuy(finish) != PurchaseProblem.None)
+                {
+                    MomentPlayed?.Invoke(DecorateMoment.Invalid);
+                    return false;
+                }
+                if (Sandbox) state.OwnFinish(finish.id);
+                else FurnitureShop.Buy(Game, finish, Thresholds);
+                MomentPlayed?.Invoke(DecorateMoment.Buy);
+            }
+            state.SetFinish(Area.Area.Id, finish.kind, finish.id);
+            Area.ApplyFinishes();
+            GameFlow.Instance?.FurnitureChanged();
+            MomentPlayed?.Invoke(DecorateMoment.Finish);
+            Refresh();
+            return true;
+        }
+
+        // ------------------------------------------------------------------ looks (4f step 5)
+
+        /// <summary>The piece the colour panel works on: the one carried, or under the cursor.</summary>
+        public PlacedFurniture StyleTarget => Carried ?? HoveredPiece;
+
+        /// <summary>Gives the carried or hovered piece a colourway and palette (D11). Undoable; nothing about where it stands changes.</summary>
+        public bool SetLook(string variant, string palette)
+        {
+            PlacedFurniture piece = StyleTarget;
+            FurnitureDefinition d = piece != null ? m_Layout.Definition(piece.definition) : null;
+            if (d == null || !d.HasLooks) return false;
+            variant ??= string.Empty;
+            palette = FurniturePalette.Restrict(palette, d.paletteChannels);
+            if (piece.variant == variant && piece.palette == palette) return false;
+            if (Carried != null)
+            {
+                Carried.variant = variant;
+                Carried.palette = palette;
+                Refresh();
+            }
+            else
+            {
+                PushUndo();
+                piece.variant = variant;
+                piece.palette = palette;
+                Rebuild();
+            }
+            LastLook = (d.id, variant, palette);
+            MomentPlayed?.Invoke(DecorateMoment.Restyle);
+            return true;
+        }
+
+        /// <summary>
+        /// Copies the last look given to a piece onto this one: the colourway when it's the same piece, the palette ramps
+        /// for whichever channels it shares.
+        /// </summary>
+        public bool CopyLastLook()
+        {
+            PlacedFurniture piece = StyleTarget;
+            if (piece == null || LastLook == null) return false;
+            var (definition, variant, palette) = LastLook.Value;
+            return SetLook(definition == piece.definition ? variant : piece.variant, string.IsNullOrEmpty(palette) ? piece.palette : palette);
+        }
+
+        /// <summary>Gives every copy of the target's piece in this area the target's look. Returns how many changed.</summary>
+        public int ApplyLookToAll()
+        {
+            PlacedFurniture piece = StyleTarget;
+            if (piece == null) return 0;
+            int changed = 0;
+            List<PlacedFurniture> before = m_Layout.Snapshot();
+            foreach (PlacedFurniture p in m_Layout.Pieces)
+            {
+                if (p == piece || p.definition != piece.definition || (p.variant == piece.variant && p.palette == piece.palette)) continue;
+                p.variant = piece.variant;
+                p.palette = piece.palette;
+                changed++;
+            }
+            if (changed == 0) return 0;
+            m_Undo.Push(before);
+            Rebuild();
+            MomentPlayed?.Invoke(DecorateMoment.Restyle);
+            return changed;
         }
 
         /// <summary>Moves the cursor to a piece (the check's "show me").</summary>
@@ -656,7 +900,7 @@ namespace Hearthdelve.Tavern.Scene
                         go.transform.position = art.Position;
                         go.transform.rotation = Quaternion.Euler(0f, 0f, art.Degrees);
                         var sprite = go.AddComponent<SpriteRenderer>();
-                        sprite.sprite = art.Art.frames != null && art.Art.frames.Length > 0 ? art.Art.frames[0] : art.Art.sprite;
+                        sprite.sprite = Area.Drawing(art, r);
                         sprite.flipX = art.FlipX;
                         sprite.sortingLayerName = SortingLayers.Above;
                         sprite.sortingOrder = 10 + art.Art.order;

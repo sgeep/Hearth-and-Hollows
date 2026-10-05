@@ -19,6 +19,11 @@ namespace Hearthdelve.Tavern.Scene
         public MMF_Player fromStorage;
         public MMF_Player undo;
         public MMF_Player putBack;
+        [Tooltip("A piece bought from the catalogue: coins and a firm pulse.")] public MMF_Player buy;
+        public MMF_Player sell;
+        [Tooltip("A new colourway or palette: a soft brush.")] public MMF_Player restyle;
+        [Tooltip("A wall or floor finish laid.")] public MMF_Player finish;
+        [Tooltip("Off to another room.")] public MMF_Player area;
     }
 
     /// <summary>
@@ -64,6 +69,11 @@ namespace Hearthdelve.Tavern.Scene
                 DecorateMoment.FromStorage => m_Moments.fromStorage,
                 DecorateMoment.Undo => m_Moments.undo,
                 DecorateMoment.PutBack => m_Moments.putBack,
+                DecorateMoment.Buy => m_Moments.buy,
+                DecorateMoment.Sell => m_Moments.sell,
+                DecorateMoment.Restyle => m_Moments.restyle,
+                DecorateMoment.Finish => m_Moments.finish,
+                DecorateMoment.Area => m_Moments.area,
                 _ => null,
             };
             if (player != null) player.PlayFeedbacks();

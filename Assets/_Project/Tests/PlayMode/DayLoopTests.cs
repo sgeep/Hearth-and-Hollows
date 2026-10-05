@@ -5,6 +5,7 @@ using System.Linq;
 using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Dungeon.Run;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Haptics;
@@ -425,6 +426,65 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Hearthdelve.Dungeon.Rooms.RoomRunner.Active, Is.Not.Null);
             Assert.That(Object.FindAnyObjectByType<Hearthdelve.UI.Debugging.LookTestOverlay>(), Is.Null, "no F2-F4 look-test keys");
             Assert.That(SceneManager.GetSceneByName(GameScenes.Tavern).isLoaded, Is.False, "the tavern and the dungeon are never loaded together");
+        }
+
+        /// <summary>
+        /// 4f Checkpoint B through the day loop: Renown that opens a catalogue tier is announced at Night (once, and the
+        /// announcement is saved); a piece bought, a colourway and palette chosen, a floor laid and the guest room
+        /// decorated all survive the save and Continue.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ANewTier_IsAnnouncedOnce_AndBothRoomsLooksSurviveContinue()
+        {
+            yield return NewGameToTheDelve();
+            Flow.State.AddRenown(30);
+            yield return ExtractAndGoHome();
+            var night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            Assert.That(night.WordText, Does.Contain("dwarven masons"), "word is spreading");
+            Assert.That(Flow.State.Furniture.AnnouncedTier, Is.EqualTo(1));
+
+            // Decorate: a dwarven chair bought into the guest room, its bed restyled, a parquet floor there; a teal chair downstairs.
+            Flow.DebugAddGold(500);
+            DecorateMode mode = DecorateMode.Instance;
+            night.DecorateButton.onClick.Invoke();
+            yield return null;
+            Assert.That(mode.IsActive);
+            PlacedFurniture chair = mode.Layout.Pieces.First(p => p.definition == "tavern_chair");
+            mode.SetCursor(chair.cell);
+            Assert.That(mode.SetLook("", "cushion=teal"));
+            mode.SwitchArea();
+            Assert.That(mode.Area.Area.Id, Is.EqualTo("guest_room"));
+            Assert.That(mode.Buy("dwarven_chair", place: true));
+            mode.SetCursor(new Vector2Int(10, 6));
+            mode.Place();
+            Assert.That(mode.Carried, Is.Null, "the chair stands in the guest room");
+            PlacedFurniture bed = mode.Layout.Pieces.First(p => p.definition == "bed_double");
+            mode.SetCursor(bed.cell);
+            Assert.That(mode.SetLook("brown", ""));
+            Assert.That(mode.UseFinish(Flow.Database.Finish("floor_parquet")));
+            mode.Leave();
+            yield return null;
+            int gold = Flow.State.Gold;
+            Assert.That(gold, Is.EqualTo(500 - 18 - 70), "the chair and the floor, paid for");
+
+            // Quit and Continue: everything as it was left; the tier isn't announced again.
+            yield return BootToMenu();
+            Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
+            yield return InTavern(TavernPhase.Night, "the night, continued");
+            FurnitureState furniture = Flow.State.Furniture;
+            Assert.That(furniture.Layout("guest_room").Any(p => p.definition == "dwarven_chair" && p.cell == new Vector2Int(10, 6)));
+            Assert.That(furniture.Layout("guest_room").Single(p => p.definition == "bed_double").variant, Is.EqualTo("brown"));
+            Assert.That(furniture.Finish("guest_room", FinishKind.Floor), Is.EqualTo("floor_parquet"));
+            Assert.That(furniture.OwnsFinish("floor_parquet"));
+            Assert.That(furniture.Layout("tavern").Single(p => p.uid == chair.uid).palette, Is.EqualTo("cushion=teal"));
+            Assert.That(Flow.State.Gold, Is.EqualTo(gold));
+            night = Object.FindAnyObjectByType<NightScreen>();
+            yield return null;
+            Assert.That(night.WordText, Is.Null, "announced once");
+            AreaFurniture guest = AreaFurniture.Find("guest_room");
+            Assert.That(guest.Pieces.Any(p => p.Definition.id == "dwarven_chair"), "the guest room is built as saved");
+            Assert.That(guest.Finishes.FloorFinish?.id, Is.EqualTo("floor_parquet"));
         }
 
         /// <summary>

@@ -14,21 +14,21 @@ using UnityEngine.UI;
 namespace Hearthdelve.UI.Tavern
 {
     /// <summary>
-    /// Decorate Mode's screen (4f step 2): the room stays in view, with a strip at the top (what you're doing, and
-    /// whether the doors could open), a line naming the piece under the cursor or carried (and why it won't go where
-    /// it's held), the controls for the device in use at the bottom, and two panels: storage (take a piece out) and
-    /// the layout check (each problem in words, put it all back, done). Reads <see cref="DecorateMode"/>; presentation only.
+    /// Decorate Mode's screen (4f step 2): the room stays in view, with a strip at the top (which room, and whether the
+    /// doors could open), a line naming the piece under the cursor or carried (and why it won't go where it's held), the
+    /// controls for the device in use at the bottom, and the panels: the catalogue (storage, buying, walls and floors;
+    /// Checkpoint B), the colours, and the layout check (each problem in words, put it all back, done). Reads
+    /// <see cref="DecorateMode"/>; presentation only.
     /// </summary>
     public sealed class DecorateScreen : MonoBehaviour
     {
         [SerializeField] GameObject m_Root;
+        [SerializeField] LocalizedSuperText m_Title;
         [SerializeField] LocalizedSuperText m_Status;
         [SerializeField] LocalizedSuperText m_Piece;
         [SerializeField] LocalizedSuperText m_Controls;
-        [SerializeField] GameObject m_Storage;
-        [SerializeField] Button[] m_StorageRows = Array.Empty<Button>();
-        [SerializeField] LocalizedSuperText[] m_StorageLabels = Array.Empty<LocalizedSuperText>();
-        [SerializeField] LocalizedSuperText m_StorageEmpty;
+        [SerializeField] DecorateCatalogue m_Catalogue;
+        [SerializeField] DecorateStyle m_Style;
         [SerializeField] GameObject m_Check;
         [SerializeField] LocalizedSuperText[] m_Issues = Array.Empty<LocalizedSuperText>();
         [SerializeField] Button m_PutAllBack;
@@ -39,31 +39,31 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] Color m_Warning = new(1f, 0.85f, 0.45f);
 
         DecorateMode m_Mode;
-        readonly List<string> m_StorageIds = new();
         bool m_Gamepad;
         InputAction m_UiCancel;
 
         public static bool IsDecorating => DecorateMode.Instance != null && DecorateMode.Instance.IsActive;
 
         public bool IsShown => m_Root != null && m_Root.activeSelf;
-        public bool StorageOpen => m_Storage != null && m_Storage.activeSelf;
+        public bool StorageOpen => m_Catalogue != null && m_Catalogue.IsOpen;
+        public bool StyleOpen => m_Style != null && m_Style.IsOpen;
         public bool CheckOpen => m_Check != null && m_Check.activeSelf;
-        public IReadOnlyList<Button> StorageRows => m_StorageRows;
+        public DecorateCatalogue Catalogue => m_Catalogue;
+        public DecorateStyle Style => m_Style;
+        public string TitleText => m_Title != null ? m_Title.GetComponent<SuperTextMesh>()?.text : null;
         public string PieceText => m_Piece != null ? m_Piece.GetComponent<SuperTextMesh>()?.text : null;
         public string StatusText => m_Status != null ? m_Status.GetComponent<SuperTextMesh>()?.text : null;
 
-        public void Configure(GameObject root, LocalizedSuperText status, LocalizedSuperText piece, LocalizedSuperText controls, GameObject storage,
-            Button[] storageRows, LocalizedSuperText[] storageLabels, LocalizedSuperText storageEmpty, GameObject check, LocalizedSuperText[] issues,
-            Button putAllBack, Button done)
+        public void Configure(GameObject root, LocalizedSuperText title, LocalizedSuperText status, LocalizedSuperText piece, LocalizedSuperText controls,
+            DecorateCatalogue catalogue, DecorateStyle style, GameObject check, LocalizedSuperText[] issues, Button putAllBack, Button done)
         {
             m_Root = root;
+            m_Title = title;
             m_Status = status;
             m_Piece = piece;
             m_Controls = controls;
-            m_Storage = storage;
-            m_StorageRows = storageRows;
-            m_StorageLabels = storageLabels;
-            m_StorageEmpty = storageEmpty;
+            m_Catalogue = catalogue;
+            m_Style = style;
             m_Check = check;
             m_Issues = issues;
             m_PutAllBack = putAllBack;
@@ -73,14 +73,8 @@ namespace Hearthdelve.UI.Tavern
         void Start()
         {
             m_Root.SetActive(false);
-            m_Storage.SetActive(false);
             m_Check.SetActive(false);
             m_UiCancel = InputMaps.Find(InputMaps.UI, "Cancel");
-            for (int i = 0; i < m_StorageRows.Length; i++)
-            {
-                int row = i;
-                m_StorageRows[i].onClick.AddListener(() => TakeOut(row));
-            }
             m_PutAllBack.onClick.AddListener(() =>
             {
                 m_Mode?.PutAllBack();
@@ -101,6 +95,7 @@ namespace Hearthdelve.UI.Tavern
             m_Mode.Changed += Refresh;
             m_Mode.StorageRequested += OpenStorage;
             m_Mode.CheckRequested += OpenCheck;
+            m_Mode.StyleRequested += OpenStyle;
             return m_Mode;
         }
 
@@ -110,6 +105,7 @@ namespace Hearthdelve.UI.Tavern
             m_Mode.Changed -= Refresh;
             m_Mode.StorageRequested -= OpenStorage;
             m_Mode.CheckRequested -= OpenCheck;
+            m_Mode.StyleRequested -= OpenStyle;
         }
 
         void LateUpdate()
@@ -128,7 +124,7 @@ namespace Hearthdelve.UI.Tavern
                 else ClosePanels();
             }
             if (!shown) return;
-            if ((StorageOpen || CheckOpen) && m_UiCancel != null && m_UiCancel.WasPressedThisFrame())
+            if (CheckOpen && m_UiCancel != null && m_UiCancel.WasPressedThisFrame())
             {
                 ClosePanels();
                 return;
@@ -151,9 +147,12 @@ namespace Hearthdelve.UI.Tavern
             foreach (LayoutIssue issue in report.Issues)
                 if (issue.Blocking) blocking++;
                 else warnings++;
+            PropertyArea area = mode.Area != null ? mode.Area.Area : null;
+            m_Title.Set(DecorateLocKeys.Title, Loc.UI(area != null && !string.IsNullOrEmpty(area.NameKey) ? area.NameKey : DecorateLocKeys.AreaTavern));
+            bool tavern = area == null || area.Kind == AreaKind.Tavern;
             if (blocking > 0) m_Status.Set(blocking == 1 ? DecorateLocKeys.StatusProblem : DecorateLocKeys.StatusProblems, blocking);
             else if (warnings > 0) m_Status.Set(DecorateLocKeys.StatusWarnings, warnings);
-            else m_Status.Set(DecorateLocKeys.StatusReady);
+            else m_Status.Set(tavern ? DecorateLocKeys.StatusReady : DecorateLocKeys.StatusRoomReady);
             SetColor(m_Status, blocking > 0 ? m_Problem : warnings > 0 ? m_Warning : m_Ready);
 
             if (mode.Carried != null)
@@ -181,7 +180,6 @@ namespace Hearthdelve.UI.Tavern
             }
             RefreshControls();
             if (CheckOpen) FillCheck();
-            if (StorageOpen) FillStorage();
         }
 
         static bool GamepadUsed()
@@ -217,7 +215,8 @@ namespace Hearthdelve.UI.Tavern
                     B(DecorateActions.Store), B(DecorateActions.Cancel), B(DecorateActions.Free));
             else
                 m_Controls.Set(DecorateLocKeys.Controls, B(DecorateActions.Select), B(DecorateActions.Turn), B(DecorateActions.Flip), B(DecorateActions.Store),
-                    B(DecorateActions.Undo), B(DecorateActions.Storage), B(DecorateActions.Check), B(DecorateActions.Cancel));
+                    B(DecorateActions.Undo), B(DecorateActions.Storage), B(DecorateActions.Style), B(DecorateActions.Area), B(DecorateActions.Check),
+                    B(DecorateActions.Cancel));
         }
 
         static void SetColor(LocalizedSuperText text, Color color)
@@ -267,46 +266,33 @@ namespace Hearthdelve.UI.Tavern
 
         // ------------------------------------------------------------------ panels
 
+        /// <summary>The catalogue, open at what's in storage (Tab / Start).</summary>
         public void OpenStorage()
         {
             DecorateMode mode = Mode();
             if (mode == null || !mode.IsActive || mode.Carried != null) return;
             m_Check.SetActive(false);
-            m_Storage.SetActive(true);
-            mode.PanelOpen = true;
-            FillStorage();
-            Button first = Array.Find(m_StorageRows, b => b.gameObject.activeSelf);
-            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(first != null ? first.gameObject : null);
+            m_Style.Close();
+            if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+            m_Catalogue.OpenStorage();
         }
 
-        void FillStorage()
+        /// <summary>The colour panel, for the piece carried or under the cursor (V / right stick).</summary>
+        public void OpenStyle()
         {
-            List<(FurnitureDefinition definition, int count)> stored = m_Mode.Storage();
-            m_StorageIds.Clear();
-            for (int i = 0; i < m_StorageRows.Length; i++)
-            {
-                bool has = i < stored.Count;
-                m_StorageRows[i].gameObject.SetActive(has);
-                if (!has) continue;
-                m_StorageIds.Add(stored[i].definition.id);
-                m_StorageLabels[i].Set(DecorateLocKeys.StorageRow, PieceName(stored[i].definition.id), stored[i].count);
-            }
-            m_StorageEmpty.gameObject.SetActive(stored.Count == 0);
-        }
-
-        void TakeOut(int row)
-        {
-            if (row >= m_StorageIds.Count) return;
-            string id = m_StorageIds[row];
-            ClosePanels();
-            m_Mode?.TakeFromStorage(id);
+            DecorateMode mode = Mode();
+            if (mode == null || !mode.IsActive || mode.StyleTarget == null) return;
+            m_Check.SetActive(false);
+            m_Catalogue.Close();
+            m_Style.Open();
         }
 
         public void OpenCheck()
         {
             DecorateMode mode = Mode();
             if (mode == null || !mode.IsActive) return;
-            m_Storage.SetActive(false);
+            m_Catalogue.Close();
+            m_Style.Close();
             m_Check.SetActive(true);
             mode.PanelOpen = true;
             FillCheck();
@@ -334,7 +320,8 @@ namespace Hearthdelve.UI.Tavern
 
         void ClosePanels()
         {
-            if (m_Storage != null) m_Storage.SetActive(false);
+            if (m_Catalogue != null) m_Catalogue.Close();
+            if (m_Style != null) m_Style.Close();
             if (m_Check != null) m_Check.SetActive(false);
             if (m_Mode != null) m_Mode.PanelOpen = false;
             if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
