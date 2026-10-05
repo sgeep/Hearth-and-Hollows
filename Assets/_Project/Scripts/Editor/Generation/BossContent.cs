@@ -5,7 +5,10 @@ using Hearthdelve.Dungeon.Bosses;
 using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Shared.Engine;
+using System.Linq;
 using MoreMountains.Feedbacks;
+using MoreMountains.Tools;
+using MoreMountains.TopDownEngine;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,6 +43,14 @@ namespace Hearthdelve.Editor
                 b.drainMultiplierWhileActive = 0f;
                 b.entranceSeconds = 1.6f;
             });
+            // What its slams shake loose (step 2): the Cellars' everyday parts, as ordinary parts. Set once; edits are kept.
+            if (boss.feeding.scraps == null || boss.feeding.scraps.Length == 0)
+            {
+                boss.feeding.scraps = new[] { "SlimeGel", "SpiderLeg", "BatWing" }
+                    .Select(a => AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Ingredients.IngredientDefinition>($"{EditorPaths.Ingredients}/Ingredient_{a}.asset"))
+                    .Where(i => i != null).ToArray();
+                EditorUtility.SetDirty(boss);
+            }
 
             GameObject prefab = DungeonContent.BuildEnemy("LarderTroll", PrefabPath, enemy, set, shadow, new Vector2(1.3f, 0.7f), new Vector2(0f, 0.3f), 2.4f, null,
                 root => AddBossParts(root, boss));
@@ -62,9 +73,67 @@ namespace Hearthdelve.Editor
             root.AddComponent<AttackTelegraphMarker>().Configure(0, AttackTelegraphMarker.Shape.Area, Mark(root, "SlamMark"));
             var line = root.AddComponent<AttackTelegraphMarker>();
             line.Configure(1, AttackTelegraphMarker.Shape.Line, Mark(root, "ChargeMark"));
-            // The entrance: a roar, a shake and the boss rumble.
+            // The entrance: a roar, a shake and the boss rumble. The defeat: slow motion, the fall, a big shake, a heavy rumble.
+            MMF_Player defeat = LookTestContent.Feedback(root.transform, "Feedback_Defeat", null, 0.8f,
+                LookTestContent.Sfx("PH_TrollFall"), LookTestContent.Pattern(HapticIds.HitHeavy));
+            defeat.AddFeedback(new MMF_TimescaleModifier { Label = "Slow motion", Mode = MMF_TimescaleModifier.Modes.Shake, TimeScale = 0.3f, TimeScaleDuration = 0.8f });
             root.AddComponent<BossEncounter>().Configure(boss, LookTestContent.Feedback(root.transform, "Feedback_Entrance", null, 0.5f,
-                LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossTelegraph)));
+                LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossTelegraph)), defeat);
+
+            // Step 2: the frenzy (a roar, a big shake, the phase-change rumble), its stolen larder, and its appetite.
+            root.AddComponent<BossFrenzy>().Configure(boss, LookTestContent.Feedback(root.transform, "Feedback_Frenzy", body, 0.7f,
+                LookTestContent.Sfx("PH_TrollRoar"), LookTestContent.Pattern(HapticIds.BossPhaseChange)));
+            root.AddComponent<LarderScraps>().Configure(boss);
+            var eater = root.AddComponent<ScrapEater>();
+            eater.Configure(boss,
+                LookTestContent.Feedback(root.transform, "Feedback_Gulp", body, 0f, LookTestContent.Sfx("PH_TrollGulp"), null),
+                LookTestContent.Feedback(root.transform, "Feedback_Spoil", null, 0.2f, LookTestContent.Sfx("PH_TrollSpoil"), LookTestContent.Pattern(HapticIds.TapFirm)));
+            AddFeeding(root, eater);
+        }
+
+        /// <summary>
+        /// The brain's appetite (step 2): from the chase, after the slam (so it still answers a player in reach) and before
+        /// the charge, it goes for a part on the floor (Feed: target the part, walk to it), then eats it (Eat), then returns
+        /// to the chase. Taking the part sends it back to the chase at once.
+        /// </summary>
+        static void AddFeeding(GameObject root, ScrapEater eater)
+        {
+            AIBrain brain = root.GetComponent<AIBrain>();
+            AIState chase = brain.States.First(s => s.StateName == "Chase");
+            var wants = root.AddComponent<AIDecisionWantsFood>();
+            wants.Eater = eater;
+            chase.Transitions.Insert(Mathf.Min(1, chase.Transitions.Count), new AITransition { Decision = wants, TrueState = "Feed", FalseState = "" });
+
+            var target = root.AddComponent<AIActionTargetFood>();
+            target.Eater = eater;
+            var walk = root.AddComponent<AIActionPathfindToTarget2D>();
+            walk.StopDistance = 0.4f;
+            var reach = root.AddComponent<AIDecisionFoodInReach>();
+            reach.Eater = eater;
+            var gone = root.AddComponent<AIDecisionWantsFood>();
+            gone.Eater = eater;
+            gone.Invert = true;
+            brain.States.Add(new AIState
+            {
+                StateName = "Feed",
+                Actions = new AIActionsList { target, walk },
+                Transitions = new AITransitionsList
+                {
+                    new AITransition { Decision = reach, TrueState = "Eat", FalseState = "" },
+                    new AITransition { Decision = gone, TrueState = "Chase", FalseState = "" },
+                },
+            });
+
+            var eat = root.AddComponent<AIActionEat>();
+            eat.Eater = eater;
+            var done = root.AddComponent<AIDecisionDoneEating>();
+            done.Eater = eater;
+            brain.States.Add(new AIState
+            {
+                StateName = "Eat",
+                Actions = new AIActionsList { eat },
+                Transitions = new AITransitionsList { new AITransition { Decision = done, TrueState = "Chase", FalseState = "" } },
+            });
         }
 
         /// <summary>A tinted pixel on the floor (unlit, so it reads in the dark), placed and scaled by the marker.</summary>

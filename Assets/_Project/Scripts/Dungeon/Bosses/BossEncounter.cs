@@ -1,4 +1,5 @@
 using Hearthdelve.Core.Events;
+using Hearthdelve.Core.Input;
 using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Rooms;
 using Hearthdelve.Shared.Animation;
@@ -34,6 +35,8 @@ namespace Hearthdelve.Dungeon.Bosses
         [SerializeField] BossDefinition m_Boss;
         [SerializeField, Tooltip("The entrance: a roar, a shake and a heavy rumble.")]
         MMF_Player m_EntranceFeedback;
+        [SerializeField, Tooltip("The defeat: slow motion, a fall, a big shake, a heavy rumble.")]
+        MMF_Player m_DefeatFeedback;
 
         Health m_Health;
         AIBrain m_Brain;
@@ -45,10 +48,11 @@ namespace Hearthdelve.Dungeon.Bosses
         public BossDefinition Boss => m_Boss;
         public BossEncounterState State { get; private set; } = BossEncounterState.Waiting;
 
-        public void Configure(BossDefinition boss, MMF_Player entrance)
+        public void Configure(BossDefinition boss, MMF_Player entrance, MMF_Player defeat = null)
         {
             m_Boss = boss;
             m_EntranceFeedback = entrance;
+            m_DefeatFeedback = defeat;
         }
 
         void Awake()
@@ -71,7 +75,8 @@ namespace Hearthdelve.Dungeon.Bosses
         void OnDisable()
         {
             EventBus<PlayerDefeated>.Unsubscribe(OnPlayerDefeated);
-            End(defeated: false);
+            // TDE switches a dead character's components off as it dies: that's a victory, not the room going away.
+            End(defeated: State == BossEncounterState.Fighting && m_Health != null && m_Health.CurrentHealth <= 0f);
         }
 
         void OnPlayerDefeated(PlayerDefeated _) => End(defeated: false);
@@ -111,12 +116,27 @@ namespace Hearthdelve.Dungeon.Bosses
             m_PlayerEssence = player != null ? player.GetComponent<EssenceHealth>() : null;
             m_PlayerEssence?.SetEncounterDrain(m_Boss != null ? m_Boss.drainMultiplierWhileActive : 1f);
             m_EntranceFeedback?.PlayFeedbacks(transform.position);
+            // The camera finds it at its meal; the player waits until it turns.
+            RoomRunner.Active?.FocusCamera(transform);
+            InputMaps.ActivateUIOnly();
+            m_InputHeld = true;
             EventBus<BossEncounterStarted>.Publish(new BossEncounterStarted(m_Boss != null ? m_Boss.id : name, m_LastHealth, m_Health.MaximumHealth));
+        }
+
+        bool m_InputHeld;
+
+        void ReleaseEntrance()
+        {
+            RoomRunner.Active?.ReleaseCamera();
+            if (!m_InputHeld) return;
+            m_InputHeld = false;
+            InputMaps.Activate(InputMaps.Dungeon);
         }
 
         void BeginFight()
         {
             State = BossEncounterState.Fighting;
+            ReleaseEntrance();
             m_Animator?.Release();
             if (m_Brain != null) m_Brain.BrainActive = true;
         }
@@ -126,7 +146,9 @@ namespace Hearthdelve.Dungeon.Bosses
             if (State is BossEncounterState.Defeated or BossEncounterState.Ended) return;
             bool started = State != BossEncounterState.Waiting;
             State = defeated ? BossEncounterState.Defeated : BossEncounterState.Ended;
+            ReleaseEntrance();
             m_PlayerEssence?.SetEncounterDrain(1f);
+            if (defeated) m_DefeatFeedback?.PlayFeedbacks(transform.position);
             if (started) EventBus<BossEncounterEnded>.Publish(new BossEncounterEnded(m_Boss != null ? m_Boss.id : name, defeated));
         }
     }

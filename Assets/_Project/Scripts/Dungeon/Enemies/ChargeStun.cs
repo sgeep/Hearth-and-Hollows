@@ -123,7 +123,9 @@ namespace Hearthdelve.Dungeon.Enemies
         {
             IsStunned = false;
             m_Animator?.Release();
-            if (m_PausedBrain && m_Brain != null && m_Health != null && m_Health.CurrentHealth > 0f) m_Brain.BrainActive = true;
+            // A frenzy roar that began during the daze wakes the brain itself when it ends.
+            bool roaring = TryGetComponent(out Hearthdelve.Dungeon.Bosses.BossFrenzy frenzy) && frenzy.IsRoaring;
+            if (m_PausedBrain && !roaring && m_Brain != null && m_Health != null && m_Health.CurrentHealth > 0f) m_Brain.BrainActive = true;
             m_PausedBrain = false;
         }
     }

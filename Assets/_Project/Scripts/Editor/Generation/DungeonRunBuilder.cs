@@ -334,7 +334,13 @@ namespace Hearthdelve.Editor
                 (LookTestContent.Noise(n) * 0.6f + Sin(t, 55f - 25f * t) * 0.9f) * Mathf.Exp(-t * 9f) * 0.9f);
             LookTestContent.WriteWav("PH_TrollThud", 0.55f, (t, n) =>
                 (LookTestContent.Noise(n) * 0.7f + Sin(t, 45f - 20f * t) * 1f) * Mathf.Exp(-t * 6f) * 0.95f);
-            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp", "PH_TrollRoar", "PH_TrollSlam", "PH_TrollThud" })
+            // Step 2: a wet gulp, a squelch when the meal is spoiled, and the long fall.
+            LookTestContent.WriteWav("PH_TrollGulp", 0.35f, (t, n) => Sin(t, 180f - 260f * t) * Mathf.Sin(t / 0.35f * Mathf.PI) * 0.6f);
+            LookTestContent.WriteWav("PH_TrollSpoil", 0.3f, (t, n) => (LookTestContent.Noise(n) * 0.7f + Sin(t, 120f) * 0.3f) * Mathf.Exp(-t * 10f) * 0.8f);
+            LookTestContent.WriteWav("PH_TrollFall", 1.4f, (t, n) =>
+                (LookTestContent.Noise(n) * 0.4f + Sin(t, 60f - 25f * t) * 0.9f) * Mathf.Exp(-t * 1.8f) * 0.85f);
+            foreach (string name in new[] { "PH_GateSlam", "PH_GateRise", "PH_Whoosh", "PH_Coin", "PH_PowerUp", "PH_TrollRoar", "PH_TrollSlam", "PH_TrollThud",
+                         "PH_TrollGulp", "PH_TrollSpoil", "PH_TrollFall" })
                 AssetDatabase.ImportAsset($"{EditorPaths.Audio}/{name}.wav");
         }
 

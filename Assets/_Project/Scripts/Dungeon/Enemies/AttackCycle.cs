@@ -53,6 +53,12 @@ namespace Hearthdelve.Dungeon.Enemies
             Enter(EnemyAttackPhase.Cooldown);
         }
 
+        /// <summary>Ends a cooldown at once (a frenzied boss's second slam, 4e). Nothing else changes.</summary>
+        public void SkipCooldown()
+        {
+            if (Phase == EnemyAttackPhase.Cooldown) Enter(EnemyAttackPhase.Ready);
+        }
+
         public void Tick(float dt)
         {
             if (Phase == EnemyAttackPhase.Ready || dt <= 0f) return;

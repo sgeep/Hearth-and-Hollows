@@ -162,6 +162,9 @@ namespace Hearthdelve.Dungeon.Enemies
             return Cycle.TryStart();
         }
 
+        /// <summary>Ready again without the cooldown (the lockout between attacks still applies).</summary>
+        public void SkipCooldown() => Cycle?.SkipCooldown();
+
         /// <summary>Abandons the attack (a stagger): it goes straight to cooldown.</summary>
         public void Interrupt() => Cycle?.Interrupt();
 

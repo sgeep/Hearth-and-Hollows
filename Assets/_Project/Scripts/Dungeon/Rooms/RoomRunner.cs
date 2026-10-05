@@ -348,6 +348,26 @@ namespace Hearthdelve.Dungeon.Rooms
         }
 
         /// <summary>The camera's bounds become the room, and it jumps to the player instead of sliding across.</summary>
+        Transform m_HeldFollow;
+
+        /// <summary>Points the camera at <paramref name="focus"/> (a boss's entrance) until <see cref="ReleaseCamera"/>.</summary>
+        public void FocusCamera(Transform focus)
+        {
+            if (m_Camera == null || focus == null) return;
+            if (m_HeldFollow == null) m_HeldFollow = m_Camera.Follow;
+            m_Camera.Follow = focus;
+        }
+
+        public void ReleaseCamera()
+        {
+            if (m_Camera == null || m_HeldFollow == null) return;
+            m_Camera.Follow = m_HeldFollow;
+            m_HeldFollow = null;
+        }
+
+        /// <summary>What the camera follows now (tests).</summary>
+        public Transform CameraFollow => m_Camera != null ? m_Camera.Follow : null;
+
         void BindCamera(Character player)
         {
             if (m_CameraBounds != null)

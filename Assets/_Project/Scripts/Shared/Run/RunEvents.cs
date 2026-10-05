@@ -232,6 +232,13 @@ namespace Hearthdelve.Shared.Run
         }
     }
 
+    /// <summary>A boss entered a new phase (4e step 2: the troll's frenzy is phase 2).</summary>
+    public readonly struct BossPhaseChanged : IEvent
+    {
+        public readonly int Phase;
+        public BossPhaseChanged(int phase) => Phase = phase;
+    }
+
     /// <summary>A boss encounter ended: defeated, or not (the player died, or the room went away).</summary>
     public readonly struct BossEncounterEnded : IEvent
     {

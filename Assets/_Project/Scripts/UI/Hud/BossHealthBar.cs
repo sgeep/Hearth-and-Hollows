@@ -10,22 +10,39 @@ namespace Hearthdelve.UI.Hud
     public sealed class BossHealthBar : MonoBehaviour
     {
         [SerializeField] GameObject m_Root;
-        [SerializeField] LocalizedSuperText m_Name;
+        [SerializeField] LocalizedSuperText m_Label;
         [SerializeField] Image m_Fill;
+        [SerializeField, Tooltip("The fill in the boss's second phase.")]
+        Color m_FrenzyColour = new(0.95f, 0.45f, 0.1f);
+        [SerializeField, Min(0f), Tooltip("Seconds the defeat caption stays.")]
+        float m_CaptionSeconds = 3f;
+
+        Color m_Colour;
+        float m_HideAt = -1f;
 
         public bool IsShown => m_Root != null && m_Root.activeSelf;
         public float Fraction => m_Fill != null ? m_Fill.fillAmount : 0f;
         public string BossId { get; private set; }
+        public bool IsCaption { get; private set; }
 
         public void Configure(GameObject root, LocalizedSuperText name, Image fill)
         {
             m_Root = root;
-            m_Name = name;
+            m_Label = name;
             m_Fill = fill;
         }
 
         void Awake()
         {
+            if (m_Root != null) m_Root.SetActive(false);
+            if (m_Fill != null) m_Colour = m_Fill.color;
+        }
+
+        void Update()
+        {
+            if (m_HideAt < 0f || Time.unscaledTime < m_HideAt) return;
+            m_HideAt = -1f;
+            IsCaption = false;
             if (m_Root != null) m_Root.SetActive(false);
         }
 
@@ -34,6 +51,7 @@ namespace Hearthdelve.UI.Hud
             EventBus<BossEncounterStarted>.Subscribe(OnStarted);
             EventBus<BossHealthChanged>.Subscribe(OnHealth);
             EventBus<BossEncounterEnded>.Subscribe(OnEnded);
+            EventBus<BossPhaseChanged>.Subscribe(OnPhase);
         }
 
         void OnDisable()
@@ -41,21 +59,39 @@ namespace Hearthdelve.UI.Hud
             EventBus<BossEncounterStarted>.Unsubscribe(OnStarted);
             EventBus<BossHealthChanged>.Unsubscribe(OnHealth);
             EventBus<BossEncounterEnded>.Unsubscribe(OnEnded);
+            EventBus<BossPhaseChanged>.Unsubscribe(OnPhase);
         }
 
         void OnStarted(BossEncounterStarted e)
         {
             BossId = e.BossId;
-            m_Name?.Set(LocKeys.BossName(e.BossId));
+            IsCaption = false;
+            m_HideAt = -1f;
+            if (m_Fill != null) m_Fill.color = m_Colour;
+            m_Label?.Set(LocKeys.BossName(e.BossId));
             Show(e.Health, e.MaxHealth);
             if (m_Root != null) m_Root.SetActive(true);
         }
 
         void OnHealth(BossHealthChanged e) => Show(e.Health, e.MaxHealth);
 
+        void OnPhase(BossPhaseChanged e)
+        {
+            if (m_Fill != null && e.Phase >= 2) m_Fill.color = m_FrenzyColour;
+        }
+
+        // Defeated: "the Larder Troll falls" over an empty bar for a moment. Otherwise the bar simply goes.
         void OnEnded(BossEncounterEnded e)
         {
-            if (m_Root != null) m_Root.SetActive(false);
+            if (!e.Defeated || m_Label == null)
+            {
+                if (m_Root != null) m_Root.SetActive(false);
+                return;
+            }
+            IsCaption = true;
+            Show(0f, 1f);
+            m_Label.Set(LocKeys.BossDefeated, Loc.UI(LocKeys.BossName(e.BossId)));
+            m_HideAt = Time.unscaledTime + m_CaptionSeconds;
         }
 
         void Show(float health, float max)
