@@ -125,6 +125,58 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
         }
 
+        /// <summary>4e playtest: in the tavern the keeper looks along the right stick, standing or walking; centred, they face their walk.</summary>
+        [UnityTest]
+        public IEnumerator TheKeeper_LooksAlongTheRightStick_AndCentred_FacesTheWalk()
+        {
+            yield return Load("Tavern");
+            TavernDirector.Instance.OpenDebugEvening();
+            TavernDirector.Instance.ArrivalsPaused = true;
+            yield return null;
+            Character keeper = Object.FindAnyObjectByType<TavernInteractor>().GetComponent<Character>();
+            var animator = keeper.GetComponentInChildren<CharacterSpriteAnimator>();
+
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { rightStick = new Vector2(-1f, 0.6f) });
+            yield return new WaitForSeconds(0.1f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackLeft), "looks up and left, standing");
+
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftStick = new Vector2(1f, -0.2f), rightStick = new Vector2(-1f, 0.6f) });
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackLeft), "and while walking the other way");
+
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftStick = new Vector2(1f, -0.6f) });
+            yield return new WaitForSeconds(0.2f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontRight), "the stick let go: faces the walk");
+            yield return HoldStick(Vector2.zero, 0.1f);
+        }
+
+        /// <summary>4e playtest: on keyboard and mouse the keeper faces the mouse, but not while at a station.</summary>
+        [UnityTest]
+        public IEnumerator TheKeeper_FacesTheMouse()
+        {
+            yield return Load("Tavern");
+            TavernDirector.Instance.OpenDebugEvening();
+            TavernDirector.Instance.ArrivalsPaused = true;
+            yield return null;
+            Mouse mouse = Mouse.current ?? InputSystem.AddDevice<Mouse>();
+            Character keeper = Object.FindAnyObjectByType<TavernInteractor>().GetComponent<Character>();
+            var animator = keeper.GetComponentInChildren<CharacterSpriteAnimator>();
+            Vector2 Screen(Vector2 offset) => Camera.main.WorldToScreenPoint((Vector2)keeper.transform.position + offset);
+
+            InputSystem.QueueStateEvent(mouse, new MouseState { position = Screen(new Vector2(3f, 4f)), delta = new Vector2(20f, 0f) });
+            yield return new WaitForSeconds(0.1f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.BackRight), "up and right");
+            InputSystem.QueueStateEvent(mouse, new MouseState { position = Screen(new Vector2(-3f, -3f)), delta = new Vector2(-20f, 0f) });
+            yield return new WaitForSeconds(0.1f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "down and left");
+
+            Hearthdelve.Core.Input.InputMaps.Activate(Hearthdelve.Core.Input.InputMaps.Minigame);
+            InputSystem.QueueStateEvent(mouse, new MouseState { position = Screen(new Vector2(3f, 4f)), delta = new Vector2(20f, 0f) });
+            yield return new WaitForSeconds(0.1f);
+            Assert.That(animator.Facing, Is.EqualTo(Facing4.FrontLeft), "at a station the mouse belongs to the minigame");
+            Hearthdelve.Core.Input.InputMaps.Activate(Hearthdelve.Core.Input.InputMaps.Tavern);
+        }
+
         [UnityTest]
         public IEnumerator EveryCharacterPrefab_UsesTheFloorController()
         {
