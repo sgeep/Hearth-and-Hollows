@@ -1,4 +1,4 @@
-**Hearth & Hollows** (working title; the repository and Unity project are still called Hearthdelve) is a small top-down fantasy life sim/tavern management/action roguelite game I'm building mostly through vibe coding with Claude.
+Hearth & Hollows is a small top-down fantasy life sim/tavern management/action roguelite game I'm building mostly through vibe coding with Claude.
 
 Idea is inspired by Stardew Valley, Dave the Diver, and Delicious in Dungeon: run and customize your own tavern, spend your days around a small fantasy village farming, fishing, ranching, and getting to know its residents, then open the tavern in the evening and delve into the Hollows, the strange underworld beneath the village, at night for rare ingredients, loot, quests, and strange things to bring home.
 
