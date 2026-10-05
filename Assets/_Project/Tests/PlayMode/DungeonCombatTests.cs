@@ -111,7 +111,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(0.1f);
             seen.Add(animator.Current);
 
-            Assert.That(charged, Is.EqualTo(cleaver.heavy[^1].attack.damage).Within(0.01f), "a full charge gives the last step");
+            // The full step, or all the target had left (the full charge, 40 since 4e, can exceed a small enemy's health).
+            Assert.That(charged, Is.EqualTo(Mathf.Min(cleaver.heavy[^1].attack.damage, before)).Within(0.01f), "a full charge gives the last step");
             Assert.That(charged, Is.GreaterThan(tap));
             Assert.That(seen, Has.Member(CharacterAnim.Charge), "winds up");
             Assert.That(seen, Has.Member(CharacterAnim.ChargeHold), "then holds the charge");

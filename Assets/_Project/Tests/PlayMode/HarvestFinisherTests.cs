@@ -165,7 +165,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Encounter == null || Encounter.State == BossEncounterState.Defeated, 5f, "the moment to pass");
             Assert.That(health.WasFinished, Is.False);
             yield return new WaitForSeconds(0.6f);
-            IngredientPickup core = Drops().FirstOrDefault(p => p.Item.Definition.id == "slime_core");
+            // Its own harvest is a single core; the larder cache (step 4) is a Premium pair, set aside here.
+            IngredientPickup core = Drops().FirstOrDefault(p => p.Item.Definition.id == "slime_core" && p.Count == 1);
             Assert.That(core, Is.Not.Null);
             // The ordinary harvest: Fine, unless the weapon's clean kill lifts it (the cleaver's Offal); the finisher makes all of it Premium.
             Assert.That(core.Item.Quality, Is.EqualTo(Quality.Fine), "the slime core, without the finisher");

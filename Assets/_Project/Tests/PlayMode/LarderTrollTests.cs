@@ -147,6 +147,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return KeepAway(4f, () => eater.Eaten > 0);
             Assert.That(eater.Eaten, Is.EqualTo(1));
             Assert.That(health.CurrentHealth, Is.EqualTo(atMeal + health.MaximumHealth * 0.08f).Within(1f), "healed by the meal");
+            yield return null; // destroyed at the end of the frame the meal finished
             Assert.That(part == null, "eaten up");
         }
 
