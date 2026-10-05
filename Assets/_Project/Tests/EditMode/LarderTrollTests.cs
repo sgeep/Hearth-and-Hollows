@@ -25,6 +25,46 @@ namespace Hearthdelve.Tests.EditMode
         }
 
         [Test]
+        public void Feeding_HealsAShare_SpoilsWithEnoughDamage_AndDropsOnlyWhenRoomAndTimeAllow()
+        {
+            Assert.That(FeedingRules.Heal(500f, 900f, 0.08f), Is.EqualTo(72f).Within(1e-3f));
+            Assert.That(FeedingRules.Heal(880f, 900f, 0.08f), Is.EqualTo(20f).Within(1e-3f), "never past its maximum");
+            Assert.That(FeedingRules.Spoiled(600f, 555f, 40f), "hit hard enough while eating");
+            Assert.That(FeedingRules.Spoiled(600f, 580f, 40f), Is.False, "a light hit doesn't stop it");
+            Assert.That(FeedingRules.MayDrop(15f, 14f, onFloor: 1, maxOnFloor: 4));
+            Assert.That(FeedingRules.MayDrop(5f, 14f, 1, 4), Is.False, "too soon");
+            Assert.That(FeedingRules.MayDrop(30f, 14f, 4, 4), Is.False, "the floor is full");
+        }
+
+        [Test]
+        public void ACooldown_CanBeSkipped_ButNothingElse()
+        {
+            var cycle = new AttackCycle(0.1f, 0.1f, 0.1f, 5f);
+            Assert.That(cycle.TryStart());
+            cycle.SkipCooldown();
+            Assert.That(cycle.Phase, Is.EqualTo(EnemyAttackPhase.Telegraph), "only a cooldown is skipped");
+            cycle.Tick(0.11f);
+            cycle.Tick(0.11f);
+            cycle.Tick(0.11f);
+            Assert.That(cycle.Phase, Is.EqualTo(EnemyAttackPhase.Cooldown));
+            cycle.SkipCooldown();
+            Assert.That(cycle.Phase, Is.EqualTo(EnemyAttackPhase.Ready), "the frenzy's second slam");
+        }
+
+        [Test]
+        public void TheTroll_Feeds_AndFrenzies()
+        {
+            BossDefinition boss = Boss;
+            Assert.That(boss.feeding.enabled);
+            Assert.That(boss.feeding.scraps, Is.Not.Empty.And.All.Not.Null, "existing Cellars parts, no boss-only ingredient");
+            Assert.That(boss.feeding.eatSeconds, Is.GreaterThanOrEqualTo(1f), "a window to spoil the meal");
+            Assert.That(boss.frenzy.enabled);
+            Assert.That(boss.frenzy.atHealth, Is.InRange(0.3f, 0.7f));
+            foreach (System.Type part in new[] { typeof(ScrapEater), typeof(LarderScraps), typeof(BossFrenzy) })
+                Assert.That(boss.prefab.GetComponent(part), Is.Not.Null, part.Name);
+        }
+
+        [Test]
         public void AnEncounterCanPauseDrain_ButHitsStillCost()
         {
             var meter = new EssenceMeter(new EssenceSettings { baseMax = 100f, drainPerSecond = 0.5f, damageMultiplier = 1f, lowThreshold = 0.25f },

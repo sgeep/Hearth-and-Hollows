@@ -69,6 +69,35 @@ namespace Hearthdelve.Tests.PlayMode
                 yield return WaitUntil(() => stun.IsStunned, 3f, "the wall");
                 yield return new WaitForSeconds(0.3f);
                 TavernEveningCaptures.Capture("BatchLogs/troll_5_stunned.png");
+                yield return WaitUntil(() => !stun.IsStunned, 4f, "the troll to recover");
+
+                // Step 2: a part on the floor, eaten (the player kept far off); then the frenzy; then the fall.
+                var health = troll.GetComponent<Health>();
+                health.SetHealth(health.MaximumHealth * 0.7f);
+                Vector2 middle = (Vector2)room.transform.position + new Vector2(room.Size.x / 2f, room.Size.y / 2f + 4f);
+                Teleport(troll, middle);
+                troll.CharacterBrain.BrainActive = true;
+                troll.GetComponent<Hearthdelve.Dungeon.Bosses.LarderScraps>().Drop((Vector2)troll.transform.position + new Vector2(2f, -1.5f));
+                var eater = troll.GetComponent<Hearthdelve.Dungeon.Bosses.ScrapEater>();
+                Vector2 far = (Vector2)room.transform.position + new Vector2(room.Size.x - 3f, 3f);
+                for (float t = 0f; t < 6f && !eater.IsEating; t += Time.deltaTime)
+                {
+                    Teleport(Player, far);
+                    yield return null;
+                }
+                Teleport(Player, (Vector2)troll.transform.position + new Vector2(-4f, -4f));
+                yield return new WaitForSeconds(0.4f);
+                TavernEveningCaptures.Capture("BatchLogs/troll_6_eating.png");
+                yield return WaitUntil(() => !eater.IsEating, 4f, "the meal");
+                FreezeEnemies();
+                health.Damage(health.CurrentHealth - health.MaximumHealth * 0.45f, Player.gameObject, 0f, 0f, Vector3.zero);
+                yield return new WaitForSeconds(0.5f);
+                TavernEveningCaptures.Capture("BatchLogs/troll_7_frenzy.png");
+                yield return new WaitForSeconds(1.2f);
+                FreezeEnemies();
+                health.Damage(health.CurrentHealth + 10f, Player.gameObject, 0f, 0f, Vector3.zero);
+                yield return new WaitForSecondsRealtime(1.2f);
+                TavernEveningCaptures.Capture("BatchLogs/troll_8_falls.png");
             }
             finally
             {
