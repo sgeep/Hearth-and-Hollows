@@ -81,7 +81,7 @@ namespace Hearthdelve.UI.Localization
 
         public static readonly (string key, string english)[] English =
         {
-            (MenuTitle, "Hearthdelve"),
+            (MenuTitle, "Hearth & Hollows"),
             (MenuNewGame, "new game"),
             (MenuContinue, "continue"),
             (MenuNoSave, "no saved game yet."),

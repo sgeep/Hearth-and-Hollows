@@ -72,7 +72,7 @@ namespace Hearthdelve.Tests
         /// <summary>Words that keep a capital in English: proper nouns, resource names and control labels (CLAUDE.md, Localization).</summary>
         static readonly HashSet<string> k_Capitalised = new()
         {
-            "Hearthdelve", "Pip", "Cellars",
+            "Hearth", "Hollows", "Pip", "Cellars",
             "Essence", "Gold", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };
@@ -105,7 +105,7 @@ namespace Hearthdelve.Tests
             Assert.That(english["recipe.cellar_stew"], Is.EqualTo("cellar stew"));
             Assert.That(english["ingredient.spider_leg"], Is.EqualTo("spider leg"));
             Assert.That(english["staff.pip"], Is.EqualTo("Pip"), "a proper noun keeps its capital");
-            Assert.That(english[LoopLocKeys.MenuTitle], Is.EqualTo("Hearthdelve"));
+            Assert.That(english[LoopLocKeys.MenuTitle], Is.EqualTo("Hearth & Hollows"));
             Assert.That(english[TavernLocKeys.PrepValue], Is.EqualTo("{0} Gold"), "resource names are capitalised");
             Assert.That(english[LoopLocKeys.BuffMaxEssence], Is.EqualTo("+{0} max Essence"));
             Assert.That(english[TavernLocKeys.GrillPrompt], Does.Contain("gold band"), "gold the colour isn't the resource");
