@@ -55,6 +55,8 @@ namespace Hearthdelve.Core.Input
         public const string Move = "Move";
         /// <summary>Mouse / pointer position in screen pixels; aim on keyboard and mouse.</summary>
         public const string AimPoint = "AimPoint";
+        /// <summary>The right stick: aim on a gamepad (4e playtest); movement direction when it's centred.</summary>
+        public const string AimStick = "AimStick";
         public const string Attack = "Attack";
         /// <summary>Heavy / charged attack (hold).</summary>
         public const string Heavy = "Heavy";

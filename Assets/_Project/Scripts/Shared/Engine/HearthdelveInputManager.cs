@@ -71,6 +71,12 @@ namespace Hearthdelve.Shared.Engine
             if (Map == GameplayMap.Dungeon)
             {
                 m_AimPoint = _playerControlsMap.FindAction(DungeonActions.AimPoint, false);
+                // The right stick is TDE's secondary movement: weapons aim with it, falling back to movement when it's centred.
+                BindValue(_playerControlsMap.FindAction(DungeonActions.AimStick, false), context =>
+                {
+                    _secondaryMovementInput = context.ReadValue<Vector2>();
+                    if (_secondaryMovementInput.sqrMagnitude > 0.04f) NoteDevice(context);
+                });
                 BindButton(DungeonActions.Attack, ShootButton);
                 BindButton(DungeonActions.Heavy, SecondaryShootButton);
                 BindButton(DungeonActions.Dodge, DashButton);

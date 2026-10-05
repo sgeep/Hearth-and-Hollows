@@ -4,8 +4,9 @@ using UnityEngine;
 namespace Hearthdelve.Shared.Engine
 {
     /// <summary>
-    /// Locked design: aim by movement direction on a gamepad and by the mouse on keyboard and
-    /// mouse. Switches the current weapon's aim control to follow the device last used.
+    /// Aim by the mouse on keyboard and mouse, and by the right stick on a gamepad, falling back to the movement direction
+    /// while the stick is centred (4e playtest; the character faces where it aims). Switches the current weapon's aim
+    /// control to follow the device last used.
     /// </summary>
     [RequireComponent(typeof(CharacterHandleWeapon))]
     public sealed class AimControlSwitcher : MonoBehaviour
@@ -24,7 +25,7 @@ namespace Hearthdelve.Shared.Engine
             WeaponAim aim = m_HandleWeapon.WeaponAimComponent;
             if (aim == null || m_Character == null) return;
             bool pointer = m_Character.LinkedInputManager is HearthdelveInputManager input && input.PointerAim;
-            WeaponAim.AimControls wanted = pointer ? WeaponAim.AimControls.Mouse : WeaponAim.AimControls.PrimaryMovement;
+            WeaponAim.AimControls wanted = pointer ? WeaponAim.AimControls.Mouse : WeaponAim.AimControls.SecondaryThenPrimaryMovement;
             if (aim.AimControl != wanted) aim.AimControl = wanted;
         }
     }

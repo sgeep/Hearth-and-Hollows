@@ -19,6 +19,8 @@ namespace Hearthdelve.Shared.Animation
         [SerializeField] SpriteAnimationSet m_ShadowSet;
         [SerializeField] SpriteRenderer m_ShadowRenderer;
         [SerializeField] Facing4 m_InitialFacing = Facing4.FrontRight;
+        [SerializeField, Tooltip("Faces where its weapon aims (the player: the mouse or the right stick), except while rolling. Off: faces where it moves.")]
+        bool m_FaceAim;
 
         Character m_Character;
         TopDownController m_Controller;
@@ -58,6 +60,13 @@ namespace Hearthdelve.Shared.Animation
             m_Renderer = renderer;
             m_ShadowSet = shadowSet;
             m_ShadowRenderer = shadowRenderer;
+        }
+
+        /// <summary>Faces where its weapon aims rather than where it moves (the player, 4e playtest).</summary>
+        public bool FaceAim
+        {
+            get => m_FaceAim;
+            set => m_FaceAim = value;
         }
 
         void Awake()
@@ -233,12 +242,16 @@ namespace Hearthdelve.Shared.Animation
             bool attacking = m_OneShotActive && m_OneShot == CharacterAnim.Attack;
             if (m_TelegraphedActive)
                 direction = m_TelegraphDirection;
-            else if (attacking && m_HandleWeapon != null && m_HandleWeapon.WeaponAimComponent != null)
+            else if ((attacking || m_FaceAim && !Rolling) && m_HandleWeapon != null && m_HandleWeapon.WeaponAimComponent != null &&
+                     m_HandleWeapon.WeaponAimComponent.CurrentAim.sqrMagnitude > 0.01f)
                 direction = m_HandleWeapon.WeaponAimComponent.CurrentAim;
             else if (m_Controller != null && m_Controller.CurrentMovement.sqrMagnitude > 0.01f)
                 direction = m_Controller.CurrentMovement.normalized;
             Facing = FacingLogic.FromDirection(direction.x, direction.y, Facing);
         }
+
+        bool Rolling => m_Character != null && m_Character.MovementState != null &&
+                        m_Character.MovementState.CurrentState == CharacterStates.MovementStates.Dashing;
 
         void ShowTelegraphed()
         {

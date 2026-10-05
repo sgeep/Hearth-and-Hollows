@@ -382,6 +382,8 @@ namespace Hearthdelve.Editor
             }
             var aim = root.AddComponent<WeaponAim2D>();
             aim.AimControl = WeaponAim.AimControls.Mouse;
+            // The system cursor stays visible (4e playtest): TDE hides it for a reticle, and we draw none.
+            aim.ReplaceMousePointer = false;
             // Melee goes exactly where the player aims: TDE's default eases the weapon round at one turn per second.
             aim.WeaponRotationSpeed = 0f;
             root.AddComponent<ComboWeapon>();
@@ -452,6 +454,8 @@ namespace Hearthdelve.Editor
                     root.AddComponent<PlayerAttackGate>();
                 }
                 root.AddComponent<AimControlSwitcher>();
+                // The character faces where it aims: the mouse, or the right stick (4e playtest).
+                root.GetComponentInChildren<CharacterSpriteAnimator>().FaceAim = true;
 
                 var health = root.AddComponent<EssenceHealth>();
                 health.Configure(essenceConfig);

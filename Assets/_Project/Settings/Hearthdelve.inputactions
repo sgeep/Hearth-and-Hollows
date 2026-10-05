@@ -1162,6 +1162,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "AimStick",
+                    "type": "Value",
+                    "id": "057e3767-719f-4a4a-b257-2841663af213",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -1503,6 +1513,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "485312b5-3e12-4d30-9c22-22fb6a5c6447",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "StickDeadzone(min=0.25)",
+                    "groups": "Gamepad",
+                    "action": "AimStick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

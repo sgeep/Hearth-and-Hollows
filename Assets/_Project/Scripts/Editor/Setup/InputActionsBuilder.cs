@@ -112,6 +112,12 @@ namespace Hearthdelve.Editor
                 changed = true;
                 Debug.Log("[Hearthdelve] Rebuilt the Dungeon action map for top-down controls.");
             }
+            dungeon = asset.FindActionMap(InputMaps.Dungeon);
+            if (dungeon.FindAction(DungeonActions.AimStick) == null)
+            {
+                AddAimStick(dungeon);
+                changed = true;
+            }
             var minigame = asset.FindActionMap(InputMaps.Minigame);
             if (minigame != null && minigame.FindAction(MinigameActions.Point) == null)
             {
@@ -133,6 +139,7 @@ namespace Hearthdelve.Editor
             AddMove(d, DungeonActions.Move);
             var aim = d.AddAction(DungeonActions.AimPoint, InputActionType.PassThrough, expectedControlLayout: "Vector2");
             aim.AddBinding("<Pointer>/position", groups: KM);
+            AddAimStick(d);
             Button(d, DungeonActions.Attack, ("<Mouse>/leftButton", KM), ("<Gamepad>/buttonWest", GP));
             Button(d, DungeonActions.Heavy, ("<Mouse>/rightButton", KM), ("<Gamepad>/buttonNorth", GP));
             Button(d, DungeonActions.Dodge, ("<Keyboard>/space", KM), ("<Gamepad>/buttonEast", GP));
@@ -142,6 +149,13 @@ namespace Hearthdelve.Editor
             Button(d, DungeonActions.KitchenArts, ("<Keyboard>/q", KM), ("<Gamepad>/rightTrigger", GP));
             Button(d, DungeonActions.Finisher, ("<Keyboard>/f", KM), ("<Gamepad>/leftTrigger", GP));
             Button(d, DungeonActions.Pause, ("<Keyboard>/escape", KM), ("<Gamepad>/start", GP));
+        }
+
+        /// <summary>The right stick aims on a gamepad (4e playtest).</summary>
+        static void AddAimStick(InputActionMap map)
+        {
+            var stick = map.AddAction(DungeonActions.AimStick, InputActionType.Value, expectedControlLayout: "Vector2");
+            stick.AddBinding("<Gamepad>/rightStick", groups: GP, processors: "StickDeadzone(min=0.25)");
         }
 
         static void AddPoint(InputActionMap map)

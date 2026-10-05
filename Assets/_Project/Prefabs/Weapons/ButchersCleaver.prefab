@@ -136,10 +136,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728512
-  - rid: 2696332444289728513
-  - rid: 2696332444289728514
-  - rid: 2696332444289728515
+  - rid: 2696332490907582464
+  - rid: 2696332490907582465
+  - rid: 2696332490907582466
+  - rid: 2696332490907582467
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -155,11 +155,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728512
+    - rid: 2696332490907582464
       type: {class: MMF_HitStop, ns: Hearthdelve.Shared.Engine, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -16456387
+        UniqueID: -2120143783
         Label: Hit Stop
         OriginalLabel: 
         ChannelMode: 0
@@ -232,11 +232,11 @@ MonoBehaviour:
         DebugActive: 0
         FreezeFrameDuration: 0.06
         MinimumTimescaleThreshold: 0.1
-    - rid: 2696332444289728513
+    - rid: 2696332490907582465
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -779967346
+        UniqueID: 956254760
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -308,11 +308,11 @@ MonoBehaviour:
         Owner: {fileID: 9196504234326721122}
         DebugActive: 0
         Force: 0.15
-    - rid: 2696332444289728514
+    - rid: 2696332490907582466
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 1021640973
+        UniqueID: 675427061
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -434,11 +434,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332444289728515
+    - rid: 2696332490907582467
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1141797429
+        UniqueID: -232635507
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
@@ -866,7 +866,7 @@ MonoBehaviour:
   ReticleHeight: 0
   ReticleAtMousePosition: 0
   RotateReticle: 0
-  ReplaceMousePointer: 1
+  ReplaceMousePointer: 0
   MouseDeadZoneRadius: 0.5
   DisplayReticle: 1
   MoveCameraTargetTowardsReticle: 0
@@ -1041,10 +1041,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728516
-  - rid: 2696332444289728517
-  - rid: 2696332444289728518
-  - rid: 2696332444289728519
+  - rid: 2696332490907582468
+  - rid: 2696332490907582469
+  - rid: 2696332490907582470
+  - rid: 2696332490907582471
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1060,11 +1060,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728516
+    - rid: 2696332490907582468
       type: {class: MMF_HitStop, ns: Hearthdelve.Shared.Engine, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1303407921
+        UniqueID: -90253381
         Label: Hit Stop
         OriginalLabel: 
         ChannelMode: 0
@@ -1137,11 +1137,11 @@ MonoBehaviour:
         DebugActive: 0
         FreezeFrameDuration: 0.06
         MinimumTimescaleThreshold: 0.1
-    - rid: 2696332444289728517
+    - rid: 2696332490907582469
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1976116054
+        UniqueID: -652782038
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -1213,11 +1213,11 @@ MonoBehaviour:
         Owner: {fileID: 3171315639764917663}
         DebugActive: 0
         Force: 0.15
-    - rid: 2696332444289728518
+    - rid: 2696332490907582470
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 406827479
+        UniqueID: 2065423021
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1339,11 +1339,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332444289728519
+    - rid: 2696332490907582471
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 2072898358
+        UniqueID: -568996954
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
@@ -1553,10 +1553,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332444289728520
-  - rid: 2696332444289728521
-  - rid: 2696332444289728522
-  - rid: 2696332444289728523
+  - rid: 2696332490907582472
+  - rid: 2696332490907582473
+  - rid: 2696332490907582474
+  - rid: 2696332490907582475
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1572,11 +1572,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332444289728520
+    - rid: 2696332490907582472
       type: {class: MMF_HitStop, ns: Hearthdelve.Shared.Engine, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 2086385637
+        UniqueID: 353421073
         Label: Hit Stop
         OriginalLabel: 
         ChannelMode: 0
@@ -1649,11 +1649,11 @@ MonoBehaviour:
         DebugActive: 0
         FreezeFrameDuration: 0.06
         MinimumTimescaleThreshold: 0.1
-    - rid: 2696332444289728521
+    - rid: 2696332490907582473
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -1870951163
+        UniqueID: -2039882157
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -1725,11 +1725,11 @@ MonoBehaviour:
         Owner: {fileID: 6475237133467804930}
         DebugActive: 0
         Force: 0.15
-    - rid: 2696332444289728522
+    - rid: 2696332490907582474
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1265369218
+        UniqueID: -564422053
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1851,11 +1851,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332444289728523
+    - rid: 2696332490907582475
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -1323504783
+        UniqueID: -844695150
         Label: Haptic Tap.Firm
         OriginalLabel: 
         ChannelMode: 0
