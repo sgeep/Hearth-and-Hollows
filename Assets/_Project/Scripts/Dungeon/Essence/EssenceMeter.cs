@@ -18,9 +18,9 @@ namespace Hearthdelve.Dungeon.Essence
         public static EssenceSettings Default => new()
         {
             baseMax = 100f,
-            // 4d step 5 (raised after the playtest, which reached the arena with Essence to spare): drain alone lasts about
-            // 8 minutes, against a full Cellars run of about 6; hits spend the rest (GDD §4.4: pressure, not a set failure).
-            drainPerSecond = 0.2f,
+            // 4d playtest (2026-10-05): drain alone lasts about 3⅓ minutes at base: floor 1 and some of floor 2, not a full
+            // Cellars run (about 6 minutes). A full run needs gear: upgrades, the delve meal, powers (GDD §4.4, §7.2).
+            drainPerSecond = 0.5f,
             damageMultiplier = 1f,
             lowThreshold = 0.25f,
         };
