@@ -72,7 +72,7 @@ namespace Hearthdelve.Tests
         /// <summary>Words that keep a capital in English: proper nouns, resource names and control labels (CLAUDE.md, Localization).</summary>
         static readonly HashSet<string> k_Capitalised = new()
         {
-            "Hearth", "Hollows", "Pip", "Cellars",
+            "Hearth", "Hollows", "Pip", "Cellars", "Larder", "Troll",
             "Essence", "Gold", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };

@@ -147,12 +147,15 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void TheArena_HoldsThePlaceholderFight()
+        public void WithoutABoss_TheArenaHoldsTheStandInFight()
         {
-            ArenaPlaceholder placeholder = Settings.tuning.arenaPlaceholder;
+            // 4e: the Larder Troll is the arena's encounter (LarderTrollTests); settings without a boss keep 4d's stand-in.
+            RunTuning tuning = UnityEngine.JsonUtility.FromJson<RunTuning>(UnityEngine.JsonUtility.ToJson(Settings.tuning));
+            tuning.boss = null;
+            ArenaPlaceholder placeholder = tuning.arenaPlaceholder;
             foreach (int seed in k_Seeds.Take(50))
             {
-                FloorNode arena = RunGraph.Ends(Generate(seed).Floors[2], RoomKind.Arena).Single();
+                FloorNode arena = RunGraph.Ends(RunGenerator.Generate(seed, tuning, Settings.Catalog()).Floors[2], RoomKind.Arena).Single();
                 Assert.That(arena.Encounter.Count(e => e.Kind == EnemyKind.Slime), Is.EqualTo(placeholder.slimes));
                 Assert.That(arena.Encounter.Count(e => e.Kind == EnemyKind.Bat), Is.EqualTo(placeholder.bats));
                 Assert.That(arena.Encounter.Count(e => e.Kind == EnemyKind.Spider), Is.EqualTo(placeholder.spiders));

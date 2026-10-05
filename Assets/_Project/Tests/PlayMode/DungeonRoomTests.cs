@@ -23,8 +23,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4d, in the <c>Dungeon</c> scene with a fixed seed: the generated run's rooms load one at a time, the gates seal
     /// while anything is alive and open (only the exits the graph uses) when it's clear, exits lead where the graph says
-    /// and never back, the hole drops to the next floor, ropes end the run, and the arena's placeholder fight ends a full
-    /// run. The navigation grid and the camera follow every room.
+    /// and never back, the hole drops to the next floor, ropes end the run, and the arena's boss ends a full run. The navigation grid and the camera follow every room.
     /// </summary>
     public class DungeonRoomTests : LookTestFixture
     {
@@ -216,7 +215,7 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator AFullRun_DropsThroughThreeFloors_ToTheArena_WhosePlaceholderFightEndsTheRun()
+        public IEnumerator AFullRun_DropsThroughThreeFloors_ToTheArena_WhoseBossEndsTheRun()
         {
             yield return LoadRun();
             yield return WalkTo(RoomKind.Descent);
@@ -238,7 +237,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(rope.gameObject.activeInHierarchy, Is.False, "the way out waits for the fight");
             Assert.That(Runner.Encounter.IsSealed);
             Assert.That(Room.LivingEnemies(), Is.EqualTo(Node.Encounter.Count));
-            Assert.That(Node.Encounter.Count, Is.GreaterThanOrEqualTo(6), "the placeholder elite wave");
+            Assert.That(Node.Encounter.Select(e => e.Kind), Is.EqualTo(new[] { EnemyKind.Boss }), "the Larder Troll (4e), not 4d's stand-in wave");
             yield return ClearRoom();
             Assert.That(rope.gameObject.activeInHierarchy, "the rope appears once the arena is clear");
 
