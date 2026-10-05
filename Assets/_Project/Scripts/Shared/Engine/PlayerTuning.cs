@@ -60,6 +60,8 @@ namespace Hearthdelve.Shared.Engine
                 if (m_Dash.Cooldown != null)
                 {
                     m_Dash.Cooldown.Unlimited = false;
+                    // TDE lets a new dash cut the refill short by default: spamming the button skipped the cooldown.
+                    m_Dash.Cooldown.CanInterruptRefill = false;
                     m_Dash.Cooldown.ConsumptionDuration = 0f;
                     m_Dash.Cooldown.PauseOnEmptyDuration = 0f;
                     m_Dash.Cooldown.RefillDuration = m_Config.dodgeCooldown * m_DodgeCooldownMultiplier;
