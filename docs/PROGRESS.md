@@ -778,6 +778,8 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - Web rebuilt and loaded. A browser that played an earlier build can load stale string tables (CRC mismatch, `#menu.title` on screen), because Localization's bundle names don't change between builds; the local test server now sends no-cache headers. Elsewhere, a hard refresh (Ctrl+Shift+R) fixes it.
 - Tests: EditMode 441/441, PlayMode 150/150.
 
+- **The keeper looks around the tavern too** (your request, for immersion): `PlayerLook` turns them toward the mouse, or along the right stick (new `Tavern/LookStick` action), standing or walking; with the stick centred they face their walk. It stays out of the way at stations, in minigames and in menus (only while the tavern's gameplay map is on). Presentation only: which station you use doesn't depend on facing. Tests: the stick and the mouse, and the mouse ignored at a station. EditMode 441/441, PlayMode 152/152.
+
 **Next: your check of these fixes, then 4e sign-off and the 4f plan.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
