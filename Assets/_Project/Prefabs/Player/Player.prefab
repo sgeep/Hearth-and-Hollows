@@ -228,10 +228,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332481779728419
-  - rid: 2696332481779728420
-  - rid: 2696332481779728421
-  - rid: 2696332481779728422
+  - rid: 2696332490646487075
+  - rid: 2696332490646487076
+  - rid: 2696332490646487077
+  - rid: 2696332490646487078
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -247,11 +247,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332481779728419
+    - rid: 2696332490646487075
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1293522825
+        UniqueID: 1928906885
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -323,11 +323,11 @@ MonoBehaviour:
         Owner: {fileID: 738392191101723443}
         DebugActive: 0
         Force: 0.4
-    - rid: 2696332481779728420
+    - rid: 2696332490646487076
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1355719678
+        UniqueID: -1742179839
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -449,11 +449,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332481779728421
+    - rid: 2696332490646487077
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1612360679
+        UniqueID: -653718535
         Label: Haptic Finisher.Harvest
         OriginalLabel: 
         ChannelMode: 0
@@ -527,11 +527,11 @@ MonoBehaviour:
         Pattern: {fileID: 11400000, guid: bde9c11036a94e44391a6a0407cb420c, type: 2}
         Scale: 1
         UseFeedbackIntensity: 0
-    - rid: 2696332481779728422
+    - rid: 2696332490646487078
       type: {class: MMF_HitStop, ns: Hearthdelve.Shared.Engine, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 443946329
+        UniqueID: -629590095
         Label: Hit Stop
         OriginalLabel: 
         ChannelMode: 0
@@ -740,7 +740,7 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332481779728412
+  - rid: 2696332490646487068
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -756,11 +756,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332481779728412
+    - rid: 2696332490646487068
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -893071373
+        UniqueID: 927036991
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1069,8 +1069,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332481779728417
-  - rid: 2696332481779728418
+  - rid: 2696332490646487073
+  - rid: 2696332490646487074
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1086,11 +1086,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332481779728417
+    - rid: 2696332490646487073
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1488511587
+        UniqueID: -1299716003
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1212,11 +1212,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332481779728418
+    - rid: 2696332490646487074
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1311956602
+        UniqueID: 733520687
         Label: Haptic Heartbeat.Warning
         OriginalLabel: 
         ChannelMode: 0
@@ -1549,8 +1549,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332481779728423
-  - rid: 2696332481779728424
+  - rid: 2696332490646487079
+  - rid: 2696332490646487080
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1566,11 +1566,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332481779728423
+    - rid: 2696332490646487079
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 285363610
+        UniqueID: -409584479
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -1692,11 +1692,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332481779728424
+    - rid: 2696332490646487080
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -34099431
+        UniqueID: 221959040
         Label: Haptic Buzz.Failure
         OriginalLabel: 
         ChannelMode: 0
@@ -1906,10 +1906,10 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332481779728413
-  - rid: 2696332481779728414
-  - rid: 2696332481779728415
-  - rid: 2696332481779728416
+  - rid: 2696332490646487069
+  - rid: 2696332490646487070
+  - rid: 2696332490646487071
+  - rid: 2696332490646487072
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1925,11 +1925,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332481779728413
+    - rid: 2696332490646487069
       type: {class: MMF_SpriteFlash, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -996619219
+        UniqueID: -87837742
         Label: Flash
         OriginalLabel: 
         ChannelMode: 0
@@ -2003,11 +2003,11 @@ MonoBehaviour:
         Target: {fileID: 999214110843787531}
         FlashColor: {r: 1, g: 0.35, b: 0.35, a: 1}
         Duration: 0.12
-    - rid: 2696332481779728414
+    - rid: 2696332490646487070
       type: {class: MMF_ScreenShake, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 461102332
+        UniqueID: -918317306
         Label: Screen Shake
         OriginalLabel: 
         ChannelMode: 0
@@ -2079,11 +2079,11 @@ MonoBehaviour:
         Owner: {fileID: 3542817586572496047}
         DebugActive: 0
         Force: 0.6
-    - rid: 2696332481779728415
+    - rid: 2696332490646487071
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: -1449219150
+        UniqueID: 214097675
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -2205,11 +2205,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332481779728416
+    - rid: 2696332490646487072
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: -1519735634
+        UniqueID: 1762205175
         Label: Haptic Hit.Taken
         OriginalLabel: 
         ChannelMode: 0
@@ -2309,6 +2309,7 @@ GameObject:
   - component: {fileID: 6497250814091916748}
   - component: {fileID: 7587266356196405071}
   - component: {fileID: 4917328070641940068}
+  - component: {fileID: 8474875326712523267}
   - component: {fileID: 1418833621827107432}
   m_Layer: 10
   m_Name: Player
@@ -2823,6 +2824,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Harvest.SatchelCarrier
   m_Config: {fileID: 11400000, guid: 37991d2608b3b01459da0b39254d96de, type: 2}
   m_FullFeedback: {fileID: 4363897262104370144}
+--- !u!114 &8474875326712523267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8875810124745081221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a647aea9c7cd142469ff88d15229fea2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Player.DodgeThroughEnemies
+  m_PassThrough:
+    serializedVersion: 2
+    m_Bits: 8192
 --- !u!114 &1418833621827107432
 MonoBehaviour:
   m_ObjectHideFlags: 0

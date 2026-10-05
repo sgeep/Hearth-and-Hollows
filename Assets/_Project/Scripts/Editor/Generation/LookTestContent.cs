@@ -466,6 +466,8 @@ namespace Hearthdelve.Editor
                 // The Harvest Finisher (4e step 3): a freeze, a shake, its sound and the Finisher.Harvest rumble together.
                 MMF_Player finish = Feedback(root.transform, "Feedback_Finisher", null, 0.4f, Sfx("PH_Finisher"), Pattern(HapticIds.FinisherHarvest));
                 finish.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.14f });
+                // The dodge roll passes through enemies (4e playtest).
+                root.AddComponent<Hearthdelve.Dungeon.Player.DodgeThroughEnemies>().Configure(LayerMask.GetMask(Layers.Enemies));
                 root.AddComponent<PlayerFinisher>().Configure(
                     AssetDatabase.LoadAssetAtPath<HarvestRulesConfig>($"{EditorPaths.Config}/HarvestRulesConfig.asset"), finish);
                 carrier.ConfigureFeedback(Feedback(root.transform, "Feedback_SatchelFull", null, 0f, Sfx("PH_SatchelFull"), Pattern(HapticIds.BuzzFailure)));
