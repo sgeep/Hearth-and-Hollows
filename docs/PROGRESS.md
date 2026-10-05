@@ -851,7 +851,11 @@ The tavern's furniture is no longer baked into `Tavern.unity`: it's data, built 
 - **Queue spots** stay the authored lane inside the door rather than dynamic: furniture on them is a warning ("furniture stands where customers queue"). Simpler, and the check catches it.
 - **Surface items and decor nudging** (D1's quarter-tile steps, D4's surface layer) are in the data and rules but have no pieces yet: they arrive with the catalogue (Checkpoint B), where they'll get their controls.
 - **In the Scene view** (edit mode) the tavern shows its shell only; the furniture is built in Play.
-- **At 1× in the captures**, two of the controls line's single-pixel "·" separators fall between pixels; check how it reads at your resolution.
+- **At 1× in the captures**, two of the controls line's single-pixel "·" separators fall between pixels; in the browser at its normal size they all draw.
+
+**Web (development build, 130 MB), smoke-tested in Chrome:** a 4e save already in the browser (version 3, day 5, mid-delve) continued into the delve and came home through the migration with the starting tavern (three tables, six seats; the seat upgrade gone from the Night screen); Decorate Mode from the Night screen, a barrel picked up and put down with the mouse, its ghost following the pointer, "game saved." on leaving; a page reload and Continue brought the barrel back where it was put. No console errors. Not driven on the web: the gamepad (covered by PlayMode tests).
+
+**Checkpoint A (steps 1–2) is done and waiting for your playtest.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
