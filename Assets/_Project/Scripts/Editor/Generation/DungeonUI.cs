@@ -94,7 +94,8 @@ namespace Hearthdelve.Editor
             satchel.gameObject.AddComponent<Hearthdelve.UI.Hud.SatchelHud>().Configure(slots);
 
             // The harvest feed: one line per message (the longest, "standard spider leg was destroyed", is 190 pixels in Silver).
-            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -16f), new Vector2(212f, 52f));
+            // Below the boss bar (4e), which runs across the top while a boss fights.
+            RectTransform feed = LookTestBuilder.UIRect(root, "HarvestFeed", Vector2.one, Vector2.one, new Vector2(-4f, -26f), new Vector2(212f, 52f));
             var lines = new Hearthdelve.UI.Hud.HarvestFeedLine[4];
             for (int i = 0; i < lines.Length; i++)
             {
