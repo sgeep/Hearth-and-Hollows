@@ -15,8 +15,8 @@ namespace Hearthdelve.Editor
     /// <summary>
     /// The guest room (4f step 6; plan §8): a second area of the property, proving one decorating system for every room.
     /// A one-screen room (18×13 cells; 16×8 of floor) cut from the Shop Indoor add-on's cream-walled premade room (a different shell from
-    /// the tavern's), placed beside the tavern in the Tavern scene, off camera. The stairs on the tavern's back wall (the
-    /// Towns II stucco staircase) lead up to it; its door leads back down; both fade. It has its own layout, finishes and
+    /// the tavern's), placed beside the tavern in the Tavern scene, off camera. Decorate Mode switches to it (there's no
+    /// staircase in the tavern yet); its door leads back down with a fade. It has its own layout, finishes and
     /// validation profile (only its doorway is checked), and the same catalogue, storage and save as the tavern. No
     /// guests, prices or ratings. Built in place in the existing scene (D23): every run replaces what it made and nothing
     /// else, so running it again changes nothing.
@@ -27,8 +27,6 @@ namespace Hearthdelve.Editor
         public const int Width = 18, Height = 13, DoorColumn = 9;
         /// <summary>Walkable floor rows: from the front wall's top to the back wall's foot.</summary>
         public const int FloorBottom = 2, FloorTop = 10;
-        /// <summary>The tavern cells the stairs stand on (kept clear of furniture).</summary>
-        public static readonly RectInt TavernStairs = new(9, 12, 4, 2);
 
         static int SourceColumn(int column, bool doorRow) =>
             column == 0 ? 0 : column == Width - 1 ? 16 : doorRow && column == DoorColumn ? MinifantasySheets.ShopDoorColumn : 2;
@@ -54,7 +52,7 @@ namespace Hearthdelve.Editor
             return finishes;
         }
 
-        /// <summary>Where you arrive in the tavern coming down: just below the stairs' foot.</summary>
+        /// <summary>Where you arrive in the tavern coming down: in front of the back wall, between the bar and the sign.</summary>
         public static readonly Vector2 TavernArrival = new(12.5f, 11.2f);
 
         public static void Build(PropertyArea tavern, FurnitureContent.Built furniture, TavernContent content)
@@ -104,7 +102,7 @@ namespace Hearthdelve.Editor
             AreaFurniture builder = root.GetComponent<AreaFurniture>() ?? root.gameObject.AddComponent<AreaFurniture>();
             builder.Configure(area, furniture.Database, furniture.Presentation, content, finishes);
 
-            // Down: the doorway (a step onto it fades back to the foot of the tavern's stairs).
+            // Down: the doorway (a step onto it fades back down to the tavern).
             var door = new GameObject("Door");
             door.transform.SetParent(root, false);
             door.transform.localPosition = new Vector2(DoorColumn + 0.5f, FloorBottom + 0.25f);
@@ -113,35 +111,19 @@ namespace Hearthdelve.Editor
             doorTrigger.size = new Vector2(0.9f, 0.5f);
             door.AddComponent<AreaPassage>().Configure(area, tavern);
 
-            AddStairs(tavern, area);
+            RemoveStairs(tavern);
         }
 
-        /// <summary>Up: the staircase against the tavern's back wall between the bar and the sign, rising to the left.</summary>
-        static void AddStairs(PropertyArea tavern, PropertyArea guest)
+        /// <summary>
+        /// No staircase in the tavern (removed at the owner's request after the Checkpoint B playtest): until the Inn gets a
+        /// real way up, the guest room is reached from Decorate Mode. Clears the stairs an earlier update put in the scene.
+        /// </summary>
+        static void RemoveStairs(PropertyArea tavern)
         {
             Transform root = tavern.transform;
             for (Transform old = root.Find("Stairs"); old != null; old = root.Find("Stairs"))
                 Object.DestroyImmediate(old.gameObject);
-            var stairs = new GameObject("Stairs").transform;
-            stairs.SetParent(root, false);
-            stairs.position = new Vector2(TavernStairs.xMin, TavernStairs.yMin);
-            var art = new GameObject("Art");
-            art.transform.SetParent(stairs, false);
-            var renderer = art.AddComponent<SpriteRenderer>();
-            renderer.sprite = MinifantasyImporter.Sprite(MinifantasySheets.TownsII, "StuccoIndoorTileset", "StairsUpLeft");
-            renderer.sortingLayerName = SortingLayers.Floor;
-            renderer.sortingOrder = 3;
-            if (LookTestContent.LitSpriteMaterial != null) renderer.sharedMaterial = LookTestContent.LitSpriteMaterial;
-            // The flight is solid (and the layout check knows it); its foot, at the right, is the way up.
-            LookTestBuilder.Solid(stairs, "Flight", new Vector2(1.125f, 1f), new Vector2(2.25f, 2f));
-            tavern.SetFixtures(new Rect(TavernStairs.xMin, TavernStairs.yMin, 2.25f, 2f));
-            var foot = new GameObject("Foot");
-            foot.transform.SetParent(stairs, false);
-            foot.transform.localPosition = new Vector2(2.75f, 0.35f);
-            var trigger = foot.AddComponent<BoxCollider2D>();
-            trigger.isTrigger = true;
-            trigger.size = new Vector2(1f, 0.7f);
-            foot.AddComponent<AreaPassage>().Configure(tavern, guest);
+            tavern.SetFixtures();
         }
 
         /// <summary>The black cover for the fade between areas, over everything on the tavern's canvas.</summary>

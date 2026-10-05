@@ -24,11 +24,11 @@ namespace Hearthdelve.Tavern.Scene
     }
 
     /// <summary>
-    /// A fixed way between two areas of the property (4f step 6; plan §8): the stairs up to the guest room, the guest
-    /// room's door back down. Walking onto it fades the screen, moves the keeper to the other area's arrival point and the
-    /// camera onto that area, and fades back. Until the village milestone the keeper only walks during service, so the
-    /// stairs work then too (customers keep waiting while the keeper is upstairs); when the evening ends (results, night,
-    /// the next day) the keeper is brought back down. Not while decorating, which switches areas itself.
+    /// A fixed way between two areas of the property (4f step 6; plan §8): for now only the guest room's door back down
+    /// (the tavern's staircase was removed after the Checkpoint B playtest; the guest room is reached from Decorate Mode).
+    /// Walking onto it fades the screen, moves the keeper to the other area's arrival point and the camera onto that area,
+    /// and fades back. It works whenever the keeper walks (Prep and service until the village milestone); when the
+    /// evening ends with the keeper still upstairs, they're brought back down. Not while decorating, which switches areas itself.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public sealed class AreaPassage : MonoBehaviour

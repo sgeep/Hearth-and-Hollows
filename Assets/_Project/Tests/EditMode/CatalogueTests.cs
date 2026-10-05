@@ -374,7 +374,7 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void FixedFixtures_LikeTheStairs_BlockTheWalkableGrid()
+        public void FixedFixtures_BlockTheWalkableGrid()
         {
             var shape = new AreaShape { Bounds = new RectInt(0, 0, 6, 6), Floor = new RectInt(0, 0, 6, 6) };
             shape.Fixtures.Add(new Rect(2f, 2f, 2f, 2f));

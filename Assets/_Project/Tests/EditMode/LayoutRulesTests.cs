@@ -32,12 +32,7 @@ namespace Hearthdelve.Tests
                 Reserved = new HashSet<Vector2Int> { new(13, 2), new(13, 3) },
                 Door = new Vector2(13.5f, 2.4f),
                 Rest = new Vector2(25.5f, 5.5f),
-                // The stairs up to the guest room (Checkpoint B): their cells kept clear, their flight solid.
-                Fixtures = { new Rect(9f, 12f, 2.25f, 2f) },
             };
-            for (int x = 9; x < 13; x++)
-            for (int y = 12; y < 14; y++)
-                shape.Reserved.Add(new Vector2Int(x, y));
             for (int i = 0; i < 6; i++) shape.Queue.Add(new Vector2(12.25f - i, 2.6f));
             return shape;
         }

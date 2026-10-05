@@ -265,7 +265,8 @@ namespace Hearthdelve.Editor
             LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -4f),
                 new Vector2(104f, Line));
 
-            // The list (left, 170 wide): a name, and the price or what's stored, per row.
+            // The list (left, 170 wide): a name (110), and the price or what's stored (72, room for "not for sale";
+            // the boxes overlap, the words don't: the catalogue test measures them), per row.
             var rows = new CatalogueRow[8];
             for (int i = 0; i < rows.Length; i++)
             {
@@ -280,7 +281,7 @@ namespace Hearthdelve.Editor
                     button = button,
                     background = row.GetComponent<Image>(),
                     name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(2f, 0f), new Vector2(110f, Line)),
-                    info = Label(row, "Info", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-2f, 0f), new Vector2(60f, Line)),
+                    info = Label(row, "Info", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-2f, 0f), new Vector2(72f, Line)),
                 };
             }
             LocalizedSuperText empty = Label(panel, "Empty", DecorateLocKeys.EmptyTab, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -40f), new Vector2(166f, Line));

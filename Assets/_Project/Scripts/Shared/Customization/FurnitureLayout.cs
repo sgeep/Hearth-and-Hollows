@@ -18,9 +18,9 @@ namespace Hearthdelve.Shared.Customization
         public RectInt Floor;
         /// <summary>Where wall pieces hang.</summary>
         public RectInt WallBand;
-        /// <summary>Tiles nothing standing may cover (the entrance and the tile inside it, the stairs).</summary>
+        /// <summary>Tiles nothing standing may cover (the entrance and the tile inside it).</summary>
         public HashSet<Vector2Int> Reserved = new();
-        /// <summary>The room's fixed solid parts that aren't furniture (the stairs' flight), in world tiles: they block like bodies.</summary>
+        /// <summary>The room's fixed solid parts that aren't furniture (none yet), in world tiles: they block like bodies.</summary>
         public List<Rect> Fixtures = new();
         /// <summary>The service's points, in world tiles: inside the door, the queue spots front first, where staff rest.</summary>
         public Vector2 Door;

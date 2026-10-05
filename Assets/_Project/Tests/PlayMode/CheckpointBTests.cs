@@ -17,7 +17,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4f Checkpoint B in the tavern scene: buying from the catalogue onto the cursor, storing and selling; tiers opening
     /// with Renown; recolouring a piece (and undoing it), the colour panel and matching every copy; laying a floor finish
-    /// and putting it back; decorating the guest room by switching areas; the stairs and the guest room's door; and a
+    /// and putting it back; decorating the guest room by switching areas; no stairs, and the guest room's door; and a
     /// service in a tavern furnished quite differently from the start.
     /// </summary>
     public class CheckpointBTests : LookTestFixture
@@ -282,44 +282,87 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint), "back to where the keeper is");
         }
 
+        /// <summary>Every row and detail line of every page fits its box: nothing wraps onto the line below.</summary>
         [UnityTest]
-        public IEnumerator TheStairs_LeadUpToTheGuestRoom_AndItsDoorLeadsBackDown()
+        public IEnumerator EveryCatalogueText_FitsItsLines()
+        {
+            yield return LoadTavern();
+            Mode.Enter();
+            yield return null;
+            DecorateCatalogue catalogue = Screen.Catalogue;
+            Screen.OpenStorage();
+            yield return null;
+            // Every piece stored, so the storage page lists them all; then the shop pages (locked rows too).
+            foreach (FurnitureDefinition d in Tavern.Content.furniture.Where(d => d != null && Tavern.State.OwnedCount(d.id) == 0))
+                Tavern.State.AddOwnedCopies(d.id, 1);
+            var problems = new System.Collections.Generic.List<string>();
+            for (int tab = 0; tab < catalogue.TabCount; tab++, catalogue.Tab(1))
+            for (int i = 0; i < catalogue.Count; i++)
+            {
+                catalogue.Select(i);
+                foreach (CatalogueRow row in catalogue.Rows)
+                {
+                    Check(row.name, 1, problems);
+                    Check(row.info, 1, problems);
+                    if (!row.info.isActiveAndEnabled || !row.name.isActiveAndEnabled) continue;
+                    var name = row.name.GetComponent<SuperTextMesh>();
+                    var info = row.info.GetComponent<SuperTextMesh>();
+                    if (string.IsNullOrEmpty(name.text) || string.IsNullOrEmpty(info.text)) continue;
+                    // A pixel of daylight between the name and the price.
+                    float gap = (info.finalTopLeftTextBounds.x - name.finalBottomRightTextBounds.x) / row.name.transform.lossyScale.x;
+                    if (gap < 2f) problems.Add($"\"{name.text}\" runs into \"{info.text}\" ({gap:0.#} px apart)");
+                }
+                foreach ((LocalizedSuperText text, int lines) in catalogue.DetailTexts) Check(text, lines, problems);
+            }
+            Assert.That(problems.Distinct(), Is.Empty);
+        }
+
+        static void Check(LocalizedSuperText label, int lines, System.Collections.Generic.List<string> problems)
+        {
+            if (label == null || !label.isActiveAndEnabled) return;
+            var text = label.GetComponent<SuperTextMesh>();
+            if (string.IsNullOrEmpty(text.text)) return;
+            text.Rebuild();
+            // STM lists one height per line plus one for the last character (its own bookkeeping).
+            int drawn = text.lineHeights.Count - 1;
+            if (drawn > lines) problems.Add($"{label.name}: \"{text.text}\" takes {drawn} lines (room for {lines})");
+        }
+
+        [UnityTest]
+        public IEnumerator TheTavernHasNoStairs_AndTheGuestRoomsDoorLeadsBackDown()
         {
             yield return LoadTavern();
             Rigidbody2D keeper = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-            AreaPassage up = Tavern.GetComponentsInChildren<AreaPassage>().Single();
+            Assert.That(Tavern.transform.Find("Stairs"), Is.Null, "no staircase in the tavern");
+            Assert.That(Tavern.GetComponentsInChildren<AreaPassage>(), Is.Empty);
+            Assert.That(Tavern.Area.Fixtures, Is.Empty);
             AreaPassage down = Guest.GetComponentsInChildren<AreaPassage>().Single();
-            Assert.That(up.To, Is.SameAs(Guest.Area));
             Assert.That(down.To, Is.SameAs(Tavern.Area));
 
-            // Walked onto the stairs' foot: the screen fades, and the keeper is upstairs.
-            keeper.position = up.transform.position;
-            yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "the guest room");
-            yield return WaitUntil(() => !up.Busy, 3f, "the fade back in");
-            Assert.That(Vector2.Distance(keeper.position, Guest.Area.Arrival), Is.LessThan(0.6f));
-            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Guest.Area.CameraPoint));
-
-            // Decorating from upstairs decorates the guest room.
+            // Decorating the guest room and leaving keeps the keeper (and the camera) in the tavern.
             Mode.Enter();
+            yield return null;
+            Mode.SwitchArea();
             yield return null;
             Assert.That(Mode.Area, Is.SameAs(Guest));
             Mode.Leave();
-
-            down.Pass(keeper);
+            yield return null;
             Assert.That(PropertyArea.Current, Is.SameAs(Tavern.Area));
-            Assert.That(Vector2.Distance(keeper.position, Tavern.Area.Arrival), Is.LessThan(0.01f));
             Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
 
-            // The keeper walks only during service until the village milestone: the stairs work then, and the end of the
-            // evening brings them back down.
+            // If the keeper is ever upstairs, the door brings them down, and so does the end of the evening.
             Director.OpenDebugEvening();
             yield return null;
-            keeper.position = up.transform.position;
-            yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "upstairs mid-service");
-            yield return WaitUntil(() => !up.Busy, 3f, "the fade");
+            PropertyArea.Current = Guest.Area;
+            TavernView.Show(Guest.Area);
+            keeper.position = down.transform.position;
+            yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 3f, "down through the door");
+            yield return WaitUntil(() => !down.Busy, 3f, "the fade back in");
+            Assert.That(Vector2.Distance(keeper.position, Tavern.Area.Arrival), Is.LessThan(0.6f));
+            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
+            PropertyArea.Current = Guest.Area;
             Director.EndServiceNow();
             yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 5f, "back down when the evening ends");
-            Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Tavern.Area.CameraPoint));
         }
 
         [UnityTest]

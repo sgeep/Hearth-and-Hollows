@@ -895,16 +895,16 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 
 **Step 6, the guest room.**
 - A second area beside the tavern in the Tavern scene (18×13 cells, 16×8 of floor), cut from the Shop Indoor add-on's cream-walled premade room. It starts with a double bed, a nightstand with a candle, a chest, a rug and a picture.
-- The stairs (the Towns II stucco staircase) stand against the tavern's back wall between the bar and the sign; walking onto their foot fades up to the guest room; its door fades back down. The camera holds on whichever room you're in. Decorate Mode decorates the room you're in and switches rooms with G / left stick press, with one storage for the whole property.
+- Decorate Mode switches between the tavern and the guest room with G / left stick press, with one storage for the whole property; the camera holds on the room being decorated. (A staircase on the tavern's back wall led up to it at first; it was removed after your first look, see below.) The guest room's door still leads down to the tavern.
 - Its check is only its doorway (no service checks). Bedroom pieces work in the tavern and tavern pieces upstairs.
 
 **Also changed:**
 - Stools seat whoever sits at whichever table is beside them; every seat now picks an approach that can be walked to (a chair facing down in a row is stepped onto from behind), the same way in the check and in the room.
 - Surface items on a table sort just in front of it. Tables have surface anchors (candles, tankards, small plants, bottles, books, jack-o'-lanterns).
-- The room's fixed parts (the stairs' flight) block the check's walkable grid like furniture.
+- A room's fixed parts (none now that the stairs are gone) block the check's walkable grid like furniture.
 - Direction input keeps taps that start and end within one frame (the web build lost them in menus).
 - **Save version 6:** each piece's colourway and palette, each area's floor and wall, finishes owned, the tier announced. A version 5 save (your Checkpoint A playtest) loads as it was, gains the guest room furnished, and hears about tiers it has already reached at its next Night.
-- The starting room changed only by the stairs (their art, solid flight, foot and the cells they keep clear); the baseline `TavernStarting.txt` was re-recorded and checked line by line.
+- The starting tavern is unchanged from Checkpoint A (`TavernStarting.txt` is the Checkpoint A baseline again).
 
 **Tests:** EditMode 504/504 (new `CatalogueTests`: the generated catalogue and stable ids, every drawing per facing and colourway, the collections across four tiers, buying, uniques, selling, finishes, tier announcements, palette parsing and the remap, the baked recolour cache, finishes' patterns, property-wide storage, granting the guest room to an old save, the guest room's check, fixtures, stools, surface sorting, version 6 and the v5 migration). PlayMode 178/178 plus 7 explicit captures (new `CheckpointBTests`: buying onto the cursor, storing and selling; a tier opening with Renown; recolouring and undo; the colour panel and matching every copy; the panels and a one-frame tap from the keyboard; a floor finish and putting it back; decorating the guest room; the stairs and the door, also mid-service; a service in a tavern refurnished as a dwarven hall; and in `DayLoopTests` a tier announced once with both rooms' looks surviving Continue).
 
@@ -914,16 +914,22 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 
 **Deviations from the plan:**
 - The guest room's shell is Shop Indoor's cream-walled room, not the Towns II plank interior: the plank tileset is a dark modular exterior-style set; the shop room matches the tavern's cell geometry (so the same cutting works) and reads as a warm inn room. It's 18×13 cells rather than about 12×9, which looked lost on screen.
-- The stairs work during service: until the village milestone the keeper walks only during service (the daytime, Prep and Night are panels), so blocking them then would have made them unreachable. Customers keep waiting while you're upstairs, and the evening's end brings you back down.
+- There's no way up to the guest room on foot yet: the staircase was removed at your request, so the guest room is decorated from Decorate Mode only. A real way up belongs with the Inn.
 - The old storage panel became the catalogue's first page.
 - The Animated UI Book wasn't used: the parchment panel keeps the list and details readable at 320×180.
 - The catalogue's hand-coded pieces (the stations, the 4e tables, chairs, barrels and back-wall pieces) stay in `FurnitureContent` because of their use points, posts and overlays; their prices, themes, descriptions and palette channels are set there too.
 
 **Known issues (Checkpoint B):**
-- A few wall pieces drawn over the stairs' top (x 9–12 of the back wall) are partly hidden by the staircase art.
+- Not driven in the web check after the follow-up fixes (the stairs removed, the row width, the spellings): the build was rebuilt and the suites pass.
 - The castle rugs' centring under 2×2 tables is half a tile off in the review capture (placement, not the art).
 - The wooden lantern and paper-lantern stands are large; judge them in the room.
 - The haunted den capture has one seat whose approach can't be reached (a warning, as designed).
+
+**First look (2026-10-05):** three fixes.
+- The staircase on the tavern's back wall is gone (its art, solid flight, foot, fixture and reserved cells, and the imported stucco sheet). The guest room is reached from Decorate Mode (G / left stick press).
+- "not for sale" wrapped onto the next row in the catalogue's list: the price column is wider (72), and two starting descriptions that ran to five lines (the stool, the bar) are shorter. A new test (`EveryCatalogueText_FitsItsLines`) opens every page, selects every entry, and fails on any row or detail line that wraps past its room or a name that runs into its price.
+- Player-facing "colours" is now "colors" (the controls line, the panel title, "use last colors", and two descriptions).
+- Tests: EditMode 504/504, PlayMode 179 passed plus 7 explicit captures. Web build rebuilt.
 
 **Checkpoint B is waiting for your playtest.**
 

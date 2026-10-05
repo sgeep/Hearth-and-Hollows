@@ -334,11 +334,7 @@ namespace Hearthdelve.Editor
             PropertyArea area = tavern.GetComponent<PropertyArea>() ?? tavern.gameObject.AddComponent<PropertyArea>();
             // The floor inside the half-tile side walls, from the front wall's top to the back wall's foot; the back wall's
             // band above it; the doorway and the tile inside it kept clear.
-            // The stairs up to the guest room (4f step 6) are kept clear too.
             var reserved = new List<Vector2Int> { new(DoorColumn, (int)FloorBottom), new(DoorColumn, (int)FloorBottom + 1) };
-            for (int x = GuestRoomBuilder.TavernStairs.xMin; x < GuestRoomBuilder.TavernStairs.xMax; x++)
-            for (int y = GuestRoomBuilder.TavernStairs.yMin; y < GuestRoomBuilder.TavernStairs.yMax; y++)
-                reserved.Add(new Vector2Int(x, y));
             area.Configure(AreaId, Hearthdelve.Shared.Customization.AreaKind.Tavern, Vector2.zero, new RectInt(0, 0, Width, Height),
                 new RectInt(1, (int)FloorBottom, Width - 2, (int)(FloorTop - FloorBottom)), new RectInt(1, (int)FloorTop, Width - 2, Height - (int)FloorTop),
                 reserved.ToArray());

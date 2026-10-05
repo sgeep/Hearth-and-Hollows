@@ -314,12 +314,6 @@ namespace Hearthdelve.Editor
             foreach (string layer in new[] { "basebuilding", "wall", "floor" })
                 sheets.Add(new Sheet { Source = $"{k_Shop}/ShopIndoor_{layer}.png", Pack = ShopIndoor, File = $"ShopIndoor_{layer}", Mode = SliceMode.Rects, Rects = ShopCells(layer), Readable = layer == "wall" });
             sheets.Add(new Sheet { Source = k_CastleIndoor, Pack = CastlesAndStrongholds, File = "CastleIndoorTileset", Mode = SliceMode.Rects, Rects = k_CastleFloorCells });
-            // The stairs up to the guest room (4f step 6): the Towns II stucco interior's staircase, rising to the left.
-            sheets.Add(new Sheet
-            {
-                Source = "Minifantasy_Towns2_v1.5/Minifantasy_Towns2_Assets/Buildings/Stucco_Building/Indoor/Minifantasy_TownsIIStuccoBuildingIndoorTileset.png",
-                Pack = TownsII, File = "StuccoIndoorTileset", Mode = SliceMode.Rects, Rects = new[] { new SheetRect("StairsUpLeft", 88, 99, 26, 21, k_BottomLeft) },
-            });
             sheets.Add(Tavern("shadows", new[] { new SheetRect("Shadows", 224, 8, 88, 88, k_BottomLeft) }));
             sheets.Add(Tavern("props", new[]
             {

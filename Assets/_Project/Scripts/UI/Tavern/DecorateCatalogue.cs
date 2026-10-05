@@ -78,6 +78,20 @@ namespace Hearthdelve.UI.Tavern
         public string TabText => Text(m_Tab);
         public string MessageText => Text(m_Message);
         public IReadOnlyList<CatalogueRow> Rows => m_Rows;
+        public int TabCount => m_Tabs.Count;
+
+        /// <summary>The details' texts and how many lines each has room for (checked by the tests).</summary>
+        public IEnumerable<(LocalizedSuperText text, int lines)> DetailTexts
+        {
+            get
+            {
+                yield return (m_PieceName, 1);
+                yield return (m_Description, 4);
+                yield return (m_Tier, 1);
+                yield return (m_Counts, 1);
+                yield return (m_Source, 1);
+            }
+        }
         public FurnitureDefinition SelectedPiece => CurrentPage != Page.Room && m_Selected < m_Pieces.Count ? m_Pieces[m_Selected] : null;
         public FinishDefinition SelectedFinish => CurrentPage == Page.Room && m_Selected < m_Finishes.Count ? m_Finishes[m_Selected] : null;
 

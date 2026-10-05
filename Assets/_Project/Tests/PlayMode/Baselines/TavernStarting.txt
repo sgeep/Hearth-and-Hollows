@@ -3,7 +3,6 @@ collider|BoxCollider2D|0.0000,0.0000..28.0000,2.0000|trigger False|layer Obstacl
 collider|BoxCollider2D|0.0000,14.0000..28.0000,17.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|1.5000,11.0000..2.1250,13.7500|trigger False|layer Obstacles
 collider|BoxCollider2D|10.3750,7.2500..11.1250,8.2500|trigger False|layer Obstacles
-collider|BoxCollider2D|11.2500,12.0000..12.2500,12.7000|trigger True|layer Default
 collider|BoxCollider2D|16.8750,4.2500..17.6250,5.2500|trigger False|layer Obstacles
 collider|BoxCollider2D|17.7500,4.0000..19.2500,5.5000|trigger False|layer Obstacles
 collider|BoxCollider2D|19.1250,12.0000..20.5000,15.1250|trigger False|layer Obstacles
@@ -21,7 +20,6 @@ collider|BoxCollider2D|3.7500,7.0000..5.2500,8.5000|trigger False|layer Obstacle
 collider|BoxCollider2D|5.3750,7.2500..6.1250,8.2500|trigger False|layer Obstacles
 collider|BoxCollider2D|7.8750,7.2500..8.6250,8.2500|trigger False|layer Obstacles
 collider|BoxCollider2D|8.7500,7.0000..10.2500,8.5000|trigger False|layer Obstacles
-collider|BoxCollider2D|9.0000,12.0000..11.2500,14.0000|trigger False|layer Obstacles
 grid|00|############################
 grid|01|############################
 grid|02|#..........................#
@@ -34,8 +32,8 @@ grid|08|#.##########.......#########
 grid|09|#..................#####.###
 grid|10|#..........................#
 grid|11|#########...............##.#
-grid|12|############.......####.##.#
-grid|13|###......###.......##......#
+grid|12|#########..........####.##.#
+grid|13|###................##......#
 grid|14|############################
 grid|15|############################
 grid|16|############################
@@ -90,7 +88,6 @@ sprite|Props_Barrel|25.2500,8.0000|rot 0.0000|scale 1.0000,1.0000|flip False,Fal
 sprite|Props_Barrel|26.2500,8.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Props_Barrel|26.2500,9.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Props_Cauldron|24.7500,11.5000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/1|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|group Characters/0@24.7500,11.5000
-sprite|StuccoIndoorTileset_StairsUpLeft|9.0000,12.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props2_BarTop|1.7500,12.1250|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/1|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|group Characters/0@1.5000,11.0000
 sprite|TavernIndoor_props2_Glasses|24.7500,15.5000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/4|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props2_ShelfGoods|2.7500,14.1250|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/4|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
