@@ -1,4 +1,4 @@
-Hearth & Hollows is a small top-down fantasy life sim/tavern management/action roguelite game I'm building mostly through vibe coding with Claude.
+Hearth & Hollows is a top-down fantasy life sim/tavern management/action roguelite game I'm building mostly through vibe coding with Claude.
 
 Idea is inspired by Stardew Valley, Dave the Diver, and Delicious in Dungeon: run a tavern, spend your days around a small fantasy village, interact with its residents, then open the tavern in the evening. At night, delve into the Hollows for rare ingredients, treasure, and strange things to bring home.
 
