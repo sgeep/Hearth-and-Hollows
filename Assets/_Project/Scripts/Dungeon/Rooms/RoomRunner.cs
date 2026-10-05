@@ -191,7 +191,7 @@ namespace Hearthdelve.Dungeon.Rooms
         void OnCleared()
         {
             GrantReward(Node.Reward);
-            LightCampfire();
+            if (Node.Next.Any(id => Floor.Node(id).Kind == RoomKind.Arena)) LightCampfire(m_Settings != null ? m_Settings.tuning.campfire : null, CampfirePoint());
             OpenUsedExits(instant: false);
             Current.SetRevealed(true);
             m_ClearFeedback?.PlayFeedbacks(Player != null ? Player.transform.position : Vector3.zero);
@@ -253,12 +253,17 @@ namespace Hearthdelve.Dungeon.Rooms
             }
         }
 
-        /// <summary>The room before the boss's arena gets a campfire once it's clear, apart from the room's reward (4e playtest).</summary>
-        void LightCampfire()
+        /// <summary>Lights a campfire (4e playtest): before the boss's arena once that room is clear, and by each floor's hole down.</summary>
+        void LightCampfire(CampfireSettings settings, Vector2 at)
         {
-            CampfireSettings settings = m_Settings != null ? m_Settings.tuning.campfire : null;
-            if (settings == null || !settings.enabled || m_Settings.campfire == null || Current == null) return;
-            if (!Node.Next.Any(id => Floor.Node(id).Kind == RoomKind.Arena)) return;
+            if (settings == null || !settings.enabled || m_Settings == null || m_Settings.campfire == null || Current == null) return;
+            Campfire fire = Instantiate(m_Settings.campfire, at, Quaternion.identity, Current.transform);
+            fire.Setup(settings);
+        }
+
+        /// <summary>A ground spawn near the room's middle but apart from its reward.</summary>
+        Vector2 CampfirePoint()
+        {
             Vector2 reward = RewardPoint();
             Vector2 middle = (Vector2)Current.transform.position + (Vector2)Current.Size / 2f;
             Transform best = null;
@@ -267,9 +272,7 @@ namespace Hearthdelve.Dungeon.Rooms
                 if (point == null || Vector2.Distance(point.position, reward) < 3f) continue;
                 if (best == null || Vector2.Distance(point.position, middle) < Vector2.Distance(best.position, middle)) best = point;
             }
-            Vector2 at = best != null ? (Vector2)best.position : reward + new Vector2(3f, 0f);
-            Campfire fire = Instantiate(m_Settings.campfire, at, Quaternion.identity, Current.transform);
-            fire.Setup(settings);
+            return best != null ? (Vector2)best.position : reward + new Vector2(3f, 0f);
         }
 
         /// <summary>The ground spawn point nearest the room's middle (spawn points are always reachable floor).</summary>
@@ -324,6 +327,9 @@ namespace Hearthdelve.Dungeon.Rooms
             // Arrive with the used gates up; they drop as the fight starts (after the fade).
             OpenUsedExits(instant: true);
             if (m_Encounter.IsCleared) Current.SetRevealed(true);
+            // The hole down: a campfire by it for the delver going deeper (4e playtest). Beside the arrival, clear of the hole.
+            if (Node.Kind == RoomKind.Descent && m_Settings != null)
+                LightCampfire(m_Settings.tuning.floorCampfire, (Vector2)Current.Arrival.position + new Vector2(3.5f, 3f));
         }
 
         bool CanLeave => !m_Transitioning && (DelveRunController.Active == null || !DelveRunController.Active.IsEnding);

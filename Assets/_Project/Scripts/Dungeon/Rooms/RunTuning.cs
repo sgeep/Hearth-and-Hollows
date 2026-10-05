@@ -86,6 +86,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public Hearthdelve.Dungeon.Bosses.BossDefinition boss;
         [Tooltip("The campfire lit in the room before the boss's arena (4e playtest).")]
         public CampfireSettings campfire = new();
+        [Tooltip("A smaller campfire by each floor's hole down, for delvers going deeper (4e playtest).")]
+        public CampfireSettings floorCampfire = new() { restoreFraction = 0.25f, restoreSeconds = 1.5f };
 
         public const int Floors = 3;
 

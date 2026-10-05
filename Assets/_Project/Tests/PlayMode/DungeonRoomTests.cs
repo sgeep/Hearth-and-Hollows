@@ -282,6 +282,28 @@ namespace Hearthdelve.Tests.PlayMode
             essence.SetEncounterDrain(1f);
         }
 
+        /// <summary>4e playtest: the room with the hole down has a smaller campfire, giving back a quarter of the delver's Essence.</summary>
+        [UnityTest]
+        public IEnumerator TheHoleDown_HasASmallerCampfire_ThatGivesBackAQuarter()
+        {
+            yield return LoadRun();
+            yield return WalkTo(RoomKind.Descent);
+            Campfire fire = Object.FindAnyObjectByType<Campfire>();
+            Assert.That(fire, Is.Not.Null, "a campfire by the hole");
+            Assert.That(fire.transform.IsChildOf(Room.transform));
+            Assert.That(Vector2.Distance(fire.transform.position, Room.Descent.transform.position), Is.GreaterThan(3f), "clear of the hole");
+
+            var essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            essence.SetEncounterDrain(0f);
+            essence.SetHealth(essence.MaximumHealth * 0.2f);
+            float before = essence.CurrentHealth;
+            Teleport(Player, (Vector2)fire.transform.position + new Vector2(0f, -1.2f));
+            yield return WaitUntil(() => fire.IsSpent, 4f, "the fire to give all it has");
+            Assert.That(essence.CurrentHealth - before, Is.EqualTo(essence.MaximumHealth * 0.25f).Within(1.5f), "a quarter back");
+            essence.SetEncounterDrain(1f);
+        }
+
         /// <summary>Goes on through fights, preferring one whose reward is the given kind, until standing in such a room.</summary>
         IEnumerator WalkToReward(RewardKind kind)
         {
