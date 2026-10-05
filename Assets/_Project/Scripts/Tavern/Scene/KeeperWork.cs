@@ -57,13 +57,17 @@ namespace Hearthdelve.Tavern.Scene
         CookedIngredients m_DelveMealUsed;
         public Ticket CarryTicket { get; private set; }
 
+        bool m_Started;
+
+        /// <summary>The stations, the pass and the seats of the placed furniture (4f: set whenever the layout is built).</summary>
         public void Configure(TavernInteractable grill, TavernInteractable tap, TavernInteractable stewPot, TavernInteractable pass, TavernInteractable[] seats)
         {
             m_Grill = grill;
             m_Tap = tap;
             m_StewPot = stewPot;
             m_Pass = pass;
-            m_Seats = seats;
+            m_Seats = seats ?? System.Array.Empty<TavernInteractable>();
+            if (m_Started) HookDescriptions();
         }
 
         void Awake() => Instance = this;
@@ -83,6 +87,12 @@ namespace Hearthdelve.Tavern.Scene
             m_Action = InputMaps.Find(InputMaps.Minigame, MinigameActions.Action);
             m_Cancel = InputMaps.Find(InputMaps.Minigame, MinigameActions.Cancel);
             m_Point = InputMaps.Find(InputMaps.Minigame, MinigameActions.Point);
+            m_Started = true;
+            HookDescriptions();
+        }
+
+        void HookDescriptions()
+        {
             if (m_Grill != null) m_Grill.Describe = () => DescribeCook(m_Grill, CookStation.Grill, StaffStation.Grill);
             if (m_Tap != null) m_Tap.Describe = () => DescribeCook(m_Tap, CookStation.Tap, StaffStation.Tap);
             if (m_StewPot != null) m_StewPot.Describe = DescribeStewPot;

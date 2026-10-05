@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Recipes;
@@ -100,7 +101,7 @@ namespace Hearthdelve.Shared.Game
 
     /// <summary>
     /// Everything that persists between days (and goes in the save): the day and phase, gold,
-    /// renown, the storeroom, upgrade levels, and a delve meal not yet used. Pure data;
+    /// renown, the storeroom, upgrade levels, a delve meal not yet used, bosses defeated, and furniture. Pure data;
     /// <see cref="DayRules"/> changes it.
     /// </summary>
     public sealed class GameState
@@ -116,6 +117,8 @@ namespace Hearthdelve.Shared.Game
         public int Gold { get; internal set; }
         public int Renown { get; internal set; }
         public Storeroom Storeroom { get; } = new();
+        /// <summary>Owned furniture and each area's layout (4f).</summary>
+        public FurnitureState Furniture { get; } = new();
         public IReadOnlyDictionary<string, int> UpgradeLevels => m_UpgradeLevels;
         public MealBuff Meal { get; internal set; }
         public DaySummary Today { get; } = new();

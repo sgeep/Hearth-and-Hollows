@@ -13,6 +13,9 @@ namespace Hearthdelve.Shared.Animation
         SpriteRenderer m_Renderer;
         float m_Time;
 
+        public System.Collections.Generic.IReadOnlyList<Sprite> Frames => m_Frames;
+        public float FrameDuration => m_FrameDuration;
+
         public void Configure(Sprite[] frames, float frameDuration)
         {
             m_Frames = frames;

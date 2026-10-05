@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_wall_fireplace
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: wall_fireplace
+  nameKey: furniture.wall_fireplace
+  category: 3
+  layer: 2
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 0
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 0
+  unique: 0
+  catalogTier: 0
+  sources: 1
+  facings:
+  - turns: 0
+    size: {x: 3, y: 3}
+    art:
+    - name: Fire
+      sprite: {fileID: 0}
+      frames:
+      - {fileID: 1985844615, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: -444095102, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: -1326694374, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: 1935336012, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: 1939836630, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: 508830357, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: 634231509, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      - {fileID: 2016437792, guid: 2090c6494cd73334ea4c8da6c3480236, type: 3}
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 1.5, y: 0}
+      sortingLayer: Ground
+      order: 3
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies: []
+    seats: []
+    interactPoint: {x: 0, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights:
+    - position: {x: 1.5, y: 0.5}
+      color: {r: 1, g: 0.66, b: 0.36, a: 1}
+      intensity: 0.9
+      innerRadius: 1.4
+      outerRadius: 7
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

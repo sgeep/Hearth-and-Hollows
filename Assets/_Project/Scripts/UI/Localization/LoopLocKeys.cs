@@ -42,7 +42,6 @@ namespace Hearthdelve.UI.Localization
 
         public const string UpgradeSatchel = "upgrade.effect_satchel";
         public const string UpgradeEssence = "upgrade.effect_essence";
-        public const string UpgradeSeats = "upgrade.effect_seats";
 
         public const string SummaryTitle = "summary.title";
         public const string SummaryDelve = "summary.delve";
@@ -124,7 +123,6 @@ namespace Hearthdelve.UI.Localization
 
             (UpgradeSatchel, "+{0} satchel slot"),
             (UpgradeEssence, "+{0} max Essence"),
-            (UpgradeSeats, "+{0} seat"),
 
             (SummaryTitle, "today"),
             (SummaryDelve, "delve"),

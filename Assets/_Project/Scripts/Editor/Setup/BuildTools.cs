@@ -90,6 +90,7 @@ namespace Hearthdelve.Editor
             {
                 // The fixed one-screen view, with the Grill highlighted as when the player is in reach.
                 EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                BuildTavernFurniture();
                 foreach (var station in UnityEngine.Object.FindObjectsByType<Hearthdelve.Tavern.Scene.TavernInteractable>())
                     if (station.Kind == Hearthdelve.Tavern.Scene.TavernInteractableKind.Grill) station.SetHighlighted(true);
                 Capture(EditorPaths.TavernScene, "BatchLogs/tavern.png", TavernBuilder.CameraCentre, reopen: false);
@@ -111,6 +112,7 @@ namespace Hearthdelve.Editor
             try
             {
                 EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                BuildTavernFurniture();
                 var layout = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.Tavern.Scene.TavernLayout>();
                 var content = AssetDatabase.LoadAssetAtPath<Hearthdelve.Tavern.Scene.TavernContent>(EditorPaths.Data + "/Tavern/TavernContent.asset");
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(NpcContent.CustomerPrefab);
@@ -147,6 +149,7 @@ namespace Hearthdelve.Editor
             try
             {
                 EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Single);
+                BuildTavernFurniture();
                 var content = AssetDatabase.LoadAssetAtPath<Hearthdelve.Tavern.Scene.TavernContent>(EditorPaths.Data + "/Tavern/TavernContent.asset");
                 var panel = UnityEngine.Object.FindAnyObjectByType<Hearthdelve.UI.Tavern.StationPanel>(FindObjectsInactive.Include);
                 var canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include).First(c => c.name == "UI");
@@ -382,6 +385,16 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>Renders the scene's camera to a PNG: at the spawn point by default, or over a given area at 8 px per tile.</summary>
+        /// <summary>
+        /// The furniture is data since 4f step 1, built as the scene plays; captures run in the editor, so they build it
+        /// here from the starting layout (the scene isn't saved afterwards).
+        /// </summary>
+        static void BuildTavernFurniture()
+        {
+            foreach (var area in UnityEngine.Object.FindObjectsByType<Hearthdelve.Tavern.Scene.AreaFurniture>(FindObjectsInactive.Include))
+                area.Build(area.CurrentLayout());
+        }
+
         static void Capture(string scenePath, string output, Vector2? centre = null, int width = 0, int height = 0, bool reopen = true)
         {
             if (reopen) EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);

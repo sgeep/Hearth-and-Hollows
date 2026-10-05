@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f41ef7a149c2d445bf52e6aca825f62, type: 3}
+  m_Name: FurnitureStartingLayout
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureStartingLayout
+  areas:
+  - area: tavern
+    pieces:
+    - uid: 1
+      definition: tavern_bar
+      cell: {x: 1, y: 11}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 2
+      definition: kitchen_range
+      cell: {x: 19, y: 12}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 3
+      definition: stew_pot
+      cell: {x: 24, y: 11}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 4
+      definition: pass_table
+      cell: {x: 20, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 5
+      definition: table_round_a
+      cell: {x: 4, y: 7}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 6
+      definition: tavern_chair
+      cell: {x: 3, y: 7}
+      turns: 1
+      flipped: 0
+      nudge: {x: -2, y: 2}
+      host: -1
+    - uid: 7
+      definition: tavern_chair
+      cell: {x: 5, y: 7}
+      turns: 3
+      flipped: 0
+      nudge: {x: 2, y: 2}
+      host: -1
+    - uid: 8
+      definition: table_round_b
+      cell: {x: 9, y: 7}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 9
+      definition: tavern_chair
+      cell: {x: 8, y: 7}
+      turns: 1
+      flipped: 0
+      nudge: {x: -2, y: 2}
+      host: -1
+    - uid: 10
+      definition: tavern_chair
+      cell: {x: 10, y: 7}
+      turns: 3
+      flipped: 0
+      nudge: {x: 2, y: 2}
+      host: -1
+    - uid: 11
+      definition: table_round_a
+      cell: {x: 18, y: 4}
+      turns: 0
+      flipped: 0
+      nudge: {x: -4, y: 0}
+      host: -1
+    - uid: 12
+      definition: tavern_chair
+      cell: {x: 16, y: 4}
+      turns: 1
+      flipped: 0
+      nudge: {x: 2, y: 2}
+      host: -1
+    - uid: 13
+      definition: tavern_chair
+      cell: {x: 19, y: 4}
+      turns: 3
+      flipped: 0
+      nudge: {x: -2, y: 2}
+      host: -1
+    - uid: 14
+      definition: cellar_barrel
+      cell: {x: 26, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: -2, y: 0}
+      host: -1
+    - uid: 15
+      definition: cellar_barrel
+      cell: {x: 26, y: 9}
+      turns: 0
+      flipped: 0
+      nudge: {x: -2, y: 0}
+      host: -1
+    - uid: 16
+      definition: cellar_barrel
+      cell: {x: 25, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: -2, y: 0}
+      host: -1
+    - uid: 17
+      definition: bottle_shelves
+      cell: {x: 2, y: 14}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 18
+      definition: wall_sign
+      cell: {x: 11, y: 15}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 19
+      definition: wall_fireplace
+      cell: {x: 14, y: 14}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 20
+      definition: low_shelf
+      cell: {x: 24, y: 14}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+    - uid: 21
+      definition: shelf_glasses
+      cell: {x: 24, y: 15}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+  storage: []

@@ -17,8 +17,6 @@ namespace Hearthdelve.Tavern.Scene
         public List<RecipeDefinition> recipes = new();
         public List<CustomerProfile> customers = new();
         public List<StaffDefinition> staff = new();
-        [Min(1), Tooltip("Seats before any seat upgrades (the room holds more; extra stools appear as seats are bought).")]
-        public int baseSeats = 6;
         [Tooltip("What the debug 'fill storeroom' action stocks (Phase 1 ingredients).")]
         public List<IngredientDefinition> debugStockIngredients = new();
 

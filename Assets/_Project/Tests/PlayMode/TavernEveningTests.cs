@@ -55,7 +55,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(stew.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("chop, simmer"), "the stew's two steps");
             DishCard kebab = Prep.Cards[CardOf("cellar_kebab")];
             Assert.That(kebab.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("grill"));
-            Assert.That(kebab.detail.GetComponent<SuperTextMesh>().text, Is.EqualTo($"{Director.Content.recipes.First(r => r.id == "cellar_kebab").baseValue} Gold"), "the price");
+            Assert.That(kebab.detail.GetComponent<SuperTextMesh>().text, Is.EqualTo($"{Director.Content.recipes.First(r => r.id == "cellar_kebab").baseValue} gold"), "the price");
             Assert.That(kebab.amount.GetComponent<SuperTextMesh>().text, Does.EndWith(" to serve"), "how many");
             Assert.That(Prep.OpenButton.interactable, Is.False, "nothing chosen yet: the doors stay shut");
         }

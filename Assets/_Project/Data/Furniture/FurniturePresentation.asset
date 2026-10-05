@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a97337a5b6580e4ba23435efed1546d, type: 3}
+  m_Name: FurniturePresentation
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Scene.FurniturePresentation
+  litMaterial: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  overlayMaterial: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  cornerTopLeft: {fileID: -1416936925, guid: 5babcf3f16b6aed4d8462c10327dd758, type: 3}
+  cornerTopRight: {fileID: 103680895, guid: 5babcf3f16b6aed4d8462c10327dd758, type: 3}
+  cornerBottomLeft: {fileID: -209608156, guid: 5babcf3f16b6aed4d8462c10327dd758, type: 3}
+  cornerBottomRight: {fileID: -200601266, guid: 5babcf3f16b6aed4d8462c10327dd758, type: 3}
+  marker: {fileID: 507633014, guid: 5babcf3f16b6aed4d8462c10327dd758, type: 3}
+  highlightColor: {r: 1, g: 0.82, b: 0.3, a: 1}
+  seatHighlight:
+    serializedVersion: 2
+    x: -0.5
+    y: -0.1
+    width: 1
+    height: 1.85
+  pixel: {fileID: 3883298416164446047, guid: 03ed6f2f24915ca4497399fd6a2b0bbf, type: 3}

@@ -12,8 +12,7 @@ namespace Hearthdelve.Shared.Progression
         SatchelSlots,
         /// <summary>Extra max Essence on every delve.</summary>
         MaxEssence,
-        /// <summary>Extra seats in the tavern.</summary>
-        Seats,
+        // (Seats was retired in 4f, D16: seating comes from placed tables and chairs.)
     }
 
     [Serializable]

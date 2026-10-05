@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_tavern_bar
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: tavern_bar
+  nameKey: furniture.tavern_bar
+  category: 9
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 3
+  station: 2
+  useNameKey: station.tap
+  reach: 1
+  price: 0
+  unique: 0
+  catalogTier: 0
+  sources: 1
+  facings:
+  - turns: 0
+    size: {x: 8, y: 3}
+    art:
+    - name: Bar
+      sprite: {fileID: 1931677333, guid: e287e055a1533aa40a5a3e26e7e9c135, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+    - name: Taps
+      sprite: {fileID: 1936658009, guid: 5a88c2cc8eeb9f84cbae63c0f21a5b24, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.75, y: 1.125}
+      sortingLayer: Characters
+      order: 1
+    grouped: 1
+    groupPoint: {x: 0.5, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 1
+      y: 0
+      width: 6.875
+      height: 1.75
+    - serializedVersion: 2
+      x: 0.5
+      y: 0
+      width: 0.625
+      height: 2.75
+    seats: []
+    interactPoint: {x: 0.5, y: 0}
+    usePoints:
+    - {x: 1.6, y: -0.55}
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0.6
+      y: 1
+      width: 1.8
+      height: 1.75
+    surfaces: []
+    lights:
+    - position: {x: 4, y: 2}
+      color: {r: 1, g: 0.8, b: 0.55, a: 1}
+      intensity: 0.6
+      innerRadius: 1.2
+      outerRadius: 6
+      falloff: 0.6
+    slots: []
+    statusPoint: {x: 0, y: 0}

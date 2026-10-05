@@ -319,7 +319,7 @@ namespace Hearthdelve.Tests
         [Test]
         public void BuyingOutsideNight_Throws()
         {
-            var u = Upgrade("x", UpgradeKind.Seats, (1, 1));
+            var u = Upgrade("x", UpgradeKind.SatchelSlots, (1, 1));
             var state = new GameState();
             state.AddGold(10);
             Assert.Throws<InvalidOperationException>(() => DayRules.BuyUpgrade(state, u));
@@ -330,12 +330,10 @@ namespace Hearthdelve.Tests
         {
             var satchel = Upgrade("satchel_slots", UpgradeKind.SatchelSlots, (1, 1), (1, 1), (1, 1));
             var essence = Upgrade("max_essence", UpgradeKind.MaxEssence, (1, 20), (1, 25));
-            var seats = Upgrade("tavern_seats", UpgradeKind.Seats, (1, 1), (1, 1));
-            var levels = new Dictionary<string, int> { ["satchel_slots"] = 2, ["max_essence"] = 2, ["tavern_seats"] = 0 };
-            var e = Upgrades.Effects(new[] { satchel, essence, seats }, id => levels.TryGetValue(id, out int l) ? l : 0);
+            var levels = new Dictionary<string, int> { ["satchel_slots"] = 2, ["max_essence"] = 2 };
+            var e = Upgrades.Effects(new[] { satchel, essence }, id => levels.TryGetValue(id, out int l) ? l : 0);
             Assert.That(e.SatchelSlots, Is.EqualTo(2));
             Assert.That(e.MaxEssence, Is.EqualTo(45f));
-            Assert.That(e.Seats, Is.Zero);
         }
 
         // ---------- The delve meal ----------
@@ -421,7 +419,7 @@ namespace Hearthdelve.Tests
             Assert.That(gel.Item.Quality, Is.EqualTo(Quality.Poor));
             Assert.That(gel.Item.Prep, Is.EqualTo(PrepState.Chilled));
             Assert.That(gel.Freshness, Is.EqualTo(0.5f).Within(1e-5f));
-            Assert.That(json, Does.Contain("\"version\": 3"));
+            Assert.That(json, Does.Contain("\"version\": 4"));
             Assert.That(json, Does.Contain("\"rat_haunch\""), "content is saved by id");
         }
 
@@ -439,17 +437,17 @@ namespace Hearthdelve.Tests
             Assert.That(state.TimesDefeated("mother_slime"), Is.Zero);
 
             string json = SaveSystem.ToJson(SaveSystem.Capture(state));
-            Assert.That(json, Does.Contain("\"version\": 3"));
+            Assert.That(json, Does.Contain("\"version\": 4"));
             GameState loaded = SaveSystem.Restore(SaveSystem.FromJson(json), Lookup, KnownUpgrade);
             Assert.That(loaded.TimesDefeated("larder_troll"), Is.EqualTo(2));
         }
 
         [Test]
-        public void AVersion2Save_MigratesToVersion3_WithNoBossesYet()
+        public void AVersion2Save_MigratesToTheCurrentVersion_WithNoBossesYet()
         {
             const string v2 = "{\"version\":2,\"day\":5,\"phase\":\"Night\",\"gold\":140,\"renown\":3,\"storeroom\":[],\"upgrades\":[],\"meal\":{\"kind\":\"None\",\"amount\":0,\"recipe\":\"\"}}";
             SaveData data = SaveSystem.FromJson(v2);
-            Assert.That(data.version, Is.EqualTo(3));
+            Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
             Assert.That(data.bosses, Is.Empty);
             GameState state = SaveSystem.Restore(data, Lookup, KnownUpgrade);
             Assert.That((state.Day, state.Phase, state.Gold), Is.EqualTo((5, DayPhase.Night, 140)));

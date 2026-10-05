@@ -16,6 +16,8 @@ namespace Hearthdelve.Tavern.Scene
         float m_Time;
 
         public bool IsWorking { get; private set; }
+        public Sprite Idle => m_Idle;
+        public int WorkingFrameCount => m_Working.Length;
 
         public void Configure(SpriteRenderer renderer, Sprite idle, Sprite[] working)
         {

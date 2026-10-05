@@ -9,7 +9,6 @@ namespace Hearthdelve.Shared.Progression
     {
         public int SatchelSlots;
         public float MaxEssence;
-        public int Seats;
     }
 
     /// <summary>Buying upgrades and adding up their effects. Pure logic.</summary>
@@ -42,7 +41,6 @@ namespace Hearthdelve.Shared.Progression
                 {
                     case UpgradeKind.SatchelSlots: e.SatchelSlots += Mathf.RoundToInt(total); break;
                     case UpgradeKind.MaxEssence: e.MaxEssence += total; break;
-                    case UpgradeKind.Seats: e.Seats += Mathf.RoundToInt(total); break;
                 }
             }
             return e;

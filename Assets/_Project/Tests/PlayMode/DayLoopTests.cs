@@ -256,7 +256,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(night.IsShown);
             Assert.That(night.SavedNoteShown, "says it saved");
-            Assert.That(ShownText(night), Has.Some.EqualTo("banked today").And.Some.EqualTo($"{takings + 25} Gold"), "the takings and the run's Gold");
+            Assert.That(ShownText(night), Has.Some.EqualTo("banked today").And.Some.EqualTo($"{takings + 25} gold"), "the takings and the run's Gold");
             Assert.That(ShownText(night), Has.Some.EqualTo("made it out"));
             Flow.DebugAddGold(300);
             int satchelRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.SatchelSlots);
@@ -384,7 +384,7 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator EssenceAndSeatingUpgrades_ReachTheNextDaysScenes()
+        public IEnumerator EssenceUpgrade_AndTheStartingFurniture_ReachTheNextDaysScenes()
         {
             yield return NewGameToTheDelve();
             float baseMax = Player.GetComponent<EssenceHealth>().Essence.Max;
@@ -394,18 +394,17 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Flow.DebugAddGold(1000);
             int essenceRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.MaxEssence);
-            int seatsRow = night.Definitions.ToList().FindIndex(u => u.kind == UpgradeKind.Seats);
             night.Buy(essenceRow);
-            for (int i = 0; i < night.Definitions[seatsRow].levels.Count; i++) night.Buy(seatsRow);
-            Assert.That(Flow.State.UpgradeLevel(night.Definitions[seatsRow].id), Is.EqualTo(night.Definitions[seatsRow].levels.Count), "seating maxed");
+            Assert.That(night.Definitions.Any(u => u.id == Hearthdelve.Shared.Save.SaveSystem.RetiredSeatUpgrade), Is.False, "the seat upgrade is retired (D16)");
             night.SleepButton.onClick.Invoke();
             yield return InTavern(TavernPhase.Daytime, "the next daytime");
 
             float bonus = Flow.Loadout.MaxEssenceBonus;
             Assert.That(bonus, Is.GreaterThan(0f), "no delve meal today: the bonus is the upgrade's");
             yield return OpenForTheEvening();
-            Assert.That(Director.ActiveSeats, Is.EqualTo(Director.Layout.Seats.Count), "every seat in the room is open");
-            Assert.That(Director.Layout.Seats.Count(st => st.IsActive), Is.EqualTo(Director.ActiveSeats));
+            Assert.That(Flow.State.Furniture.Initialized, "a new game owns the starting furniture");
+            Assert.That(Director.ActiveSeats, Is.EqualTo(6), "the starting layout's six seats");
+            Assert.That(Director.ActiveSeats, Is.EqualTo(Director.Layout.Seats.Count), "every usable seat is open");
             Transform rail = Object.FindObjectsByType<Canvas>().First(c => c.name == "UI").transform.Find("TavernHud/Content");
             for (int i = 1; i <= Director.ActiveSeats; i++)
                 Assert.That(rail.Find($"Order{i}"), Is.Not.Null, $"a rail row for order {i}");
@@ -473,7 +472,7 @@ namespace Hearthdelve.Tests.PlayMode
             death.Confirm.onClick.Invoke();
             yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
             yield return null;
-            Assert.That(ShownText(result), Has.Some.EqualTo("30 Gold left in the dark"));
+            Assert.That(ShownText(result), Has.Some.EqualTo("30 gold left in the dark"));
             result.Proceed();
             yield return InTavern(TavernPhase.Night, "the night");
 

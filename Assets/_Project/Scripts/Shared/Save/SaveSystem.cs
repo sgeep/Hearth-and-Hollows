@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
@@ -16,7 +17,20 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 3;
+        public const int CurrentVersion = 4;
+
+        /// <summary>The seat upgrade retired in 4f (D16): seating comes from placed tables and chairs.</summary>
+        public const string RetiredSeatUpgrade = "tavern_seats";
+        /// <summary>What each of its levels cost when it was retired: migrated saves get it back.</summary>
+        static readonly int[] k_RetiredSeatUpgradeCosts = { 120, 220 };
+
+        /// <summary>The Gold refunded for <paramref name="levels"/> bought levels of the retired seat upgrade.</summary>
+        public static int SeatUpgradeRefund(int levels)
+        {
+            int gold = 0;
+            for (int i = 0; i < levels && i < k_RetiredSeatUpgradeCosts.Length; i++) gold += k_RetiredSeatUpgradeCosts[i];
+            return gold;
+        }
 
         public static SaveData Capture(GameState state)
         {
@@ -48,14 +62,36 @@ namespace Hearthdelve.Shared.Save
             foreach (var pair in state.BossClears)
                 data.bosses.Add(new BossClearData { id = pair.Key, clears = pair.Value });
             data.bosses.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
+
+            FurnitureState furniture = state.Furniture;
+            data.furniture = new FurnitureSaveData { initialized = furniture.Initialized, nextUid = furniture.NextUid };
+            foreach (var pair in furniture.Owned)
+                data.furniture.owned.Add(new OwnedPieceData { id = pair.Key, count = pair.Value });
+            data.furniture.owned.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
+            var areas = new List<string>(furniture.AreaIds);
+            areas.Sort(string.CompareOrdinal);
+            foreach (string area in areas)
+            {
+                var saved = new AreaSaveData { id = area };
+                foreach (PlacedFurniture p in furniture.Layout(area))
+                    saved.pieces.Add(new PieceData
+                    {
+                        uid = p.uid, def = p.definition, x = p.cell.x, y = p.cell.y, turns = p.turns, flip = p.flipped,
+                        nx = p.nudge.x, ny = p.nudge.y, host = p.host,
+                    });
+                data.furniture.areas.Add(saved);
+            }
             return data;
         }
 
         /// <param name="ingredientById">Resolves an ingredient id (null if unknown).</param>
         /// <param name="upgradeExists">Whether an upgrade id is still in the game.</param>
         /// <param name="warnings">Receives a line per dropped entry.</param>
+        /// <param name="furnitureExists">Whether a furniture id is still in the game (null: every id is kept).</param>
+        /// <param name="startingFurniture">Granted when the save has no furniture yet (migrated from version 3).</param>
         public static GameState Restore(SaveData data, Func<string, IngredientDefinition> ingredientById,
-            Func<string, bool> upgradeExists, List<string> warnings = null)
+            Func<string, bool> upgradeExists, List<string> warnings = null, Func<string, bool> furnitureExists = null,
+            FurnitureStartingLayout startingFurniture = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             // Saves from before the v0.5 day order name daytime "Morning".
@@ -98,11 +134,55 @@ namespace Hearthdelve.Shared.Save
 
             if (data.meal != null && Enum.TryParse(data.meal.kind, out MealBuffKind kind))
                 state.Meal = new MealBuff(kind, data.meal.amount, data.meal.recipe);
+
+            RestoreFurniture(state.Furniture, data.furniture, furnitureExists ?? (_ => true), startingFurniture, warnings);
             return state;
         }
 
+        static void RestoreFurniture(FurnitureState furniture, FurnitureSaveData data, Func<string, bool> exists,
+            FurnitureStartingLayout startingFurniture, List<string> warnings)
+        {
+            if (data == null || !data.initialized)
+            {
+                furniture.GrantStarter(startingFurniture);
+                return;
+            }
+            var owned = new List<(string, int)>();
+            foreach (OwnedPieceData o in data.owned)
+            {
+                if (o == null || !exists(o.id))
+                {
+                    warnings?.Add($"Dropped unknown furniture '{o?.id}'.");
+                    continue;
+                }
+                owned.Add((o.id, o.count));
+            }
+            var areas = new List<(string, List<PlacedFurniture>)>();
+            foreach (AreaSaveData a in data.areas)
+            {
+                if (a == null || string.IsNullOrEmpty(a.id)) continue;
+                var pieces = new List<PlacedFurniture>();
+                foreach (PieceData p in a.pieces)
+                {
+                    if (p == null || !exists(p.def))
+                    {
+                        warnings?.Add($"Dropped unknown placed furniture '{p?.def}' in {a.id}.");
+                        continue;
+                    }
+                    pieces.Add(new PlacedFurniture
+                    {
+                        uid = p.uid, definition = p.def, cell = new Vector2Int(p.x, p.y), turns = p.turns, flipped = p.flip,
+                        nudge = new Vector2Int(p.nx, p.ny), host = p.host,
+                    });
+                }
+                areas.Add((a.id, pieces));
+            }
+            furniture.Restore(owned, areas, data.nextUid);
+        }
+
         public static GameState Restore(SaveData data, GameDatabase database, List<string> warnings = null) =>
-            Restore(data, database.Ingredient, id => database.Upgrade(id) != null, warnings);
+            Restore(data, database.Ingredient, id => database.Upgrade(id) != null, warnings, id => database.Furniture(id) != null,
+                database.startingFurniture);
 
         public static string ToJson(SaveData data) => JsonUtility.ToJson(data, prettyPrint: true);
 
@@ -111,24 +191,39 @@ namespace Hearthdelve.Shared.Save
         {
             if (string.IsNullOrWhiteSpace(json)) throw new FormatException("The save file is empty.");
             int version = JsonUtility.FromJson<VersionProbe>(json).version;
-            switch (version)
+            if (version > CurrentVersion) throw new NotSupportedException($"The save is from a newer version ({version}) of the game.");
+            if (version < 1) throw new FormatException($"Unknown save version {version}.");
+            // One step per version, so an old save goes through every change since.
+            SaveData data = version == 1 ? MigrateV1(JsonUtility.FromJson<SaveDataV1>(json)) : JsonUtility.FromJson<SaveData>(json);
+            if (data.version == 2) data = MigrateV2(data);
+            if (data.version == 3) data = MigrateV3(data);
+            return data;
+        }
+
+        /// <summary>
+        /// v3 → v4 (4f): furniture arrives. The save holds none yet (<see cref="FurnitureSaveData.initialized"/> false), so
+        /// the starting furniture is granted as it loads. The retired seat upgrade (D16) is refunded: the Gold its levels
+        /// cost goes back to the purse and the upgrade is dropped.
+        /// </summary>
+        static SaveData MigrateV3(SaveData v3)
+        {
+            v3.version = 4;
+            v3.furniture = new FurnitureSaveData { initialized = false };
+            v3.upgrades ??= new List<UpgradeData>();
+            for (int i = v3.upgrades.Count - 1; i >= 0; i--)
             {
-                case CurrentVersion:
-                    return JsonUtility.FromJson<SaveData>(json);
-                case 2:
-                    return MigrateV2(JsonUtility.FromJson<SaveData>(json));
-                case 1:
-                    return MigrateV1(JsonUtility.FromJson<SaveDataV1>(json));
-                default:
-                    if (version > CurrentVersion) throw new NotSupportedException($"The save is from a newer version ({version}) of the game.");
-                    throw new FormatException($"Unknown save version {version}.");
+                UpgradeData u = v3.upgrades[i];
+                if (u == null || u.id != RetiredSeatUpgrade) continue;
+                v3.gold += SeatUpgradeRefund(u.level);
+                v3.upgrades.RemoveAt(i);
             }
+            return v3;
         }
 
         /// <summary>v2 → v3: the same, with no bosses defeated yet (4e).</summary>
         static SaveData MigrateV2(SaveData v2)
         {
-            v2.version = CurrentVersion;
+            v2.version = 3;
             v2.bosses ??= new List<BossClearData>();
             return v2;
         }
@@ -138,7 +233,7 @@ namespace Hearthdelve.Shared.Save
         {
             var data = new SaveData
             {
-                version = CurrentVersion,
+                version = 2,
                 day = v1.day,
                 phase = DayPhase.Daytime.ToString(),
                 gold = v1.gold,

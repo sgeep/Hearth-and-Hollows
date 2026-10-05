@@ -191,15 +191,15 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(pip.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer(Layers.Npcs)));
         }
 
+        /// <summary>4f (D16): seating is the placed chairs that face a table; the starting layout has three tables and six seats.</summary>
         [UnityTest]
-        public IEnumerator SeatsNotBoughtYet_PutTheirTableAway_AndTheGridFollows()
+        public IEnumerator Seating_IsThePlacedChairsFacingTables()
         {
             yield return Open();
-            GameObject table4 = GameObject.Find("Service").GetComponent<TavernLayout>().Seats[6].Furniture[0];
-            Assert.That(table4.activeSelf, Is.False, "the fourth table waits for the seat upgrade");
+            Assert.That(Director.Layout.Seats.Count, Is.EqualTo(6));
+            Assert.That(Director.ActiveSeats, Is.EqualTo(6));
             NavGrid grid = NavGrid.Current;
-            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(table4.transform.position + new Vector3(0f, 0.5f, 0f))), "its floor is walkable");
-            Assert.That(Director.Layout.Seats.Count(s => s.IsActive), Is.EqualTo(6));
+            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(new Vector2(23f, 4.5f))), "where 4e kept a fourth table for the seat upgrade, the floor is open");
         }
 
         [UnityTest]

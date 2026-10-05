@@ -64,6 +64,7 @@ namespace Hearthdelve.Tavern.Scene
         public ServiceSession Session { get; private set; }
         public IReadOnlyList<CustomerAgent> Agents => m_Agents;
         public IReadOnlyList<RecipeDefinition> Menu => m_Menu;
+        /// <summary>Seats open tonight: the placed furniture's usable seats (4f, D16).</summary>
         public int ActiveSeats { get; private set; }
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
         public StaffDefinition StaffMember => m_Content != null && m_Content.staff.Count > 0 ? m_Content.staff[0] : null;
@@ -107,10 +108,8 @@ namespace Hearthdelve.Tavern.Scene
             m_Flow = GameFlow.Instance != null && GameFlow.Instance.InGame ? GameFlow.Instance : null;
             Storeroom = m_Flow != null ? m_Flow.State.Storeroom : new Storeroom();
             Storeroom.Changed += OnStoreroomChanged;
-            // Seat upgrades bring out more of the room's tables.
-            int extraSeats = m_Flow != null && m_Flow.Database != null ? m_Flow.Database.Effects(m_Flow.State).Seats : 0;
-            ActiveSeats = Mathf.Clamp(m_Content.baseSeats + extraSeats, 1, Mathf.Max(1, m_Layout.SeatCount));
-            m_Layout.SetActiveSeats(ActiveSeats);
+            // 4f (D16): the seats are the placed furniture's usable seats (AreaFurniture builds them before this wakes).
+            ActiveSeats = m_Layout.SeatCount;
             m_EveningSeed = m_Seed != 0 ? m_Seed : Environment.TickCount;
             m_Random = new SeededRandom(m_EveningSeed);
             Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving,

@@ -129,6 +129,7 @@ namespace Hearthdelve.Shared.Game
         public void NewGame()
         {
             State = new GameState(1, DayPhase.Delve) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
+            State.Furniture.GrantStarter(m_Database != null ? m_Database.startingFurniture : null);
             Save();
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));

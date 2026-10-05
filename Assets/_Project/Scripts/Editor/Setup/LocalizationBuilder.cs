@@ -54,7 +54,6 @@ namespace Hearthdelve.Editor
             ("staff.pip", "Pip"),
             ("upgrade.satchel_slots", "bigger satchel"),
             ("upgrade.max_essence", "deeper reserves"),
-            ("upgrade.tavern_seats", "extra seating"),
         };
 
         [MenuItem("Hearthdelve/Setup/Localization Tables", priority = 30)]

@@ -224,7 +224,7 @@ namespace Hearthdelve.UI.Tavern
             }
         }
 
-        /// <summary>What the next level adds: "+1 satchel slot", "+20 max Essence", "+1 seat".</summary>
+        /// <summary>What the next level adds: "+1 satchel slot", "+20 max Essence".</summary>
         public static string Effect(TavernUpgradeDefinition upgrade, int level)
         {
             float amount = level < upgrade.MaxLevel ? upgrade.levels[level].amount : 0f;
@@ -232,8 +232,7 @@ namespace Hearthdelve.UI.Tavern
             return Loc.UI(upgrade.kind switch
             {
                 UpgradeKind.SatchelSlots => LoopLocKeys.UpgradeSatchel,
-                UpgradeKind.MaxEssence => LoopLocKeys.UpgradeEssence,
-                _ => LoopLocKeys.UpgradeSeats,
+                _ => LoopLocKeys.UpgradeEssence,
             }, rounded);
         }
     }

@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_table_round_b
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: table_round_b
+  nameKey: furniture.table_round_b
+  category: 1
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 2
+  station: 0
+  useNameKey: 
+  reach: 1
+  price: 40
+  unique: 0
+  catalogTier: 0
+  sources: 3
+  facings:
+  - turns: 0
+    size: {x: 1, y: 1}
+    art:
+    - name: Table
+      sprite: {fileID: 757945271, guid: e287e055a1533aa40a5a3e26e7e9c135, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0}
+      sortingLayer: Characters
+      order: 0
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: -0.25
+      y: 0
+      width: 1.5
+      height: 1.5
+    seats: []
+    interactPoint: {x: 0, y: 0}
+    usePoints: []
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

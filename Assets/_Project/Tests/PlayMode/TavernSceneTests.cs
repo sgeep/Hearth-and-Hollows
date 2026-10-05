@@ -42,7 +42,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return LoadServing();
             var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat).ToList();
             Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.Pass }));
-            Assert.That(GameObject.Find("Seats").transform.childCount, Is.EqualTo(8), "4 tables of 2 seats");
+            Assert.That(TavernDirector.Instance.Layout.Seats.Count, Is.EqualTo(6), "3 tables of 2 seats (the starting layout)");
             Assert.That(NavGrid.Current, Is.Not.Null);
             Assert.That(NavGrid.Current.Bounds, Is.EqualTo(new RectInt(0, 0, 28, 17)));
             foreach (SpriteRenderer sprite in Object.FindObjectsByType<SpriteRenderer>().Where(r => r.gameObject.layer != LayerMask.NameToLayer("UI")))
@@ -83,7 +83,9 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Furniture_StopsThePlayerInFront_AndDrawsBehindThem()
         {
             yield return LoadServing();
-            string[] pieces = { "Bar", "Kitchen", "Cauldron", "Pass", "Table1", "Table3", "Chair1W", "Chair3E" };
+            // Placed pieces are named after their definition and uid (4f step 1: the starting layout's bar, kitchen, stew pot,
+            // pass, first and third tables, the first table's west chair and the third table's east chair).
+            string[] pieces = { "tavern_bar#1", "kitchen_range#2", "stew_pot#3", "pass_table#4", "table_round_a#5", "table_round_a#11", "tavern_chair#6", "tavern_chair#13" };
             foreach (string name in pieces)
             {
                 GameObject piece = GameObject.Find(name);
@@ -100,7 +102,7 @@ namespace Hearthdelve.Tests.PlayMode
                     float feet = Player.transform.position.y;
                     Assert.That(feet, Is.LessThan(footprint.bounds.min.y), $"{name} blocks the player");
                     Assert.That(feet, Is.GreaterThan(footprint.bounds.min.y - 0.6f), $"the player walked right up to {name}");
-                    Transform sortRoot = piece.GetComponentInParent<SortingGroup>()?.transform ?? piece.transform;
+                    Transform sortRoot = piece.GetComponentInChildren<SortingGroup>()?.transform ?? piece.GetComponentInChildren<SpriteRenderer>().transform;
                     Assert.That(feet, Is.LessThan(sortRoot.position.y), $"the player sorts in front of {name}");
                 }
             }
@@ -161,7 +163,7 @@ namespace Hearthdelve.Tests.PlayMode
             }
 
             TavernInteractable grill = Station(TavernInteractableKind.Grill);
-            Bounds oven = GameObject.Find("Kitchen").GetComponents<Collider2D>().OrderByDescending(c => c.bounds.min.y).First().bounds;
+            Bounds oven = GameObject.Find("kitchen_range#2").GetComponents<Collider2D>().OrderByDescending(c => c.bounds.min.y).First().bounds;
             // Walk up to the oven, left of the range.
             Teleport(Player, new Vector2(oven.center.x, oven.min.y - 1.2f));
             yield return new WaitForFixedUpdate();
@@ -181,7 +183,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return LoadServing();
             NavGrid grid = NavGrid.Current;
-            GameObject table = GameObject.Find("Table1");
+            GameObject table = GameObject.Find("table_round_a#5");
             GridCell under = grid.Space.ToCell(table.GetComponent<Collider2D>().bounds.center);
             Assert.That(grid.Map.IsWalkable(under), Is.False, "the table blocks its cell");
             int version = grid.Version;

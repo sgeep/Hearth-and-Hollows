@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Progression;
@@ -17,6 +18,10 @@ namespace Hearthdelve.Shared.Game
         [Tooltip("Bought at Night, in display order.")]
         public List<TavernUpgradeDefinition> upgrades = new();
         public FreshnessConfig freshness;
+        [Tooltip("Every furniture piece saves and layouts may name (4f).")]
+        public List<FurnitureDefinition> furniture = new();
+        [Tooltip("What a new game's property starts with; also granted to saves from before furniture.")]
+        public FurnitureStartingLayout startingFurniture;
 
         [Header("New game")]
         [Min(0)] public int newGameGold;
@@ -37,6 +42,20 @@ namespace Hearthdelve.Shared.Game
         {
             foreach (var u in upgrades) if (u != null && u.id == id) return u;
             return null;
+        }
+
+        Dictionary<string, FurnitureDefinition> m_FurnitureById;
+
+        public FurnitureDefinition Furniture(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            if (m_FurnitureById == null || m_FurnitureById.Count != furniture.Count)
+            {
+                m_FurnitureById = new Dictionary<string, FurnitureDefinition>();
+                foreach (var f in furniture)
+                    if (f != null && !string.IsNullOrEmpty(f.id)) m_FurnitureById[f.id] = f;
+            }
+            return m_FurnitureById.TryGetValue(id, out var found) ? found : null;
         }
 
         public UpgradeEffects Effects(GameState state) => Upgrades.Effects(upgrades, state.UpgradeLevel);
