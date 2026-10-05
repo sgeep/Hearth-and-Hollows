@@ -42,6 +42,22 @@ namespace Hearthdelve.Shared.Animation
         [Tooltip("A single-row sheet drawn facing front-right: mirror it for the left facings instead of reusing it as drawn " +
                  "(the Townsfolk's jump, used for the dodge, has no other rows).")]
         public bool mirrorForLeft;
+        [Tooltip("A sheet drawn only facing the front: for the back facings, show the walk's back frames instead, so the head " +
+                 "doesn't turn to the camera (the Townsfolk's jump, used for the dodge).")]
+        public bool walkForBack;
+
+        /// <summary>Whether the sheet has its own frames for a facing (one-row sheets only have front-right).</summary>
+        public bool HasOwn(Facing4 facing)
+        {
+            Sprite[] own = facing switch
+            {
+                Facing4.FrontLeft => frontLeft,
+                Facing4.BackRight => backRight,
+                Facing4.BackLeft => backLeft,
+                _ => frontRight,
+            };
+            return own != null && own.Length > 0;
+        }
 
         /// <summary>
         /// Frames for a facing, and whether to draw them mirrored: a sheet missing a left facing's frames, with

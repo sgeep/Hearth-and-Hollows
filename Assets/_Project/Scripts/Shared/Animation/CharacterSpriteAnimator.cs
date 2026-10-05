@@ -49,6 +49,7 @@ namespace Hearthdelve.Shared.Animation
         /// <summary>The body's renderer.</summary>
         public SpriteRenderer Renderer => m_Renderer;
         public CharacterAnim Current => m_Current;
+        public SpriteAnimationSet Set => m_Set;
         public bool IsTelegraphing => m_TelegraphedActive;
 
         public void Configure(SpriteAnimationSet set, SpriteRenderer renderer, SpriteAnimationSet shadowSet, SpriteRenderer shadowRenderer)
@@ -261,6 +262,9 @@ namespace Hearthdelve.Shared.Animation
         {
             SpriteAnim anim = set.Find(m_Current) ?? set.Find(CharacterAnim.Idle);
             if (anim == null) return;
+            // A front-only sheet (the dodge) borrows the walk's back frames, so a character facing away keeps facing away.
+            if (anim.walkForBack && (Facing == Facing4.BackRight || Facing == Facing4.BackLeft) && !anim.HasOwn(Facing))
+                anim = set.Find(CharacterAnim.Walk) ?? anim;
             Sprite[] frames = anim.For(Facing, out bool mirrored);
             if (frames == null || frames.Length == 0) return;
             target.flipX = mirrored;

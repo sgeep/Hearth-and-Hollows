@@ -35,6 +35,9 @@ namespace Hearthdelve.Tests
         {
             var set = AssetDatabase.LoadAssetAtPath<SpriteAnimationSet>("Assets/_Project/Data/Animations/Anim_HumanTownsfolk.asset");
             Assert.That(set.Find(CharacterAnim.Dodge).mirrorForLeft);
+            Assert.That(set.Find(CharacterAnim.Dodge).walkForBack, "facing away, the dodge keeps the head turned away");
+            Assert.That(set.Find(CharacterAnim.Walk).HasOwn(Hearthdelve.Core.Movement.Facing4.BackLeft), "the walk has the back frames it borrows");
+            Assert.That(set.Find(CharacterAnim.Dodge).HasOwn(Hearthdelve.Core.Movement.Facing4.BackLeft), Is.False);
         }
     }
 

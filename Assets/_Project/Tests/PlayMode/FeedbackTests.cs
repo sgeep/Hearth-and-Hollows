@@ -213,6 +213,17 @@ namespace Hearthdelve.Tests.PlayMode
             ReleaseKeys();
             yield return new WaitForSeconds(0.6f);
             Assert.That(renderer.flipX, Is.False, "walking and standing are never mirrored");
+
+            // Facing away: the dodge shows the walk's back frames, so the head never turns to the camera.
+            Hold(Key.W);
+            yield return new WaitForSeconds(0.2f);
+            Hold(Key.W, Key.Space);
+            yield return WaitUntil(() => Essence.Invulnerable, 1f, "a dodge away from the camera");
+            yield return null;
+            Assert.That(body.Current, Is.EqualTo(Hearthdelve.Shared.Animation.CharacterAnim.Dodge));
+            Assert.That(body.Facing, Is.EqualTo(Hearthdelve.Core.Movement.Facing4.BackRight).Or.EqualTo(Hearthdelve.Core.Movement.Facing4.BackLeft));
+            Assert.That(body.Set.Find(Hearthdelve.Shared.Animation.CharacterAnim.Walk).For(body.Facing), Does.Contain(renderer.sprite), "a back-facing frame");
+            ReleaseKeys();
         }
     }
 }
