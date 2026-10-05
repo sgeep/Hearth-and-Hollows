@@ -770,6 +770,7 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - **Aim and facing** (changes a locked decision, at your request; CLAUDE.md updated): the mouse aims on keyboard and mouse with the **system cursor visible** (TDE hid it for a reticle we don't draw, so it seemed to vanish), the **right stick** aims on a gamepad (new `Dungeon/AimStick` action; movement direction while centred), and the delver **faces where they aim**, except while rolling. Attacks go that way, as before.
 - **The stray stool** right of the bar is gone from the tavern (builder and in-place updater).
 - Tests: the give-up and campfire rules; the troll giving up on a part past the wall; the roll through a slime; mashing dodge; facing the mouse, walking or standing; the roll facing its way; the right stick aiming and turning, centred following the walk; the refill on victory; the campfire's room and its gift. **EditMode 439/439, PlayMode 149/149.**
+- **Web:** rebuilt and smoke-tested (Continue, sleep, evening, staying shut, the delve; the cursor visible over the canvas, no pointer lock; no console errors). The first rebuild crashed at load with "Maximum call stack size exceeded" inside IL2CPP's type loading: a stale incremental WebGL cache after switching build targets. Clearing `Library/Bee/artifacts/WebGL`, `WebGL_CodeGen`, `UnityLinkerInputs` and `Library/PlayerDataCache` and rebuilding fixed it; no code change was needed.
 
 **Next: your check of these fixes, then 4e sign-off and the 4f plan.**
 
