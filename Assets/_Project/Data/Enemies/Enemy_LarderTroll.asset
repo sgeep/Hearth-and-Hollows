@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e0f0bc6a32804d4e8a3dee6dc6d8c7e, type: 3}
+  m_Name: Enemy_LarderTroll
+  m_EditorClassIdentifier: Hearthdelve.Dungeon::Hearthdelve.Dungeon.Enemies.EnemyDefinition
+  schema: 0
+  id: larder_troll
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: Content
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: enemy.larder_troll
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  maxHealth: 500
+  moveSpeed: 2.4
+  aggroRange: 40
+  knockbackMultiplier: 0
+  staggerMultiplier: 0
+  superArmorWhileAttacking: 1
+  keepDistance: {x: 0, y: 0}
+  flutter: 0
+  startsAsleep: 0
+  wakeRange: 3.5
+  attack:
+    debugName: Slam
+    kind: 2
+    minRange: 0
+    maxRange: 2.4
+    telegraph: 0.95
+    active: 0.18
+    recovery: 1
+    cooldown: 1.2
+    damage: 18
+    hitboxOffset: {x: 0.7, y: 0.3}
+    hitboxSize: {x: 3, y: 2.4}
+    animation: 2
+    releaseFrame: 4
+    travelDistance: 4
+    stunOnBlock: 0
+    arcHeight: 0.8
+    projectileSpeed: 7
+    projectileRange: 8
+    projectileSpawnOffset: {x: 0.5, y: 0.3}
+  otherAttacks:
+  - debugName: Charge
+    kind: 1
+    minRange: 4
+    maxRange: 16
+    telegraph: 0.9
+    active: 1.6
+    recovery: 0.7
+    cooldown: 2.2
+    damage: 16
+    hitboxOffset: {x: 0, y: 0.3}
+    hitboxSize: {x: 1.6, y: 1.3}
+    animation: 1
+    releaseFrame: 2
+    travelDistance: 13
+    stunOnBlock: 2.4
+    arcHeight: 0.8
+    projectileSpeed: 7
+    projectileRange: 8
+    projectileSpawnOffset: {x: 0.5, y: 0.3}
+  harvest: []
+  placeholderColor: {r: 0.45, g: 0.5, b: 0.2, a: 1}
+  references:
+    version: 2
+    RefIds: []
