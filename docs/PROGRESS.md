@@ -726,7 +726,14 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - **Fixed:** the boss bar's text never changed in step 1, because its field was named `m_Name` and collided with Unity's own serialized object name; it's `m_Label` now (the name only showed because it was the builder's default text).
 - Tests: the feeding rules and cooldown skip (EditMode); in PlayMode, the entrance's camera and held input, a part eaten and healing, a part taken first (into the satchel, no meal), a meal spoiled by a hard hit, the frenzy's roar (invulnerable, still) and speed, and the defeat caption. **EditMode 434/434, PlayMode 136/136**; the troll capture covers the meal, the frenzy and the fall.
 
-**Next: step 3 (the Harvest Finisher).**
+**Step 3: the Harvest Finisher (2026-10-05).** The experience: mid-fight, a moment to choose the cook's cut over one more swing. Combat → monsters → ingredients, without busywork.
+- **When:** an ordinary enemy you've **just hit** (within 1.2 s) that's **low** (at most 35% of its health, or 20) shows a **drumstick** over its head (`FinisherTarget`, pure `FinisherRules`). Most enemies offer it once, partway through a combo; it's never required: ordinary kills still harvest as before.
+- **How:** **Finisher** (F, left trigger) within 1.8 tiles (`PlayerFinisher`). You're committed for **0.5 s**: no moving, attacking or dodging, and no i-frames (the risk). The blow lands at 0.2 s with its own moment: a freeze, a shake, a heavy chop and ring (`PH_Finisher`), and the `Finisher.Harvest` rumble. The kill is a finisher for the harvest: **Premium parts**, never an overkill (the existing `HarvestRules` path).
+- **The troll:** the hit that would kill it **brings it down** instead (at 1 health, `BossHealth`, a TDE `Health` subclass) for **3 s**: it can't be hurt, its drumstick shows, and the fight (and the paused drain) goes on. **Finish** it in reach for the finisher's harvest and its moment on top of the defeat; or leave it and it falls as it would have. It can't be finished before lethal damage, so no boss health is skipped. Its own harvest: a slime core and a venom sac, Fine (the cleaver's clean kill lifts the venom sac anyway), **Premium to the finisher**. The larder cache reward is step 4.
+- Tunable in `HarvestRulesConfig` (finisher section). The prompt is unlit, like the "!" alert, so it reads in the dark.
+- Tests: the rules (EditMode); finishing a low, freshly hit slime (committed, then free; Premium parts), the moment passing and a healthy enemy never eligible, the troll brought down then finished (no early execution, can't be hurt while down, Premium), and left down to fall with its ordinary harvest. **EditMode 435/435, PlayMode 140/140.**
+
+**Next: step 4 (rewards, the first-clear record, feel).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
