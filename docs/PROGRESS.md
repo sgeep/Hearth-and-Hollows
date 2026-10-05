@@ -714,7 +714,19 @@ The experience: delve through the Cellars, make reward and build choices, reach 
 - **charge:** from 3.5 tiles (was 4) out to 18, telegraph 0.9 → **0.6 s**, run 13 → **16** tiles (about 10 tiles/s), recovery 0.7 → **0.4 s**, cooldown 2.2 → **1 s**, damage 16 → **24**, a wider body (2 × 1.6), and the daze after a wall 2.4 → **1.6 s**.
 Two or three hits now cost most of an arriving delver's Essence, the openings are short enough to need timing, and the daze still fits one full charged heavy. All values stay in the asset for further tuning.
 
-**Next: your step 1 playtest, then step 2 (eating the drops, escalation, defeat).**
+**Step 1 approved (2026-10-05)** with the harder tuning. Parts grabbed during the fight are ordinary loot (the usual death rule applies; decided 2026-10-05).
+
+**Step 2: eating the drops, the frenzy, the entrance and the defeat (2026-10-05).** The experience: the troll's food is the fight's tug of war. Every part on the floor is both loot for you and a meal for it.
+- **Its stolen larder:** a slam shakes **2 parts** loose (at most every 14 s, the first sooner; never while 4 lie on the floor): slime gel, spider leg or bat wing, standard quality, popping onto open floor (`LarderScraps`). They're ordinary parts: walk over one and it's in your satchel, to take home like any other.
+- **Its appetite** (`ScrapEater`, through its TDE brain: Chase → **Feed** (walk to the nearest part) → **Eat** → Chase; the slam still answers a player in reach before it goes for food, the charge comes after): eating takes **1.5 s** (its Eat animation, a gulp and a flash) and heals **8% of its health** (72) per part, with 2.5 s before the next. Take the part first and the meal is denied; deal **40 damage** while it eats and the meal is **spoiled** (the part is ruined, nothing healed, a squelch and a firm tap). Pure rules: `FeedingRules`.
+- **The frenzy** at half health (`BossFrenzy`): it roars for 1.2 s (it can't be hurt and doesn't act; a big shake, the `Boss.PhaseChange` rumble; any meal is dropped), turns a hot tint, the bar goes orange, and then it's **20% faster**, its **slams come in pairs** (the cooldown is skipped once; the lockout still gives a beat), and each **charge spills a part** where it started. A roar that begins during a daze keeps it still until the roar ends.
+- **The entrance:** the camera cuts to the troll at its meal while it's named, and the player waits; both hand back when it fights.
+- **The defeat:** slow motion (0.3× for 0.8 s), the fall (21 frames), a big shake, a heavy rumble, and the bar reads "the Larder Troll falls" for 3 s. The rope appears as before.
+- All of it is tunable on `Boss_LarderTroll` (feeding and frenzy sections). Placeholder sounds `PH_TrollGulp`, `PH_TrollSpoil`, `PH_TrollFall`.
+- **Fixed:** the boss bar's text never changed in step 1, because its field was named `m_Name` and collided with Unity's own serialized object name; it's `m_Label` now (the name only showed because it was the builder's default text).
+- Tests: the feeding rules and cooldown skip (EditMode); in PlayMode, the entrance's camera and held input, a part eaten and healing, a part taken first (into the satchel, no meal), a meal spoiled by a hard hit, the frenzy's roar (invulnerable, still) and speed, and the defeat caption. **EditMode 434/434, PlayMode 136/136**; the troll capture covers the meal, the frenzy and the fall.
+
+**Next: step 3 (the Harvest Finisher).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
