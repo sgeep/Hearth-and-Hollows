@@ -708,6 +708,12 @@ The experience: delve through the Cellars, make reward and build choices, reach 
 - Placeholder sounds `PH_TrollRoar`, `PH_TrollSlam`, `PH_TrollThud`. Not yet: eating the drops, the enrage, the full entrance and defeat presentation (step 2); the finisher (step 3); the reward and the first-clear record (step 4). The troll drops nothing yet.
 - Tests: EditMode (the charge's blocked rule, the encounter's drain multiplier, the troll's data and prefab, the arena's encounter across 50 seeds, the stand-in without a boss); PlayMode (found eating, then the entrance with the bar and no acting, then the fight; drain paused while it fights, hits still cost, drain back after; the slam's mark and its cost; the charge's line, the wall, the stun and the recovery; a full run ending at the troll). **EditMode 431/431, PlayMode 131/131**; the troll capture (`LarderTrollCaptures`) and the run capture pass.
 
+**Step 1 playtest (2026-10-05): "plays great, telegraphs read well, but much too easy."** Retuned a lot harder (`Enemy_LarderTroll`):
+- health 500 → **900**; walk speed 2.4 → **3.8** tiles/s (the player walks at 6, so outpacing it is no longer free);
+- **slam:** reach 2.4 → 3, telegraph 0.95 → **0.7 s**, recovery 1 → **0.55 s**, cooldown 1.2 → **0.5 s**, damage 18 → **26**, area 3 × 2.4 → **3.6 × 3** tiles;
+- **charge:** from 3.5 tiles (was 4) out to 18, telegraph 0.9 → **0.6 s**, run 13 → **16** tiles (about 10 tiles/s), recovery 0.7 → **0.4 s**, cooldown 2.2 → **1 s**, damage 16 → **24**, a wider body (2 × 1.6), and the daze after a wall 2.4 → **1.6 s**.
+Two or three hits now cost most of an arriving delver's Essence, the openings are short enough to need timing, and the daze still fits one full charged heavy. All values stay in the asset for further tuning.
+
 **Next: your step 1 playtest, then step 2 (eating the drops, escalation, defeat).**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.

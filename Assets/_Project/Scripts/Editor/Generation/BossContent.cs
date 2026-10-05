@@ -79,12 +79,15 @@ namespace Hearthdelve.Editor
             return mark;
         }
 
-        /// <summary>The troll's data: lumbering, unshakeable, two readable patterns. New assets only; edits are kept.</summary>
+        /// <summary>
+        /// The troll's data: unshakeable, quick for its size, two readable patterns with short openings (made much harder after the
+        /// step 1 playtest). New assets only; edits are kept.
+        /// </summary>
         static void Defaults(EnemyDefinition d)
         {
             d.id = Id;
-            d.maxHealth = 500f;
-            d.moveSpeed = 2.4f;
+            d.maxHealth = 900f;
+            d.moveSpeed = 3.8f;
             d.aggroRange = 40f;
             d.knockbackMultiplier = 0f;
             d.staggerMultiplier = 0f;
@@ -95,9 +98,9 @@ namespace Hearthdelve.Editor
             {
                 // Arms up over a long wind-up, then both fists into the floor in front: step out of the mark, then punish
                 // the long recovery.
-                debugName = "Slam", kind = EnemyAttackKind.Bite, minRange = 0f, maxRange = 2.4f,
-                telegraph = 0.95f, active = 0.18f, recovery = 1.0f, cooldown = 1.2f, damage = 18f,
-                hitboxOffset = new Vector2(0.7f, 0.3f), hitboxSize = new Vector2(3f, 2.4f),
+                debugName = "Slam", kind = EnemyAttackKind.Bite, minRange = 0f, maxRange = 3f,
+                telegraph = 0.7f, active = 0.18f, recovery = 0.55f, cooldown = 0.5f, damage = 26f,
+                hitboxOffset = new Vector2(0.8f, 0.3f), hitboxSize = new Vector2(3.6f, 3f),
                 animation = CharacterAnim.Attack, releaseFrame = 4,
             };
             d.otherAttacks = new List<EnemyAttackSettings>
@@ -105,10 +108,10 @@ namespace Hearthdelve.Editor
                 new()
                 {
                     // A lumbering run along the marked line: dodge aside, and bait it into a pillar or wall to stun it.
-                    debugName = "Charge", kind = EnemyAttackKind.Swoop, minRange = 4f, maxRange = 16f,
-                    telegraph = 0.9f, active = 1.6f, recovery = 0.7f, cooldown = 2.2f, damage = 16f,
-                    hitboxOffset = new Vector2(0f, 0.3f), hitboxSize = new Vector2(1.6f, 1.3f),
-                    animation = CharacterAnim.Walk, releaseFrame = 2, travelDistance = 13f, stunOnBlock = 2.4f,
+                    debugName = "Charge", kind = EnemyAttackKind.Swoop, minRange = 3.5f, maxRange = 18f,
+                    telegraph = 0.6f, active = 1.6f, recovery = 0.4f, cooldown = 1f, damage = 24f,
+                    hitboxOffset = new Vector2(0f, 0.3f), hitboxSize = new Vector2(2f, 1.6f),
+                    animation = CharacterAnim.Walk, releaseFrame = 2, travelDistance = 16f, stunOnBlock = 1.6f,
                 },
             };
         }
