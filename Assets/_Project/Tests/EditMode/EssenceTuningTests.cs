@@ -17,8 +17,8 @@ namespace Hearthdelve.Tests.EditMode
         static EssenceSettings Essence => AssetDatabase.LoadAssetAtPath<EssenceConfig>("Assets/_Project/Data/Config/EssenceConfig.asset").essence;
         static RunTuning Run => AssetDatabase.LoadAssetAtPath<RunSettings>("Assets/_Project/Data/Dungeon/RunSettings.asset").tuning;
 
-        /// <summary>About a full Cellars run of competent play (4d step 5 estimate; see PROGRESS.md).</summary>
-        const float k_FullRunSeconds = 400f;
+        /// <summary>About a full Cellars run of competent play (4d step 5; the playtest ran faster than the first 400 s estimate).</summary>
+        const float k_FullRunSeconds = 360f;
 
         [Test]
         public void DrainAlone_OutlastsACompetentFullRun_ButNotByAWide_Margin()

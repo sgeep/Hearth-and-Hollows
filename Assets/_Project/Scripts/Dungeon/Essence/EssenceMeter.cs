@@ -18,9 +18,9 @@ namespace Hearthdelve.Dungeon.Essence
         public static EssenceSettings Default => new()
         {
             baseMax = 100f,
-            // 4d step 5: drain alone lasts about 11 minutes, against a full Cellars run of about 6-7 minutes for competent
-            // play; hits are what spend the rest (GDD §4.4: pressure, not a predetermined failure).
-            drainPerSecond = 0.15f,
+            // 4d step 5 (raised after the playtest, which reached the arena with Essence to spare): drain alone lasts about
+            // 8 minutes, against a full Cellars run of about 6; hits spend the rest (GDD §4.4: pressure, not a set failure).
+            drainPerSecond = 0.2f,
             damageMultiplier = 1f,
             lowThreshold = 0.25f,
         };
