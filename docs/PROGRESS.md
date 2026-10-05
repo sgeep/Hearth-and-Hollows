@@ -772,6 +772,12 @@ Two or three hits now cost most of an arriving delver's Essence, the openings ar
 - Tests: the give-up and campfire rules; the troll giving up on a part past the wall; the roll through a slime; mashing dodge; facing the mouse, walking or standing; the roll facing its way; the right stick aiming and turning, centred following the walk; the refill on victory; the campfire's room and its gift. **EditMode 439/439, PlayMode 149/149.**
 - **Web:** rebuilt and smoke-tested (Continue, sleep, evening, staying shut, the delve; the cursor visible over the canvas, no pointer lock; no console errors). The first rebuild crashed at load with "Maximum call stack size exceeded" inside IL2CPP's type loading: a stale incremental WebGL cache after switching build targets. Clearing `Library/Bee/artifacts/WebGL`, `WebGL_CodeGen`, `UnityLinkerInputs` and `Library/PlayerDataCache` and rebuilding fixed it; no code change was needed.
 
+**Second round (2026-10-05):**
+- **The tap could never pour clean on a keyboard.** The glass tilted toward the stick's position, so W/S could only hold it upright, level or fully tilted, and the tilt that puts the head in the band (about a third of the way down) was out of reach: the best keyboard pour scored 0.8 against the 0.85 a clean pour needs. The tilt now moves while W/S or the stick is pushed and **stays where it's left** (`tiltSpeed` 1 per second); a short tap of S finds the band. The fill window is a little wider (`fillTolerance` 0.03 → 0.04, about ±0.25 s), and the prompt reads "pour · tilt, head in the band". An untouched level glass still pours a passable (not clean) drink.
+- **A smaller campfire by each floor's hole down** (`RunTuning.floorCampfire`): a quarter of max Essence over 1.5 s, in the descent room, beside the arrival and clear of the hole. Only delvers going deeper pass it.
+- Web rebuilt and loaded. A browser that played an earlier build can load stale string tables (CRC mismatch, `#menu.title` on screen), because Localization's bundle names don't change between builds; the local test server now sends no-cache headers. Elsewhere, a hard refresh (Ctrl+Shift+R) fixes it.
+- Tests: EditMode 441/441, PlayMode 150/150.
+
 **Next: your check of these fixes, then 4e sign-off and the 4f plan.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
