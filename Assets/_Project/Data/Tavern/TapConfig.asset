@@ -15,14 +15,14 @@ MonoBehaviour:
   tap:
     pourRate: 0.16
     fillLine: 0.85
-    fillTolerance: 0.03
+    fillTolerance: 0.04
     fillFalloff: 0.2
     foamShareTilted: 0.05
     foamShareUpright: 0.45
     foamBandMin: 0.12
     foamBandMax: 0.22
     foamFalloff: 0.15
-    tiltSpeed: 3
+    tiltSpeed: 1
     timeout: 12
     autoMaxTiltError: 0.5
     autoMaxLineError: 0.15

@@ -29,7 +29,7 @@ namespace Hearthdelve.Tavern.Minigames
         [Range(0, 1)] public float foamBandMin;
         [Range(0, 1)] public float foamBandMax;
         [Min(0.01f)] public float foamFalloff;
-        [Min(0.01f), Tooltip("How quickly the glass tilts toward the stick position.")]
+        [Min(0.01f), Tooltip("How fast the glass tilts with the stick or W/S fully pushed, in tilt (0 to 1) per second. It stays where it's left.")]
         public float tiltSpeed;
         [Min(1), Tooltip("Gives up (scores 0) if nothing is poured by then.")]
         public float timeout;
@@ -44,14 +44,14 @@ namespace Hearthdelve.Tavern.Minigames
         {
             pourRate = 0.16f,
             fillLine = 0.85f,
-            fillTolerance = 0.03f,
+            fillTolerance = 0.04f,
             fillFalloff = 0.2f,
             foamShareTilted = 0.05f,
             foamShareUpright = 0.45f,
             foamBandMin = 0.12f,
             foamBandMax = 0.22f,
             foamFalloff = 0.15f,
-            tiltSpeed = 3f,
+            tiltSpeed = 1f,
             timeout = 12f,
             autoMaxTiltError = 0.5f,
             autoMaxLineError = 0.15f,
@@ -64,6 +64,9 @@ namespace Hearthdelve.Tavern.Minigames
     /// Tap: hold Action to pour, release at the line. Tilting the glass (Aim up/down) changes
     /// how much of the pour becomes foam; the head should land in the foam band. Overflowing
     /// scores zero. Score = fill accuracy × foam accuracy.
+    /// The tilt moves while Aim is pushed and stays where it's left (4e playtest: following the
+    /// stick's position, a keyboard could only hold it upright, level or fully tilted, and the
+    /// ideal tilt between them was out of reach, so no keyboard pour was ever clean).
     /// </summary>
     public sealed class TapMinigame : IMinigame
     {
@@ -97,8 +100,7 @@ namespace Hearthdelve.Tavern.Minigames
             if (IsComplete || deltaTime <= 0f) return;
             Elapsed += deltaTime;
 
-            float tiltTarget = Mathf.Clamp01(0.5f + 0.5f * input.Aim.y);
-            Tilt = Mathf.MoveTowards(Tilt, tiltTarget, m_Settings.tiltSpeed * deltaTime);
+            Tilt = Mathf.Clamp01(Tilt + Mathf.Clamp(input.Aim.y, -1f, 1f) * m_Settings.tiltSpeed * deltaTime);
 
             IsPouring = input.ActionHeld || input.ActionPressed;
             if (IsPouring)
@@ -164,9 +166,11 @@ namespace Hearthdelve.Tavern.Minigames
 
         public MinigameInput NextInput(float deltaTime)
         {
-            var input = new MinigameInput { Aim = new Vector2(0f, m_TiltTarget * 2f - 1f) };
-            // Settle the tilt before pouring, then pour until the release point.
-            bool tilted = Mathf.Abs(m_Game.Tilt - m_TiltTarget) < 0.02f;
+            // Push the tilt toward its target (it holds where it's left), then pour until the release point.
+            float error = m_TiltTarget - m_Game.Tilt;
+            float push = Mathf.Abs(error) < 0.005f ? 0f : Mathf.Clamp(error / Mathf.Max(1e-4f, m_Game.Settings.tiltSpeed * deltaTime), -1f, 1f);
+            var input = new MinigameInput { Aim = new Vector2(0f, push) };
+            bool tilted = Mathf.Abs(error) < 0.02f;
             float nextTotal = m_Game.Total + m_Game.Settings.pourRate * deltaTime;
             input.ActionHeld = tilted && nextTotal < m_ReleaseAt || (m_Game.IsPouring && nextTotal < m_ReleaseAt);
             return input;

@@ -69,18 +69,46 @@ namespace Hearthdelve.Tests
         const float Dt = 1f / 60f;
         static readonly TapSettings S = TapSettings.Default;
 
-        static TapMinigame PourTo(float total, float aimY)
+        /// <summary>Tilts the glass to <paramref name="tilt"/> (it stays there), then pours to <paramref name="total"/> and lets go.</summary>
+        static TapMinigame PourTo(float total, float tilt)
         {
             var t = new TapMinigame(S);
             t.Begin();
-            var aim = new Vector2(0f, aimY);
-            for (int i = 0; i < 60; i++) t.Tick(Dt, new MinigameInput { Aim = aim }); // settle tilt
-            while (t.Total + S.pourRate * Dt < total && !t.IsComplete) t.Tick(Dt, new MinigameInput { ActionHeld = true, Aim = aim });
-            t.Tick(Dt, new MinigameInput { Aim = aim }); // release
+            for (int i = 0; i < 120 && Mathf.Abs(t.Tilt - tilt) > 0.005f; i++)
+                t.Tick(Dt, new MinigameInput { Aim = new Vector2(0f, Mathf.Clamp((tilt - t.Tilt) / (S.tiltSpeed * Dt), -1f, 1f)) });
+            while (t.Total + S.pourRate * Dt < total && !t.IsComplete) t.Tick(Dt, new MinigameInput { ActionHeld = true });
+            t.Tick(Dt, default); // release
             return t;
         }
 
-        static float IdealAim => TapMinigame.IdealTilt(S) * 2f - 1f;
+        static float IdealAim => TapMinigame.IdealTilt(S);
+
+        /// <summary>
+        /// 4e playtest: on a keyboard (W/S are all or nothing) a short tap tilts the glass and it stays tilted, so a clean pour
+        /// is reachable; before, the tilt sprang back to level and the head always overflowed the band.
+        /// </summary>
+        [Test]
+        public void AKeyboard_TapsTheTilt_AndItHolds_ForACleanPour()
+        {
+            var t = new TapMinigame(S);
+            t.Begin();
+            // S held for a fifth of a second, then let go.
+            for (int i = 0; i < 12; i++) t.Tick(Dt, new MinigameInput { Aim = new Vector2(0f, -1f) });
+            float tilted = t.Tilt;
+            for (int i = 0; i < 30; i++) t.Tick(Dt, default);
+            Assert.That(t.Tilt, Is.EqualTo(tilted), "the glass stays tilted when the key is let go");
+            while (t.Total + S.pourRate * Dt < S.fillLine && !t.IsComplete) t.Tick(Dt, new MinigameInput { ActionHeld = true });
+            t.Tick(Dt, default);
+            Assert.That(t.FoamFraction, Is.InRange(S.foamBandMin, S.foamBandMax), "the head in the band");
+            Assert.That(t.Evaluate(), Is.GreaterThanOrEqualTo(0.85f), "a clean pour");
+        }
+
+        [Test]
+        public void ALevelGlass_UntouchedTilt_StillPoursAPassableDrink()
+        {
+            var t = PourTo(S.fillLine, 0.5f);
+            Assert.That(t.Evaluate(), Is.InRange(0.6f, 0.85f), "not clean, but not a failure");
+        }
 
         [Test]
         public void PouringToTheLine_WithIdealTilt_ScoresNearlyOne()
