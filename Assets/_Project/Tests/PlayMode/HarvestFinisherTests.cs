@@ -135,6 +135,26 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator TheTrollsFall_LeavesItsGold_AndAPremiumLarderCache_AndIsRecordedForTheDelve()
+        {
+            yield return Fighting();
+            var health = (BossHealth)Encounter.GetComponent<Health>();
+            BossDefinition boss = Encounter.Boss;
+            health.Damage(health.CurrentHealth + 50f, Player.gameObject, 0f, 0f, Vector3.zero);
+            health.FinishOff(Player.gameObject, finisher: false);
+            yield return new WaitForSeconds(0.7f);
+            GoldPickup gold = Runner.Current.GetComponentInChildren<GoldPickup>();
+            Assert.That(gold, Is.Not.Null, "its Gold");
+            Assert.That(gold.Amount, Is.EqualTo(boss.gold).And.GreaterThanOrEqualTo(100), "a substantial sum");
+            foreach (CacheEntry entry in boss.cache)
+                Assert.That(Drops().Any(p => p.Item.Definition == entry.ingredient && p.Item.Quality == Quality.Premium && p.Count == entry.count),
+                    $"the cache's {entry.ingredient.id}");
+            Assert.That(boss.cache.Select(c => c.ingredient.id), Is.EquivalentTo(new[] { "slime_core", "venom_sac" }), "the deeper Cellars' parts");
+            Assert.That(Hearthdelve.Dungeon.Run.DelveRunController.Active.Loot.BossesDefeated, Is.EqualTo(new[] { "larder_troll" }));
+            Assert.That(boss.trophyId, Is.Not.Null, "4f's hook is there, empty until then");
+        }
+
+        [UnityTest]
         public IEnumerator LeftDown_TheTrollFallsOnItsOwn_WithItsOrdinaryHarvest()
         {
             yield return Fighting();

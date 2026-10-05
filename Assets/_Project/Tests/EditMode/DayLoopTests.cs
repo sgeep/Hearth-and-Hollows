@@ -421,8 +421,39 @@ namespace Hearthdelve.Tests
             Assert.That(gel.Item.Quality, Is.EqualTo(Quality.Poor));
             Assert.That(gel.Item.Prep, Is.EqualTo(PrepState.Chilled));
             Assert.That(gel.Freshness, Is.EqualTo(0.5f).Within(1e-5f));
-            Assert.That(json, Does.Contain("\"version\": 2"));
+            Assert.That(json, Does.Contain("\"version\": 3"));
             Assert.That(json, Does.Contain("\"rat_haunch\""), "content is saved by id");
+        }
+
+        [Test]
+        public void BossesDefeated_AreRecordedByIdAndCount_EvenIfTheDelveEndsInDeath_AndSurviveTheSave()
+        {
+            var state = new GameState(1, DayPhase.Delve);
+            DayRules.CompleteDelve(state, DelveReport.Death(DeathPenalty.Resolve(new Satchel(6, 3), DeathPenalty.KeepNothing, 0), 0, new[] { "larder_troll" }));
+            Assert.That(state.TimesDefeated("larder_troll"), Is.EqualTo(1), "a victory is a victory");
+            DayRules.Sleep(state, FreshnessSettings.Default);
+            DayRules.StartEvening(state);
+            DayRules.SkipService(state);
+            DayRules.CompleteDelve(state, DelveReport.Extraction(new Satchel(6, 3), 0, new[] { "larder_troll" }));
+            Assert.That(state.TimesDefeated("larder_troll"), Is.EqualTo(2));
+            Assert.That(state.TimesDefeated("mother_slime"), Is.Zero);
+
+            string json = SaveSystem.ToJson(SaveSystem.Capture(state));
+            Assert.That(json, Does.Contain("\"version\": 3"));
+            GameState loaded = SaveSystem.Restore(SaveSystem.FromJson(json), Lookup, KnownUpgrade);
+            Assert.That(loaded.TimesDefeated("larder_troll"), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void AVersion2Save_MigratesToVersion3_WithNoBossesYet()
+        {
+            const string v2 = "{\"version\":2,\"day\":5,\"phase\":\"Night\",\"gold\":140,\"renown\":3,\"storeroom\":[],\"upgrades\":[],\"meal\":{\"kind\":\"None\",\"amount\":0,\"recipe\":\"\"}}";
+            SaveData data = SaveSystem.FromJson(v2);
+            Assert.That(data.version, Is.EqualTo(3));
+            Assert.That(data.bosses, Is.Empty);
+            GameState state = SaveSystem.Restore(data, Lookup, KnownUpgrade);
+            Assert.That((state.Day, state.Phase, state.Gold), Is.EqualTo((5, DayPhase.Night, 140)));
+            Assert.That(state.BossClears, Is.Empty);
         }
 
         /// <summary>Saving and loading again and again (each night, each purchase, each Continue) never duplicates or loses the haul.</summary>

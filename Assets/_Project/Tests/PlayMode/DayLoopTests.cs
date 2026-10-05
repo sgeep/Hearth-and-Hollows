@@ -342,6 +342,47 @@ namespace Hearthdelve.Tests.PlayMode
         /// EditMode-tested; this checks the dungeon and tavern actually read them). Every seat opens, and the order rail
         /// has a row for each.
         /// </summary>
+        /// <summary>
+        /// 4e: defeating the Larder Troll in a real delve is recorded once in the save (its first clear announced for 4f's
+        /// trophy and story), even across a reload, and its Gold comes home with the haul.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator DefeatingTheTroll_IsRecordedOnce_InTheSave()
+        {
+            Hearthdelve.Dungeon.Rooms.RoomRunner.StartInArenaOverride = true;
+            int firsts = 0;
+            void Count(BossFirstCleared e) => firsts += e.BossId == "larder_troll" ? 1 : 0;
+            Hearthdelve.Core.Events.EventBus<BossFirstCleared>.Subscribe(Count);
+            try
+            {
+                yield return NewGameToTheDelve();
+                Player.GetComponent<EssenceHealth>().GodMode = true;
+                var encounter = Object.FindAnyObjectByType<Hearthdelve.Dungeon.Bosses.BossEncounter>();
+                yield return WaitUntil(() => encounter.State == Hearthdelve.Dungeon.Bosses.BossEncounterState.Fighting, 8f, "the troll");
+                var health = encounter.GetComponent<Hearthdelve.Dungeon.Bosses.BossHealth>();
+                health.Damage(health.CurrentHealth + 50f, Player.gameObject, 0f, 0f, Vector3.zero);
+                health.FinishOff(Player.gameObject, finisher: false);
+                yield return WaitUntil(() => DelveRunController.Active.Loot.BossesDefeated.Count == 1, 3f, "the defeat recorded");
+                DelveRunController.Active.Loot.AddGold(encounter.Boss.gold);
+                yield return ExtractAndGoHome();
+                Assert.That(Flow.State.TimesDefeated("larder_troll"), Is.EqualTo(1));
+                Assert.That(firsts, Is.EqualTo(1), "its first clear, announced once");
+                Assert.That(SavedGame().bosses.Single().id, Is.EqualTo("larder_troll"));
+                Assert.That(Flow.State.Gold, Is.EqualTo(encounter.Boss.gold), "its Gold banked");
+
+                yield return BootToMenu();
+                Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
+                yield return InTavern(TavernPhase.Night, "the night, continued");
+                Assert.That(Flow.State.TimesDefeated("larder_troll"), Is.EqualTo(1), "kept, and not counted twice");
+                Assert.That(firsts, Is.EqualTo(1));
+            }
+            finally
+            {
+                Hearthdelve.Dungeon.Rooms.RoomRunner.StartInArenaOverride = false;
+                Hearthdelve.Core.Events.EventBus<BossFirstCleared>.Unsubscribe(Count);
+            }
+        }
+
         [UnityTest]
         public IEnumerator EssenceAndSeatingUpgrades_ReachTheNextDaysScenes()
         {
