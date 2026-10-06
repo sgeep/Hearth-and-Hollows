@@ -15,6 +15,8 @@ namespace Hearthdelve.Shared.Story
     {
         Tavern,
         Village,
+        /// <summary>One character (4g Checkpoint B): a deed done for them (returning Boog's bomb); they care about themselves.</summary>
+        Character,
     }
 
     /// <summary>Who learns of a deed (the relationship adapter decides; nobody needs to see it happen).</summary>
@@ -24,6 +26,8 @@ namespace Hearthdelve.Shared.Story
         Staff,
         /// <summary>Every tracked character.</summary>
         Everyone,
+        /// <summary>Only the character it was done for (a <see cref="DeedTarget.Character"/> deed).</summary>
+        Target,
     }
 
     /// <summary>
@@ -39,6 +43,8 @@ namespace Hearthdelve.Shared.Story
         [Tooltip("The fact that commits it (None: dialogue or quests only).")]
         public DeedSource source;
         public DeedTarget target = DeedTarget.Tavern;
+        [Tooltip("The character it's done for, when the target is Character (their id: \"gunta\" is Boog).")]
+        public string character;
         public DeedLearners learners = DeedLearners.Staff;
         [Tooltip("What it shows about the player: judges who value the same respect it more.")]
         public SocialTraits shows;

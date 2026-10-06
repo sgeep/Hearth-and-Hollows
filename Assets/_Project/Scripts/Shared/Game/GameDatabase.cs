@@ -33,6 +33,11 @@ namespace Hearthdelve.Shared.Game
         [Tooltip("The catalogue's Renown tiers (D14).")]
         public CatalogSettings catalog;
 
+        [Tooltip("Quest objects the Hollows can hold (4g Checkpoint B).")]
+        public List<Quests.QuestObjectDefinition> questObjects = new();
+        [Tooltip("The keeper's bodies and colourways (4g Checkpoint B): the creator and the keeper in play read them.")]
+        public Characters.KeeperLooks keeperLooks;
+
         [Header("New game")]
         [Min(0)] public int newGameGold;
 
@@ -66,6 +71,13 @@ namespace Hearthdelve.Shared.Game
                     if (f != null && !string.IsNullOrEmpty(f.id)) m_FurnitureById[f.id] = f;
             }
             return m_FurnitureById.TryGetValue(id, out var found) ? found : null;
+        }
+
+        public Quests.QuestObjectDefinition QuestObject(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            foreach (var q in questObjects) if (q != null && q.id == id) return q;
+            return null;
         }
 
         public FinishDefinition Finish(string id)

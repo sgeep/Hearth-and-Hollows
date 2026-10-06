@@ -226,7 +226,7 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ animation sets
 
-        static SpriteAnim Mirrored(SpriteAnim anim)
+        internal static SpriteAnim Mirrored(SpriteAnim anim)
         {
             anim.mirrorForLeft = true;
             anim.walkForBack = true;
@@ -238,7 +238,7 @@ namespace Hearthdelve.Editor
         /// A one-row sheet drawn facing front-right, mirrored for the left facings: the charged attack's stages, so the
         /// charge turns with the aim while it's held (Checkpoint A playtest; the back facings keep the front pose).
         /// </summary>
-        static SpriteAnim MirrorLeft(SpriteAnim anim)
+        internal static SpriteAnim MirrorLeft(SpriteAnim anim)
         {
             anim.mirrorForLeft = true;
             return anim;

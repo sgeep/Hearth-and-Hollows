@@ -159,7 +159,7 @@ namespace Hearthdelve.Dungeon.Run
             if (IsEnding) return false;
             IsEnding = true;
             Satchel satchel = PlayerSatchel();
-            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold, Loot.BossesDefeated, Loot.Curios) : DelveReport.Empty;
+            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold, Loot.BossesDefeated, Loot.Curios, Loot.QuestObjects) : DelveReport.Empty;
             satchel?.Clear();
             End(report);
             return true;
@@ -179,7 +179,7 @@ namespace Hearthdelve.Dungeon.Run
             Satchel satchel = PlayerSatchel();
             // The death screen shows even with an empty satchel, so the player sees why the delve ended.
             if (satchel == null || EventBus<DeathScreenRequested>.HandlerCount == 0) FinishDefeat(DeathPenalty.KeepNothing);
-            else EventBus<DeathScreenRequested>.Publish(new DeathScreenRequested(satchel, reason, FinishDefeat, Loot.Curios));
+            else EventBus<DeathScreenRequested>.Publish(new DeathScreenRequested(satchel, reason, FinishDefeat, Loot.Curios, Loot.QuestObjects));
         }
 
         void FinishDefeat(int keepSlot)
@@ -188,7 +188,7 @@ namespace Hearthdelve.Dungeon.Run
             DeathPenaltyResult result = DeathPenalty.Resolve(satchel, keepSlot, RunCurrency);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
-            End(DelveReport.Death(result, Loot.Gold, Loot.BossesDefeated, Loot.Curios));
+            End(DelveReport.Death(result, Loot.Gold, Loot.BossesDefeated, Loot.Curios, Loot.QuestObjects));
         }
 
         void End(DelveReport report)

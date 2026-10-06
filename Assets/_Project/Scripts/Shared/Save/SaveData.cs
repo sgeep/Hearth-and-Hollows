@@ -29,6 +29,15 @@ namespace Hearthdelve.Shared.Save
         public FurnitureSaveData furniture = new();
         /// <summary>Version 8 (4g): the story.</summary>
         public StorySaveData story = new();
+        /// <summary>Version 9 (4g Checkpoint B): quest objects (by id) and where each is.</summary>
+        public List<QuestObjectData> questObjects = new();
+    }
+
+    [Serializable]
+    public sealed class QuestObjectData
+    {
+        public string id;
+        public string status;
     }
 
     /// <summary>
@@ -41,6 +50,12 @@ namespace Hearthdelve.Shared.Save
     public sealed class StorySaveData
     {
         public bool openingComplete;
+        /// <summary>Version 9: where the Act I opening is (OpeningStage by name).</summary>
+        public string openingStage = string.Empty;
+        /// <summary>Version 9: the keeper was made at character creation (or is a legacy keeper).</summary>
+        public bool creationComplete;
+        /// <summary>Version 9: onboarding prompts already shown.</summary>
+        public List<string> seenHints = new();
         public PlayerProfile player = new();
         public string dialogue = string.Empty;
         public string quests = string.Empty;

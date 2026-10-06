@@ -251,6 +251,13 @@ namespace Hearthdelve.UI.Localization
         /// <summary>A furnishing's name (the catalogue's key).</summary>
         public static string FurnitureName(string id) => Loc.UI($"furniture.{id}");
 
+        /// <summary>A quest object's name (4g Checkpoint B): "Boog's bomb".</summary>
+        public static string QuestObjectName(string id) => Loc.UI($"quest_object.{id}");
+
+        public const string HarvestQuestObject = "harvest.quest_object";
+        public const string ResultQuestObjectHome = "result.quest_object_home";
+        public const string ResultQuestObjectLost = "result.quest_object_lost";
+
         /// <summary>Furnishings by name for one line: "a", "a and b", or "a and 2 more".</summary>
         public static string FurnitureList(System.Collections.Generic.IReadOnlyList<string> ids)
         {
@@ -330,6 +337,9 @@ namespace Hearthdelve.UI.Localization
             (ResultBoss, "you felled {0}"),
             (HudCurios, "{0}"),
             (HarvestCurio, "found: {0}"),
+            (HarvestQuestObject, "found: {0}!"),
+            (ResultQuestObjectHome, "brought home: {0}"),
+            (ResultQuestObjectLost, "lost: {0}. still down there somewhere"),
             (ResultCuriosKept, "found for Tally Ho!: {0}"),
             (ResultCuriosLost, "found, then lost: {0}"),
             (ResultTrophy, "a trophy: {0}"),

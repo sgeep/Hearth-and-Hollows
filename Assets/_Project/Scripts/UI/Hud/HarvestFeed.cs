@@ -1,5 +1,6 @@
 using System;
 using Hearthdelve.Core.Events;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Run;
 using Hearthdelve.UI.Localization;
 using UnityEngine;
@@ -35,6 +36,8 @@ namespace Hearthdelve.UI.Hud
         Sprite m_CurioIcon;
         [SerializeField, Tooltip("A found furnishing's line: its own color, unlike a harvest's.")]
         Color m_CurioColor = new(0.62f, 0.86f, 1f);
+        [SerializeField, Tooltip("A quest object found (4g Checkpoint B): its line's color, warm like the fuse.")]
+        Color m_QuestObjectColor = new(1f, 0.7f, 0.35f);
 
         Color m_TextColor = Color.white;
 
@@ -57,12 +60,29 @@ namespace Hearthdelve.UI.Hud
         {
             EventBus<HarvestFeedback>.Subscribe(Push);
             EventBus<CurioFound>.Subscribe(PushCurio);
+            EventBus<QuestObjectFound>.Subscribe(PushQuestObject);
         }
 
         void OnDisable()
         {
             EventBus<HarvestFeedback>.Unsubscribe(Push);
             EventBus<CurioFound>.Unsubscribe(PushCurio);
+            EventBus<QuestObjectFound>.Unsubscribe(PushQuestObject);
+        }
+
+        /// <summary>A quest object found: "found: Boog's bomb!", with its own first frame, in the fuse's color.</summary>
+        void PushQuestObject(QuestObjectFound found)
+        {
+            if (m_Lines.Length == 0 || string.IsNullOrEmpty(found.ObjectId)) return;
+            HarvestFeedLine line = NextLine();
+            line.text.Set(LocKeys.HarvestQuestObject, LocKeys.QuestObjectName(found.ObjectId));
+            Tint(line, m_QuestObjectColor);
+            var flow = Shared.Game.GameFlow.Instance;
+            Shared.Quests.QuestObjectDefinition definition = flow != null && flow.Database != null ? flow.Database.QuestObject(found.ObjectId) : null;
+            line.icon.sprite = definition != null && definition.frames.Length > 0 ? definition.frames[0] : null;
+            line.icon.enabled = line.icon.sprite != null;
+            line.shownAt = Time.time;
+            line.group.alpha = 1f;
         }
 
         /// <summary>A furnishing found: "found: skull candle", with the chest, in the discovery color.</summary>

@@ -96,9 +96,13 @@ namespace Hearthdelve.UI.Screens
             }
             if (m_Curios != null)
             {
-                bool kept = Report.CuriosKept.Count > 0, lost = Report.CuriosLost.Count > 0;
-                m_Curios.gameObject.SetActive(kept || lost);
-                if (kept) m_Curios.Set(LocKeys.ResultCuriosKept, LocKeys.FurnitureList(Report.CuriosKept));
+                bool kept = Report.CuriosKept.Count > 0, lost = Report.CuriosLost.Count > 0, quest = Report.QuestObjectsCarried.Count > 0;
+                m_Curios.gameObject.SetActive(kept || lost || quest);
+                // A quest object comes first (4g Checkpoint B): it's what the delve was for.
+                if (quest)
+                    m_Curios.Set(Report.Outcome == Shared.Game.DelveOutcome.Extracted ? LocKeys.ResultQuestObjectHome : LocKeys.ResultQuestObjectLost,
+                        LocKeys.QuestObjectName(Report.QuestObjectsCarried[0]));
+                else if (kept) m_Curios.Set(LocKeys.ResultCuriosKept, LocKeys.FurnitureList(Report.CuriosKept));
                 else if (lost) m_Curios.Set(LocKeys.ResultCuriosLost, LocKeys.FurnitureList(Report.CuriosLost));
             }
             if (m_Trophy != null)

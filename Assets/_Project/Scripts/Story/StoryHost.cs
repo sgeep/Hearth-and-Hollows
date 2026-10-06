@@ -79,6 +79,9 @@ namespace Hearthdelve.Story
             EventBus<TrophyDisplayed>.Subscribe(OnTrophyDisplayed);
             EventBus<BossDefeated>.Subscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Subscribe(OnCurioBroughtHome);
+            EventBus<TavernPhaseStarted>.Subscribe(OnTavernPhaseStarted);
+            EventBus<QuestObjectBroughtHome>.Subscribe(OnQuestObjectBroughtHome);
+            EventBus<QuestObjectDelivered>.Subscribe(OnQuestObjectDelivered);
         }
 
         void OnDisable()
@@ -86,6 +89,9 @@ namespace Hearthdelve.Story
             EventBus<TrophyDisplayed>.Unsubscribe(OnTrophyDisplayed);
             EventBus<BossDefeated>.Unsubscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Unsubscribe(OnCurioBroughtHome);
+            EventBus<TavernPhaseStarted>.Unsubscribe(OnTavernPhaseStarted);
+            EventBus<QuestObjectBroughtHome>.Unsubscribe(OnQuestObjectBroughtHome);
+            EventBus<QuestObjectDelivered>.Unsubscribe(OnQuestObjectDelivered);
         }
 
         void OnDestroy()
@@ -114,6 +120,63 @@ namespace Hearthdelve.Story
         void OnBossDefeated(BossDefeated e) => Quests?.Fact(nameof(BossDefeated), e.BossId);
 
         void OnCurioBroughtHome(CurioBroughtHome e) => Quests?.Fact(nameof(CurioBroughtHome), e.FurnitureId);
+
+        void OnQuestObjectBroughtHome(QuestObjectBroughtHome e) => Quests?.Fact(nameof(QuestObjectBroughtHome), e.ObjectId);
+
+        void OnQuestObjectDelivered(QuestObjectDelivered e) => Quests?.Fact(nameof(QuestObjectDelivered), e.ObjectId);
+
+        /// <summary>
+        /// Gives a quest (dialogue's <c>HH_GiveQuest</c>), and with it wants the quest objects it sends the keeper for: Quest Machine
+        /// keeps the quest, Hearth &amp; Hollows the object (so the delve knows to place it).
+        /// </summary>
+        public bool GiveQuest(string questId, string giverId)
+        {
+            if (Quests == null || !Quests.Give(questId, giverId)) return false;
+            GameFlow flow = GameFlow.Instance;
+            if (flow != null && flow.Database != null)
+                foreach (Shared.Quests.QuestObjectDefinition q in flow.Database.questObjects)
+                    if (q != null && q.questId == questId) flow.WantQuestObject(q.id);
+            return true;
+        }
+
+        /// <summary>Commits one deed by id (dialogue's <c>HH_Deed</c>) to whoever learns of it.</summary>
+        public bool CommitDeed(string deedId)
+        {
+            DeedDefinition deed = Relationships?.Deed(deedId);
+            if (deed == null) return false;
+            Relationships.Commit(deed, RelationshipRules.Learners(deed, Characters.All));
+            return true;
+        }
+
+        // ---------- The Act I opening (4g Checkpoint B) ----------
+
+        [SerializeField, Min(0f), Tooltip("Seconds after a part of the day begins before its opening conversation starts (the scene settles first).")]
+        float m_BeatDelay = 0.8f;
+
+        void OnTavernPhaseStarted(TavernPhaseStarted e)
+        {
+            GameFlow flow = GameFlow.Instance;
+            if (flow == null || !flow.InGame || Dialogue == null) return;
+            OpeningBeat? beat = OpeningRules.Beat(flow.State.Story.Opening, e.Phase, flow.State.Story.SeenHints);
+            if (beat.HasValue) StartCoroutine(PlayBeat(beat.Value, e.Phase));
+        }
+
+        System.Collections.IEnumerator PlayBeat(OpeningBeat beat, string phase)
+        {
+            float until = Time.realtimeSinceStartup + m_BeatDelay;
+            // After the scene is revealed: a conversation started under the fade would pause it there (the world waits while talking).
+            while (Time.realtimeSinceStartup < until || (GameFlow.Instance != null &&
+                   (GameFlow.Instance.IsLoading || (GameFlow.Instance.Transition != null && GameFlow.Instance.Transition.IsCovering))))
+                yield return null;
+            GameFlow flow = GameFlow.Instance;
+            // Still the same moment of the same game.
+            if (flow == null || !flow.InGame || !OpeningRules.Beat(flow.State.Story.Opening, phase, flow.State.Story.SeenHints).HasValue) yield break;
+            if (beat.OnceId != null) flow.MarkHintSeen(beat.OnceId);
+            Dialogue.Play(beat.Conversation, () =>
+            {
+                if (GameFlow.Instance != null && GameFlow.Instance.InGame) GameFlow.Instance.AdvanceOpening(beat.After);
+            });
+        }
 
         /// <summary>Commits every deed the fact defines to the characters who learn of it.</summary>
         public void Commit(DeedSource source)
@@ -153,7 +216,7 @@ namespace Hearthdelve.Story
             Relationships?.SetDay(state.Day);
             Dialogue?.Apply(state.Story.Dialogue);
             Dialogue?.SetPlayerName(state.Story.Player?.name ?? PlayerProfile.DefaultName);
-            Quests?.Apply(state.Story.Quests);
+            Quests?.Apply(state.Story.Quests, LastWarnings);
             Relationships?.Apply(state.Story.Relationships, LastWarnings);
             foreach (string w in LastWarnings) Debug.LogWarning($"[Hearthdelve] Story: {w}");
         }

@@ -7,15 +7,15 @@ namespace Hearthdelve.UI.Localization
         public const string Continue = "dialogue.continue";
         /// <summary>Beside the chosen response.</summary>
         public const string Pointer = "dialogue.pointer";
-        /// <summary>4g Checkpoint A's proof quest (Boog wants something with teeth over the bar); replaced by Boog's Bomb in Step 6.</summary>
-        public const string ProofQuestTitle = "quest.proof_trophy_wall.title";
+        /// <summary>Boog's Bomb (4g Checkpoint B): the quest's title in the journal.</summary>
+        public const string BoogsBombTitle = "quest.boogs_bomb.title";
 
         public static readonly (string key, string english)[] English =
         {
             (Continue, "▼"),
             // U+2023 (‣), not ▶: Super Text Mesh draws U+25B6 as an emoji, which Silver hasn't got (TextStyleTests checks).
             (Pointer, "‣"),
-            (ProofQuestTitle, "something with teeth"),
+            (BoogsBombTitle, "Boog's bomb"),
         };
     }
 }

@@ -18,13 +18,21 @@ namespace Hearthdelve.Story.Dialogue
     /// <item><c>HH_QuestState("proof_trophy_wall")</c>: "unassigned", "active", "successful", "failed"…</item>
     /// <item><c>HH_GiveQuest("proof_trophy_wall", "gunta")</c>: gives the player the quest, from that character.</item>
     /// <item><c>HH_PlayerName()</c>, <c>HH_Day()</c>, <c>HH_TimesDefeated("larder_troll")</c>.</item>
+    /// <item>4g Checkpoint B: <c>HH_OpeningStage()</c> ("Arrival", "FirstDelve", "Homecoming", "FirstEvening", "Complete");
+    /// <c>HH_QuestObject("boogs_bomb")</c> ("none", "wanted", "home", "delivered") and <c>HH_HasQuestObject("boogs_bomb")</c> (it's home,
+    /// not yet handed over); <c>HH_DeliverQuestObject("boogs_bomb")</c> (hand it over: its reward, once); <c>HH_Deed("returned_boogs_bomb")</c>
+    /// (commit a deed to whoever learns of it); <c>HH_PartsHome()</c> (parts the last delve brought home today).</item>
     /// </list>
     /// </summary>
     /// <remarks>Called only by reflection from Lua: <see cref="PreserveAttribute"/> keeps the web build's code stripping off them.</remarks>
     [Preserve]
     public static class StoryLua
     {
-        public static readonly string[] Names = { "HH_Affinity", "HH_Respect", "HH_Remembers", "HH_QuestState", "HH_GiveQuest", "HH_PlayerName", "HH_Day", "HH_TimesDefeated" };
+        public static readonly string[] Names =
+        {
+            "HH_Affinity", "HH_Respect", "HH_Remembers", "HH_QuestState", "HH_GiveQuest", "HH_PlayerName", "HH_Day", "HH_TimesDefeated",
+            "HH_OpeningStage", "HH_QuestObject", "HH_HasQuestObject", "HH_DeliverQuestObject", "HH_Deed", "HH_PartsHome",
+        };
 
         static StoryHost Host => StoryHost.Instance;
         static GameState Game => GameFlow.Instance != null ? GameFlow.Instance.State : null;
@@ -52,13 +60,31 @@ namespace Hearthdelve.Story.Dialogue
 
         [Preserve] public static string HH_QuestState(string questId) => Host != null && Host.Quests != null ? Host.Quests.State(questId) : "unassigned";
 
-        [Preserve] public static void HH_GiveQuest(string questId, string giverId) => Host?.Quests?.Give(questId, giverId);
+        [Preserve] public static void HH_GiveQuest(string questId, string giverId) => Host?.GiveQuest(questId, giverId);
 
         [Preserve] public static string HH_PlayerName() => Game?.Story.Player?.name ?? PlayerProfile.DefaultName;
 
         [Preserve] public static double HH_Day() => Game?.Day ?? 1;
 
         [Preserve] public static double HH_TimesDefeated(string bossId) => Game?.TimesDefeated(bossId) ?? 0;
+
+        [Preserve] public static string HH_OpeningStage() => (Game?.Story.Opening ?? OpeningStage.Complete).ToString();
+
+        [Preserve] public static string HH_QuestObject(string id) => Game == null ? "none" : Game.QuestObjects.Status(id) switch
+        {
+            Shared.Quests.QuestObjectStatus.Wanted => "wanted",
+            Shared.Quests.QuestObjectStatus.Home => "home",
+            Shared.Quests.QuestObjectStatus.Delivered => "delivered",
+            _ => "none",
+        };
+
+        [Preserve] public static bool HH_HasQuestObject(string id) => Game != null && Game.QuestObjects.IsHome(id);
+
+        [Preserve] public static bool HH_DeliverQuestObject(string id) => GameFlow.Instance != null && GameFlow.Instance.DeliverQuestObject(id);
+
+        [Preserve] public static bool HH_Deed(string deedId) => Host != null && Host.CommitDeed(deedId);
+
+        [Preserve] public static double HH_PartsHome() => Game?.Today.PartsBroughtBack ?? 0;
 
         /// <summary>The registered names (tests).</summary>
         public static IReadOnlyList<string> All => Names;

@@ -56,6 +56,8 @@ namespace Hearthdelve.Shared.Animation
         /// <summary>Whether the drawing is mirrored (a one-facing sheet shown for a left facing).</summary>
         public bool Mirrored => m_Renderer != null && m_Renderer.flipX;
         public SpriteAnimationSet Set => m_Set;
+        public SpriteAnimationSet ShadowSet => m_ShadowSet;
+        public SpriteRenderer ShadowRenderer => m_ShadowRenderer;
         public bool IsTelegraphing => m_TelegraphedActive;
 
         public void Configure(SpriteAnimationSet set, SpriteRenderer renderer, SpriteAnimationSet shadowSet, SpriteRenderer shadowRenderer)

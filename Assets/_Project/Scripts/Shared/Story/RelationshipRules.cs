@@ -53,7 +53,13 @@ namespace Hearthdelve.Shared.Story
             foreach (CharacterDefinition c in cast)
             {
                 if (c == null || !c.tracked || c.kind == CharacterKind.Player) continue;
-                if (deed.learners == DeedLearners.Everyone || c.kind == CharacterKind.Staff) yield return c.id;
+                bool learns = deed.learners switch
+                {
+                    DeedLearners.Everyone => true,
+                    DeedLearners.Target => deed.target == DeedTarget.Character && c.id == deed.character,
+                    _ => c.kind == CharacterKind.Staff,
+                };
+                if (learns) yield return c.id;
             }
         }
 
@@ -67,6 +73,10 @@ namespace Hearthdelve.Shared.Story
 
         /// <summary>The Love/Hate faction a deed targets.</summary>
         public static string TargetFaction(DeedTarget target) => target == DeedTarget.Village ? StoryFactions.Village : StoryFactions.Tavern;
+
+        /// <summary>The Love/Hate faction a deed targets: a place, or the character it was done for (their own faction).</summary>
+        public static string TargetFaction(DeedDefinition deed) =>
+            deed != null && deed.target == DeedTarget.Character && !string.IsNullOrEmpty(deed.character) ? deed.character : TargetFaction(deed?.target ?? DeedTarget.Tavern);
     }
 
     /// <summary>The Love/Hate factions that aren't characters: the places deeds are done for.</summary>

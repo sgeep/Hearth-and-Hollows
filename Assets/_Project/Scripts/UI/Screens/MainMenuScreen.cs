@@ -22,6 +22,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] GameObject m_Confirm;
         [SerializeField] Button m_ConfirmYes;
         [SerializeField] Button m_ConfirmNo;
+        [SerializeField] CharacterCreatorScreen m_Creator;
 
         GameFlow m_Flow;
         bool m_HasSave;
@@ -31,6 +32,10 @@ namespace Hearthdelve.UI.Screens
         public bool IsConfirming => m_Confirm != null && m_Confirm.activeSelf;
         public Button ConfirmYes => m_ConfirmYes;
         public Button ConfirmNo => m_ConfirmNo;
+        public CharacterCreatorScreen Creator => m_Creator;
+
+        /// <summary>The character creator New Game opens (4g Checkpoint B).</summary>
+        public void ConfigureCreator(CharacterCreatorScreen creator) => m_Creator = creator;
 
         public void Configure(GameObject choices, Button continueButton, LocalizedSuperText continueDetail, Button newGame, GameObject confirm, Button yes, Button no)
         {
@@ -61,7 +66,7 @@ namespace Hearthdelve.UI.Screens
             if (m_HasSave) StartCoroutine(ShowSave(save));
             m_Continue.onClick.AddListener(() => m_Flow.Continue());
             m_NewGame.onClick.AddListener(NewGame);
-            m_ConfirmYes.onClick.AddListener(() => m_Flow.NewGame());
+            m_ConfirmYes.onClick.AddListener(OpenCreator);
             m_ConfirmNo.onClick.AddListener(() => ShowChoices(m_NewGame));
             ShowChoices(m_HasSave ? m_Continue : m_NewGame);
         }
@@ -70,13 +75,29 @@ namespace Hearthdelve.UI.Screens
         {
             if (!m_HasSave)
             {
-                m_Flow.NewGame();
+                OpenCreator();
                 return;
             }
             m_Choices.SetActive(false);
             m_Confirm.SetActive(true);
             // Back is the safe default: starting over replaces the save.
             Select(m_ConfirmNo);
+        }
+
+        /// <summary>
+        /// A new game begins with the keeper (4g Checkpoint B): the creator, then Tally Ho!. Without a creator (an old menu
+        /// scene) the game starts straight away, as Bram.
+        /// </summary>
+        void OpenCreator()
+        {
+            m_Confirm.SetActive(false);
+            if (m_Creator == null)
+            {
+                m_Flow.NewGame(new Hearthdelve.Shared.Story.PlayerProfile());
+                return;
+            }
+            m_Choices.SetActive(false);
+            m_Creator.Open(m_Flow, () => ShowChoices(m_NewGame));
         }
 
         void ShowChoices(Button selected)

@@ -123,13 +123,17 @@ namespace Hearthdelve.Shared.Run
         public readonly Action<int> OnChosen;
         /// <summary>Furnishings found on the delve (4f Checkpoint C): lost with it, never in the Lockbox.</summary>
         public readonly IReadOnlyList<string> Curios;
+        /// <summary>Quest objects carried (4g Checkpoint B): lost with the delve, never in the Lockbox; they turn up again later.</summary>
+        public readonly IReadOnlyList<string> QuestObjects;
 
-        public DeathScreenRequested(Satchel satchel, DefeatReason reason, Action<int> onChosen, IReadOnlyList<string> curios = null)
+        public DeathScreenRequested(Satchel satchel, DefeatReason reason, Action<int> onChosen, IReadOnlyList<string> curios = null,
+            IReadOnlyList<string> questObjects = null)
         {
             Satchel = satchel;
             Reason = reason;
             OnChosen = onChosen;
             Curios = curios ?? Array.Empty<string>();
+            QuestObjects = questObjects ?? Array.Empty<string>();
         }
     }
 
@@ -296,5 +300,12 @@ namespace Hearthdelve.Shared.Run
             Index = index;
             RoomId = roomId;
         }
+    }
+
+    /// <summary>An enemy can be finished with the Harvest Finisher (it just became eligible): the onboarding's cue (4g Checkpoint B).</summary>
+    public readonly struct FinisherAvailable : IEvent
+    {
+        public readonly bool Boss;
+        public FinisherAvailable(bool boss) => Boss = boss;
     }
 }

@@ -92,9 +92,12 @@ namespace Hearthdelve.UI.Screens
             if (m_CuriosLost != null)
             {
                 var curios = request.Curios;
-                bool any = curios != null && curios.Count > 0;
+                bool quest = request.QuestObjects != null && request.QuestObjects.Count > 0;
+                bool any = quest || (curios != null && curios.Count > 0);
                 m_CuriosLost.gameObject.SetActive(any);
-                if (any) m_CuriosLost.Set(LocKeys.DeathCuriosLost, LocKeys.FurnitureList(curios));
+                // A quest object can't go in the Lockbox (4g Checkpoint B): said first, by name.
+                if (quest) m_CuriosLost.Set(LocKeys.DeathCuriosLost, LocKeys.QuestObjectName(request.QuestObjects[0]));
+                else if (any) m_CuriosLost.Set(LocKeys.DeathCuriosLost, LocKeys.FurnitureList(curios));
             }
             ShowChoice();
             m_Panel.SetActive(true);

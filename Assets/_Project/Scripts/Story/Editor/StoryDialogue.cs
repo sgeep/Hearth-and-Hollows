@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Hearthdelve.Editor;
@@ -23,8 +24,10 @@ namespace Hearthdelve.Story.Editor
         public const string BoogTalk = "Boog/Talk";
         public const string OrikTalk = "Orik/Talk";
 
-        public static DialogueDatabase Ensure(string path)
+        /// <param name="seedLog">The seed log (tests use their own); the project's by default.</param>
+        public static DialogueDatabase Ensure(string path, string seedLog = null)
         {
+            seedLog ??= SeedLogPath;
             var db = AssetDatabase.LoadAssetAtPath<DialogueDatabase>(path);
             if (db == null)
             {
@@ -33,15 +36,85 @@ namespace Hearthdelve.Story.Editor
                 AssetDatabase.CreateAsset(db, path);
             }
             Template template = Template.FromDefault();
-            Actor player = EnsureActor(db, template, DialogueAdapter.PlayerActor, CharacterIds.Player, true);
-            Actor boog = EnsureActor(db, template, "Boog", CharacterIds.Boog, false);
+            var cast = new StoryDialogueSeeds.Cast
+            {
+                Player = EnsureActor(db, template, DialogueAdapter.PlayerActor, CharacterIds.Player, true),
+                Boog = EnsureActor(db, template, "Boog", CharacterIds.Boog, false),
+            };
             RenamePipToOrik(db);
-            Actor pip = EnsureActor(db, template, "Orik", CharacterIds.Orik, false);
-            if (db.GetConversation(BoogTalk) == null) WriteBoog(db, template, player, boog);
-            if (db.GetConversation(OrikTalk) == null) WriteOrik(db, template, player, pip);
+            cast.Orik = EnsureActor(db, template, "Orik", CharacterIds.Orik, false);
+            Seed(db, template, cast, seedLog);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);
             return db;
+        }
+
+        // ---------- Seeding, once (the builder boundary, 4g Checkpoint B) ----------
+
+        /// <summary>
+        /// Every conversation this tooling has ever written, one title per line. A title here is never written again, whatever has
+        /// happened to it since: edited, renamed or deleted in the Dialogue System's editor, it stays that way. Delete a line (and
+        /// the conversation) to have it seeded afresh.
+        /// </summary>
+        public static string SeedLogPath => StoryPaths.Root + "/DialogueSeeds.txt";
+
+        /// <summary>The titles this tooling seeds (tests check each is in the database and well formed).</summary>
+        public static IEnumerable<string> SeedTitles => StoryDialogueSeeds.All.Select(s => s.Title);
+
+        public static HashSet<string> SeededTitles(string seedLog = null)
+        {
+            seedLog ??= SeedLogPath;
+            var titles = new HashSet<string>(StringComparer.Ordinal);
+            if (File.Exists(seedLog))
+                foreach (string line in File.ReadAllLines(seedLog))
+                    if (!string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("#")) titles.Add(line.Trim());
+            return titles;
+        }
+
+        static void LogSeeded(IEnumerable<string> titles, string seedLog)
+        {
+            var all = SeededTitles(seedLog);
+            all.UnionWith(titles);
+            var lines = new List<string>
+            {
+                "# Dialogue System conversations Hearthdelve's story tooling has seeded (StoryDialogue). A title listed here is never",
+                "# written again: the Dialogue System's editor owns it. Remove a line (and its conversation) to have it seeded afresh.",
+            };
+            lines.AddRange(all.OrderBy(t => t, StringComparer.Ordinal));
+            File.WriteAllLines(seedLog, lines);
+            AssetDatabase.ImportAsset(seedLog);
+        }
+
+        /// <summary>
+        /// Writes each seed conversation not yet seeded. Checkpoint A's two proof conversations were seeded before the log existed:
+        /// each is replaced by its Checkpoint B version only if it's exactly as Checkpoint A wrote it; one changed by hand is kept
+        /// (with a warning) and logged as seeded.
+        /// </summary>
+        static void Seed(DialogueDatabase db, Template template, StoryDialogueSeeds.Cast cast, string seedLog)
+        {
+            HashSet<string> seeded = SeededTitles(seedLog);
+            var written = new List<string>();
+            foreach (StoryDialogueSeeds.Seed seed in StoryDialogueSeeds.All)
+            {
+                if (seeded.Contains(seed.Title)) continue;
+                Conversation existing = db.GetConversation(seed.Title);
+                if (existing != null)
+                {
+                    if (!StoryDialogueSeeds.IsUneditedCheckpointA(existing, template, cast))
+                    {
+                        Debug.LogWarning($"[Hearthdelve] Dialogue: '{seed.Title}' already exists and isn't the tooling's own; it's kept as it is.");
+                        written.Add(seed.Title);
+                        continue;
+                    }
+                    int id = existing.id;
+                    // Its old lines leave the Dialogue table with it (FillTable removes keys no longer in the database).
+                    db.conversations.Remove(existing);
+                    seed.Write(db, template, cast, id);
+                }
+                else seed.Write(db, template, cast, -1);
+                written.Add(seed.Title);
+            }
+            if (written.Count > 0) LogSeeded(written, seedLog);
         }
 
         /// <summary>
@@ -102,121 +175,5 @@ namespace Hearthdelve.Story.Editor
 
         /// <summary>A line's text as a player reads it: the Dialogue System's markup (<c>[lua(…)]</c>, <c>[var=…]</c>, <c>[em1]</c>) removed.</summary>
         public static string Readable(string text) => Regex.Replace(text ?? string.Empty, @"\[(lua\([^\]]*\)|var=[^\]]*|/?em\d|f|pic=[^\]]*|position=[^\]]*|auto|nosubtitle|a)\]", "");
-
-        // ---------- Checkpoint A's conversations (temporary writing; the Dialogue System editor owns them from here) ----------
-
-        sealed class Writer
-        {
-            readonly DialogueDatabase m_Db;
-            readonly Template m_Template;
-            readonly Conversation m_Conversation;
-            readonly int m_Npc, m_Player;
-            int m_Next = 1;
-
-            public Writer(DialogueDatabase db, Template template, string title, Actor player, Actor npc, string description)
-            {
-                m_Db = db;
-                m_Template = template;
-                m_Player = player.id;
-                m_Npc = npc.id;
-                m_Conversation = template.CreateConversation(template.GetNextConversationID(db), title);
-                m_Conversation.ActorID = m_Player;
-                m_Conversation.ConversantID = m_Npc;
-                Field.SetValue(m_Conversation.fields, "Description", description);
-                DialogueEntry start = template.CreateDialogueEntry(0, m_Conversation.id, "START");
-                start.ActorID = m_Player;
-                start.ConversantID = m_Npc;
-                start.Sequence = "None()";
-                start.canvasRect = new Rect(20f, 20f, DialogueEntry.CanvasRectWidth, DialogueEntry.CanvasRectHeight);
-                m_Conversation.dialogueEntries.Add(start);
-                db.conversations.Add(m_Conversation);
-            }
-
-            public DialogueEntry Start => m_Conversation.dialogueEntries[0];
-
-            public DialogueEntry Npc(string text, int column, int row, string condition = null) => Entry(m_Npc, m_Player, text, column, row, condition, null);
-
-            public DialogueEntry Player(string text, int column, int row, string script = null) => Entry(m_Player, m_Npc, text, column, row, null, script);
-
-            DialogueEntry Entry(int actor, int conversant, string text, int column, int row, string condition, string script)
-            {
-                DialogueEntry e = m_Template.CreateDialogueEntry(m_Next++, m_Conversation.id, string.Empty);
-                e.ActorID = actor;
-                e.ConversantID = conversant;
-                e.DialogueText = text;
-                if (!string.IsNullOrEmpty(condition)) e.conditionsString = condition;
-                if (!string.IsNullOrEmpty(script)) e.userScript = script;
-                e.canvasRect = new Rect(20f + column * 200f, 20f + row * 60f, DialogueEntry.CanvasRectWidth, DialogueEntry.CanvasRectHeight);
-                m_Conversation.dialogueEntries.Add(e);
-                return e;
-            }
-
-            public void Link(DialogueEntry from, params DialogueEntry[] to)
-            {
-                foreach (DialogueEntry t in to)
-                    from.outgoingLinks.Add(new Link(m_Conversation.id, from.id, m_Conversation.id, t.id));
-            }
-        }
-
-        const string BoogRemembersTusks = "HH_Remembers(\"gunta\", \"displayed_trophy\")";
-
-        /// <summary>
-        /// Boog's Checkpoint A conversation: the proof that a deed done in Decorate Mode reaches him, is remembered and respected,
-        /// and changes what he says. The first branch whose condition holds is taken.
-        /// </summary>
-        static void WriteBoog(DialogueDatabase db, Template template, Actor player, Actor boog)
-        {
-            var w = new Writer(db, template, BoogTalk, player, boog,
-                "Checkpoint A (temporary writing): the tusks proof. Boog remembers the trophy (Love/Hate memory) and respects it (Respect), or offers the proof quest.");
-
-            // He remembers the tusks going up, and respects it.
-            DialogueEntry tusks = w.Npc("you hung the Larder Troll's tusks over the bar. i've been looking at them for an hour.", 0, 1,
-                $"{BoogRemembersTusks} and HH_Respect(\"gunta\") >= 10");
-            DialogueEntry save = w.Npc("if the stove catches fire again, they're the first thing i'm saving. after the bomb.", 0, 2);
-            DialogueEntry looks = w.Player("they do look good up there.", 0, 3);
-            DialogueEntry terrifying = w.Npc("they look terrifying. that's what good looks like.", 0, 4);
-            DialogueEntry again = w.Player("again? the stove's been on fire?", 1, 3);
-            DialogueEntry once = w.Npc("only the once. twice. it's fine, i was there both times.", 1, 4);
-            w.Link(tusks, save);
-            w.Link(save, looks, again);
-            w.Link(looks, terrifying);
-            w.Link(again, once);
-
-            // He remembers, without the respect (a fallback: the values say this shouldn't happen).
-            DialogueEntry noticed = w.Npc("the tusks are up. good. they keep an eye on the stew for me.", 2, 1, BoogRemembersTusks);
-
-            // The proof quest is under way.
-            DialogueEntry waiting = w.Npc("the wall over the bar is still bare. it's begging for something with teeth.", 3, 1,
-                "HH_QuestState(\"proof_trophy_wall\") == \"active\"");
-
-            // Otherwise: the offer.
-            DialogueEntry quiet = w.Npc("this kitchen's too quiet. nothing on the walls is looking at us.", 4, 1);
-            DialogueEntry bring = w.Npc("bring me something big from the Hollows. something with teeth. it goes over the bar.", 4, 2);
-            DialogueEntry yes = w.Player("i'll see what i can find.", 4, 3, "HH_GiveQuest(\"proof_trophy_wall\", \"gunta\")");
-            DialogueEntry cutlery = w.Npc("big teeth. small teeth are just cutlery.", 4, 4);
-            DialogueEntry later = w.Player("maybe later.", 5, 3);
-            DialogueEntry sneak = w.Npc("later is when things sneak up on you. but fine.", 5, 4);
-            w.Link(quiet, bring);
-            w.Link(bring, yes, later);
-            w.Link(yes, cutlery);
-            w.Link(later, sneak);
-
-            w.Link(w.Start, tusks, noticed, waiting, quiet);
-        }
-
-        /// <summary>Orik's Checkpoint A conversation: he remembers the tusks too (affinity, no respect), and greets the keeper by name.</summary>
-        static void WriteOrik(DialogueDatabase db, Template template, Actor player, Actor pip)
-        {
-            var w = new Writer(db, template, OrikTalk, player, pip,
-                "Checkpoint A (temporary writing): Orik remembers the trophy; otherwise he greets the keeper by name.");
-            DialogueEntry tusks = w.Npc("the tusks over the bar are a talking point. a guest asked if they bite. i said only on weekends.", 0, 1,
-                "HH_Remembers(\"pip\", \"displayed_trophy\")");
-            DialogueEntry bite = w.Player("do they?", 0, 2);
-            DialogueEntry check = w.Npc("i haven't checked. i'm not going to check.", 0, 3);
-            w.Link(tusks, bite);
-            w.Link(bite, check);
-            DialogueEntry hello = w.Npc("good evening, [lua(HH_PlayerName())]. the ledger and i are on speaking terms again.", 1, 1);
-            w.Link(w.Start, tusks, hello);
-        }
     }
 }

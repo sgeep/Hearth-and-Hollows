@@ -14,6 +14,7 @@ using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Service;
 using Hearthdelve.Tavern.Staff;
+using Hearthdelve.Shared.Story;
 using UnityEngine;
 
 namespace Hearthdelve.Tavern.Scene
@@ -28,6 +29,11 @@ namespace Hearthdelve.Tavern.Scene
         Results,
         /// <summary>Day loop: the day's summary, upgrades, sleep.</summary>
         Night,
+        /// <summary>
+        /// The Act I opening's first day (4g Checkpoint B): the keeper has just arrived, walks the room, meets Orik and Boog, and goes
+        /// down the cellar hatch to the first delve. In place of the daytime placeholder.
+        /// </summary>
+        Arrival,
     }
 
     /// <summary>
@@ -205,6 +211,7 @@ namespace Hearthdelve.Tavern.Scene
             }
             SetPhase(m_Flow.Phase switch
             {
+                DayPhase.Daytime when m_Flow.State.Story.Opening == OpeningStage.Arrival => TavernPhase.Arrival,
                 DayPhase.Daytime => TavernPhase.Daytime,
                 DayPhase.Night => TavernPhase.Night,
                 _ => TavernPhase.Prep,
@@ -241,6 +248,14 @@ namespace Hearthdelve.Tavern.Scene
             PrepChanged?.Invoke();
         }
 
+        /// <summary>Arrival day (the opening): down the cellar hatch to the first delve.</summary>
+        public void GoDownHatch()
+        {
+            if (Phase != TavernPhase.Arrival || m_Flow == null || m_Flow.IsLoading) return;
+            if (StoryServices.Conversations != null && StoryServices.Conversations.IsTalking) return;
+            m_Flow.BeginFirstDelve();
+        }
+
         /// <summary>The day is done: open the tavern for the evening.</summary>
         public void OpenForEvening()
         {
@@ -270,6 +285,7 @@ namespace Hearthdelve.Tavern.Scene
                 case TavernPhase.Service: EndServiceNow(); break;
                 case TavernPhase.Results: FinishEvening(); break;
                 case TavernPhase.Night: Sleep(); break;
+                case TavernPhase.Arrival: GoDownHatch(); break;
             }
         }
 
@@ -329,9 +345,12 @@ namespace Hearthdelve.Tavern.Scene
         void SetPhase(TavernPhase phase)
         {
             Phase = phase;
-            if (phase == TavernPhase.Service) InputMaps.Activate(InputMaps.Tavern);
+            // On foot while serving, and on arrival day (walking the room is the point).
+            if (phase is TavernPhase.Service or TavernPhase.Arrival) InputMaps.Activate(InputMaps.Tavern);
             else InputMaps.ActivateUIOnly();
             PhaseChanged?.Invoke();
+            // The fact (4g Checkpoint B): the story layer plays the opening's beats when they begin.
+            EventBus<TavernPhaseStarted>.Publish(new TavernPhaseStarted(phase.ToString()));
         }
 
         void OnDestroy()

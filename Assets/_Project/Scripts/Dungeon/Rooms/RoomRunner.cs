@@ -7,7 +7,9 @@ using Hearthdelve.Dungeon.Enemies;
 using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Dungeon.Run;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Navigation;
+using Hearthdelve.Shared.Quests;
 using Hearthdelve.Shared.Run;
 using MoreMountains.Feedbacks;
 using MoreMountains.TopDownEngine;
@@ -195,6 +197,7 @@ namespace Hearthdelve.Dungeon.Rooms
         void OnCleared()
         {
             GrantReward(Node.Reward);
+            if (Node.Kind == RoomKind.Combat) PlaceQuestObjects();
             if (Node.Next.Any(id => Floor.Node(id).Kind == RoomKind.Arena)) LightCampfire(m_Settings != null ? m_Settings.tuning.campfire : null, CampfirePoint());
             OpenUsedExits(instant: false);
             Current.SetRevealed(true);
@@ -259,6 +262,34 @@ namespace Hearthdelve.Dungeon.Rooms
                     HarvestSystem.Instance.Drop(new Hearthdelve.Shared.Inventory.IngredientStack(
                         new Hearthdelve.Shared.Ingredients.IngredientItem(ingredient, reward.Quality), reward.Amount, 1f), at, null);
                     break;
+            }
+        }
+
+        // ---------- Quest objects (4g Checkpoint B) ----------
+
+        int m_FightsFloor = -1, m_FightsCleared;
+
+        /// <summary>
+        /// A quest object the game wants turns up in the fight cleared the set number of rooms into its floor (reliable, whichever
+        /// way the keeper goes; never a random drop), beside the room's reward, until it's brought home.
+        /// </summary>
+        void PlaceQuestObjects()
+        {
+            if (m_FightsFloor != Floor.Floor)
+            {
+                m_FightsFloor = Floor.Floor;
+                m_FightsCleared = 0;
+            }
+            m_FightsCleared++;
+            GameFlow flow = GameFlow.Instance;
+            DelveRunController run = DelveRunController.Active;
+            if (flow == null || !flow.InGame || flow.Database == null || run == null || m_Settings == null || m_Settings.questObjectPickup == null) return;
+            foreach (QuestObjectDefinition definition in flow.Database.questObjects)
+            {
+                if (!QuestObjectRules.PlaceHere(definition, flow.State.QuestObjects, Floor.Floor, m_FightsCleared, run.Loot.Carries(definition.id))) continue;
+                Vector2 at = RewardPoint() + new Vector2(1.5f, 0f);
+                QuestObjectPickup pickup = Instantiate(m_Settings.questObjectPickup, at, Quaternion.identity, Current.transform);
+                pickup.Set(definition);
             }
         }
 

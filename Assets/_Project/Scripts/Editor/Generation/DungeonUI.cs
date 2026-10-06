@@ -130,7 +130,7 @@ namespace Hearthdelve.Editor
         public static void RebuildScreens(Canvas canvas)
         {
             UiFeedbackContent.Ensure(canvas);
-            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "CampfireHint", "DeathScreen", "DelveResult", "RunPower", "PH_EssenceBar", "EssenceLabel" })
+            foreach (string name in new[] { "Hud", "SwapPrompt", "ExitHint", "CampfireHint", "DeathScreen", "DelveResult", "RunPower", "PH_EssenceBar", "EssenceLabel", "Onboarding" })
             {
                 Transform old = canvas.transform.Find(name);
                 if (old != null) Object.DestroyImmediate(old.gameObject);
@@ -148,6 +148,28 @@ namespace Hearthdelve.Editor
             BuildDeathScreen(canvas);
             BuildResultScreen(canvas);
             BuildPowerScreen(canvas);
+            BuildOnboarding(canvas);
+        }
+
+        /// <summary>
+        /// The first delve's prompts (4g Checkpoint B): up to three lines at the foot of the screen, over a dark strip, above the hints
+        /// and clear of the satchel.
+        /// </summary>
+        static void BuildOnboarding(Canvas canvas)
+        {
+            RectTransform root = FullScreen(canvas, "Onboarding");
+            var bottom = new Vector2(0.5f, 0f);
+            RectTransform strip = LookTestBuilder.UIRect(root, "Strip", bottom, bottom, new Vector2(0f, k_HintY + 18f), new Vector2(288f, 3f * GameFonts.LinePixels + 4f));
+            AddImage(strip, Pixel(), new Color(0.05f, 0.04f, 0.06f, 0.78f));
+            var group = strip.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
+            var centre = new Vector2(0.5f, 0.5f);
+            LocalizedSuperText text = LookTestBuilder.Text(strip, "Text", OnboardingLocKeys.Move, TextStyle.Body, k_Light, TextAnchor.MiddleCenter,
+                centre, centre, centre, Vector2.zero, new Vector2(280f, 3f * GameFonts.LinePixels));
+            root.gameObject.AddComponent<Hearthdelve.UI.Hud.OnboardingPrompts>().Configure(group, text);
+            // Under the HUD's screens (the death and result screens cover it), over the world.
+            root.SetSiblingIndex(canvas.transform.Find("Hud") != null ? canvas.transform.Find("Hud").GetSiblingIndex() + 1 : 0);
         }
 
         /// <summary>A 1×1 white sprite for pips, bars and outlines, point filtered.</summary>

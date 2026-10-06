@@ -17,6 +17,8 @@ namespace Hearthdelve.UI.Localization
         public const string PrepTonight = "tavern.prep.tonight";
         /// <summary>Text that's already localized (a dish name, a list of steps), shown as it is.</summary>
         public const string Plain = "tavern.plain";
+        /// <summary>The cellar hatch on arrival day (4g Checkpoint B).</summary>
+        public const string Hatch = "tavern.hatch";
         public const string PrepServings = "tavern.prep.servings";
         public const string PrepPots = "tavern.prep.pots";
         public const string PrepPot = "tavern.prep.pot";
@@ -124,6 +126,7 @@ namespace Hearthdelve.UI.Localization
             (PrepOpen, "open the doors"),
             (PrepTonight, "menu: {0} of {1}"),
             (Plain, "{0}"),
+            (Hatch, "go down into the Hollows"),
             (PrepServings, "{0} to serve"),
             (PrepPots, "{0} pots"),
             (PrepPot, "1 pot"),

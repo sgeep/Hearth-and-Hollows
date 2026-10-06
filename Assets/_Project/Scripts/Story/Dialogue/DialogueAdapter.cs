@@ -39,6 +39,34 @@ namespace Hearthdelve.Story.Dialogue
             return DialogueManager.isConversationActive;
         }
 
+        System.Action m_Ended;
+
+        /// <summary>
+        /// Plays a conversation by its title (the opening's beats, 4g Checkpoint B) and calls <paramref name="ended"/> when it ends,
+        /// however it ends. False if there's no such conversation or one is already open.
+        /// </summary>
+        public bool Play(string title, System.Action ended = null)
+        {
+            if (IsTalking || !DialogueManager.hasInstance || DialogueManager.masterDatabase == null || DialogueManager.masterDatabase.GetConversation(title) == null)
+                return false;
+            m_Ended = ended;
+            DialogueManager.instance.conversationEnded -= OnEnded;
+            DialogueManager.instance.conversationEnded += OnEnded;
+            DialogueManager.StartConversation(title);
+            if (DialogueManager.isConversationActive) return true;
+            DialogueManager.instance.conversationEnded -= OnEnded;
+            m_Ended = null;
+            return false;
+        }
+
+        void OnEnded(Transform actor)
+        {
+            if (DialogueManager.hasInstance) DialogueManager.instance.conversationEnded -= OnEnded;
+            System.Action ended = m_Ended;
+            m_Ended = null;
+            ended?.Invoke();
+        }
+
         /// <summary>The character an actor speaks for, from its <see cref="CharacterIdField"/>.</summary>
         public static string CharacterId(Actor actor)
         {
@@ -67,6 +95,9 @@ namespace Hearthdelve.Story.Dialogue
         public void Clear()
         {
             if (!DialogueManager.hasInstance) return;
+            // A beat cut short by a new game or the menu doesn't move the story on.
+            m_Ended = null;
+            DialogueManager.instance.conversationEnded -= OnEnded;
             if (DialogueManager.isConversationActive) DialogueManager.StopAllConversations();
             DialogueManager.ResetDatabase(DatabaseResetOptions.KeepAllLoaded);
         }

@@ -145,7 +145,7 @@ namespace Hearthdelve.Story.Relationships
         public void Commit(DeedDefinition deed, IEnumerable<string> learners)
         {
             if (deed == null || Database == null || m_Player == null) return;
-            int target = Database.GetFactionID(RelationshipRules.TargetFaction(deed.target));
+            int target = Database.GetFactionID(RelationshipRules.TargetFaction(deed));
             Deed committed = PixelCrushers.LoveHate.Deed.GetNew(deed.id, m_Player.factionID, target, deed.impact, 0f, 0f, deed.shows.ToArray());
             try
             {

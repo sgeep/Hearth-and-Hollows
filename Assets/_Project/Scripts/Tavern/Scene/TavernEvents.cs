@@ -18,6 +18,8 @@ namespace Hearthdelve.Tavern.Scene
         Door,
         /// <summary>Someone to talk to (4g): a member of staff, later anyone with something to say.</summary>
         Person,
+        /// <summary>The cellar hatch on arrival day (4g Checkpoint B): down to the first delve.</summary>
+        Hatch,
     }
 
     /// <summary>What the interaction hint says (the UI turns it into localized text).</summary>

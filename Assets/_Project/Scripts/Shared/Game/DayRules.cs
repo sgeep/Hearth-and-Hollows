@@ -10,8 +10,9 @@ namespace Hearthdelve.Shared.Game
     public sealed class DelveReport
     {
         DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost, IEnumerable<string> bosses = null,
-            IEnumerable<string> curiosKept = null, IEnumerable<string> curiosLost = null)
+            IEnumerable<string> curiosKept = null, IEnumerable<string> curiosLost = null, IEnumerable<string> questObjects = null)
         {
+            QuestObjectsCarried = questObjects != null ? new List<string>(questObjects) : new List<string>();
             BossesDefeated = bosses != null ? new List<string>(bosses) : new List<string>();
             CuriosKept = curiosKept != null ? new List<string>(curiosKept) : new List<string>();
             CuriosLost = curiosLost != null ? new List<string>(curiosLost) : new List<string>();
@@ -35,6 +36,8 @@ namespace Hearthdelve.Shared.Game
         public IReadOnlyList<string> CuriosKept { get; }
         /// <summary>Furnishings found on the delve and lost with it (death). The Lockbox never holds them.</summary>
         public IReadOnlyList<string> CuriosLost { get; }
+        /// <summary>Quest objects carried when the delve ended (4g Checkpoint B): home on extraction, lost on a death by their policy.</summary>
+        public IReadOnlyList<string> QuestObjectsCarried { get; }
 
         public int PartsBroughtBack
         {
@@ -47,21 +50,23 @@ namespace Hearthdelve.Shared.Game
         }
 
         /// <summary>Left through the exit: everything in the satchel comes home (freshness as it is now), and the run's Gold with it.</summary>
-        public static DelveReport Extraction(Satchel satchel, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null)
+        public static DelveReport Extraction(Satchel satchel, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null,
+            IEnumerable<string> questObjects = null)
         {
             var haul = new List<IngredientStack>();
             if (satchel != null)
                 foreach (var slot in satchel.Slots)
                     if (!slot.IsEmpty) haul.Add(slot);
-            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0, bosses, curios);
+            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0, bosses, curios, null, questObjects);
         }
 
         /// <summary>Died: only the Lockbox stack comes home; the run's Gold is lost.</summary>
-        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null)
+        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null,
+            IEnumerable<string> questObjects = null)
         {
             var haul = new List<IngredientStack>();
             if (result.KeptSomething) haul.Add(result.Kept);
-            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold), bosses, null, curios);
+            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold), bosses, null, curios, questObjects);
         }
 
         /// <summary>Debug skip: nothing brought back.</summary>
@@ -97,11 +102,28 @@ namespace Hearthdelve.Shared.Game
         public static void StartEvening(GameState state) => Require(state, DayPhase.Daytime).Cycle.AdvanceTo(DayPhase.Evening);
 
         /// <summary>
+        /// The Act I opening (4g Checkpoint B): the keeper goes down the hatch on arrival day, straight from the daytime to the
+        /// first delve (there's nothing to serve yet). The opening moves on to the first delve.
+        /// </summary>
+        public static void StartOpeningDelve(GameState state)
+        {
+            Require(state, DayPhase.Daytime);
+            if (state.Story.Opening != Story.OpeningStage.Arrival) throw new InvalidOperationException("Only the arrival goes straight down.");
+            state.Today.KeptShut = true;
+            state.Cycle.AdvanceTo(DayPhase.Evening);
+            state.Cycle.AdvanceTo(DayPhase.Delve);
+            state.Story.Opening = Story.OpeningStage.FirstDelve;
+        }
+
+        /// <summary>
         /// Back from the night's delve: the haul goes into the storeroom, the run's Gold into the purse, the delve meal is
         /// used up, and it's night.
         /// </summary>
+        /// <summary>The quest objects the last <see cref="CompleteDelve"/> brought home (for the facts).</summary>
+        public static List<string> QuestObjectsHome { get; private set; } = new();
+
         public static void CompleteDelve(GameState state, DelveReport report, Func<string, Customization.FurnitureDefinition> furniture = null,
-            IEnumerable<BossTrophy> trophies = null)
+            IEnumerable<BossTrophy> trophies = null, Func<string, Quests.QuestObjectDefinition> questObjects = null)
         {
             Require(state, DayPhase.Delve);
             if (report == null) throw new ArgumentNullException(nameof(report));
@@ -123,6 +145,10 @@ namespace Hearthdelve.Shared.Game
             state.Today.CuriosLost += report.CuriosLost.Count;
             // A boss's trophy (D10): granted with the victory, whatever the delve's end.
             TrophyRules.GrantEarned(state, trophies);
+            // Quest objects (4g Checkpoint B): home on extraction; lost with a death (by their policy), still wanted.
+            QuestObjectsHome = Quests.QuestObjectRules.EndDelve(state.QuestObjects, report.QuestObjectsCarried, report.Outcome == DelveOutcome.Extracted, questObjects);
+            // The opening: home from the first delve.
+            if (state.Story.Opening == Story.OpeningStage.FirstDelve) state.Story.Opening = Story.OpeningStage.Homecoming;
             state.Meal = MealBuff.None;
             state.Cycle.AdvanceTo(DayPhase.Night);
         }

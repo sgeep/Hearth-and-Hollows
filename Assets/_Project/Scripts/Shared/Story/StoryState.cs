@@ -15,8 +15,31 @@ namespace Hearthdelve.Shared.Story
 
         public string name = DefaultName;
         public string body = DefaultBody;
+        /// <summary>
+        /// 4g Checkpoint B: the keeper's colours, one Minifantasy ramp per channel ("keeper_hair=red;keeper_skin=brown"), in the
+        /// furniture palettes' format. Empty: the body as drawn.
+        /// </summary>
+        public string palette = string.Empty;
 
-        public PlayerProfile Clone() => new() { name = name, body = body };
+        public PlayerProfile Clone() => new() { name = name, body = body, palette = palette ?? string.Empty };
+    }
+
+    /// <summary>
+    /// Where the Act I opening has got to (4g Checkpoint B), saved by name. Explicit story state: never inferred from the day,
+    /// bosses or furniture. A game saved before the opening existed is <see cref="Complete"/>.
+    /// </summary>
+    public enum OpeningStage
+    {
+        /// <summary>The keeper has just arrived at Tally Ho! (day 1, the tavern, walking): Orik and Boog, then the hatch down.</summary>
+        Arrival,
+        /// <summary>The first delve (the onboarding prompts).</summary>
+        FirstDelve,
+        /// <summary>Home from the first delve (day 1's night): Boog sees what came up.</summary>
+        Homecoming,
+        /// <summary>The first evening's service (day 2): the menu, cooking, serving, getting paid.</summary>
+        FirstEvening,
+        /// <summary>The opening is over (Boog has asked about his bomb).</summary>
+        Complete,
     }
 
     /// <summary>One relationship value, by stable ids and trait name: how <see cref="judge"/> feels about <see cref="subject"/>.</summary>
@@ -67,8 +90,21 @@ namespace Hearthdelve.Shared.Story
     /// </summary>
     public sealed class StoryState
     {
-        /// <summary>The Act I opening has been played (or skipped, for a save from before 4g). A new game starts without it.</summary>
-        public bool OpeningComplete { get; set; }
+        /// <summary>Where the Act I opening is (4g Checkpoint B). A bare state (tests, tools) has none ahead.</summary>
+        public OpeningStage Opening { get; set; } = OpeningStage.Complete;
+
+        /// <summary>The Act I opening has been played (or skipped, for a save from before it existed).</summary>
+        public bool OpeningComplete
+        {
+            get => Opening == OpeningStage.Complete;
+            set => Opening = value ? OpeningStage.Complete : OpeningStage.Arrival;
+        }
+
+        /// <summary>The keeper was made at character creation (or is a legacy keeper, Bram as before). Continue never reopens creation.</summary>
+        public bool CreationComplete { get; set; } = true;
+
+        /// <summary>Onboarding prompts already shown (by id, <see cref="OnboardingHints"/>): each is shown once.</summary>
+        public HashSet<string> SeenHints { get; } = new();
         public PlayerProfile Player { get; set; } = new();
         /// <summary>The Dialogue System's recorded state (its Lua variables): written and read only by the dialogue adapter.</summary>
         public string Dialogue { get; set; } = string.Empty;

@@ -65,6 +65,10 @@ namespace Hearthdelve.Story.Editor
 
             StoryScene.UpdateBoot(database);
             AssetDatabase.SaveAssets();
+            // 4g Checkpoint B: the keeper's looks, the bomb, and the main menu's creator (the menu panel is rebuilt in place).
+            MinifantasyImporter.ImportAll();
+            KeeperContent.Build();
+            BootBuilder.Generate();
             Debug.Log("[Hearthdelve] Story content updated.");
         }
 
@@ -180,6 +184,7 @@ namespace Hearthdelve.Story.Editor
         // ---------- Deeds ----------
 
         public const string DisplayedTrophy = "displayed_trophy";
+        public const string ReturnedBoogsBomb = "returned_boogs_bomb";
 
         static List<DeedDefinition> Deeds()
         {
@@ -196,7 +201,24 @@ namespace Hearthdelve.Story.Editor
             trophy.target = DeedTarget.Tavern;
             trophy.learners = DeedLearners.Staff;
             EditorUtility.SetDirty(trophy);
-            return new List<DeedDefinition> { trophy };
+
+            // 4g Checkpoint B: Boog's bomb, brought back from the Hollows and handed over. Done for Boog, and only he learns of it
+            // (in the conversation that hands it over: HH_Deed). It shows nerve (the keeper went down for it) and a little warmth;
+            // remembered for good. Made once: tune it on the asset.
+            DeedDefinition bomb = LoadOrCreate<DeedDefinition>($"{StoryPaths.Deeds}/Deed_{ReturnedBoogsBomb}.asset", d =>
+            {
+                d.shows = new SocialTraits(0f, 70f, 30f);
+                d.impact = 40f;
+                d.respect = 12f;
+                d.memoryDays = 0;
+            });
+            bomb.id = ReturnedBoogsBomb;
+            bomb.source = DeedSource.None;
+            bomb.target = DeedTarget.Character;
+            bomb.character = CharacterIds.Boog;
+            bomb.learners = DeedLearners.Target;
+            EditorUtility.SetDirty(bomb);
+            return new List<DeedDefinition> { trophy, bomb };
         }
 
         // ---------- Love/Hate ----------
@@ -233,6 +255,8 @@ namespace Hearthdelve.Story.Editor
                 db.SetPersonalRelationshipTrait(c.id, StoryFactions.Player, 1, c.respectForPlayer);
                 db.SetPersonalRelationshipTrait(c.id, StoryFactions.Tavern, 0, c.affinityToTavern);
                 db.SetPersonalRelationshipTrait(c.id, StoryFactions.Village, 0, c.affinityToVillage);
+                // Everyone cares about themselves (4g Checkpoint B): a deed done for them pleases them as much as its impact.
+                db.SetPersonalRelationshipTrait(c.id, c.id, 0, 100f);
             }
             EditorUtility.SetDirty(db);
             return db;
@@ -241,26 +265,30 @@ namespace Hearthdelve.Story.Editor
         // ---------- Quest Machine ----------
 
         public const string ProofQuest = "proof_trophy_wall";
+        public const string BoogsBombQuest = QuestObjectContent.BoogsBombQuest;
 
         /// <summary>
-        /// Checkpoint A's proof quest (temporary; Boog's Bomb replaces it in Step 6): Boog wants something with teeth over the bar.
-        /// One objective, completed by the <c>TrophyDisplayed</c> fact. Its title is a Localization key: Quest Machine's own text
-        /// tables are not used.
+        /// Boog's Bomb (4g Checkpoint B), replacing Checkpoint A's proof quest (its asset is deleted; a save that has it drops it on
+        /// load). Two objectives, each completed by a gameplay fact sent as a Quest Machine message: bring her home (the bomb comes
+        /// up with an extraction: <c>QuestObjectBroughtHome</c>), then hand her to Boog (<c>QuestObjectDelivered</c>, from his
+        /// conversation). Death never fails it. Created once: from then on Quest Machine's editor owns it. Its title is a
+        /// Localization key; the reward is given by Hearth &amp; Hollows code, never a quest action.
         /// </summary>
         static QuestDatabase Quests()
         {
-            string path = $"{StoryPaths.Quests}/Quest_{ProofQuest}.asset";
+            string proof = $"{StoryPaths.Quests}/Quest_{ProofQuest}.asset";
+            if (AssetDatabase.LoadAssetAtPath<Quest>(proof) != null) AssetDatabase.DeleteAsset(proof);
+            string path = $"{StoryPaths.Quests}/Quest_{BoogsBombQuest}.asset";
             var quest = AssetDatabase.LoadAssetAtPath<Quest>(path);
             if (quest == null)
             {
-                var builder = new QuestBuilder("Something with teeth (Checkpoint A proof)", ProofQuest, StoryLocKeys.ProofQuestTitle);
+                var builder = new QuestBuilder("Boog's Bomb", BoogsBombQuest, StoryLocKeys.BoogsBombTitle);
                 QuestNode start = builder.GetStartNode();
-                QuestNode hang = builder.AddConditionNode(start, "hang", "Hang a trophy over the bar");
-                var heard = ScriptableObject.CreateInstance<MessageQuestCondition>();
-                heard.message = new StringField(global::Hearthdelve.Story.Quests.QuestAdapter.FactMessage);
-                heard.parameter = new StringField("TrophyDisplayed");
-                hang.conditionSet.conditionList.Add(heard);
-                builder.AddSuccessNode(hang);
+                QuestNode find = builder.AddConditionNode(start, "find", "Bring her home from the Cellars");
+                find.conditionSet.conditionList.Add(Heard(nameof(Hearthdelve.Shared.Game.QuestObjectBroughtHome), QuestObjectContent.BoogsBomb));
+                QuestNode hand = builder.AddConditionNode(find, "return", "Give her back to Boog");
+                hand.conditionSet.conditionList.Add(Heard(nameof(Hearthdelve.Shared.Game.QuestObjectDelivered), QuestObjectContent.BoogsBomb));
+                builder.AddSuccessNode(hand);
                 quest = QuestEditorAssetUtility.SaveQuestAsAsset(builder.ToQuest(), path);
             }
             var db = LoadOrCreate<QuestDatabase>(StoryPaths.QuestDatabase);
@@ -268,6 +296,16 @@ namespace Hearthdelve.Story.Editor
             db.questAssets.Add(quest);
             EditorUtility.SetDirty(db);
             return db;
+        }
+
+        /// <summary>A condition true when the fact arrives for this id (Hearth &amp; Hollows' "HH Fact" message).</summary>
+        static MessageQuestCondition Heard(string fact, string id)
+        {
+            var heard = ScriptableObject.CreateInstance<MessageQuestCondition>();
+            heard.message = new StringField(global::Hearthdelve.Story.Quests.QuestAdapter.FactMessage);
+            heard.parameter = new StringField(fact);
+            heard.value = new MessageValue { stringValue = id };
+            return heard;
         }
     }
 }

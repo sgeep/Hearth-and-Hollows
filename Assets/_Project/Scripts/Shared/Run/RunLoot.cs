@@ -46,6 +46,25 @@ namespace Hearthdelve.Shared.Run
         /// <summary>An enemy's curio is on the floor (counted when it drops, so the cap holds even if it's left lying).</summary>
         public void NoteEnemyDrop() => CuriosDropped++;
 
+        readonly System.Collections.Generic.List<string> m_QuestObjects = new();
+
+        /// <summary>
+        /// Quest objects picked up on this delve (4g Checkpoint B), by id: never in the satchel or the Lockbox; home with an
+        /// extraction, lost with a death by their policy.
+        /// </summary>
+        public System.Collections.Generic.IReadOnlyList<string> QuestObjects => m_QuestObjects;
+
+        public event Action<string> QuestObjectAdded;
+
+        public bool Carries(string id) => id != null && m_QuestObjects.Contains(id);
+
+        public void AddQuestObject(string id)
+        {
+            if (string.IsNullOrEmpty(id) || m_QuestObjects.Contains(id)) return;
+            m_QuestObjects.Add(id);
+            QuestObjectAdded?.Invoke(id);
+        }
+
         public int Gold { get; private set; }
 
         /// <summary>Raised whenever the run's Gold changes, with the new total.</summary>

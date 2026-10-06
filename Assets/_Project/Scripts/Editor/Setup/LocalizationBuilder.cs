@@ -106,7 +106,7 @@ namespace Hearthdelve.Editor
             // The furniture catalogue's names, descriptions and colourways, and the palette ramps, tiers and finishes, come from
             // their own tables (4f Checkpoint B).
             FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English)
-                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()), k_GeneratedPrefixes);
+                .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(KeeperContent.English()).Concat(QuestObjectContent.English), k_GeneratedPrefixes);
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();
         }
@@ -115,7 +115,7 @@ namespace Hearthdelve.Editor
         /// Key prefixes whose keys are made from names by a generator (a colorway's "look." key comes from its name): a key
         /// under one of them that's no longer generated is removed, so a renamed colorway leaves no stale entry behind.
         /// </summary>
-        static readonly string[] k_GeneratedPrefixes = { "look." };
+        static readonly string[] k_GeneratedPrefixes = { "look.", "keeper." };
 
         internal static void FillTable(string tableName, IEnumerable<(string key, string english)> entries, string[] prunePrefixes = null)
         {

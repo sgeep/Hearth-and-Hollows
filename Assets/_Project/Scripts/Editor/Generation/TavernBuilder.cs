@@ -93,6 +93,7 @@ namespace Hearthdelve.Editor
             TavernScreens.Rebuild(ui);
             GuestRoomBuilder.BuildFade(ui);
             AddMood();
+            AddOpeningHatch();
             GameFonts.ApplyToOpenScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -278,6 +279,26 @@ namespace Hearthdelve.Editor
         // ------------------------------------------------------------------ stations and serving (step 3)
 
         /// <summary>The keeper carries plates over their head (4c decision 2): added to the tavern player prefab in place.</summary>
+        /// <summary>
+        /// The cellar hatch for arrival day (4g Checkpoint B): the Dungeon pack's ladder hole on the floor, used like a station. Rebuilt
+        /// in place; it shows itself only while the keeper is arriving, on the open tile nearest its spot.
+        /// </summary>
+        static void AddOpeningHatch()
+        {
+            GameObject old = GameObject.Find("Opening Hatch");
+            if (old != null) Object.DestroyImmediate(old);
+            var root = new GameObject("Opening Hatch");
+            var visual = new GameObject("Visual");
+            visual.transform.SetParent(root.transform, false);
+            LookTestContent.AddSprite(visual.transform, "Hole", MinifantasyImporter.Sprite(MinifantasySheets.Dungeon, "Holes", "Ladder"), SortingLayers.Floor, 3, Vector3.zero);
+            var use = new GameObject("Use");
+            use.transform.SetParent(root.transform, false);
+            var interactable = use.AddComponent<TavernInteractable>();
+            // The keeper stands at its lower edge, as at a station.
+            interactable.Configure(TavernInteractableKind.Hatch, TavernLocKeys.Hatch, new Vector2(0f, -0.7f), 1f, null);
+            root.AddComponent<OpeningHatch>().Configure(interactable, visual, new Vector2(6.5f, 5.5f));
+        }
+
         internal static void AddCarryViewToPlayer()
         {
             GameObject contents = PrefabUtility.LoadPrefabContents(LookTestContent.TavernPlayerPrefab);

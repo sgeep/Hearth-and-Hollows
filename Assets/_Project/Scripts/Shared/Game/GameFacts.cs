@@ -208,4 +208,39 @@ namespace Hearthdelve.Shared.Game
             CameHome = cameHome;
         }
     }
+
+    /// <summary>A part of the day began in the tavern (4g Checkpoint B): "Daytime", "Arrival", "Prep", "Service", "Results", "Night".</summary>
+    public readonly struct TavernPhaseStarted : IEvent
+    {
+        public readonly string Phase;
+        public TavernPhaseStarted(string phase) => Phase = phase;
+    }
+
+    /// <summary>A quest object was picked up in the Hollows (4g Checkpoint B).</summary>
+    public readonly struct QuestObjectFound : IEvent
+    {
+        public readonly string ObjectId;
+        public QuestObjectFound(string objectId) => ObjectId = objectId;
+    }
+
+    /// <summary>A quest object came home with an extraction: persistent quest progress.</summary>
+    public readonly struct QuestObjectBroughtHome : IEvent
+    {
+        public readonly string ObjectId;
+        public QuestObjectBroughtHome(string objectId) => ObjectId = objectId;
+    }
+
+    /// <summary>A quest object was lost with a death before extraction (it turns up again while the quest wants it).</summary>
+    public readonly struct QuestObjectLost : IEvent
+    {
+        public readonly string ObjectId;
+        public QuestObjectLost(string objectId) => ObjectId = objectId;
+    }
+
+    /// <summary>A quest object was handed over (its quest's part done).</summary>
+    public readonly struct QuestObjectDelivered : IEvent
+    {
+        public readonly string ObjectId;
+        public QuestObjectDelivered(string objectId) => ObjectId = objectId;
+    }
 }

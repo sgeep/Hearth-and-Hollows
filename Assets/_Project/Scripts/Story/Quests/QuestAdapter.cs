@@ -74,10 +74,40 @@ namespace Hearthdelve.Story.Quests
         /// <summary>The journal as Quest Machine records it (its JSON), for the game's save.</summary>
         public string Record() => m_Journal != null ? m_Journal.RecordData() : string.Empty;
 
-        public void Apply(string data)
+        public void Apply(string data, List<string> warnings = null)
         {
             Clear();
-            if (m_Journal != null && !string.IsNullOrEmpty(data)) m_Journal.ApplyData(data);
+            if (m_Journal != null && !string.IsNullOrEmpty(data)) m_Journal.ApplyData(WithoutRetired(data, warnings));
+        }
+
+        /// <summary>
+        /// The journal's data without quests the game no longer has (4g Checkpoint A's proof quest, retired in Checkpoint B): Quest
+        /// Machine would report each as an error. A retired quest has nothing to hand on; it's dropped with a warning.
+        /// </summary>
+        static string WithoutRetired(string data, List<string> warnings)
+        {
+            QuestListContainer.SaveData saved;
+            try
+            {
+                saved = SaveSystem.Deserialize<QuestListContainer.SaveData>(data);
+            }
+            catch (System.Exception)
+            {
+                return data;
+            }
+            if (saved == null) return data;
+            bool dropped = false;
+            for (int i = saved.staticQuestIds.Count - 1; i >= 0; i--)
+            {
+                string id = saved.staticQuestIds[i];
+                if (string.IsNullOrEmpty(id) || QuestMachine.GetQuestAsset(id) != null) continue;
+                saved.staticQuestIds.RemoveAt(i);
+                if (i < saved.staticQuestJsonData.Count) saved.staticQuestJsonData.RemoveAt(i);
+                if (i < saved.staticQuestData.Count) saved.staticQuestData.RemoveAt(i);
+                warnings?.Add($"the quest '{id}' is no longer in the game; dropped from the journal");
+                dropped = true;
+            }
+            return dropped ? SaveSystem.Serialize(saved) : data;
         }
 
         /// <summary>An empty journal: a new game, or the menu.</summary>

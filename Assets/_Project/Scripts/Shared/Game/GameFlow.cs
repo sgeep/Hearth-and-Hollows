@@ -28,6 +28,8 @@ namespace Hearthdelve.Shared.Game
     {
         IEnumerator Cover();
         IEnumerator Reveal();
+        /// <summary>Anything of the cover is still up (4g Checkpoint B: the opening's conversations wait for the scene to show).</summary>
+        bool IsCovering { get; }
     }
 
     /// <summary>
@@ -122,21 +124,87 @@ namespace Hearthdelve.Shared.Game
         }
 
         /// <summary>
-        /// Starts day 1 with a delve into the Hollows: the storeroom starts empty, so the first thing to do is go down for
-        /// something to cook (after the 4d playtest: an empty first daytime and a shut first evening were dead time). The
-        /// first night, sleep, and the second day begins in the daytime. Saved at once, so Continue never brings back a
-        /// game the player started over from.
+        /// A new game (4g Checkpoint B), after character creation: the keeper made in the creator arrives at Tally Ho! on day 1
+        /// (the Act I opening: Orik and Boog, then the hatch down to the first delve). Saved at once, so Continue never brings
+        /// back a game the player started over from.
         /// </summary>
-        public void NewGame()
+        public void NewGame(PlayerProfile keeper)
         {
-            State = new GameState(1, DayPhase.Delve) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
+            State = new GameState(1, DayPhase.Daytime) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
             State.Furniture.GrantStarter(m_Database != null ? m_Database.startingFurniture : null);
-            // A fresh story (4g): no history, the opening still to play (Step 5). Explicit, never inferred from the day.
-            State.Story.OpeningComplete = false;
+            State.Story.Player = (keeper ?? new PlayerProfile()).Clone();
+            State.Story.Player.name = Characters.KeeperRules.CleanName(State.Story.Player.name);
+            State.Story.CreationComplete = true;
+            State.Story.Opening = OpeningStage.Arrival;
             StoryServices.State?.Clear();
             Save();
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));
+        }
+
+        /// <summary>
+        /// A new game without character creation or the opening (tests and debugging; the game before 4g Checkpoint B): Bram,
+        /// day 1 with a delve into the Hollows (the storeroom starts empty), every onboarding prompt already seen.
+        /// </summary>
+        public void QuickNewGame()
+        {
+            State = new GameState(1, DayPhase.Delve) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
+            State.Furniture.GrantStarter(m_Database != null ? m_Database.startingFurniture : null);
+            State.Story.Opening = OpeningStage.Complete;
+            State.Story.CreationComplete = true;
+            foreach (string hint in OnboardingHints.All) State.Story.SeenHints.Add(hint);
+            StoryServices.State?.Clear();
+            Save();
+            PhaseChanged?.Invoke();
+            Load(SceneFor(State.Phase));
+        }
+
+        /// <summary>The opening's arrival (4g Checkpoint B): down the hatch to the first delve. Saved.</summary>
+        public bool BeginFirstDelve()
+        {
+            if (!InGame || IsLoading || State.Phase != DayPhase.Daytime || State.Story.Opening != OpeningStage.Arrival) return false;
+            DayRules.StartOpeningDelve(State);
+            PhaseChanged?.Invoke();
+            Save();
+            Load(GameScenes.Dungeon);
+            return true;
+        }
+
+        /// <summary>The opening moves on (the story layer, as its beats finish). Never backwards; saved at the next safe point.</summary>
+        public void AdvanceOpening(OpeningStage stage)
+        {
+            if (!InGame || stage <= State.Story.Opening) return;
+            State.Story.Opening = stage;
+            StateChanged?.Invoke();
+        }
+
+        /// <summary>An onboarding prompt was shown (saved with the day's next save).</summary>
+        public void MarkHintSeen(string hint)
+        {
+            if (InGame && !string.IsNullOrEmpty(hint)) State.Story.SeenHints.Add(hint);
+        }
+
+        /// <summary>A quest now wants an object (giving its quest): it turns up in the Hollows until brought home.</summary>
+        public bool WantQuestObject(string id)
+        {
+            if (!InGame || !State.QuestObjects.Want(id)) return false;
+            StateChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// A quest object handed over (the conversation that ends its quest): its reward is given (Hearth &amp; Hollows code,
+        /// never a quest action, so a reload can't give it twice), the fact is published, and the game saves.
+        /// </summary>
+        public bool DeliverQuestObject(string id)
+        {
+            if (!InGame || !State.QuestObjects.Deliver(id)) return false;
+            Quests.QuestObjectDefinition definition = m_Database != null ? m_Database.QuestObject(id) : null;
+            if (definition != null) State.AddGold(definition.rewardGold);
+            EventBus<QuestObjectDelivered>.Publish(new QuestObjectDelivered(id));
+            StateChanged?.Invoke();
+            Save();
+            return true;
         }
 
         /// <summary>Loads the save and resumes at its phase. Returns false if there's no readable save.</summary>
@@ -212,9 +280,15 @@ namespace Hearthdelve.Shared.Game
         /// </summary>
         public void CompleteDelve(DelveReport report)
         {
-            DayRules.CompleteDelve(State, report, m_Database != null ? m_Database.Furniture : null, m_Database != null ? m_Database.bossTrophies : null);
+            DayRules.CompleteDelve(State, report, m_Database != null ? m_Database.Furniture : null, m_Database != null ? m_Database.bossTrophies : null,
+                m_Database != null ? m_Database.QuestObject : null);
             // Facts for later reactions (4g's dialogue adapters): what came home from the Hollows.
             foreach (string curio in report.CuriosKept) EventBus<CurioBroughtHome>.Publish(new CurioBroughtHome(curio));
+            foreach (string id in report.QuestObjectsCarried)
+            {
+                if (DayRules.QuestObjectsHome.Contains(id)) EventBus<QuestObjectBroughtHome>.Publish(new QuestObjectBroughtHome(id));
+                else EventBus<QuestObjectLost>.Publish(new QuestObjectLost(id));
+            }
             // A boss's first defeat (4e): the hook for first-clear rewards, story reactions and 4f's trophy.
             foreach (string boss in report.BossesDefeated)
             {

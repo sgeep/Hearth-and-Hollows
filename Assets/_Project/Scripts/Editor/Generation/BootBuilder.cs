@@ -166,7 +166,10 @@ namespace Hearthdelve.Editor
             Button no = TavernScreens.SmallButton(confirm, "No", LoopLocKeys.MenuConfirmNo, centre, new Vector2(45f, -10f), 80f, out _);
             confirm.gameObject.SetActive(false);
 
-            root.gameObject.AddComponent<MainMenuScreen>().Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
+            var menu = root.gameObject.AddComponent<MainMenuScreen>();
+            menu.Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
+            // 4g Checkpoint B: New Game makes the keeper first.
+            menu.ConfigureCreator(KeeperCreatorUI.Build(root));
             UiFeedbackContent.Commit(continueButton);
             UiFeedbackContent.Commit(newGame);
             UiFeedbackContent.Commit(yes);

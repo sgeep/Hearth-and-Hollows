@@ -5,6 +5,7 @@ using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
+using Hearthdelve.Shared.Quests;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Shared.Story;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 8;
+        public const int CurrentVersion = 9;
 
         /// <summary>Starting pieces added in version 7 (4f Checkpoint C); a version 6 save gets them once, in storage.</summary>
         public static readonly string[] StartersAddedInV7 = { "butcher_block" };
@@ -96,11 +97,18 @@ namespace Hearthdelve.Shared.Save
             data.story = new StorySaveData
             {
                 openingComplete = story.OpeningComplete,
+                openingStage = story.Opening.ToString(),
+                creationComplete = story.CreationComplete,
+                seenHints = new List<string>(story.SeenHints),
                 player = (story.Player ?? new PlayerProfile()).Clone(),
                 dialogue = story.Dialogue ?? string.Empty,
                 quests = story.Quests ?? string.Empty,
                 relationships = story.Relationships ?? new RelationshipData(),
             };
+            data.story.seenHints.Sort(string.CompareOrdinal);
+            foreach (var pair in state.QuestObjects.All)
+                data.questObjects.Add(new QuestObjectData { id = pair.Key, status = pair.Value.ToString() });
+            data.questObjects.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
             return data;
         }
 
@@ -157,6 +165,9 @@ namespace Hearthdelve.Shared.Save
 
             RestoreFurniture(state.Furniture, data.furniture, furnitureExists ?? (_ => true), startingFurniture, warnings);
             RestoreStory(state.Story, data.story);
+            if (data.questObjects != null)
+                foreach (QuestObjectData q in data.questObjects)
+                    if (q != null && Enum.TryParse(q.status, out QuestObjectStatus status)) state.QuestObjects.Set(q.id, status);
             // A boss beaten before its trophy existed (a 4e save) earns it now, once: the same rule as a fresh victory.
             TrophyRules.GrantEarned(state, trophies);
             return state;
@@ -164,13 +175,21 @@ namespace Hearthdelve.Shared.Save
 
         static void RestoreStory(StoryState story, StorySaveData data)
         {
-            data ??= new StorySaveData { openingComplete = true };
-            story.OpeningComplete = data.openingComplete;
+            data ??= new StorySaveData { openingComplete = true, openingStage = nameof(OpeningStage.Complete), creationComplete = true };
+            story.Opening = Enum.TryParse(data.openingStage, out OpeningStage stage) && Enum.IsDefined(typeof(OpeningStage), stage)
+                ? stage
+                : data.openingComplete ? OpeningStage.Complete : OpeningStage.Arrival;
+            story.CreationComplete = data.creationComplete;
+            story.SeenHints.Clear();
+            if (data.seenHints != null)
+                foreach (string hint in data.seenHints)
+                    if (!string.IsNullOrEmpty(hint)) story.SeenHints.Add(hint);
             PlayerProfile player = data.player ?? new PlayerProfile();
             story.Player = new PlayerProfile
             {
                 name = string.IsNullOrWhiteSpace(player.name) ? PlayerProfile.DefaultName : player.name,
                 body = string.IsNullOrWhiteSpace(player.body) ? PlayerProfile.DefaultBody : player.body,
+                palette = player.palette ?? string.Empty,
             };
             story.Dialogue = data.dialogue ?? string.Empty;
             story.Quests = data.quests ?? string.Empty;
@@ -252,6 +271,7 @@ namespace Hearthdelve.Shared.Save
             if (data.version == 5) data = MigrateV5(data);
             if (data.version == 6) data = MigrateV6(data);
             if (data.version == 7) data = MigrateV7(data);
+            if (data.version == 8) data = MigrateV8(data);
             return data;
         }
 
@@ -280,6 +300,25 @@ namespace Hearthdelve.Shared.Save
             v7.version = 8;
             v7.story = new StorySaveData { openingComplete = true, player = new PlayerProfile() };
             return v7;
+        }
+
+        /// <summary>
+        /// v8 → v9 (4g Checkpoint B): the opening's stage, character creation and the onboarding prompts become explicit. Every
+        /// version 8 save (4g Checkpoint A's playtests included) is past them: its opening is complete, its keeper made (Bram, as
+        /// migrated), its prompts seen; no quest objects yet. Continue never sends it through creation or the opening.
+        /// </summary>
+        static SaveData MigrateV8(SaveData v8)
+        {
+            v8.version = 9;
+            v8.story ??= new StorySaveData();
+            v8.story.openingComplete = true;
+            v8.story.openingStage = nameof(OpeningStage.Complete);
+            v8.story.creationComplete = true;
+            v8.story.seenHints = new List<string>(OnboardingHints.All);
+            v8.story.player ??= new PlayerProfile();
+            v8.story.player.palette ??= string.Empty;
+            v8.questObjects = new List<QuestObjectData>();
+            return v8;
         }
 
         static SaveData MigrateV6(SaveData v6)

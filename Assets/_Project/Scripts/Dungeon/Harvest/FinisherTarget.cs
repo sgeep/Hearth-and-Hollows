@@ -1,6 +1,7 @@
 using Hearthdelve.Dungeon.Bosses;
 using Hearthdelve.Dungeon.Enemies;
 using MoreMountains.TopDownEngine;
+using Hearthdelve.Core.Events;
 using UnityEngine;
 
 namespace Hearthdelve.Dungeon.Harvest
@@ -51,8 +52,11 @@ namespace Hearthdelve.Dungeon.Harvest
                 float since = m_Reaction != null ? Time.time - m_Reaction.LastHitTime : float.MaxValue;
                 eligible = FinisherRules.Eligible(m_Health.CurrentHealth, m_Health.MaximumHealth, since, Settings);
             }
+            bool was = IsEligible;
             IsEligible = eligible && !FinishingBlow;
             if (m_Prompt != null && m_Prompt.activeSelf != IsEligible) m_Prompt.SetActive(IsEligible);
+            // 4g Checkpoint B: the onboarding's cue that the finisher is there.
+            if (IsEligible && !was) EventBus<Hearthdelve.Shared.Run.FinisherAvailable>.Publish(new Hearthdelve.Shared.Run.FinisherAvailable(IsBoss));
         }
 
         /// <summary>The finishing blow, from <paramref name="by"/>. False if it can't be finished now.</summary>

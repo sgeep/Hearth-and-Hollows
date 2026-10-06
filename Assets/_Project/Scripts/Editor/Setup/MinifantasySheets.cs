@@ -71,6 +71,9 @@ namespace Hearthdelve.Editor
         const string k_Creatures = "Minifantasy_Creatures_v3.3_Commercial_Version/Minifantasy_Creatures_Assets";
         const string k_Townsfolk = k_Creatures + "/Base_Humanoids/Human/Human_Townsfolk";
         const string k_Slime = k_Creatures + "/Slimes/Green_Slime";
+        const string k_Amazon = k_Creatures + "/Base_Humanoids/Human/Human_Amazon";
+        const string k_WildOrc = k_Creatures + "/Base_Humanoids/Orc/Wild Orc";
+        const string k_Dwarf = k_Creatures + "/Base_Humanoids/Dwarf/Dwarf_Yellow_Beard";
         const string k_Dungeon = "Minifantasy_Dungeon_v2.3_Commercial_Version/Minifantasy_Dungeon_Assets";
         const string k_Tavern = "All_Exclusives_20261002/Addons/Towns_I_II/Tavern_Indoor/Separate_Layers";
         const string k_Shop = "All_Exclusives_20261002/Addons/Towns_I_II/Shop_Indoor/Separate_Layers";
@@ -244,13 +247,33 @@ namespace Hearthdelve.Editor
             // Player (4a look test): the Human Townsfolk from Creatures, with its shadow sheets.
             foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
             {
-                sheets.Add(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}"));
+                sheets.Add(Readable(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}")));
                 // 4f Checkpoint C: Orik, a derived sheet in the same layout (idle and walk only). The cook is Boog now (the Goblin Sapper, below).
                 if (anim is "Idle" or "Walk")
                     foreach (string who in new[] { "Orik" })
                         sheets.Add(Character($"derived:Tools/characters/derived/{who}{anim}.png", Staff, $"{who}{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
             }
+
+            // The keeper's other bodies (4g Checkpoint B, the creator), readable for their colourways: the Human Amazon and the
+            // Wild Orc (a 12-frame Die in place of SpinDie; four-facing Jumps), and the Yellow Beard dwarf with its own shadows.
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "Die", "ChargedAttack" })
+            {
+                sheets.Add(Readable(Character($"{k_Amazon}/Amazon{anim}.png", Creatures, $"Amazon{anim}")));
+                sheets.Add(Readable(Character($"{k_WildOrc}/WildOrc{anim}.png", Creatures, $"WildOrc{anim}")));
+            }
+            foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
+            {
+                // The pack's own spellings: "YellowBeardIdle", "YellowBear" for the rest; "ShadowDwar" for the walk, jump and spin.
+                string body = anim == "Idle" ? "YellowBeard" : "YellowBear";
+                string shadow = anim is "Walk" or "Jump" or "SpinDie" ? "ShadowDwar" : "ShadowDwarf";
+                sheets.Add(Readable(Character($"{k_Dwarf}/{body}{anim}.png", Creatures, $"DwarfYellowBeard{anim}")));
+                sheets.Add(Character($"{k_Dwarf}/_Shadows/{shadow}{anim}.png", Creatures, $"ShadowDwarf{anim}"));
+            }
+
+            // Boog's bomb (4g Checkpoint B, the quest object): the Goblin Sapper's bomb, its fuse sputtering (row 0, 10 frames).
+            sheets.Add(new Sheet { Source = $"{k_Sapper}/Only_Bomb.png", Pack = GoblinSapper, File = "GoblinSapperBomb", Mode = SliceMode.Grid,
+                Cell = new Vector2Int(CharacterFrame, CharacterFrame), Pivot = FeetPivot });
 
             // Dialogue portraits (4g).
             foreach (string id in PortraitIds) sheets.Add(PortraitSheet(id));
@@ -610,6 +633,12 @@ namespace Hearthdelve.Editor
                     all.Add(new SheetRect($"Cell_{c}_{r}", TavernRoomOrigin.x + c * Tile, TavernRoomOrigin.y + r * Tile, Tile, Tile, k_Centre));
             }
             return all.ToArray();
+        }
+
+        static Sheet Readable(Sheet sheet)
+        {
+            sheet.Readable = true;
+            return sheet;
         }
 
         static Sheet Character(string source, string pack, string file) =>

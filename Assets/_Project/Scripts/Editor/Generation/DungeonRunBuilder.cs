@@ -316,6 +316,9 @@ namespace Hearthdelve.Editor
         {
             BuildSounds();
             BuildCurios(settings);
+            // 4g Checkpoint B: quest objects (Boog's bomb) and their pickup.
+            MinifantasyImporter.ImportAll();
+            QuestObjectContent.Build(settings);
             Scene scene = EditorSceneManager.OpenScene(EditorPaths.DungeonScene, OpenSceneMode.Single);
             // The HUD and the result screen (step 3: run Gold) are rebuilt with the run.
             DungeonUI.RebuildScreens(UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI"));

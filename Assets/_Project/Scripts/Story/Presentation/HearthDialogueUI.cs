@@ -38,8 +38,7 @@ namespace Hearthdelve.Story.Presentation
         [SerializeField] Button[] m_ChoiceButtons = Array.Empty<Button>();
         [SerializeField] LocalizedSuperText[] m_ChoiceLabels = Array.Empty<LocalizedSuperText>();
         [SerializeField] GameObject[] m_ChoicePointers = Array.Empty<GameObject>();
-        [SerializeField, Min(1f), Tooltip("How fast a line is revealed.")] float m_CharactersPerSecond = 45f;
-        [SerializeField, Min(0.05f), Tooltip("The ▼ bobs a pixel this often (seconds).")] float m_ContinueBob = 0.35f;
+        [SerializeField, Tooltip("The typewriter's speed and the ▼'s bob (one asset for every dialogue box).")] DialogueSettings m_Settings;
         [SerializeField, Tooltip("Pixels from one choice to the next, and the panel's margin above and below them.")]
         float m_ChoicePitch = 15f, m_ChoicePad = 4f;
 
@@ -51,6 +50,7 @@ namespace Hearthdelve.Story.Presentation
         int m_ResponseCount;
         string[] m_Maps;
         int m_ArmedAfterFrame;
+        bool m_ChoicesLocked;
         bool m_Paused;
         PortraitDefinition m_Speaker;
         float m_TalkTime, m_NextBlink, m_BlinkUntil;
@@ -88,6 +88,8 @@ namespace Hearthdelve.Story.Presentation
             m_ChoiceLabels = choiceLabels;
             m_ChoicePointers = choicePointers;
         }
+
+        public void ConfigureSettings(DialogueSettings settings) => m_Settings = settings;
 
         void Awake()
         {
@@ -151,7 +153,7 @@ namespace Hearthdelve.Story.Presentation
             SetChoicesVisible(false);
             ShowSpeaker(subtitle);
             Line = DialogueText.Line(subtitle);
-            if (m_BodyText != null) m_BodyText.readDelay = 1f / Mathf.Max(1f, m_CharactersPerSecond);
+            if (m_BodyText != null) m_BodyText.readDelay = 1f / Mathf.Max(1f, CharactersPerSecond);
             m_Body.Set(TavernLocKeys.Plain, Line);
             m_TalkTime = 0f;
             if (m_Continue != null) m_Continue.gameObject.SetActive(false);
@@ -198,6 +200,8 @@ namespace Hearthdelve.Story.Presentation
             SetChoicesVisible(true);
             Select(first != null ? first.gameObject : null);
             Arm();
+            // The press that finished the line can't also choose: choices wait until every confirm is let go.
+            m_ChoicesLocked = true;
         }
 
         public void HideResponses()
@@ -222,6 +226,22 @@ namespace Hearthdelve.Story.Presentation
         /// <summary>A press that opened the box or chose a line this frame doesn't also move it on.</summary>
         void Arm() => m_ArmedAfterFrame = Time.frameCount;
 
+        public float CharactersPerSecond => m_Settings != null ? m_Settings.charactersPerSecond : 45f;
+        float ContinueBob => m_Settings != null ? m_Settings.continueBob : 0.35f;
+
+        /// <summary>Choices can't be taken yet: the confirm that brought them up is still held.</summary>
+        public bool ChoicesLocked => m_ChoicesLocked;
+
+        static bool Held(string action)
+        {
+            InputAction a = InputMaps.Find(InputMaps.UI, action);
+            return a != null && a.IsPressed();
+        }
+
+        /// <summary>Any confirm still down: Submit (Enter, Space, A), E, or the mouse's button.</summary>
+        static bool ConfirmHeld() =>
+            Held(UIActions.Submit) || Held(UIActions.Advance) || (Mouse.current != null && Mouse.current.leftButton.isPressed);
+
         static bool Pressed(string action)
         {
             InputAction a = InputMaps.Find(InputMaps.UI, action);
@@ -236,8 +256,9 @@ namespace Hearthdelve.Story.Presentation
             if (m_Continue != null)
             {
                 if (m_Continue.gameObject.activeSelf != waiting) m_Continue.gameObject.SetActive(waiting);
-                if (waiting) m_Continue.anchoredPosition = m_ContinueAt + new Vector2(0f, Mathf.FloorToInt(Time.unscaledTime / m_ContinueBob) % 2 == 0 ? 0f : -1f);
+                if (waiting) m_Continue.anchoredPosition = m_ContinueAt + new Vector2(0f, Mathf.FloorToInt(Time.unscaledTime / ContinueBob) % 2 == 0 ? 0f : -1f);
             }
+            if (m_ChoicesLocked && Time.frameCount > m_ArmedAfterFrame && !ConfirmHeld()) m_ChoicesLocked = false;
             if (Time.frameCount <= m_ArmedAfterFrame) return;
             if (m_Mode == Mode.Speaking)
             {
@@ -281,7 +302,7 @@ namespace Hearthdelve.Story.Presentation
         /// <summary>Chooses response <paramref name="index"/> (a click, Submit or E on its button).</summary>
         public void Choose(int index)
         {
-            if (m_Mode != Mode.Choosing || index < 0 || index >= m_ResponseCount || !m_Responses[index].enabled) return;
+            if (m_Mode != Mode.Choosing || m_ChoicesLocked || index < 0 || index >= m_ResponseCount || !m_Responses[index].enabled) return;
             Response chosen = m_Responses[index];
             HideResponses();
             Arm();
