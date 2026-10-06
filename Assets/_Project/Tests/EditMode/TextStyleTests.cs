@@ -73,7 +73,7 @@ namespace Hearthdelve.Tests
         /// <summary>Words that keep a capital in English: proper nouns, resource names and control labels (CLAUDE.md, Localization).</summary>
         static readonly HashSet<string> k_Capitalised = new()
         {
-            "Hearth", "Hollows", "Pip", "Brackenford", "Cellars", "Larder", "Troll", "Sunken", "Flagon",
+            "Hearth", "Hollows", "Pip", "Gunta", "Ashbelly", "Brackenford", "Cellars", "Larder", "Troll", "Sunken", "Flagon",
             "Essence", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };
@@ -88,7 +88,8 @@ namespace Hearthdelve.Tests
             var bad = new List<string>();
             foreach (var (key, text) in CodeEnglish)
             foreach (Match word in Regex.Matches(text, @"[A-Za-z][A-Za-z0-9']*"))
-                if (char.IsUpper(word.Value[0]) && !k_Capitalised.Contains(word.Value))
+                // A possessive is its noun ("Pip's", "the Cellars' larder").
+                if (char.IsUpper(word.Value[0]) && !k_Capitalised.Contains(Regex.Replace(word.Value, "'s?$", "")))
                     bad.Add($"{key}: \"{word.Value}\" in \"{text}\"");
             Assert.That(bad, Is.Empty, string.Join("\n", bad) + "\nIf one of these is a proper noun, add it to the list (and say so in review).");
         }

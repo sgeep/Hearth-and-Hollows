@@ -419,7 +419,7 @@ namespace Hearthdelve.Tests
             Assert.That(gel.Item.Quality, Is.EqualTo(Quality.Poor));
             Assert.That(gel.Item.Prep, Is.EqualTo(PrepState.Chilled));
             Assert.That(gel.Freshness, Is.EqualTo(0.5f).Within(1e-5f));
-            Assert.That(json, Does.Contain("\"version\": 6"));
+            Assert.That(json, Does.Contain($"\"version\": {SaveSystem.CurrentVersion}"));
             Assert.That(json, Does.Contain("\"rat_haunch\""), "content is saved by id");
         }
 
@@ -437,7 +437,7 @@ namespace Hearthdelve.Tests
             Assert.That(state.TimesDefeated("mother_slime"), Is.Zero);
 
             string json = SaveSystem.ToJson(SaveSystem.Capture(state));
-            Assert.That(json, Does.Contain("\"version\": 6"));
+            Assert.That(json, Does.Contain($"\"version\": {SaveSystem.CurrentVersion}"));
             GameState loaded = SaveSystem.Restore(SaveSystem.FromJson(json), Lookup, KnownUpgrade);
             Assert.That(loaded.TimesDefeated("larder_troll"), Is.EqualTo(2));
         }

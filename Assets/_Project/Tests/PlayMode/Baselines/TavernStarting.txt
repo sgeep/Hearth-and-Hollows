@@ -11,6 +11,7 @@ collider|BoxCollider2D|19.7500,8.5000..23.2500,9.5000|trigger False|layer Obstac
 collider|BoxCollider2D|2.0000,11.0000..8.8750,12.7500|trigger False|layer Obstacles
 collider|BoxCollider2D|2.8750,7.2500..3.6250,8.2500|trigger False|layer Obstacles
 collider|BoxCollider2D|20.5000,12.0000..22.5000,13.0000|trigger False|layer Obstacles
+collider|BoxCollider2D|22.2500,3.0000..25.6250,4.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|24.0000,11.5000..25.5000,12.8750|trigger False|layer Obstacles
 collider|BoxCollider2D|24.7500,8.0000..25.7500,9.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|25.7500,8.0000..26.7500,9.0000|trigger False|layer Obstacles
@@ -25,7 +26,7 @@ collider|BoxCollider2D|8.7500,7.0000..10.2500,8.5000|trigger False|layer Obstacl
 grid|00|############################
 grid|01|############################
 grid|02|#..........................#
-grid|03|#..........................#
+grid|03|#.....................####.#
 grid|04|#...............#####......#
 grid|05|#...............#####......#
 grid|06|#..........................#
@@ -40,6 +41,7 @@ grid|14|############################
 grid|15|############################
 grid|16|############################
 grid|bounds (x:0, y:0, width:28, height:17)
+interactable|ButcherBlock|station.butcher_block|reach 1.2000|use 23.9500,2.4500|highlight CornerBL@22.1250,2.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@25.7500,2.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@22.1250,5.0000/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@25.7500,5.0000/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@23.9375,5.1250/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Grill|station.grill|reach 1.5000|use 20.8125,11.4250;21.5000,13.5000|highlight CornerBL@19.0000,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@22.6250,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@19.0000,15.2500/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@22.6250,15.2500/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@20.8125,15.3750/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Pass|station.pass|reach 1.5000|use 21.5000,9.0000|highlight CornerBL@19.6250,8.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@23.3750,8.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@19.6250,9.6250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@23.3750,9.6250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@21.5000,9.7500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 10.7500,7.2500|highlight CornerBL@10.1250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@11.3750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@10.1250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@11.3750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@10.7500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
@@ -87,6 +89,7 @@ sprite|FloorFireplace_0_0|24.7500,11.3750|rot 0.0000|scale 1.0000,1.0000|flip Fa
 sprite|InteriorStairs_WoodenFlight|27.5000,12.0000|rot 0.0000|scale 1.0000,1.0000|flip True,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|KitchenShadow|19.0000,11.6250|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/5|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Kitchen|19.0000,11.6250|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
+sprite|PrepTable|22.0000,2.2500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Props_Barrel|25.2500,8.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Props_Barrel|26.2500,8.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|Props_Barrel|26.2500,9.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped

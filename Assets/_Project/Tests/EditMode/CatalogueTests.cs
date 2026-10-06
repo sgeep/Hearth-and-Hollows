@@ -438,7 +438,7 @@ namespace Hearthdelve.Tests
             state.Furniture.AnnouncedTier = 2;
 
             string json = SaveSystem.ToJson(SaveSystem.Capture(state));
-            Assert.That(json, Does.Contain("\"version\": 6"));
+            Assert.That(json, Does.Contain($"\"version\": {SaveSystem.CurrentVersion}"));
             GameState back = SaveSystem.Restore(SaveSystem.FromJson(json), _ => null, _ => true);
             PlacedFurniture chair = back.Furniture.Layout("tavern").Single(p => p.uid == tavern[0].uid);
             Assert.That(chair.variant, Is.EqualTo("slate"));
@@ -458,7 +458,7 @@ namespace Hearthdelve.Tests
                               "\"owned\":[{\"id\":\"chair\",\"count\":1},{\"id\":\"table\",\"count\":1}]," +
                               "\"areas\":[{\"id\":\"tavern\",\"pieces\":[{\"uid\":1,\"def\":\"chair\",\"x\":4,\"y\":5,\"turns\":1,\"host\":-1},{\"uid\":2,\"def\":\"table\",\"x\":5,\"y\":5,\"host\":-1}]}]}}";
             SaveData data = SaveSystem.FromJson(v5);
-            Assert.That(data.version, Is.EqualTo(6));
+            Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
             Assert.That(data.furniture.tierAnnounced, Is.Zero, "tiers already reached are announced at the next Night");
             GameState state = SaveSystem.Restore(data, _ => null, _ => true, null, _ => true, TwoAreas());
             Assert.That(state.Furniture.Layout("tavern").Select(p => (p.definition, p.cell)), Is.EqualTo(new[] { ("chair", new Vector2Int(4, 5)), ("table", new Vector2Int(5, 5)) }));

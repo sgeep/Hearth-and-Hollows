@@ -155,7 +155,7 @@ namespace Hearthdelve.Tests
             Assert.That(library, Is.Not.Null, "Run Hearthdelve > Generate > 4a Look Test (All).");
 
             string[] ids = typeof(HapticIds).GetFields().Select(f => (string)f.GetRawConstantValue()).ToArray();
-            Assert.That(ids.Length, Is.EqualTo(15));
+            Assert.That(ids.Length, Is.EqualTo(18));
             foreach (string id in ids)
             {
                 HapticPattern pattern = library.Find(id);

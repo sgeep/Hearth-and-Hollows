@@ -211,6 +211,9 @@ namespace Hearthdelve.Tests
             Assert.That(layout.Check(New("wall_sign", 6, 8)).Problem, Is.EqualTo(PlacementProblem.NotOnTheWall));
             Assert.That(layout.Check(New("wall_sign", 8, 16)).IsValid, "higher up the wall");
             Assert.That(layout.Check(New("wall_sign", 12, 15)).Problem, Is.EqualTo(PlacementProblem.Overlaps), "half over the sign already there");
+            // 4f Checkpoint C: never where the corner stairs would hide it.
+            Assert.That(layout.Check(New("wall_sign", 25, 15)).Problem, Is.EqualTo(PlacementProblem.Overlaps), "behind the stairs");
+            Assert.That(layout.Check(New("wall_sign", 23, 15)).IsValid, "beside them");
 
             PlacedFurniture range = Piece(layout, "kitchen_range", new Vector2Int(19, 12)).Clone();
             range.cell = new Vector2Int(9, 6);

@@ -38,7 +38,17 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
         }
 
-        int CardOf(string recipeId) => Prep.Recipes.ToList().FindIndex(r => r.id == recipeId);
+        /// <summary>The card showing a dish, turning the menu's pages to it (six cards a page since 4f Checkpoint C).</summary>
+        int CardOf(string recipeId)
+        {
+            for (int page = 0; page < Prep.PageCount; page++)
+            {
+                int at = Prep.Recipes.ToList().FindIndex(r => r.id == recipeId);
+                if (at >= 0) return at;
+                Prep.NextPage();
+            }
+            return -1;
+        }
 
         [UnityTest]
         public IEnumerator TheEvening_StartsAtPrep_WithTheStoreroomAndADishCardEach()
@@ -50,7 +60,18 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Results.IsShown, Is.False);
             Assert.That(InputMaps.Find(InputMaps.Tavern, TavernActions.Move).enabled, Is.False, "the keeper waits while you plan");
 
-            Assert.That(Prep.Recipes.Count, Is.EqualTo(Director.Content.recipes.Count), "a card per dish");
+            // 4f Checkpoint C: thirteen dishes, six cards a page, dishes the storeroom can make first.
+            int dishes = Director.Content.recipes.Count;
+            Assert.That(Prep.Recipes.Count, Is.EqualTo(Mathf.Min(dishes, 6)), "a card per dish on this page");
+            Assert.That(Prep.PageCount, Is.EqualTo((dishes + 5) / 6));
+            var seen = new System.Collections.Generic.HashSet<string>();
+            for (int page = 0; page < Prep.PageCount; page++)
+            {
+                foreach (var r in Prep.Recipes) seen.Add(r.id);
+                Prep.NextPage();
+            }
+            Assert.That(seen.Count, Is.EqualTo(dishes), "every dish is on some page");
+            Assert.That(Prep.Page, Is.Zero, "and round again");
             DishCard stew = Prep.Cards[CardOf("cellar_stew")];
             Assert.That(stew.steps.GetComponent<SuperTextMesh>().text, Is.EqualTo("chop, simmer"), "the stew's two steps");
             DishCard kebab = Prep.Cards[CardOf("cellar_kebab")];

@@ -127,7 +127,9 @@ namespace Hearthdelve.Tests.PlayMode
         protected static IEnumerator WaitUntil(Func<bool> condition, float seconds, string what)
         {
             float deadline = Time.time + seconds;
-            while (!condition() && Time.time < deadline) yield return null;
+            // Also a real-time limit, generous for sped-up tests: a paused game (scaled time stopped) fails instead of hanging.
+            float realDeadline = Time.realtimeSinceStartup + seconds * 4f + 10f;
+            while (!condition() && Time.time < deadline && Time.realtimeSinceStartup < realDeadline) yield return null;
             Assert.That(condition(), "Timed out waiting for: " + what);
         }
 

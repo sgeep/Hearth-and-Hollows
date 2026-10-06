@@ -41,7 +41,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return LoadServing();
             var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat).ToList();
-            Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.Pass }));
+            Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.ButcherBlock, TavernInteractableKind.Pass }));
             Assert.That(TavernDirector.Instance.Layout.Seats.Count, Is.EqualTo(6), "3 tables of 2 seats (the starting layout)");
             Assert.That(NavGrid.Current, Is.Not.Null);
             Assert.That(NavGrid.Current.Bounds, Is.EqualTo(new RectInt(0, 0, 28, 17)));

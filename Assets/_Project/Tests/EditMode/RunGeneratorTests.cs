@@ -196,6 +196,7 @@ namespace Hearthdelve.Tests
                     RoomReward reward = node.Reward;
                     if (reward.Kind == RewardKind.Gold) Assert.That(reward.Amount, Is.InRange(t.minGold, t.maxGold), at);
                     else if (reward.Kind == RewardKind.Power) Assert.That(reward.Amount, Is.EqualTo(1), at);
+                    else if (reward.Kind == RewardKind.Curio) Assert.That(tuning.curios, Is.Not.Null, $"{at}: curio rooms only with a pool");
                     else
                     {
                         Assert.That(reward.Kind, Is.EqualTo(RewardKind.Ingredient), at);
