@@ -1,6 +1,30 @@
 # 4g plan: story, quests, character creation and relationship reactivity
 
-> **Status: proposed 2026-10-06, awaiting the owner's approval.** Nothing of 4g is built and no Pixel Crushers package is imported. 4f is complete (signed off 2026-10-06).
+> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built 2026-10-06, waiting for the owner's playtest.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
+
+## Approval (2026-10-06): the owner's decisions
+
+- **Canon:** Kariaston, Tally Ho!, Boog (the goblin cook, stable id `gunta`), Pip Marrowby, the Hollows. Gunta, the Sunken Flagon and Brackenford are not reintroduced.
+- **Tag:** `milestone-4f` (annotated, on `f7812b3`); later milestones `milestone-4g`, `milestone-4h`…
+- **D1:** the Dialogue System's editor and database are authoritative for conversations; no text-file importer in 4g (read-only exports, review dumps and localization reports may come later).
+- **Packages:** all three were purchased and **already imported by the owner**; nothing is downloaded or reimported, only missing official support components are added (§2's import order is superseded; see "As built").
+- **Love/Hate:** approved, with Affinity and Respect only (no Trust yet); social stand-ins approved; Respect by the smallest clean extension of Love/Hate's evaluation; memories on a deterministic game-day clock.
+- **Quest Machine localization:** Unity Localization stays authoritative; quest text holds our keys.
+- **D5 replaced:** the first quest is **Boog's Bomb** (his favorite bomb, lost in the Hollows, wanted back for "research"), not Tamsin's strongbox. Step 6.
+- **D6:** quest objects are lost on death before extraction and obtainable again while the quest is active; never in the Satchel or the Lockbox; kept on extraction; a modest per-object policy.
+- **D4:** no keeper portrait in 4g. **D7:** old saves skip the opening through explicit story state; new games play it.
+
+## As built: Checkpoint A (2026-10-06)
+
+Where the build differs from §§2–14 below (each for a reason found in the packages' own code):
+
+- **No Pixel Crushers save recorder.** Each adapter records its middleware directly (the Dialogue System's `PersistentDataManager`, Quest Machine's journal `RecordData`); Pixel Crushers' `SaveSystem` component exists in Boot only because Quest Machine's journal serializes through it. Nothing writes a slot.
+- **Relationships are saved in our own shape** (`RelationshipData`: changed values and memories by stable id and trait name), not Love/Hate's `SerializeToString`, which is positional (adding Trust later would misread old saves) and writes floats in the player's locale.
+- **No support packages installed.** The `HH_` Lua functions stand in for the Dialogue System ↔ Love/Hate and ↔ Quest Machine bridges; our dialogue UI implements `IDialogueUI` directly (the STM support package lands outside `Plugins`, where our assemblies can't reference it); our builder writes the Dialogue table with the bridge's key convention (each entry's `Guid`, `<guid>_MenuText`).
+- **Respect alignment** uses Love/Hate's own formula over only the traits a deed shows, and gives respect only above indifference (`RelationshipRules`): over all traits, a judge's unrelated values counted against a deed and a neutral judge respected it as much as Boog.
+- **The memory clock** is Pixel Crushers' `GameTime` in manual mode, set to the game day; each deed's memory lasts its `memoryDays` (0: for good). The Dialogue System keeps its own real-time clock.
+- **The proof quest** is `proof_trophy_wall` ("something with teeth": Boog wants a trophy over the bar), completed by the same `TrophyDisplayed` fact as the deed; temporary, replaced by Boog's Bomb in Step 6.
+- **Talking:** staff carry a `Person` interactable (E during service, while they stand still with their hands free); F1 (debug builds) talks to Boog in any tavern phase, Shift+F1 brings the first boss trophy home again.
 
 ## 0. Corrections to the brief, from the repository
 

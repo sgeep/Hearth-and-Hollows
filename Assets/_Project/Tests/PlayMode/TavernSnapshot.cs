@@ -60,7 +60,8 @@ namespace Hearthdelve.Tests.PlayMode
                 lines.Add($"collider|{col.GetType().Name}|{V(b.min)}..{V(b.max)}|trigger {col.isTrigger}|layer {LayerMask.LayerToName(col.gameObject.layer)}");
             }
 
-            foreach (TavernInteractable i in Object.FindObjectsByType<TavernInteractable>())
+            // The room's own interactables: talking to staff (4g) moves with them and isn't part of the recorded room.
+            foreach (TavernInteractable i in Object.FindObjectsByType<TavernInteractable>().Where(i => i.Kind != TavernInteractableKind.Person))
             {
                 string uses = string.Join(";", i.UsePoints.Select(V));
                 Transform highlight = i.transform.Find("Highlight");

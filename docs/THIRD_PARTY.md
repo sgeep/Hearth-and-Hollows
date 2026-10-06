@@ -22,6 +22,11 @@ Rules for working with these are in `CLAUDE.md` ("Third-party code"). The repo s
 | Super Text Mesh (Kai Clavier) | version not stated in the package | `Assets/Clavian/SuperTextMesh` | Unity Asset Store EULA, plus `3rdPartyComponentLicense.txt` | All player-facing text (uGUI and world space), Ultra shader under URP |
 | Silver font (Poppy Works) | font version field "Version 1.0", copyright "2019 Poppy Works" (the release date of our copy isn't recorded); **adapted** (see license notes) | `Assets/_Project/Fonts/silver/Silver.ttf` | CC BY 4.0, with a budget condition (see license notes) | All player-facing text (the only game font) |
 | Minifantasy (Krishna Palacio) | per pack; imported so far: Creatures 3.3, Dungeon 2.3, A Myriad of NPCs 1.0, UI Overhaul 1.0, Crafting And Professions II 1.0, Dwarven Kingdom 1.0, and the Tavern Indoor, Loot Icons, Giant Spider and Hole Entrances And Ropes exclusives (see `docs/ASSET_MAP.md`) | raw: `C:\Dev\Minifantasy` (outside the repo); imported: `Assets/ThirdParty/Minifantasy/<Pack>/` | Each pack's `CommercialLicense.txt` | All art |
+| Dialogue System for Unity (Pixel Crushers) | **2.2.74** (`_README.txt`; released 2026-09-12, "updated for Unity 6.6") | `Assets/Plugins/Pixel Crushers/Dialogue System` | Unity Asset Store EULA | Conversations, branching, conversation state (4g). Our own dialogue UI (`HearthDialogueUI`, uGUI + STM) implements its `IDialogueUI`; its Standard UI, STM support package and Localization bridge are not used. Replaces Yarn Spinner, which was never imported. |
+| Quest Machine (Pixel Crushers) | **1.2.74** (`_README.txt`; 2026-09-12) | `Assets/Plugins/Pixel Crushers/Quest Machine` | Unity Asset Store EULA | Quest state, objectives, completion (4g). Its text tables and UIs are not used: quest text holds our Localization keys. |
+| Love/Hate (Pixel Crushers) | **1.10.74.1** (`_README.txt`; 2026-09-12) | `Assets/Plugins/Pixel Crushers/LoveHate` | Unity Asset Store EULA | Affinity, Respect, deed evaluation and memory (4g), through our `RelationshipAdapter`. |
+| Pixel Crushers Common | shipped with the three above (one copy) | `Assets/Plugins/Pixel Crushers/Common` | Same | Shared code (message system, save-system serializer, `GameTime`). Its `SaveSystem` component exists in Boot only as the JSON serializer Quest Machine's journal calls: it never saves a slot, and our `SaveSystem` is the only save. |
+| Minifantasy Portrait Generator (Krishna Palacio) | 1.0 (graphical assets and app) | raw files in `C:\Dev\Minifantasy`; composed frames in `Assets/ThirdParty/Minifantasy/Portraits` | Minifantasy commercial license | Dialogue portraits (4g), composed from its own layers by `Tools/portraits/compose.py` (`docs/ASSET_MAP.md`). |
 
 ### Licensed or planned, not imported
 
@@ -29,10 +34,7 @@ Listed so nobody mistakes them for missing installs. Versions and license notes 
 
 | Asset | Status | When |
 |---|---|---|
-| Dialogue System for Unity (Pixel Crushers) | Licensed, not imported | 4g. Replaces Yarn Spinner, which is not used. |
-| Quest Machine (Pixel Crushers) | Licensed, not imported | 4g |
-| Love/Hate (Pixel Crushers) | Planned, not purchased | Decided when 4g is planned |
-| Minifantasy Portrait Generator (Krishna Palacio) | Planned, not imported | 4g; recorded in `docs/ASSET_MAP.md` when inspected |
+| (none) | The Pixel Crushers products and the Portrait Generator were imported in 4g Checkpoint A (table above). | |
 
 ### License notes
 
@@ -49,6 +51,10 @@ Vendor code is never modified. These are the only files we added inside a vendor
 - `Assets/Clavian/SuperTextMesh/Scripts/Editor/Clavian.SuperTextMesh.Editor.asmdef`
 
 Super Text Mesh ships without assembly definitions, so it would compile into `Assembly-CSharp`, which our `Hearthdelve.*` assemblies cannot reference. After an STM upgrade, check that both files are still present.
+
+**Pixel Crushers (4g):** no files of ours. Their code sits in `Assets/Plugins`, which compiles into the firstpass assembly our asmdefs can't reference, so each product's **own assembly-definition package** was unpacked (with its shipped `.meta` files, exactly as Unity's importer would): `Common/Scripts/CommonAssemblyDefinitions.unitypackage`, `LoveHate/Scripts/LoveHateAssemblyDefinitions.unitypackage`, `Dialogue System/Scripts/DialogueSystemAssemblyDefinitions.unitypackage`, `Quest Machine/Scripts/QuestMachineAssemblyDefinitions.unitypackage`. They give `PixelCrushers` ← `LoveHate` ← `DialogueSystem` ← `QuestMachine` (plus editor assemblies and wrapper asmrefs). Batch mode couldn't import them one by one (the half-converted project doesn't compile between them). Dialogue System's import added the `TMP_PRESENT` and `USE_NEW_INPUT` scripting defines. After a Pixel Crushers upgrade, re-unpack the four packages.
+
+**Pixel Crushers support packages:** present in the products' `Third Party Support` folders as shipped; **none installed**. Not needed for Checkpoint A: our own adapters do what the Dialogue System ↔ Love/Hate and ↔ Quest Machine bridges would (the `HH_` Lua functions), our dialogue UI draws STM itself, and our story builder writes the Dialogue string table (the Localization Package Support's window would do the same). Recorded so a later milestone can reconsider each.
 
 ## Removed vendor folders
 
@@ -67,6 +73,7 @@ Removed before the first commit to keep Git LFS usage small (Assets went from 48
 | `Assets/Feel/NiceVibrations/Plugins/iOS`, `Plugins/Android` | Mobile-only native plugins (the Windows/macOS editor plugins stay) |
 | `Assets/Feel/NiceVibrations/HapticSamples` | Sample haptic clips; re-add individual clips only if we use them |
 | `Assets/Welcome` | Unity template tutorial |
+| `Assets/Plugins/Pixel Crushers/Quest Machine/Demo` | Quest Machine's demo (scenes, art, demo scripts); removed at the owner's request (4g). Dialogue System and Love/Hate came without demo folders; Dialogue System's `Scripts/Demo Scripts` and `Wrappers/Demo` stay, because its Player Setup Wizard compiles against them. |
 
 TDE's `Koala2D` and `Minimal2D` demos were copied to `C:\Dev\TDE-Reference` (outside the repo) for reading.
 

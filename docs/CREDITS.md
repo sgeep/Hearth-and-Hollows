@@ -17,6 +17,5 @@ The list of credits the shipped game must show, kept up to date as assets are ad
 
 - Sound effects and music (none yet; all audio is placeholder).
 - A decorative title font, if one is chosen in 4h.
-- Dialogue System for Unity and Quest Machine by Pixel Crushers (when they are imported in 4g; check their licenses for credit requirements then).
-- Love/Hate by Pixel Crushers, if it is bought and imported.
-- Minifantasy Portrait Generator portraits fall under the Krishna Palacio credit above; confirm its license terms when its assets are first imported.
+- Dialogue System for Unity, Quest Machine and Love/Hate by Pixel Crushers (imported in 4g; Unity Asset Store EULA, which requires no credit; credited by courtesy).
+- Minifantasy Portrait Generator (graphical assets by Krishna Palacio; app by Pixel_Pincher): the dialogue portraits are composed from its layers (4g). Its commercial license allows use and editing in a game; it falls under the Krishna Palacio credit above.

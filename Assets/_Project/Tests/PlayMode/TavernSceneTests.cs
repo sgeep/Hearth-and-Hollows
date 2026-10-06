@@ -40,7 +40,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Room_HasItsStations_SeatsAndGrid()
         {
             yield return LoadServing();
-            var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat).ToList();
+            var kinds = Object.FindObjectsByType<TavernInteractable>().Select(s => s.Kind).Where(k => k != TavernInteractableKind.Seat && k != TavernInteractableKind.Person).ToList();
             Assert.That(kinds, Is.EquivalentTo(new[] { TavernInteractableKind.Grill, TavernInteractableKind.Tap, TavernInteractableKind.StewPot, TavernInteractableKind.ButcherBlock, TavernInteractableKind.Pass }));
             Assert.That(TavernDirector.Instance.Layout.Seats.Count, Is.EqualTo(6), "3 tables of 2 seats (the starting layout)");
             Assert.That(NavGrid.Current, Is.Not.Null);
@@ -117,7 +117,7 @@ namespace Hearthdelve.Tests.PlayMode
             GridCell door = grid.Space.ToCell(new Vector2(13.5f, 2.5f));
             GridCell spawn = grid.Space.ToCell(Player.transform.position);
             Assert.That(grid.Map.IsWalkable(door), "inside the door is walkable");
-            foreach (TavernInteractable station in Object.FindObjectsByType<TavernInteractable>())
+            foreach (TavernInteractable station in Object.FindObjectsByType<TavernInteractable>().Where(i => i.Kind != TavernInteractableKind.Person))
             {
                 // Somewhere to stand within reach (the pass is used from either side of its table).
                 var standing = new List<GridCell>();
