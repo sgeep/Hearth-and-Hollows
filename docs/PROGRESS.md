@@ -1042,19 +1042,23 @@ Step 10, the last checkpoint of 4f. Commits `688df57`, `4ffdc7f` and the fixes a
 
 **Saves (D5).** Still version 7: requests are evening-only and the tuning lives in assets, so nothing new is saved.
 
-**Tests:** EditMode 552/552 (new: `CustomerRequestTests`, `RenownAndBalanceTests`, and the trophy-spot wall check). PlayMode 195 passed, 0 failed, plus 16 explicit captures (new: `CheckpointDTests`, `CheckpointDDayLoopTests`).
+**Tests:** EditMode 556/556 (new: `CustomerRequestTests`, `RenownAndBalanceTests`, `ArrivalTests`, and the trophy-spot wall check). PlayMode 197 passed, 0 failed, plus 16 explicit captures (new: `CheckpointDTests`, including Gunta stepping to a job she can't walk to and Pip serving at three frames a second, and `CheckpointDDayLoopTests`).
 
 **Captures** (`CheckpointDCaptures`, explicit; `BatchLogs/checkpointD/`): Prep's menu, the tusks' first spot, a request in service, met and missed, the results with requests, Night, the catalog, the guest room, the market. Checkpoint C's captures were rerun as a regression check.
 
-**Web:** @@WEB@@
+**Web:** a fresh build (`bundleVersion` 0.4f, which also silences the loader's version warning), served without caching and every build file refetched. Checked: a v6 save with two troll clears migrated once to v7 (tusks and Butcher Block granted once, nothing doubled), Continue, the homecoming, the guest room, the catalog and a purchase, an upgrade, the market, Prep, the Butcher Block by hand and by Gunta, Gunta on the grill with Pip serving, a special request (the sparkle on the bubble and the rail, met for a 4-gold thank-you and +1 Renown, "special requests 1 of 1" on the results), Night, a delve into the second room and an extraction, sleep, and reloading the page to Continue on the next day, twice. No console errors; the only warning is URP's own stripped-upscaler notice at load.
+- **Two bugs found and fixed.** The browser tab was in the background, which runs Unity at about three frames a second, and that exposed a frame-rate-dependent arrival: staff and patrons only arrived within 0.2 tiles of a goal, but a slow frame moves them about a tile, so they overshot for ever (Gunta never reached the Butcher Block; Pip circled the pass and never picked up a plate). Now a goal within one frame's travel counts as reached (`Core/Pathfinding/Arrival`, used by `StaffAgent` and `CustomerAgent`; at normal frame rates nothing changes), and a staff job outside service steps straight to its spot after 8 s of walking. Both have regression tests (`Time.captureDeltaTime`). Enemies use the same AI action but were not changed; the delve was only checked at normal speed.
+- **Not checked in the browser:** a curio pickup and a death (clearing rooms by synthetic clicks at three frames a second wasn't practical); both are covered by PlayMode tests and were checked in the browser at Checkpoint C.
 
 **Deviations from the request:**
 - The tier-3 furniture price rise and Gunta's lower cap are the two tuning changes beyond the menu and Renown; both are explained above.
 - "spider-leg steaks" became "spider steaks" on screen (the id is unchanged), so its name clears its price at 320×180.
 - A request missed at closing time frowns behind the results panel (a walkout's frown during service is visible).
+- The arrival fix (staff and patrons at a slow frame rate) and Gunta's step-to fallback were not in the request; they came out of the web check.
 
 **Known issues (end of 4f):**
 - `EveningEstimate` is a comparison tool, not a simulation: no walking, queues or walkouts, an average patron, and a fixed play style per evening.
+- At a very low frame rate (a background browser tab) long staff walks still lean on the 8 s step-to, and enemies, which share the pathfinding action, were not reviewed for the same overshoot.
 - The oversized lanterns (subjective), the patrons' "!" not aimed at the tusks, and no sitting or eating poses for Gunta and Pip remain, as agreed.
 - The three unrelated files that had been in `Assets/_Project/Fonts/silver/` were no longer there when this checkpoint began (removed or moved outside this work); nothing of theirs was touched or committed.
 
