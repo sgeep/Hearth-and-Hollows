@@ -4,6 +4,7 @@ using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Tavern;
+using Hearthdelve.UI.Typography;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -188,7 +189,7 @@ namespace Hearthdelve.Editor
             panel.ConfigureButcher(butcherGroup.gameObject, block, partImage, dots, dotsPerLine, blade, butcherTimer, butcherTitle, butcherPrompt);
 
             // Under every box: how to step away.
-            LocalizedSuperText stepAway = LookTestBuilder.Text(root, "StepAway", TavernLocKeys.HintStepAway, 6f, DungeonUI.k_Light, TextAnchor.LowerCenter,
+            LocalizedSuperText stepAway = LookTestBuilder.Text(root, "StepAway", TavernLocKeys.HintStepAway, TextStyle.Prompt, DungeonUI.k_Light, TextAnchor.LowerCenter,
                 new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 0f), new Vector2(240f, 12f));
             panel.ConfigureStepAway(stepAway);
             // The result flash: a wash over the box (every box sits in the same place).
@@ -205,7 +206,7 @@ namespace Hearthdelve.Editor
             RectTransform box = DungeonUI.Panel(root, new Vector2(256f, 66f), new Vector2(0f, -45f));
             box.name = name;
             if (titleKey != null) DungeonUI.Title(box, titleKey, rule: false);
-            prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -23f);
+            prompt = DungeonUI.Line(box, "Prompt", TavernLocKeys.HintStepAway, -23f, style: TextStyle.Prompt);
             return box;
         }
 

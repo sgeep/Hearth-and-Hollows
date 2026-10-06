@@ -6,6 +6,7 @@ using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Haptics;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
+using Hearthdelve.UI.Typography;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -63,6 +64,9 @@ namespace Hearthdelve.Editor
         {
             var scene = EditorSceneManager.OpenScene(BootScene, OpenSceneMode.Single);
             if (GameObject.Find("Boot Camera") == null) AddBootCamera();
+            // The transition caption is a heading (2×, the type pass): its box takes a 2× line.
+            foreach (SuperTextMesh text in Object.FindObjectsByType<SuperTextMesh>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                if (text.name == "Caption" && text.transform is RectTransform rect && rect.sizeDelta.y < 24f) rect.sizeDelta = new Vector2(rect.sizeDelta.x, 24f);
             GameFonts.ApplyToOpenScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -128,7 +132,7 @@ namespace Hearthdelve.Editor
             black.raycastTarget = true;
             var group = cover.gameObject.AddComponent<CanvasGroup>();
             var centre = new Vector2(0.5f, 0.5f);
-            LocalizedSuperText caption = TavernScreens.Label(cover, "Caption", LoopLocKeys.MorningTitle, 10f, k_Light, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(300f, 14f));
+            LocalizedSuperText caption = TavernScreens.Label(cover, "Caption", LoopLocKeys.MorningTitle, TextStyle.Heading, k_Light, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(300f, 24f));
             go.AddComponent<TransitionScreen>().Configure(group, caption);
 
             EditorSceneManager.SaveScene(scene, BootScene);
@@ -141,7 +145,7 @@ namespace Hearthdelve.Editor
             UiFeedbackContent.Ensure(canvas);
             RectTransform root = DungeonUI.FullScreen(canvas, "Menu");
             var centre = new Vector2(0.5f, 0.5f);
-            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, 16f, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 50f), new Vector2(300f, 24f));
+            TavernScreens.Label(root, "Title", LoopLocKeys.MenuTitle, TextStyle.Display, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, new Vector2(0f, 50f), new Vector2(300f, 36f));
             RectTransform panel = DungeonUI.Panel(root, new Vector2(300f, 76f), new Vector2(0f, -18f));
 
             // Stacked and centred, so the panel looks right with or without Continue.

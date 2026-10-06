@@ -612,6 +612,7 @@ GameObject:
   - component: {fileID: 1624268170}
   - component: {fileID: 1624268169}
   - component: {fileID: 1624268168}
+  - component: {fileID: 1624268172}
   m_Layer: 5
   m_Name: Caption
   m_TagString: Untagged
@@ -717,13 +718,13 @@ MonoBehaviour:
   leftoverText: 
   textMaterial: {fileID: 2100000, guid: 7eb5f9fe336acdb4a9bf712635bf8b26, type: 2}
   textMesh: {fileID: 278585257}
-  rawTopLeftBounds: {x: 150, y: -7, z: 0}
-  rawBottomRightBounds: {x: -150, y: 7, z: 0}
+  rawTopLeftBounds: {x: 150, y: -12, z: 0}
+  rawBottomRightBounds: {x: -150, y: 12, z: 0}
   rawBottomRightTextBounds: {x: 0, y: 0, z: 0}
-  topLeftBounds: {x: 170, y: 247, z: 0}
-  topRightBounds: {x: 470, y: 247, z: 0}
-  bottomLeftBounds: {x: 170, y: 233, z: 0}
-  bottomRightBounds: {x: 470, y: 233, z: 0}
+  topLeftBounds: {x: -80, y: 272, z: 0}
+  topRightBounds: {x: 720, y: 272, z: 0}
+  bottomLeftBounds: {x: -80, y: 208, z: 0}
+  bottomRightBounds: {x: 720, y: 208, z: 0}
   centerBounds: {x: 320, y: 240, z: 0}
   topLeftTextBounds: {x: 0, y: 0, z: 0}
   topRightTextBounds: {x: 0, y: 0, z: 0}
@@ -795,8 +796,21 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 14}
+  m_SizeDelta: {x: 300, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1624268172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624268167}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4f1d1c872592ad4a8b7b33433d43154, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Typography.StyledText
+  m_Style: 3
 --- !u!1 &1722124795
 GameObject:
   m_ObjectHideFlags: 0

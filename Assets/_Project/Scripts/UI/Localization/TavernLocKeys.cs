@@ -151,7 +151,7 @@ namespace Hearthdelve.UI.Localization
             (ButcherPrompt, "move the knife · hold {0}: cut"),
             (ResultsLedger, "from Pip's ledger"),
             (PrepNothingCookable, "nothing in the storeroom makes a dish tonight."),
-            (PrepFillKey, "F4: fill storeroom"),
+            (PrepFillKey, "F4: fill"),
 
             (StationGrill, "grill"),
             (StationPass, "the pass"),

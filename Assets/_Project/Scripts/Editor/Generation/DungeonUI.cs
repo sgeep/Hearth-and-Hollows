@@ -1,6 +1,7 @@
 using System.IO;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
+using Hearthdelve.UI.Typography;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -200,28 +201,43 @@ namespace Hearthdelve.Editor
             return panel;
         }
 
-        /// <summary>A panel's title: deep red, with a thin rule under it where there's room (<paramref name="rule"/>).</summary>
-        internal static LocalizedSuperText Title(RectTransform panel, string key, bool rule = true)
+        /// <summary>A heading's box sits this far under its panel's top edge (its capitals two pixels lower).</summary>
+        internal const float HeadingTop = 3f;
+        /// <summary>A heading's rule, under its descenders.</summary>
+        internal const float HeadingRule = 28f;
+        /// <summary>Content under a heading starts at least this far under the panel's top edge.</summary>
+        internal const float HeadingBand = 30f;
+        /// <summary>A heading's first baseline under the panel's top edge: 1× text beside it sits 10 pixels above, on the same baseline.</summary>
+        internal const float HeadingBaseline = HeadingTop + 2f * SilverMetrics.BaselineFromTop;
+
+        /// <summary>
+        /// A panel's title, deep red, with a thin rule under it where there's room (<paramref name="rule"/>). A screen's title is a
+        /// <see cref="TextStyle.Heading"/> (2×) when its words fit with room to translate; a sub-panel's stays 1× (the type pass).
+        /// </summary>
+        internal static LocalizedSuperText Title(RectTransform panel, string key, bool rule = true, TextStyle style = TextStyle.Body)
         {
-            LocalizedSuperText title = LookTestBuilder.Text(panel, "Title", key, 7f, k_Title, TextAnchor.UpperCenter,
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -7f), new Vector2(panel.sizeDelta.x - 14f, 12f));
+            bool heading = style == TextStyle.Heading;
+            float top = heading ? HeadingTop : 7f, height = heading ? 2f * SilverMetrics.LinePixels : SilverMetrics.LinePixels;
+            LocalizedSuperText title = LookTestBuilder.Text(panel, "Title", key, style, k_Title, TextAnchor.UpperCenter,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -top), new Vector2(panel.sizeDelta.x - 14f, height));
             if (rule)
             {
-                RectTransform line = LookTestBuilder.UIRect(panel, "TitleRule", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -21f), new Vector2(panel.sizeDelta.x - 40f, 1f));
+                RectTransform line = LookTestBuilder.UIRect(panel, "TitleRule", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, heading ? -HeadingRule : -21f),
+                    new Vector2(panel.sizeDelta.x - 40f, 1f));
                 AddImage(line, Pixel(), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
             }
             return title;
         }
 
-        internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 12f) =>
-            LookTestBuilder.Text(panel, name, key, 6f, k_Ink, TextAnchor.MiddleCenter,
+        internal static LocalizedSuperText Line(RectTransform panel, string name, string key, float y, float height = 12f, TextStyle style = TextStyle.Body) =>
+            LookTestBuilder.Text(panel, name, key, style, k_Ink, TextAnchor.MiddleCenter,
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, y), new Vector2(panel.sizeDelta.x - 16f, height));
 
         internal static Button TextButton(RectTransform panel, string name, string key, Vector2 position, float width, out LocalizedSuperText label)
         {
             RectTransform rect = LookTestBuilder.UIRect(panel, name, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), position, new Vector2(width, ButtonHeight));
             Button button = ButtonFace(rect);
-            label = LookTestBuilder.Text(rect, "Label", key, 6f, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            label = LookTestBuilder.Text(rect, "Label", key, TextStyle.Prompt, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             return button;
         }
 
@@ -339,7 +355,7 @@ namespace Hearthdelve.Editor
         {
             RectTransform hint = LookTestBuilder.UIRect(root, "Hint", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, y), new Vector2(300f, 14f));
             AddImage(hint, Pixel(), new Color(0.05f, 0.04f, 0.06f, 0.75f));
-            text = LookTestBuilder.Text(hint, "Text", key, 6f, k_Light, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-4f, 0f));
+            text = LookTestBuilder.Text(hint, "Text", key, TextStyle.Prompt, k_Light, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-4f, 0f));
             return hint.gameObject;
         }
 
@@ -390,7 +406,7 @@ namespace Hearthdelve.Editor
                 buttons[i] = button;
             }
             Navigate(buttons, null);
-            Line(panel, "Footer", LocKeys.PowerFooter, -55f);
+            Line(panel, "Footer", LocKeys.PowerFooter, -55f, style: TextStyle.Secondary);
 
             var screen = root.gameObject.AddComponent<RunPowerScreen>();
             screen.Configure(panel.gameObject, cards);
@@ -434,16 +450,16 @@ namespace Hearthdelve.Editor
             AddImage(shade, Pixel(), new Color(0.03f, 0.02f, 0.04f, 0.55f));
             // 4f Checkpoint C: 12 taller, so the furnishings lost clear the buttons.
             RectTransform panel = Panel(window, new Vector2(300f, 152f), new Vector2(0f, 4f));
-            Title(panel, LocKeys.DeathTitle);
-            LocalizedSuperText subtitle = LookTestBuilder.Text(panel, "Subtitle", LocKeys.DeathSubtitle, 6f, k_Ink, TextAnchor.UpperCenter,
-                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -23f), new Vector2(284f, 36f));
+            Title(panel, LocKeys.DeathTitle, style: TextStyle.Heading);
+            LocalizedSuperText subtitle = LookTestBuilder.Text(panel, "Subtitle", LocKeys.DeathSubtitle, TextStyle.Body, k_Ink, TextAnchor.UpperCenter,
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -HeadingBand - 1f), new Vector2(284f, 36f));
             SatchelSlotView[] slots = SlotRow(panel, -12f, true, out Button[] buttons);
             LocalizedSuperText chosen = Line(panel, "Chosen", LocKeys.DeathSelectedNone, -31f);
             // Furnishings found on the delve (4f Checkpoint C): never in the Lockbox, lost with the delve.
             LocalizedSuperText curiosLost = Line(panel, "CuriosLost", LocKeys.DeathCuriosLost, -44f);
             curiosLost.GetComponent<SuperTextMesh>().color = k_Discovery;
             Button keepNothing = TextButton(panel, "KeepNothing", LocKeys.DeathKeepNothing, new Vector2(-60f, 7f), 84f, out _);
-            Button confirm = TextButton(panel, "Confirm", LocKeys.DeathConfirm, new Vector2(56f, 7f), 124f, out _);
+            Button confirm = TextButton(panel, "Confirm", LocKeys.DeathConfirm, new Vector2(58f, 7f), 128f, out _);
             UiFeedbackContent.Commit(confirm);
             Navigate(buttons, confirm);
             confirm.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = buttons[3], selectOnLeft = keepNothing };

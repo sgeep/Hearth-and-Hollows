@@ -23,6 +23,11 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText[] m_Labels = Array.Empty<LocalizedSuperText>();
         [SerializeField, Tooltip("Each line's amount, beside its label.")] LocalizedSuperText[] m_Lines = Array.Empty<LocalizedSuperText>();
         [SerializeField] GameObject m_TakingsRow;
+        [SerializeField, Tooltip("Pip's ledger line under the takings. A night's note (closed early, stayed shut) goes in the row after its last " +
+                                 "line; only when all eight lines are used does it take the ledger's row.")]
+        GameObject m_Ledger;
+
+        float m_NoteTop = float.NaN;
         [SerializeField] LocalizedSuperText m_Takings;
         [SerializeField] Button m_Done;
         [SerializeField] LocalizedSuperText m_DoneLabel;
@@ -49,6 +54,8 @@ namespace Hearthdelve.UI.Tavern
             m_Done = done;
         }
 
+        public void ConfigureLedger(GameObject ledger) => m_Ledger = ledger;
+
         void Start()
         {
             m_Director = TavernDirector.Instance;
@@ -70,7 +77,9 @@ namespace Hearthdelve.UI.Tavern
             m_Root.SetActive(shown);
             if (!shown) return;
             EveningReport report = m_Director.Report;
-            m_Note.gameObject.SetActive(report.StayedShut || report.ClosedEarly);
+            bool note = report.StayedShut || report.ClosedEarly;
+            m_Note.gameObject.SetActive(note);
+            PlaceNote(note ? report.Lines.Count : -1);
             if (report.StayedShut) m_Note.Set(TavernLocKeys.ResultsStayedShut);
             else if (report.ClosedEarly) m_Note.Set(TavernLocKeys.ResultsClosedEarly);
             for (int i = 0; i < m_Lines.Length; i++) ShowLine(i, false);
@@ -133,6 +142,17 @@ namespace Hearthdelve.UI.Tavern
             }
             m_TakingsRow.SetActive(!report.StayedShut);
             if (!report.StayedShut) m_Takings.Set(TavernLocKeys.PrepValue, report.Takings);
+        }
+
+        /// <summary>The note in the row after the last of <paramref name="lines"/> lines, or in the ledger's row when every row is used (-1: no note).</summary>
+        void PlaceNote(int lines)
+        {
+            var rect = (RectTransform)m_Note.transform;
+            if (float.IsNaN(m_NoteTop)) m_NoteTop = rect.anchoredPosition.y;
+            bool inARow = lines >= 0 && lines < m_Lines.Length;
+            if (m_Ledger != null) m_Ledger.SetActive(lines < 0 || inARow);
+            float top = inARow ? ((RectTransform)m_Lines[lines].transform).anchoredPosition.y : m_NoteTop;
+            rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, top);
         }
 
         void ShowLine(int i, bool shown)

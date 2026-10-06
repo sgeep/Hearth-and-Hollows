@@ -15,6 +15,7 @@ using Hearthdelve.Shared.Inventory;
 using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Hud;
 using Hearthdelve.UI.Localization;
+using Hearthdelve.UI.Typography;
 using Hearthdelve.UI.World;
 using MoreMountains.Tools;
 using MoreMountains.TopDownEngine;
@@ -435,7 +436,13 @@ namespace Hearthdelve.Editor
             return material;
         }
 
+        /// <summary>Old callers: a requested size of <see cref="GameFonts.LargeRequest"/> or more is a heading, smaller is body text.</summary>
         public static LocalizedSuperText Text(Transform parent, string name, string key, float size, Color color, TextAnchor anchor,
+            Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 sizeDelta) =>
+            Text(parent, name, key, size >= GameFonts.LargeRequest ? TextStyle.Heading : TextStyle.Body, color, anchor, anchorMin, anchorMax, pivot, position, sizeDelta);
+
+        /// <summary>A localized text in a style of the type scale (its size and line come from <see cref="GameFonts.Scale"/>).</summary>
+        public static LocalizedSuperText Text(Transform parent, string name, string key, TextStyle style, Color color, TextAnchor anchor,
             Vector2 anchorMin, Vector2 anchorMax, Vector2 pivot, Vector2 position, Vector2 sizeDelta)
         {
             var prefab = Resources.Load<GameObject>("STMPrefabs/Super Text");
@@ -450,7 +457,6 @@ namespace Hearthdelve.Editor
 
             var text = go.GetComponent<SuperTextMesh>();
             text._text = string.Empty; // text comes from the string table at runtime
-            text.size = size;
             text.color = color;
             text.anchor = anchor;
             text.alignment = anchor switch
@@ -462,8 +468,8 @@ namespace Hearthdelve.Editor
             text.autoWrap = rect.rect.width;
             Material material = TextMaterial();
             if (material != null) text.textMaterial = material;
-            // The game font at its pixel size (the requested size snaps to 1× or 2×).
-            GameFonts.Apply(text, size >= GameFonts.LargeRequest);
+            // The game font at its style's size from the type scale.
+            GameFonts.Apply(text, style);
 
             var localized = go.AddComponent<LocalizedSuperText>();
             localized.Configure(key);

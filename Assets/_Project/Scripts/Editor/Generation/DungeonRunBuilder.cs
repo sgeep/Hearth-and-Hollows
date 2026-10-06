@@ -11,6 +11,7 @@ using Hearthdelve.Shared.Navigation;
 using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
+using Hearthdelve.UI.Typography;
 using MoreMountains.Feedbacks;
 using Unity.Cinemachine;
 using UnityEditor;
@@ -366,7 +367,7 @@ namespace Hearthdelve.Editor
             Transform old = canvas.transform.Find("DelveDebug");
             if (old != null) UnityEngine.Object.DestroyImmediate(old.gameObject);
             var corner = new Vector2(1f, 0f);
-            LocalizedSuperText text = LookTestBuilder.Text(canvas.transform, "DelveDebug", LocKeys.DelveDebug, 6f, new Color(0.6f, 0.62f, 0.7f), TextAnchor.LowerRight,
+            LocalizedSuperText text = LookTestBuilder.Text(canvas.transform, "DelveDebug", LocKeys.DelveDebug, TextStyle.Secondary, new Color(0.6f, 0.62f, 0.7f), TextAnchor.LowerRight,
                 corner, corner, corner, new Vector2(-4f, 3f), new Vector2(200f, GameFonts.LinePixels));
             text.gameObject.AddComponent<DelveDebugLabel>();
         }

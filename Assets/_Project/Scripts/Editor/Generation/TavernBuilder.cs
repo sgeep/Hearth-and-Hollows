@@ -8,6 +8,7 @@ using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Tavern;
+using Hearthdelve.UI.Typography;
 using Unity.Cinemachine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -161,7 +162,7 @@ namespace Hearthdelve.Editor
             Canvas canvas = LookTestBuilder.Canvas(content.Actions, out _);
             BuildHint(canvas);
             TavernStationContent.BuildStationPanel(canvas);
-            LocalizedSuperText controls = LookTestBuilder.Text(canvas.transform, "Controls", TavernLocKeys.TavernControls, 6f, new Color(0.95f, 0.92f, 0.85f),
+            LocalizedSuperText controls = LookTestBuilder.Text(canvas.transform, "Controls", TavernLocKeys.TavernControls, TextStyle.Prompt, new Color(0.95f, 0.92f, 0.85f),
                 TextAnchor.LowerCenter, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(310f, 10f));
             controls.gameObject.AddComponent<Hearthdelve.UI.Debugging.FadeOutAfter>();
             TavernScreens.Rebuild(canvas);

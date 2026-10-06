@@ -1,6 +1,7 @@
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
 using Hearthdelve.UI.Tavern;
+using Hearthdelve.UI.Typography;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,15 +32,24 @@ namespace Hearthdelve.Editor
 
         /// <summary>One line of text: 9-pixel capitals, 2-pixel descenders and a pixel between lines.</summary>
         public const float Line = GameFonts.LinePixels;
-        /// <summary>The planning panels: as large as the smallest canvas allows.</summary>
-        static readonly Vector2 k_Panel = new(316f, 172f);
-        const float k_PanelTop = 86f;
-        /// <summary>The title row's top (and the title's), 7 pixels under the panel's edge.</summary>
-        const float k_TitleTop = k_PanelTop - 7f;
+        /// <summary>The planning panels: as large as the smallest canvas allows, two pixels inside it.</summary>
+        static readonly Vector2 k_Panel = new(316f, 176f);
+        const float k_PanelTop = 88f;
+        /// <summary>
+        /// 1× text in the title row (Prep's count): its box's top, so its baseline is the heading's baseline (the heading is 2×,
+        /// <see cref="DungeonUI.HeadingBaseline"/> under the panel's edge; a 1× baseline is 10 under its box's top).
+        /// </summary>
+        const float k_TitleTop = k_PanelTop - DungeonUI.HeadingBaseline + SilverMetrics.BaselineFromTop;
+        /// <summary>Content under the heading starts here.</summary>
+        const float k_ContentTop = k_PanelTop - DungeonUI.HeadingBand;
         /// <summary>Two-line cards: a line each, exactly.</summary>
         const float k_CardWidth = 150f, k_CardHeight = 24f, k_CardPitch = 25f;
+        /// <summary>The storeroom's slots stand on this line (17 tall, their top on the heading band); their quality pips and freshness bar hang 5 under it.</summary>
+        const float k_StoreroomBottom = k_ContentTop - 17f;
+        /// <summary>What sits under the storeroom row starts here: a pixel under the freshness bars.</summary>
+        const float k_UnderStoreroom = k_StoreroomBottom - 6f;
         /// <summary>The first card row's top: under the storeroom row.</summary>
-        const float k_CardsTop = 41f;
+        const float k_CardsTop = k_UnderStoreroom;
 
         /// <summary>
         /// Removes the day's screens from the canvas and builds them again (HUD first, at the back). The controls
@@ -70,15 +80,19 @@ namespace Hearthdelve.Editor
         {
             RectTransform rect = LookTestBuilder.UIRect(parent, name, anchorAt, anchorAt, position, new Vector2(width, DungeonUI.ButtonHeight));
             Button button = DungeonUI.ButtonFace(rect);
-            label = LookTestBuilder.Text(rect, "Label", key, 6f, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            label = LookTestBuilder.Text(rect, "Label", key, TextStyle.Prompt, k_Ink, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             return button;
         }
 
         internal static LocalizedSuperText Label(RectTransform parent, string name, string key, float size, Color color, TextAnchor anchor, Vector2 anchorAt, Vector2 position, Vector2 box) =>
             LookTestBuilder.Text(parent, name, key, size, color, anchor, anchorAt, anchorAt, anchorAt, position, box);
 
+        internal static LocalizedSuperText Label(RectTransform parent, string name, string key, TextStyle style, Color color, TextAnchor anchor, Vector2 anchorAt, Vector2 position, Vector2 box) =>
+            LookTestBuilder.Text(parent, name, key, style, color, anchor, anchorAt, anchorAt, anchorAt, position, box);
+
         /// <summary>One line of body text whose box's top edge is at <paramref name="top"/> (parent-centre coordinates).</summary>
-        static LocalizedSuperText TextLine(RectTransform parent, string name, string key, Color color, TextAnchor anchor, float x, float top, float width, int lines = 1)
+        static LocalizedSuperText TextLine(RectTransform parent, string name, string key, Color color, TextAnchor anchor, float x, float top, float width, int lines = 1,
+            TextStyle style = TextStyle.Body)
         {
             var at = new Vector2(0.5f, 0.5f);
             var pivot = anchor switch
@@ -87,7 +101,7 @@ namespace Hearthdelve.Editor
                 TextAnchor.UpperCenter => new Vector2(0.5f, 1f),
                 _ => new Vector2(0f, 1f),
             };
-            return LookTestBuilder.Text(parent, name, key, 6f, color, anchor, at, at, pivot, new Vector2(x, top), new Vector2(width, Line * lines));
+            return LookTestBuilder.Text(parent, name, key, style, color, anchor, at, at, pivot, new Vector2(x, top), new Vector2(width, Line * lines));
         }
 
         internal static RectTransform Rect(RectTransform parent, string name, Vector2 anchorAt, Vector2 pivot, Vector2 position, Vector2 size, Color? color = null)
@@ -114,15 +128,15 @@ namespace Hearthdelve.Editor
         /// <summary>The storeroom as one row of satchel-style slots under the title, with its label.</summary>
         static SatchelSlotView[] Storeroom(RectTransform panel, out LocalizedSuperText empty)
         {
-            TextLine(panel, "StoreroomLabel", TavernLocKeys.PrepStoreroom, k_Label, TextAnchor.UpperLeft, -150f, 62f, 56f);
+            TextLine(panel, "StoreroomLabel", TavernLocKeys.PrepStoreroom, k_Label, TextAnchor.UpperLeft, -150f, k_ContentTop, 56f, style: TextStyle.Secondary);
             var stock = new SatchelSlotView[15];
             for (int i = 0; i < stock.Length; i++)
             {
-                stock[i] = DungeonUI.Slot(panel, i, new Vector2(-84f + i * 16f, 46f), false, out Button button);
+                stock[i] = DungeonUI.Slot(panel, i, new Vector2(-84f + i * 16f, k_StoreroomBottom), false, out Button button);
                 Object.DestroyImmediate(button);
                 stock[i].GetComponent<Image>().raycastTarget = false;
             }
-            empty = TextLine(panel, "StoreroomEmpty", TavernLocKeys.PrepStoreroomEmpty, k_Note, TextAnchor.UpperLeft, -90f, 62f, 230f);
+            empty = TextLine(panel, "StoreroomEmpty", TavernLocKeys.PrepStoreroomEmpty, k_Note, TextAnchor.UpperLeft, -90f, k_ContentTop, 230f, style: TextStyle.Secondary);
             return stock;
         }
 
@@ -136,22 +150,25 @@ namespace Hearthdelve.Editor
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Morning");
             RectTransform panel = DungeonUI.Panel(root, k_Panel, Vector2.zero);
-            LocalizedSuperText title = DungeonUI.Title(panel, LoopLocKeys.MorningTitle);
+            LocalizedSuperText title = DungeonUI.Title(panel, LoopLocKeys.MorningTitle, style: TextStyle.Heading);
             SatchelSlotView[] stock = Storeroom(panel, out LocalizedSuperText empty);
 
             // The delve meal: what to cook, or what was eaten.
-            LocalizedSuperText meal = TextLine(panel, "Breakfast", LoopLocKeys.MorningBreakfast, k_Title, TextAnchor.UpperCenter, 0f, 40f, 296f);
+            LocalizedSuperText meal = TextLine(panel, "Breakfast", LoopLocKeys.MorningBreakfast, k_Title, TextAnchor.UpperCenter, 0f, k_UnderStoreroom, 296f);
             var cards = new DishCard[6];
             // The delve meal cards: the name with its station on the right, then the buff across the card.
-            for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, 27f), 130f);
+            float cardsTop = k_UnderStoreroom - Line - 1f;
+            for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, cardsTop), 130f);
 
             // What today's delve starts with, from upgrades and delve meal: the tavern feeding the dungeon.
-            LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, new Color(0.3f, 0.2f, 0.45f), TextAnchor.UpperCenter, 0f, -49f, 296f);
-            Button descend = BottomButton(panel, "Descend", LoopLocKeys.MorningDescend, 0f, 156f, out _);
+            LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, new Color(0.3f, 0.2f, 0.45f), TextAnchor.UpperCenter, 0f,
+                cardsTop - 2f * k_CardPitch - k_CardHeight - 1f, 296f);
+            // The buttons sit 5 from the panel's foot (the heading took the room the 8 had).
+            Button descend = SmallButton(panel, "Descend", LoopLocKeys.MorningDescend, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 156f, out _);
             UiFeedbackContent.Commit(descend);
-            Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 117f, 70f, out _);
+            Button decorate = SmallButton(panel, "Decorate", DecorateLocKeys.Button, new Vector2(0.5f, 0f), new Vector2(117f, 5f), 70f, out _);
             // The Brackenford market (4f Checkpoint C): opposite Decorate, its list over the panel.
-            Button marketButton = BottomButton(panel, "Market", LoopLocKeys.MarketButton, -117f, 70f, out _);
+            Button marketButton = SmallButton(panel, "Market", LoopLocKeys.MarketButton, new Vector2(0.5f, 0f), new Vector2(-117f, 5f), 70f, out _);
             MorningScreen morning = root.gameObject.AddComponent<MorningScreen>();
             morning.Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend, decorate);
             morning.ConfigureMarket(marketButton, BuildMarket(root));
@@ -168,7 +185,7 @@ namespace Hearthdelve.Editor
             panel.name = "Market";
             DungeonUI.Title(panel, LoopLocKeys.MarketTitle);
             var topLeft = new Vector2(0f, 1f);
-            LocalizedSuperText purse = Label(panel, "Purse", LoopLocKeys.MarketPurse, 6f, k_Label, TextAnchor.MiddleLeft, topLeft, new Vector2(10f, -20f), new Vector2(110f, Line));
+            LocalizedSuperText purse = Label(panel, "Purse", LoopLocKeys.MarketPurse, TextStyle.Secondary, k_Label, TextAnchor.MiddleLeft, topLeft, new Vector2(10f, -20f), new Vector2(110f, Line));
             var rows = new MarketRow[6];
             Button previous = null;
             var buttons = new System.Collections.Generic.List<Button>();
@@ -178,9 +195,9 @@ namespace Hearthdelve.Editor
                 RectTransform iconRect = Rect(row, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
                 Image icon = DungeonUI.AddImage(iconRect, null, Color.white);
                 LocalizedSuperText name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(46f, Line));
-                LocalizedSuperText stock = Label(row, "Stock", LoopLocKeys.MarketHave, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(58f, 0f), new Vector2(84f, Line));
-                // Anchored right, a small button's position is its right edge: 144–212, clear of the count.
-                Button buy = SmallButton(row, "Buy", LoopLocKeys.MarketBuy, new Vector2(1f, 0.5f), Vector2.zero, 68f, out LocalizedSuperText buyLabel);
+                LocalizedSuperText stock = Label(row, "Stock", LoopLocKeys.MarketHave, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(58f, 0f), new Vector2(78f, Line));
+                // Anchored right, a small button's position is its right edge: 138–212, clear of the count, room for a two-digit price (two pixels inside the frame).
+                Button buy = SmallButton(row, "Buy", LoopLocKeys.MarketBuy, new Vector2(1f, 0.5f), Vector2.zero, 74f, out LocalizedSuperText buyLabel);
                 UiFeedbackContent.Commit(buy);
                 rows[i] = new MarketRow { root = row.gameObject, icon = icon, name = name, stock = stock, buy = buy, buyLabel = buyLabel };
                 buttons.Add(buy);
@@ -213,7 +230,7 @@ namespace Hearthdelve.Editor
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Night");
             RectTransform panel = DungeonUI.Panel(root, k_Panel, Vector2.zero);
-            LocalizedSuperText title = DungeonUI.Title(panel, LoopLocKeys.NightTitle);
+            LocalizedSuperText title = DungeonUI.Title(panel, LoopLocKeys.NightTitle, style: TextStyle.Heading);
 
             // How the day went, as a ledger in two columns: the day on the left (the delve, what came home, the
             // evening), the money and standing on the right (banked tonight, the purse, Renown). Labels step back.
@@ -221,20 +238,20 @@ namespace Hearthdelve.Editor
             var summary = new LocalizedSuperText[6];
             for (int i = 0; i < 3; i++)
             {
-                float top = 62f - i * Line;
-                labels[i] = TextLine(panel, $"SummaryLabel{i + 1}", LoopLocKeys.SummaryDelve, k_Label, TextAnchor.UpperLeft, -150f, top, 62f);
-                summary[i] = TextLine(panel, $"Summary{i + 1}", LoopLocKeys.SummaryDelve, k_Ink, TextAnchor.UpperLeft, -86f, top, 102f);
-                labels[i + 3] = TextLine(panel, $"SummaryLabel{i + 4}", LoopLocKeys.NightBanked, k_Label, TextAnchor.UpperLeft, 18f, top, 82f);
-                summary[i + 3] = TextLine(panel, $"Summary{i + 4}", LoopLocKeys.NightBanked, k_Accent, TextAnchor.UpperRight, 152f, top, 52f);
+                float top = k_ContentTop - i * Line;
+                labels[i] = TextLine(panel, $"SummaryLabel{i + 1}", LoopLocKeys.SummaryDelve, k_Label, TextAnchor.UpperLeft, -150f, top, 62f, style: TextStyle.Secondary);
+                summary[i] = TextLine(panel, $"Summary{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, -86f, top, 102f);
+                labels[i + 3] = TextLine(panel, $"SummaryLabel{i + 4}", LoopLocKeys.NightBanked, k_Label, TextAnchor.UpperLeft, 18f, top, 82f, style: TextStyle.Secondary);
+                summary[i + 3] = TextLine(panel, $"Summary{i + 4}", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperRight, 152f, top, 52f);
             }
 
             // The upgrades, bought with banked Gold: a row each, with its price on a button.
             var rows = new UpgradeRow[3];
             for (int i = 0; i < rows.Length; i++)
             {
-                RectTransform row = Rect(panel, $"Upgrade{i + 1}", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, 24f - i * 25f), new Vector2(300f, 24f), k_Card);
+                RectTransform row = Rect(panel, $"Upgrade{i + 1}", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, k_ContentTop - 3f * Line - 1f - i * 25f), new Vector2(300f, 24f), k_Card);
                 LocalizedSuperText name = TextLine(row, "Name", LoopLocKeys.NightUpgradeLevel, k_Ink, TextAnchor.UpperLeft, -147f, 12f, 230f);
-                LocalizedSuperText effect = TextLine(row, "Effect", LoopLocKeys.NightNextTime, k_Note, TextAnchor.UpperLeft, -147f, 0f, 230f);
+                LocalizedSuperText effect = TextLine(row, "Effect", LoopLocKeys.NightNextTime, k_Note, TextAnchor.UpperLeft, -147f, 0f, 230f, style: TextStyle.Secondary);
                 Button buy = SmallButton(row, "Buy", LoopLocKeys.NightBuyCost, new Vector2(1f, 0.5f), new Vector2(-4f, 0f), 60f, out LocalizedSuperText cost);
                 ((RectTransform)buy.transform).pivot = new Vector2(1f, 0.5f);
                 // A purchase has its own moment (the Night screen plays it when the buy goes through).
@@ -242,12 +259,14 @@ namespace Hearthdelve.Editor
                 rows[i] = new UpgradeRow { root = row.gameObject, name = name, effect = effect, buy = buy, cost = cost };
             }
 
-            LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, new Color(0.25f, 0.45f, 0.2f), TextAnchor.UpperLeft, -150f, -64f, 76f);
+            // Beside the buttons, at the left: the game saved.
+            LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, new Color(0.25f, 0.45f, 0.2f), TextAnchor.UpperLeft, -150f, -k_PanelTop + 5f + 14f, 76f,
+                style: TextStyle.Secondary);
             // A new catalogue tier opened (4f, D14): one line under the upgrades.
-            LocalizedSuperText word = TextLine(panel, "Word", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperCenter, 0f, -51f, 300f);
-            Button sleep = BottomButton(panel, "Sleep", LoopLocKeys.NightSleep, 0f, 120f, out _);
+            LocalizedSuperText word = TextLine(panel, "Word", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperCenter, 0f, k_ContentTop - 3f * Line - 1f - 3f * 25f, 300f);
+            Button sleep = SmallButton(panel, "Sleep", LoopLocKeys.NightSleep, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 120f, out _);
             UiFeedbackContent.Commit(sleep);
-            Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 110f, 70f, out _);
+            Button decorate = SmallButton(panel, "Decorate", DecorateLocKeys.Button, new Vector2(0.5f, 0f), new Vector2(110f, 5f), 70f, out _);
             root.gameObject.AddComponent<NightScreen>().Configure(panel.gameObject, title, labels, summary, null, rows, saved, sleep, decorate, word);
             saved.gameObject.SetActive(false);
             word.gameObject.SetActive(false);
@@ -274,13 +293,13 @@ namespace Hearthdelve.Editor
             LocalizedSuperText title = Label(top, "Title", DecorateLocKeys.Title, 6f, k_Light, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(5f, 0f), new Vector2(170f, 12f));
             LocalizedSuperText status = Label(top, "Status", DecorateLocKeys.StatusReady, 6f, new Color(0.55f, 0.9f, 0.5f), TextAnchor.MiddleRight,
                 new Vector2(1f, 0.5f), new Vector2(-5f, 0f), new Vector2(140f, 12f));
-            RectTransform pieceBar = Rect(content, "PieceBar", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(320f, 13f),
+            RectTransform pieceBar = Rect(content, "PieceBar", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -14f), new Vector2(320f, 14f),
                 new Color(0.08f, 0.06f, 0.06f, 0.55f));
             LocalizedSuperText piece = Label(pieceBar, "Piece", DecorateLocKeys.Empty, 6f, k_Light, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(310f, 12f));
-            RectTransform bottom = Rect(content, "Bottom", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(320f, 2f * Line + 3f), strip);
-            LocalizedSuperText controls = Label(bottom, "Controls", DecorateLocKeys.Controls, 6f, new Color(0.85f, 0.8f, 0.7f), TextAnchor.MiddleCenter,
-                new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(312f, 2f * Line));
+            RectTransform bottom = Rect(content, "Bottom", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(320f, 3f * Line + 4f), strip);
+            LocalizedSuperText controls = Label(bottom, "Controls", DecorateLocKeys.Controls, TextStyle.Prompt, new Color(0.85f, 0.8f, 0.7f), TextAnchor.MiddleCenter,
+                new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(312f, 3f * Line));
 
             DecorateCatalogue catalogue = BuildCatalogue(content);
             DecorateStyle style = BuildStyle(content);
@@ -315,7 +334,7 @@ namespace Hearthdelve.Editor
             LocalizedSuperText tab = DungeonUI.Title(panel, DecorateLocKeys.TabStorage);
             var topLeft = new Vector2(0f, 1f);
             // The purse at the top left, clear of the page's name in the middle.
-            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -4f),
+            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -4f),
                 new Vector2(104f, Line));
 
             // The list (left, 170 wide): a name (110), and the price or what's stored (72, room for "not for sale";
@@ -337,24 +356,24 @@ namespace Hearthdelve.Editor
                     info = Label(row, "Info", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-2f, 0f), new Vector2(72f, Line)),
                 };
             }
-            LocalizedSuperText empty = Label(panel, "Empty", DecorateLocKeys.EmptyTab, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -40f), new Vector2(166f, Line));
+            LocalizedSuperText empty = Label(panel, "Empty", DecorateLocKeys.EmptyTab, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -40f), new Vector2(166f, Line));
             LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, new Color(0.62f, 0.2f, 0.12f), TextAnchor.MiddleLeft, topLeft,
                 new Vector2(8f, -120f), new Vector2(166f, Line));
-            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.CatalogControls, 6f, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -134f),
+            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.CatalogControls, TextStyle.Prompt, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -134f),
                 new Vector2(166f, Line));
 
             // The chosen piece (right, 116 wide): its drawing, name, description, price and tier, counts, where copies come from.
             RectTransform iconBox = Rect(panel, "IconBox", topLeft, new Vector2(0.5f, 0.5f), new Vector2(236f, -38f), new Vector2(40f, 40f));
             Image icon = DungeonUI.AddImage(Rect(iconBox, "Icon", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(16f, 16f)), null, Color.white);
             icon.preserveAspect = true;
-            LocalizedSuperText Detail(string name, float top, int lines, Color color) =>
-                Label(panel, name, TavernLocKeys.Plain, 6f, color, lines > 1 ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, topLeft,
+            LocalizedSuperText Detail(string name, float top, int lines, Color color, TextStyle style = TextStyle.Body) =>
+                Label(panel, name, TavernLocKeys.Plain, style, color, lines > 1 ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft, topLeft,
                     new Vector2(182f, top), new Vector2(116f, Line * lines));
             LocalizedSuperText name = Detail("Name", -58f, 1, k_Title);
             LocalizedSuperText description = Detail("Description", -70f, 4, k_Ink);
             LocalizedSuperText tier = Detail("Tier", -118f, 1, k_Ink);
-            LocalizedSuperText counts = Detail("Counts", -130f, 1, k_Note);
-            LocalizedSuperText source = Detail("Source", -142f, 1, k_Note);
+            LocalizedSuperText counts = Detail("Counts", -130f, 1, k_Note, TextStyle.Secondary);
+            LocalizedSuperText source = Detail("Source", -142f, 1, k_Note, TextStyle.Secondary);
             // Its colourways: a column of swatches beside the drawing.
             var swatches = new Image[8];
             for (int i = 0; i < swatches.Length; i++)
@@ -399,7 +418,7 @@ namespace Hearthdelve.Editor
                     root = row.gameObject,
                     background = band,
                     label = Label(row, "Label", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(2f, 0f), new Vector2(50f, Line)),
-                    value = Label(row, "Value", TavernLocKeys.Plain, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(162f, 0f), new Vector2(100f, Line)),
+                    value = Label(row, "Value", TavernLocKeys.Plain, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(162f, 0f), new Vector2(100f, Line)),
                     swatches = new Image[9],
                     buttons = new Button[9],
                 };
@@ -418,9 +437,9 @@ namespace Hearthdelve.Editor
                 r.marker = DungeonUI.AddImage(mark, marker, k_Gold);
                 rows[i] = r;
             }
-            LocalizedSuperText nothing = Label(panel, "Nothing", DecorateLocKeys.StyleNothing, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
+            LocalizedSuperText nothing = Label(panel, "Nothing", DecorateLocKeys.StyleNothing, TextStyle.Secondary, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(220f, Line));
-            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.StyleControls, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
+            LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.StyleControls, TextStyle.Prompt, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
                 new Vector2(0f, 20f), new Vector2(272f, Line));
             Button copy = SmallButton(panel, "Copy", DecorateLocKeys.StyleCopy, new Vector2(0.5f, 0f), new Vector2(-60f, 4f), 112f, out LocalizedSuperText copyLabel);
             Button applyAll = SmallButton(panel, "ApplyAll", DecorateLocKeys.StyleApplyAll, new Vector2(0.5f, 0f), new Vector2(60f, 4f), 112f, out LocalizedSuperText applyAllLabel);
@@ -444,22 +463,24 @@ namespace Hearthdelve.Editor
             RectTransform clockFill = Fill(clock, "Fill", new Color(1f, 0.78f, 0.35f));
             LocalizedSuperText lastOrders = LookTestBuilder.Text(root, "LastOrders", TavernLocKeys.HudLastOrders, 6f, k_Warning, TextAnchor.UpperCenter, top, top, top, new Vector2(0f, -4f), new Vector2(100f, Line));
 
-            // Takings and Renown: a dim label over a bright number, with a gap between them (the margin is 48 pixels wide).
+            // Takings and Renown: a dim label over a bright 2× number, read at a glance (the margin is 48 pixels wide; four 2× digits
+            // fit its 46).
             LocalizedSuperText Stat(string name, string labelKey, float statTop)
             {
-                LookTestBuilder.Text(root, name + "Label", labelKey, 6f, k_HudLabel, TextAnchor.UpperLeft, topLeft, topLeft, topLeft, new Vector2(3f, statTop), new Vector2(44f, Line));
-                return LookTestBuilder.Text(root, name, TavernLocKeys.Plain, 6f, k_HudValue, TextAnchor.UpperLeft, topLeft, topLeft, topLeft, new Vector2(3f, statTop - Line), new Vector2(44f, Line));
+                LookTestBuilder.Text(root, name + "Label", labelKey, TextStyle.Secondary, k_HudLabel, TextAnchor.UpperLeft, topLeft, topLeft, topLeft, new Vector2(3f, statTop), new Vector2(44f, Line));
+                return LookTestBuilder.Text(root, name, TavernLocKeys.Plain, TextStyle.Heading, k_HudValue, TextAnchor.UpperLeft, topLeft, topLeft, topLeft, new Vector2(3f, statTop - Line),
+                    new Vector2(46f, 2f * Line));
             }
             LocalizedSuperText gold = Stat("Gold", TavernLocKeys.HudGold, -12f);
-            LocalizedSuperText tips = Stat("Tips", TavernLocKeys.HudTips, -41f);
-            LocalizedSuperText renown = Stat("Renown", TavernLocKeys.HudRenown, -70f);
+            LocalizedSuperText tips = Stat("Tips", TavernLocKeys.HudTips, -50f);
+            LocalizedSuperText renown = Stat("Renown", TavernLocKeys.HudRenown, -88f);
 
             // Tonight's menu: a sold-out dish dims and gets a red bar (two cues, not only colour).
             var menu = new Image[3];
             var soldOut = new GameObject[3];
             for (int i = 0; i < menu.Length; i++)
             {
-                RectTransform icon = Rect(root, $"Menu{i + 1}", topLeft, topLeft, new Vector2(3f + i * 13f, -102f), new Vector2(8f, 8f));
+                RectTransform icon = Rect(root, $"Menu{i + 1}", topLeft, topLeft, new Vector2(3f + i * 13f, -128f), new Vector2(8f, 8f));
                 menu[i] = DungeonUI.AddImage(icon, null, Color.white);
                 soldOut[i] = Rect(icon, "SoldOut", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10f, 2f), new Color(0.9f, 0.2f, 0.15f)).gameObject;
                 soldOut[i].transform.localRotation = Quaternion.Euler(0f, 0f, 45f);
@@ -467,7 +488,7 @@ namespace Hearthdelve.Editor
             }
 
             // The order rail, right margin: per order, the dish and its customer's patience, with the state under them.
-            LookTestBuilder.Text(root, "Orders", TavernLocKeys.HudOrders, 6f, k_HudLabel, TextAnchor.UpperLeft, topRight, topRight, topRight, new Vector2(-3f, -3f), new Vector2(44f, Line));
+            LookTestBuilder.Text(root, "Orders", TavernLocKeys.HudOrders, TextStyle.Secondary, k_HudLabel, TextAnchor.UpperLeft, topRight, topRight, topRight, new Vector2(-3f, -3f), new Vector2(44f, Line));
             // A row per seat (eight with every seating upgrade), packed to fit the 180-pixel column.
             var rows = new RailRow[8];
             for (int i = 0; i < rows.Length; i++)
@@ -507,10 +528,10 @@ namespace Hearthdelve.Editor
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Prep");
             RectTransform panel = DungeonUI.Panel(root, k_Panel, Vector2.zero);
-            DungeonUI.Title(panel, TavernLocKeys.PrepTitle);
-            // The title row carries the debug fill key on the left and tonight's count on the right.
-            LocalizedSuperText fill = TextLine(panel, "FillHint", TavernLocKeys.PrepFillKey, k_Note, TextAnchor.UpperLeft, -150f, k_TitleTop, 100f);
-            LocalizedSuperText tonight = TextLine(panel, "Tonight", TavernLocKeys.PrepTonight, k_Title, TextAnchor.UpperRight, 150f, k_TitleTop, 100f);
+            DungeonUI.Title(panel, TavernLocKeys.PrepTitle, style: TextStyle.Heading);
+            // The title row carries the debug fill key on the left and tonight's count on the right, on the heading's baseline.
+            LocalizedSuperText fill = TextLine(panel, "FillHint", TavernLocKeys.PrepFillKey, k_Note, TextAnchor.UpperLeft, -150f, k_TitleTop, 70f, style: TextStyle.Secondary);
+            LocalizedSuperText tonight = TextLine(panel, "Tonight", TavernLocKeys.PrepTonight, k_Title, TextAnchor.UpperRight, 150f, k_TitleTop, 76f);
 
             // The storeroom: what came back from the dungeon, as satchel-style slots.
             SatchelSlotView[] stock = Storeroom(panel, out LocalizedSuperText empty);
@@ -519,16 +540,17 @@ namespace Hearthdelve.Editor
             var cards = new DishCard[6];
             for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, k_CardsTop), 66f);
             // When nothing can be cooked: a banner over the (dimmed) cards, so closing for the night is the clear choice.
-            RectTransform banner = Rect(panel, "NothingBanner", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(296f, Line + 6f), new Color(0.95f, 0.85f, 0.62f));
-            LocalizedSuperText nothing = TextLine(banner, "Nothing", TavernLocKeys.PrepNothingCookable, new Color(0.6f, 0.15f, 0.1f), TextAnchor.UpperCenter, -32f, Line / 2f + 1f, 226f);
+            RectTransform banner = Rect(panel, "NothingBanner", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(296f, 2f * Line + 6f), new Color(0.95f, 0.85f, 0.62f));
+            LocalizedSuperText nothing = TextLine(banner, "Nothing", TavernLocKeys.PrepNothingCookable, new Color(0.6f, 0.15f, 0.1f), TextAnchor.UpperCenter, -32f, Line + 3f, 226f, lines: 2);
             // 4f: when the layout keeps the doors shut, the banner says why and offers Decorate Mode.
             Button decorate = SmallButton(banner, "Decorate", DecorateLocKeys.Button, new Vector2(1f, 0.5f), new Vector2(-3f, 0f), 60f, out _);
 
             // The staff and the kitchen's tools: Pip's job, Gunta's job, the Butcher Block, the menu's next page.
-            Button staff = SmallButton(panel, "Staff", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-114f, 28f), 80f, out LocalizedSuperText staffLabel);
-            Button cook = SmallButton(panel, "Cook", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-30f, 28f), 84f, out LocalizedSuperText cookLabel);
-            Button butcher = SmallButton(panel, "Butcher", TavernLocKeys.PrepButcher, new Vector2(0.5f, 0f), new Vector2(52f, 28f), 76f, out _);
-            Button page = SmallButton(panel, "Page", TavernLocKeys.PrepPage, new Vector2(0.5f, 0f), new Vector2(122f, 28f), 60f, out LocalizedSuperText pageLabel);
+            // Each label two pixels clear of its button's one-pixel frame ("Gunta: off duty" is 83): 76, 90, 80 and 60 wide, -155 to 155.
+            Button staff = SmallButton(panel, "Staff", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-117f, 28f), 76f, out LocalizedSuperText staffLabel);
+            Button cook = SmallButton(panel, "Cook", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-33f, 28f), 90f, out LocalizedSuperText cookLabel);
+            Button butcher = SmallButton(panel, "Butcher", TavernLocKeys.PrepButcher, new Vector2(0.5f, 0f), new Vector2(54f, 28f), 80f, out _);
+            Button page = SmallButton(panel, "Page", TavernLocKeys.PrepPage, new Vector2(0.5f, 0f), new Vector2(125f, 28f), 60f, out LocalizedSuperText pageLabel);
             Button close = BottomButton(panel, "Close", LoopLocKeys.PrepClose, -62f, 114f, out _);
             Button open = BottomButton(panel, "Open", TavernLocKeys.PrepOpen, 62f, 114f, out _);
             UiFeedbackContent.Commit(open);
@@ -551,7 +573,7 @@ namespace Hearthdelve.Editor
             panel.name = "Butcher";
             DungeonUI.Title(panel, TavernLocKeys.ButcherTitle);
             var topLeft = new Vector2(0f, 1f);
-            LocalizedSuperText intro = Label(panel, "Intro", TavernLocKeys.ButcherIntro, 6f, k_Label, TextAnchor.UpperLeft, topLeft, new Vector2(10f, -21f), new Vector2(292f, Line * 2));
+            LocalizedSuperText intro = Label(panel, "Intro", TavernLocKeys.ButcherIntro, TextStyle.Secondary, k_Label, TextAnchor.UpperLeft, topLeft, new Vector2(10f, -21f), new Vector2(292f, Line * 2));
             var rows = new ButcherRow[5];
             for (int i = 0; i < rows.Length; i++)
             {
@@ -559,7 +581,7 @@ namespace Hearthdelve.Editor
                 Image icon = DungeonUI.AddImage(Rect(row, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)), null, Color.white);
                 LocalizedSuperText name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(113f, Line));
                 LocalizedSuperText count = Label(row, "Count", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(126f, 0f), new Vector2(20f, Line));
-                LocalizedSuperText yield = Label(row, "Yield", TavernLocKeys.ButcherYield, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(148f, 0f), new Vector2(44f, Line));
+                LocalizedSuperText yield = Label(row, "Yield", TavernLocKeys.ButcherYield, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(148f, 0f), new Vector2(44f, Line));
                 // Anchored right, a small button's position is its right edge: "cut it" 196–236, the staff 238–292.
                 Button yourself = SmallButton(row, "Yourself", TavernLocKeys.ButcherYourself, new Vector2(1f, 0.5f), new Vector2(-56f, 0f), 40f, out _);
                 Button staff = SmallButton(row, "Staff", TavernLocKeys.ButcherStaff, new Vector2(1f, 0.5f), Vector2.zero, 54f, out LocalizedSuperText staffLabel);
@@ -618,12 +640,13 @@ namespace Hearthdelve.Editor
             var left = new Vector2(0f, 0.5f);
             RectTransform iconRect = Rect(rect, "Icon", left, left, new Vector2(1f, 0f), new Vector2(8f, 8f));
             Image icon = DungeonUI.AddImage(iconRect, null, Color.white);
-            // Every pixel counts: the longest pair ("offal pottage", "8 gold/bowl") leaves a two-pixel gap.
-            float x = -k_CardWidth / 2f + 11f, right = k_CardWidth / 2f - 1f;
+            // The longest pair ("spider-leg steaks", "22 gold") keeps a gap of three pixels or more (the Prep card test).
+            // The name starts a pixel after the icon's 8 (the type pass gave it this pixel back for "spider-leg steaks").
+            float x = -k_CardWidth / 2f + 10f, right = k_CardWidth / 2f - 1f;
             LocalizedSuperText name = TextLine(rect, "Name", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, x, Line, 98f);
             LocalizedSuperText detail = TextLine(rect, "Detail", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperRight, right, Line, 70f);
             LocalizedSuperText amount = TextLine(rect, "Amount", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, x, 0f, amountWidth);
-            LocalizedSuperText steps = TextLine(rect, "Steps", TavernLocKeys.Plain, k_Note, TextAnchor.UpperRight, right, 0f, 100f);
+            LocalizedSuperText steps = TextLine(rect, "Steps", TavernLocKeys.Plain, k_Note, TextAnchor.UpperRight, right, 0f, 100f, style: TextStyle.Secondary);
 
             // Chosen: the gold corners of a highlighted station, so the choice reads by shape too.
             var selected = Rect(rect, "Selected", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(k_CardWidth + 4f, k_CardHeight + 2f));
@@ -638,36 +661,43 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ Results
 
-        /// <summary>The results' lines sit 11 px apart (one less than a text line: eight of them fit the screen with the takings).</summary>
-        const float k_ResultPitch = 11f;
+        /// <summary>The results' lines: a text line apart (the type pass ended the 11-pixel squeeze).</summary>
+        const float k_ResultPitch = Line;
 
         static void BuildResults(Canvas canvas)
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Results");
             // Eight lines since 4f Checkpoint D (special requests), packed into nearly the whole screen's height.
+            // 178 tall: the heading, eight lines, the takings under a rule, Pip's ledger, and the button. A night's note (closed
+            // early, stayed shut) goes in the row after its last line (EveningResultsScreen), or the ledger's row if all eight are used.
             RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 178f), Vector2.zero);
-            DungeonUI.Title(panel, TavernLocKeys.ResultsTitle);
-            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, 66f, 224f);
+            DungeonUI.Title(panel, TavernLocKeys.ResultsTitle, style: TextStyle.Heading);
+            const float top = 89f, linesTop = top - DungeonUI.HeadingBand + 1f;
             var labels = new LocalizedSuperText[8];
             var lines = new LocalizedSuperText[8];
             for (int i = 0; i < lines.Length; i++)
             {
-                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, 54f - i * k_ResultPitch, 104f);
-                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, 54f - i * k_ResultPitch, 104f);
+                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, linesTop - i * k_ResultPitch, 104f, style: TextStyle.Secondary);
+                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, linesTop - i * k_ResultPitch, 104f);
             }
+            float rule = linesTop - lines.Length * k_ResultPitch - 2f, takingsTop = rule - 2f, ledgerTop = takingsTop - Line - 1f;
             // The takings, set apart under a rule.
             RectTransform takingsRow = Rect(panel, "TakingsRow", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(224f, 172f));
-            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -37f), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
-            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, -39f, 104f);
-            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, -39f, 104f);
+            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, rule), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
+            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, takingsTop, 104f, style: TextStyle.Secondary);
+            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, takingsTop, 104f);
             // Pip keeps the books (4f Checkpoint C): the takings come from Pip's ledger.
-            RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -56f), new Vector2(104f, 10f));
+            RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, ledgerTop), new Vector2(104f, Line));
             DungeonUI.AddImage(Rect(ledger, "Book", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Book"), Color.white);
-            Label(ledger, "Text", TavernLocKeys.ResultsLedger, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(120f, Line));
-            Button done = BottomButton(panel, "Done", TavernLocKeys.ResultsAgain, 0f, 144f, out LocalizedSuperText doneLabel);
+            Label(ledger, "Text", TavernLocKeys.ResultsLedger, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(120f, Line));
+            // Why the night was short: built in the ledger's row; the screen moves it up under the last line when there's room.
+            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, ledgerTop, 224f);
+            Button done = SmallButton(panel, "Done", TavernLocKeys.ResultsAgain, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 144f, out LocalizedSuperText doneLabel);
             UiFeedbackContent.Commit(done);
-            root.gameObject.AddComponent<EveningResultsScreen>().Configure(panel.gameObject, note, labels, lines, takingsRow.gameObject, takings, done, doneLabel);
+            var results = root.gameObject.AddComponent<EveningResultsScreen>();
+            results.Configure(panel.gameObject, note, labels, lines, takingsRow.gameObject, takings, done, doneLabel);
+            results.ConfigureLedger(ledger.gameObject);
             panel.gameObject.SetActive(false);
         }
     }

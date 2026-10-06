@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Hearthdelve.UI;
+using Hearthdelve.UI.Typography;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,8 +12,8 @@ namespace Hearthdelve.Editor
     /// The game's text font: <b>Silver</b> by Poppy Works (chosen 2026-10-03, replacing m5x7), a pixel font on a
     /// 1900-unit em whose pixels are 100 units, so it is pixel-exact at size 19 (one font pixel per game pixel at
     /// 320×180) and at 38. Capitals and ascenders are 9 pixels, descenders 2. Imported as hinted raster at 19 and
-    /// rasterised by Super Text Mesh at 19, point filtered, on a 12-pixel line. Any other size drops or doubles pixel
-    /// rows, so text is only ever <see cref="Body"/> (1×) or <see cref="Large"/> (2×).
+    /// rasterised by Super Text Mesh at 19, point filtered, on a 12-pixel line. Any size that isn't a whole multiple drops or
+    /// doubles pixel rows, so the type scale (<see cref="TypeScale"/>, <see cref="Scale"/>) has 1×, 2× and 3× only.
     /// </summary>
     public static class GameFonts
     {
@@ -53,37 +54,61 @@ namespace Hearthdelve.Editor
             importer.SaveAndReimport();
         }
 
-        /// <summary>Text built with a requested size of this or more is large (2×); smaller is body text.</summary>
+        /// <summary>Text built with a requested size of this or more is a heading (2×); smaller is body text (old callers).</summary>
         public const float LargeRequest = 10f;
 
-        /// <summary>Existing text drawn large when retrofitted: the game's name on the main menu and the transition caption.</summary>
-        static bool IsLarge(SuperTextMesh text) =>
-            text.name == "Caption" || (text.name == "Title" && text.transform.parent != null && text.transform.parent.name == "Menu");
+        /// <summary>The type scale: one asset, every style's size and line (the UI foundation pass after 4f).</summary>
+        public const string ScalePath = "Assets/_Project/Data/UI/TypeScale.asset";
 
-        /// <summary>Sets a text up to draw the font crisply, at body (1×) or large (2×) size.</summary>
-        public static void Apply(SuperTextMesh text, bool large)
+        /// <summary>The type scale, created with the default sizes the first time.</summary>
+        public static TypeScale Scale()
+        {
+            var scale = AssetDatabase.LoadAssetAtPath<TypeScale>(ScalePath);
+            if (scale != null) return scale;
+            EditorPaths.Ensure("Assets/_Project/Data/UI");
+            scale = ScriptableObject.CreateInstance<TypeScale>();
+            AssetDatabase.CreateAsset(scale, ScalePath);
+            AssetDatabase.SaveAssets();
+            return scale;
+        }
+
+        /// <summary>A text with no style yet, from before styles: the game's name is Display, the transition caption a heading.</summary>
+        static TextStyle Legacy(SuperTextMesh text)
+        {
+            if (text.name == "Title" && text.transform.parent != null && text.transform.parent.name == "Menu") return TextStyle.Display;
+            if (text.name == "Caption") return TextStyle.Heading;
+            return text.size >= Large - 0.5f ? TextStyle.Heading : TextStyle.Body;
+        }
+
+        /// <summary>Sets a text up as a style: the game font, the style's size and line from the type scale, drawn crisply.</summary>
+        public static void Apply(SuperTextMesh text, TextStyle style)
         {
             Font font = Load();
             if (font == null || text == null) return;
             text.font = font;
-            text.size = large ? Large : Body;
-            text.quality = Native;
-            text.autoQuality = false;
-            text.filterMode = FilterMode.Point;
-            text.lineSpacing = LineSpacing;
-            text.relativeBaseOffset = true;
-            text.baseOffset = new Vector3(0f, BaseLift, 0f);
+            StyledText styled = text.GetComponent<StyledText>();
+            if (styled == null) styled = text.gameObject.AddComponent<StyledText>();
+            styled.Style = style;
+            Scale().Apply(text, style);
+            EditorUtility.SetDirty(styled);
             EditorUtility.SetDirty(text);
         }
 
+        /// <summary>Old callers: body (1×) or large (a heading, 2×).</summary>
+        public static void Apply(SuperTextMesh text, bool large) => Apply(text, large ? TextStyle.Heading : TextStyle.Body);
+
         /// <summary>
-        /// The open scene's text and canvases, in place: every Super Text Mesh gets the font, and every screen-space canvas
-        /// scales by whole pixels. For text built before the font (screens that are rebuilt get it as they're built).
+        /// The open scene's text and canvases, in place: every Super Text Mesh gets the font and its style's size from the type
+        /// scale (so a change to the scale reaches every text through the updaters), and every screen-space canvas scales by
+        /// whole pixels. For text built before the font (screens that are rebuilt get it as they're built).
         /// </summary>
         public static void ApplyToOpenScene()
         {
             foreach (SuperTextMesh text in Object.FindObjectsByType<SuperTextMesh>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-                Apply(text, IsLarge(text));
+            {
+                StyledText styled = text.GetComponent<StyledText>();
+                Apply(text, styled != null ? styled.Style : Legacy(text));
+            }
             foreach (Canvas canvas in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace) PixelScale(canvas);
         }

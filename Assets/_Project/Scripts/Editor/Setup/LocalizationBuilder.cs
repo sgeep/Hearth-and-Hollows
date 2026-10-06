@@ -64,7 +64,7 @@ namespace Hearthdelve.Editor
             ("recipe.onion_broth", "onion broth"),
             ("recipe.eggs_on_toast", "eggs on toast"),
             ("recipe.crispy_bat_wings", "crispy bat wings"),
-            ("recipe.spider_leg_steaks", "spider steaks"),
+            ("recipe.spider_leg_steaks", "spider-leg steaks"),
             ("recipe.bat_wing_platter", "bat-wing platter"),
             ("staff.gunta", "Gunta"),
             ("supply.brackenford_market", "the Brackenford market"),
