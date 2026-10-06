@@ -33,6 +33,7 @@ namespace Hearthdelve.Tests.PlayMode
         [TearDown]
         public void Restore()
         {
+            Time.captureDeltaTime = 0f;
             Time.timeScale = 1f;
             MenuPause.Clear();
         }
@@ -250,6 +251,28 @@ namespace Hearthdelve.Tests.PlayMode
             Time.timeScale = 1f;
             Assert.That(gunta.SteppedToTask);
             Assert.That(gunta.HasTask, Is.False);
+        }
+
+        /// <summary>
+        /// Staff and patrons arrive at a slow frame rate too (the 4f web check: in a background tab, at three frames a
+        /// second, Pip circled the pass for ever and never picked up a plate). A goal within one frame's travel counts as reached.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Pip_Serves_AtThreeFramesASecond()
+        {
+            yield return TavernAtPrep();
+            Director.AssignStaff(StaffStation.Serving);
+            Director.AssignCook(StaffStation.Grill);
+            OpenWithRequests("grilled_spider_leg");
+            int served = 0;
+            void Served(DishServed e) => served++;
+            EventBus<DishServed>.Subscribe(Served);
+            Patron();
+            Time.captureDeltaTime = 1f / 3f;
+            for (int frame = 0; frame < 300 && served == 0; frame++) yield return null;
+            Time.captureDeltaTime = 0f;
+            EventBus<DishServed>.Unsubscribe(Served);
+            Assert.That(served, Is.EqualTo(1), "the patron walked in and sat, Gunta grilled it and Pip carried it");
         }
 
         /// <summary>Every dish's card, on every page: one line each, and three pixels of daylight between name and price.</summary>

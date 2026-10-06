@@ -1,3 +1,4 @@
+using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Service;
@@ -187,7 +188,10 @@ namespace Hearthdelve.Tavern.Scene
             UpdateVisuals();
         }
 
-        bool Arrived() => Vector2.Distance(transform.position, m_Goal.position) <= k_Arrive;
+        bool Arrived() => Vector2.Distance(transform.position, m_Goal.position) <= Reach();
+
+        // Within one frame's travel counts as there: a slow frame would carry them past it (Arrival).
+        float Reach() => Arrival.Reach(k_Arrive, m_Movement != null ? m_Movement.MovementSpeed : 0f, Time.deltaTime);
 
         /// <summary>
         /// Once there (a queue spot), stand still with the AI off: the walk action would otherwise overshoot
@@ -197,12 +201,13 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (m_Brain == null) return;
             float distance = Vector2.Distance(transform.position, m_Goal.position);
-            if (m_Brain.BrainActive && distance <= k_Arrive)
+            float reach = Reach();
+            if (m_Brain.BrainActive && distance <= reach)
             {
                 m_Brain.BrainActive = false;
                 m_Movement?.SetMovement(Vector2.zero);
             }
-            else if (!m_Brain.BrainActive && distance > k_Resume) m_Brain.BrainActive = true;
+            else if (!m_Brain.BrainActive && distance > Arrival.Resume(k_Resume, reach)) m_Brain.BrainActive = true;
         }
 
         void SitDown()

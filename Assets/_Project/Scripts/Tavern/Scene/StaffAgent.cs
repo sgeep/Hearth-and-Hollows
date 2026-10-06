@@ -1,4 +1,5 @@
 using Hearthdelve.Core.Events;
+using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Recipes;
@@ -248,6 +249,7 @@ namespace Hearthdelve.Tavern.Scene
                 if (m_TaskWalked < m_TaskWalkLimit) return m_TaskAt;
                 StepTo(m_TaskAt);
                 SteppedToTask = true;
+                if (Debug.isDebugBuild) Debug.Log($"[Hearthdelve] {Member?.id}: couldn't walk to the job; stepped to it");
                 return m_TaskAt;
             }
             m_TaskLeft -= dt;
@@ -393,13 +395,16 @@ namespace Hearthdelve.Tavern.Scene
                 if (AtGoal && Vector2.Distance(transform.position, goal) > k_Arrive) Resume();
             }
             float distance = Vector2.Distance(transform.position, goal);
+            // Within one frame's travel counts as there (a slow frame would carry them past it); they stand on the spot.
+            float reach = Arrival.Reach(k_Arrive, m_Movement != null ? m_Movement.MovementSpeed : m_WalkSpeed, Time.deltaTime);
             if (!AtGoal && distance <= k_Arrive)
             {
                 AtGoal = true;
                 if (m_Brain != null) m_Brain.BrainActive = false;
                 m_Movement?.SetMovement(Vector2.zero);
             }
-            else if (AtGoal && distance > k_Resume) Resume();
+            else if (!AtGoal && distance <= reach) StepTo(goal);
+            else if (AtGoal && distance > Arrival.Resume(k_Resume, reach)) Resume();
         }
 
         void StepTo(Vector2 at)
