@@ -1,0 +1,87 @@
+#if USE_TIMELINE
+#if UNITY_2017_1_OR_NEWER
+// Copyright (c) Pixel Crushers. All rights reserved.
+
+using UnityEngine;
+using UnityEngine.Playables;
+using System.Collections.Generic;
+
+namespace PixelCrushers.DialogueSystem
+{
+
+    public class ConversationMixerBehaviour : PlayableBehaviour
+    {
+
+        private HashSet<int> played = new HashSet<int>();
+
+        private double timeLastStartedConversation = -1;
+
+        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+        {
+            GameObject trackBinding = playerData as GameObject;
+
+            Transform actorTransform = (trackBinding != null) ? trackBinding.transform : null;
+
+            int inputCount = playable.GetInputCount();
+
+            for (int i = 0; i < inputCount; i++)
+            {
+                float inputWeight = playable.GetInputWeight(i);
+                if (inputWeight > 0.001f && !played.Contains(i))
+                {
+                    played.Add(i);
+                    ScriptPlayable<StartConversationBehaviour> inputPlayable = (ScriptPlayable<StartConversationBehaviour>)playable.GetInput(i);
+                    StartConversationBehaviour input = inputPlayable.GetBehaviour();
+                    if (Application.isPlaying)                        
+                    {
+                        double rootTime = playable.GetGraph().GetRootPlayable(0).GetTime();
+                        double dt = rootTime - timeLastStartedConversation;
+                        var sameTimeAsLastStartConversation = (-0.01 <= dt && dt <= 0.01);
+                        if (!sameTimeAsLastStartConversation)
+                        {
+                            timeLastStartedConversation = rootTime;
+                            if (input.exclusive)
+                            {
+                                DialogueManager.StopAllConversations();
+                            }
+                            var entryID = (input.jumpToSpecificEntry && input.entryID > 0) ? input.entryID : -1;
+                            if (input.overrideDialogueUI != null)
+                            {
+                                DialogueManager.StartConversation(input.conversation, actorTransform, input.conversant, input.entryID, input.overrideDialogueUI);
+                            }
+                            else
+                            {
+                                DialogueManager.StartConversation(input.conversation, actorTransform, input.conversant, input.entryID);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var message = "Conversation (" + DialogueActor.GetActorName(actorTransform) + "->" + DialogueActor.GetActorName(input.conversant) + "):\n[" + input.conversation + "]\n'" + input.GetEditorDialogueText() + "' (may vary)";
+                        PreviewUI.ShowMessage(message);
+                    }
+                }
+                else if (inputWeight <= 0.001f && played.Contains(i))
+                {
+                    played.Remove(i);
+                    PreviewUI.HideMessage();
+                }
+            }
+        }
+
+        public override void OnGraphStart(Playable playable)
+        {
+            base.OnGraphStart(playable);
+            played.Clear();
+        }
+
+        public override void OnGraphStop(Playable playable)
+        {
+            base.OnGraphStop(playable);
+            played.Clear();
+        }
+
+    }
+}
+#endif
+#endif
