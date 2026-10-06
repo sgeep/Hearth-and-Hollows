@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe340064c169a904db029832237359d2, type: 3}
-  m_Name: Quest_proof_trophy_wall
+  m_Name: Quest_boogs_bomb
   m_EditorClassIdentifier: QuestMachine::PixelCrushers.QuestMachine.Quest
   m_isInstance: 0
   m_originalAsset: {fileID: 0}
   m_fileVersion: 0
   m_id:
-    m_text: proof_trophy_wall
+    m_text: boogs_bomb
     m_stringAsset: {fileID: 0}
     m_textTable: {fileID: 0}
     m_textTableFieldID: 0
   m_title:
-    m_text: quest.proof_trophy_wall.title
+    m_text: quest.boogs_bomb.title
     m_stringAsset: {fileID: 0}
     m_textTable: {fileID: 0}
     m_textTableFieldID: 0
@@ -97,7 +97,7 @@ MonoBehaviour:
   m_counterList: []
   m_nodeList:
   - m_id:
-      m_text: proof_trophy_wall.start
+      m_text: boogs_bomb.start
       m_stringAsset: {fileID: 0}
       m_textTable: {fileID: 0}
       m_textTableFieldID: 0
@@ -143,12 +143,12 @@ MonoBehaviour:
       width: 120
       height: 48
   - m_id:
-      m_text: hang
+      m_text: find
       m_stringAsset: {fileID: 0}
       m_textTable: {fileID: 0}
       m_textTableFieldID: 0
     m_internalName:
-      m_text: Hang a trophy over the bar
+      m_text: Bring her home from the Cellars
       m_stringAsset: {fileID: 0}
       m_textTable: {fileID: 0}
       m_textTableFieldID: 0
@@ -178,7 +178,7 @@ MonoBehaviour:
       - m_contentList: []
     m_conditionSet:
       m_conditionList:
-      - {fileID: 3772986282885202636}
+      - {fileID: 8833924447932507060}
       m_conditionCountMode: 1
       m_minConditionCount: 0
       m_numTrueConditions: 0
@@ -187,6 +187,53 @@ MonoBehaviour:
       serializedVersion: 2
       x: 200
       y: 88
+      width: 120
+      height: 48
+  - m_id:
+      m_text: return
+      m_stringAsset: {fileID: 0}
+      m_textTable: {fileID: 0}
+      m_textTableFieldID: 0
+    m_internalName:
+      m_text: Give her back to Boog
+      m_stringAsset: {fileID: 0}
+      m_textTable: {fileID: 0}
+      m_textTableFieldID: 0
+    m_nodeType: 4
+    m_isOptional: 0
+    m_state: 0
+    m_speaker:
+      m_text: 
+      m_stringAsset: {fileID: 0}
+      m_textTable: {fileID: 0}
+      m_textTableFieldID: 0
+    m_stateInfoList:
+    - m_actionList: []
+      m_categorizedContentList:
+      - m_contentList: []
+      - m_contentList: []
+      - m_contentList: []
+    - m_actionList: []
+      m_categorizedContentList:
+      - m_contentList: []
+      - m_contentList: []
+      - m_contentList: []
+    - m_actionList: []
+      m_categorizedContentList:
+      - m_contentList: []
+      - m_contentList: []
+      - m_contentList: []
+    m_conditionSet:
+      m_conditionList:
+      - {fileID: 4844872586327576893}
+      m_conditionCountMode: 1
+      m_minConditionCount: 0
+      m_numTrueConditions: 0
+    m_childIndexList: 03000000i
+    m_canvasRect:
+      serializedVersion: 2
+      x: 200
+      y: 156
       width: 120
       height: 48
   - m_id:
@@ -232,13 +279,13 @@ MonoBehaviour:
     m_canvasRect:
       serializedVersion: 2
       x: 200
-      y: 156
+      y: 224
       width: 120
       height: 48
   m_textTable: {fileID: 0}
   m_goalEntityTypeName: 
   m_nextContentID: 0
---- !u!114 &3772986282885202636
+--- !u!114 &4844872586327576893
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -269,11 +316,50 @@ MonoBehaviour:
     m_textTable: {fileID: 0}
     m_textTableFieldID: 0
   m_parameter:
-    m_text: TrophyDisplayed
+    m_text: QuestObjectDelivered
     m_stringAsset: {fileID: 0}
     m_textTable: {fileID: 0}
     m_textTableFieldID: 0
   m_value:
-    m_valueType: 0
+    m_valueType: 2
     m_intValue: 0
-    m_stringValue: 
+    m_stringValue: boogs_bomb
+--- !u!114 &8833924447932507060
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e375154654a2a3e45a617dd4a412510c, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: QuestMachine::PixelCrushers.QuestMachine.MessageQuestCondition
+  m_alreadyTrue: 0
+  m_senderSpecifier: 0
+  m_senderID:
+    m_text: 
+    m_stringAsset: {fileID: 0}
+    m_textTable: {fileID: 0}
+    m_textTableFieldID: 0
+  m_targetSpecifier: 0
+  m_targetID:
+    m_text: 
+    m_stringAsset: {fileID: 0}
+    m_textTable: {fileID: 0}
+    m_textTableFieldID: 0
+  m_message:
+    m_text: HH Fact
+    m_stringAsset: {fileID: 0}
+    m_textTable: {fileID: 0}
+    m_textTableFieldID: 0
+  m_parameter:
+    m_text: QuestObjectBroughtHome
+    m_stringAsset: {fileID: 0}
+    m_textTable: {fileID: 0}
+    m_textTableFieldID: 0
+  m_value:
+    m_valueType: 2
+    m_intValue: 0
+    m_stringValue: boogs_bomb

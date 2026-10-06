@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 429a89923efc08d47a3ca5b0bb7221a5, type: 3}
+  m_Name: QuestObject_boogs_bomb
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Quests.QuestObjectDefinition
+  id: boogs_bomb
+  frames:
+  - {fileID: 1141870724, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -357285221, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -72381768, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -1061358915, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: 89851430, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: 2094048179, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -1543363907, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -655334501, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: -953100825, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  - {fileID: 486887974, guid: ae4c6dca63fceec429c9a418fa9f8b5a, type: 3}
+  frameSeconds: 0.1
+  questId: boogs_bomb
+  floor: 1
+  afterRoomsCleared: 2
+  lostOnDeath: 1
+  offeredAgain: 1
+  rewardGold: 60

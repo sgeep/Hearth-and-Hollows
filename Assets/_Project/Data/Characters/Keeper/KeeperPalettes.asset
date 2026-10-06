@@ -1,0 +1,316 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ead3fb98a3c353448b4b07db631c117c, type: 3}
+  m_Name: KeeperPalettes
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.PaletteLibrary
+  ramps:
+  - id: keeper_skin.light
+    kind: keeper_skin
+    nameKey: keeper.skin.light
+    colors:
+    - serializedVersion: 2
+      rgba: 4286950605
+    - serializedVersion: 2
+      rgba: 4287608797
+    - serializedVersion: 2
+      rgba: 4288332782
+    - serializedVersion: 2
+      rgba: 4289121274
+  - id: keeper_skin.rosy
+    kind: keeper_skin
+    nameKey: keeper.skin.rosy
+    colors:
+    - serializedVersion: 2
+      rgba: 4286814411
+    - serializedVersion: 2
+      rgba: 4287537883
+    - serializedVersion: 2
+      rgba: 4288327406
+    - serializedVersion: 2
+      rgba: 4289247485
+  - id: keeper_skin.pale
+    kind: keeper_skin
+    nameKey: keeper.skin.pale
+    colors:
+    - serializedVersion: 2
+      rgba: 4288585653
+    - serializedVersion: 2
+      rgba: 4289507267
+    - serializedVersion: 2
+      rgba: 4290496223
+    - serializedVersion: 2
+      rgba: 4291222776
+  - id: keeper_skin.tan
+    kind: keeper_skin
+    nameKey: keeper.skin.tan
+    colors:
+    - serializedVersion: 2
+      rgba: 4283198334
+    - serializedVersion: 2
+      rgba: 4284318106
+    - serializedVersion: 2
+      rgba: 4285305009
+    - serializedVersion: 2
+      rgba: 4286291914
+  - id: keeper_skin.brown
+    kind: keeper_skin
+    nameKey: keeper.skin.brown
+    colors:
+    - serializedVersion: 2
+      rgba: 4279313210
+    - serializedVersion: 2
+      rgba: 4279905360
+    - serializedVersion: 2
+      rgba: 4281548919
+    - serializedVersion: 2
+      rgba: 4282994321
+  - id: keeper_orc_skin.orc_green
+    kind: keeper_orc_skin
+    nameKey: keeper.orc_skin.orc_green
+    colors:
+    - serializedVersion: 2
+      rgba: 4281625902
+    - serializedVersion: 2
+      rgba: 4282089526
+    - serializedVersion: 2
+      rgba: 4282421052
+    - serializedVersion: 2
+      rgba: 4282621763
+    - serializedVersion: 2
+      rgba: 4283149647
+  - id: keeper_orc_skin.goblin_green
+    kind: keeper_orc_skin
+    nameKey: keeper.orc_skin.goblin_green
+    colors:
+    - serializedVersion: 2
+      rgba: 4281765203
+    - serializedVersion: 2
+      rgba: 4282162015
+    - serializedVersion: 2
+      rgba: 4282426985
+    - serializedVersion: 2
+      rgba: 4282824822
+    - serializedVersion: 2
+      rgba: 4283418247
+  - id: keeper_hair.chestnut
+    kind: keeper_hair
+    nameKey: keeper.hair.chestnut
+    colors:
+    - serializedVersion: 2
+      rgba: 4278920265
+    - serializedVersion: 2
+      rgba: 4278987610
+    - serializedVersion: 2
+      rgba: 4279253108
+    - serializedVersion: 2
+      rgba: 4279518866
+    - serializedVersion: 2
+      rgba: 4279980451
+  - id: keeper_hair.ginger
+    kind: keeper_hair
+    nameKey: keeper.hair.ginger
+    colors:
+    - serializedVersion: 2
+      rgba: 4280574631
+    - serializedVersion: 2
+      rgba: 4281431763
+    - serializedVersion: 2
+      rgba: 4284912105
+  - id: keeper_hair.golden
+    kind: keeper_hair
+    nameKey: keeper.hair.golden
+    colors:
+    - serializedVersion: 2
+      rgba: 4279196834
+    - serializedVersion: 2
+      rgba: 4279726530
+    - serializedVersion: 2
+      rgba: 4281305821
+  - id: keeper_hair.crimson
+    kind: keeper_hair
+    nameKey: keeper.hair.crimson
+    colors:
+    - serializedVersion: 2
+      rgba: 4279963494
+    - serializedVersion: 2
+      rgba: 4280686214
+    - serializedVersion: 2
+      rgba: 4282462122
+  - id: keeper_hair.black
+    kind: keeper_hair
+    nameKey: keeper.hair.black
+    colors:
+    - serializedVersion: 2
+      rgba: 4281479730
+    - serializedVersion: 2
+      rgba: 4283914071
+    - serializedVersion: 2
+      rgba: 4286085240
+  - id: keeper_hair.blonde
+    kind: keeper_hair
+    nameKey: keeper.hair.blonde
+    colors:
+    - serializedVersion: 2
+      rgba: 4279140561
+    - serializedVersion: 2
+      rgba: 4279213279
+    - serializedVersion: 2
+      rgba: 4281382115
+  - id: keeper_hair.brown
+    kind: keeper_hair
+    nameKey: keeper.hair.brown
+    colors:
+    - serializedVersion: 2
+      rgba: 4278920275
+    - serializedVersion: 2
+      rgba: 4280302464
+    - serializedVersion: 2
+      rgba: 4282997153
+  - id: keeper_hair.red
+    kind: keeper_hair
+    nameKey: keeper.hair.red
+    colors:
+    - serializedVersion: 2
+      rgba: 4281805749
+    - serializedVersion: 2
+      rgba: 4281816012
+    - serializedVersion: 2
+      rgba: 4285034717
+  - id: keeper_hair.white
+    kind: keeper_hair
+    nameKey: keeper.hair.white
+    colors:
+    - serializedVersion: 2
+      rgba: 4288124823
+    - serializedVersion: 2
+      rgba: 4290098613
+    - serializedVersion: 2
+      rgba: 4292993505
+  - id: keeper_outfit.navy
+    kind: keeper_outfit
+    nameKey: keeper.outfit.navy
+    colors:
+    - serializedVersion: 2
+      rgba: 4287581760
+    - serializedVersion: 2
+      rgba: 4288829255
+    - serializedVersion: 2
+      rgba: 4289946192
+  - id: keeper_outfit.forest
+    kind: keeper_outfit
+    nameKey: keeper.outfit.forest
+    colors:
+    - serializedVersion: 2
+      rgba: 4280239639
+    - serializedVersion: 2
+      rgba: 4281889326
+    - serializedVersion: 2
+      rgba: 4283077181
+  - id: keeper_outfit.rust
+    kind: keeper_outfit
+    nameKey: keeper.outfit.rust
+    colors:
+    - serializedVersion: 2
+      rgba: 4279053945
+    - serializedVersion: 2
+      rgba: 4280301724
+  - id: keeper_outfit.leather
+    kind: keeper_outfit
+    nameKey: keeper.outfit.leather
+    colors:
+    - serializedVersion: 2
+      rgba: 4280567176
+    - serializedVersion: 2
+      rgba: 4281094816
+    - serializedVersion: 2
+      rgba: 4280702387
+  - id: keeper_outfit.red
+    kind: keeper_outfit
+    nameKey: keeper.outfit.red
+    colors:
+    - serializedVersion: 2
+      rgba: 4279571877
+    - serializedVersion: 2
+      rgba: 4281874636
+    - serializedVersion: 2
+      rgba: 4283980006
+  - id: keeper_outfit.blue
+    kind: keeper_outfit
+    nameKey: keeper.outfit.blue
+    colors:
+    - serializedVersion: 2
+      rgba: 4287982396
+    - serializedVersion: 2
+      rgba: 4289104968
+    - serializedVersion: 2
+      rgba: 4290093398
+  - id: keeper_outfit.purple
+    kind: keeper_outfit
+    nameKey: keeper.outfit.purple
+    colors:
+    - serializedVersion: 2
+      rgba: 4287053665
+    - serializedVersion: 2
+      rgba: 4289485428
+    - serializedVersion: 2
+      rgba: 4291326092
+  - id: keeper_outfit.turquoise
+    kind: keeper_outfit
+    nameKey: keeper.outfit.turquoise
+    colors:
+    - serializedVersion: 2
+      rgba: 4285825822
+    - serializedVersion: 2
+      rgba: 4286619187
+    - serializedVersion: 2
+      rgba: 4286886211
+  - id: keeper_outfit.magenta
+    kind: keeper_outfit
+    nameKey: keeper.outfit.magenta
+    colors:
+    - serializedVersion: 2
+      rgba: 4285544846
+    - serializedVersion: 2
+      rgba: 4288236200
+    - serializedVersion: 2
+      rgba: 4289684669
+  - id: keeper_outfit.orange
+    kind: keeper_outfit
+    nameKey: keeper.outfit.orange
+    colors:
+    - serializedVersion: 2
+      rgba: 4279592101
+    - serializedVersion: 2
+      rgba: 4281890508
+    - serializedVersion: 2
+      rgba: 4283925212
+  - id: keeper_outfit.yellow
+    kind: keeper_outfit
+    nameKey: keeper.outfit.yellow
+    colors:
+    - serializedVersion: 2
+      rgba: 4279866565
+    - serializedVersion: 2
+      rgba: 4279411677
+    - serializedVersion: 2
+      rgba: 4283282419
+  - id: keeper_outfit.white
+    kind: keeper_outfit
+    nameKey: keeper.outfit.white
+    colors:
+    - serializedVersion: 2
+      rgba: 4289506476
+    - serializedVersion: 2
+      rgba: 4291151301
+    - serializedVersion: 2
+      rgba: 4293322470
+  presets: []

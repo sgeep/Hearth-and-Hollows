@@ -99,6 +99,11 @@ MonoBehaviour:
       traits:
       - 20
       - 0
+    - factionID: 3
+      inheritable: 1
+      traits:
+      - 100
+      - 0
     percentJudgeParents: 0
   - id: 4
     name: pip
@@ -124,6 +129,11 @@ MonoBehaviour:
       inheritable: 1
       traits:
       - 50
+      - 0
+    - factionID: 4
+      inheritable: 1
+      traits:
+      - 100
       - 0
     percentJudgeParents: 0
   traitInheritanceType: 0

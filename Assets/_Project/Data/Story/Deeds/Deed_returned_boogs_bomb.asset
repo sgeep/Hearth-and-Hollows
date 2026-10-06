@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945773e93197f434babc4f332ed09c02, type: 3}
+  m_Name: Deed_returned_boogs_bomb
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Story.DeedDefinition
+  id: returned_boogs_bomb
+  source: 0
+  target: 2
+  character: gunta
+  learners: 2
+  shows:
+    craft: 0
+    nerve: 70
+    warmth: 30
+  impact: 40
+  respect: 12
+  memoryDays: 0

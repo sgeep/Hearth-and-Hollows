@@ -892,6 +892,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1838311052056437547}
   - component: {fileID: 7579746386926957456}
+  - component: {fileID: 6033958680982069072}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -934,6 +935,19 @@ MonoBehaviour:
   m_ShadowRenderer: {fileID: 250689793487181276}
   m_InitialFacing: 0
   m_FaceAim: 1
+--- !u!114 &6033958680982069072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3635783511644526784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8dd261394412684bbb2168076a49d34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Characters.KeeperAppearance
+  m_Looks: {fileID: 11400000, guid: 6a38f39df45eae54fa653e107981519d, type: 2}
 --- !u!1 &3932727656726392812
 GameObject:
   m_ObjectHideFlags: 0

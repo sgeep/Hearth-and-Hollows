@@ -1,0 +1,172 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 680216229b0b69a4e9edef244953c2c3, type: 3}
+  m_Name: KeeperLooks
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Characters.KeeperLooks
+  bodies:
+  - id: townsfolk
+    nameKey: keeper.body.townsfolk
+    animations: {fileID: 11400000, guid: 6b58bd33f848e6d4d88fb12b3aa05172, type: 2}
+    shadow: {fileID: 11400000, guid: 1d7cb6f82b13b214ea7be1c4e72719c0, type: 2}
+    channels:
+    - kind: keeper_skin
+      source:
+      - serializedVersion: 2
+        rgba: 4286950605
+      - serializedVersion: 2
+        rgba: 4287608797
+      - serializedVersion: 2
+        rgba: 4288332782
+      - serializedVersion: 2
+        rgba: 4289121274
+    - kind: keeper_hair
+      source:
+      - serializedVersion: 2
+        rgba: 4278920265
+      - serializedVersion: 2
+        rgba: 4278987610
+      - serializedVersion: 2
+        rgba: 4279253108
+      - serializedVersion: 2
+        rgba: 4279518866
+      - serializedVersion: 2
+        rgba: 4279980451
+    - kind: keeper_outfit
+      source:
+      - serializedVersion: 2
+        rgba: 4287581760
+      - serializedVersion: 2
+        rgba: 4288829255
+      - serializedVersion: 2
+        rgba: 4289946192
+    drawnAs:
+    - kind: keeper_skin
+      ramp: keeper_skin.light
+    - kind: keeper_hair
+      ramp: keeper_hair.chestnut
+    - kind: keeper_outfit
+      ramp: keeper_outfit.navy
+  - id: amazon
+    nameKey: keeper.body.amazon
+    animations: {fileID: 11400000, guid: fc566ae78f41b874aa86a699f9717ab4, type: 2}
+    shadow: {fileID: 11400000, guid: 1d7cb6f82b13b214ea7be1c4e72719c0, type: 2}
+    channels:
+    - kind: keeper_skin
+      source:
+      - serializedVersion: 2
+        rgba: 4286950605
+      - serializedVersion: 2
+        rgba: 4287608797
+      - serializedVersion: 2
+        rgba: 4288332782
+      - serializedVersion: 2
+        rgba: 4289121274
+    - kind: keeper_hair
+      source:
+      - serializedVersion: 2
+        rgba: 4280574631
+      - serializedVersion: 2
+        rgba: 4281431763
+      - serializedVersion: 2
+        rgba: 4284912105
+    - kind: keeper_outfit
+      source:
+      - serializedVersion: 2
+        rgba: 4280239639
+      - serializedVersion: 2
+        rgba: 4281889326
+      - serializedVersion: 2
+        rgba: 4283077181
+    drawnAs:
+    - kind: keeper_skin
+      ramp: keeper_skin.light
+    - kind: keeper_hair
+      ramp: keeper_hair.ginger
+    - kind: keeper_outfit
+      ramp: keeper_outfit.forest
+  - id: dwarf
+    nameKey: keeper.body.dwarf
+    animations: {fileID: 11400000, guid: be927dcd692536646b1bae317d2920ae, type: 2}
+    shadow: {fileID: 11400000, guid: 1c106084e60ae50468bde6c5fe610567, type: 2}
+    channels:
+    - kind: keeper_skin
+      source:
+      - serializedVersion: 2
+        rgba: 4286814411
+      - serializedVersion: 2
+        rgba: 4287537883
+      - serializedVersion: 2
+        rgba: 4288327406
+      - serializedVersion: 2
+        rgba: 4289247485
+    - kind: keeper_hair
+      source:
+      - serializedVersion: 2
+        rgba: 4279196834
+      - serializedVersion: 2
+        rgba: 4279726530
+      - serializedVersion: 2
+        rgba: 4281305821
+    - kind: keeper_outfit
+      source:
+      - serializedVersion: 2
+        rgba: 4279053945
+      - serializedVersion: 2
+        rgba: 4280301724
+    drawnAs:
+    - kind: keeper_skin
+      ramp: keeper_skin.rosy
+    - kind: keeper_hair
+      ramp: keeper_hair.golden
+    - kind: keeper_outfit
+      ramp: keeper_outfit.rust
+  - id: orc
+    nameKey: keeper.body.orc
+    animations: {fileID: 11400000, guid: 880341799f3bc89478bc3d840380a857, type: 2}
+    shadow: {fileID: 11400000, guid: 1d7cb6f82b13b214ea7be1c4e72719c0, type: 2}
+    channels:
+    - kind: keeper_orc_skin
+      source:
+      - serializedVersion: 2
+        rgba: 4281625902
+      - serializedVersion: 2
+        rgba: 4282089526
+      - serializedVersion: 2
+        rgba: 4282421052
+      - serializedVersion: 2
+        rgba: 4282621763
+      - serializedVersion: 2
+        rgba: 4283149647
+    - kind: keeper_hair
+      source:
+      - serializedVersion: 2
+        rgba: 4279963494
+      - serializedVersion: 2
+        rgba: 4280686214
+      - serializedVersion: 2
+        rgba: 4282462122
+    - kind: keeper_outfit
+      source:
+      - serializedVersion: 2
+        rgba: 4280567176
+      - serializedVersion: 2
+        rgba: 4281094816
+      - serializedVersion: 2
+        rgba: 4280702387
+    drawnAs:
+    - kind: keeper_orc_skin
+      ramp: keeper_orc_skin.orc_green
+    - kind: keeper_hair
+      ramp: keeper_hair.crimson
+    - kind: keeper_outfit
+      ramp: keeper_outfit.leather
+  palettes: {fileID: 11400000, guid: 6f50504c74214144385c2adcedb987fc, type: 2}
