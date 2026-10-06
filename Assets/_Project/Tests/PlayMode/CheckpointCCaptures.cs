@@ -77,7 +77,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
             yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
             yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance &&
                                          LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0, 30f, "the delve");
             Player = LevelManager.Instance.Players[0];

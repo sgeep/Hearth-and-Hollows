@@ -143,8 +143,12 @@ namespace Hearthdelve.Tests
         static GameState StoryGame()
         {
             var state = new GameState(4, DayPhase.Night);
-            state.Story.OpeningComplete = false;
-            state.Story.Player = new PlayerProfile { name = "Wren", body = "amazon" };
+            state.Story.Opening = OpeningStage.FirstEvening;
+            state.Story.CreationComplete = true;
+            state.Story.SeenHints.Add(OnboardingHints.Move);
+            state.Story.SeenHints.Add("beat:arrival");
+            state.Story.Player = new PlayerProfile { name = "Wren", body = "amazon", palette = "keeper_hair=keeper_hair.red;keeper_skin=keeper_skin.tan" };
+            state.QuestObjects.Want("boogs_bomb");
             state.Story.Dialogue = "Variable={Alert=\"\"}";
             state.Story.Quests = "{\"staticQuestIds\":[\"proof_trophy_wall\"]}";
             state.Story.Relationships = new RelationshipData
@@ -159,10 +163,13 @@ namespace Hearthdelve.Tests
         public void TheStory_RoundTripsThroughTheSave()
         {
             SaveData saved = SaveSystem.FromJson(SaveSystem.ToJson(SaveSystem.Capture(StoryGame())));
-            Assert.That(saved.version, Is.EqualTo(8));
+            Assert.That(saved.version, Is.EqualTo(SaveSystem.CurrentVersion));
             GameState back = SaveSystem.Restore(saved, _ => null, _ => true);
             StoryState s = back.Story;
-            Assert.That((s.OpeningComplete, s.Player.name, s.Player.body), Is.EqualTo((false, "Wren", "amazon")));
+            Assert.That((s.Opening, s.CreationComplete, s.Player.name, s.Player.body, s.Player.palette),
+                Is.EqualTo((OpeningStage.FirstEvening, true, "Wren", "amazon", "keeper_hair=keeper_hair.red;keeper_skin=keeper_skin.tan")));
+            Assert.That(s.SeenHints, Is.EquivalentTo(new[] { OnboardingHints.Move, "beat:arrival" }));
+            Assert.That(back.QuestObjects.Status("boogs_bomb"), Is.EqualTo(Hearthdelve.Shared.Quests.QuestObjectStatus.Wanted));
             Assert.That(s.Dialogue, Is.EqualTo("Variable={Alert=\"\"}"));
             Assert.That(s.Quests, Does.Contain("proof_trophy_wall"));
             RelationshipValueData v = s.Relationships.values.Single();
@@ -176,30 +183,32 @@ namespace Hearthdelve.Tests
         {
             SaveData v7 = SaveSystem.Capture(new GameState(9, DayPhase.Daytime));
             v7.version = 7;
-            string json = Regex.Replace(SaveSystem.ToJson(v7), @",\s*""story"":\s*\{.*\}\s*\}\s*$", "\n}", RegexOptions.Singleline);
+            // The story and everything after it (version 9's quest objects) are newer than version 7.
+            string json = Regex.Replace(SaveSystem.ToJson(v7), @",\s*""story"":.*$", "\n}", RegexOptions.Singleline);
             Assert.That(json, Does.Not.Contain("\"story\""), "a genuine version 7 file has no story");
             SaveData migrated = SaveSystem.FromJson(json);
             Assert.That(migrated.version, Is.EqualTo(SaveSystem.CurrentVersion));
             GameState state = SaveSystem.Restore(migrated, _ => null, _ => true);
-            Assert.That(state.Story.OpeningComplete, "Continue never sends an old game through the opening or character creation");
+            Assert.That(state.Story.OpeningComplete && state.Story.CreationComplete, "Continue never sends an old game through the opening or character creation");
+            Assert.That(state.Story.SeenHints, Is.EquivalentTo(OnboardingHints.All), "nor shows it the first delve's prompts");
             Assert.That((state.Story.Player.name, state.Story.Player.body), Is.EqualTo(("Bram", "townsfolk")));
             Assert.That(state.Story.Relationships.IsEmpty && state.Story.Dialogue == string.Empty && state.Story.Quests == string.Empty,
                 "no history inferred from the day, bosses or furniture");
         }
 
         [Test]
-        public void AVersion1Save_ReachesVersion8_ThroughEveryStep()
+        public void AVersion1Save_ReachesTheCurrentVersion_ThroughEveryStep()
         {
             const string v1 = "{\"version\":1,\"day\":2,\"gold\":40,\"storeroom\":[]}";
             SaveData data = SaveSystem.FromJson(v1);
-            Assert.That(data.version, Is.EqualTo(8));
-            Assert.That(data.story.openingComplete);
+            Assert.That(data.version, Is.EqualTo(SaveSystem.CurrentVersion));
+            Assert.That((data.story.openingComplete, data.story.openingStage, data.story.creationComplete), Is.EqualTo((true, "Complete", true)));
         }
 
         [Test]
-        public void ANewGame_HasItsOpeningAhead()
+        public void ABareState_HasNoOpeningAhead_SoToolsAndTestsNeverStartOne()
         {
-            Assert.That(new GameState().Story.OpeningComplete, Is.False);
+            Assert.That(new GameState().Story.Opening, Is.EqualTo(OpeningStage.Complete), "only GameFlow.NewGame puts a game at the arrival");
             Assert.That(new GameState().Story.Player.name, Is.EqualTo(PlayerProfile.DefaultName));
         }
 
@@ -283,14 +292,20 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void TheProofQuest_IsInTheQuestDatabase_KeyedForOurLocalization()
+        public void BoogsBomb_IsTheQuestDatabasesQuest_KeyedForOurLocalization_AndMovedOnlyByFacts()
         {
             QuestDatabase quests = Story.quests;
-            Quest quest = quests.questAssets.Single(q => StringField.GetStringValue(q.id) == StoryBuilder.ProofQuest);
-            Assert.That(StringField.GetStringValue(quest.title), Is.EqualTo(StoryLocKeys.ProofQuestTitle), "the title is a Localization key, not Quest Machine text");
-            QuestNode hang = quest.nodeList.Single(n => StringField.GetStringValue(n.id) == "hang");
-            var condition = (MessageQuestCondition)hang.conditionSet.conditionList.Single();
-            Assert.That((StringField.GetStringValue(condition.message), StringField.GetStringValue(condition.parameter)), Is.EqualTo((QuestAdapter.FactMessage, "TrophyDisplayed")));
+            Assert.That(quests.questAssets.Select(q => StringField.GetStringValue(q.id)), Is.EqualTo(new[] { StoryBuilder.BoogsBombQuest }),
+                "Checkpoint A's proof quest is retired");
+            Quest quest = quests.questAssets.Single();
+            Assert.That(StringField.GetStringValue(quest.title), Is.EqualTo(StoryLocKeys.BoogsBombTitle), "the title is a Localization key, not Quest Machine text");
+            foreach (var (node, fact) in new[] { ("find", "QuestObjectBroughtHome"), ("return", "QuestObjectDelivered") })
+            {
+                var condition = (MessageQuestCondition)quest.nodeList.Single(n => StringField.GetStringValue(n.id) == node).conditionSet.conditionList.Single();
+                Assert.That((StringField.GetStringValue(condition.message), StringField.GetStringValue(condition.parameter), condition.value.stringValue),
+                    Is.EqualTo((QuestAdapter.FactMessage, fact, "boogs_bomb")), node);
+            }
+            Assert.That(quest.nodeList.Any(n => n.nodeType == QuestNodeType.Failure), Is.False, "death never fails it: there's no way to fail");
             Assert.That(QuestAdapter.Name(QuestState.Active), Is.EqualTo("active"));
         }
 

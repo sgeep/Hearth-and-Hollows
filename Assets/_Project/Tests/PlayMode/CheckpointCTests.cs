@@ -97,7 +97,7 @@ namespace Hearthdelve.Tests.PlayMode
         IEnumerator NewGameToTheDelve()
         {
             yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return InDungeon();
         }
 

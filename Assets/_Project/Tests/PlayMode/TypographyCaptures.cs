@@ -134,7 +134,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
             yield return new WaitForSecondsRealtime(0.3f);
             yield return Shot("main_menu");
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance &&
                                          LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0, 30f, "the delve");
             var cover = Object.FindAnyObjectByType<TransitionScreen>();

@@ -110,7 +110,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             // ---------- Day 1: the first night's delve, a curio and a haul home ----------
             yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return InDungeon();
             RoomRunner.Active.GrantReward(RoomReward.Curio());
             yield return PickUpCurios(1);

@@ -120,7 +120,7 @@ namespace Hearthdelve.Tests.PlayMode
         IEnumerator NewGameToTheDelve()
         {
             yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return InDungeon();
         }
 
@@ -173,8 +173,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return BootToMenu();
             var menu = Object.FindAnyObjectByType<MainMenuScreen>();
             Assert.That(menu.ContinueButton.gameObject.activeSelf, Is.False, "no save, no Continue");
-            menu.NewGameButton.onClick.Invoke();
-            Assert.That(menu.IsConfirming, Is.False, "nothing to replace, so no question");
+            GameFlow.Instance.QuickNewGame();
 
             // Day 1 starts with a delve into the Hollows: the storeroom is empty, so the first job is something to cook.
             var transition = Object.FindAnyObjectByType<TransitionScreen>();
@@ -581,7 +580,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return BootToMenu();
             int framesWithoutCamera = 0, frames = 0;
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             var transition = Object.FindAnyObjectByType<TransitionScreen>();
             do
             {
@@ -597,7 +596,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator NewGame_OverASave_AsksOnce_AndBackKeepsIt()
         {
             yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return InDungeon();
             Flow.DebugAddGold(50);
             Flow.Save();
@@ -611,7 +610,10 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().gold, Is.EqualTo(50), "Back keeps it");
             menu.NewGameButton.onClick.Invoke();
             menu.ConfirmYes.onClick.Invoke();
-            yield return InDungeon();
+            Assert.That(menu.Creator.IsOpen, "starting over makes a new keeper first");
+            Assert.That(SavedGame().gold, Is.EqualTo(50), "nothing is replaced until the keeper is made");
+            menu.Creator.BeginButton.onClick.Invoke();
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Tavern, 30f, "Tally Ho!");
             Assert.That(SavedGame().gold, Is.Zero, "started over");
         }
         /// <summary>

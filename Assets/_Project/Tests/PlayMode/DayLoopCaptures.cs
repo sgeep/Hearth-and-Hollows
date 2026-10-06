@@ -48,7 +48,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(0.6f);
             TavernEveningCaptures.Capture("BatchLogs/day_menu.png");
 
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             // A new game starts with a delve: home with nothing, sleep, and day 2's daytime.
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance && LevelManager.Instance.Players.Count > 0, 30f, "the first delve");
             yield return null;

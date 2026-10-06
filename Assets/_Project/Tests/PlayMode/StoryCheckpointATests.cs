@@ -94,7 +94,7 @@ namespace Hearthdelve.Tests.PlayMode
         IEnumerator NewGameToTheDelve()
         {
             yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance &&
                                          LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0, 30f, "the delve");
             Player = LevelManager.Instance.Players[0];
@@ -238,23 +238,19 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
             Assert.That(Flow.State.Furniture.PendingHomecoming, Is.EqualTo("trophy_larder_troll"));
 
-            // Before: Boog hasn't seen them. He offers the proof quest (Quest Machine), which the keeper takes.
+            // Before: Boog hasn't seen them. (Checkpoint B: his everyday branch, with his bomb to ask about; Checkpoint A's proof
+            // quest is retired, and Boog's Bomb has its own tests.)
             Assert.That((Social.Affinity("gunta"), Social.Respect("gunta"), Social.Remembers("gunta", "displayed_trophy")), Is.EqualTo((10f, 0f, false)));
             yield return Talk(CharacterIds.Boog);
             Assert.That((Box.SpeakerId, Box.SpeakerName), Is.EqualTo(("gunta", "Boog")));
-            Assert.That(Box.Line, Does.StartWith("this kitchen's too quiet"));
-            yield return NextLine();
-            Assert.That(Box.Line, Does.StartWith("bring me something big"));
+            Assert.That(Box.Line, Does.StartWith("the stove's hot"));
             yield return NextLine();
             yield return WaitUntil(() => Box.IsChoosing, 2f, "the choices");
-            Assert.That((Box.ResponseCount, Box.ChoiceText(0), Box.ChoiceText(1)), Is.EqualTo((2, "i'll see what i can find.", "maybe later.")));
+            Assert.That((Box.ResponseCount, Box.ChoiceText(0), Box.ChoiceText(1)), Is.EqualTo((2, "about your bomb...", "carry on.")));
             Assert.That(Selected, Is.EqualTo("Choice0"), "the first choice has the focus");
+            yield return Press(Key.DownArrow);
             yield return Press(Key.Enter);
-            yield return WaitUntil(() => !Box.IsChoosing, 2f, "the choice taken");
-            Assert.That(Host.Quests.State("proof_trophy_wall"), Is.EqualTo("active"), "Quest Machine: the quest is under way");
-            ListenAsAtEndOfFrame("proof_trophy_wall");
-            Assert.That(Box.Line, Does.StartWith("big teeth"));
-            yield return UntilClosed();
+            yield return WaitUntil(() => !Box.IsOpen, 2f, "carry on: the conversation ends");
             Assert.That(MenuPause.IsPaused, Is.False);
 
             // The deed: the tusks go up. Boog and Orik learn of it at once, though neither is in Decorate Mode.
@@ -265,7 +261,6 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(boogRespect, Is.EqualTo(13.5f).Within(0.01f), "and respects them: 15 × the nerve match (0.9)");
             Assert.That(pipAffinity, Is.GreaterThan(20f), "Orik likes it too");
             Assert.That(Social.Respect("pip"), Is.EqualTo(5f).Within(0.01f), "but isn't impressed by monster parts");
-            yield return WaitUntil(() => Host.Quests.State("proof_trophy_wall") == "successful", 2f, "the quest done by the same fact");
             DecorateMode.Instance.Leave();
             yield return null;
 
@@ -273,7 +268,6 @@ namespace Hearthdelve.Tests.PlayMode
             StorySaveData saved = SavedGame().story;
             Assert.That(saved.relationships.values.Any(v => v.judge == "gunta" && v.subject == "player" && v.trait == "Respect" && Mathf.Abs(v.value - 13.5f) < 0.01f));
             Assert.That(saved.relationships.memories.Select(m => (m.judge, m.deed)), Is.SupersetOf(new[] { ("gunta", "displayed_trophy"), ("pip", "displayed_trophy") }));
-            Assert.That(saved.quests, Does.Contain("proof_trophy_wall"));
             Assert.That(saved.dialogue, Is.Not.Empty);
 
             // After: a different branch, read from his memory and his respect. The choice by gamepad.
@@ -305,7 +299,6 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Social.Respect("gunta"), Is.EqualTo(boogRespect).Within(1e-3f));
             Assert.That(Social.Affinity("pip"), Is.EqualTo(pipAffinity).Within(1e-3f));
             Assert.That((Social.Remembers("gunta", "displayed_trophy"), Social.TimesSeen("gunta", "displayed_trophy")), Is.EqualTo((true, 1)));
-            Assert.That(Host.Quests.State("proof_trophy_wall"), Is.EqualTo("successful"), "Quest Machine's state came back");
             yield return Talk(CharacterIds.Boog);
             Assert.That(Box.Line, Does.StartWith("you hung the Larder Troll's tusks over the bar"), "the same branch after Continue");
             yield return NextLine();
@@ -328,10 +321,11 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(menu.IsConfirming, "starting over asks first");
             menu.ConfirmYes.onClick.Invoke();
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "a new delve");
+            menu.Creator.BeginButton.onClick.Invoke();
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Tavern, 30f, "the arrival");
             Assert.That((Social.Remembers("gunta", "displayed_trophy"), Social.Respect("gunta"), Social.Affinity("gunta")), Is.EqualTo((false, 0f, 10f)));
-            Assert.That(Host.Quests.State("proof_trophy_wall"), Is.EqualTo("unassigned"));
-            Assert.That(Flow.State.Story.OpeningComplete, Is.False, "a new game has its opening ahead");
+            Assert.That(Host.Quests.State("boogs_bomb"), Is.EqualTo("unassigned"));
+            Assert.That(Flow.State.Story.Opening, Is.EqualTo(OpeningStage.Arrival), "a new game has its opening ahead");
             Assert.That(respectBefore, Is.GreaterThan(0f));
         }
 
@@ -348,23 +342,25 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(InputMaps.Snapshot(), Is.EqualTo(new[] { InputMaps.UI }), "only the UI map while talking");
             Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "good evening, Bram. the ledger and i are on speaking terms again.")));
             var portrait = Object.FindObjectsByType<UnityEngine.UI.Image>().Single(i => i.name == "Portrait");
-            Assert.That(portrait.gameObject.activeInHierarchy, "her portrait");
+            Assert.That(portrait.gameObject.activeInHierarchy, "his portrait");
             Assert.That(Host.Characters.Definition("pip").portrait.talking, Does.Contain(portrait.sprite), "talking while the line is revealed");
             Assert.That(Box.IsRevealing, "the line is revealed as it's spoken");
             yield return Press(Key.E);
             Assert.That(Box.IsRevealing, Is.False, "E finishes the reveal");
             Assert.That(Box.IsOpen, "and doesn't skip the line");
-            // A click on the box moves on.
+            // A click on the box moves on: to his questions (Checkpoint B), where "never mind." ends it.
             Vector2 at = Centre(Object.FindAnyObjectByType<DialogueBoxClick>().transform);
             yield return ClickAt(at);
-            yield return null;
-            Assert.That(Box.IsOpen, Is.False, "a click on the box moves on (her only line)");
+            yield return WaitUntil(() => Box.IsChoosing, 2f, "his questions");
+            Assert.That(Box.ResponseCount, Is.EqualTo(4));
+            Assert.That(Box.ChoiceText(3), Is.EqualTo("never mind."));
+            yield return ClickAt(Centre(Box.ChoiceButton(3).transform));
+            yield return WaitUntil(() => !Box.IsOpen, 2f, "never mind: closed");
             Assert.That(Time.timeScale, Is.EqualTo(1f));
             Assert.That(InputMaps.Snapshot(), Is.EqualTo(before), "the maps that were on are on again");
 
             // Boog's choices by mouse: hovering moves the focus and the ▶; a click chooses.
             yield return Talk(CharacterIds.Boog);
-            yield return NextLine();
             yield return NextLine();
             yield return WaitUntil(() => Box.IsChoosing, 2f, "the choices");
             Vector2 second = Centre(Box.ChoiceButton(1).transform);
@@ -375,16 +371,19 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Enumerable.Range(0, 4).Where(Box.PointerShown), Is.EqualTo(new[] { 1 }), "▶ beside it, and only it");
             Assert.That(Object.FindObjectsByType<SuperTextMesh>().Single(t => t.name == "Pointer1").drawText, Is.EqualTo("‣"), "drawn");
             yield return ClickAt(second);
-            yield return WaitUntil(() => !Box.IsChoosing, 2f, "the choice taken");
-            Assert.That(Box.Line, Does.StartWith("later is when things sneak up"));
-            Assert.That(Host.Quests.State("proof_trophy_wall"), Is.EqualTo("unassigned"), "declined: no quest");
-            yield return UntilClosed();
+            yield return WaitUntil(() => !Box.IsOpen, 2f, "carry on: the choice taken, the conversation over");
 
-            // Gamepad A moves on as well.
+            // Gamepad A moves on as well, and chooses.
             yield return Talk(CharacterIds.Orik);
             yield return PressPad(GamepadButton.South);
+            Assert.That(Box.IsRevealing || Box.IsChoosing, Is.False, "A finishes the reveal and stops there");
             yield return PressPad(GamepadButton.South);
-            Assert.That(Box.IsOpen, Is.False, "A finishes the reveal, then moves on");
+            yield return WaitUntil(() => Box.IsChoosing, 2f, "then moves on");
+            // Down to the fourth (the module may let the first nudge after the choices appear settle the focus).
+            for (int i = 0; i < 5 && Selected != "Choice3"; i++) yield return PressPad(GamepadButton.DpadDown);
+            Assert.That(Selected, Is.EqualTo("Choice3"));
+            yield return PressPad(GamepadButton.South);
+            yield return WaitUntil(() => !Box.IsOpen, 2f, "A chooses never mind");
         }
 
         [UnityTest]
@@ -451,7 +450,7 @@ namespace Hearthdelve.Tests.PlayMode
             string path = Path.Combine(m_SaveDir, SaveStore.FileName);
             SaveData data = SavedGame();
             data.version = 7;
-            string json = Regex.Replace(SaveSystem.ToJson(data), @",\s*""story"":\s*\{.*\}\s*\}\s*$", "\n}", RegexOptions.Singleline);
+            string json = Regex.Replace(SaveSystem.ToJson(data), @",\s*""story"":.*$", "\n}", RegexOptions.Singleline);
             File.WriteAllText(path, json);
 
             yield return BootToMenu();
@@ -462,12 +461,12 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.TimesDefeated("larder_troll"), Is.EqualTo(1));
             Assert.That(Social.Remembers("gunta", "displayed_trophy") || Social.Respect("gunta") != 0f, Is.False, "the troll's fall isn't turned into history");
             yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("this kitchen's too quiet"), "no tusks branch: the offer");
+            Assert.That(Box.Line, Does.StartWith("the stove's hot"), "no tusks branch: his everyday line");
             DialogueManager.StopAllConversations();
             yield return null;
             Assert.That(Box.IsOpen, Is.False);
             Flow.Save();
-            Assert.That((SavedGame().version, SavedGame().story.openingComplete), Is.EqualTo((SaveSystem.CurrentVersion, true)), "saved as version 8, still without its opening");
+            Assert.That((SavedGame().version, SavedGame().story.openingComplete), Is.EqualTo((SaveSystem.CurrentVersion, true)), "saved at the current version, still without its opening");
         }
 
         [UnityTest]

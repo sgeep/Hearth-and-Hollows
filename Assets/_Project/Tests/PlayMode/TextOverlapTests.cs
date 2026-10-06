@@ -199,7 +199,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
             var problems = new List<string>();
             Check(Object.FindAnyObjectByType<MainMenuScreen>().transform, "the main menu", problems);
-            Object.FindAnyObjectByType<MainMenuScreen>().NewGameButton.onClick.Invoke();
+            GameFlow.Instance.QuickNewGame();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance &&
                                          LevelManager.Instance.Players != null && LevelManager.Instance.Players.Count > 0, 30f, "the delve");
             Satchel satchel = LevelManager.Instance.Players[0].GetComponent<SatchelCarrier>().Satchel;
