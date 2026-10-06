@@ -210,7 +210,9 @@ namespace Hearthdelve.Tests
             FurnitureLayout layout = Starting();
             Assert.That(layout.Check(New("wall_sign", 6, 8)).Problem, Is.EqualTo(PlacementProblem.NotOnTheWall));
             Assert.That(layout.Check(New("wall_sign", 8, 16)).IsValid, "higher up the wall");
-            Assert.That(layout.Check(New("wall_sign", 12, 15)).Problem, Is.EqualTo(PlacementProblem.Overlaps), "half over the sign already there");
+            Assert.That(layout.Check(New("wall_sign", 18, 15)).Problem, Is.EqualTo(PlacementProblem.Overlaps), "half over the sign already there");
+            // 4f Checkpoint D: a clean stretch of back wall for the first trophy, between the bottle shelves and the fireplace.
+            Assert.That(layout.Check(New("wall_sign", 9, 15)).IsValid);
             // 4f Checkpoint C: never where the corner stairs would hide it.
             Assert.That(layout.Check(New("wall_sign", 25, 15)).Problem, Is.EqualTo(PlacementProblem.Overlaps), "behind the stairs");
             Assert.That(layout.Check(New("wall_sign", 23, 15)).IsValid, "beside them");
