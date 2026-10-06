@@ -197,12 +197,19 @@ namespace Hearthdelve.Editor
             };
             SpriteRenderer icon = LookTestContent.AddSprite(bubble, "Icon", null, SortingLayers.Above, 3, Vector3.zero);
             bubbleSprites.Add(icon);
+            // A special request's sparkle on the bubble's top-right corner (4f Checkpoint D).
+            SpriteRenderer requestMark = LookTestContent.AddSprite(bubble, "RequestMark", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Sparkle"),
+                SortingLayers.Above, 4, new Vector3(0.625f, 0.5f, 0f));
+            requestMark.enabled = false;
+            bubbleSprites.Add(requestMark);
             if (unlit != null) foreach (SpriteRenderer r in bubbleSprites) r.sharedMaterial = unlit;
             bubble.gameObject.SetActive(false);
 
             root.AddComponent<CustomerAgent>().Configure(look, back, fill, bubble.gameObject, icon,
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Thinking"), MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Angry"));
             root.GetComponent<CustomerAgent>().ConfigureEmotes(MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Surprised"));
+            root.GetComponent<CustomerAgent>().ConfigureRequests(requestMark, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Heart"),
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Frown"));
             return LookTestContent.SavePrefab(root, CustomerPrefab);
         }
 

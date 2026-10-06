@@ -400,11 +400,28 @@ namespace Hearthdelve.Tavern.Scene
             Session = new ServiceSession(m_Content.service.service, economy.dishScoring, economy.service, Storeroom, m_Menu, ActiveSeats, m_Random,
                 m_Content.stew != null ? m_Content.stew.pot : StewPotSettings.Default);
             Session.Ended += OnServiceEnded;
+            // Special requests (4f Checkpoint D), and the evening's facts for 4g.
+            Session.ConfigureRequests(m_Content.service.requests);
+            Session.Served += (c, t, gold, tip) => EventBus<DishServed>.Publish(new DishServed(t.Recipe.id, PatronId(c), t.DishQuality, gold, tip, c.IsRequest));
+            Session.RequestIssued += (c, dish) => EventBus<CustomerRequestIssued>.Publish(new CustomerRequestIssued(PatronId(c), c.Id, dish.id));
+            Session.RequestCompleted += (c, dish, quality, gold, renown) =>
+                EventBus<CustomerRequestCompleted>.Publish(new CustomerRequestCompleted(PatronId(c), c.Id, dish.id, quality, gold, renown));
+            Session.RequestFailed += (c, dish, outcome) =>
+                EventBus<CustomerRequestFailed>.Publish(new CustomerRequestFailed(PatronId(c), c.Id, dish != null ? dish.id : null, RequestReason(outcome)));
             m_Arrivals = new ArrivalSchedule(m_Content.service.service, m_Content.customers, m_Random);
             Report = null;
             SetPhase(TavernPhase.Service);
             ServiceOpened?.Invoke();
         }
+
+        static string PatronId(CustomerLogic c) => c.Profile != null ? c.Profile.id : "guest";
+
+        static string RequestReason(RequestOutcome outcome) => outcome switch
+        {
+            RequestOutcome.WalkedOut => "walked_out",
+            RequestOutcome.SoldOut => "sold_out",
+            _ => "closing_time",
+        };
 
         /// <summary>Debug (F5) and tests: close up now. Everyone still inside goes home.</summary>
         public void EndServiceNow() => Session?.End();
@@ -457,6 +474,9 @@ namespace Hearthdelve.Tavern.Scene
         void OnServiceEnded()
         {
             Report = new EveningReport(Session.Ledger, Session.ClosedEarly, stayedShut: false);
+            ServiceLedger l = Session.Ledger;
+            EventBus<ServiceCompleted>.Publish(new ServiceCompleted(m_Flow != null && m_Flow.State != null ? m_Flow.State.Day : 0, l.DishesServed, l.Gold, l.Tips,
+                l.Renown, l.Walkouts, l.RequestsCompleted, l.RequestsFailed));
             SetPhase(TavernPhase.Results);
             ServiceEnded?.Invoke();
         }

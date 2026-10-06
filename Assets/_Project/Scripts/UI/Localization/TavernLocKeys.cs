@@ -99,6 +99,9 @@ namespace Hearthdelve.UI.Localization
         public const string ResultsGold = "results.gold";
         public const string ResultsTips = "results.tips";
         public const string ResultsRenown = "results.renown";
+        // 4f Checkpoint D: special requests on the evening's results.
+        public const string ResultsRequests = "results.requests";
+        public const string ResultsRequestsOf = "results.requests_of";
         public const string ResultsWalkouts = "results.walkouts";
         public const string ResultsSoldOut = "results.sold_out";
         public const string ResultsDropped = "results.dropped";
@@ -198,6 +201,8 @@ namespace Hearthdelve.UI.Localization
             (ResultsGold, "gold earned"),
             (ResultsTips, "tips"),
             (ResultsRenown, "Renown"),
+            (ResultsRequests, "special requests"),
+            (ResultsRequestsOf, "{0} of {1}"),
             (ResultsWalkouts, "walkouts"),
             (ResultsSoldOut, "left, sold out"),
             (ResultsDropped, "plates dropped"),

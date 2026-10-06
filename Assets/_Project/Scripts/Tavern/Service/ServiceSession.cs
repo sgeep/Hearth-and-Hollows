@@ -5,6 +5,7 @@ using Hearthdelve.Shared.Economy;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
+using UnityEngine;
 
 namespace Hearthdelve.Tavern.Service
 {
@@ -61,6 +62,12 @@ namespace Hearthdelve.Tavern.Service
         public int SoldOutLeaves;
         public int DroppedDishes;
         public int CustomersArrived;
+        /// <summary>Special requests (4f Checkpoint D): made, met, missed, and the thanks (already in <see cref="Tips"/> and <see cref="Renown"/>).</summary>
+        public int RequestsIssued;
+        public int RequestsCompleted;
+        public int RequestsFailed;
+        public int RequestGold;
+        public int RequestRenown;
     }
 
     /// <summary>
@@ -120,6 +127,41 @@ namespace Hearthdelve.Tavern.Service
         public event Action PotChanged;
         public event Action<CustomerLogic> CustomerLeft;
         public event Action Ended;
+        /// <summary>A patron paid for their dish: the patron, the ticket, the payment and the tip (a request's thanks apart).</summary>
+        public event Action<CustomerLogic, Ticket, int, int> Served;
+        /// <summary>A patron's order became a special request.</summary>
+        public event Action<CustomerLogic, RecipeDefinition> RequestIssued;
+        /// <summary>A special request was met: the patron, the dish, the dish's quality, the extra gold and Renown.</summary>
+        public event Action<CustomerLogic, RecipeDefinition, float, int, int> RequestCompleted;
+        /// <summary>A special request was missed, and how.</summary>
+        public event Action<CustomerLogic, RecipeDefinition, RequestOutcome> RequestFailed;
+
+        CustomerRequestSettings m_Requests;
+        int m_OrdersPlaced;
+        float m_RenownExact;
+        int m_RenownCounted;
+
+        /// <summary>Turns special requests on for this evening (off unless configured).</summary>
+        public void ConfigureRequests(CustomerRequestSettings settings) => m_Requests = settings;
+        public CustomerRequestSettings RequestSettings => m_Requests;
+
+        /// <summary>The order just placed may be a special request (it can be made: it was just taken or promised).</summary>
+        void MaybeRequest(CustomerLogic customer, RecipeDefinition dish)
+        {
+            int before = m_OrdersPlaced++;
+            if (!CustomerRequestRules.IsRequest(before, Ledger.RequestsIssued, m_Requests, m_Random)) return;
+            customer.MarkRequest();
+            Ledger.RequestsIssued++;
+            RequestIssued?.Invoke(customer, dish);
+        }
+
+        void RequestMissed(CustomerLogic customer, RequestOutcome outcome)
+        {
+            if (customer == null || !customer.IsRequest || customer.RequestOutcome != RequestOutcome.Open) return;
+            customer.EndRequest(outcome);
+            Ledger.RequestsFailed++;
+            RequestFailed?.Invoke(customer, customer.Order, outcome);
+        }
 
         public bool IsSoldOut(RecipeDefinition recipe) => m_SoldOut.Contains(recipe);
 
@@ -219,6 +261,7 @@ namespace Hearthdelve.Tavern.Service
                 // A dish someone else left behind: it's theirs, and no more stock is used.
                 spare.Customer = customer;
                 customer.PlaceOrder(choice);
+                MaybeRequest(customer, choice);
                 TicketChanged?.Invoke(spare);
                 return;
             }
@@ -228,6 +271,7 @@ namespace Hearthdelve.Tavern.Service
                 var order = new Ticket(customer, choice, null);
                 m_Tickets.Add(order);
                 customer.PlaceOrder(choice);
+                MaybeRequest(customer, choice);
                 TicketChanged?.Invoke(order);
                 LadleStew();
                 RefreshSoldOut();
@@ -243,6 +287,7 @@ namespace Hearthdelve.Tavern.Service
             var ticket = new Ticket(customer, choice, reserved);
             m_Tickets.Add(ticket);
             customer.PlaceOrder(choice);
+            MaybeRequest(customer, choice);
             RefreshSoldOut();
             TicketChanged?.Invoke(ticket);
         }
@@ -278,14 +323,17 @@ namespace Hearthdelve.Tavern.Service
                 case Departure.WalkedOut:
                     Ledger.Walkouts++;
                     Ledger.Renown += m_Economy.walkoutRenown;
+                    RequestMissed(customer, RequestOutcome.WalkedOut);
                     Release(ticket);
                     break;
                 case Departure.SoldOut:
                     Ledger.SoldOutLeaves++;
                     Ledger.Renown += m_Economy.soldOutRenown;
+                    RequestMissed(customer, RequestOutcome.SoldOut);
                     Release(ticket);
                     break;
                 case Departure.ClosingTime:
+                    RequestMissed(customer, RequestOutcome.ClosingTime);
                     Release(ticket);
                     break;
             }
@@ -299,8 +347,26 @@ namespace Hearthdelve.Tavern.Service
             float satisfaction = ServiceEconomy.Satisfaction(ticket.DishQuality, match, customer.WaitFraction, m_Economy);
             Ledger.DishesServed++;
             Ledger.Gold += ServiceEconomy.Payment(ticket.DishValue);
-            Ledger.Tips += ServiceEconomy.Tip(ticket.DishValue, satisfaction, customer.Traits.generosity, m_Economy);
-            Ledger.Renown += ServiceEconomy.Renown(satisfaction, m_Economy);
+            int tip = ServiceEconomy.Tip(ticket.DishValue, satisfaction, customer.Traits.generosity, m_Economy);
+            Ledger.Tips += tip;
+            // Satisfaction's Renown adds up over the evening and is rounded as a whole (4f Checkpoint D).
+            m_RenownExact += ServiceEconomy.RenownExact(satisfaction, m_Economy);
+            int rounded = Mathf.RoundToInt(m_RenownExact);
+            Ledger.Renown += rounded - m_RenownCounted;
+            m_RenownCounted = rounded;
+            if (customer.IsRequest && customer.RequestOutcome == RequestOutcome.Open)
+            {
+                // Their special request, met: a thank-you on top (in the tips) and a little Renown.
+                int bonus = CustomerRequestRules.BonusGold(ticket.DishValue, m_Requests);
+                customer.EndRequest(RequestOutcome.Completed);
+                Ledger.RequestsCompleted++;
+                Ledger.RequestGold += bonus;
+                Ledger.Tips += bonus;
+                Ledger.RequestRenown += m_Requests.bonusRenown;
+                Ledger.Renown += m_Requests.bonusRenown;
+                RequestCompleted?.Invoke(customer, ticket.Recipe, ticket.DishQuality, bonus, m_Requests.bonusRenown);
+            }
+            Served?.Invoke(customer, ticket, ServiceEconomy.Payment(ticket.DishValue), tip);
             m_Tickets.Remove(ticket);
             TicketChanged?.Invoke(ticket);
         }

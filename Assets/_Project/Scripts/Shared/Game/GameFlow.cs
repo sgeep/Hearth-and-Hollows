@@ -209,7 +209,10 @@ namespace Hearthdelve.Shared.Game
             foreach (string curio in report.CuriosKept) EventBus<CurioBroughtHome>.Publish(new CurioBroughtHome(curio));
             // A boss's first defeat (4e): the hook for first-clear rewards, story reactions and 4f's trophy.
             foreach (string boss in report.BossesDefeated)
+            {
                 if (State.TimesDefeated(boss) == 1) EventBus<BossFirstCleared>.Publish(new BossFirstCleared(boss));
+                EventBus<BossDefeated>.Publish(new BossDefeated(boss, State.TimesDefeated(boss), report.Outcome != DelveOutcome.Died));
+            }
             PhaseChanged?.Invoke();
             Save();
             Load(GameScenes.Tavern);

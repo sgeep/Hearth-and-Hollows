@@ -80,6 +80,8 @@ namespace Hearthdelve.Tavern.Service
         Walkouts,
         SoldOut,
         Dropped,
+        /// <summary>Special requests met (shown as "met of made"; only when some were made).</summary>
+        Requests,
     }
 
     /// <summary>
@@ -94,6 +96,8 @@ namespace Hearthdelve.Tavern.Service
         public bool ClosedEarly { get; }
         /// <summary>The doors never opened (closed for the night at prep).</summary>
         public bool StayedShut { get; }
+        /// <summary>Special requests made this evening (the Requests line shows those met of these).</summary>
+        public int RequestsIssued { get; }
 
         public EveningReport(ServiceLedger ledger, bool closedEarly, bool stayedShut)
         {
@@ -104,6 +108,8 @@ namespace Hearthdelve.Tavern.Service
             Lines.Add((EveningLine.Gold, ledger.Gold));
             Lines.Add((EveningLine.Tips, ledger.Tips));
             Lines.Add((EveningLine.Renown, ledger.Renown));
+            RequestsIssued = ledger.RequestsIssued;
+            if (ledger.RequestsIssued > 0) Lines.Add((EveningLine.Requests, ledger.RequestsCompleted));
             if (ledger.Walkouts > 0) Lines.Add((EveningLine.Walkouts, ledger.Walkouts));
             if (ledger.SoldOutLeaves > 0) Lines.Add((EveningLine.SoldOut, ledger.SoldOutLeaves));
             if (ledger.DroppedDishes > 0) Lines.Add((EveningLine.Dropped, ledger.DroppedDishes));

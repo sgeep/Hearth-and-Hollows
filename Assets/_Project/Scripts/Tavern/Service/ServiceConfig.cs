@@ -6,6 +6,8 @@ namespace Hearthdelve.Tavern.Service
     public sealed class ServiceConfig : ScriptableObject
     {
         public ServiceSettings service = ServiceSettings.Default;
+        [Tooltip("Special requests (4f Checkpoint D): how often, how many, and the thanks.")]
+        public CustomerRequestSettings requests = CustomerRequestSettings.Default;
         public TavernPlayerSettings player = TavernPlayerSettings.Default;
     }
 

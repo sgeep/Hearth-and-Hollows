@@ -498,6 +498,8 @@ namespace Hearthdelve.Editor
                     new SheetRect("Book", 416, 24, 8, 8, k_Centre),
                     new SheetRect("Heart", 472, 40, 8, 8, k_Centre),
                     new SheetRect("Droplet", 552, 40, 8, 8, k_Centre),
+                    // 4f Checkpoint D: a special request's mark, on the patron's bubble and the order rail.
+                    new SheetRect("Sparkle", 488, 40, 8, 8, k_Centre),
                 },
             });
 

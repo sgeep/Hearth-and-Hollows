@@ -28,11 +28,12 @@ namespace Hearthdelve.Editor
                 pip.id = StaffIds.Pip;
                 EditorUtility.SetDirty(pip);
             }
-            // Gunta: steadier than Pip (she's the cook), the same staff cap, so the keeper's best work still beats hers.
+            // Gunta: a steady hand (she reaches her cap nearly every time), capped below a competent keeper's work (4f
+            // Checkpoint D balance: at 0.85 she out-cooked most players, so handing her the grill was simply better).
             StaffDefinition gunta = LookTestContent.LoadOrCreate<StaffDefinition>($"{k_Staff}/Staff_Gunta.asset", created =>
             {
                 created.skill = 0.75f;
-                created.qualityCap = 0.85f;
+                created.qualityCap = 0.75f;
                 created.restBetweenJobs = 0.8f;
                 created.placeholderColor = new Color(0.72f, 0.2f, 0.18f);
             });

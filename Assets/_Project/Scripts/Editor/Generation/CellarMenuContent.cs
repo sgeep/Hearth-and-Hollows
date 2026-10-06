@@ -20,7 +20,7 @@ namespace Hearthdelve.Editor
     /// </summary>
     public static class CellarMenuContent
     {
-        public const int MenuVersion = 2;
+        public const int MenuVersion = 3;
         public const string MarketPath = EditorPaths.Data + "/Tavern/Supply_BrackenfordMarket.asset";
         const string k_Recipes = EditorPaths.Data + "/Recipes";
         const string k_TavernContent = EditorPaths.Data + "/Tavern/TavernContent.asset";
@@ -85,7 +85,7 @@ namespace Hearthdelve.Editor
                     Icon(MinifantasySheets.MiscellanyIcons, "Miscellany", "FullBeer"), One(malt)),
                 Recipe("OnionBroth", "onion_broth", CookStation.StewPot, 6, FlavorTags.Savory | FlavorTags.Sweet, default,
                     Icon(k_Cooking, "DishIcons", "OnionBroth"), One(onion, 2), One(herbs, 1, true)),
-                Recipe("EggsOnToast", "eggs_on_toast", CookStation.Grill, 7, FlavorTags.Savory | FlavorTags.Umami, Essence(10f),
+                Recipe("EggsOnToast", "eggs_on_toast", CookStation.Grill, 9, FlavorTags.Savory | FlavorTags.Umami, Essence(10f),
                     Icon(k_Cooking, "DishIcons", "FriedEgg"), One(eggs), One(bread)),
                 // Better: one thing from below.
                 Recipe("Gelbrew", "gelbrew", CookStation.Tap, 10, FlavorTags.Sour | FlavorTags.Arcane, Drain(0.2f), null, One(slimeGel), One(malt)),
@@ -102,10 +102,10 @@ namespace Hearthdelve.Editor
                     Any(IngredientCategory.Meat | IngredientCategory.Offal), One(shroomCap), One(bread)),
                 // Signature: valuable Hollows parts, or the Butcher Block's cuts.
                 Recipe("CoreTonic", "core_tonic", CookStation.Tap, 22, FlavorTags.Arcane | FlavorTags.Sweet, Drain(0.3f), null, One(slimeCore), One(slimeGel)),
-                Recipe("SpiderLegSteaks", "spider_leg_steaks", CookStation.Grill, 26, FlavorTags.Savory | FlavorTags.Earthy, Essence(30f),
+                Recipe("SpiderLegSteaks", "spider_leg_steaks", CookStation.Grill, 22, FlavorTags.Savory | FlavorTags.Earthy, Essence(30f),
                     Icon(k_Cooking, "DishIcons", "SteakPlate"), One(legCuts, 2), One(herbs)),
-                Recipe("BatWingPlatter", "bat_wing_platter", CookStation.Grill, 28, FlavorTags.Savory | FlavorTags.Spicy | FlavorTags.Earthy, Essence(30f),
-                    Icon(k_Cooking, "DishIcons", "MeatPlatter"), One(wingCuts, 3), One(bread), One(sporeSac)),
+                Recipe("BatWingPlatter", "bat_wing_platter", CookStation.Grill, 26, FlavorTags.Savory | FlavorTags.Spicy | FlavorTags.Earthy, Essence(30f),
+                    Icon(k_Cooking, "DishIcons", "MeatPlatter"), One(wingCuts, 4), One(bread), One(sporeSac)),
             };
             if (tavern != null)
             {
@@ -188,8 +188,8 @@ namespace Hearthdelve.Editor
                 {
                     new() { ingredient = staples[0], price = 2 },
                     new() { ingredient = staples[1], price = 2 },
-                    new() { ingredient = staples[2], price = 3 },
-                    new() { ingredient = staples[3], price = 3 },
+                    new() { ingredient = staples[2], price = 2 },
+                    new() { ingredient = staples[3], price = 2 },
                     new() { ingredient = staples[4], price = 2 },
                 };
             });

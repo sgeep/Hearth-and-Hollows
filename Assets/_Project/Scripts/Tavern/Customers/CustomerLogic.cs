@@ -64,6 +64,16 @@ namespace Hearthdelve.Tavern.Customers
         public float WaitFraction { get; private set; }
         public float DishQuality { get; private set; }
         public bool IsWaiting => State is CustomerState.Queueing or CustomerState.WaitingForFood;
+        /// <summary>Their order is a special request (4f Checkpoint D): they particularly want it tonight.</summary>
+        public bool IsRequest { get; private set; }
+        /// <summary>How their special request ended (Open while it's still on).</summary>
+        public Hearthdelve.Tavern.Service.RequestOutcome RequestOutcome { get; private set; }
+
+        internal void MarkRequest() => IsRequest = true;
+        internal void EndRequest(Hearthdelve.Tavern.Service.RequestOutcome outcome)
+        {
+            if (IsRequest && RequestOutcome == Hearthdelve.Tavern.Service.RequestOutcome.Open) RequestOutcome = outcome;
+        }
 
         /// <summary>Raised once, when they've finished reading the menu. The service answers with PlaceOrder or NothingToOrder.</summary>
         public event Action<CustomerLogic> OrderRequested;

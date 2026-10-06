@@ -86,4 +86,126 @@ namespace Hearthdelve.Shared.Game
             Quality = quality;
         }
     }
+
+    // ---------- 4f Checkpoint D: service, requests, bosses ----------
+
+    /// <summary>
+    /// A patron's order became a special request: they particularly want this dish tonight. <c>VisitId</c> tells this
+    /// evening's patrons apart (it isn't saved); <c>PatronId</c> is their profile's stable id (a villager or a kind of Visitor).
+    /// </summary>
+    public readonly struct CustomerRequestIssued : IEvent
+    {
+        public readonly string PatronId;
+        public readonly int VisitId;
+        public readonly string RecipeId;
+
+        public CustomerRequestIssued(string patronId, int visitId, string recipeId)
+        {
+            PatronId = patronId;
+            VisitId = visitId;
+            RecipeId = recipeId;
+        }
+    }
+
+    /// <summary>A special request was met: the dish's quality (1 is a perfect Fine dish) and the thanks given.</summary>
+    public readonly struct CustomerRequestCompleted : IEvent
+    {
+        public readonly string PatronId;
+        public readonly int VisitId;
+        public readonly string RecipeId;
+        public readonly float Quality;
+        public readonly int BonusGold;
+        public readonly int BonusRenown;
+
+        public CustomerRequestCompleted(string patronId, int visitId, string recipeId, float quality, int bonusGold, int bonusRenown)
+        {
+            PatronId = patronId;
+            VisitId = visitId;
+            RecipeId = recipeId;
+            Quality = quality;
+            BonusGold = bonusGold;
+            BonusRenown = bonusRenown;
+        }
+    }
+
+    /// <summary>A special request was missed. <c>Reason</c>: "walked_out", "sold_out" or "closing_time".</summary>
+    public readonly struct CustomerRequestFailed : IEvent
+    {
+        public readonly string PatronId;
+        public readonly int VisitId;
+        public readonly string RecipeId;
+        public readonly string Reason;
+
+        public CustomerRequestFailed(string patronId, int visitId, string recipeId, string reason)
+        {
+            PatronId = patronId;
+            VisitId = visitId;
+            RecipeId = recipeId;
+            Reason = reason;
+        }
+    }
+
+    /// <summary>A patron paid for a dish during service.</summary>
+    public readonly struct DishServed : IEvent
+    {
+        public readonly string RecipeId;
+        public readonly string PatronId;
+        public readonly float Quality;
+        public readonly int Gold;
+        public readonly int Tip;
+        public readonly bool WasRequest;
+
+        public DishServed(string recipeId, string patronId, float quality, int gold, int tip, bool wasRequest)
+        {
+            RecipeId = recipeId;
+            PatronId = patronId;
+            Quality = quality;
+            Gold = gold;
+            Tip = tip;
+            WasRequest = wasRequest;
+        }
+    }
+
+    /// <summary>An evening's service ended (the doors opened that night): what it came to.</summary>
+    public readonly struct ServiceCompleted : IEvent
+    {
+        public readonly int Day;
+        public readonly int DishesServed;
+        public readonly int Gold;
+        public readonly int Tips;
+        public readonly int Renown;
+        public readonly int Walkouts;
+        public readonly int RequestsCompleted;
+        public readonly int RequestsFailed;
+
+        public ServiceCompleted(int day, int dishesServed, int gold, int tips, int renown, int walkouts, int requestsCompleted, int requestsFailed)
+        {
+            Day = day;
+            DishesServed = dishesServed;
+            Gold = gold;
+            Tips = tips;
+            Renown = renown;
+            Walkouts = walkouts;
+            RequestsCompleted = requestsCompleted;
+            RequestsFailed = requestsFailed;
+        }
+    }
+
+    /// <summary>
+    /// A boss fell on a delve that's now over (every defeat, not only the first: <see cref="BossFirstCleared"/> is the
+    /// first). <c>TimesDefeated</c> counts this one; <c>CameHome</c> is false if the delve then ended in death.
+    /// </summary>
+    public readonly struct BossDefeated : IEvent
+    {
+        public readonly string BossId;
+        public readonly int TimesDefeated;
+        public readonly bool CameHome;
+
+        public BossDefeated(string bossId, int timesDefeated, bool cameHome)
+        {
+            BossId = bossId;
+            TimesDefeated = timesDefeated;
+            CameHome = cameHome;
+        }
+    }
 }

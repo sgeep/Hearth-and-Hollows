@@ -1,5 +1,6 @@
 using Hearthdelve.Shared.Animation;
 using Hearthdelve.Tavern.Customers;
+using Hearthdelve.Tavern.Service;
 using MoreMountains.Tools;
 using MoreMountains.TopDownEngine;
 using UnityEngine;
@@ -64,6 +65,22 @@ namespace Hearthdelve.Tavern.Scene
         public bool NoticedTrophy { get; private set; }
 
         public void ConfigureEmotes(Sprite noticeTrophy) => m_NoticeTrophy = noticeTrophy;
+
+        [Header("Special requests (4f Checkpoint D)")]
+        [SerializeField, Tooltip("The sparkle on the bubble while their request is on.")] SpriteRenderer m_RequestMark;
+        [SerializeField] Sprite m_RequestMet;
+        [SerializeField] Sprite m_RequestMissed;
+        RequestOutcome m_ShownOutcome;
+
+        /// <summary>Is the request sparkle showing (tests)?</summary>
+        public bool ShowsRequest => m_RequestMark != null && m_RequestMark.gameObject.activeInHierarchy && m_RequestMark.enabled;
+
+        public void ConfigureRequests(SpriteRenderer mark, Sprite met, Sprite missed)
+        {
+            m_RequestMark = mark;
+            m_RequestMet = met;
+            m_RequestMissed = missed;
+        }
 
         /// <summary>Shows a face in the bubble from <paramref name="delay"/> seconds for <paramref name="seconds"/> (presentation only).</summary>
         public void Emote(Sprite face, float seconds, float delay = 0f)
@@ -254,6 +271,16 @@ namespace Hearthdelve.Tavern.Scene
                 : null;
             if (m_Bubble != null && m_Bubble.activeSelf != (icon != null)) m_Bubble.SetActive(icon != null);
             if (icon != null && m_BubbleIcon != null) m_BubbleIcon.sprite = icon;
+
+            // A special request: the sparkle beside the dish they want; then a heart, or a frown as they go.
+            if (Logic.RequestOutcome != m_ShownOutcome)
+            {
+                m_ShownOutcome = Logic.RequestOutcome;
+                if (m_ShownOutcome == RequestOutcome.Completed) Emote(m_RequestMet, 1.6f);
+                else if (m_ShownOutcome != RequestOutcome.Open) Emote(m_RequestMissed, 1.6f);
+            }
+            if (m_RequestMark != null)
+                m_RequestMark.enabled = Logic.IsRequest && Logic.RequestOutcome == RequestOutcome.Open && icon != null && icon == Logic.Order?.icon;
         }
     }
 }

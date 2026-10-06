@@ -479,7 +479,11 @@ namespace Hearthdelve.Editor
                 RectTransform patience = Fill(patienceBack, "Patience", Color.white);
                 LocalizedSuperText state = LookTestBuilder.Text(row, "State", TavernLocKeys.TicketQueued, 6f, k_Light, TextAnchor.UpperLeft,
                     new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, -8f), new Vector2(44f, Line));
-                rows[i] = new RailRow { root = row.gameObject, icon = icon, state = state, patience = patience, patienceFill = patience.GetComponent<Image>() };
+                // A special request's sparkle, just left of the dish (4f Checkpoint D).
+                Image request = DungeonUI.AddImage(Rect(row, "Request", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(-1f, 0f), new Vector2(8f, 8f)),
+                    MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Sparkle"), Color.white);
+                request.enabled = false;
+                rows[i] = new RailRow { root = row.gameObject, icon = icon, state = state, patience = patience, patienceFill = patience.GetComponent<Image>(), request = request };
                 row.gameObject.SetActive(false);
             }
 
@@ -637,15 +641,16 @@ namespace Hearthdelve.Editor
         static void BuildResults(Canvas canvas)
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Results");
-            RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 172f), Vector2.zero);
+            // Eight lines since 4f Checkpoint D (special requests): 24 taller, the lines start 12 higher.
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 196f), Vector2.zero);
             DungeonUI.Title(panel, TavernLocKeys.ResultsTitle);
-            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, 63f, 224f);
-            var labels = new LocalizedSuperText[7];
-            var lines = new LocalizedSuperText[7];
+            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, 75f, 224f);
+            var labels = new LocalizedSuperText[8];
+            var lines = new LocalizedSuperText[8];
             for (int i = 0; i < lines.Length; i++)
             {
-                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, 50f - i * Line, 104f);
-                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, 50f - i * Line, 104f);
+                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, 62f - i * Line, 104f);
+                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, 62f - i * Line, 104f);
             }
             // The takings, set apart under a rule.
             RectTransform takingsRow = Rect(panel, "TakingsRow", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(224f, 172f));

@@ -178,7 +178,8 @@ namespace Hearthdelve.Tavern.Scene
 
         /// <summary>
         /// The homecoming opens with the trophy where it can hang (the web check: it opened over the floor, saying "can't go
-        /// there"): the free spot on the back wall nearest its middle, if there is one.
+        /// there"): a spot on the back wall where it fits, preferring one whose drawing nothing else covers (4f Checkpoint D:
+        /// the range's chimney stood in front of the only gap), then the one nearest the middle.
         /// </summary>
         void CursorToFreeWall()
         {
@@ -186,14 +187,27 @@ namespace Hearthdelve.Tavern.Scene
             RectInt band = m_Layout.Shape.WallBand;
             Vector2Int start = Cursor;
             Vector2Int? best = null;
-            float bestDistance = float.MaxValue;
+            float bestCovered = float.MaxValue, bestDistance = float.MaxValue;
             for (int y = band.yMin; y < band.yMax; y++)
             for (int x = band.xMin; x < band.xMax; x++)
             {
                 SetCursor(new Vector2Int(x, y));
                 if (!m_Layout.Check(Carried).IsValid) continue;
-                float distance = Mathf.Abs(x - band.center.x) + (y - band.yMin) * 0.01f;
-                if (distance >= bestDistance) continue;
+                ResolvedFurniture here = FurnitureGeometry.Resolve(m_Layout.Definition(Carried.definition), Carried, m_Layout.Shape.Origin);
+                if (here == null) continue;
+                Rect art = FurnitureGeometry.ArtBounds(here);
+                float covered = 0f;
+                foreach (PlacedFurniture other in m_Layout.Pieces)
+                {
+                    ResolvedFurniture o = m_Layout.Resolve(other);
+                    if (o == null) continue;
+                    Rect a = FurnitureGeometry.ArtBounds(o);
+                    float w = Mathf.Min(art.xMax, a.xMax) - Mathf.Max(art.xMin, a.xMin), h = Mathf.Min(art.yMax, a.yMax) - Mathf.Max(art.yMin, a.yMin);
+                    if (w > 0f && h > 0f) covered += w * h;
+                }
+                float distance = Mathf.Abs(art.center.x - (m_Layout.Shape.Origin.x + band.center.x)) + (y - band.yMin) * 0.01f;
+                if (covered > bestCovered + 0.01f || covered >= bestCovered - 0.01f && distance >= bestDistance) continue;
+                bestCovered = covered;
                 bestDistance = distance;
                 best = new Vector2Int(x, y);
             }

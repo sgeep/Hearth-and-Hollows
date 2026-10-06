@@ -67,7 +67,7 @@ namespace Hearthdelve.Shared.Economy
         {
             dishWeight = 0.6f, flavorWeight = 0.25f, waitWeight = 0.15f,
             tipThreshold = 0.5f, maxTipFraction = 0.5f,
-            renownNeutral = 0.5f, renownScale = 4f,
+            renownNeutral = 0.45f, renownScale = 4f,
             walkoutRenown = -3, soldOutRenown = -1,
             likedFlavorBonus = 0.25f, dislikedFlavorPenalty = 0.3f, baseOrderWeight = 0.1f,
         };
@@ -149,6 +149,13 @@ namespace Hearthdelve.Shared.Economy
         }
 
         public static int Renown(float satisfaction, in ServiceEconomySettings s) =>
-            Mathf.RoundToInt((Mathf.Clamp01(satisfaction) - s.renownNeutral) * s.renownScale);
+            Mathf.RoundToInt(RenownExact(satisfaction, s));
+
+        /// <summary>
+        /// Renown from one patron before rounding (4f Checkpoint D): an evening adds these up and rounds the total, so a
+        /// run of decent-but-not-great dishes still counts instead of each rounding to nothing.
+        /// </summary>
+        public static float RenownExact(float satisfaction, in ServiceEconomySettings s) =>
+            (Mathf.Clamp01(satisfaction) - s.renownNeutral) * s.renownScale;
     }
 }

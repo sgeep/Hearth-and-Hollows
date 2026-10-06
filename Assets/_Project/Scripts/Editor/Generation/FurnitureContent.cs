@@ -390,7 +390,9 @@ namespace Hearthdelve.Editor
             Place("cellar_barrel", 25, 8);
             // The back wall.
             Place("bottle_shelves", 2, 14);
-            Place("wall_sign", 11, 15);
+            // Right of the fireplace (4f Checkpoint D): the stretch between the bottle shelves and the fireplace stays open,
+            // the first trophy's natural spot (it was the one gap wide enough, behind the range's chimney).
+            Place("wall_sign", 17, 15);
             Place("wall_fireplace", 14, 14);
             Place("low_shelf", 24, 14);
             pieces.Add(new PlacedFurniture { uid = pieces.Count + 1, definition = "shelf_glasses", host = pieces.Count, anchor = 0 });

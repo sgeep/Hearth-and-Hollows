@@ -106,10 +106,10 @@ namespace Hearthdelve.UI.Tavern
                 UiFeedback.Play(UiMoment.Tick);
                 for (float t = 0f; t < m_CountTime; t += Time.unscaledDeltaTime)
                 {
-                    text.Set(TavernLocKeys.Plain, Format(kind, Mathf.RoundToInt(value * (t / m_CountTime))));
+                    text.Set(TavernLocKeys.Plain, Format(kind, Mathf.RoundToInt(value * (t / m_CountTime)), report));
                     yield return null;
                 }
-                text.Set(TavernLocKeys.Plain, Format(kind, value));
+                text.Set(TavernLocKeys.Plain, Format(kind, value, report));
             }
             if (!report.StayedShut)
             {
@@ -129,7 +129,7 @@ namespace Hearthdelve.UI.Tavern
                 ShowLine(i, has);
                 if (!has) continue;
                 m_Labels[i].Set(KeyFor(report.Lines[i].line));
-                m_Lines[i].Set(TavernLocKeys.Plain, Format(report.Lines[i].line, report.Lines[i].value));
+                m_Lines[i].Set(TavernLocKeys.Plain, Format(report.Lines[i].line, report.Lines[i].value, report));
             }
             m_TakingsRow.SetActive(!report.StayedShut);
             if (!report.StayedShut) m_Takings.Set(TavernLocKeys.PrepValue, report.Takings);
@@ -149,9 +149,16 @@ namespace Hearthdelve.UI.Tavern
             EveningLine.Renown => TavernLocKeys.ResultsRenown,
             EveningLine.Walkouts => TavernLocKeys.ResultsWalkouts,
             EveningLine.SoldOut => TavernLocKeys.ResultsSoldOut,
+            EveningLine.Requests => TavernLocKeys.ResultsRequests,
             _ => TavernLocKeys.ResultsDropped,
         };
 
-        static object Format(EveningLine line, int value) => line == EveningLine.Renown && value > 0 ? $"+{value}" : value;
+        static object Format(EveningLine line, int value, EveningReport report) => line switch
+        {
+            EveningLine.Renown when value > 0 => $"+{value}",
+            // Special requests: those met of those made.
+            EveningLine.Requests => Loc.UI(TavernLocKeys.ResultsRequestsOf, value, report != null ? report.RequestsIssued : value),
+            _ => value,
+        };
     }
 }

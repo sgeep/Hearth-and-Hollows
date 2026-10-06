@@ -18,6 +18,8 @@ namespace Hearthdelve.UI.Tavern
         public LocalizedSuperText state;
         public RectTransform patience;
         public Image patienceFill;
+        /// <summary>The special-request sparkle (4f Checkpoint D).</summary>
+        public Image request;
         [NonSerialized] public string shownKey;
     }
 
@@ -121,6 +123,8 @@ namespace Hearthdelve.UI.Tavern
                 if (!has) continue;
                 Ticket ticket = m_Open[i];
                 row.icon.sprite = ticket.Recipe.icon;
+                if (row.request != null)
+                    row.request.enabled = ticket.Customer != null && ticket.Customer.IsRequest && ticket.Customer.RequestOutcome == RequestOutcome.Open;
                 string key = StateKey(ticket);
                 if (key != row.shownKey) row.state.Set(row.shownKey = key);
                 // A spare has no one waiting: no patience bar.
