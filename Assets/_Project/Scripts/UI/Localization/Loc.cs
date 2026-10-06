@@ -300,7 +300,7 @@ namespace Hearthdelve.UI.Localization
             (ResultBoss, "you felled {0}"),
             (HudCurios, "{0}"),
             (HarvestCurio, "found: {0}"),
-            (ResultCuriosKept, "found for the Sunken Flagon: {0}"),
+            (ResultCuriosKept, "found for Tally Ho!: {0}"),
             (ResultCuriosLost, "found, then lost: {0}"),
             (ResultTrophy, "a trophy: {0}"),
             (ListTwo, "{0} and {1}"),

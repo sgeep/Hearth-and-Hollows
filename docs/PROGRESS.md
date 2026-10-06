@@ -1109,6 +1109,13 @@ Secondary and Prompt share Body's metrics; they're named roles so every text say
 - A new check, `TextOverlapTests` (PlayMode): no two visible texts overlap and none leaves its panel, across Prep's pages, the Butcher Block, Decorate, every catalog page and piece at Renown 0 and 100 with 9999 gold (246 states, 5,842 texts), the layout check, the delve's result, Night, Daytime and the market. It proves itself by catching the old purse position when planted. It found nothing else; Decorate's status line was measured separately (12 px spare at its longest).
 - Tests: EditMode 564/564, PlayMode 203 passed, 0 failed, plus 18 explicit captures. Not rebuilt for the web (builder-only layout and colour changes).
 
+### Names, Boog and safe ground (2026-10-06, the owner's request)
+
+- **Names:** the tavern and inn is **Tally Ho!** ("decorating Tally Ho!", "found for Tally Ho!: …", "dealers … will call at Tally Ho!"), the village **Kariaston** ("the Kariaston market", "Kariaston ale", "made in Kariaston"), the cook **Boog**. Only player-facing English and the docs changed (CLAUDE.md, GDD Decided 35, the story outline); ids and asset names keep the old words (`gunta`, `brackenford_ale`, `Supply_BrackenfordMarket`, `Gunta.prefab`), so saves are untouched. Earlier entries in this file keep the names they were written with.
+- **Boog** is the Goblin Sapper from All Exclusives, used as drawn (idle 20 frames, its 10-frame run as his walk, 100 ms, with its own shadow); imported to `Assets/ThirdParty/Minifantasy/GoblinSapper/`. Gunta's derived sheets' imported copies and her animation set were removed (the sources stay in `Tools/characters/derived/`). ASSET_MAP updated.
+- **Safe ground:** Essence doesn't drain in the rope room or the hole room (`FloorNode.PausesEssenceDrain`); damage still applies, and walking between rooms already cost nothing. GDD Decided 36.
+- **Tests:** EditMode 565/565, PlayMode 204 passed, 0 failed, plus 18 explicit captures (new: every generated rope and hole room pauses the drain and no other kind does; Essence drains in an ordinary room and holds at the hole down; the cook drawn from the Goblin Sapper's sheets; the curio line says "found for Tally Ho!").
+
 **Waiting for your review before 4g.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.

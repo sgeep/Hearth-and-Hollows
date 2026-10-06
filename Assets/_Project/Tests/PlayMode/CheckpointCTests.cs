@@ -196,7 +196,7 @@ namespace Hearthdelve.Tests.PlayMode
             string shown = null;
             yield return ExtractAndGoHome(result => shown = result.CuriosText);
             EventBus<CurioBroughtHome>.Unsubscribe(Brought);
-            Assert.That(shown, Does.StartWith("found for the Sunken Flagon: "));
+            Assert.That(shown, Does.StartWith("found for Tally Ho!: "));
             Assert.That(home, Is.EquivalentTo(carried));
             foreach (string id in carried.Distinct())
             {
@@ -505,9 +505,10 @@ namespace Hearthdelve.Tests.PlayMode
             yield return TavernAtPrep();
             StaffAgent pip = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Pip);
             StaffAgent gunta = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Gunta);
-            foreach (var (agent, who) in new[] { (pip, "Pip"), (gunta, "Gunta") })
+            // The cook (id gunta) is Boog, drawn from the Goblin Sapper's sheets.
+            foreach (var (agent, who) in new[] { (pip, "Pip"), (gunta, "GoblinSapper") })
             {
-                SpriteRenderer body = agent.GetComponentsInChildren<SpriteRenderer>().First(r => r.sprite != null && r.sprite.texture != null && r.sprite.texture.name.StartsWith(who));
+                SpriteRenderer body = agent.GetComponentsInChildren<SpriteRenderer>().FirstOrDefault(r => r.sprite != null && r.sprite.texture != null && r.sprite.texture.name.StartsWith(who));
                 Assert.That(body, Is.Not.Null, $"{who} drawn from their own sheet");
                 Assert.That(agent.Emote, Is.Not.Null, $"{who} can emote");
                 Assert.That(agent.Faces, Is.Not.Null);

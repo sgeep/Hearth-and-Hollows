@@ -24,7 +24,7 @@ namespace Hearthdelve.UI.Localization
         public const string MorningCooking = "morning.cooking";
         public const string MorningLoadout = "morning.loadout";
         public const string MorningDescend = "morning.descend";
-        // 4f Checkpoint C: the Brackenford market on the daytime panel.
+        // 4f Checkpoint C: the village market (Kariaston, formerly Brackenford) on the daytime panel.
         public const string MarketButton = "market.button";
         public const string MarketTitle = "market.title";
         public const string MarketPurse = "market.purse";
@@ -116,7 +116,7 @@ namespace Hearthdelve.UI.Localization
             (MorningLoadout, "tonight's delve bonuses: +{0} satchel slots · +{1} max Essence · Essence drain {2}%"),
             (MorningDescend, "open for the evening"),
             (MarketButton, "market"),
-            (MarketTitle, "the Brackenford market"),
+            (MarketTitle, "the Kariaston market"),
             (MarketPurse, "purse: {0} gold"),
             (MarketHave, "you have {0}"),
             (MarketBuy, "buy · {0} gold"),

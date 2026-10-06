@@ -466,7 +466,8 @@ namespace Hearthdelve.Dungeon.Rooms
             PublishEntered(m_FadeIn);
             yield return new WaitForSecondsRealtime(m_FadeIn);
 
-            if (essence != null) essence.DrainPaused = false;
+            // Walking on: the drain resumes, except at the rope up and the hole down (safe ground).
+            if (essence != null) essence.DrainPaused = node.PausesEssenceDrain;
             InputMaps.Activate(InputMaps.Dungeon);
             m_Transitioning = false;
             if (m_Encounter.IsSealed) Seal();

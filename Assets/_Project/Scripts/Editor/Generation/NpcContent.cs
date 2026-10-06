@@ -47,7 +47,9 @@ namespace Hearthdelve.Editor
             {
                 Customer = BuildCustomer(shadow),
                 Pip = BuildStaff("Pip", PipPrefab, StaffSet("Pip"), shadow, 3.2f, Vector2.zero),
-                Gunta = BuildStaff("Gunta", GuntaPrefab, StaffSet("Gunta"), shadow, 2.8f, new Vector2(1.25f, 0f)),
+                // The cook (stable id gunta) is Boog: the Goblin Sapper, with its own shadow.
+                Gunta = BuildStaff("Gunta", GuntaPrefab, SapperSet("Boog", "GoblinSapperIdle", "GoblinSapperRun"),
+                    SapperSet("BoogShadow", "GoblinSapperIdleShadow", "GoblinSapperRunShadow"), 2.8f, new Vector2(1.25f, 0f)),
             };
         }
 
@@ -59,6 +61,17 @@ namespace Hearthdelve.Editor
             {
                 LookTestContent.Anim(CharacterAnim.Idle, MinifantasySheets.Staff, $"{who}Idle", 16, 4, 0.2f, true),
                 LookTestContent.Anim(CharacterAnim.Walk, MinifantasySheets.Staff, $"{who}Walk", 4, 4, 0.15f, true),
+            });
+        }
+
+        /// <summary>Boog's idle and walk: the Goblin Sapper's 20-frame idle and 10-frame run, 100 ms a frame, in the four facings.</summary>
+        static SpriteAnimationSet SapperSet(string name, string idleFile, string runFile)
+        {
+            EditorPaths.Ensure(k_Npcs);
+            return LookTestContent.CreateOrUpdate<SpriteAnimationSet>($"{k_Npcs}/{name}.asset", set => set.animations = new List<SpriteAnim>
+            {
+                LookTestContent.Anim(CharacterAnim.Idle, MinifantasySheets.GoblinSapper, idleFile, 20, 4, 0.1f, true),
+                LookTestContent.Anim(CharacterAnim.Walk, MinifantasySheets.GoblinSapper, runFile, 10, 4, 0.1f, true),
             });
         }
 

@@ -28,6 +28,21 @@ namespace Hearthdelve.Tests
 
         static RunGraph Generate(int seed) => RunGenerator.Generate(seed, Settings.tuning, Settings.Catalog());
 
+        /// <summary>The rope up and the hole down are safe ground: no Essence drain there (after the type pass, the owner's call).</summary>
+        [Test]
+        public void TheRopeAndTheHole_PauseTheEssenceDrain_NowhereElse()
+        {
+            var seen = new HashSet<RoomKind>();
+            foreach (int seed in k_Seeds.Take(20))
+            foreach (FloorGraph floor in Generate(seed).Floors)
+            foreach (FloorNode node in floor.Nodes)
+            {
+                seen.Add(node.Kind);
+                Assert.That(node.PausesEssenceDrain, Is.EqualTo(node.Kind is RoomKind.Extraction or RoomKind.Descent), $"seed {seed}: {node.Kind}");
+            }
+            Assert.That(seen, Is.SupersetOf(new[] { RoomKind.Extraction, RoomKind.Descent, RoomKind.Combat, RoomKind.Arena }));
+        }
+
         [Test]
         public void TheSameSeed_GivesTheSameRun_AndSeedsDiffer()
         {

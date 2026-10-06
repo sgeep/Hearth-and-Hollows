@@ -1,6 +1,6 @@
 # HEARTH & HOLLOWS — Project Design Document
 
-*Working title: **Hearth & Hollows** (renamed from Hearthdelve on 2026-10-05). Version 0.5, with 4f as built recorded 2026-10-06 (Section 11.1, Decided 28–34). Version 0.5 (title and terminology pass, 2026-10-05: Hearth & Hollows, the Hollows, delves; village life-sim direction: daily loop, Brackenford's villagers and Visitors, the Inn, farming, ranching and fishing, the surface and dungeon ingredient model; Stronghold and defense direction dropped, 2026-10-04; learning priorities, tavern customization, decor rewards, worker customization, 2026-10-04; design philosophy, tavern immersion, quests and relationships in v0.3, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
+*Working title: **Hearth & Hollows** (renamed from Hearthdelve on 2026-10-05). Version 0.5, with 4f as built recorded 2026-10-06 (Section 11.1, Decided 28–34). Version 0.5 (title and terminology pass, 2026-10-05: Hearth & Hollows, the Hollows, delves; village life-sim direction: daily loop, Kariaston's villagers and Visitors, the Inn, farming, ranching and fishing, the surface and dungeon ingredient model; Stronghold and defense direction dropped, 2026-10-04; learning priorities, tavern customization, decor rewards, worker customization, 2026-10-04; design philosophy, tavern immersion, quests and relationships in v0.3, 2026-10-03; top-down pivot in v0.2, 2026-10-02). Engine: Unity 6.6, moving to 6.7 LTS on release.*
 
 > **About this version.** Version 0.1 described a side-scrolling game in the style of Dead Cells. On 2026-10-02 the game pivoted to top-down. Sections rewritten for the pivot are marked **(rewritten in v0.2)**; the text they replace is kept in [Appendix B](#appendix-b-superseded-v01-side-scroller-design) rather than deleted. Sections and lines added in v0.3 are marked **(added in v0.3)** or *(v0.3)*, those added in v0.4 **(added in v0.4)** or *(v0.4)*, and those added or rewritten in v0.5 **(added in v0.5)**, **(rewritten in v0.5)** or *(v0.5)*; they record design direction and do not widen any milestone's approved scope (the roadmap in Section 11.1 says what each milestone builds). Sections without a mark are unchanged from v0.1. Version 0.5 moves the game's identity toward a fantasy life sim centred on the tavern; the Stronghold direction and the old day order it replaces are kept in [Appendix C](#appendix-c-superseded-v04-stronghold-direction-and-day-order). Where this document and `CLAUDE.md` disagree, `CLAUDE.md` wins.
 >
@@ -14,11 +14,11 @@
 
 **Experience target:** *Live in a strange fantasy village, grow and gather ingredients, run and personalize your tavern and inn, build relationships with villagers and visitors, and descend into the Hollows at night for things the surface world cannot provide.*
 
-You inherit the Sunken Flagon, a tavern and inn in the small frontier village of Brackenford, built over a way down into **the Hollows**, the ancient underworld beneath the village. Your days are your own: tend a garden plot and a few animals, fish, shop, decorate the tavern and its guest rooms, run errands and get to know the odd, warm people who live here (the kind of village where an elderly skeleton might keep bees and nobody finds that strange). In the evening you open the doors, cook and serve: some of the faces at the tables are your neighbours, others are Visitors passing through, and a few of those Visitors may take a room upstairs and, if you help them, settle into one of the village's empty plots. When the tavern closes, you delve into the Hollows, fighting room by room through top-down, hack-and-slash runs for monster parts, rare and magical ingredients, strange discoveries and things your neighbours asked you to find. Then you come home, sleep, and the next day begins.
+You inherit Tally Ho!, a tavern and inn in the small frontier village of Kariaston, built over a way down into **the Hollows**, the ancient underworld beneath the village. Your days are your own: tend a garden plot and a few animals, fish, shop, decorate the tavern and its guest rooms, run errands and get to know the odd, warm people who live here (the kind of village where an elderly skeleton might keep bees and nobody finds that strange). In the evening you open the doors, cook and serve: some of the faces at the tables are your neighbours, others are Visitors passing through, and a few of those Visitors may take a room upstairs and, if you help them, settle into one of the village's empty plots. When the tavern closes, you delve into the Hollows, fighting room by room through top-down, hack-and-slash runs for monster parts, rare and magical ingredients, strange discoveries and things your neighbours asked you to find. Then you come home, sleep, and the next day begins.
 
 Delving into the Hollows is still a major pillar, but it is one part of a broader daily life rather than the whole game with a tavern between runs. *(The v0.2 pitch, built around a home that grows into a fortified Stronghold, is in Appendix C.)*
 
-**The title** *(added 2026-10-05)*. *Hearth & Hollows* names the game's two halves and the contrast between them: **warmth and community above; mystery and danger below.** The **Hearth** is home: the tavern and the Inn, cooking, the village and its people, relationships, farming, ranching and fishing, and a property the player makes their own. The **Hollows** are what lies beneath Brackenford: danger, monsters, mystery, rare ingredients, quests, strange discoveries, the rewards of the deep, and the ancient forces stirring below. The game is a life sim centred on the hearth, with the Hollows as one of its major pillars, not an action roguelite with a home attached.
+**The title** *(added 2026-10-05)*. *Hearth & Hollows* names the game's two halves and the contrast between them: **warmth and community above; mystery and danger below.** The **Hearth** is home: the tavern and the Inn, cooking, the village and its people, relationships, farming, ranching and fishing, and a property the player makes their own. The **Hollows** are what lies beneath Kariaston: danger, monsters, mystery, rare ingredients, quests, strange discoveries, the rewards of the deep, and the ancient forces stirring below. The game is a life sim centred on the hearth, with the Hollows as one of its major pillars, not an action roguelite with a home attached.
 
 ### 1.2 Genre and Inspirations (rewritten in v0.5)
 
@@ -38,11 +38,11 @@ Hybrid: a top-down fantasy life sim centred on owning and running a tavern and i
 
 1. **Every kill is a harvest.** Combat is not only about survival; *how* you fight determines what you bring home.
 2. **The surface and the depths, one life.** *(rewritten in v0.5)* Village life, the tavern and the Hollows feed each other. The surface provides dependable ingredients, people and a home; the Hollows provide what the surface can't: monster and magical ingredients, discoveries and stories. No part should feel like a detour from the "real" game.
-3. **A home and a community that grow with you.** *(rewritten in v0.5)* The Sunken Flagon grows into a larger tavern, inn and home inside a village whose people know Bram, some of whom are there because of him. *(It no longer grows into a fortified Stronghold; Appendix C.)*
+3. **A home and a community that grow with you.** *(rewritten in v0.5)* Tally Ho! grows into a larger tavern, inn and home inside a village whose people know Bram, some of whom are there because of him. *(It no longer grows into a fortified Stronghold; Appendix C.)*
 4. **Cozy on the surface, dread below.** The warmth of the village and the tavern, warm, funny and a little strange, contrasts with the menace of the depths.
 5. **You can feel it.** *(added in v0.2)* Every important moment lands through visuals, sound and haptics together.
-6. **Your tavern, your hands.** *(added in v0.3)* Tavern immersion: running the Sunken Flagon should feel physical and present. You walk the room, work the stations, carry the plates and watch strange monster parts become recognizable dishes. Immersion serves the fun and is never an excuse for busywork (Section 6.5).
-7. **A home you made.** *(added in v0.4)* The Sunken Flagon increasingly becomes a place the player personally created: they choose how it looks and how it works, and fill it with things they bought, earned and dragged up from the Hollows. "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done" (Section 6.6).
+6. **Your tavern, your hands.** *(added in v0.3)* Tavern immersion: running Tally Ho! should feel physical and present. You walk the room, work the stations, carry the plates and watch strange monster parts become recognizable dishes. Immersion serves the fun and is never an excuse for busywork (Section 6.5).
+7. **A home you made.** *(added in v0.4)* Tally Ho! increasingly becomes a place the player personally created: they choose how it looks and how it works, and fill it with things they bought, earned and dragged up from the Hollows. "This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done" (Section 6.6).
 
 ### 1.4 Target Platform and Audience
 
@@ -89,8 +89,8 @@ Where each lens most often matters in Hearth & Hollows:
 | Feedback | Every action answering the player in visuals, sound and haptics (Section 9A) |
 | Juiciness | Hits, flips, pours and plating that feel good simply to do |
 | Interest Curve | The shape of a delve, an evening and an act, with peaks for bosses and signature dishes |
-| Character / Character Web | Gunta, Pip, Ser Aldric, Sylvaris, Grukka and the regulars, and how they relate to Bram and each other (Section 2.7) |
-| World | Aldmere, Brackenford and the Hollows' ecology: why monsters are edible, who lives in the village, why Visitors come |
+| Character / Character Web | Boog, Pip, Ser Aldric, Sylvaris, Grukka and the regulars, and how they relate to Bram and each other (Section 2.7) |
+| World | Aldmere, Kariaston and the Hollows' ecology: why monsters are edible, who lives in the village, why Visitors come |
 | Playtesting | The final judge (below) |
 | Technology | Choosing tools that serve the experience, and not letting a tool's shape dictate the design |
 
@@ -140,15 +140,15 @@ The other rules still hold. "Meaningful complexity over system count" governs ev
 
 The world of **Aldmere** is a traditional high-fantasy continent: human kingdoms, dwarven holds carved into mountains, elven forests, orcish clans of the steppes, and wild borderlands between them. Ages ago a civilization delved too deep and sealed what it found beneath the earth. Those seals are failing.
 
-**The Hollows** are the underground world beneath Brackenford, and they are not ordinary caves. They are a living, shifting underworld that rearranges itself (justifying procedural layouts), reaching down through distinct regions from the old cellars under the village to the Heart at the bottom (Section 4.6). The Hollows grow outward and upward over time, and monsters from their depths are beginning to emerge onto the surface. Villagers have their own stories about the Hollows, and some may have their own superstitions or slang for the different depths.
+**The Hollows** are the underground world beneath Kariaston, and they are not ordinary caves. They are a living, shifting underworld that rearranges itself (justifying procedural layouts), reaching down through distinct regions from the old cellars under the village to the Heart at the bottom (Section 4.6). The Hollows grow outward and upward over time, and monsters from their depths are beginning to emerge onto the surface. Villagers have their own stories about the Hollows, and some may have their own superstitions or slang for the different depths.
 
-*(2026-10-05)* The world's three main places are **Brackenford** (the village and its community), **the Sunken Flagon** (the player's tavern and inn) and **the Hollows** (the world below).
+*(2026-10-05)* The world's three main places are **Kariaston** (the village and its community), **Tally Ho!** (the player's tavern and inn) and **the Hollows** (the world below).
 
 ### 2.2 The Tavern
 
-**The Sunken Flagon** sits in the frontier village of **Brackenford**, built directly over an entrance to the Hollows that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the upper Hollows. The player inherits the tavern at the start of the game (see Act I).
+**Tally Ho!** sits in the frontier village of **Kariaston**, built directly over an entrance to the Hollows that locals treated as a curiosity. Adventurers used to stop in for a drink before exploring the upper Hollows. The player inherits the tavern at the start of the game (see Act I).
 
-*(v0.5)* The Sunken Flagon is a tavern **and an inn**: guest rooms are part of the property and grow with it (Section 6.8). Brackenford is no longer only a name on the sign: it is a small, persistent village around the tavern that the player lives in (Section 2.8).
+*(v0.5)* Tally Ho! is a tavern **and an inn**: guest rooms are part of the property and grow with it (Section 6.8). Kariaston is no longer only a name on the sign: it is a small, persistent village around the tavern that the player lives in (Section 2.8).
 
 ### 2.3 The Protagonist
 
@@ -162,20 +162,20 @@ A retired (or reluctant) adventurer who has taken over the tavern. The protagoni
 
 The story unfolds in four acts, advanced by reaching new depths of the Hollows and by tavern milestones (renown, sanctuary capacity).
 
-**Act I — The Inn (Biomes 1–2).** Bram inherits the Sunken Flagon from a mentor who vanished in the Hollows. Business is slow. A wandering dwarf cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the walls of the Hollows.
+**Act I — The Inn (Biomes 1–2).** Bram inherits Tally Ho! from a mentor who vanished in the Hollows. Business is slow. A wandering goblin cook teaches Bram that monster meat, prepared right, is delicious. The first customers are adventurers and curious villagers. Hooks: the mentor's disappearance, strange carvings on the walls of the Hollows.
 
 **Act II — The Sanctuary (Biomes 3–4).** Travelers bring news: other openings into the deep have appeared across Aldmere. Monsters raid nearby farms. Refugees begin arriving at the tavern looking for food and safety. Bram expands the inn into a sanctuary with rooms, a wall, and space for newcomers. Some refugees have skills and join the tavern's workforce. The player learns these openings all lead down into the Hollows, which run beneath the world.
 
 **Act III — The Stronghold (Biomes 5–6).** A neighboring kingdom falls. The tavern becomes one of the last safe places on the frontier. Soldiers, a disgraced knight, an elven scout and an orc warband arrive, uneasy allies. The tavern is fortified. Patrons now watch Bram's delves with hope; their morale becomes a mechanical force (see Section 6.4). Bram discovers what happened to his mentor.
 
-**Act IV — The Champion (Biome 7 and the Heart).** The source of what stirs in the Hollows is revealed at their deepest point beneath Brackenford. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post-game: endless/ascension mode and "legendary" ingredients.
+**Act IV — The Champion (Biome 7 and the Heart).** The source of what stirs in the Hollows is revealed at their deepest point beneath Kariaston. The whole stronghold rallies. A final descent culminates in a boss fight, with the people Bram fed and sheltered providing direct support. Post-game: endless/ascension mode and "legendary" ingredients.
 
 ### 2.5 Key Characters (Draft)
 
 | Character | Role |
 |---|---|
 | **Bram Holloway** | Protagonist, tavern keeper and delver |
-| **Gunta Ashbelly** (dwarf) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
+| **Boog** (goblin) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
 | **Pip Marrowby** (halfling) | Server and bookkeeper; runs the floor during service |
 | **Old Tamsin** | Former owner/mentor, vanished in the Hollows; central mystery |
 | **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
@@ -183,9 +183,9 @@ The story unfolds in four acts, advanced by reaching new depths of the Hollows a
 | **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder *(v0.5: the fortification role no longer has a home; Section 2.9)* |
 | **The Warden Below** | The intelligence behind the Hollows; antagonist |
 
-*(v0.3)* Gunta, Pip, Ser Aldric, Sylvaris, Grukka and other important characters are the obvious candidates for personal questlines (Section 2.6) and persistent relationship state (Section 2.7), and they speak with Portrait Generator portraits (Section 8.1). Their quest trees and relationship progressions are not designed yet.
+*(v0.3)* Boog, Pip, Ser Aldric, Sylvaris, Grukka and other important characters are the obvious candidates for personal questlines (Section 2.6) and persistent relationship state (Section 2.7), and they speak with Portrait Generator portraits (Section 8.1). Their quest trees and relationship progressions are not designed yet.
 
-*(v0.4)* **Canonical characters keep their identities.** Authored story characters (Pip Marrowby, Gunta Ashbelly, Grukka Stonejaw, Sylvaris, Ser Aldric Vane and others) are not renameable, because their names are part of the story; they may still allow visual customization where it fits. Full naming and appearance customization belongs to hired and recruited workers (Section 6.7). Making a named character renameable would be an explicit story decision.
+*(v0.4)* **Canonical characters keep their identities.** Authored story characters (Pip Marrowby, Boog, Grukka Stonejaw, Sylvaris, Ser Aldric Vane and others) are not renameable, because their names are part of the story; they may still allow visual customization where it fits. Full naming and appearance customization belongs to hired and recruited workers (Section 6.7). Making a named character renameable would be an explicit story decision.
 
 ### 2.6 Quests and Objectives (added in v0.3)
 
@@ -213,7 +213,7 @@ Three different things, kept separate:
 
 | Measure | What it describes | Drives |
 |---|---|---|
-| **Renown** | The reputation of the Sunken Flagon as a tavern | Customer tiers, story progress (Section 7.1) |
+| **Renown** | The reputation of Tally Ho! as a tavern | Customer tiers, story progress (Section 7.1) |
 | **Morale** | *(v0.5, reinterpreted)* The state of the village community as a whole | **Cheer** in the Hollows (Section 6.4) |
 | **Disposition** | What one named character, or a relevant faction, thinks of Bram | That character's dialogue, quests, help and reactions |
 
@@ -229,11 +229,11 @@ Three different things, kept separate:
 
 **Recurring patrons.** The tavern should gradually feel less like a room of disposable customer entities and more like a place with familiar faces. Some patrons return, develop preferences, recognize Bram, react to the tavern's changes and to other residents or events, remember notable service, offer or take part in quests, and change their disposition over time. Most customers stay lightweight and procedurally generated; persistent relationship state is kept for the characters whose continuity creates value. Familiar faces are part of tavern immersion (Section 6.5). *(v0.5)* The familiar faces are now mostly **named villagers** who come to the tavern in the evening, plus the few Visitors promoted to persistent identities (Sections 2.8, 6.3).
 
-### 2.8 Brackenford and Its People (added in v0.5)
+### 2.8 Kariaston and Its People (added in v0.5)
 
 Long-term design direction. Nothing here is in the current milestone's scope; the roadmap (Section 11.1) says when village life is first built.
 
-**The village.** Brackenford is a small, persistent village around the Sunken Flagon. It is small enough that players learn who lives there: a place where people know each other, and come to know Bram. Its exact size, layout and buildings are not designed yet (Section 13).
+**The village.** Kariaston is a small, persistent village around Tally Ho!. It is small enough that players learn who lives there: a place where people know each other, and come to know Bram. Its exact size, layout and buildings are not designed yet (Section 13).
 
 **Who lives there.** The population is mostly human, but classic fantasy peoples are normal neighbours: dwarves, elves, orcs, goblins, halflings, skeletons, liches and other fitting folk. A skeleton, a goblin, a lich or an orc can simply be a member of the community, with a job, a garden and opinions about the new rug in the tavern, rather than an enemy archetype that happens to be friendly. The tone is a **cozy fantasy community with odd people and occasional absurdity**, contrasted against the Hollows, a dangerous ancient underworld: warm, funny and strange on the surface; dangerous below (pillar 4).
 
@@ -241,7 +241,7 @@ Long-term design direction. Nothing here is in the current milestone's scope; th
 
 | Tier | Who | Persists |
 |---|---|---|
-| **Named villagers** | A fixed, authored cast of residents, including canonical story characters who live in Brackenford | Always |
+| **Named villagers** | A fixed, authored cast of residents, including canonical story characters who live in Kariaston | Always |
 | **Visitors** | Generated outsiders who come to the tavern; not members of the village | Mostly not: a Visitor lasts the evening (or their stay) and is then forgotten |
 | **Promoted Visitors** | A Visitor who has become relevant through the Inn or the path toward settling: an Inn guest the player has got to know, a resident candidate | Yes, from the moment of promotion: their generated identity becomes a saved, persistent identity |
 | **Recruited residents** | A promoted Visitor who has moved into one of the village's empty plots (Section 6A.5) | Permanently, as a villager |
@@ -268,10 +268,10 @@ The village direction leaves parts of the story written for the Stronghold direc
 6. **Grukka Stonejaw** is "warband chief; blacksmith and fortification builder" and arrives with a warband in Act III. The blacksmith survives; the fortification role and the warband arrival need revision.
 7. **Ser Aldric Vane** arrives in Act II (weapon training). Compatible, but his arrival was framed by the sanctuary.
 8. **Sylvaris** unlocks the herb garden; farming (Section 6A.2) may make Sylvaris its natural mentor, or a garden may now come earlier than Sylvaris.
-9. **Canonical characters and the village.** It is undecided which canonical characters are Brackenford villagers from the start and which arrive later, and whether a late arrival uses one of the three empty plots (which would reduce the player's influence over who settles there).
+9. **Canonical characters and the village.** It is undecided which canonical characters are Kariaston villagers from the start and which arrive later, and whether a late arrival uses one of the three empty plots (which would reduce the player's influence over who settles there).
 10. **Rescued NPCs and refugee staff.** "Rescued NPCs join the tavern" and "refugee staff unlock new dungeon abilities" (Section 3.3) relied on refugees; people rescued in the Hollows could instead become Visitors or resident candidates.
 11. **Customer types.** "Refugees, and eventually soldiers and heroes" as customer tiers (Section 6.3) came from the war arc.
-12. **How far the Hollows reach** *(2026-10-05)*. The Hollows are the world beneath Brackenford, but Act II's news of "other dungeons" opening across Aldmere, "connected beneath the world", is now worded as other openings that all lead into the Hollows. Whether the Hollows run beneath all of Aldmere or are local to Brackenford, and whether those other openings stay in the story at all, is for the story revision.
+12. **How far the Hollows reach** *(2026-10-05)*. The Hollows are the world beneath Kariaston, but Act II's news of "other dungeons" opening across Aldmere, "connected beneath the world", is now worded as other openings that all lead into the Hollows. Whether the Hollows run beneath all of Aldmere or are local to Kariaston, and whether those other openings stay in the story at all, is for the story revision.
 
 ---
 
@@ -281,7 +281,7 @@ The village direction leaves parts of the story written for the Stronghold direc
 
 **Wake → free daytime → evening prep → tavern service → nighttime delve → return and sleep → next day.**
 
-1. **Wake.** A new day in the Sunken Flagon.
+1. **Wake.** A new day in Tally Ho!.
 2. **Free daytime (the village and the property).** The player is free to spend the day as they like. Long term this includes decorating and rearranging the tavern, decorating and managing the Inn, farming, ranching, fishing, talking to villagers, relationship moments, quests and errands, shopping, exploring the village, managing ingredients and resources, and preparing for the evening or the night's delve (Section 6A). Daytime is **not** a menu leading straight into the delve: it becomes a free-roaming life-sim part of the day.
 3. **Evening: the tavern.** The player decides to prepare and open the tavern. The established flow stays: **Prep → open → cook and serve → Results → close.** The physical service gameplay remains central (Sections 6.1, 6.5). The crowd is a mix of named villagers and Visitors (Section 6.3).
 4. **Night: the delve.** After the tavern closes, the player may delve into the Hollows (Section 4). There is **no separate time-of-night limit:** Essence remains the delve's only health pool and its only time pressure (Section 4.4).
@@ -410,7 +410,7 @@ Room rewards:
 
 Floors are generated from a **room graph** (Section 10.5). Each biome has 3 floors plus a boss arena. Special rooms: campfire (field cooking), shop, extraction point.
 
-**Biomes and their Minifantasy packs.** *(2026-10-05)* The biomes are regions of the one Hollows at increasing depth, not separate dungeons: the Cellars lie just beneath Brackenford and the Heart at the bottom. Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
+**Biomes and their Minifantasy packs.** *(2026-10-05)* The biomes are regions of the one Hollows at increasing depth, not separate dungeons: the Cellars lie just beneath Kariaston and the Heart at the bottom. Only Biome 1 has been checked against the catalog in detail. The rest are provisional: the packs exist in our library, but their sheets have not been inspected yet. `docs/ASSET_MAP.md` holds the verified mapping.
 
 | # | Biome | Theme | Environment packs | Creature candidates | Boss candidate |
 |---|---|---|---|---|---|
@@ -572,7 +572,7 @@ When a named villager walks in, the player recognizes them; what they order, wha
 
 ### 6.4 The Growing Property (rewritten in v0.5)
 
-The Sunken Flagon grows from a small tavern into a larger, personalized **tavern, inn and home inside the village**. It expands, gains rooms, becomes more successful, houses more people and becomes the village's social centre. It does **not** grow into a fortress: the Stronghold direction and its stage table are dropped and kept in Appendix C.
+Tally Ho! grows from a small tavern into a larger, personalized **tavern, inn and home inside the village**. It expands, gains rooms, becomes more successful, houses more people and becomes the village's social centre. It does **not** grow into a fortress: the Stronghold direction and its stage table are dropped and kept in Appendix C.
 
 Growth areas, none of them locked as stages or tied to particular acts yet:
 
@@ -666,7 +666,7 @@ Character customization and attachment are worth practising, so future hired or 
 
 Long-term design direction; nothing here is in the current milestone's scope.
 
-The Sunken Flagon eventually contains an **Inn**: a guest-room area alongside the tavern. The essential experience is: **"I decorated this room, someone interesting stayed here, and now I know them."**
+Tally Ho! eventually contains an **Inn**: a guest-room area alongside the tavern. The essential experience is: **"I decorated this room, someone interesting stayed here, and now I know them."**
 
 - The player can unlock guest rooms, furnish and decorate them, customize their appearance, and invite or offer rooms to suitable Visitors.
 - Guest rooms reuse **the same furniture, placement and customization architecture** as the tavern (Section 6.6): a guest room is another area with its own layout, saved the same way. There is no second, unrelated decorating system.
@@ -973,7 +973,7 @@ Assets/
 | **1. Prototype: Combat** | Prove the dungeon feels good | Done as a side-scroller (see tag `v0-sidescroller-prototype`) |
 | **2. Prototype: Tavern** | Prove service is fun | Done as a side-scroller |
 | **3. Loop Prototype** | Prove the halves connect | Done as a side-scroller |
-| **4. Vertical Slice** | Represent final quality, top-down; *(v0.5)* prove the new identity in miniature | Biome 1 fully arted + boss, Stage 1 tavern polished with its customization foundation, Act I opening story; *(v0.5, approved 2026-10-05)* one full day of the new loop: a free daytime in a small part of Brackenford with a few named villagers and one small farm plot, an evening service where villagers and Visitors eat, a Biome 1 delve at night, then sleep |
+| **4. Vertical Slice** | Represent final quality, top-down; *(v0.5)* prove the new identity in miniature | Biome 1 fully arted + boss, Stage 1 tavern polished with its customization foundation, Act I opening story; *(v0.5, approved 2026-10-05)* one full day of the new loop: a free daytime in a small part of Kariaston with a few named villagers and one small farm plot, an evening service where villagers and Visitors eat, a Biome 1 delve at night, then sleep |
 | **5. Production** | *(v0.5, approved 2026-10-05)* Prove the remaining life-sim systems, then build out content | First the Inn's guests and Visitor promotion, settling residents on the three plots, fishing, ranching and farming depth, each prototyped against its essential experience; then Biomes 2–7, all minigames, the growing property, the revised full story, more villagers and relationship content, Love/Hate if not earlier; *(v0.4)* the large furnishing catalog, many enemy- and biome-specific drop pools, more boss trophies and rewards, rarity tuning, customization of the whole property (tavern, Inn, own quarters), advanced customization content, worker customization |
 | **6. Polish and Launch** | Ship | Balance, accessibility, localization, performance, platform certification |
 
@@ -984,9 +984,9 @@ Assets/
 - **4c Tavern and UI migration:** top-down tavern, customer pathing, 2D serving, Grill/Tap/Serving with haptics, all UI in uGUI + STM.
 - **4d Biome 1 runs:** room-by-room structure, room rewards, run power-ups, 3 floors plus a boss arena. *(v0.4)* The reward architecture leaves room for future persistent reward kinds (customization discoveries) without building any. *(v0.5)* Scope unchanged and the completed step 1 and 2 work stands. Step 3's rewards are designed knowing a larger ingredient ecosystem exists: ingredient rewards don't assume monster parts are the only ingredients, and the reward model stays open to dungeon ingredients, quest objects, customization discoveries and future weapons and currencies (ingredient and Gold rewards remain the prototype's focus). No farming, fishing or ranching in 4d. Step 5 (day-loop integration) is where the run joins `GameFlow`; **proposed:** it adopts the new order there (evening service → delve → sleep, with the existing Morning panel standing in for the daytime until 4h), so the integration isn't done twice. How the Night upgrade screen and the breakfast buff are rehomed is decided when step 5 is planned. *(4d step 5, 2026-10-04: adopted. The old morning panel is the daytime placeholder; the breakfast became the **delve meal**, cooked in the daytime and kept until that night's delve; the Night screen keeps the upgrades, after the delve.)* *(4d playtest, 2026-10-05: a new game opens with the first night's delve, since the storeroom starts empty; base Essence is tuned so a full run of the Cellars needs some gear.)* *(Complete, approved 2026-10-05.)*
 - **4e Combat depth and boss:** *(revised in the 4e plan, 2026-10-05)* **the Larder Troll** (the Cellars boss), the **Harvest Finisher** (a small version, and an optional finishing moment on the defeated boss), the boss's rewards (Gold, a Premium larder cache, a persistent first-clear record, a hook for 4f's trophy), and tuning the cleaver and the Cellars' enemies for it. Deferred: more weapons (until 4g's protagonist decision), Kitchen Arts, field cooking, Essence Tonics. Removed: weapon rarity and affixes, Delve Marks, relics. *(Originally: Harvest Finisher, Kitchen Arts, 3–4 more weapons with rarity and affixes, Essence Tonics, field cooking, Delve Marks and the Delver's Board, one relic, the Biome 1 boss.)* *(v0.4)* Boss rewards are designed so a unique boss furnishing can plug in later. *(v0.5)* Unchanged: the roadmap review found no reason to move it. *(Complete, signed off 2026-10-05; final values)* The Larder Troll: 900 health, a slam (26) and a charge (24) with floor telegraphs and a 1.6 s wall stun; it eats any ingredient lying in the arena (including parts swapped out of the satchel) for 8% of its health, spoiled by 40 damage; a frenzy at half health (roar, swell, hit-stop, shake, rumble and "rages!" on the bar besides the tint); the full ~1.6 s reveal until first beaten (the save's boss-clear record), then a ~0.85 s intro. Passive drain paused in the fight; a full Essence refill when it falls; 120 run Gold and a Premium larder cache; the result screen says it was felled. Campfires (each with a prompt): a quarter of max Essence by each floor's hole down and before the arena. Harvest Finisher: about 25% health or 15 or less, within 1.2 s of a hit, 1.8 tiles; the troll's optional 3 s finishing window. The cleaver's heavy 26 / 40. Aim is independent of movement (mouse, or the right stick), the dodge rolls through enemies with a 0.5 s cooldown.
-- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Gunta, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5. Once that foundation exists, 4f also proves **one small end-to-end reward loop in Biome 1**: fight → a furnishing discovery drops → pick it up → extract → it is permanently owned → place it through Decorate Mode. That means a small real furnishing drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under whichever rule is approved when the feature is designed. It is an integration slice, not the production loot catalog: it proves that finding strange things in the Hollows and bringing them home is fun. *(v0.5, approved 2026-10-05)* The customization foundation is built for **several areas from the start** and proves it with **one small guest room** as a second decoratable area with its own saved layout (no guests or Inn rules yet), so the Inn never needs a second decorating system. The Biome 1 recipe rework follows the surface and dungeon ingredient model (Section 5.5): a few everyday surface staples, bought until farming exists, alongside the dungeon's parts. *(4e sign-off, 2026-10-05)* **Renown gets its first tangible gameplay use here**, ideally a small tavern or customer-content unlock (until now it is only earned, saved and shown). *(4f as built, 2026-10-06; awaiting sign-off.)* Four checkpoints (`docs/PLAN_4F.md` is the approved plan as a historical record; `docs/PROGRESS.md` records what was built and every deviation). **A:** furniture as data in placed layouts, Decorate Mode (whole tiles, the free-placement key for pixel nudges, real quarter turns, flips), nav rebuild and service validation. **B:** the catalog (about a hundred pieces from Minifantasy, generated from `catalog.json`), Gold purchases into property-wide storage, four Renown tiers (0, 25, 60, 100; Renown is earned, never spent), palette-ramp recolouring and area finishes, and the guest room (a second property area up the corner stairs). **C:** furnishing discoveries (a curio channel, kept on extraction, lost on death), the Larder Troll's tusks (granted with the victory, never lost, with a homecoming in Decorate Mode), the Brackenford market (`SupplySource`) and five surface staples, a 13-dish Cellars menu in three tiers, mushroom forage, the Butcher Block (a Prep-time precision cut whose score sets the yield), Gunta and Pip. **D:** special customer requests, a whole-loop balance pass with a balance report tool, a clean trophy spot on the back wall, and the event facts 4g will consume. Save version 7.
+- **4f Tavern Stage 1 content:** Butcher Block, all Biome 1 recipes, customer requests, Pip and Boog, and *(v0.4)* **a real customization foundation**: Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated catalog from Minifantasy (enough that players make visibly different taverns, not a token handful), one proven recolouring workflow, and controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, with more added through Phase 5. Once that foundation exists, 4f also proves **one small end-to-end reward loop in Biome 1**: fight → a furnishing discovery drops → pick it up → extract → it is permanently owned → place it through Decorate Mode. That means a small real furnishing drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under whichever rule is approved when the feature is designed. It is an integration slice, not the production loot catalog: it proves that finding strange things in the Hollows and bringing them home is fun. *(v0.5, approved 2026-10-05)* The customization foundation is built for **several areas from the start** and proves it with **one small guest room** as a second decoratable area with its own saved layout (no guests or Inn rules yet), so the Inn never needs a second decorating system. The Biome 1 recipe rework follows the surface and dungeon ingredient model (Section 5.5): a few everyday surface staples, bought until farming exists, alongside the dungeon's parts. *(4e sign-off, 2026-10-05)* **Renown gets its first tangible gameplay use here**, ideally a small tavern or customer-content unlock (until now it is only earned, saved and shown). *(4f as built, 2026-10-06; awaiting sign-off.)* Four checkpoints (`docs/PLAN_4F.md` is the approved plan as a historical record; `docs/PROGRESS.md` records what was built and every deviation). **A:** furniture as data in placed layouts, Decorate Mode (whole tiles, the free-placement key for pixel nudges, real quarter turns, flips), nav rebuild and service validation. **B:** the catalog (about a hundred pieces from Minifantasy, generated from `catalog.json`), Gold purchases into property-wide storage, four Renown tiers (0, 25, 60, 100; Renown is earned, never spent), palette-ramp recolouring and area finishes, and the guest room (a second property area up the corner stairs). **C:** furnishing discoveries (a curio channel, kept on extraction, lost on death), the Larder Troll's tusks (granted with the victory, never lost, with a homecoming in Decorate Mode), the Kariaston market (`SupplySource`) and five surface staples, a 13-dish Cellars menu in three tiers, mushroom forage, the Butcher Block (a Prep-time precision cut whose score sets the yield), Boog and Pip. **D:** special customer requests, a whole-loop balance pass with a balance report tool, a clean trophy spot on the back wall, and the event facts 4g will consume. Save version 7.
 - **4g Story, quests and character creation:** Dialogue System for Unity and Quest Machine integration; uGUI + Super Text Mesh dialogue presentation; Minifantasy Portrait Generator NPC portraits; character creation; the Act I opening; onboarding and tutorial flow; the first story quests and objectives; one representative NPC quest integration; save/load of dialogue and quest state; architecture and hooks so Love/Hate can be added cleanly. Love/Hate itself is not automatically in 4g: when 4g is planned, we decide whether to integrate it there or later. *(v0.5, approved 2026-10-05)* The representative NPC quest is a villager's errand into the Hollows that returns a **quest object** (the first non-ingredient, non-Gold reward kind in real use), and the dialogue adapters are built knowing villagers, Visitors and generated residents will use them. Act I is written for the village direction. *(4e sign-off)* 4g may also use Renown in story and dialogue conditions.
-- **4h Village and daytime slice** *(v0.5, new; approved 2026-10-05)*: a small part of Brackenford and the tavern's grounds, walkable in the daytime, replacing the Morning panel; a prototype of the daytime time model (a ticking clock or player-controlled phases, chosen by playtesting both cheaply); 3–4 named villagers with homes, simple presence or schedules, dialogue and relationship hooks; named villagers chosen into evening service alongside Visitors (today's generated customers become the Visitors); one small farm plot with a handful of crops feeding the storeroom (the smallest test of "I grew part of tonight's menu"); the full new day loop working through `GameFlow`. Not in 4h: ranching, fishing, Inn guests, Visitor promotion, resident recruitment.
+- **4h Village and daytime slice** *(v0.5, new; approved 2026-10-05)*: a small part of Kariaston and the tavern's grounds, walkable in the daytime, replacing the Morning panel; a prototype of the daytime time model (a ticking clock or player-controlled phases, chosen by playtesting both cheaply); 3–4 named villagers with homes, simple presence or schedules, dialogue and relationship hooks; named villagers chosen into evening service alongside Visitors (today's generated customers become the Visitors); one small farm plot with a handful of crops feeding the storeroom (the smallest test of "I grew part of tonight's menu"); the full new day loop working through `GameFlow`. Not in 4h: ranching, fishing, Inn guests, Visitor promotion, resident recruitment.
 - **4i Menus, options and polish** *(was 4h)*: settings (screen shake, flash and vibration intensity), accessibility per Section 12, audio system, web build.
 
 **Phase 5's first steps** *(v0.5, approved 2026-10-05; order to be set when Phase 5 is planned)*:
@@ -1043,7 +1043,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 18. **Identity:** a fantasy life sim centred on owning and running a tavern and inn in a strange village, with delving into the Hollows as a major pillar inside that daily life (Section 1.1).
 19. **The day:** wake → free daytime → evening prep → tavern service → nighttime delve → return and sleep. Tavern before the delve for now (Section 3.1).
 20. **The Stronghold direction is dropped:** no fortified Stronghold as the late-game home, no tower defense and no defense events (Section 6.4; Appendix C).
-21. **Brackenford is a small persistent village** with a fixed authored cast of named villagers; tavern customers are named villagers plus generated Visitors; most Visitors are transient and only relevant ones are promoted to persistent identities (Sections 2.8, 6.3).
+21. **Kariaston is a small persistent village** with a fixed authored cast of named villagers; tavern customers are named villagers plus generated Visitors; most Visitors are transient and only relevant ones are promoted to persistent identities (Sections 2.8, 6.3).
 22. **The Inn reuses the customization architecture;** no second decorating system (Section 6.8).
 23. **About three fixed residential plots** that settled Visitors can move into; fixed sites, not city-building (a current target, Section 6A.5).
 24. **Surface ingredients and the Hollows:** the surface provides dependable ingredients, the Hollows unusual ones and discoveries; neither replaces the other (Section 5.5).
@@ -1052,7 +1052,12 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 *Recorded 2026-10-05:*
 
 26. **Customization rules for 4f** *(2026-10-05)*: the Section 13 Open 9 questions are settled for 4f in `docs/PLAN_4F.md` §22: whole-tile snapping for blocking furniture (quarter tiles for decor); explicit rotation modes including real quarter-turn rotation; per-piece flipping; area-wide floor and wall finishes with fixed structure; movable stations (the Grill wall-bound); owned copies; curios kept on extraction and lost on death, boss trophies never lost; palette-channel recolouring baked into textures; no stat bonuses in 4f. Decor's relationship effects and renaming canonical characters stay open.
-27. **Gunta Ashbelly** *(2026-10-05)*: the head cook, formerly Gundra Ashbelly; stable id `gunta`.
+27. **Boog** *(2026-10-05; renamed 2026-10-06)*: the head cook, a goblin (he; drawn from Minifantasy's Goblin Sapper). Formerly Gunta Ashbelly, a dwarf, and before that Gundra Ashbelly; the stable id stays `gunta`.
+
+*Recorded 2026-10-06 (names, after the 4f type pass):*
+
+35. **Names** *(the owner's call, 2026-10-06)*: the tavern and inn is **Tally Ho!** (with its exclamation mark, written as a name: "decorating Tally Ho!", "Tally Ho!'s guest room"), replacing the Sunken Flagon; the village is **Kariaston**, replacing Brackenford; the head cook is **Boog**, a goblin (entry 27). Stable ids keep their old names (`gunta`, `brackenford_ale`, `Supply_BrackenfordMarket`), like the Hollows' `Dungeon` code.
+36. **Safe ground in the Hollows** *(2026-10-06)*: Essence doesn't drain in the rope room (climbing out) or the hole room (going deeper), so the choice at a floor's end isn't rushed; walking between rooms already cost nothing. Damage still applies.
 
 *Recorded 2026-10-06 (4f as built):*
 
@@ -1060,7 +1065,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 29. **Renown pacing (4f)**: each patron's Renown is added up over the evening and the total rounded, so competent service earns some and strong service clearly more; the catalog tiers stay at 0, 25, 60 and 100 (about a week of strong nights to the last).
 30. **Surface food is the safety net (4f)**: the market's staples make a modest profit even when played weakly, while a delve night at the same skill earns well over twice as much; signature dishes are the best nights but limited by their cuts and rare parts. Checked with the balance report (Hearthdelve → Balance → Evening Report), not final balance.
 31. **The Butcher Block (4f)**: a Prep activity, not a service stage; a weak cut is about as good as cooking the part whole, a clean one roughly two and a half to three times better as the signature dish.
-32. **Staff defaults (4f)**: Gunta starts each game off duty and is given a station at Prep, so the player meets the cooking first; her steady work is capped below a competent keeper's (0.75), Pip serves by default.
+32. **Staff defaults (4f)**: Boog starts each game off duty and is given a station at Prep, so the player meets the cooking first; his steady work is capped below a competent keeper's (0.75), Pip serves by default.
 33. **Gameplay facts for 4g (4f)**: the tavern and the Hollows publish what happened (a curio brought home, a piece placed, a trophy displayed, a market purchase, a part butchered, staff work, a dish served, a service completed, a boss defeated, special requests issued, met or missed) as stable-id events on the `EventBus`. 4g's Dialogue System, Quest Machine and Love/Hate adapters listen there; gameplay never calls them.
 34. **Save version 7 (4f)**: discoveries marked new and a trophy awaiting its homecoming are saved; older saves migrate in place, gain only what didn't exist when they were made (the guest room, the Butcher Block, a trophy already earned), and never twice.
 
@@ -1112,10 +1117,10 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 ## 14. Appendix A: Glossary
 
 - **Hearth & Hollows:** the game's working title since 2026-10-05 (formerly Hearthdelve). Hearthdelve remains the repository, Unity project and code name.
-- **The Hollows:** the underground world beneath Brackenford, made of regions (biomes) at increasing depth from the Cellars to the Heart; the in-world proper name, always "the Hollows" *(2026-10-05; formerly "the Dungeons")*.
+- **The Hollows:** the underground world beneath Kariaston, made of regions (biomes) at increasing depth from the Cellars to the Heart; the in-world proper name, always "the Hollows" *(2026-10-05; formerly "the Dungeons")*.
 - **Dungeon:** the technical and genre term for the gameplay layer set in the Hollows (the `Dungeon` assembly, scenes, input map and classes); not an in-world place name *(2026-10-05)*.
 - **Delve:** a single roguelite run into the Hollows; *(v0.5)* it happens at night, after service. To **delve**; a **delver** is someone who does.
-- **Brackenford:** the village above the Hollows; **the Sunken Flagon:** the player's tavern and inn.
+- **Kariaston:** the village above the Hollows; **Tally Ho!:** the player's tavern and inn.
 - **Essence:** the delve timer and the player's only health pool.
 - **Haul:** ingredients carried back from a delve.
 - **Harvest Finisher:** a special kill move that guarantees a premium part.
@@ -1126,11 +1131,11 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 - **Disposition:** what one named character or faction thinks of Bram (Section 2.7).
 - **Quest:** an objective that persists or matters beyond a single ordinary order, owned by Quest Machine.
 - **Recurring patron:** a named customer who returns and remembers.
-- **Named villager** *(v0.5)*: a persistent, authored resident of Brackenford (Section 2.8).
+- **Named villager** *(v0.5)*: a persistent, authored resident of Kariaston (Section 2.8).
 - **Visitor** *(v0.5)*: a generated outsider who comes to the tavern; usually transient (Section 2.8).
 - **Promoted Visitor** *(v0.5)*: a Visitor saved as a persistent identity because they became relevant through the Inn or as a resident candidate.
 - **Resident** *(v0.5)*: a villager; a **recruited resident** is a former Visitor who settled in one of the empty plots (Section 6A.5).
-- **Inn** *(v0.5)*: the Sunken Flagon's guest rooms (Section 6.8).
+- **Inn** *(v0.5)*: Tally Ho!'s guest rooms (Section 6.8).
 - **Preparation stage:** one step of a multi-stage dish (Section 5.4).
 - **Satchel / Lockbox:** carry inventory / the one slot kept on death.
 - **Run power-up:** a temporary boon chosen from three, lasting one run.
@@ -1286,4 +1291,4 @@ The inn plays the role the cult plays in *Cult of the Lamb*. It grows across the
 
 ### C.4 Customization growing into the Stronghold (v0.4, Section 6.6)
 
-"**Growing with the home.** The same architecture later serves the Sanctuary and the Stronghold (Section 6.4): early game, personalize the Sunken Flagon; Act II, the inn grows into a Sanctuary with new areas and furnishing possibilities; Act III, the Stronghold's larger customizable spaces; Act IV, a home that visibly reflects everything the player survived and collected. No separate building system per stage."
+"**Growing with the home.** The same architecture later serves the Sanctuary and the Stronghold (Section 6.4): early game, personalize Tally Ho!; Act II, the inn grows into a Sanctuary with new areas and furnishing possibilities; Act III, the Stronghold's larger customizable spaces; Act IV, a home that visibly reflects everything the player survived and collected. No separate building system per stage."

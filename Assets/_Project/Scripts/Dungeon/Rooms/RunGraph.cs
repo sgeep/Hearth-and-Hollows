@@ -48,6 +48,12 @@ namespace Hearthdelve.Dungeon.Rooms
 
         /// <summary>Where the run ends or leaves the floor: no exits.</summary>
         public bool IsEnd => Kind is RoomKind.Extraction or RoomKind.Descent or RoomKind.Arena;
+
+        /// <summary>
+        /// The rope up and the hole down are safe ground: Essence doesn't drain there, so reaching one is a breath, and the
+        /// choice (climb out or go deeper) isn't rushed (the owner's call, after the type pass). Damage still applies.
+        /// </summary>
+        public bool PausesEssenceDrain => Kind is RoomKind.Extraction or RoomKind.Descent;
     }
 
     /// <summary>One floor of a run: a one-way graph of rooms from its first room to its ends (extraction, descent or the arena).</summary>

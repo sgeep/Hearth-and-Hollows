@@ -160,7 +160,7 @@ namespace Hearthdelve.UI.Localization
             (StationStewPot, "stew pot"),
             (StationButcherBlock, "butcher block"),
 
-            (AreaTavern, "the Sunken Flagon"),
+            (AreaTavern, "Tally Ho!"),
             (AreaGuestRoom, "the guest room"),
 
             (CatalogPurse, "{0} gold · Renown {1}"),
@@ -179,7 +179,7 @@ namespace Hearthdelve.UI.Localization
             (Unique, "one of a kind"),
             (Looks, "{0} looks"),
             (SourceStarter, "from the start"),
-            (SourceBought, "made in Brackenford"),
+            (SourceBought, "made in Kariaston"),
             (SourceDiscovery, "found in the Hollows"),
             (SourceBoss, "a trophy"),
             (SourceStory, "a gift"),

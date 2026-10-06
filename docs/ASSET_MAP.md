@@ -307,7 +307,7 @@ The catalogue's art is defined by `Assets/_Project/Data/Furniture/Catalog/catalo
 No new colours outside those ramps. Rerun the script to rebuild it.
 
 **Pip and Gunta (derived).** `Tools/characters/staff_looks.py` writes `Tools/characters/derived/{PipIdle,PipWalk,GuntaIdle,GuntaWalk}.png` from the Creatures pack's base humanoids (`Minifantasy_Creatures_v3.3_Commercial_Version/…/Base_Humanoids/`), imported as the `Staff` pack (Idle 16 frames × 4 directions, Walk 4 × 4):
-- **Gunta Ashbelly:** the yellow-bearded dwarf, palette-remapped: the grey helmet becomes a white cook's cap, the orange beard deep auburn, the clothes a cook's red (the apron).
+- **Gunta Ashbelly (retired 2026-10-06; the cook is now Boog, below):** the yellow-bearded dwarf, palette-remapped: the grey helmet becomes a white cook's cap, the orange beard deep auburn, the clothes a cook's red (the apron).
 - **Pip Marrowby:** the base halfling (one cream ramp throughout), coloured by where each pixel sits: brown curls on the head, the face as drawn, a green waistcoat, brown breeches. Outline and shading ramps kept.
 Minifantasy has no dressed halfling, cook or apron layer; these are recolours, not new drawings.
 
@@ -321,7 +321,9 @@ Minifantasy has no dressed halfling, cook or apron layer; these are recolours, n
 
 **Sound:** all placeholders (`PH_Discovery`, `PH_Homecoming`, `PH_KnifeIn`, `PH_Cleave`, `PH_ChopRagged`, `PH_ButcherDone`).
 
-**Gaps:** no sitting or eating pose for Gunta and Pip; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.
+**Boog (2026-10-06).** The cook is the **Goblin Sapper** from All Exclusives (`All_Exclusives_20261002/Creatures/Goblin_Sapper`), used as drawn: `Idle.png` (20 frames) and `Run.png` (10 frames, used as his walk), 32×32 frames at 100 ms in Minifantasy's four facings, with `_Shadows/Idle_Shadow.png` and `Run_Shadow.png` as his own shadow. Imported to `Assets/ThirdParty/Minifantasy/GoblinSapper/`; `Dmg`, `Die` and `Only_Bomb` aren't imported. He carries the sapper's lit bomb on his back, which is the look's joke. Gunta's derived sheets stay in `Tools/characters/derived/` as history; their imported copies were removed.
+
+**Gaps:** no sitting or eating pose for Boog and Pip; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.
 
 ## Selectors (UI Overhaul → `UIOverhaul/Selectors`)
 

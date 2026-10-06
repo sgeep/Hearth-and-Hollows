@@ -85,6 +85,7 @@ namespace Hearthdelve.Editor
         const string k_Bat = k_Creatures + "/Beasts/Bat";
         const string k_Spider = "All_Exclusives_20261002/Creatures/Giant_Spider";
         const string k_Troll = "All_Exclusives_20261002/Creatures/Ancient_Troll";
+        const string k_Sapper = "All_Exclusives_20261002/Creatures/Goblin_Sapper";
         const string k_Campsite = "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Adventurer's_Campsite_v1.0/Minifantasy Adventurer's Campsite/Animations/Campfires";
         const string k_GuiEmoticons = "Minifantasy_UserInterface_v1.0/Minifantasy_Userinterface_Assets/Miscellany/Emoticons";
         const string k_Cooking = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Cooking";
@@ -110,12 +111,14 @@ namespace Hearthdelve.Editor
         public const string MyriadOfNPCs = "AMyriadOfNPCs";
         public const string GiantSpider = "GiantSpider";
         public const string AncientTroll = "AncientTroll";
+        /// <summary>Boog's look: the Goblin Sapper from All Exclusives (the owner's choice, after the type pass).</summary>
+        public const string GoblinSapper = "GoblinSapper";
         public const string AdventurersCampsite = "AdventurersCampsite";
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         /// <summary>Farm add-on icons (4f Checkpoint C): the market's eggs and malt.</summary>
         public const string FarmIcons = "FarmIcons";
-        /// <summary>Pip's and Gunta's looks (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
+        /// <summary>Pip's look (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
         public const string Staff = "Staff";
         public const string DwarvenKingdom = "DwarvenKingdom";
         public const string GladiatorArena = "GladiatorArena";
@@ -227,11 +230,18 @@ namespace Hearthdelve.Editor
             foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
             {
                 sheets.Add(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}"));
-                // 4f Checkpoint C: Pip and Gunta, derived sheets in the same layout (idle and walk only).
+                // 4f Checkpoint C: Pip, a derived sheet in the same layout (idle and walk only). The cook is Boog now (the Goblin Sapper, below).
                 if (anim is "Idle" or "Walk")
-                    foreach (string who in new[] { "Pip", "Gunta" })
+                    foreach (string who in new[] { "Pip" })
                         sheets.Add(Character($"derived:Tools/characters/derived/{who}{anim}.png", Staff, $"{who}{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
+            }
+
+            // Boog, the cook: the Goblin Sapper (32-pixel frames, 100 ms; 20 idle frames, a 10-frame run), with its shadows.
+            foreach (string anim in new[] { "Idle", "Run" })
+            {
+                sheets.Add(Character($"{k_Sapper}/{anim}.png", GoblinSapper, $"GoblinSapper{anim}"));
+                sheets.Add(Character($"{k_Sapper}/_Shadows/{anim}_Shadow.png", GoblinSapper, $"GoblinSapper{anim}Shadow"));
             }
 
             // Green slime.

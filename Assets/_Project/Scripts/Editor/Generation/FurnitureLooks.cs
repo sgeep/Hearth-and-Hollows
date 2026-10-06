@@ -63,7 +63,7 @@ namespace Hearthdelve.Editor
             (0, "the village joiner", null),
             (25, "the dwarven masons", "word is spreading: the dwarven masons will take your orders."),
             (60, "the elven and castle workshops", "word is spreading: the elven carvers and the castle's suppliers will take your orders."),
-            (100, "the strange and the grand", "word is spreading: dealers in strange and grand things will call on the Sunken Flagon."),
+            (100, "the strange and the grand", "word is spreading: dealers in strange and grand things will call at Tally Ho!"),
         };
 
         public static string RampKey(string id) => $"palette.{id}";

@@ -294,6 +294,26 @@ namespace Hearthdelve.Tests.PlayMode
             essence.SetEncounterDrain(1f);
         }
 
+        /// <summary>Essence drains in an ordinary room but not at the hole down (or the rope up): safe ground (after the type pass).</summary>
+        [UnityTest]
+        public IEnumerator TheHoleDown_StopsTheEssenceDrain_AndOrdinaryRoomsDon_t()
+        {
+            yield return LoadRun();
+            var essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            float before = essence.CurrentHealth;
+            yield return new WaitForSeconds(1.5f);
+            Assert.That(essence.CurrentHealth, Is.LessThan(before), "the first room drains");
+            essence.GodMode = true; // the walk there goes through fights
+            yield return WalkTo(RoomKind.Descent);
+            essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            Assert.That(essence.DrainPaused, "the drain stops at the hole down");
+            before = essence.CurrentHealth;
+            yield return new WaitForSeconds(1.5f);
+            Assert.That(essence.CurrentHealth, Is.EqualTo(before), "no Essence lost at the hole down");
+        }
+
         /// <summary>4e playtest: the room with the hole down has a smaller campfire, giving back a quarter of the delver's Essence.</summary>
         [UnityTest]
         public IEnumerator TheHoleDown_HasASmallerCampfire_ThatGivesBackAQuarter()
