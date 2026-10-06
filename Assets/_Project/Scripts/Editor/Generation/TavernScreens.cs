@@ -328,7 +328,7 @@ namespace Hearthdelve.Editor
         /// </summary>
         static DecorateStyle BuildStyle(RectTransform content)
         {
-            RectTransform panel = DungeonUI.Panel(content, new Vector2(248f, 120f), Vector2.zero);
+            RectTransform panel = DungeonUI.Panel(content, new Vector2(288f, 120f), Vector2.zero);
             panel.name = "Colours";
             LocalizedSuperText title = DungeonUI.Title(panel, DecorateLocKeys.StyleTitle);
             var topLeft = new Vector2(0f, 1f);
@@ -336,12 +336,17 @@ namespace Hearthdelve.Editor
             var rows = new StyleRow[4];
             for (int i = 0; i < rows.Length; i++)
             {
-                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(12f, -24f - i * 16f), new Vector2(226f, 14f));
+                // A row: its name (50), up to nine swatches (58–158), and the chosen colour's name in its own column after them
+                // (162–264), so a long name never runs into the swatches. The row's band shows which row is chosen.
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(12f, -24f - i * 16f), new Vector2(264f, 14f), new Color(0f, 0f, 0f, 0f));
+                Image band = row.GetComponent<Image>();
+                band.raycastTarget = false;
                 var r = new StyleRow
                 {
                     root = row.gameObject,
-                    label = Label(row, "Label", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(0f, 0f), new Vector2(50f, Line)),
-                    value = Label(row, "Value", TavernLocKeys.Plain, 6f, k_Note, TextAnchor.MiddleRight, new Vector2(1f, 0.5f), new Vector2(-30f, 0f), new Vector2(60f, Line)),
+                    background = band,
+                    label = Label(row, "Label", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(2f, 0f), new Vector2(50f, Line)),
+                    value = Label(row, "Value", TavernLocKeys.Plain, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(162f, 0f), new Vector2(100f, Line)),
                     swatches = new Image[9],
                     buttons = new Button[9],
                 };
@@ -363,7 +368,7 @@ namespace Hearthdelve.Editor
             LocalizedSuperText nothing = Label(panel, "Nothing", DecorateLocKeys.StyleNothing, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(220f, Line));
             LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.StyleControls, 6f, k_Note, TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
-                new Vector2(0f, 20f), new Vector2(232f, Line));
+                new Vector2(0f, 20f), new Vector2(272f, Line));
             Button copy = SmallButton(panel, "Copy", DecorateLocKeys.StyleCopy, new Vector2(0.5f, 0f), new Vector2(-60f, 4f), 112f, out LocalizedSuperText copyLabel);
             Button applyAll = SmallButton(panel, "ApplyAll", DecorateLocKeys.StyleApplyAll, new Vector2(0.5f, 0f), new Vector2(60f, 4f), 112f, out LocalizedSuperText applyAllLabel);
             var style = panel.gameObject.AddComponent<DecorateStyle>();

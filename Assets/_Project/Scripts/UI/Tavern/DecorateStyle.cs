@@ -20,6 +20,8 @@ namespace Hearthdelve.UI.Tavern
         public Image[] swatches = Array.Empty<Image>();
         public Button[] buttons = Array.Empty<Button>();
         public Image marker;
+        /// <summary>The row's band: soft gold behind the chosen row, as in the catalogue.</summary>
+        public Image background;
     }
 
     /// <summary>
@@ -55,7 +57,9 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] StyleRow[] m_Rows = Array.Empty<StyleRow>();
         [SerializeField] Button m_Copy, m_ApplyAll;
         [SerializeField] LocalizedSuperText m_CopyLabel, m_ApplyAllLabel;
-        [SerializeField] Color m_Focus = new(0.95f, 0.75f, 0.3f);
+        [SerializeField, Tooltip("The band behind the chosen row (the catalogue's selection colour); its text stays ink.")]
+        Color m_RowSelected = new(0.95f, 0.8f, 0.45f, 0.55f);
+        [SerializeField, Tooltip("A chosen button's tint.")] Color m_ButtonSelected = new(1f, 0.82f, 0.45f);
         [SerializeField] Color m_Ink = new(0.24f, 0.16f, 0.12f);
         [SerializeField, Min(0.05f)] float m_RepeatDelay = 0.3f;
         [SerializeField, Min(0.02f)] float m_RepeatRate = 0.1f;
@@ -72,6 +76,7 @@ namespace Hearthdelve.UI.Tavern
 
         public bool IsOpen => m_Root != null && m_Root.activeSelf;
         public int LineCount => m_Lines.Count;
+        public IReadOnlyList<StyleRow> Rows => m_Rows;
         public int Focused => m_Focused;
         public string TitleText => m_Title != null ? m_Title.GetComponent<SuperTextMesh>()?.text : null;
 
@@ -337,7 +342,8 @@ namespace Hearthdelve.UI.Tavern
                 {
                     m_Copy.gameObject.SetActive(true);
                     m_CopyLabel.Set(DecorateLocKeys.StyleCopy);
-                    SetColor(m_CopyLabel, focused ? m_Focus : m_Ink);
+                    SetColor(m_CopyLabel, m_Ink);
+                    Tint(m_Copy, focused);
                     m_Copy.interactable = Mode.LastLook != null;
                     continue;
                 }
@@ -345,7 +351,8 @@ namespace Hearthdelve.UI.Tavern
                 {
                     m_ApplyAll.gameObject.SetActive(true);
                     m_ApplyAllLabel.Set(DecorateLocKeys.StyleApplyAll, DecorateScreen.PieceName(m_Piece.id));
-                    SetColor(m_ApplyAllLabel, focused ? m_Focus : m_Ink);
+                    SetColor(m_ApplyAllLabel, m_Ink);
+                    Tint(m_ApplyAll, focused);
                     continue;
                 }
                 if (row >= m_Rows.Length) continue;
@@ -362,7 +369,8 @@ namespace Hearthdelve.UI.Tavern
                 r.label.Set(label);
                 r.value.gameObject.SetActive(chosen.Length > 0);
                 if (chosen.Length > 0) r.value.Set(TavernLocKeys.Plain, chosen);
-                SetColor(r.label, focused ? m_Focus : m_Ink);
+                SetColor(r.label, m_Ink);
+                if (r.background != null) r.background.color = focused ? m_RowSelected : Color.clear;
                 bool swatches = line.Kind != Kind.Presets;
                 for (int s = 0; s < r.swatches.Length; s++)
                 {
@@ -391,6 +399,16 @@ namespace Hearthdelve.UI.Tavern
                 return string.IsNullOrEmpty(shown) ? a.GetBindingDisplayString() : shown.Split('|')[0].Trim();
             }
             m_Controls.Set(DecorateLocKeys.StyleControls, Prompt(DecorateActions.Move), Prompt(DecorateActions.Select), Prompt(DecorateActions.Cancel));
+        }
+
+        readonly Dictionary<Button, Color> m_ButtonColors = new();
+
+        /// <summary>A chosen button takes the selection tint; otherwise it keeps its own color.</summary>
+        void Tint(Button button, bool focused)
+        {
+            if (button.targetGraphic == null) return;
+            if (!m_ButtonColors.TryGetValue(button, out Color own)) m_ButtonColors[button] = own = button.targetGraphic.color;
+            button.targetGraphic.color = focused ? m_ButtonSelected : own;
         }
 
         static void SetColor(LocalizedSuperText text, Color color)

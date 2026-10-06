@@ -177,14 +177,14 @@ namespace Hearthdelve.Tests
             PlacedFurniture glasses = layout.Pieces.Single(p => p.definition == "shelf_glasses");
             Assert.That((glasses.host, glasses.anchor), Is.EqualTo((shelf.uid, 0)));
             Vector2 before = layout.ResolveAll().Single(r => r.Placement.uid == glasses.uid).Art[0].Position;
-            Assert.That(Vector2.Distance(before, new Vector2(24.75f, 15.5f)), Is.LessThan(1e-4f), "where 4e put them");
+            Assert.That(Vector2.Distance(before, new Vector2(24.75f, 15f)), Is.LessThan(1e-4f), "inside the shelf, on its inner floor");
 
             List<PlacedFurniture> lifted = layout.Remove(shelf.uid);
             Assert.That(lifted.Select(p => p.definition), Is.EquivalentTo(new[] { "low_shelf", "shelf_glasses" }), "a shelf's glasses come away with it");
             shelf.cell = new Vector2Int(5, 15);
             foreach (PlacedFurniture p in lifted) layout.Add(p);
             Vector2 after = layout.ResolveAll().Single(r => r.Placement.uid == glasses.uid).Art[0].Position;
-            Assert.That(Vector2.Distance(after, new Vector2(5.75f, 16.5f)), Is.LessThan(1e-4f), "and stand on it wherever it goes");
+            Assert.That(Vector2.Distance(after, new Vector2(5.75f, 16f)), Is.LessThan(1e-4f), "and stand in it wherever it goes");
 
             PlacedFurniture loose = New("shelf_glasses", 0, 0);
             Assert.That(layout.Check(loose).Problem, Is.EqualTo(PlacementProblem.NeedsASurface), "glasses need a surface");
@@ -201,7 +201,7 @@ namespace Hearthdelve.Tests
             // The first table's west chair is drawn from x 2.875 to 3.625: its left edge is over the tile to the west.
             Assert.That(layout.AtPoint(new Vector2(2.95f, 7.6f)).First().definition, Is.EqualTo("tavern_chair"));
             Assert.That(layout.At(new Vector2Int(2, 7)), Is.Empty, "no piece's tile there");
-            Assert.That(layout.AtPoint(new Vector2(24.9f, 15.6f)).First().definition, Is.EqualTo("shelf_glasses"), "the glasses before their shelf");
+            Assert.That(layout.AtPoint(new Vector2(24.9f, 15.2f)).First().definition, Is.EqualTo("shelf_glasses"), "the glasses before their shelf");
         }
 
         [Test]

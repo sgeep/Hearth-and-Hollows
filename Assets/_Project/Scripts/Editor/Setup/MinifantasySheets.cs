@@ -363,7 +363,8 @@ namespace Hearthdelve.Editor
                 new SheetRect("BottlesA", 93, 66, 13, 5, k_BottomLeft),
                 new SheetRect("BottlesB", 117, 66, 14, 5, k_BottomLeft),
                 new SheetRect("BottlesC", 141, 66, 13, 5, k_BottomLeft),
-                new SheetRect("Glasses", 165, 66, 14, 4, k_BottomLeft),
+                // The row of glasses with brown bases (the sheet's lower row), so they stand inside the low shelf.
+                new SheetRect("Glasses", 165, 74, 14, 4, k_BottomLeft),
             }));
 
             // 4c kitchen (Crafting And Professions II): a stone oven and a range with pans, one 32×32 frame.

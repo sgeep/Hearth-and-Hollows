@@ -278,7 +278,7 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Place();
             Assert.That(Mode.Carried, Is.Null);
             PlacedFurniture glasses = Mode.Layout.Pieces.Single(p => p.definition == "shelf_glasses");
-            Assert.That(Vector2.Distance(Mode.Layout.Resolve(glasses).Art[0].Position, new Vector2(8.75f, 16.5f)), Is.LessThan(1e-4f), "and stand on it where it went");
+            Assert.That(Vector2.Distance(Mode.Layout.Resolve(glasses).Art[0].Position, new Vector2(8.75f, 16f)), Is.LessThan(1e-4f), "and stand in it where it went");
             Mode.Leave();
         }
 

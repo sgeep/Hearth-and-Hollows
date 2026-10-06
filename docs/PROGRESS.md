@@ -935,6 +935,12 @@ Steps 3–6 as one package. The aim: from "I can move the existing tavern around
 
 **Corner stairs (2026-10-05):** your choice after the first look: a smaller staircase in a corner. Medieval City's slim wooden flight (9×17 px, about a third the size of the stucco one) stands in the back-right corner against the right wall, rising into the back wall, mirrored so its handrail faces the room. Walking onto its foot (column 26, row 11) fades up to the guest room; the guest room's door brings you down just below it. A Decorate test that carried a barrel to (26, 12) now carries it to (26, 10). EditMode 505/505, PlayMode 179 passed plus 7 explicit captures. Web build rebuilt.
 
+**Color panel and the low shelf (2026-10-05):**
+- The color panel's chosen-color name overlapped the swatches on longer names (a table's "slate black", "gray stone"): the panel is wider (288) and the name has its own column after the last swatch. A test (`EveryColorPanelText_FitsItsRow`) opens the panel on every piece with looks and every option of every row, and fails if a name wraps, touches a swatch or runs past the row.
+- The chosen row was pale yellow text on parchment: it's now ink on a soft gold band, as in the catalog; a chosen button takes the same gold.
+- The glasses stood on top of the low shelf: they now stand inside it (the shelf's surface anchor is its inner floor, half a tile lower, and the glasses are the sheet's brown-based row). Saves keep only which shelf an item is on, so old saves show them inside too.
+- Tests: EditMode 505/505, PlayMode 180 passed plus 7 explicit captures (new capture: `colours_table.png`). Web build rebuilt.
+
 **Checkpoint B is waiting for your playtest.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.

@@ -238,12 +238,20 @@ namespace Hearthdelve.Tests.PlayMode
             plain.RemoveAll(p => !k_Keep.Contains(p.definition));
             plain.Add(new PlacedFurniture { uid = tavern.State.TakeUid(), definition = "tavern_chair", cell = new Vector2Int(5, 6), palette = "cushion=teal;wood=walnut" });
             tavern.State.AddOwnedCopies("tavern_chair", 1);
+            // A round table in the longest wood name, for the panel's name column.
+            plain.Add(new PlacedFurniture { uid = tavern.State.TakeUid(), definition = "table_round_a", cell = new Vector2Int(10, 6), palette = "wood=slate" });
+            tavern.State.AddOwnedCopies("table_round_a", 1);
             tavern.Commit(plain);
             Mode.Enter();
             yield return null;
             Mode.SetCursor(new Vector2Int(5, 6));
             screen.OpenStyle();
             yield return Shot("colours_chair.png");
+            screen.Style.Close();
+            Mode.SetCursor(new Vector2Int(10, 6));
+            screen.OpenStyle();
+            screen.Style.Step(0);
+            yield return Shot("colours_table.png");
             screen.Style.Close();
             Mode.Leave();
             File.WriteAllLines($"{k_Out}/report.txt", report);

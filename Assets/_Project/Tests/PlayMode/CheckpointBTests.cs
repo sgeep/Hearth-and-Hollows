@@ -317,6 +317,54 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(problems.Distinct(), Is.Empty);
         }
 
+        /// <summary>
+        /// The color panel on every piece with looks, every option of every row: names stay on one line and clear of the
+        /// swatches.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator EveryColorPanelText_FitsItsRow()
+        {
+            yield return LoadTavern();
+            DecorateMode.Sandbox = true;
+            Mode.Enter();
+            yield return null;
+            DecorateStyle style = Screen.Style;
+            var problems = new System.Collections.Generic.List<string>();
+            int checkedPieces = 0;
+            foreach (FurnitureDefinition d in Tavern.Content.furniture.Where(d => d != null && d.HasLooks))
+            {
+                Tavern.State.AddOwnedCopies(d.id, 1);
+                if (!Mode.TakeFromStorage(d.id)) continue;
+                Screen.OpenStyle();
+                Assert.That(style.IsOpen, d.id);
+                checkedPieces++;
+                for (int line = 0; line < style.LineCount; line++)
+                for (int option = 0; option < 16; option++)
+                {
+                    style.Choose(line, option);
+                    foreach (StyleRow row in style.Rows.Where(r => r.root.activeInHierarchy))
+                    {
+                        Check(row.label, 1, problems);
+                        Check(row.value, 1, problems);
+                        var value = row.value.GetComponent<SuperTextMesh>();
+                        if (!row.value.isActiveAndEnabled || string.IsNullOrEmpty(value.text)) continue;
+                        float right = row.buttons.Where(b => b.gameObject.activeSelf)
+                            .Select(b => ((RectTransform)b.transform).TransformPoint(new Vector3(((RectTransform)b.transform).rect.xMax, 0f)).x)
+                            .DefaultIfEmpty(float.MinValue).Max();
+                        float gap = (value.finalTopLeftTextBounds.x - right) / row.value.transform.lossyScale.x;
+                        if (gap < 1f) problems.Add($"{d.id}: \"{value.text}\" runs into the swatches ({gap:0.#} px)");
+                        float edge = ((RectTransform)row.root.transform).TransformPoint(new Vector3(((RectTransform)row.root.transform).rect.xMax, 0f)).x;
+                        if (value.finalBottomRightTextBounds.x > edge + 0.01f) problems.Add($"{d.id}: \"{value.text}\" runs past the row");
+                    }
+                }
+                style.Close();
+                Mode.PutBack();
+                yield return null;
+            }
+            Assert.That(checkedPieces, Is.GreaterThan(50), "the pieces with looks were checked");
+            Assert.That(problems.Distinct(), Is.Empty);
+        }
+
         static void Check(LocalizedSuperText label, int lines, System.Collections.Generic.List<string> problems)
         {
             if (label == null || !label.isActiveAndEnabled) return;

@@ -302,10 +302,11 @@ namespace Hearthdelve.Editor
                 Art("Bottles", Tavern("props2", "ShelfGoods"), new Vector2(0.75f, 0.125f), SortingLayers.Floor, 4));
             yield return Wall("wall_sign", FurnitureCategory.WallDecor, new Vector2Int(2, 1),
                 Art("Sign", Tavern("props", "Sign"), new Vector2(0f, 0.25f), SortingLayers.Floor, 3));
-            // The low shelf has a surface: the row of glasses stands on it (D4), moves with it, and can go on another shelf.
+            // The low shelf has a surface inside it: the row of glasses stands in the shelf (D4), moves with it, and can go on
+            // another shelf. The anchor is the shelf's inner floor, so whatever stands there sits in the opening, not on top.
             FurnitureDefinition lowShelf = Wall("low_shelf", FurnitureCategory.BarAndStorage, new Vector2Int(2, 1),
                 Art("Shelf", Tavern("props", "ShelfLow"), new Vector2(0.5f, 0.75f), SortingLayers.Floor, 3));
-            lowShelf.facings[0].surfaces.Add(new Vector2(0.75f, 1.5f));
+            lowShelf.facings[0].surfaces.Add(new Vector2(0.75f, 1f));
             yield return lowShelf;
             yield return Define("shelf_glasses", "furniture.shelf_glasses", FurnitureCategory.BarAndStorage, d =>
             {
