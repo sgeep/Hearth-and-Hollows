@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (the UI foundation pass, typography: done, awaiting your review; 4f Checkpoint D done and awaiting your sign-off; Checkpoints A–C approved). Next, after review: 4g (story, quests and character creation), then 4h (village and daytime slice), then 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (**4f complete: approved and signed off 2026-10-06**, including the UI foundation pass and the names change. 4g planning under way; nothing of 4g is built). Next: 4g (story, quests, character creation and relationship reactivity), then 4h (village and daytime slice), then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -996,7 +996,7 @@ Steps 7–9 as one package. The question: delve → bring strange things home �
 
 **Checkpoint C: approved (2026-10-06).** Final calls from its playtest: Gunta stays off duty by default; one clean trophy-sized patch of back wall in the starting layout; curio frequency and the Butcher Block's feel unchanged.
 
-### 4f Checkpoint D: special requests, the balance pass, integration and the 4f sign-off package (2026-10-06, done; awaiting your sign-off)
+### 4f Checkpoint D: special requests, the balance pass, integration and the 4f sign-off package (2026-10-06, done; approved with 4f)
 
 Step 10, the last checkpoint of 4f. Commits `688df57`, `4ffdc7f` and the fixes and docs after them.
 
@@ -1062,9 +1062,9 @@ Step 10, the last checkpoint of 4f. Commits `688df57`, `4ffdc7f` and the fixes a
 - The oversized lanterns (subjective), the patrons' "!" not aimed at the tusks, and no sitting or eating poses for Gunta and Pip remain, as agreed.
 - The three unrelated files that had been in `Assets/_Project/Fonts/silver/` were no longer there when this checkpoint began (removed or moved outside this work); nothing of theirs was touched or committed.
 
-**4f is waiting for your sign-off.**
+**4f signed off 2026-10-06** (see "4f complete" below).
 
-### UI foundation pass: a type scale for Silver (2026-10-06, done; awaiting your review)
+### UI foundation pass: a type scale for Silver (2026-10-06, done; approved with 4f)
 
 Before 4g, at your request: a typography hierarchy with the one font, applied conservatively.
 
@@ -1116,7 +1116,23 @@ Secondary and Prompt share Body's metrics; they're named roles so every text say
 - **Safe ground:** Essence doesn't drain in the rope room or the hole room (`FloorNode.PausesEssenceDrain`); damage still applies, and walking between rooms already cost nothing. GDD Decided 36.
 - **Tests:** EditMode 565/565, PlayMode 204 passed, 0 failed, plus 18 explicit captures (new: every generated rope and hole room pauses the drain and no other kind does; Essence drains in an ordinary room and holds at the hole down; the cook drawn from the Goblin Sapper's sheets; the curio line says "found for Tally Ho!").
 
-**Waiting for your review before 4g.**
+### 4f complete (approved and signed off 2026-10-06)
+
+4f, Tavern Stage 1 content and the customization foundation, is complete: Checkpoints A–D, the UI foundation pass (the type scale), and the names change (Tally Ho!, Kariaston, Boog) with safe ground in the Hollows. No further 4f feature work; only fixes for regressions found later.
+
+- **Final commit:** `64ddf4d` (Tally Ho!, Kariaston and Boog; no Essence drain at the rope and the hole), on `origin/main`.
+- **Final tests:** EditMode 565/565; PlayMode 204 passed, 0 failed, plus 18 explicit capture fixtures (222 in all).
+- **Web:** the final build (`64ddf4d`) compiles and builds; the last full browser check was the type pass (`4958c28`, 1280×720, no console errors or warnings), which followed the full Checkpoint D smoke test (v6 migration, Continue, market, Prep, Butcher Block by hand and by the cook, a met special request, service, Results, Night, a delve and extraction, decorating, the guest room, reloads).
+- **Save version:** 7.
+- **Known issues carried forward:**
+  - `EveningEstimate` is a comparison tool, not a simulation.
+  - At a very low frame rate (a background browser tab), long staff walks lean on the 8 s step-to; enemies share the pathfinding action and weren't reviewed for the same overshoot.
+  - Accented capitals and CJK glyphs are 11–12 px tall on a 12-px line and touch the line above (a 14-px line in the type scale when such a locale arrives).
+  - The tavern HUD's gold fits four digits at 2×.
+  - The market's "not enough gold." sits close to its panel's edge.
+  - The oversized lanterns (subjective), the patrons' "!" not aimed at the tusks, no sitting or eating poses for Boog and Pip.
+  - Code identifiers keep the old names (`gunta`, `brackenford_ale`, `Supply_BrackenfordMarket`, `Gunta.prefab`); comments still say Gunta in places.
+- **Milestone tag:** proposed with the 4g plan; created once its name is approved.
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
