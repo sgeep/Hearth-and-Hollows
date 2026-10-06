@@ -7,6 +7,7 @@ using Hearthdelve.Dungeon.Essence;
 using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Dungeon.Rooms;
 using Hearthdelve.Shared.Ingredients;
+using Hearthdelve.Shared.Inventory;
 using MoreMountains.TopDownEngine;
 using NUnit.Framework;
 using UnityEngine;
@@ -50,10 +51,14 @@ namespace Hearthdelve.Tests.PlayMode
             FreezeEnemies();
         }
 
-        /// <summary>A slime beside the player, at <paramref name="health"/>, just hit.</summary>
+        /// <summary>
+        /// A slime a tile below the player (in the finisher's reach), at <paramref name="health"/>, just hit. Below, because parts
+        /// land in the half circle in front of (below) the body: beside the player, a part could land on them and be picked up
+        /// before the test looks (the intermittent 4g Checkpoint B failure); below, every landing spot is out of reach.
+        /// </summary>
         GameObject LowSlime(float health)
         {
-            GameObject slime = Object.Instantiate(Runner.Settings.slime, (Vector2)Player.transform.position + new Vector2(1f, 0f), Quaternion.identity);
+            GameObject slime = Object.Instantiate(Runner.Settings.slime, (Vector2)Player.transform.position + new Vector2(0f, -1f), Quaternion.identity);
             slime.GetComponent<MoreMountains.Tools.AIBrain>().BrainActive = false;
             slime.GetComponent<Health>().SetHealth(health);
             slime.GetComponent<HitReaction>().ReceiveHit(new HitContext(null, null, false, Player.transform.position));
@@ -62,29 +67,61 @@ namespace Hearthdelve.Tests.PlayMode
 
         static IngredientPickup[] Drops() => Object.FindObjectsByType<IngredientPickup>();
 
+        /// <summary>The harvest's rolls, played back in order (then the last again); counts are their minimum.</summary>
+        sealed class ScriptedRandom : Hearthdelve.Core.Random.IRandom
+        {
+            readonly float[] m_Values;
+            int m_Next;
+            public ScriptedRandom(params float[] values) => m_Values = values;
+            public float Value() => m_Values[System.Math.Min(m_Next++, m_Values.Length - 1)];
+            public int Range(int minInclusive, int maxInclusive) => minInclusive;
+        }
+
+        /// <summary>
+        /// The harvest's extremes (parts kept or not, the landing angle and reach at their limits), and a fixed seed, so the test
+        /// covers every way the parts can fall instead of one unrepeatable roll. The order of rolls: the core's chance, the second
+        /// part's chance, then each landed part's angle and reach.
+        /// </summary>
+        static (string name, Hearthdelve.Core.Random.IRandom random)[] Rolls() => new (string, Hearthdelve.Core.Random.IRandom)[]
+        {
+            ("one part, nearest angle and reach", new ScriptedRandom(0f, 0.9f, 0f, 0f)),
+            ("one part, farthest angle and reach", new ScriptedRandom(0f, 0.9f, 0.999f, 0.999f)),
+            ("two parts, nearest reach", new ScriptedRandom(0f, 0f, 0f, 0f, 0.999f, 0f)),
+            ("two parts, farthest reach", new ScriptedRandom(0f, 0f, 0f, 0.999f, 0.999f, 0.999f)),
+            ("a seeded harvest", new Hearthdelve.Core.Random.SeededRandom(20261006)),
+        };
+
         [UnityTest]
         public IEnumerator ALowFreshlyHitEnemy_CanBeFinished_ForPremiumParts()
         {
             yield return Fighting();
             Teleport(Player, (Vector2)Runner.Current.transform.position + new Vector2(8f, 6f));
             yield return null;
-            GameObject slime = LowSlime(8f);
-            var target = slime.GetComponent<FinisherTarget>();
-            yield return null;
-            Assert.That(target.IsEligible, "low and freshly hit");
-            Assert.That(slime.transform.Find("FinisherPrompt").gameObject.activeSelf, "the drumstick says so");
-            Assert.That(Finisher.TryFinish(), "the finisher starts");
-            yield return null;
-            Assert.That(Finisher.IsFinishing, "committed");
-            Assert.That(Player.GetComponent<CharacterDash2D>().AbilityPermitted, Is.False, "no dodging out of it");
-            yield return WaitUntil(() => slime == null || slime.GetComponent<Health>().CurrentHealth <= 0f, 2f, "the blow");
-            Assert.That(target.FinishingBlow);
-            yield return WaitUntil(() => !Finisher.IsFinishing, 2f, "the finisher to end");
-            Assert.That(Player.GetComponent<CharacterDash2D>().AbilityPermitted, "free again");
-            yield return new WaitForSeconds(0.6f);
-            IngredientPickup[] parts = Drops();
-            Assert.That(parts, Is.Not.Empty, "the slime's parts");
-            Assert.That(parts.All(p => p.Item.Quality == Quality.Premium), "a finisher's harvest is Premium");
+            Satchel satchel = Player.GetComponent<SatchelCarrier>().Satchel;
+            foreach ((string name, Hearthdelve.Core.Random.IRandom random) in Rolls())
+            {
+                HarvestSystem.Instance.SetRandom(random);
+                GameObject slime = LowSlime(8f);
+                var target = slime.GetComponent<FinisherTarget>();
+                yield return null;
+                Assert.That(target.IsEligible, $"{name}: low and freshly hit");
+                Assert.That(slime.transform.Find("FinisherPrompt").gameObject.activeSelf, $"{name}: the drumstick says so");
+                Assert.That(Finisher.TryFinish(), $"{name}: the finisher starts");
+                yield return null;
+                Assert.That(Finisher.IsFinishing, $"{name}: committed");
+                Assert.That(Player.GetComponent<CharacterDash2D>().AbilityPermitted, Is.False, $"{name}: no dodging out of it");
+                yield return WaitUntil(() => slime == null || slime.GetComponent<Health>().CurrentHealth <= 0f, 2f, "the blow");
+                Assert.That(target.FinishingBlow, name);
+                yield return WaitUntil(() => !Finisher.IsFinishing, 2f, "the finisher to end");
+                Assert.That(Player.GetComponent<CharacterDash2D>().AbilityPermitted, $"{name}: free again");
+                yield return new WaitForSeconds(0.6f);
+                IngredientPickup[] parts = Drops();
+                Assert.That(parts, Is.Not.Empty, $"{name}: the slime's parts");
+                Assert.That(parts.All(p => p.Item.Quality == Quality.Premium), $"{name}: a finisher's harvest is Premium");
+                Assert.That(satchel.Slots.All(slot => slot.IsEmpty), $"{name}: none landed on the keeper");
+                foreach (IngredientPickup part in parts) Object.Destroy(part.gameObject);
+                yield return null;
+            }
         }
 
         [UnityTest]
