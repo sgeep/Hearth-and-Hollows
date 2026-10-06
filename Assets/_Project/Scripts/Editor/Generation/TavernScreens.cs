@@ -638,27 +638,30 @@ namespace Hearthdelve.Editor
 
         // ------------------------------------------------------------------ Results
 
+        /// <summary>The results' lines sit 11 px apart (one less than a text line: eight of them fit the screen with the takings).</summary>
+        const float k_ResultPitch = 11f;
+
         static void BuildResults(Canvas canvas)
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Results");
-            // Eight lines since 4f Checkpoint D (special requests): 24 taller, the lines start 12 higher.
-            RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 196f), Vector2.zero);
+            // Eight lines since 4f Checkpoint D (special requests), packed into nearly the whole screen's height.
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 178f), Vector2.zero);
             DungeonUI.Title(panel, TavernLocKeys.ResultsTitle);
-            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, 75f, 224f);
+            LocalizedSuperText note = TextLine(panel, "Note", TavernLocKeys.ResultsClosedEarly, k_Note, TextAnchor.UpperCenter, 0f, 66f, 224f);
             var labels = new LocalizedSuperText[8];
             var lines = new LocalizedSuperText[8];
             for (int i = 0; i < lines.Length; i++)
             {
-                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, 62f - i * Line, 104f);
-                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, 62f - i * Line, 104f);
+                labels[i] = TextLine(panel, $"Label{i + 1}", TavernLocKeys.ResultsServed, k_Label, TextAnchor.UpperRight, -4f, 54f - i * k_ResultPitch, 104f);
+                lines[i] = TextLine(panel, $"Line{i + 1}", TavernLocKeys.Plain, k_Ink, TextAnchor.UpperLeft, 4f, 54f - i * k_ResultPitch, 104f);
             }
             // The takings, set apart under a rule.
             RectTransform takingsRow = Rect(panel, "TakingsRow", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(224f, 172f));
-            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -36f), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
-            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, -38f, 104f);
-            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, -38f, 104f);
+            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -37f), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
+            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, -39f, 104f);
+            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, -39f, 104f);
             // Pip keeps the books (4f Checkpoint C): the takings come from Pip's ledger.
-            RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -55f), new Vector2(104f, 10f));
+            RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -56f), new Vector2(104f, 10f));
             DungeonUI.AddImage(Rect(ledger, "Book", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Book"), Color.white);
             Label(ledger, "Text", TavernLocKeys.ResultsLedger, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(120f, Line));

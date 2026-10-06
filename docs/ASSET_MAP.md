@@ -317,6 +317,8 @@ Minifantasy has no dressed halfling, cook or apron layer; these are recolours, n
 - Dish icons: Brackenford ale is Miscellany's full tankard (0,64); onion broth (56,64), eggs on toast (16,56), crispy bat wings (128,16), spider-leg steaks (112,16) and the bat-wing platter (120,16) from `DishIcons`.
 - UI Overhaul: Icons chest (496,24) for curios, book (416,24) for Pip's ledger; Emotions (16 px grid, centre (16c+8, 16r+8)) heart (104,88), happy (8,8), surprised (40,56), content (72,72), frown (88,24), sweat (24,88) for staff and patron beats.
 
+**Special requests (Checkpoint D):** UI Overhaul Icons' sparkle (488,40) on the patron's bubble and the order rail; the met and missed faces are the Emotions heart and frown already imported.
+
 **Sound:** all placeholders (`PH_Discovery`, `PH_Homecoming`, `PH_KnifeIn`, `PH_Cleave`, `PH_ChopRagged`, `PH_ButcherDone`).
 
 **Gaps:** no sitting or eating pose for Gunta and Pip; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.

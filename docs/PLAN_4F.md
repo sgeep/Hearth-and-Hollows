@@ -1,5 +1,7 @@
 # 4f plan: Tavern Stage 1 content and the customization foundation
 
+> **Historical record.** This is the plan as approved on 2026-10-05, kept unchanged apart from status notes. 4f was built in four checkpoints (A–D, finished 2026-10-06); what was actually built, the tuning and every deviation from this plan are in `docs/PROGRESS.md` (Phase 4, 4f), and the decisions that outlive 4f are in `CLAUDE.md` and `docs/GDD.md` (Decided 26–34).
+
 _Proposed and **approved 2026-10-05**, with the decisions in §22 locked (D2 and D20 changed by you, D22 chosen). Work proceeds in four checkpoints (§20); `docs/PROGRESS.md` records progress._
 
 **The experience 4f targets:** *"This is my tavern. I chose how it looks, I earned the strange things inside it, and the room itself tells the story of what I've done"* (GDD §6.6). Around that sits a richer evening: a menu that mixes everyday food from the market with strange food from the Hollows, a butcher's block that turns a good monster part into several portions, a cook and a server who feel like people, and patrons who sometimes want something particular.

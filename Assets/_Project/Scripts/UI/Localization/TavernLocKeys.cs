@@ -128,7 +128,7 @@ namespace Hearthdelve.UI.Localization
             (PrepDetail, "{0}, {1}"),
             (PrepNone, "not in stock"),
             (PrepValue, "{0} gold"),
-            (PrepValueStew, "{0} gold/bowl"),
+            (PrepValueStew, "{0} gold"),
             (PrepThen, "{0}, {1}"),
             (StepChop, "chop"),
             (StepSimmer, "simmer"),

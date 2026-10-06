@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-05 (4f Checkpoint C, steps 7–9: done, awaiting your playtest; Checkpoints A and B approved)_
+_Last updated: 2026-10-06 (4f Checkpoint D, step 10: done; 4f awaiting your final sign-off; Checkpoints A–C approved). Next, after sign-off: 4g (story, quests and character creation), then 4h (village and daytime slice), then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -994,7 +994,71 @@ Steps 7–9 as one package. The question: delve → bring strange things home �
 - The starting tavern's back wall is nearly full: the tusks fit in one gap, above the kitchen range, and the range's chimney draws over their lower half. Moving a shelf or the sign makes room; whether the starting wall should leave a trophy spot is a call for your playtest.
 - Three files in `Assets/_Project/Fonts/silver/` (a field-guide HTML page, an image and a scanned PDF) aren't part of this work and are left uncommitted.
 
-**Checkpoint C is waiting for your playtest.**
+**Checkpoint C: approved (2026-10-06).** Final calls from its playtest: Gunta stays off duty by default; one clean trophy-sized patch of back wall in the starting layout; curio frequency and the Butcher Block's feel unchanged.
+
+### 4f Checkpoint D: special requests, the balance pass, integration and the 4f sign-off package (2026-10-06, done; awaiting your sign-off)
+
+Step 10, the last checkpoint of 4f. Commits `688df57`, `4ffdc7f` and the fixes and docs after them.
+
+**Special customer requests (D1).**
+- Now and then a patron's order is one they particularly want tonight. It is the same order through the ordinary service loop (no second minigame, not a quest): when a patron orders, the service may mark the order a request (`CustomerRequestRules`, pure and seeded by the evening's random). Because it is decided at the moment of ordering, a request is only ever for a dish on today's menu that the stock can make right then (its ingredients are already set aside, or a stew helping promised); if the player later lets that dish sell out, the request can fail through their own choices.
+- **Tuning** (`ServiceConfig.requests`): chance 0.2 per order, at most 2 an evening, never the evening's first order. In a normal service that is about one or two (0–2), with some nights none.
+- **Met:** a thank-you of half the dish's value (at least 2 gold), added to the tips, and +1 Renown; a heart over the patron. **Missed** (walked out, sold out, closing time): a frown, nothing taken away.
+- **Readable at 320×180:** a sparkle on the patron's bubble beside the dish and on the order rail; the results show "special requests 1 of 2" (met of made) when there were any.
+- **Facts for 4g:** `CustomerRequestIssued`, `CustomerRequestCompleted` (quality, gold and Renown given), `CustomerRequestFailed` (reason `walked_out`, `sold_out` or `closing_time`), each with the patron's profile id and a visit id that tells tonight's patrons apart (not saved).
+- Requests live only for the evening: a new service starts with none, and nothing about them is saved.
+
+**The balance pass (D2).** Measured with a new tool, `BalanceReport` (*Hearthdelve → Balance → Evening Report*, or `-executeMethod Hearthdelve.Editor.BalanceReport.RunBatch`; writes `BatchLogs/balance.md`), which runs representative evenings through the game's own recipe matching and scoring (`EveningEstimate`: about 11 patrons a night, played weakly, competently or strongly; parts from below cost nothing, their price is the delve).
+
+| Evening | Profit before | Profit after | Renown before | Renown after |
+|---|---:|---:|---:|---:|
+| market only, weak | −7 | +2 | 0 | −1 |
+| market only, competent | (new) | +26 | | +7 |
+| market only, strong | +28 | +43 | +12 | +13 |
+| recovery after a death (a Lockbox stack of legs) | +25 | +41 | +1 | +7 |
+| ordinary Cellars delve, competent | +63 | +63 | +1 | +6 |
+| the same, Gunta on the grill | (+46, at a guessed score) | +50 | +1 | +5 |
+| strong Cellars delve | +128 | +133 | +13 | +15 |
+| signature night (butchered cuts, a core) | +261 | +208 | +11 | +13 |
+
+- **What changed and why:**
+  - **Renown adds up over the evening** and the total is rounded (it was rounded per patron, so anything short of strong play earned nothing); neutral satisfaction 0.5 → 0.45. Competent nights now earn about 6, strong ones about 15.
+  - **Market:** bread 3 → 2 and eggs 3 → 2 gold; **eggs on toast** 7 → 9 (it cost more than it sold for). A weak market night now breaks even instead of losing money; at the same skill a delve night earns about 2.4× a market night (63 against 26), a strong one about 3× (133 against 43).
+  - **Signature dishes:** spider-leg steaks 26 → 22 (and renamed "spider steaks" on screen: the full name ran into its price), bat-wing platter 28 → 26 and four wing cuts instead of three. A clean cut was turning a 6-gold bat wing into 28.
+  - **Gunta's cap** 0.85 → 0.75. Measured, she reached her cap at every station, which beat a competent keeper (0.82): handing her the grill was simply better. At 0.75 she costs about a fifth of a competent night's profit (50 against 63) and never cooks badly. Pip is unchanged (0.85 cap, serving).
+  - **The strange and the grand (tier 3, Renown 100)** priced as aspirational: from 15–200 (median 55) to 25–300 (median 85), e.g. the stone fireplace 200 → 300, the haunted sofa 85 → 130. Tiers 0–2 unchanged.
+- **Kept:** the Renown tiers (0, 25, 60, 100: a strong player reaches the last in about a week of nights, a competent one in two or three), curio frequency (0.3, 4%, 2 a delve, ×3), the Butcher Block's feel and thresholds, Gunta off duty by default.
+- **The Butcher Block's value per part (gold of dishes):** spider leg 13 whole; 11, 22, 33 at a weak, fair and clean cut. Bat wing 6 whole; 6.5, 13, 19.5.
+- **Furniture against earnings:** a median tier-0 piece (20) is a third of a competent night; a median tier-2 piece (55) about one night; the dearest piece (300) two strong nights or five competent ones, before any upgrades.
+
+**Integration (D3).** A new PlayMode test plays three days from a new game: the first delve brings a curio and a haul home; at night an upgrade is bought and a barrel moved; day 2 buys staples at the market, cuts a spider leg at the Butcher Block, puts Gunta on the grill and Pip on the plates, and a special request is met between them; the takings (the thanks among them) are banked; the second delve finds a curio and dies, losing it; day 3, then Continue twice, with every piece of furniture, the gold, Renown, storeroom and the rearranged room exactly as they were, and nothing granted again. Existing tests cover the rest: v6 and v5 migrations, a v7 save continued, extraction and death, the troll's first clear and the trophy, a service in a refurnished tavern, the guest room and its stairs.
+
+**Polish (D4).**
+- **A clean trophy spot:** the wall sign moves from (11,15) to (17,15), right of the fireplace, opening a clear stretch between the bottle shelves and the fireplace; the homecoming now prefers a spot whose drawing nothing covers, then the one nearest the middle (so older layouts avoid the range's chimney where they can). Old saves keep their own layouts.
+- Prep: stew prices read "9 gold" (no "/bowl"), and the card test now wants three pixels between a name and its price.
+- The results panel fits eight lines (special requests) on screen: 178 px tall, lines 11 px apart.
+
+**Facts for 4g (D6).** Besides Checkpoint C's (`CurioBroughtHome`, `FurniturePlaced`, `TrophyDisplayed`, `MarketPurchase`, `PartButchered`, `StaffWorkDone`) and 4e's `BossFirstCleared`: `CustomerRequestIssued`, `CustomerRequestCompleted`, `CustomerRequestFailed`, `DishServed` (dish, patron, quality, gold, tip, whether it was a request), `ServiceCompleted` (day, dishes, gold, tips, Renown, walkouts, requests met and missed) and `BossDefeated` (every defeat, whether the delve came home). All in `Shared/Game/GameFacts.cs`, stable ids only; nothing listens yet.
+
+**Saves (D5).** Still version 7: requests are evening-only and the tuning lives in assets, so nothing new is saved.
+
+**Tests:** EditMode 552/552 (new: `CustomerRequestTests`, `RenownAndBalanceTests`, and the trophy-spot wall check). PlayMode 195 passed, 0 failed, plus 16 explicit captures (new: `CheckpointDTests`, `CheckpointDDayLoopTests`).
+
+**Captures** (`CheckpointDCaptures`, explicit; `BatchLogs/checkpointD/`): Prep's menu, the tusks' first spot, a request in service, met and missed, the results with requests, Night, the catalog, the guest room, the market. Checkpoint C's captures were rerun as a regression check.
+
+**Web:** @@WEB@@
+
+**Deviations from the request:**
+- The tier-3 furniture price rise and Gunta's lower cap are the two tuning changes beyond the menu and Renown; both are explained above.
+- "spider-leg steaks" became "spider steaks" on screen (the id is unchanged), so its name clears its price at 320×180.
+- A request missed at closing time frowns behind the results panel (a walkout's frown during service is visible).
+
+**Known issues (end of 4f):**
+- `EveningEstimate` is a comparison tool, not a simulation: no walking, queues or walkouts, an average patron, and a fixed play style per evening.
+- The oversized lanterns (subjective), the patrons' "!" not aimed at the tusks, and no sitting or eating poses for Gunta and Pip remain, as agreed.
+- The three unrelated files that had been in `Assets/_Project/Fonts/silver/` were no longer there when this checkpoint began (removed or moved outside this work); nothing of theirs was touched or committed.
+
+**4f is waiting for your sign-off.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 

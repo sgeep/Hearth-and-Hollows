@@ -232,7 +232,7 @@ namespace Hearthdelve.Tests.PlayMode
             mode.Leave();
         }
 
-        /// <summary>Every dish's card, on every page: one line each, and two pixels of daylight between name and price.</summary>
+        /// <summary>Every dish's card, on every page: one line each, and three pixels of daylight between name and price.</summary>
         [UnityTest]
         public IEnumerator EveryDishCard_NameClearsItsPrice_AndNothingWraps()
         {
@@ -248,8 +248,8 @@ namespace Hearthdelve.Tests.PlayMode
                     foreach (var label in new[] { card.name, card.detail, card.amount, card.steps })
                         if (label.isActiveAndEnabled && Lines(label) > 1) problems.Add($"{name}: \"{label.GetComponent<SuperTextMesh>().text}\" wraps");
                     float top = Gap(card.name, card.detail), bottom = Gap(card.amount, card.steps);
-                    if (top < 2f) problems.Add($"\"{name}\" runs into \"{card.detail.GetComponent<SuperTextMesh>().text}\" ({top:0.#} px)");
-                    if (bottom < 2f) problems.Add($"{name}: \"{card.amount.GetComponent<SuperTextMesh>().text}\" runs into \"{card.steps.GetComponent<SuperTextMesh>().text}\" ({bottom:0.#} px)");
+                    if (top < 3f) problems.Add($"\"{name}\" runs into \"{card.detail.GetComponent<SuperTextMesh>().text}\" ({top:0.#} px)");
+                    if (bottom < 3f) problems.Add($"{name}: \"{card.amount.GetComponent<SuperTextMesh>().text}\" runs into \"{card.steps.GetComponent<SuperTextMesh>().text}\" ({bottom:0.#} px)");
                 }
                 prep.NextPage();
             }
