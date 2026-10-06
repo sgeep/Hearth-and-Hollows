@@ -41,7 +41,7 @@ namespace Hearthdelve.Tavern.Scene
         Simmering,
         /// <summary>"E: 3 helpings left".</summary>
         StewReady,
-        /// <summary>"Pip is working here".</summary>
+        /// <summary>"Orik is working here".</summary>
         Staffed,
         /// <summary>"E: talk to Boog" (4g).</summary>
         Talk,

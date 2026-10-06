@@ -59,7 +59,7 @@ namespace Hearthdelve.Editor
         /// Applies builder changes to the existing tavern scene in place, without rebuilding it (D23):
         /// the camera's resting point; the furniture as data (4f step 1: the old scene pieces, seats and
         /// their lights are removed, and the area with its furniture builder is added once); the service
-        /// (the door, the queue, Pip, the keeper's work) and Decorate Mode, rebuilt each time; the UI. Idempotent: running
+        /// (the door, the queue, Orik, the keeper's work) and Decorate Mode, rebuilt each time; the UI. Idempotent: running
         /// it again changes nothing it made, adds nothing twice, and leaves the rest of the scene alone.
         /// </summary>
         [MenuItem("Hearthdelve/Generate/Update Tavern", priority = 3)]
@@ -233,7 +233,7 @@ namespace Hearthdelve.Editor
 
         /// <summary>
         /// The evening: the door, the queue (inside the door, running west along the front wall), where staff
-        /// rest, the director that runs the service, Pip, the keeper's work and the debug keys. Seats and staff
+        /// rest, the director that runs the service, Orik, the keeper's work and the debug keys. Seats and staff
         /// posts come from the placed furniture at runtime (4f step 1). Replaces any it had.
         /// </summary>
         static void AddService(NpcContent.Built npcs)
@@ -270,7 +270,7 @@ namespace Hearthdelve.Editor
             // The keeper's stations, pass and seats are handed over by the area's furniture as it builds.
             root.gameObject.AddComponent<KeeperWork>();
 
-            // Pip from an earlier run of this updater.
+            // Orik from an earlier run of this updater.
             foreach (StaffAgent extra in Object.FindObjectsByType<StaffAgent>(FindObjectsInactive.Include))
                 if (extra.gameObject != pip && extra.gameObject != gunta) Object.DestroyImmediate(extra.gameObject);
         }

@@ -31,7 +31,7 @@ namespace Hearthdelve.UI.Tavern
 
     /// <summary>
     /// Evening Prep (GDD §3.1): what's in the storeroom, the dishes it can make (each as a card with its
-    /// value, how many there are and how it's prepared), choosing up to three for tonight, Pip's job, and
+    /// value, how many there are and how it's prepared), choosing up to three for tonight, Orik's job, and
     /// opening the doors or closing for the night. Shown over the room; the room stays in view around it.
     /// </summary>
     public sealed class PrepScreen : MonoBehaviour

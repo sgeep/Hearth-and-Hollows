@@ -105,7 +105,7 @@ namespace Hearthdelve.Editor
 
         /// <summary>
         /// Batch entry point (run without -nographics): the tavern with customers on six seats and two in
-        /// the queue (looks from fixed seeds), and Pip at the serving post, to judge readability at 320×180.
+        /// the queue (looks from fixed seeds), and Orik at the serving post, to judge readability at 320×180.
         /// </summary>
         public static void CaptureTavernCustomersBatch()
         {

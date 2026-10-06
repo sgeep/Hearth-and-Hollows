@@ -51,7 +51,7 @@ namespace Hearthdelve.Editor
             ("customer.villager", "villager"),
             ("customer.adventurer", "adventurer"),
             ("customer.dwarf", "dwarf"),
-            ("staff.pip", "Pip"),
+            ("staff.pip", "Orik"),
             // 4f Checkpoint C: surface staples from the Kariaston market, butchered cuts, the Biome 1 menu, Boog (id gunta).
             ("ingredient.onion", "onions"),
             ("ingredient.herbs", "herbs"),

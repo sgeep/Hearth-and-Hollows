@@ -24,7 +24,7 @@ namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
     /// 4f Checkpoint D in the tavern scene: special requests through a real service (met, missed, the results, a clean
-    /// next evening), alongside Gunta and Pip; the trophy's clean spot; and the Prep cards' text fitting at 320×180.
+    /// next evening), alongside Gunta and Orik; the trophy's clean spot; and the Prep cards' text fitting at 320×180.
     /// </summary>
     public class CheckpointDTests : LookTestFixture
     {
@@ -200,7 +200,7 @@ namespace Hearthdelve.Tests.PlayMode
             EventBus<CustomerRequestCompleted>.Subscribe(Met);
             CustomerAgent patron = Patron();
             Time.timeScale = 4f;
-            yield return WaitUntil(() => met, 60f, "Gunta to grill it and Pip to carry it");
+            yield return WaitUntil(() => met, 60f, "Gunta to grill it and Orik to carry it");
             Time.timeScale = 1f;
             EventBus<CustomerRequestCompleted>.Unsubscribe(Met);
             Assert.That(patron.Logic.RequestOutcome, Is.EqualTo(RequestOutcome.Completed));
@@ -255,7 +255,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         /// <summary>
         /// Staff and patrons arrive at a slow frame rate too (the 4f web check: in a background tab, at three frames a
-        /// second, Pip circled the pass for ever and never picked up a plate). A goal within one frame's travel counts as reached.
+        /// second, Orik circled the pass for ever and never picked up a plate). A goal within one frame's travel counts as reached.
         /// </summary>
         [UnityTest]
         public IEnumerator Pip_Serves_AtThreeFramesASecond()
@@ -272,7 +272,7 @@ namespace Hearthdelve.Tests.PlayMode
             for (int frame = 0; frame < 300 && served == 0; frame++) yield return null;
             Time.captureDeltaTime = 0f;
             EventBus<DishServed>.Unsubscribe(Served);
-            Assert.That(served, Is.EqualTo(1), "the patron walked in and sat, Gunta grilled it and Pip carried it");
+            Assert.That(served, Is.EqualTo(1), "the patron walked in and sat, Gunta grilled it and Orik carried it");
         }
 
         /// <summary>Every dish's card, on every page: one line each, and three pixels of daylight between name and price.</summary>

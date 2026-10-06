@@ -9,7 +9,7 @@ using UnityEngine.Localization;
 namespace Hearthdelve.Editor
 {
     /// <summary>
-    /// The tavern's staff (4f Checkpoint C): Pip Marrowby, server and bookkeeper, and Gunta Ashbelly, the cook (stable ids
+    /// The tavern's staff (4f Checkpoint C): Orik, server and bookkeeper, and Gunta Ashbelly, the cook (stable ids
     /// <c>pip</c>, <c>gunta</c>; canonical, never renamed). Gunta is made once (her tuning is kept); both are on the
     /// tavern's roster. Also the Butcher Block's tuning asset.
     /// </summary>
@@ -23,9 +23,9 @@ namespace Hearthdelve.Editor
         {
             var tavern = AssetDatabase.LoadAssetAtPath<TavernContent>(k_TavernContent);
             var pip = AssetDatabase.LoadAssetAtPath<StaffDefinition>($"{k_Staff}/Staff_Pip.asset");
-            if (pip != null && pip.id != StaffIds.Pip)
+            if (pip != null && pip.id != StaffIds.Orik)
             {
-                pip.id = StaffIds.Pip;
+                pip.id = StaffIds.Orik;
                 EditorUtility.SetDirty(pip);
             }
             // Gunta: a steady hand (she reaches her cap nearly every time), capped below a competent keeper's work (4f

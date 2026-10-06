@@ -16,7 +16,7 @@ using Object = UnityEngine.Object;
 namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
-    /// 4c step 4: one complete evening in the <c>Tavern</c> scene. Prep (the storeroom, choosing dishes, Pip's job,
+    /// 4c step 4: one complete evening in the <c>Tavern</c> scene. Prep (the storeroom, choosing dishes, Orik's job,
     /// opening or closing for the night), the service HUD (orders, clock, takings, the menu), service timing and an
     /// early sell-out, and Results (the evening's lines, then another evening).
     /// </summary>
@@ -98,7 +98,7 @@ namespace Hearthdelve.Tests.PlayMode
 
             StaffStation before = Director.StaffAssignment;
             Prep.StaffButton.onClick.Invoke();
-            Assert.That(Director.StaffAssignment, Is.Not.EqualTo(before), "Pip's job changes");
+            Assert.That(Director.StaffAssignment, Is.Not.EqualTo(before), "Orik's job changes");
             while (Director.StaffAssignment != StaffStation.Grill) Prep.StaffButton.onClick.Invoke();
 
             Assert.That(Prep.OpenButton.interactable);
@@ -108,7 +108,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Prep.IsShown, Is.False);
             Assert.That(Hud.IsShown, "the HUD during service");
             Assert.That(InputMaps.Find(InputMaps.Tavern, TavernActions.Move).enabled, "walking again");
-            Assert.That(Director.Staff.Assignment, Is.EqualTo(StaffStation.Grill), "Pip works the job chosen at prep");
+            Assert.That(Director.Staff.Assignment, Is.EqualTo(StaffStation.Grill), "Orik works the job chosen at prep");
         }
 
         [UnityTest]

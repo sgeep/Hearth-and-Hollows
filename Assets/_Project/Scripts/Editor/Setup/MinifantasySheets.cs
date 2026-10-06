@@ -118,7 +118,7 @@ namespace Hearthdelve.Editor
         public const string CraftingAndProfessions = "CraftingAndProfessions";
         /// <summary>Farm add-on icons (4f Checkpoint C): the market's eggs and malt.</summary>
         public const string FarmIcons = "FarmIcons";
-        /// <summary>Pip's look (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
+        /// <summary>Orik's look (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
         public const string Staff = "Staff";
         /// <summary>
         /// Dialogue portraits (4g): composed from the Portrait Generator's layers by Tools/portraits/compose.py, one strip per
@@ -245,9 +245,9 @@ namespace Hearthdelve.Editor
             foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
             {
                 sheets.Add(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}"));
-                // 4f Checkpoint C: Pip, a derived sheet in the same layout (idle and walk only). The cook is Boog now (the Goblin Sapper, below).
+                // 4f Checkpoint C: Orik, a derived sheet in the same layout (idle and walk only). The cook is Boog now (the Goblin Sapper, below).
                 if (anim is "Idle" or "Walk")
-                    foreach (string who in new[] { "Pip" })
+                    foreach (string who in new[] { "Orik" })
                         sheets.Add(Character($"derived:Tools/characters/derived/{who}{anim}.png", Staff, $"{who}{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
             }
@@ -317,7 +317,7 @@ namespace Hearthdelve.Editor
                 foreach (string variant in variants)
                     sheets.Add(Character(NpcSource(anim, category, folder, kind, variant), MyriadOfNPCs, NpcFile(anim, category, kind, variant)));
                 sheets.Add(Character($"{k_Npcs}/Shadows/Minifantasy_NPCsShadowHumanoid{anim}.png", MyriadOfNPCs, $"NpcShadow{anim}"));
-                // Pip's stand-in until 4f: the premade Butcher (apron, bright blonde hair).
+                // Orik's stand-in until 4f: the premade Butcher (apron, bright blonde hair).
                 sheets.Add(Character($"{k_Npcs}/Premade_NPCs/Butcher/Minifantasy_NPCsButcher{anim}.png", MyriadOfNPCs, $"Butcher{anim}"));
             }
             // Emotes for speech bubbles (8×8 faces on a 16 px grid): reading the menu, and walking out.
@@ -327,7 +327,7 @@ namespace Hearthdelve.Editor
                 Rects = new[]
                 {
                     new SheetRect("Thinking", 136, 88, 8, 8, k_Centre), new SheetRect("Angry", 72, 40, 8, 8, k_Centre),
-                    // 4f Checkpoint C: wordless reactions of patrons, Pip and Gunta (D18).
+                    // 4f Checkpoint C: wordless reactions of patrons, Orik and Gunta (D18).
                     new SheetRect("Heart", 104, 88, 8, 8, k_Centre), new SheetRect("Happy", 8, 8, 8, 8, k_Centre),
                     new SheetRect("Surprised", 40, 56, 8, 8, k_Centre), new SheetRect("Content", 72, 72, 8, 8, k_Centre),
                     new SheetRect("Frown", 88, 24, 8, 8, k_Centre), new SheetRect("Sweat", 24, 88, 8, 8, k_Centre),
@@ -522,7 +522,7 @@ namespace Hearthdelve.Editor
                     // 4f Checkpoint C: a curio room's door sign and the run's curio counter (the chest), and the wordless
                     // emotes of patrons and staff (the heart, the bead of sweat).
                     new SheetRect("Chest", 496, 24, 8, 8, k_Centre),
-                    // Pip's ledger on the evening's results.
+                    // Orik's ledger on the evening's results.
                     new SheetRect("Book", 416, 24, 8, 8, k_Centre),
                     new SheetRect("Heart", 472, 40, 8, 8, k_Centre),
                     new SheetRect("Droplet", 552, 40, 8, 8, k_Centre),

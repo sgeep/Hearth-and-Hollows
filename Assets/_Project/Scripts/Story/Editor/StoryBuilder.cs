@@ -24,7 +24,7 @@ namespace Hearthdelve.Story.Editor
     /// The story's content and its place in Boot (4g Checkpoint A), in one idempotent pass (<c>Hearthdelve → Story → Update Story
     /// Content</c>, or <see cref="UpdateBatch"/>):
     /// <list type="bullet">
-    /// <item>portraits from <c>Tools/portraits</c>, and a <see cref="CharacterDefinition"/> for the player, Boog and Pip (created once:
+    /// <item>portraits from <c>Tools/portraits</c>, and a <see cref="CharacterDefinition"/> for the player, Boog and Orik (created once:
     /// their values and starting feelings are then tuned on the asset), linked from the staff definitions;</item>
     /// <item>the deeds;</item>
     /// <item>the Love/Hate faction database, generated from the characters every run (never edit it by hand);</item>
@@ -140,7 +140,7 @@ namespace Hearthdelve.Story.Editor
             });
             Configure(boog, CharacterIds.Boog, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.gunta"), portraits, StoryDialogue.BoogTalk);
 
-            // Pip: looks after people and the books; the Hollows worry her.
+            // Orik: looks after people and the books; the Hollows worry him.
             CharacterDefinition pip = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_pip.asset", c =>
             {
                 c.values = new SocialTraits(40f, -30f, 80f);
@@ -149,7 +149,7 @@ namespace Hearthdelve.Story.Editor
                 c.affinityToTavern = 90f;
                 c.affinityToVillage = 50f;
             });
-            Configure(pip, CharacterIds.Pip, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.PipTalk);
+            Configure(pip, CharacterIds.Orik, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.OrikTalk);
             return new List<CharacterDefinition> { player, boog, pip };
         }
 
@@ -159,7 +159,8 @@ namespace Hearthdelve.Story.Editor
             c.kind = kind;
             c.displayName = name;
             c.portrait = portraits.TryGetValue(id, out PortraitDefinition p) ? p : null;
-            if (string.IsNullOrEmpty(c.conversation)) c.conversation = conversation;
+            // Empty, or the conversation's old title (Pip/Talk became Orik/Talk, 2026-10-06): the builder's own title.
+            if (string.IsNullOrEmpty(c.conversation) || c.conversation == "Pip/Talk") c.conversation = conversation;
             c.tracked = true;
             EditorUtility.SetDirty(c);
         }

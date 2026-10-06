@@ -561,7 +561,7 @@ namespace Hearthdelve.Editor
             // 4f: when the layout keeps the doors shut, the banner says why and offers Decorate Mode.
             Button decorate = SmallButton(banner, "Decorate", DecorateLocKeys.Button, new Vector2(1f, 0.5f), new Vector2(-3f, 0f), 60f, out _);
 
-            // The staff and the kitchen's tools: Pip's job, Gunta's job, the Butcher Block, the menu's next page.
+            // The staff and the kitchen's tools: Orik's job, Gunta's job, the Butcher Block, the menu's next page.
             // Each label two pixels clear of its button's one-pixel frame ("Gunta: off duty" is 83): 76, 90, 80 and 60 wide, -155 to 155.
             Button staff = SmallButton(panel, "Staff", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-117f, 28f), 76f, out LocalizedSuperText staffLabel);
             Button cook = SmallButton(panel, "Cook", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-33f, 28f), 90f, out LocalizedSuperText cookLabel);
@@ -684,7 +684,7 @@ namespace Hearthdelve.Editor
         {
             RectTransform root = DungeonUI.FullScreen(canvas, "Results");
             // Eight lines since 4f Checkpoint D (special requests), packed into nearly the whole screen's height.
-            // 178 tall: the heading, eight lines, the takings under a rule, Pip's ledger, and the button. A night's note (closed
+            // 178 tall: the heading, eight lines, the takings under a rule, Orik's ledger, and the button. A night's note (closed
             // early, stayed shut) goes in the row after its last line (EveningResultsScreen), or the ledger's row if all eight are used.
             RectTransform panel = DungeonUI.Panel(root, new Vector2(236f, 178f), Vector2.zero);
             DungeonUI.Title(panel, TavernLocKeys.ResultsTitle, style: TextStyle.Heading);
@@ -702,7 +702,7 @@ namespace Hearthdelve.Editor
             Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, rule), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
             TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, takingsTop, 104f, style: TextStyle.Secondary);
             LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, takingsTop, 104f);
-            // Pip keeps the books (4f Checkpoint C): the takings come from Pip's ledger.
+            // Orik keeps the books (4f Checkpoint C): the takings come from Orik's ledger.
             RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 1f), new Vector2(0f, ledgerTop), new Vector2(104f, Line));
             DungeonUI.AddImage(Rect(ledger, "Book", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Book"), Color.white);

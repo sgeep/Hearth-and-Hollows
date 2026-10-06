@@ -257,13 +257,13 @@ namespace Hearthdelve.Tests.PlayMode
             yield return UntilClosed();
             Assert.That(MenuPause.IsPaused, Is.False);
 
-            // The deed: the tusks go up. Boog and Pip learn of it at once, though neither is in Decorate Mode.
+            // The deed: the tusks go up. Boog and Orik learn of it at once, though neither is in Decorate Mode.
             yield return HangTheTusks();
             Assert.That(Social.Remembers("gunta", "displayed_trophy") && Social.Remembers("pip", "displayed_trophy"), "both remember");
             float boogAffinity = Social.Affinity("gunta"), boogRespect = Social.Respect("gunta"), pipAffinity = Social.Affinity("pip");
             Assert.That(boogAffinity, Is.GreaterThan(10f), "Boog likes the keeper more (Love/Hate's evaluation)");
             Assert.That(boogRespect, Is.EqualTo(13.5f).Within(0.01f), "and respects them: 15 × the nerve match (0.9)");
-            Assert.That(pipAffinity, Is.GreaterThan(20f), "Pip likes it too");
+            Assert.That(pipAffinity, Is.GreaterThan(20f), "Orik likes it too");
             Assert.That(Social.Respect("pip"), Is.EqualTo(5f).Within(0.01f), "but isn't impressed by monster parts");
             yield return WaitUntil(() => Host.Quests.State("proof_trophy_wall") == "successful", 2f, "the quest done by the same fact");
             DecorateMode.Instance.Leave();
@@ -342,11 +342,11 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
             string[] before = InputMaps.Snapshot();
 
-            // Pip, by name: the keeper's name comes from the save, through the dialogue's markup.
-            yield return Talk(CharacterIds.Pip);
+            // Orik, by name: the keeper's name comes from the save, through the dialogue's markup.
+            yield return Talk(CharacterIds.Orik);
             Assert.That(Time.timeScale, Is.Zero, "the world waits");
             Assert.That(InputMaps.Snapshot(), Is.EqualTo(new[] { InputMaps.UI }), "only the UI map while talking");
-            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Pip", "good evening, Bram. the ledger and i are on speaking terms again.")));
+            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "good evening, Bram. the ledger and i are on speaking terms again.")));
             var portrait = Object.FindObjectsByType<UnityEngine.UI.Image>().Single(i => i.name == "Portrait");
             Assert.That(portrait.gameObject.activeInHierarchy, "her portrait");
             Assert.That(Host.Characters.Definition("pip").portrait.talking, Does.Contain(portrait.sprite), "talking while the line is revealed");
@@ -381,7 +381,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return UntilClosed();
 
             // Gamepad A moves on as well.
-            yield return Talk(CharacterIds.Pip);
+            yield return Talk(CharacterIds.Orik);
             yield return PressPad(GamepadButton.South);
             yield return PressPad(GamepadButton.South);
             Assert.That(Box.IsOpen, Is.False, "A finishes the reveal, then moves on");
@@ -403,7 +403,7 @@ namespace Hearthdelve.Tests.PlayMode
             void Seen(DeedReaction r) { if (r.Judge == "pip") pip = r; }
             Social.Reacted += Seen;
             Social.Commit(deed, new[] { "pip" });
-            Assert.That(pip.HasValue && pip.Value.Remembered && pip.Value.Affinity > 0f, "Pip saw it and liked it");
+            Assert.That(pip.HasValue && pip.Value.Remembered && pip.Value.Affinity > 0f, "Orik saw it and liked it");
             Assert.That(pip.Value.Respect, Is.EqualTo(RelationshipRules.RespectChange(10f, 1f - 0f / 200f, 1f)).Within(0.01f), "warmth for warmth: full respect");
             Assert.That(Social.Remembers("gunta", "test_kindness"), Is.False, "only those it was committed to learn of it");
 

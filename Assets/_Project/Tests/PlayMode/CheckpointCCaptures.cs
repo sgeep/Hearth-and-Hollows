@@ -35,7 +35,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// Not a check: renders 4f Checkpoint C for review at 320×180 into <c>BatchLogs/checkpointC/</c>: curios on the floor and
     /// in the HUD, the result and death screens, the tusks' homecoming and the room with them up, the market, Prep with the
-    /// staff row and the menu's pages, the Butcher Block (list, cut, Gunta at it), Gunta and Pip at work, Pip's ledger, and
+    /// staff row and the menu's pages, the Butcher Block (list, cut, Gunta at it), Gunta and Orik at work, Orik's ledger, and
     /// a new piece in storage. Explicit, so it only runs when asked for.
     /// </summary>
     [Explicit]
@@ -258,7 +258,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Director.Cook.HasTask, 10f, "Gunta done");
             panel.Close();
 
-            // Service: Gunta grills, Pip carries; then the results and Pip's ledger.
+            // Service: Gunta grills, Orik carries; then the results and Orik's ledger.
             RecipeDefinition grilled = Director.Content.recipes.First(r => r.id == "grilled_spider_leg");
             foreach (var need in grilled.slots.Where(sl => sl.ingredient != null))
                 Director.Storeroom.Add(new IngredientStack(new IngredientItem(need.ingredient, Quality.Standard), 4, 1f));

@@ -21,7 +21,7 @@ namespace Hearthdelve.Story.Editor
     public static class StoryDialogue
     {
         public const string BoogTalk = "Boog/Talk";
-        public const string PipTalk = "Pip/Talk";
+        public const string OrikTalk = "Orik/Talk";
 
         public static DialogueDatabase Ensure(string path)
         {
@@ -35,12 +35,29 @@ namespace Hearthdelve.Story.Editor
             Template template = Template.FromDefault();
             Actor player = EnsureActor(db, template, DialogueAdapter.PlayerActor, CharacterIds.Player, true);
             Actor boog = EnsureActor(db, template, "Boog", CharacterIds.Boog, false);
-            Actor pip = EnsureActor(db, template, "Pip", CharacterIds.Pip, false);
+            RenamePipToOrik(db);
+            Actor pip = EnsureActor(db, template, "Orik", CharacterIds.Orik, false);
             if (db.GetConversation(BoogTalk) == null) WriteBoog(db, template, player, boog);
-            if (db.GetConversation(PipTalk) == null) WritePip(db, template, player, pip);
+            if (db.GetConversation(OrikTalk) == null) WriteOrik(db, template, player, pip);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);
             return db;
+        }
+
+        /// <summary>
+        /// The owner's rename (2026-10-06): Pip became Orik, a dwarf (same character id). A one-off migration of the database's names,
+        /// as the Dialogue System's editor would make it by hand: the actor's name and the conversation's title; lines and Guids stay.
+        /// </summary>
+        static void RenamePipToOrik(DialogueDatabase db)
+        {
+            Actor actor = db.actors.FirstOrDefault(a => DialogueAdapter.CharacterId(a) == CharacterIds.Orik && a.Name == "Pip");
+            if (actor != null) actor.Name = "Orik";
+            Conversation talk = db.GetConversation("Pip/Talk");
+            if (talk != null && db.GetConversation(OrikTalk) == null)
+            {
+                talk.Title = OrikTalk;
+                Field.SetValue(talk.fields, "Description", "Checkpoint A (temporary writing): Orik remembers the trophy; otherwise he greets the keeper by name.");
+            }
         }
 
         /// <summary>The actor speaking for <paramref name="characterId"/>, created if no actor has that character id.</summary>
@@ -187,11 +204,11 @@ namespace Hearthdelve.Story.Editor
             w.Link(w.Start, tusks, noticed, waiting, quiet);
         }
 
-        /// <summary>Pip's Checkpoint A conversation: she remembers the tusks too (affinity, no respect), and greets the keeper by name.</summary>
-        static void WritePip(DialogueDatabase db, Template template, Actor player, Actor pip)
+        /// <summary>Orik's Checkpoint A conversation: he remembers the tusks too (affinity, no respect), and greets the keeper by name.</summary>
+        static void WriteOrik(DialogueDatabase db, Template template, Actor player, Actor pip)
         {
-            var w = new Writer(db, template, PipTalk, player, pip,
-                "Checkpoint A (temporary writing): Pip remembers the trophy; otherwise she greets the keeper by name.");
+            var w = new Writer(db, template, OrikTalk, player, pip,
+                "Checkpoint A (temporary writing): Orik remembers the trophy; otherwise he greets the keeper by name.");
             DialogueEntry tusks = w.Npc("the tusks over the bar are a talking point. a guest asked if they bite. i said only on weekends.", 0, 1,
                 "HH_Remembers(\"pip\", \"displayed_trophy\")");
             DialogueEntry bite = w.Player("do they?", 0, 2);

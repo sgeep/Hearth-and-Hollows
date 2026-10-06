@@ -23,7 +23,7 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText[] m_Labels = Array.Empty<LocalizedSuperText>();
         [SerializeField, Tooltip("Each line's amount, beside its label.")] LocalizedSuperText[] m_Lines = Array.Empty<LocalizedSuperText>();
         [SerializeField] GameObject m_TakingsRow;
-        [SerializeField, Tooltip("Pip's ledger line under the takings. A night's note (closed early, stayed shut) goes in the row after its last " +
+        [SerializeField, Tooltip("Orik's ledger line under the takings. A night's note (closed early, stayed shut) goes in the row after its last " +
                                  "line; only when all eight lines are used does it take the ledger's row.")]
         GameObject m_Ledger;
 

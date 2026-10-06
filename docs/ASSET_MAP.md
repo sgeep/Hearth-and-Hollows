@@ -306,7 +306,7 @@ The catalogue's art is defined by `Assets/_Project/Data/Furniture/Catalog/catalo
 - a curved horn from Giant Bones (`AE/Addons/Desolate_Desert/Giant_Bones/Bones.png`, crop (73,13)–(96,40)), halved to its tip, re-outlined with a 1 px margin, its bone ramp remapped onto yellowed ivory (five colours, dark to light), mirrored into a pair.
 No new colours outside those ramps. Rerun the script to rebuild it.
 
-**Pip and Gunta (derived).** `Tools/characters/staff_looks.py` writes `Tools/characters/derived/{PipIdle,PipWalk,GuntaIdle,GuntaWalk}.png` from the Creatures pack's base humanoids (`Minifantasy_Creatures_v3.3_Commercial_Version/…/Base_Humanoids/`), imported as the `Staff` pack (Idle 16 frames × 4 directions, Walk 4 × 4):
+**Pip and Gunta (derived; both retired 2026-10-06: Gunta became Boog, Pip became Orik, below).** `Tools/characters/staff_looks.py` writes `Tools/characters/derived/{PipIdle,PipWalk,GuntaIdle,GuntaWalk}.png` from the Creatures pack's base humanoids (`Minifantasy_Creatures_v3.3_Commercial_Version/…/Base_Humanoids/`), imported as the `Staff` pack (Idle 16 frames × 4 directions, Walk 4 × 4):
 - **Gunta Ashbelly (retired 2026-10-06; the cook is now Boog, below):** the yellow-bearded dwarf, palette-remapped: the grey helmet becomes a white cook's cap, the orange beard deep auburn, the clothes a cook's red (the apron).
 - **Pip Marrowby:** the base halfling (one cream ramp throughout), coloured by where each pixel sits: brown curls on the head, the face as drawn, a green waistcoat, brown breeches. Outline and shading ramps kept.
 Minifantasy has no dressed halfling, cook or apron layer; these are recolours, not new drawings.
@@ -315,7 +315,7 @@ Minifantasy has no dressed halfling, cook or apron layer; these are recolours, n
 - The Butcher Block is Crafting And Professions II's preparation table: `…/Crafting_Professions/Food_Preparation/Minifantasy_CraftingAndProfessions2PreparationTableProp.png` (idle) and `…PreparationTableWorking.png` (12 frames of the knife at work), 32×32 cells; the table's drawing is (2,11)–(29,26) in its frame.
 - Staple icons: `…/Craftable_Item_Icons/Minifantasy_CraftingAndProfessions2PreparationTableIngredients.png` (bread (8,8), onion (16,8), herbs (40,8), mushroom (64,8), steak (8,56) for spider-leg cuts, slices (8,72) for bat-wing cuts); eggs from `AE/Icons/8x8px/Farm_Animal_Product_Icons/FarmAnimalProductIcons.png` (16,40); malt as wheat from `Minifantasy_Farm_v3.0/…/Crops/Minifantasy_FarmSeedsAndCrops.png` (64,72); spore sacs from Crafting And Professions' potion herbs (24,80).
 - Dish icons: Brackenford ale is Miscellany's full tankard (0,64); onion broth (56,64), eggs on toast (16,56), crispy bat wings (128,16), spider-leg steaks (112,16) and the bat-wing platter (120,16) from `DishIcons`.
-- UI Overhaul: Icons chest (496,24) for curios, book (416,24) for Pip's ledger; Emotions (16 px grid, centre (16c+8, 16r+8)) heart (104,88), happy (8,8), surprised (40,56), content (72,72), frown (88,24), sweat (24,88) for staff and patron beats.
+- UI Overhaul: Icons chest (496,24) for curios, book (416,24) for Orik's ledger; Emotions (16 px grid, centre (16c+8, 16r+8)) heart (104,88), happy (8,8), surprised (40,56), content (72,72), frown (88,24), sweat (24,88) for staff and patron beats.
 
 **Special requests (Checkpoint D):** UI Overhaul Icons' sparkle (488,40) on the patron's bubble and the order rail; the met and missed faces are the Emotions heart and frown already imported.
 
@@ -323,7 +323,9 @@ Minifantasy has no dressed halfling, cook or apron layer; these are recolours, n
 
 **Boog (2026-10-06).** The cook is the **Goblin Sapper** from All Exclusives (`All_Exclusives_20261002/Creatures/Goblin_Sapper`), used as drawn: `Idle.png` (20 frames) and `Run.png` (10 frames, used as his walk), 32×32 frames at 100 ms in Minifantasy's four facings, with `_Shadows/Idle_Shadow.png` and `Run_Shadow.png` as his own shadow. Imported to `Assets/ThirdParty/Minifantasy/GoblinSapper/`; `Dmg`, `Die` and `Only_Bomb` aren't imported. He carries the sapper's lit bomb on his back, which is the look's joke. Gunta's derived sheets stay in `Tools/characters/derived/` as history; their imported copies were removed.
 
-**Gaps:** no sitting or eating pose for Boog and Pip; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.
+**Orik (2026-10-06).** The server who replaced Pip (stable id `pip`) is the Creatures pack's **yellow-bearded dwarf** (`Base_Humanoids/Dwarf/Dwarf_Yellow_Beard/YellowBeardIdle.png`, `YellowBearWalk.png`: idle 16 frames and walk 4, in four facings, the same layout Pip's sheets had), remapped by `Tools/characters/staff_looks.py` into `Tools/characters/derived/{OrikIdle,OrikWalk}.png`: his ginger hair and beard as drawn, the grey belt brown leather, the brown-red clothes green (the server's colours). Imported as the `Staff` pack's `OrikIdle`/`OrikWalk`; Pip's derived sheets stay in `Tools/characters/derived/` as history, their imported copies removed. (The All Exclusives Dwarven Marksman was the other dressed dwarf; it carries a crossbow.)
+
+**Gaps:** no sitting or eating pose for Boog and Orik; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.
 
 ## Selectors (UI Overhaul → `UIOverhaul/Selectors`)
 
@@ -394,6 +396,6 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 **The workflow.** A recipe per character, `Tools/portraits/<id>.json` (race, skin, height and the layers: type, variant, colour, the same choices the app offers), composed by `Tools/portraits/compose.py` with the app's own rules into `Tools/portraits/derived/<id>_portrait.png`: six 32×32 frames (still, blink, talking 1–4). `Hearthdelve → Story → Update Story Content` imports the strips (`derived:` sheets, `MinifantasySheets.PortraitSheet`) and points `Data/Story/Portraits/Portrait_<id>.asset` at them; the dialogue box shows them at 2×. To change a face: edit the recipe (`compose.py --preview <race> <skin> <layer> <variants> --out <png> <recipe>` lays a layer's options side by side), compose, update. The app is also fine for exploring: copy its choices into a recipe.
 
 - **Boog** (`gunta.json`): goblin, grassland skin; round eyes, pointy nose, big ears, happy black brows, a toothy grit; a red doublet (the Sapper's red scarf); brown leather engineer goggles pushed up; light khaki background.
-- **Pip** (`pip.json`): halfling, wheat skin (her sprite's cream); happy eyes, small nose, normal ears, brown worried brows, brown curls (`afro`), a green vest (her waistcoat), a smile; light green background.
+- **Orik** (`pip.json`, named by his stable id): dwarf, rosacea skin; happy eyes, a ball nose, normal ears, ginger (`red`) worried brows, short ginger hair, a bushy ginger `lumberjack` beard, a green vest, a smile; light green background. (Until 2026-10-06 the recipe was Pip's: a halfling with brown curls.)
 
 No portrait for the keeper in 4g (decision D4). License: the pack's commercial license allows use and editing in our game; credit Krishna Palacio (art) as for all Minifantasy, and the app is by Pixel_Pincher (`docs/CREDITS.md`).

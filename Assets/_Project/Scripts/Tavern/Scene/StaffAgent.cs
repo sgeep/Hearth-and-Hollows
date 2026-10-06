@@ -15,7 +15,7 @@ using UnityEngine;
 namespace Hearthdelve.Tavern.Scene
 {
     /// <summary>
-    /// A member of staff (Pip) as a TDE character, walking the grid through the same thin pathfinding AI
+    /// A member of staff (Orik) as a TDE character, walking the grid through the same thin pathfinding AI
     /// action as customers. At the Grill, Tap or Stew Pot they stand at the station and cook (the ported
     /// <see cref="StaffCook"/> / <see cref="StaffPotCook"/> auto-resolve). On Serving they take plates that
     /// someone is waiting for from the pass and walk them over: speed comes from their skill, customers
@@ -40,7 +40,7 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] StaffFaces m_Faces = new();
         [SerializeField, Tooltip("Where they wait off duty, beside the rest post (so two staff don't stand on one spot).")]
         Vector2 m_RestOffset;
-        [SerializeField, Min(0f), Tooltip("Pip: seconds spent tidying a table after a guest leaves.")] float m_TidySeconds = 1.2f;
+        [SerializeField, Min(0f), Tooltip("Orik: seconds spent tidying a table after a guest leaves.")] float m_TidySeconds = 1.2f;
 
         // Personality beats (presentation only): a face to show later, a table to tidy.
         Sprite m_PendingFace;
@@ -83,7 +83,7 @@ namespace Hearthdelve.Tavern.Scene
 
         public NpcEmote Emote => m_Emote;
         public StaffFaces Faces => m_Faces;
-        /// <summary>Tidying a table a guest just left (Pip, between plates).</summary>
+        /// <summary>Tidying a table a guest just left (Orik, between plates).</summary>
         public bool IsTidying => m_Tidy.HasValue;
         /// <summary>Tables tidied tonight (tests).</summary>
         public int Tidied { get; private set; }
@@ -129,7 +129,7 @@ namespace Hearthdelve.Tavern.Scene
             if (e.Moment == PlateMoment.Dropped && Member != null) Show(m_Faces.surprised);
         }
 
-        /// <summary>A guest who paid and left: Pip, if serving and free, tidies the table.</summary>
+        /// <summary>A guest who paid and left: Orik, if serving and free, tidies the table.</summary>
         void OnCustomerLeft(CustomerLogic customer)
         {
             if (Assignment != StaffStation.Serving || customer == null || customer.Departure != Departure.Paid || m_Director == null) return;
@@ -405,7 +405,7 @@ namespace Hearthdelve.Tavern.Scene
 
         /// <summary>
         /// Walks to <paramref name="goal"/>, then stands still with the AI off: the walk action alone overshoots
-        /// a point, turns back and overshoots again (Pip "vibrating" at the pass, step 2 playtest).
+        /// a point, turns back and overshoots again (Orik "vibrating" at the pass, step 2 playtest).
         /// </summary>
         void Walk(Vector2 goal)
         {

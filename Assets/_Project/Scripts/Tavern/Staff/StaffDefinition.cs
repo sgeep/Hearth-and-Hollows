@@ -16,7 +16,8 @@ namespace Hearthdelve.Tavern.Staff
     /// <summary>The canonical staff's stable ids (4f Checkpoint C): what saves, events and 4g's dialogue use (<see cref="CharacterIds"/>).</summary>
     public static class StaffIds
     {
-        public const string Pip = CharacterIds.Pip;
+        /// <summary>Orik, the server: his stable id is still <c>pip</c> (renamed 2026-10-06; ids never change).</summary>
+        public const string Orik = CharacterIds.Orik;
         /// <summary>Boog, the cook: his stable id is still <c>gunta</c> (renamed 2026-10-06; ids never change).</summary>
         public const string Boog = CharacterIds.Boog;
     }

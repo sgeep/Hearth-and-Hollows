@@ -378,7 +378,7 @@ namespace Hearthdelve.Tests
         {
             var tavern = AssetDatabase.LoadAssetAtPath<TavernContent>("Assets/_Project/Data/Tavern/TavernContent.asset");
             StaffDefinition gunta = tavern.staff.Single(s => s.id == StaffIds.Boog);
-            Assert.That(tavern.staff.Any(s => s.id == StaffIds.Pip));
+            Assert.That(tavern.staff.Any(s => s.id == StaffIds.Orik));
             var random = new SeededRandom(4);
             var scores = Enumerable.Range(0, 20).Select(_ =>
             {

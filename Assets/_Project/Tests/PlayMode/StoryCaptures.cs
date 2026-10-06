@@ -22,7 +22,7 @@ using Object = UnityEngine.Object;
 namespace Hearthdelve.Tests.PlayMode
 {
     /// <summary>
-    /// 4g Checkpoint A's dialogue box at 320×180 (not a check): Boog and Pip during an evening's service, the reveal, the ▼, the
+    /// 4g Checkpoint A's dialogue box at 320×180 (not a check): Boog and Orik during an evening's service, the reveal, the ▼, the
     /// choices with the ▶, and Boog's branch after the tusks went up. Output in <c>HD_CAPTURE_DIR</c> (default
     /// <c>BatchLogs/story</c>). Explicit, so it only runs when asked for.
     /// </summary>
@@ -109,8 +109,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Director.Phase == TavernPhase.Service, 5f, "service");
             yield return new WaitForSeconds(1.5f);
 
-            // Pip greets the keeper by name, mid-reveal, then waiting with the ▼.
-            StoryServices.Conversations.Talk(CharacterIds.Pip);
+            // Orik greets the keeper by name, mid-reveal, then waiting with the ▼.
+            StoryServices.Conversations.Talk(CharacterIds.Orik);
             yield return null;
             yield return new WaitForSecondsRealtime(0.5f);
             Shot("01_pip_revealing");

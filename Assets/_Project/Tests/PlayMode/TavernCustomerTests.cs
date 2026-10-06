@@ -17,7 +17,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4c step 2 in the <c>Tavern</c> scene: customers walk in, take seats or queue, wait with visible
     /// patience, walk out when it runs out, and never clip furniture or shove the player; their layered
-    /// look stays in step and fixed; Pip walks to their post.
+    /// look stays in step and fixed; Orik walks to their post.
     /// </summary>
     public class TavernCustomerTests : LookTestFixture
     {
@@ -172,10 +172,10 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Open();
             StaffAgent pip = Director.Staff;
             Assert.That(pip, Is.Not.Null);
-            Assert.That(pip.Assignment, Is.EqualTo(StaffStation.Serving), "Pip starts on serving");
-            yield return WaitUntil(() => pip.AtPost, 10f, "Pip to reach the serving post");
+            Assert.That(pip.Assignment, Is.EqualTo(StaffStation.Serving), "Orik starts on serving");
+            yield return WaitUntil(() => pip.AtPost, 10f, "Orik to reach the serving post");
             Assert.That(Vector2.Distance(pip.transform.position, Director.Layout.PostFor(StaffStation.Serving)), Is.LessThan(0.25f));
-            // Step 2 playtest: Pip "vibrated" at the pass, overshooting the post and turning back every frame.
+            // Step 2 playtest: Orik "vibrated" at the pass, overshooting the post and turning back every frame.
             var look = pip.GetComponentInChildren<Hearthdelve.Shared.Animation.LayeredSpriteAnimator>();
             // The interpolated sprite catches up with the stopped body within a physics step or two.
             yield return new WaitForSeconds(0.2f);
@@ -184,7 +184,7 @@ namespace Hearthdelve.Tests.PlayMode
             for (int i = 0; i < 90; i++)
             {
                 yield return null;
-                Assert.That(Vector2.Distance(pip.transform.position, standing), Is.LessThan(0.01f), "Pip stands still at the post");
+                Assert.That(Vector2.Distance(pip.transform.position, standing), Is.LessThan(0.01f), "Orik stands still at the post");
                 Assert.That(look.Facing, Is.EqualTo(facing), "without turning back and forth");
                 Assert.That(look.Current, Is.EqualTo(Hearthdelve.Shared.Animation.CharacterAnim.Idle), "idle, not walking on the spot");
             }

@@ -15,7 +15,7 @@ namespace Hearthdelve.Editor
 {
     /// <summary>
     /// Tavern NPCs (4c step 2): one animation set per A Myriad of NPCs layer (idle and walk), an
-    /// appearance pool per customer profile, and the customer and Pip prefabs. Customers are TDE
+    /// appearance pool per customer profile, and the customer and Orik prefabs. Customers are TDE
     /// characters on the Npcs layer, walking on the grid through the thin pathfinding AI action and
     /// drawn by <see cref="LayeredSpriteAnimator"/>.
     /// </summary>
@@ -42,11 +42,11 @@ namespace Hearthdelve.Editor
             SpriteAnimationSet shadow = Set("NpcShadow", "NpcShadowIdle", "NpcShadowWalk");
             BuildPools(sets);
             AssetDatabase.SaveAssets();
-            // 4f Checkpoint C: Pip's halfling look and Gunta's, replacing the Butcher stand-in.
+            // 4f Checkpoint C: Orik's halfling look and Gunta's, replacing the Butcher stand-in.
             return new Built
             {
                 Customer = BuildCustomer(shadow),
-                Pip = BuildStaff("Pip", PipPrefab, StaffSet("Pip"), shadow, 3.2f, Vector2.zero),
+                Pip = BuildStaff("Pip", PipPrefab, StaffSet("Orik"), shadow, 3.2f, Vector2.zero),
                 // The cook (stable id gunta) is Boog: the Goblin Sapper, with its own shadow.
                 Gunta = BuildStaff("Gunta", GuntaPrefab, SapperSet("Boog", "GoblinSapperIdle", "GoblinSapperRun"),
                     SapperSet("BoogShadow", "GoblinSapperIdleShadow", "GoblinSapperRunShadow"), 2.8f, new Vector2(1.25f, 0f)),
@@ -154,7 +154,7 @@ namespace Hearthdelve.Editor
             var character = root.AddComponent<Character>();
             character.CharacterType = Character.CharacterTypes.AI;
             character.CharacterDimension = Character.CharacterDimensions.Type2D;
-            // Start and stop at once: TDE's easing let them drift past a spot and turn back (Pip "vibrating" at the
+            // Start and stop at once: TDE's easing let them drift past a spot and turn back (Orik "vibrating" at the
             // pass, step 2 playtest), and kept them looking like they walk for a moment after stopping.
             var movement = root.AddComponent<CharacterMovement>();
             movement.Acceleration = 0f;
@@ -227,7 +227,7 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
-        /// A member of staff (Pip, Gunta): a walker with their look, a plate over the head when carrying, and a face for their
+        /// A member of staff (Orik, Gunta): a walker with their look, a plate over the head when carrying, and a face for their
         /// wordless reactions (4f Checkpoint C).
         /// </summary>
         static GameObject BuildStaff(string name, string path, SpriteAnimationSet set, SpriteAnimationSet shadowSet, float walkSpeed, Vector2 restOffset)

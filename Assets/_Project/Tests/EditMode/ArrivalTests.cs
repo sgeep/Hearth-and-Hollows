@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace Hearthdelve.Tests.EditMode
 {
-    /// <summary>When a walker has arrived, at any frame rate (the 4f web check: Pip circling the pass at three frames a second).</summary>
+    /// <summary>When a walker has arrived, at any frame rate (the 4f web check: Orik circling the pass at three frames a second).</summary>
     public class ArrivalTests
     {
         [Test]

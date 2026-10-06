@@ -35,7 +35,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4f Checkpoint D's integration run through <see cref="GameFlow"/> (saves in a temp folder): three days from a new game
     /// through every part of 4f (a curio and a haul home, an upgrade and a rearranged room at night, the market, the Butcher
-    /// Block, Gunta and Pip, a special request, a death that loses a curio, sleep), then Continue twice with nothing granted
+    /// Block, Gunta and Orik, a special request, a death that loses a curio, sleep), then Continue twice with nothing granted
     /// again.
     /// </summary>
     public class CheckpointDDayLoopTests : LookTestFixture
@@ -143,7 +143,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().furniture.areas.Single(a => a.id == "tavern").pieces.Any(p => p.def == "cellar_barrel" && p.x == 12 && p.y == 10));
             night.SleepButton.onClick.Invoke();
 
-            // ---------- Day 2: the market, the Butcher Block, Gunta and Pip, a special request ----------
+            // ---------- Day 2: the market, the Butcher Block, Gunta and Orik, a special request ----------
             yield return InTavern(TavernPhase.Daytime, "the second day");
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
             daytime.MarketButton.onClick.Invoke();
@@ -171,7 +171,7 @@ namespace Hearthdelve.Tests.PlayMode
             panel.Close();
             yield return null;
 
-            // Gunta on the grill, Pip on the plates; one special request, met.
+            // Gunta on the grill, Orik on the plates; one special request, met.
             Director.AssignStaff(StaffStation.Serving);
             Director.AssignCook(StaffStation.Grill);
             RecipeDefinition grilled = Director.Content.recipes.First(r => r.id == "grilled_spider_leg");
@@ -184,7 +184,7 @@ namespace Hearthdelve.Tests.PlayMode
             EventBus<CustomerRequestCompleted>.Subscribe(Met);
             Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).First());
             Time.timeScale = 4f;
-            yield return WaitUntil(() => met, 60f, "the request met by Gunta and Pip");
+            yield return WaitUntil(() => met, 60f, "the request met by Gunta and Orik");
             Time.timeScale = 1f;
             EventBus<CustomerRequestCompleted>.Unsubscribe(Met);
             int takings = Director.Session.Ledger.Gold + Director.Session.Ledger.Tips;

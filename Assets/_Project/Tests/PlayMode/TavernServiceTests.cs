@@ -20,7 +20,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4c step 3 in the <c>Tavern</c> scene: cooking at the Grill, Tap and Stew Pot (panels and the
     /// Minigame map), plates on the pass, carrying and serving in 2D (bumps, spills, drops, the wrong
-    /// customer, putting back), and Pip doing their job.
+    /// customer, putting back), and Orik doing their job.
     /// </summary>
     public class TavernServiceTests : LookTestFixture
     {
@@ -31,7 +31,7 @@ namespace Hearthdelve.Tests.PlayMode
         [TearDown]
         public void RestoreTime() => Time.timeScale = 1f;
 
-        /// <summary>Opens an evening with just this dish on the menu (debug-filled storeroom), Pip off duty unless asked.</summary>
+        /// <summary>Opens an evening with just this dish on the menu (debug-filled storeroom), Orik off duty unless asked.</summary>
         IEnumerator Open(string recipeId, StaffStation pip = StaffStation.None)
         {
             yield return Load(Scene);
@@ -227,9 +227,9 @@ namespace Hearthdelve.Tests.PlayMode
             Keeper.FinishCook(1f);
             Teleport(Player, new Vector2(3f, 3f));
             StaffAgent pip = Director.Staff;
-            yield return WaitUntil(() => pip.Carrying != null, 6f, "Pip to pick up the plate");
-            Assert.That(pip.GetComponent<CarryView>().IsShowing, "the plate shows over Pip's head");
-            yield return WaitUntil(() => customer.Logic.State == CustomerState.Eating, 15f, "Pip to serve it");
+            yield return WaitUntil(() => pip.Carrying != null, 6f, "Orik to pick up the plate");
+            Assert.That(pip.GetComponent<CarryView>().IsShowing, "the plate shows over Orik's head");
+            yield return WaitUntil(() => customer.Logic.State == CustomerState.Eating, 15f, "Orik to serve it");
             Assert.That(customer.Logic.DishQuality, Is.LessThanOrEqualTo(pip.Member.qualityCap + 1e-4f), "staff quality is capped");
         }
 
@@ -240,10 +240,10 @@ namespace Hearthdelve.Tests.PlayMode
             CustomerAgent customer = null;
             yield return Order(c => customer = c);
             TavernInteractable grill = Station(TavernInteractableKind.Grill);
-            Assert.That(grill.Hint.Kind, Is.EqualTo(TavernHintKind.Staffed), "Pip is working here");
+            Assert.That(grill.Hint.Kind, Is.EqualTo(TavernHintKind.Staffed), "Orik is working here");
             yield return UseAt(grill);
             Assert.That(Keeper.ActiveCook, Is.Null, "the keeper can't take over");
-            yield return WaitUntil(() => TicketFor(customer).State == TicketState.Ready, 30f, "Pip to cook it");
+            yield return WaitUntil(() => TicketFor(customer).State == TicketState.Ready, 30f, "Orik to cook it");
         }
     }
 }

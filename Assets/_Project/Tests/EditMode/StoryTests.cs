@@ -55,7 +55,7 @@ namespace Hearthdelve.Tests
         {
             Assert.That(CharacterIds.Boog, Is.EqualTo("gunta"), "Boog's id never changes (saves, staff, events)");
             Assert.That(StaffIds.Boog, Is.EqualTo(CharacterIds.Boog));
-            Assert.That(StaffIds.Pip, Is.EqualTo(CharacterIds.Pip));
+            Assert.That(StaffIds.Orik, Is.EqualTo(CharacterIds.Orik));
             Assert.That(CharacterIds.IsAuthored("gunta") && CharacterIds.IsAuthored("old_tamsin"));
             Assert.That(CharacterIds.IsAuthored("Gunta") || CharacterIds.IsAuthored("visitor/1/2") || CharacterIds.IsAuthored(""), Is.False);
             Assert.That(CharacterIds.Visitor(3, 17), Is.EqualTo("visitor/3/17"));
@@ -105,7 +105,7 @@ namespace Hearthdelve.Tests
             Assert.That(RelationshipRules.RespectWeight(0.3f), Is.Zero, "a mismatch earns none (bad deeds lose respect through their own sign)");
             Assert.That(RelationshipRules.RespectWeight(1f), Is.EqualTo(1f));
             Assert.That(RelationshipRules.RespectChange(15f, 0.95f, 1f), Is.EqualTo(13.5f).Within(1e-4f), "Boog and the tusks");
-            Assert.That(RelationshipRules.RespectChange(15f, 0.45f, 1f), Is.Zero, "Pip and the tusks");
+            Assert.That(RelationshipRules.RespectChange(15f, 0.45f, 1f), Is.Zero, "Orik and the tusks");
             Assert.That(RelationshipRules.RespectChange(15f, 0.95f, 0.5f), Is.EqualTo(6.75f).Within(1e-4f), "a repeat, half as fresh");
             Assert.That(RelationshipRules.RespectChange(-20f, 1f, 1f), Is.EqualTo(-20f), "a deed against what they value");
         }
@@ -212,14 +212,14 @@ namespace Hearthdelve.Tests
             Assert.That(story, Is.Not.Null, "run Hearthdelve → Story → Update Story Content");
             var ids = story.characters.Select(c => c.id).ToList();
             Assert.That(ids, Is.Unique);
-            Assert.That(ids, Is.SupersetOf(new[] { CharacterIds.Player, CharacterIds.Boog, CharacterIds.Pip }));
+            Assert.That(ids, Is.SupersetOf(new[] { CharacterIds.Player, CharacterIds.Boog, CharacterIds.Orik }));
             Assert.That(ids.All(CharacterIds.IsAuthored));
 
             // Staff: each member of staff is the character with their id.
             foreach (string guid in AssetDatabase.FindAssets("t:StaffDefinition"))
             {
                 var staff = AssetDatabase.LoadAssetAtPath<StaffDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-                if (staff.id is StaffIds.Pip or StaffIds.Boog)
+                if (staff.id is StaffIds.Orik or StaffIds.Boog)
                     Assert.That(staff.character != null && staff.character.id == staff.id, $"{staff.name} is linked to its character");
             }
 
@@ -276,10 +276,10 @@ namespace Hearthdelve.Tests
             Assert.That((trophy.source, trophy.target, trophy.learners, trophy.memoryDays), Is.EqualTo((DeedSource.TrophyDisplayed, DeedTarget.Tavern, DeedLearners.Staff, 0)));
             Assert.That(trophy.respect, Is.GreaterThan(0f));
             CharacterDefinition boog = Story.characters.Single(c => c.id == CharacterIds.Boog);
-            CharacterDefinition pip = Story.characters.Single(c => c.id == CharacterIds.Pip);
+            CharacterDefinition pip = Story.characters.Single(c => c.id == CharacterIds.Orik);
             Assert.That(RelationshipRules.RespectChange(trophy.respect, RelationshipRules.Alignment(boog.values, trophy.shows), 1f), Is.GreaterThanOrEqualTo(10f),
                 "Boog's tusks branch needs respect 10: one hanging earns it");
-            Assert.That(RelationshipRules.RespectChange(trophy.respect, RelationshipRules.Alignment(pip.values, trophy.shows), 1f), Is.Zero, "Pip isn't impressed by monster parts");
+            Assert.That(RelationshipRules.RespectChange(trophy.respect, RelationshipRules.Alignment(pip.values, trophy.shows), 1f), Is.Zero, "Orik isn't impressed by monster parts");
         }
 
         [Test]

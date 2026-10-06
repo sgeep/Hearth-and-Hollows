@@ -24,7 +24,7 @@ namespace Hearthdelve.Editor
             {
                 count++;
                 // "derived:" sheets are composites of Minifantasy pixels made by our own tools, kept in the repo
-                // (Tools/characters/staff_looks.py: Pip's look; Tools/portraits/compose.py: the dialogue portraits), recorded in docs/ASSET_MAP.md.
+                // (Tools/characters/staff_looks.py: Orik's look; Tools/portraits/compose.py: the dialogue portraits), recorded in docs/ASSET_MAP.md.
                 string source = sheet.Source.StartsWith("derived:", System.StringComparison.Ordinal)
                     ? sheet.Source.Substring("derived:".Length)
                     : Path.Combine(EditorPaths.MinifantasySource, sheet.Source);

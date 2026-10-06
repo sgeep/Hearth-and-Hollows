@@ -4,7 +4,7 @@
 
 ## Approval (2026-10-06): the owner's decisions
 
-- **Canon:** Kariaston, Tally Ho!, Boog (the goblin cook, stable id `gunta`), Pip Marrowby, the Hollows. Gunta, the Sunken Flagon and Brackenford are not reintroduced.
+- **Canon:** Kariaston, Tally Ho!, Boog (the goblin cook, stable id `gunta`), Orik (the dwarf server, stable id `pip`; he replaced Pip Marrowby after Checkpoint A was built), the Hollows. Gunta, the Sunken Flagon and Brackenford are not reintroduced.
 - **Tag:** `milestone-4f` (annotated, on `f7812b3`); later milestones `milestone-4g`, `milestone-4h`…
 - **D1:** the Dialogue System's editor and database are authoritative for conversations; no text-file importer in 4g (read-only exports, review dumps and localization reports may come later).
 - **Packages:** all three were purchased and **already imported by the owner**; nothing is downloaded or reimported, only missing official support components are added (§2's import order is superseded; see "As built").
@@ -28,7 +28,7 @@ Where the build differs from §§2–14 below (each for a reason found in the pa
 
 ## 0. Corrections to the brief, from the repository
 
-- **Names.** The brief's Step 5 says "the Sunken Flagon" and "Gunta". Since 2026-10-06 they are **Tally Ho!** and **Boog** (GDD Decided 35). Pip and Old Tamsin are unchanged. This plan uses the current names.
+- **Names.** The brief's Step 5 says "the Sunken Flagon" and "Gunta". Since 2026-10-06 they are **Tally Ho!** and **Boog** (GDD Decided 35). Orik and Old Tamsin are unchanged. This plan uses the current names.
 - **Love/Hate's standing in the docs.** CLAUDE.md and GDD §2.7 say Love/Hate is "planned but not purchased or imported", and GDD §11.1 says 4g decides whether it joins. The brief decides it joins 4g. Once you confirm it's purchased, the docs change in Step 1.
 - **Protagonist art (affects Step 4).** The locked rule is "a pre-clothed body with palette swaps; all bodies share one animation set". Of the Creatures pack's humanoids, only four are **clothed and fully animated** in the player's exact sheet layout. The base Human, Elf, Dwarf, Halfling, Orc and Goblin are **unclothed** (an outline and five skin tones, no hair or clothes), so they can't be the protagonist as they are. See §9.
 
@@ -169,7 +169,7 @@ Compile after each import. Batch-compile and run the full suites after the last 
 
   Each reads Hearthdelve state or the relationship adapter at the moment of asking. Nothing is copied into Lua variables, so nothing goes stale.
 - **What dialogue can do:** `HH_Deed(deed, target)` (a chosen outcome counts as a deed), `HH_GiveQuest(id)` and `HH_SetQuestNode(...)` through the quest adapter, `HH_GrantQuestObject(id)`. Every effect on game state goes through Hearthdelve code that writes `GameState`.
-- **Conditions:** branch on `HH_*` in entry conditions. Conversation-local variables (Lua) are fine for dialogue-only flags such as "Pip told the cellar joke".
+- **Conditions:** branch on `HH_*` in entry conditions. Conversation-local variables (Lua) are fine for dialogue-only flags such as "Orik told the cellar joke".
 
 ## 5. Save architecture (version 8)
 
@@ -202,7 +202,7 @@ Compile after each import. Batch-compile and run the full suites after the last 
   - **Craft:** good cooking and good work.
   - **Nerve:** daring in the Hollows.
   - **Warmth:** looking after people.
-  - Boog: Craft +80, Nerve +40, Warmth −10. Pip: Warmth +70, Craft +30, Nerve −20 (Pip worries).
+  - Boog: Craft +80, Nerve +40, Warmth −10. Orik: Warmth +70, Craft +30, Nerve −20 (Orik worries).
 - **Factions:**
   - one per tracked character (`pip`, `gunta`, later villagers), with the player as `player`;
   - two "place" factions, **`tavern`** (Tally Ho!) and **`village`** (Kariaston), as deed targets. Love/Hate's affinity change scales with how much the judge likes the target, so "something good for Tally Ho!" pleases those who love Tally Ho!.
@@ -222,7 +222,7 @@ Compile after each import. Batch-compile and run the full suites after the last 
 | `defeated_boss` | `BossDefeated` (came home) | village | everyone, next morning | 0 / 90 / 20 | first clear stronger (`BossFirstCleared`) |
 | `served_exceptional_dish` | `DishServed` quality ≥ 0.9 | tavern | cooking staff present | 90 / 0 / 10 | capped per evening (acclimatization) |
 | `cut_cleanly` | `PartButchered` by the keeper, score ≥ 0.85 | tavern | Boog | 80 / 0 / 0 | |
-| `met_request` / `missed_request` | `CustomerRequestCompleted` / `CustomerRequestFailed` | the patron (later) / tavern | Pip | 10 / 0 / 70 | per-patron targets once patrons are named (4h) |
+| `met_request` / `missed_request` | `CustomerRequestCompleted` / `CustomerRequestFailed` | the patron (later) / tavern | Orik | 10 / 0 / 70 | per-patron targets once patrons are named (4h) |
 | `neglected_service` | `ServiceCompleted` with walkouts ≥ 3 | tavern | staff | −30 / 0 / −60 | negative impact |
 | `kept_a_promise` | a quest completed | the giver | the giver | 0 / 20 / 60 | from `QuestAdapter` |
 | `chose:<outcome>` | a dialogue choice | the speaker | the speaker | authored | from `HH_Deed` |
@@ -298,22 +298,22 @@ Raw packs stay outside the repo. Only exported frames are committed.
 
 **Act I opening** (Step 5; a sketch for you to rewrite):
 1. **New game.** Character creation, then a title card.
-2. **Dusk, Kariaston.** A letter from **Old Tamsin**: the deed to Tally Ho!, "if I'm not back by spring". The tavern is dusty. Pip is already at the books ("She said you'd come. She also said you'd be taller.").
+2. **Dusk, Kariaston.** A letter from **Old Tamsin**: the deed to Tally Ho!, "if I'm not back by spring". The tavern is dusty. Orik is already at the books ("She said you'd come. She also said you'd be taller.").
 3. **The kitchen.** Boog, with his lit fuse: "No meat, no menu." The cellar door leads to the Hollows.
 4. **The first delve** (the existing new-game delve), framed as Boog's errand. Contextual prompts teach movement, the cleaver, harvesting, the rope, and safe ground.
-5. **Home.** Boog's first lesson: cook your haul as the delve meal (the grill tutorial). Pip walks you through Prep, the first service (pass, carrying, Results) and Pip's ledger.
-6. **Night.** Pip shows the upgrades. Boog notices a carving on a recovered part that matches one over Tamsin's door. That's the Act I hook.
-7. **Day 2.** The market (Pip). The first real quest starts (below).
+5. **Home.** Boog's first lesson: cook your haul as the delve meal (the grill tutorial). Orik walks you through Prep, the first service (pass, carrying, Results) and Orik's ledger.
+6. **Night.** Orik shows the upgrades. Boog notices a carving on a recovered part that matches one over Tamsin's door. That's the Act I hook.
+7. **Day 2.** The market (Orik). The first real quest starts (below).
 
 Onboarding is diegetic. Each teaching beat is a short conversation or bark, gated by facts and shown once (Dialogue System variables).
 
 **Representative quest** (Step 6): **"Tamsin's strongbox"**.
-- **Given by:** Pip, the morning of day 2.
-- **The errand:** Tamsin's strongbox is locked, and her key went down with her. Pip has heard a strange glint was seen on the Cellars' second floor.
+- **Given by:** Orik, the morning of day 2.
+- **The errand:** Tamsin's strongbox is locked, and her key went down with her. Orik has heard a strange glint was seen on the Cellars' second floor.
 - **Finding it:** a quest-aware room on floor 2 offers **Tamsin's key**, a quest object.
-- **Bringing it home:** `QuestObjectBroughtHome` advances the quest. Open the strongbox with Pip, which leads to a **choice**:
+- **Bringing it home:** `QuestObjectBroughtHome` advances the quest. Open the strongbox with Orik, which leads to a **choice**:
   - read Tamsin's notes yourself (Nerve, Boog approves);
-  - or give Pip the ledger inside (Warmth, Pip approves).
+  - or give Orik the ledger inside (Warmth, Orik approves).
 
   The choice is a `chose:` deed, and the outcome persists: quest state, the deed and a memory.
 - **If you die:** the key is lost and the room offers it again.
@@ -329,9 +329,9 @@ This replaces the roadmap's "a villager's errand": there are no villagers until 
 | D2 | Respect: our per-deed extension, or our own `EvaluateRumor` | **The per-deed extension** (smallest, transparent) | low |
 | D3 | Love/Hate time: custom mode advanced by days | **Yes** (memories age in days) | medium |
 | D4 | A protagonist portrait | **None in 4g** | low |
-| D5 | The representative quest: "Tamsin's strongbox" (Pip) instead of a villager errand | **Yes** (villagers are 4h) | low |
+| D5 | The representative quest: "Tamsin's strongbox" (Orik) instead of a villager errand | **Yes** (villagers are 4h) | low |
 | D6 | Quest objects on death: lost but offered again | **Yes** | medium |
-| D7 | Old saves (v7) on Continue: start the story at Act I's next beat, or offer the opening | **Skip the opening; Pip gives the strongbox quest the next morning** | low |
+| D7 | Old saves (v7) on Continue: start the story at Act I's next beat, or offer the opening | **Skip the opening; Orik gives the strongbox quest the next morning** | low |
 | D8 | Protagonist bodies: the four dressed humanoids | **Yes**; import the three new sheet sets | medium |
 | D9 | Unity Localization through the bridge (Dialogue table) | **Yes** (our rule: every string in tables) | high |
 | D10 | Tag 4f as `milestone-4f` and tag later milestones the same way | **Yes** (§17) | low |
@@ -351,15 +351,15 @@ This replaces the roadmap's "a villager's errand": there are no villagers until 
    - Keyboard, mouse and gamepad; the Localization bridge and the `Dialogue` table.
    - 320×180 fit tests; captures.
 3. **Character, portrait and relationship adapters.**
-   - `CharacterDefinition` for player, Pip, Boog and Tamsin; `ICharacterDirectory`.
-   - Two Portrait Generator portraits (Pip, Boog) through the pipeline.
+   - `CharacterDefinition` for player, Orik, Boog and Tamsin; `ICharacterDirectory`.
+   - Two Portrait Generator portraits (Orik, Boog) through the pipeline.
    - The faction database (Affinity, Respect, Craft, Nerve, Warmth; `pip`, `gunta`, `player`, `tavern`, `village`).
    - `RelationshipRules` with the deed vocabulary; the Respect extension; the custom time mode.
 
 **Checkpoint A proof** (temporary writing allowed):
 1. Hang the Larder Troll's tusks (an existing gameplay action).
-2. `TrophyDisplayed` is published, and `RelationshipRules` maps it to `displayed_trophy` (player → tavern), learned by Boog and Pip.
-3. Love/Hate evaluates it: Boog's Affinity and Respect rise (Respect more, through Nerve and Craft alignment); Pip's Affinity rises a little. Both remember the deed.
+2. `TrophyDisplayed` is published, and `RelationshipRules` maps it to `displayed_trophy` (player → tavern), learned by Boog and Orik.
+3. Love/Hate evaluates it: Boog's Affinity and Respect rise (Respect more, through Nerve and Craft alignment); Orik's Affinity rises a little. Both remember the deed.
 4. Talking to Boog branches on `HH_Respect("gunta") >= N` and `HH_Remembers("gunta","displayed_trophy")` to a line about the tusks.
 5. Save, quit to the menu, Continue: same values, same memory, same branch.
 6. A **PlayMode test** runs the whole chain, and the web build is checked by hand.
@@ -374,7 +374,7 @@ If Love/Hate can't do this cleanly, you choose before Checkpoint B: keep it with
 
 **Checkpoint C: characters remember, and closeout** (Steps 7–8).
 
-7. **The relationship and reactivity slice:** the authored deed set (§7), Boog's and Pip's preferences and memories, a handful of reactive lines and barks (the tusks, a clean cut, a bad night, the troll), and how relationship state shows (a Prep or Night line; no meters).
+7. **The relationship and reactivity slice:** the authored deed set (§7), Boog's and Orik's preferences and memories, a handful of reactive lines and barks (the tusks, a clean cut, a bad night, the troll), and how relationship state shows (a Prep or Night line; no meters).
 8. **Act I vertical-slice content and closeout:** remaining Act I writing, polish, localization checks, the full regression, the web build, docs (CLAUDE.md rules, the GDD's story sections, `THIRD_PARTY.md`, `CREDITS.md`, `ASSET_MAP.md`), and the sign-off report.
 
 ## 15. Tests
@@ -403,7 +403,7 @@ If Love/Hate can't do this cleanly, you choose before Checkpoint B: keep it with
 
 1. **Confirm Love/Hate is purchased.** In **Package Manager → My Assets**, **download** (don't import) Dialogue System 2.2.74, Quest Machine 1.2.74 and Love/Hate 1.10.74.1. I'll import them from the cache in batch mode in the order above, unticking or deleting demos. Or import them yourself in the editor with Demo and Example unticked.
 2. **The Welcome Windows:** tick `USE_PHYSICS2D`, Input System and Super Text Mesh support (I'll set the define symbols in batch and confirm with you).
-3. **Portraits:** compose Pip, Boog and Tamsin in the Portrait Generator app; export the sheets and share codes (I'll give exact steps then).
+3. **Portraits:** compose Orik, Boog and Tamsin in the Portrait Generator app; export the sheets and share codes (I'll give exact steps then).
 4. **Playtests** at each checkpoint: dialogue feel, the creation screen, the opening.
 
 ## 17. Milestone tag

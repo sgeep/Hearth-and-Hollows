@@ -7,7 +7,7 @@ namespace Hearthdelve.Shared.Characters
     {
         /// <summary>The keeper (Bram by default): named and dressed at character creation, never a Dialogue System speaker with a portrait.</summary>
         Player,
-        /// <summary>The tavern's own people (Pip, Boog).</summary>
+        /// <summary>The tavern's own people (Orik, Boog).</summary>
         Staff,
         /// <summary>A named Kariaston villager (4h): authored, persistent.</summary>
         Villager,
@@ -28,7 +28,8 @@ namespace Hearthdelve.Shared.Characters
         public const string Player = "player";
         /// <summary>Boog, the cook (renamed from Gunta on 2026-10-06; the id stays).</summary>
         public const string Boog = "gunta";
-        public const string Pip = "pip";
+        /// <summary>Orik, the dwarf server and bookkeeper (he replaced Pip on 2026-10-06; the id stays).</summary>
+        public const string Orik = "pip";
 
         /// <summary>Generated Visitors are <c>visitor/&lt;day&gt;/&lt;visit&gt;</c>: unique for the evening, never saved.</summary>
         public const string VisitorPrefix = "visitor/";

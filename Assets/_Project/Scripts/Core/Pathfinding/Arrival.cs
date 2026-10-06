@@ -5,7 +5,7 @@ namespace Hearthdelve.Core.Pathfinding
     /// <summary>
     /// When a walker has reached its goal. The AI picks a heading once a frame, so a slow frame (a busy machine, a
     /// background browser tab) carries the walker a long way in one go: with a fixed radius smaller than that step it
-    /// overshoots, turns back and overshoots again for ever (the 4f web check: Pip circling the pass at 3 frames a
+    /// overshoots, turns back and overshoots again for ever (the 4f web check: Orik circling the pass at 3 frames a
     /// second, never picking up a plate). A goal within one frame's travel therefore counts as reached too.
     /// </summary>
     public static class Arrival

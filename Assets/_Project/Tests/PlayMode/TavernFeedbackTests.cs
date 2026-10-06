@@ -132,7 +132,7 @@ namespace Hearthdelve.Tests.PlayMode
 
             m_Patterns.Clear();
             EventBus<ServingBumped>.Publish(new ServingBumped(1.4f, 0.9f, false, false));
-            Assert.That(m_Patterns, Is.Empty, "Pip's bumps are Pip's");
+            Assert.That(m_Patterns, Is.Empty, "Orik's bumps are Orik's");
 
             EventBus<KeeperPlate>.Publish(new KeeperPlate(PlateMoment.Dropped, Director.Menu[0]));
             Assert.That(Feedback.LastMoment, Is.EqualTo(nameof(TavernMoments.dropped)));

@@ -38,7 +38,7 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4f Checkpoint C through <see cref="GameFlow"/> (saves in a temp folder): furnishing discoveries from a kill and a
     /// room, kept on extraction and lost on death; the Larder Troll's tusks, from the first clear and from an old save, and
-    /// their homecoming; the Brackenford market; the revised menu through Prep and service with Pip's ledger; the Butcher
+    /// their homecoming; the Brackenford market; the revised menu through Prep and service with Orik's ledger; the Butcher
     /// Block by hand and by Gunta; Gunta at a station; and the staff's looks and beats.
     /// </summary>
     public class CheckpointCTests : LookTestFixture
@@ -352,7 +352,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(daytime.IsShown);
 
-            // The evening: eggs on toast is on the menu's first page (it can be made), served, and in Pip's ledger.
+            // The evening: eggs on toast is on the menu's first page (it can be made), served, and in Orik's ledger.
             yield return OpenForTheEvening();
             var prep = Object.FindAnyObjectByType<PrepScreen>();
             RecipeDefinition toast = Director.Content.recipes.First(r => r.id == "eggs_on_toast");
@@ -377,10 +377,10 @@ namespace Hearthdelve.Tests.PlayMode
             var results = Object.FindAnyObjectByType<EveningResultsScreen>();
             results.DoneButton.onClick.Invoke(); // the first press finishes the reveal
             yield return null;
-            Assert.That(ShownText(results), Has.Some.EqualTo("from Pip's ledger"));
+            Assert.That(ShownText(results), Has.Some.EqualTo("from Orik's ledger"));
         }
 
-        // ---------- The Butcher Block, Gunta, Pip ----------
+        // ---------- The Butcher Block, Gunta, Orik ----------
 
         IEnumerator TavernAtPrep()
         {
@@ -473,7 +473,7 @@ namespace Hearthdelve.Tests.PlayMode
             var prep = Object.FindAnyObjectByType<PrepScreen>();
             prep.CookButton.onClick.Invoke();
             Assert.That(Director.CookAssignment, Is.EqualTo(StaffStation.Grill), "the job button: the Grill first");
-            Assert.That(Director.StaffAssignment, Is.EqualTo(StaffStation.Serving), "Pip still carries plates");
+            Assert.That(Director.StaffAssignment, Is.EqualTo(StaffStation.Serving), "Orik still carries plates");
             Director.AssignStaff(StaffStation.Grill);
             Assert.That(Director.CookAssignment, Is.EqualTo(StaffStation.None), "a station is never shared");
             Director.AssignStaff(StaffStation.Serving);
@@ -491,7 +491,7 @@ namespace Hearthdelve.Tests.PlayMode
             CustomerAgent customer = Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).First());
             Time.timeScale = 4f;
             yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Boog), 60f, "Gunta to grill the order");
-            yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Pip), 60f, "Pip to carry it");
+            yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Orik), 60f, "Orik to carry it");
             Time.timeScale = 1f;
             EventBus<StaffWorkDone>.Unsubscribe(Done);
             StaffWorkDone gunta = work.First(w => w.StaffId == StaffIds.Boog);
@@ -503,10 +503,10 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator PipAndGunta_HaveTheirOwnLooks_AndEmotes()
         {
             yield return TavernAtPrep();
-            StaffAgent pip = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Pip);
+            StaffAgent pip = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Orik);
             StaffAgent gunta = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Boog);
             // The cook (id gunta) is Boog, drawn from the Goblin Sapper's sheets.
-            foreach (var (agent, who) in new[] { (pip, "Pip"), (gunta, "GoblinSapper") })
+            foreach (var (agent, who) in new[] { (pip, "Orik"), (gunta, "GoblinSapper") })
             {
                 SpriteRenderer body = agent.GetComponentsInChildren<SpriteRenderer>().FirstOrDefault(r => r.sprite != null && r.sprite.texture != null && r.sprite.texture.name.StartsWith(who));
                 Assert.That(body, Is.Not.Null, $"{who} drawn from their own sheet");

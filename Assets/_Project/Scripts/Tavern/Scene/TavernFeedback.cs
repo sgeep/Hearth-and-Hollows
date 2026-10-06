@@ -44,7 +44,7 @@ namespace Hearthdelve.Tavern.Scene
     /// and the grill's heat and the tap's pour run continuous rumble and sound, all read from the minigames' and the
     /// session's own state (<see cref="TavernFeedbackRules"/>), never timed separately. Strong on the moments that matter
     /// (a perfect flip, a clean pour, a dropped plate), restrained on repetition; payments and walkouts are heard and
-    /// seen but don't vibrate. Only the keeper's own work rumbles: Pip's cooking is quiet. Haptics respect the player's
+    /// seen but don't vibrate. Only the keeper's own work rumbles: Orik's cooking is quiet. Haptics respect the player's
     /// settings and do nothing where unsupported (the haptic service).
     /// </summary>
     public sealed class TavernFeedback : MonoBehaviour
@@ -256,7 +256,7 @@ namespace Hearthdelve.Tavern.Scene
             }
         }
 
-        // The keeper's bumps only (Pip's are Pip's); a drop is the dropped moment, not a bump.
+        // The keeper's bumps only (Orik's are Orik's); a drop is the dropped moment, not a bump.
         void OnBumped(ServingBumped bump)
         {
             if (!bump.ByPlayer || bump.Dropped) return;

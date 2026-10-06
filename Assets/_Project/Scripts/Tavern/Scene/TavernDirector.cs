@@ -33,7 +33,7 @@ namespace Hearthdelve.Tavern.Scene
     /// <summary>
     /// Runs the evening in the tavern room: owns the <see cref="ServiceSession"/> (the ported, tested
     /// service rules: seats, the queue, orders, patience, walkouts), spawns customers by the arrival
-    /// schedule, and starts Pip at their job. UI reads it directly (CLAUDE.md).
+    /// schedule, and starts Orik at their job. UI reads it directly (CLAUDE.md).
     /// </summary>
     /// <remarks>
     /// The evening runs Prep → Service → Results (<see cref="Phase"/>). In the day loop (a <see cref="GameFlow"/>
@@ -71,7 +71,7 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Gunta Ashbelly, the cook (stable id <c>gunta</c>).</summary>
         public StaffDefinition CookMember => m_Content != null ? m_Content.staff.Find(s => s != null && s.id == StaffIds.Boog) : null;
 
-        /// <summary>Everyone on staff tonight (Pip and Gunta).</summary>
+        /// <summary>Everyone on staff tonight (Orik and Gunta).</summary>
         public IEnumerable<StaffAgent> StaffAgents
         {
             get
@@ -133,7 +133,7 @@ namespace Hearthdelve.Tavern.Scene
         public int ActiveSeats { get; private set; }
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
         public StaffDefinition StaffMember => m_Content == null ? null
-            : m_Content.staff.Find(s => s != null && s.id == StaffIds.Pip) ?? m_Content.staff.Find(s => s != null && s.id != StaffIds.Boog);
+            : m_Content.staff.Find(s => s != null && s.id == StaffIds.Orik) ?? m_Content.staff.Find(s => s != null && s.id != StaffIds.Boog);
         public bool IsServing => Session != null && !Session.IsOver;
         /// <summary>Makes the station minigames (and serving) from the tavern's tuning.</summary>
         public MinigameFactory Minigames { get; private set; }
@@ -185,7 +185,7 @@ namespace Hearthdelve.Tavern.Scene
             Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving,
                 m_Content.stew != null ? m_Content.stew.chop : ChopSettings.Default,
                 m_Content.butcher != null ? m_Content.butcher.butcher : ButcherSettings.Default);
-            // Pip starts the evening carrying plates (the prototype's playtest: most useful there).
+            // Orik starts the evening carrying plates (the prototype's playtest: most useful there).
             StaffAssignment = StaffMember != null ? StaffStation.Serving : StaffStation.None;
             // Gunta starts off duty (4f Checkpoint C): the keeper cooks every station until choosing, at Prep, which one
             // she takes. (Tuning for the playtest: a default station would take the keeper's minigame from the first night.)
@@ -362,7 +362,7 @@ namespace Hearthdelve.Tavern.Scene
             PrepChanged?.Invoke();
         }
 
-        /// <summary>Puts Pip on a job (the prep screen, step 4; tests). They walk to its post and start at once.</summary>
+        /// <summary>Puts Orik on a job (the prep screen, step 4; tests). They walk to its post and start at once.</summary>
         public void AssignStaff(StaffStation station)
         {
             StaffAssignment = StaffMember != null ? station : StaffStation.None;
@@ -378,7 +378,7 @@ namespace Hearthdelve.Tavern.Scene
 
         /// <summary>
         /// Puts Gunta on a job (the prep screen; 4f Checkpoint C): the Grill, the Tap, the Stew Pot, or none. She cooks, she
-        /// doesn't carry plates. If Pip is at that station, Pip goes back to serving.
+        /// doesn't carry plates. If Orik is at that station, Orik goes back to serving.
         /// </summary>
         public void AssignCook(StaffStation station)
         {

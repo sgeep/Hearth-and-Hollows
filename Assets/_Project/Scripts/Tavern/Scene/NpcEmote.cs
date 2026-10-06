@@ -4,7 +4,7 @@ namespace Hearthdelve.Tavern.Scene
 {
     /// <summary>
     /// A wordless reaction over a character's head (4f Checkpoint C, D18): a small face that pops up, bobs and fades. Staff
-    /// use it for their personality beats (Gunta tasting the stew, Pip at a dropped plate). Presentation only: nothing waits
+    /// use it for their personality beats (Gunta tasting the stew, Orik at a dropped plate). Presentation only: nothing waits
     /// for it, and the dialogue that might say more comes with 4g.
     /// </summary>
     public sealed class NpcEmote : MonoBehaviour

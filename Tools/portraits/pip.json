@@ -1,15 +1,16 @@
 {
-  "character": "Pip Marrowby: the halfling server and bookkeeper. Brown curls, a green waistcoat, a worried smile.",
-  "race": "halfling", "skin": "wheat", "height": 0,
+  "character": "Orik (stable id pip; he replaced Pip on 2026-10-06): the dwarf server and bookkeeper. A bushy ginger beard and hair, a green vest, a worried smile.",
+  "race": "dwarf", "skin": "rosacea", "height": 0,
   "layers": [
     {"type": "bg", "variant": "light_green"},
     {"type": "base"},
     {"type": "eyes", "variant": "happy"},
-    {"type": "nose", "variant": "small"},
-    {"type": "hair", "variant": "afro", "color": "brown"},
+    {"type": "nose", "variant": "ball"},
+    {"type": "hair", "variant": "short", "color": "red"},
     {"type": "ears", "variant": "normal"},
-    {"type": "brows", "variant": "worry", "color": "brown"},
+    {"type": "brows", "variant": "worry", "color": "red"},
     {"type": "clothes", "variant": "vest", "color": "green"},
+    {"type": "beard", "variant": "lumberjack", "color": "red"},
     {"type": "mouth", "variant": "smile"}
   ]
 }

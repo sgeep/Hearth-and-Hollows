@@ -28,7 +28,7 @@ namespace Hearthdelve.UI.Localization
         public const string StepChop = "tavern.step.chop";
         public const string StepSimmer = "tavern.step.simmer";
         public const string PrepStaffJob = "tavern.prep.staff_job";
-        // 4f Checkpoint C: the Butcher Block at Prep, Gunta's job, the menu's pages, Pip's ledger.
+        // 4f Checkpoint C: the Butcher Block at Prep, Gunta's job, the menu's pages, Orik's ledger.
         public const string StationButcherBlock = "station.butcher_block";
         public const string PrepButcher = "tavern.prep.butcher";
         public const string PrepPage = "tavern.prep.page";
@@ -151,7 +151,7 @@ namespace Hearthdelve.UI.Localization
             (ButcherDone, "done"),
             (ButcherPanelTitle, "butcher the {0}"),
             (ButcherPrompt, "move the knife · hold {0}: cut"),
-            (ResultsLedger, "from Pip's ledger"),
+            (ResultsLedger, "from Orik's ledger"),
             (PrepNothingCookable, "nothing in the storeroom makes a dish tonight."),
             (PrepFillKey, "F4: fill"),
 
