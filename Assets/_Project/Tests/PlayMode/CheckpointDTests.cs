@@ -232,6 +232,26 @@ namespace Hearthdelve.Tests.PlayMode
             mode.Leave();
         }
 
+        /// <summary>
+        /// A job outside service never hangs (the 4f web check: Gunta pressed against the far side of the Butcher Block):
+        /// if the way is blocked, she steps straight to it after a while and the cut is made.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Gunta_StepsToTheBlock_WhenSheCannotWalkThere()
+        {
+            yield return TavernAtPrep();
+            StaffAgent gunta = Director.Cook;
+            // A spot inside the bar's solid body: no path reaches it.
+            var inside = new Vector2(5f, 12f);
+            bool done = false;
+            Assert.That(gunta.DoTask(inside, 0.5f, () => done = true));
+            Time.timeScale = 4f;
+            yield return WaitUntil(() => done, 20f, "the job done anyway");
+            Time.timeScale = 1f;
+            Assert.That(gunta.SteppedToTask);
+            Assert.That(gunta.HasTask, Is.False);
+        }
+
         /// <summary>Every dish's card, on every page: one line each, and three pixels of daylight between name and price.</summary>
         [UnityTest]
         public IEnumerator EveryDishCard_NameClearsItsPrice_AndNothingWraps()

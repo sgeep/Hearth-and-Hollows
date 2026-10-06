@@ -49,7 +49,15 @@ namespace Hearthdelve.Tavern.Scene
         // A job outside service (Gunta at the Butcher Block during Prep): walk there, work a moment, report.
         Vector2 m_TaskAt;
         float m_TaskLeft;
+        float m_TaskWalked;
         System.Action m_TaskDone;
+
+        [SerializeField, Min(1f), Tooltip("Seconds of walking to a job outside service before she steps straight to it (the 4f web check: " +
+                                          "Gunta pressed against the far side of the Butcher Block and never reached it).")]
+        float m_TaskWalkLimit = 8f;
+
+        /// <summary>The last job ended with a step straight to it (tests).</summary>
+        public bool SteppedToTask { get; private set; }
 
         /// <summary>Busy with a job outside service (walking to it or working it).</summary>
         public bool HasTask => m_TaskDone != null;
@@ -65,6 +73,8 @@ namespace Hearthdelve.Tavern.Scene
             if (HasTask || Member == null || done == null) return false;
             m_TaskAt = at;
             m_TaskLeft = seconds;
+            m_TaskWalked = 0f;
+            SteppedToTask = false;
             m_TaskDone = done;
             return true;
         }
@@ -230,7 +240,16 @@ namespace Hearthdelve.Tavern.Scene
 
         Vector2 Task(float dt)
         {
-            if (!WorkingTask) return m_TaskAt;
+            if (!WorkingTask)
+            {
+                // A job outside service never hangs: if the way there is blocked (a body in the way, a layout the path
+                // can't get round), after a while she steps straight to it, as the keeper does at the Butcher Block.
+                m_TaskWalked += dt;
+                if (m_TaskWalked < m_TaskWalkLimit) return m_TaskAt;
+                StepTo(m_TaskAt);
+                SteppedToTask = true;
+                return m_TaskAt;
+            }
             m_TaskLeft -= dt;
             if (m_TaskLeft > 0f) return m_TaskAt;
             System.Action done = m_TaskDone;
@@ -381,6 +400,19 @@ namespace Hearthdelve.Tavern.Scene
                 m_Movement?.SetMovement(Vector2.zero);
             }
             else if (AtGoal && distance > k_Resume) Resume();
+        }
+
+        void StepTo(Vector2 at)
+        {
+            transform.position = at;
+            if (TryGetComponent(out Rigidbody2D body))
+            {
+                body.position = at;
+                body.linearVelocity = Vector2.zero;
+            }
+            AtGoal = true;
+            if (m_Brain != null) m_Brain.BrainActive = false;
+            m_Movement?.SetMovement(Vector2.zero);
         }
 
         void Resume()
