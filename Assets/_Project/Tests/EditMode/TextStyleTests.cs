@@ -89,6 +89,20 @@ namespace Hearthdelve.Tests
         /// Hearthdelve's English is lower case except proper nouns and control labels: every capitalised word in a source
         /// string must be one of those. (Not a snapshot of the text: it checks the rule, so new strings are held to it too.)
         /// </summary>
+        /// <summary>
+        /// Super Text Mesh replaces characters it takes for emoji (▶, ◀, ☺ and more) with emoji quads, which Hearth &amp; Hollows
+        /// doesn't have: such a character simply vanishes (4g: the dialogue's ▶ pointer did). Checked with STM's own pattern.
+        /// </summary>
+        [Test]
+        public void NoString_UsesACharacterSuperTextMeshTakesForAnEmoji()
+        {
+            var stm = (SuperTextMesh)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(SuperTextMesh));
+            var bad = new List<string>();
+            foreach (var (where, text) in TableStrings().Concat(CodeEnglish.Select(e => ($"code/{e.key}", e.text))))
+                if (stm.RemoveEmoji(text) != text) bad.Add($"{where}: \"{text}\"");
+            Assert.That(bad, Is.Empty, string.Join("\n", bad));
+        }
+
         [Test]
         public void EnglishSourceStrings_AreLowerCase_ExceptProperNounsAndControls()
         {

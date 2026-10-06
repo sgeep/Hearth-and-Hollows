@@ -372,7 +372,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             yield return null;
             Assert.That(Selected, Is.EqualTo("Choice1"), "hovering focuses the choice");
-            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Where(t => t.name.StartsWith("Pointer")).Select(t => t.name), Is.EqualTo(new[] { "Pointer1" }), "▶ beside it");
+            Assert.That(Enumerable.Range(0, 4).Where(Box.PointerShown), Is.EqualTo(new[] { 1 }), "▶ beside it, and only it");
+            Assert.That(Object.FindObjectsByType<SuperTextMesh>().Single(t => t.name == "Pointer1").drawText, Is.EqualTo("‣"), "drawn");
             yield return ClickAt(second);
             yield return WaitUntil(() => !Box.IsChoosing, 2f, "the choice taken");
             Assert.That(Box.Line, Does.StartWith("later is when things sneak up"));

@@ -170,7 +170,6 @@ namespace Hearthdelve.Story.Editor
                 LocalizedSuperText pointer = LookTestBuilder.Text(choices, $"Pointer{i}", StoryLocKeys.Pointer, TextStyle.Body, DungeonUI.k_Accent, TextAnchor.MiddleCenter,
                     topLeft, topLeft, topLeft, new Vector2(3f, top - 1f), new Vector2(MarkWidth, SilverMetrics.LinePixels));
                 pointers[i] = pointer.gameObject;
-                pointer.gameObject.SetActive(false);
             }
             choices.gameObject.SetActive(false);
 

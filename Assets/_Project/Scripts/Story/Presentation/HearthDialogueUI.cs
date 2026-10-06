@@ -330,15 +330,24 @@ namespace Hearthdelve.Story.Presentation
             ShowPointers();
         }
 
+        /// <summary>
+        /// The ▶ beside the focused choice. The marks stay active and are culled when hidden: Super Text Mesh doesn't build a
+        /// text first switched on later (the Checkpoint A captures showed none).
+        /// </summary>
         void ShowPointers()
         {
             GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
             for (int i = 0; i < m_ChoicePointers.Length; i++)
             {
                 bool on = m_Mode == Mode.Choosing && i < m_ResponseCount && selected == m_ChoiceButtons[i].gameObject;
-                if (m_ChoicePointers[i] != null && m_ChoicePointers[i].activeSelf != on) m_ChoicePointers[i].SetActive(on);
+                CanvasRenderer mark = m_ChoicePointers[i] != null ? m_ChoicePointers[i].GetComponent<CanvasRenderer>() : null;
+                if (mark != null && mark.cull == on) mark.cull = !on;
             }
         }
+
+        /// <summary>Whether the ▶ shows beside choice <paramref name="i"/> (tests).</summary>
+        public bool PointerShown(int i) => i >= 0 && i < m_ChoicePointers.Length && m_ChoicePointers[i] != null &&
+                                           m_ChoicePointers[i].GetComponent<CanvasRenderer>() is { cull: false };
 
         /// <summary>Up and down move between the shown choices, wrapping round.</summary>
         void Wire(int count)

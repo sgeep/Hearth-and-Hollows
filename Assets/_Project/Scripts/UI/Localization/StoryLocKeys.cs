@@ -13,7 +13,8 @@ namespace Hearthdelve.UI.Localization
         public static readonly (string key, string english)[] English =
         {
             (Continue, "▼"),
-            (Pointer, "▶"),
+            // U+2023 (‣), not ▶: Super Text Mesh draws U+25B6 as an emoji, which Silver hasn't got (TextStyleTests checks).
+            (Pointer, "‣"),
             (ProofQuestTitle, "something with teeth"),
         };
     }
