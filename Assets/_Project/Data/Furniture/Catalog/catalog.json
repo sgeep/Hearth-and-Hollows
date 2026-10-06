@@ -95,6 +95,18 @@
   {
    "key": "ships_lamp",
    "source": "Minifantasy_Ships And Docks v1.1/Minifantasy_ShipsAndDocks_Assets/Tileset/Props/Lamp/Lamp.png"
+  },
+  {
+   "key": "piles",
+   "source": "All_Exclusives_20261002/Addons/_Miscellany/Piles_Of_Loot_And_Stuff/PilesOfLootAndStuff.png"
+  },
+  {
+   "key": "skull_candles",
+   "source": "All_Exclusives_20261002/Addons/Dungeon/Sacrifice_Altars/Sacrifice_Candels/Minifantasy_SacrificeCandels_skulls.png"
+  },
+  {
+   "key": "trophy",
+   "source": "derived:Tools/furniture/derived/trophy_larder_troll.png"
   }
  ],
  "variantSets": [
@@ -3854,8 +3866,8 @@
    "description": "a corner cobweb. do not dust it; it's load-bearing.",
    "category": "WallDecor",
    "theme": "Haunted",
-   "tier": 3,
-   "price": 5,
+   "tier": 0,
+   "price": 0,
    "facings": [
     {
      "turns": 0,
@@ -3911,7 +3923,8 @@
      "dx": 0,
      "dy": 0
     }
-   ]
+   ],
+   "sources": "Discovery"
   },
   {
    "id": "cobweb_great",
@@ -3919,8 +3932,8 @@
    "description": "a whole web. something made it. something large.",
    "category": "WallDecor",
    "theme": "Haunted",
-   "tier": 3,
-   "price": 15,
+   "tier": 0,
+   "price": 0,
    "facings": [
     {
      "turns": 0,
@@ -3933,7 +3946,9 @@
     }
    ],
    "sheet": "haunted",
-   "layer": "Wall"
+   "layer": "Wall",
+   "sources": "Discovery",
+   "unique": true
   },
   {
    "id": "haunted_carpet",
@@ -4103,8 +4118,8 @@
    "description": "a chest with teeth. it's very well behaved. probably.",
    "category": "Curios",
    "theme": "Haunted",
-   "tier": 3,
-   "price": 120,
+   "tier": 0,
+   "price": 0,
    "facings": [
     {
      "turns": 0,
@@ -4119,7 +4134,8 @@
    ],
    "sheet": "chests",
    "variantSet": "chests",
-   "unique": true
+   "unique": true,
+   "sources": "Discovery"
   },
   {
    "id": "ghostly_curtains",
@@ -4546,6 +4562,245 @@
    "sheet": "fireplace",
    "wallBound": true,
    "unique": true
+  },
+  {
+   "id": "skull_candle",
+   "name": "skull candle",
+   "description": "a candle stuck in a skull. the skull doesn't seem to mind.",
+   "category": "Lighting",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      32,
+      32
+     ],
+     "frames": 8,
+     "frameSeconds": 0.12,
+     "light": {
+      "at": [
+       0,
+       6
+      ],
+      "color": "#ffb060",
+      "intensity": 0.5,
+      "radius": 2.5
+     }
+    }
+   ],
+   "sheet": "skull_candles",
+   "layer": "Surface",
+   "sources": "Discovery"
+  },
+  {
+   "id": "slime_jars",
+   "name": "slime jars",
+   "description": "three jars of something green. it moves when nobody's looking.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      129,
+      8,
+      22,
+      8
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "dungeon",
+   "sources": "Discovery"
+  },
+  {
+   "id": "tattered_banner",
+   "name": "tattered banner",
+   "description": "a banner the bats chewed ragged. they seem proud of it.",
+   "category": "WallDecor",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      136,
+      30,
+      8,
+      9
+     ]
+    }
+   ],
+   "sheet": "dungeon",
+   "layer": "Wall",
+   "sources": "Discovery",
+   "variants": [
+    {
+     "id": "ragged",
+     "name": "ragged",
+     "swatch": "#a02020",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "shredded",
+     "name": "shredded",
+     "swatch": "#802020",
+     "dx": 8,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "iron_cage",
+   "name": "iron cage",
+   "description": "a small iron cage. whatever was in it got out.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      200,
+      24,
+      8,
+      8
+     ],
+     "depth": 4
+    }
+   ],
+   "sheet": "dungeon",
+   "sources": "Discovery",
+   "variants": [
+    {
+     "id": "shut",
+     "name": "shut",
+     "swatch": "#4a5060",
+     "dx": 0,
+     "dy": 0
+    },
+    {
+     "id": "open",
+     "name": "open",
+     "swatch": "#6a7080",
+     "dx": 16,
+     "dy": 0
+    }
+   ]
+  },
+  {
+   "id": "cellar_stores",
+   "name": "cellar stores",
+   "description": "sacks and crates from a forgotten cellar. some of it is still good.",
+   "category": "BarAndStorage",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      13,
+      55,
+      23,
+      16
+     ],
+     "depth": 8
+    }
+   ],
+   "sheet": "piles",
+   "sources": "Discovery"
+  },
+  {
+   "id": "junk_heap",
+   "name": "delver's junk heap",
+   "description": "broken blades and bent helmets: what the Hollows kept of other delvers.",
+   "category": "Curios",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      11,
+      80,
+      26,
+      15
+     ],
+     "depth": 7
+    }
+   ],
+   "sheet": "piles",
+   "unique": true,
+   "sources": "Discovery"
+  },
+  {
+   "id": "spider_brazier",
+   "name": "spider brazier",
+   "description": "an iron brazier on eight legs. it was like that when we found it.",
+   "category": "Lighting",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      202,
+      43,
+      12,
+      11
+     ],
+     "depth": 5,
+     "light": {
+      "at": [
+       0,
+       7
+      ],
+      "color": "#ff7040",
+      "intensity": 0.6,
+      "radius": 3
+     }
+    }
+   ],
+   "sheet": "dungeon",
+   "unique": true,
+   "sources": "Discovery"
+  },
+  {
+   "id": "trophy_larder_troll",
+   "name": "Larder Troll tusks",
+   "description": "it ate the Cellars' larder for years. now its tusks hang over yours.",
+   "category": "WallDecor",
+   "theme": "Curio",
+   "tier": 0,
+   "price": 0,
+   "facings": [
+    {
+     "turns": 0,
+     "rect": [
+      0,
+      0,
+      26,
+      21
+     ]
+    }
+   ],
+   "sheet": "trophy",
+   "layer": "Wall",
+   "unique": true,
+   "sources": "Boss"
   }
  ]
 }

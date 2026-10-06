@@ -26,6 +26,10 @@ namespace Hearthdelve.Shared.Game
         public List<FinishDefinition> finishes = new();
         [Tooltip("Palette ramps and presets for recolouring (D11).")]
         public PaletteLibrary palettes;
+        [Tooltip("Each boss's first-clear trophy (4f, D10): a unique furnishing, never lost.")]
+        public List<BossTrophy> bossTrophies = new();
+        [Tooltip("The Brackenford market (4f Checkpoint C, D19): what the daytime market list sells.")]
+        public Hearthdelve.Shared.Inventory.SupplySource market;
         [Tooltip("The catalogue's Renown tiers (D14).")]
         public CatalogSettings catalog;
 

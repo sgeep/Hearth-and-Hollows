@@ -204,7 +204,9 @@ namespace Hearthdelve.Shared.Game
         /// </summary>
         public void CompleteDelve(DelveReport report)
         {
-            DayRules.CompleteDelve(State, report);
+            DayRules.CompleteDelve(State, report, m_Database != null ? m_Database.Furniture : null, m_Database != null ? m_Database.bossTrophies : null);
+            // Facts for later reactions (4g's dialogue adapters): what came home from the Hollows.
+            foreach (string curio in report.CuriosKept) EventBus<CurioBroughtHome>.Publish(new CurioBroughtHome(curio));
             // A boss's first defeat (4e): the hook for first-clear rewards, story reactions and 4f's trophy.
             foreach (string boss in report.BossesDefeated)
                 if (State.TimesDefeated(boss) == 1) EventBus<BossFirstCleared>.Publish(new BossFirstCleared(boss));
@@ -217,6 +219,20 @@ namespace Hearthdelve.Shared.Game
         {
             if (!DayRules.EatMeal(State, meal)) return false;
             StateChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>
+        /// Buys one offer at the Brackenford market (daytime; 4f Checkpoint C, D19): gold out, the goods into the storeroom,
+        /// and the game saves. False when it can't be afforded.
+        /// </summary>
+        public bool BuyFromMarket(Inventory.SupplyOffer offer)
+        {
+            if (!InGame || m_Database == null || m_Database.market == null) return false;
+            if (!DayRules.Buy(State, m_Database.market, offer)) return false;
+            EventBus<MarketPurchase>.Publish(new MarketPurchase(offer.ingredient.id, offer.bundle, offer.price));
+            StateChanged?.Invoke();
+            Save();
             return true;
         }
 

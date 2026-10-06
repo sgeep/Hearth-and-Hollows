@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_butcher_block
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: butcher_block
+  nameKey: furniture.butcher_block
+  descriptionKey: furniture.butcher_block.description
+  category: 9
+  theme: 0
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 3
+  station: 4
+  useNameKey: station.butcher_block
+  reach: 1.2
+  price: 0
+  unique: 1
+  catalogTier: 0
+  sources: 1
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 4, y: 2}
+    art:
+    - name: Block
+      sprite: {fileID: 21300000, guid: a1069497f0c06a0408ba81be3227dd25, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames:
+      - {fileID: -1511233025, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -1100766987, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -1663538108, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -504608162, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -480561914, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -984993067, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -990675008, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -174906089, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -1425619999, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -1340342653, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: -284965112, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      - {fileID: 1972090838, guid: c9ca28a5bbffcb647a1ac61c4fcb48c6, type: 3}
+      position: {x: 0, y: -0.75}
+      sortingLayer: Characters
+      order: 0
+      variantSprites: []
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 3.375
+      height: 1
+    seats: []
+    interactPoint: {x: 1.95, y: 0.45000005}
+    usePoints:
+    - {x: 1.95, y: -0.55}
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0.25
+      y: 0
+      width: 3.375
+      height: 1.875
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

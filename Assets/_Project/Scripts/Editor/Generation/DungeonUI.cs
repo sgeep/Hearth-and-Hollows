@@ -21,6 +21,9 @@ namespace Hearthdelve.Editor
         internal static readonly Color k_Title = new(0.55f, 0.15f, 0.1f);
         internal static readonly Color k_Label = new(0.5f, 0.37f, 0.27f);
         internal static readonly Color k_Accent = new(0.55f, 0.35f, 0.02f);
+        /// <summary>Furnishing discoveries (4f Checkpoint C): a cool blue on parchment, and a pale one over the dark HUD.</summary>
+        internal static readonly Color k_Discovery = new(0.12f, 0.33f, 0.55f);
+        internal static readonly Color k_DiscoveryLight = new(0.62f, 0.86f, 1f);
         /// <summary>A button: one 12-pixel line of text with two pixels above and below.</summary>
         internal const float ButtonHeight = 16f;
         internal static readonly Color k_Mark = new(1f, 0.82f, 0.3f);
@@ -60,6 +63,14 @@ namespace Hearthdelve.Editor
                 new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(11f, 0f), new Vector2(49f, 12f));
             var runGold = root.gameObject.AddComponent<Hearthdelve.UI.Hud.RunGoldView>();
             runGold.Configure(gold.gameObject, amount);
+
+            // The furnishings found (4f Checkpoint C): a chest and how many, beside the gold, once there's one.
+            RectTransform found = LookTestBuilder.UIRect(root, "RunCurios", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(52f, -18f), new Vector2(30f, 12f));
+            RectTransform chest = LookTestBuilder.UIRect(found, "Chest", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
+            AddImage(chest, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Chest"), Color.white);
+            LocalizedSuperText curioCount = LookTestBuilder.Text(found, "Count", LocKeys.HudCurios, 6f, k_DiscoveryLight, TextAnchor.UpperLeft,
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(11f, 0f), new Vector2(19f, 12f));
+            root.gameObject.AddComponent<Hearthdelve.UI.Hud.RunCurioView>().Configure(found.gameObject, curioCount);
 
             // The run's powers (4d step 4): their icons in a row under the Gold, as they're taken.
             RectTransform powers = LookTestBuilder.UIRect(root, "RunPowers", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -31f), new Vector2(8 * 17f, 16f));
@@ -108,7 +119,7 @@ namespace Hearthdelve.Editor
                     new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(-11f, 0f), new Vector2(200f, 12f));
                 lines[i] = new Hearthdelve.UI.Hud.HarvestFeedLine { group = group, icon = AddImage(iconRect, null, Color.white), text = text };
             }
-            feed.gameObject.AddComponent<Hearthdelve.UI.Hud.HarvestFeed>().Configure(lines);
+            feed.gameObject.AddComponent<Hearthdelve.UI.Hud.HarvestFeed>().Configure(lines, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Chest"));
         }
 
         /// <summary>
@@ -421,12 +432,16 @@ namespace Hearthdelve.Editor
             shade.anchorMin = Vector2.zero;
             shade.anchorMax = Vector2.one;
             AddImage(shade, Pixel(), new Color(0.03f, 0.02f, 0.04f, 0.55f));
-            RectTransform panel = Panel(window, new Vector2(300f, 140f), new Vector2(0f, 4f));
+            // 4f Checkpoint C: 12 taller, so the furnishings lost clear the buttons.
+            RectTransform panel = Panel(window, new Vector2(300f, 152f), new Vector2(0f, 4f));
             Title(panel, LocKeys.DeathTitle);
             LocalizedSuperText subtitle = LookTestBuilder.Text(panel, "Subtitle", LocKeys.DeathSubtitle, 6f, k_Ink, TextAnchor.UpperCenter,
                 new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -23f), new Vector2(284f, 36f));
             SatchelSlotView[] slots = SlotRow(panel, -12f, true, out Button[] buttons);
             LocalizedSuperText chosen = Line(panel, "Chosen", LocKeys.DeathSelectedNone, -31f);
+            // Furnishings found on the delve (4f Checkpoint C): never in the Lockbox, lost with the delve.
+            LocalizedSuperText curiosLost = Line(panel, "CuriosLost", LocKeys.DeathCuriosLost, -44f);
+            curiosLost.GetComponent<SuperTextMesh>().color = k_Discovery;
             Button keepNothing = TextButton(panel, "KeepNothing", LocKeys.DeathKeepNothing, new Vector2(-60f, 7f), 84f, out _);
             Button confirm = TextButton(panel, "Confirm", LocKeys.DeathConfirm, new Vector2(56f, 7f), 124f, out _);
             UiFeedbackContent.Commit(confirm);
@@ -436,6 +451,7 @@ namespace Hearthdelve.Editor
 
             var screen = root.gameObject.AddComponent<DeathScreen>();
             screen.Configure(window.gameObject, subtitle, chosen, slots, confirm, keepNothing);
+            screen.ConfigureCurios(curiosLost);
             window.gameObject.SetActive(false);
             return screen;
         }
@@ -444,7 +460,8 @@ namespace Hearthdelve.Editor
         public static DelveResultScreen BuildResultScreen(Canvas canvas)
         {
             RectTransform root = FullScreen(canvas, "DelveResult");
-            RectTransform panel = Panel(root, new Vector2(240f, 112f), new Vector2(0f, 4f));
+            // Taller since 4f Checkpoint C: the furnishings found (room for two lines above the button), and a boss's trophy.
+            RectTransform panel = Panel(root, new Vector2(240f, 164f), Vector2.zero);
             LocalizedSuperText title = Title(panel, LocKeys.ResultTitleExtracted);
             SatchelSlotView[] slots = SlotRow(panel, 0f, false, out Button[] buttons);
             // Display only: nothing to choose here.
@@ -464,8 +481,13 @@ namespace Hearthdelve.Editor
             UiFeedbackContent.Commit(proceed);
             proceed.navigation = new Navigation { mode = Navigation.Mode.None };
 
+            LocalizedSuperText curios = Line(panel, "Curios", LocKeys.ResultCuriosKept, -38f);
+            curios.GetComponent<SuperTextMesh>().color = k_Discovery;
+            LocalizedSuperText trophy = Line(panel, "Trophy", LocKeys.ResultTrophy, 34f);
+            trophy.GetComponent<SuperTextMesh>().color = k_Accent;
             var screen = root.gameObject.AddComponent<DelveResultScreen>();
             screen.Configure(panel.gameObject, title, summary, slots, proceed, proceedLabel, gold, boss);
+            screen.ConfigureFinds(curios, trophy);
             panel.gameObject.SetActive(false);
             return screen;
         }

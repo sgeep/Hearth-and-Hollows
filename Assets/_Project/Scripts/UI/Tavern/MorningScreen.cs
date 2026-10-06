@@ -30,6 +30,8 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_Bonuses;
         [SerializeField] Button m_Descend;
         [SerializeField, Tooltip("Decorate Mode (4f).")] Button m_Decorate;
+        [SerializeField, Tooltip("The Brackenford market (4f Checkpoint C).")] Button m_MarketButton;
+        [SerializeField] MarketPanel m_Market;
         [SerializeField] Color m_CardColour = new(0.82f, 0.66f, 0.46f);
         [SerializeField, Tooltip("The dish eaten this morning.")] Color m_EatenColour = new(0.98f, 0.86f, 0.5f);
         [SerializeField, Tooltip("The bonus line flashes this colour when delve meal adds to it.")] Color m_BonusFlash = new(0.85f, 0.55f, 0.1f);
@@ -49,6 +51,14 @@ namespace Hearthdelve.UI.Tavern
         public IReadOnlyList<RecipeDefinition> Options => m_Options;
         public Button DescendButton => m_Descend;
         public Button DecorateButton => m_Decorate;
+        public Button MarketButton => m_MarketButton;
+        public MarketPanel Market => m_Market;
+
+        public void ConfigureMarket(Button button, MarketPanel market)
+        {
+            m_MarketButton = button;
+            m_Market = market;
+        }
 
         public void Configure(GameObject root, LocalizedSuperText title, SatchelSlotView[] stock, LocalizedSuperText stockEmpty, DishCard[] cards,
             LocalizedSuperText meal, LocalizedSuperText bonuses, Button descend, Button decorate = null)
@@ -69,7 +79,6 @@ namespace Hearthdelve.UI.Tavern
             m_Director = TavernDirector.Instance;
             m_Root.SetActive(false);
             if (m_Director == null) return;
-            m_Options.AddRange(m_Director.DelveMealOptions().Take(m_Cards.Length));
             for (int i = 0; i < m_Cards.Length; i++)
             {
                 int index = i;
@@ -77,6 +86,16 @@ namespace Hearthdelve.UI.Tavern
             }
             m_Descend.onClick.AddListener(() => m_Director.OpenForEvening());
             if (m_Decorate != null) m_Decorate.onClick.AddListener(() => DecorateMode.Instance?.Enter());
+            if (m_MarketButton != null && m_Market != null)
+            {
+                m_MarketButton.onClick.AddListener(m_Market.Open);
+                // Back from the market: what was bought shows in the storeroom, and the meal cards may now be cookable.
+                m_Market.Closed += () =>
+                {
+                    MarkDirty();
+                    if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(m_MarketButton.gameObject);
+                };
+            }
             m_Director.PhaseChanged += MarkDirty;
             m_Director.PrepChanged += MarkDirty;
         }
@@ -102,7 +121,7 @@ namespace Hearthdelve.UI.Tavern
             if (m_Director == null) return;
             // Hidden while delve meal cooks: the station panel has the screen.
             bool shown = m_Director.Phase == TavernPhase.Daytime && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null) &&
-                         !DecorateScreen.IsDecorating;
+                         !DecorateScreen.IsDecorating && (m_Market == null || !m_Market.IsOpen);
             if (shown != m_Root.activeSelf) m_Root.SetActive(shown);
             if (!shown)
             {
@@ -137,6 +156,13 @@ namespace Hearthdelve.UI.Tavern
             m_StockEmpty.gameObject.SetActive(stacks.Count == 0);
 
             MealBuff meal = flow != null ? flow.State.Meal : MealBuff.None;
+            // The delve meals the storeroom can make first (the menu has more Grill and Tap dishes than cards), then the rest.
+            m_Options.Clear();
+            m_Options.AddRange(m_Director.DelveMealOptions()
+                .OrderByDescending(r => meal.IsActive && meal.RecipeId == r.id)
+                .ThenByDescending(m_Director.CanCookDelveMeal)
+                .Take(m_Cards.Length));
+            if (m_MarketButton != null) m_MarketButton.gameObject.SetActive(MarketPanel.Available);
             for (int i = 0; i < m_Cards.Length; i++)
             {
                 DishCard card = m_Cards[i];

@@ -56,6 +56,7 @@ namespace Hearthdelve.Dungeon.Rooms
         [SerializeField] Sprite m_MarkerGold;
         [SerializeField] Sprite m_MarkerIngredient;
         [SerializeField] Sprite m_MarkerPower;
+        [SerializeField] Sprite m_MarkerCurio;
 
         RoomEncounter m_Encounter;
         int m_Entered = -1;
@@ -79,7 +80,7 @@ namespace Hearthdelve.Dungeon.Rooms
 
         public void Configure(RunSettings settings, Transform roomRoot, NavGrid nav, CinemachineCamera camera, RoomCameraBounds cameraBounds,
             MMF_Player sealFeedback, MMF_Player clearFeedback, MMF_Player fallFeedback, Sprite markerOut, Sprite markerDeeper, Sprite markerArena,
-            Sprite markerGold, Sprite markerIngredient, Sprite markerPower)
+            Sprite markerGold, Sprite markerIngredient, Sprite markerPower, Sprite markerCurio = null)
         {
             m_Settings = settings;
             m_RoomRoot = roomRoot;
@@ -95,18 +96,21 @@ namespace Hearthdelve.Dungeon.Rooms
             m_MarkerGold = markerGold;
             m_MarkerIngredient = markerIngredient;
             m_MarkerPower = markerPower;
+            m_MarkerCurio = markerCurio;
         }
 
         void OnEnable()
         {
             Active = this;
             EventBus<BossEncounterEnded>.Subscribe(OnBossEnded);
+            EventBus<EnemyKilled>.Subscribe(OnEnemyKilled);
         }
 
         void OnDisable()
         {
             if (Active == this) Active = null;
             EventBus<BossEncounterEnded>.Unsubscribe(OnBossEnded);
+            EventBus<EnemyKilled>.Unsubscribe(OnEnemyKilled);
         }
 
         // The boss's reward (4e step 4): its Gold and its larder cache, where it fell.
@@ -223,6 +227,7 @@ namespace Hearthdelve.Dungeon.Rooms
                 RewardKind.Gold => m_MarkerGold,
                 RewardKind.Ingredient => m_MarkerIngredient,
                 RewardKind.Power => m_MarkerPower,
+                RewardKind.Curio => m_MarkerCurio,
                 _ => null,
             },
             _ => null,
@@ -244,6 +249,10 @@ namespace Hearthdelve.Dungeon.Rooms
                     Hearthdelve.Dungeon.Powers.PowerPickup spark = Instantiate(m_Settings.powerPickup, at, Quaternion.identity, Current.transform);
                     spark.Setup(m_Settings.tuning.powers, unchecked(Graph.Seed * 31 + Floor.Floor * 7919 + Node.Id * 104729));
                     break;
+                case RewardKind.Curio:
+                    // Which piece depends on what's owned, so it's drawn now, from a seed fixed by the run and the room.
+                    GrantCurio(CurioRules.RoomOrigin, at, new Hearthdelve.Core.Random.SeededRandom(unchecked(Graph.Seed * 37 + Floor.Floor * 7907 + Node.Id * 104723)));
+                    break;
                 case RewardKind.Ingredient when HarvestSystem.Instance != null:
                     Hearthdelve.Shared.Ingredients.IngredientDefinition ingredient = m_Settings.RewardIngredient(reward.ItemId);
                     if (ingredient == null) break;
@@ -251,6 +260,67 @@ namespace Hearthdelve.Dungeon.Rooms
                         new Hearthdelve.Shared.Ingredients.IngredientItem(ingredient, reward.Quality), reward.Amount, 1f), at, null);
                     break;
             }
+        }
+
+        // ---------- Furnishing discoveries (4f Checkpoint C) ----------
+
+        readonly System.Collections.Generic.List<string> m_CuriosOffered = new();
+        Hearthdelve.Core.Random.SeededRandom m_CurioRandom;
+        int m_CurioSeed;
+
+        /// <summary>The run's curio rolls: seeded by the run, so a seed replays its drops.</summary>
+        Hearthdelve.Core.Random.SeededRandom CurioRandom
+        {
+            get
+            {
+                int seed = Graph != null ? Graph.Seed : 0;
+                if (m_CurioRandom == null || m_CurioSeed != seed)
+                {
+                    m_CurioSeed = seed;
+                    m_CurioRandom = new Hearthdelve.Core.Random.SeededRandom(unchecked(seed * 131 + 977));
+                    m_CuriosOffered.Clear();
+                }
+                return m_CurioRandom;
+            }
+        }
+
+        /// <summary>A rare enemy drop: a kill by an enemy the pool knows, under the delve's cap.</summary>
+        void OnEnemyKilled(EnemyKilled e)
+        {
+            CurioPool pool = m_Settings != null ? m_Settings.tuning.curios : null;
+            DelveRunController run = DelveRunController.Active;
+            string enemy = e.Definition != null ? e.Definition.id : null;
+            if (pool == null || run == null || run.IsEnding || Current == null || string.IsNullOrEmpty(enemy)) return;
+            if (!pool.entries.Any(entry => entry?.piece != null && entry.From(enemy))) return;
+            if (!CurioRules.EnemyDrops(pool, run.Loot.CuriosDropped, CurioRandom.Value())) return;
+            run.Loot.NoteEnemyDrop();
+            GrantCurio(enemy, e.Position + new Vector2(0f, -0.9f), CurioRandom);
+        }
+
+        /// <summary>
+        /// Puts a curio on the floor at <paramref name="at"/>: a piece from the pool for <paramref name="origin"/> (owned
+        /// uniques and pieces already found on this delve left out, unowned pieces favoured), or run gold when nothing is
+        /// left to give (D8).
+        /// </summary>
+        public void GrantCurio(string origin, Vector2 at, Hearthdelve.Core.Random.IRandom random)
+        {
+            CurioPool pool = m_Settings != null ? m_Settings.tuning.curios : null;
+            if (pool == null || Current == null) return;
+            _ = CurioRandom; // starts the run's record of what's been offered
+            var flow = Hearthdelve.Shared.Game.GameFlow.Instance;
+            System.Func<string, int> owned = id => flow != null && flow.State != null ? flow.State.Furniture.OwnedCount(id) : 0;
+            Hearthdelve.Shared.Customization.FurnitureDefinition piece = CurioRules.Roll(pool.entries, origin, owned, m_CuriosOffered, random, pool.firstCopyWeight);
+            if (piece == null)
+            {
+                int gold = CurioRules.FallbackGold(pool, random);
+                if (gold > 0 && m_Settings.goldPickup != null)
+                    Instantiate(m_Settings.goldPickup, at, Quaternion.identity, Current.transform).SetAmount(gold);
+                return;
+            }
+            m_CuriosOffered.Add(piece.id);
+            if (m_Settings.curioPickup == null) return;
+            CurioPickup pickup = Instantiate(m_Settings.curioPickup, at, Quaternion.identity, Current.transform);
+            pickup.SetPiece(piece.id);
         }
 
         /// <summary>Lights a campfire (4e playtest): before the boss's arena once that room is clear, and by each floor's hole down.</summary>

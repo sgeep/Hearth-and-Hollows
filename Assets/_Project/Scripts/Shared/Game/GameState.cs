@@ -87,6 +87,9 @@ namespace Hearthdelve.Shared.Game
         /// <summary>Run Gold the delve brought home, and run Gold it lost.</summary>
         public int DelveGold;
         public int DelveGoldLost;
+        /// <summary>Furnishings brought home from the delve (4f), and found but lost with it.</summary>
+        public int CuriosKept;
+        public int CuriosLost;
 
         /// <summary>Banked today: service takings and the delve's Gold.</summary>
         public int Earned => Gold + Tips + DelveGold;
@@ -94,7 +97,7 @@ namespace Hearthdelve.Shared.Game
         public void Reset()
         {
             Delve = DelveOutcome.None;
-            PartsBroughtBack = PartsLost = DishesServed = Gold = Tips = Walkouts = RenownChange = DelveGold = DelveGoldLost = 0;
+            PartsBroughtBack = PartsLost = DishesServed = Gold = Tips = Walkouts = RenownChange = DelveGold = DelveGoldLost = CuriosKept = CuriosLost = 0;
             KeptShut = EveningRecorded = false;
         }
     }

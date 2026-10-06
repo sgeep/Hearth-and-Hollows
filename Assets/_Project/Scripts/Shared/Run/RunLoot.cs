@@ -22,6 +22,30 @@ namespace Hearthdelve.Shared.Run
             if (!string.IsNullOrEmpty(bossId) && !m_Bosses.Contains(bossId)) m_Bosses.Add(bossId);
         }
 
+        readonly System.Collections.Generic.List<string> m_Curios = new();
+
+        /// <summary>
+        /// Furnishings found on this delve (4f Checkpoint C, D9), by furniture id, in the order found: run-bound like the run's
+        /// Gold, owned for good only if the delve ends with extraction, lost on death, never in the Lockbox.
+        /// </summary>
+        public System.Collections.Generic.IReadOnlyList<string> Curios => m_Curios;
+        /// <summary>How many of <see cref="Curios"/> enemies dropped (the delve's cap counts these).</summary>
+        public int CuriosDropped { get; private set; }
+
+        /// <summary>Raised when a curio is picked up, with its id.</summary>
+        public event Action<string> CurioAdded;
+
+        public void AddCurio(string furnitureId, bool fromEnemy = false)
+        {
+            if (string.IsNullOrEmpty(furnitureId)) return;
+            m_Curios.Add(furnitureId);
+            if (fromEnemy) CuriosDropped++;
+            CurioAdded?.Invoke(furnitureId);
+        }
+
+        /// <summary>An enemy's curio is on the floor (counted when it drops, so the cap holds even if it's left lying).</summary>
+        public void NoteEnemyDrop() => CuriosDropped++;
+
         public int Gold { get; private set; }
 
         /// <summary>Raised whenever the run's Gold changes, with the new total.</summary>

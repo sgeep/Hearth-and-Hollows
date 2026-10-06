@@ -12,6 +12,13 @@ namespace Hearthdelve.Tavern.Staff
         StewPot,
     }
 
+    /// <summary>The canonical staff's stable ids (4f Checkpoint C): what saves, events and 4g's dialogue use.</summary>
+    public static class StaffIds
+    {
+        public const string Pip = "pip";
+        public const string Gunta = "gunta";
+    }
+
     /// <summary>A hired helper who can run one station on their own (GDD §6.2, §7.2).</summary>
     [CreateAssetMenu(menuName = "Hearthdelve/Staff Definition", fileName = "Staff_")]
     public sealed class StaffDefinition : ScriptableObject

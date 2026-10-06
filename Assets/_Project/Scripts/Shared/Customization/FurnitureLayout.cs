@@ -231,6 +231,12 @@ namespace Hearthdelve.Shared.Customization
             {
                 case FurnitureLayer.Wall:
                     if (!Inside(m_Shape.WallBand, f)) return new PlacementCheck(PlacementProblem.NotOnTheWall);
+                    // Not behind a fixture that stands against the back wall (the corner stairs, 4f Checkpoint C): it would be hidden.
+                    foreach (Rect fixture in m_Shape.Fixtures)
+                    {
+                        Vector2 min = fixture.min - m_Shape.Origin, max = fixture.max - m_Shape.Origin;
+                        if (max.y >= m_Shape.Floor.yMax && f.xMin < max.x && f.xMax > min.x) return new PlacementCheck(PlacementProblem.Overlaps);
+                    }
                     break;
                 default:
                     if (!Inside(m_Shape.Floor, f)) return new PlacementCheck(PlacementProblem.OutsideTheRoom);

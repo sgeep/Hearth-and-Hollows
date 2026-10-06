@@ -26,8 +26,16 @@ MonoBehaviour:
   flavors: 68
   rarity: 1
   baseValue: 9
-  icon: {fileID: 0}
+  icon: {fileID: 1151193309, guid: 437135e52b1df3346be87186518e27ec, type: 3}
   placeholderColor: {r: 0.88, g: 0.8, b: 0.4, a: 1}
+  source: 0
+  butchering:
+    cut: {fileID: 0}
+    minCuts: 1
+    maxCuts: 3
+    thresholds:
+    - 0.5
+    - 0.85
   references:
     version: 2
     RefIds: []

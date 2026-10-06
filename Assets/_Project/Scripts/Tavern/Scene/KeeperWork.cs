@@ -4,6 +4,9 @@ using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Minigames;
 using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Core.Random;
+using Hearthdelve.Shared.Game;
+using Hearthdelve.Shared.Ingredients;
+using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
@@ -60,6 +63,67 @@ namespace Hearthdelve.Tavern.Scene
         bool m_Started;
 
         /// <summary>The stations, the pass and the seats of the placed furniture (4f: set whenever the layout is built).</summary>
+        // ---------- The Butcher Block (4f Checkpoint C; D17: mise en place at Prep) ----------
+
+        TavernInteractable m_ButcherBlock;
+        IngredientItem m_ButcherPart;
+
+        /// <summary>The placed Butcher Block (null when it's in storage).</summary>
+        public TavernInteractable ButcherBlock => m_ButcherBlock;
+        /// <summary>The part on the block now (invalid when nothing is being cut).</summary>
+        public IngredientItem ButcheringPart => m_ButcherPart;
+        /// <summary>Breaking down a part is mise en place: at Prep, with a block out, and nothing else on the go.</summary>
+        public bool CanButcher => m_Director != null && m_Director.Phase == TavernPhase.Prep && m_ButcherBlock != null && ActiveCook == null && FindPlayer();
+        /// <summary>The cuts a finished breakdown gave (the Prep screen shows them).</summary>
+        public event System.Action<IngredientStack> Butchered;
+
+        public void ConfigureButcherBlock(TavernInteractable block)
+        {
+            m_ButcherBlock = block;
+            // Used from the Prep screen (mise en place), never by walking up to it during service: no hint, no use.
+            block?.SetAvailable(false);
+        }
+
+        /// <summary>
+        /// Puts one part from the storeroom on the block and opens the cut (the keeper steps up to it). Nothing is taken until
+        /// the cut finishes; stepping away leaves the part as it was.
+        /// </summary>
+        public bool Butcher(IngredientItem part)
+        {
+            if (!CanButcher || !part.IsValid || !part.Definition.Butcherable) return false;
+            if (m_Director.Storeroom.CountMatching(item => item == part) <= 0) return false;
+            m_ButcherPart = part;
+            // At the block, facing it, while the knife works.
+            Vector2 at = m_ButcherBlock.UsePoint;
+            m_Player.transform.position = at;
+            if (m_Player.TryGetComponent(out Rigidbody2D body)) body.position = at;
+            OpenPanel(m_Director.Minigames.CreateButcher(part.Definition.butchering.maxCuts, new Hearthdelve.Core.Random.SeededRandom(UnityEngine.Random.Range(1, int.MaxValue))));
+            return true;
+        }
+
+        void TickButcher(float dt)
+        {
+            if (m_Cancel != null && m_Cancel.WasPressedThisFrame())
+            {
+                m_ButcherPart = default;
+                EndCook();
+                return;
+            }
+            ActiveCook.Tick(dt, ReadMinigameInput());
+            if (ActiveCook.IsComplete) FinishCook(ActiveCook.Evaluate());
+        }
+
+        void FinishButcher(float score)
+        {
+            IngredientItem part = m_ButcherPart;
+            m_ButcherPart = default;
+            EndCook();
+            IngredientStack cuts = ButcherRules.Butcher(m_Director.Storeroom, part, score);
+            if (cuts.IsEmpty) return;
+            EventBus<PartButchered>.Publish(new PartButchered(part.Definition.id, cuts.Item.Definition.id, cuts.Count, score, "keeper"));
+            Butchered?.Invoke(cuts);
+        }
+
         public void Configure(TavernInteractable grill, TavernInteractable tap, TavernInteractable stewPot, TavernInteractable pass, TavernInteractable[] seats)
         {
             m_Grill = grill;
@@ -128,6 +192,11 @@ namespace Hearthdelve.Tavern.Scene
                 TickDelveMeal(Time.deltaTime);
                 return;
             }
+            if (m_ButcherPart.IsValid && ActiveCook != null)
+            {
+                TickButcher(Time.deltaTime);
+                return;
+            }
             if (!m_Director.IsServing)
             {
                 if (ActiveCook != null || Carrying != null) StopWork();
@@ -158,20 +227,21 @@ namespace Hearthdelve.Tavern.Scene
             return null;
         }
 
-        bool StaffWorks(StaffStation station) => Staff != null && Staff.Assignment == station;
+        bool StaffWorks(StaffStation station) => m_Director != null && m_Director.StaffAt(station) != null;
+        StaffDefinition StaffOn(StaffStation station) => m_Director != null ? m_Director.StaffAt(station)?.Member : null;
 
         // ---------- Hints ----------
 
         TavernHint DescribeCook(TavernInteractable station, CookStation cook, StaffStation staffed)
         {
-            if (StaffWorks(staffed)) return new TavernHint(TavernHintKind.Staffed, staff: Staff.Member);
+            if (StaffWorks(staffed)) return new TavernHint(TavernHintKind.Staffed, staff: StaffOn(staffed));
             Ticket next = Session?.NextToCook(cook);
             return next != null ? new TavernHint(TavernHintKind.Cook, dish: next.Recipe) : TavernHint.Use(station.NameKey);
         }
 
         TavernHint DescribeStewPot()
         {
-            if (StaffWorks(StaffStation.StewPot)) return new TavernHint(TavernHintKind.Staffed, staff: Staff.Member);
+            if (StaffWorks(StaffStation.StewPot)) return new TavernHint(TavernHintKind.Staffed, staff: StaffOn(StaffStation.StewPot));
             StewPot pot = Session?.Pot;
             if (pot == null) return TavernHint.Use(m_StewPot.NameKey);
             switch (pot.State)
@@ -329,6 +399,11 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Ends the open minigame with a score (tests and debugging; normally the minigame finishes itself).</summary>
         public void FinishCook(float score)
         {
+            if (m_ButcherPart.IsValid)
+            {
+                FinishButcher(score);
+                return;
+            }
             if (ActiveCook == null) return;
             if (DelveMeal != null)
             {
@@ -375,8 +450,18 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Screen x (pixels) to 0–1 across the chopping board, which the panel draws at the same share of the screen.</summary>
         float BoardFraction(float screenX)
         {
-            ChopSettings chop = m_Director.Minigames.Chop;
-            return (screenX / Mathf.Max(1f, Screen.width) - chop.boardLeft) / Mathf.Max(0.01f, chop.boardWidth);
+            float left, width;
+            if (ActiveCook is ButcherMinigame)
+            {
+                left = m_Director.Minigames.Butcher.boardLeft;
+                width = m_Director.Minigames.Butcher.boardWidth;
+            }
+            else
+            {
+                left = m_Director.Minigames.Chop.boardLeft;
+                width = m_Director.Minigames.Chop.boardWidth;
+            }
+            return (screenX / Mathf.Max(1f, Screen.width) - left) / Mathf.Max(0.01f, width);
         }
 
         // ---------- Carrying ----------

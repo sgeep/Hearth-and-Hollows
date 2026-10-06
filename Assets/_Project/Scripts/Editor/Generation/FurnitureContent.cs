@@ -211,6 +211,32 @@ namespace Hearthdelve.Editor
                 });
             });
 
+            // The Butcher Block (4f Checkpoint C, D17): Crafting And Professions II's preparation table, where parts are broken
+            // down into cuts at Prep. Movable like the other stations (D6), one of it, never needed to open. It works (the
+            // knife, the meat) while someone is butchering.
+            yield return Define("butcher_block", "furniture.butcher_block", FurnitureCategory.Stations, d =>
+            {
+                d.function = FurnitureFunction.Station;
+                d.station = StationKind.ButcherBlock;
+                d.useNameKey = TavernLocKeys.StationButcherBlock;
+                d.reach = 1.2f;
+                d.unique = true;
+                Sprite table = Single(MinifantasySheets.CraftingAndProfessions, "PrepTable");
+                // The table is drawn 6 px above the frame's bottom and 2 px in from its left.
+                var at = new Vector2(0f, -0.75f);
+                FurnitureArt art = Art("Block", table, at);
+                art.workingFrames = MinifantasyImporter.Row(MinifantasySheets.CraftingAndProfessions, "PrepTableWorking", 0, 12);
+                d.facings.Add(new FurnitureFacing
+                {
+                    size = new Vector2Int(4, 2),
+                    art = { art },
+                    bodies = { Body(table, at, 2f, 27f, 8f, 6f) },
+                    interactPoint = at + new Vector2(1.95f, 1.2f),
+                    usePoints = { at + new Vector2(1.95f, 0.2f) },
+                    highlight = Offset(new Rect(0.25f, 0.75f, 3.375f, 1.875f), at),
+                });
+            });
+
             // The pass: a long table where plates wait, usable from either side; the server waits just below it.
             yield return Define("pass_table", "furniture.pass_table", FurnitureCategory.Stations, d =>
             {
@@ -368,6 +394,9 @@ namespace Hearthdelve.Editor
             Place("wall_fireplace", 14, 14);
             Place("low_shelf", 24, 14);
             pieces.Add(new PlacedFurniture { uid = pieces.Count + 1, definition = "shelf_glasses", host = pieces.Count, anchor = 0 });
+            // 4f Checkpoint C: the Butcher Block, on the open floor right of the front table (the kitchen's walkways stay
+            // clear). Saves from before it get it in storage, marked new (FurnitureState.GrantMissing).
+            Place("butcher_block", 22, 3);
 
             // The guest room (4f step 6): a bed, a nightstand with a candle, a chest, a rug and a picture. Its uids start at 101
             // so they never meet the tavern's.

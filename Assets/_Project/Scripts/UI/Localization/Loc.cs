@@ -207,7 +207,28 @@ namespace Hearthdelve.UI.Localization
         public const string BossFrenzy = "boss.frenzy";
         /// <summary>The delve result's acknowledgement of a boss defeated on the delve.</summary>
         public const string ResultBoss = "result.boss";
+        // 4f Checkpoint C: furnishing discoveries and the boss trophy.
+        public const string HudCurios = "hud.curios";
+        public const string HarvestCurio = "harvest.curio";
+        public const string ResultCuriosKept = "result.curios_kept";
+        public const string ResultCuriosLost = "result.curios_lost";
+        public const string ResultTrophy = "result.trophy";
+        public const string ListMore = "list.more";
+        public const string ListTwo = "list.two";
+        public const string DeathCuriosLost = "death.curios_lost";
         public static string PowerDescription(string id) => $"power.{id}.desc";
+
+        /// <summary>A furnishing's name (the catalogue's key).</summary>
+        public static string FurnitureName(string id) => Loc.UI($"furniture.{id}");
+
+        /// <summary>Furnishings by name for one line: "a", "a and b", or "a and 2 more".</summary>
+        public static string FurnitureList(System.Collections.Generic.IReadOnlyList<string> ids)
+        {
+            if (ids == null || ids.Count == 0) return string.Empty;
+            if (ids.Count == 1) return FurnitureName(ids[0]);
+            if (ids.Count == 2) return Loc.UI(ListTwo, FurnitureName(ids[0]), FurnitureName(ids[1]));
+            return Loc.UI(ListMore, FurnitureName(ids[0]), ids.Count - 1);
+        }
 
         /// <summary>Every key with its English text. Used by the editor to build the table.</summary>
         public static readonly (string key, string english)[] English =
@@ -277,6 +298,14 @@ namespace Hearthdelve.UI.Localization
             (BossDefeated, "{0} falls"),
             (BossFrenzy, "{0} rages!"),
             (ResultBoss, "you felled {0}"),
+            (HudCurios, "{0}"),
+            (HarvestCurio, "found: {0}"),
+            (ResultCuriosKept, "found for the Sunken Flagon: {0}"),
+            (ResultCuriosLost, "found, then lost: {0}"),
+            (ResultTrophy, "a trophy: {0}"),
+            (ListTwo, "{0} and {1}"),
+            (ListMore, "{0} and {1} more"),
+            (DeathCuriosLost, "lost with you: {0}"),
             (PowerFooter, "it lasts until you leave the Hollows"),
             ("power.deep_reserves", "deep reserves"),
             ("power.deep_reserves.desc", "+{0} max Essence, filled at once"),

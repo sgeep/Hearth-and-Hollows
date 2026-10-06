@@ -1,5 +1,6 @@
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Random;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
@@ -19,8 +20,126 @@ namespace Hearthdelve.Tavern.Scene
     /// walking across the floor can bump them, and if the customer leaves (or the keeper serves them first)
     /// they take the plate back to the pass. Like customers, staff don't collide with the player.
     /// </summary>
+    /// <summary>The faces a member of staff shows (4f Checkpoint C, D18: wordless).</summary>
+    [System.Serializable]
+    public sealed class StaffFaces
+    {
+        public Sprite happy;
+        public Sprite content;
+        public Sprite frown;
+        public Sprite surprised;
+        public Sprite sweat;
+        public Sprite heart;
+    }
+
     public sealed class StaffAgent : MonoBehaviour
     {
+        [SerializeField, Tooltip("Their face over the head (4f Checkpoint C).")] NpcEmote m_Emote;
+        [SerializeField] StaffFaces m_Faces = new();
+        [SerializeField, Tooltip("Where they wait off duty, beside the rest post (so two staff don't stand on one spot).")]
+        Vector2 m_RestOffset;
+        [SerializeField, Min(0f), Tooltip("Pip: seconds spent tidying a table after a guest leaves.")] float m_TidySeconds = 1.2f;
+
+        // Personality beats (presentation only): a face to show later, a table to tidy.
+        Sprite m_PendingFace;
+        float m_PendingAt;
+        Vector2? m_Tidy;
+        float m_TidyLeft;
+
+        // A job outside service (Gunta at the Butcher Block during Prep): walk there, work a moment, report.
+        Vector2 m_TaskAt;
+        float m_TaskLeft;
+        System.Action m_TaskDone;
+
+        /// <summary>Busy with a job outside service (walking to it or working it).</summary>
+        public bool HasTask => m_TaskDone != null;
+        /// <summary>At the job and working it (the Butcher Block's knife moves).</summary>
+        public bool WorkingTask => m_TaskDone != null && AtGoal && Vector2.Distance(transform.position, m_TaskAt) <= 0.3f;
+
+        /// <summary>
+        /// Walks to <paramref name="at"/>, works there for <paramref name="seconds"/>, then calls <paramref name="done"/>
+        /// (outside service only). False if already busy.
+        /// </summary>
+        public bool DoTask(Vector2 at, float seconds, System.Action done)
+        {
+            if (HasTask || Member == null || done == null) return false;
+            m_TaskAt = at;
+            m_TaskLeft = seconds;
+            m_TaskDone = done;
+            return true;
+        }
+
+        public NpcEmote Emote => m_Emote;
+        public StaffFaces Faces => m_Faces;
+        /// <summary>Tidying a table a guest just left (Pip, between plates).</summary>
+        public bool IsTidying => m_Tidy.HasValue;
+        /// <summary>Tables tidied tonight (tests).</summary>
+        public int Tidied { get; private set; }
+
+        public void ConfigureLook(NpcEmote emote, Vector2 restOffset, StaffFaces faces)
+        {
+            m_Emote = emote;
+            m_RestOffset = restOffset;
+            m_Faces = faces ?? new StaffFaces();
+        }
+
+        void OnEnable()
+        {
+            EventBus<ServingBumped>.Subscribe(OnBumped);
+            EventBus<KeeperPlate>.Subscribe(OnKeeperPlate);
+        }
+
+        void OnDisable()
+        {
+            EventBus<ServingBumped>.Unsubscribe(OnBumped);
+            EventBus<KeeperPlate>.Unsubscribe(OnKeeperPlate);
+            if (m_Session != null) m_Session.CustomerLeft -= OnCustomerLeft;
+        }
+
+        /// <summary>A face now (presentation only).</summary>
+        public void Show(Sprite face, float seconds = 0f) => m_Emote?.Show(face, seconds);
+
+        /// <summary>A face a little later (Gunta tasting the pot she's just filled).</summary>
+        void ShowLater(Sprite face, float delay)
+        {
+            m_PendingFace = face;
+            m_PendingAt = Time.time + delay;
+        }
+
+        // Anyone's plate on the floor: a start, and a bead of sweat.
+        void OnBumped(ServingBumped e)
+        {
+            if (e.Dropped && Member != null) Show(m_Faces.sweat);
+        }
+
+        void OnKeeperPlate(KeeperPlate e)
+        {
+            if (e.Moment == PlateMoment.Dropped && Member != null) Show(m_Faces.surprised);
+        }
+
+        /// <summary>A guest who paid and left: Pip, if serving and free, tidies the table.</summary>
+        void OnCustomerLeft(CustomerLogic customer)
+        {
+            if (Assignment != StaffStation.Serving || customer == null || customer.Departure != Departure.Paid || m_Director == null) return;
+            TavernSeat seat = m_Director.Layout.Seat(customer.Seat);
+            if (seat != null && !m_Tidy.HasValue) m_Tidy = seat.ApproachPoint;
+        }
+
+        void OnCooked(RecipeDefinition dish, float quality)
+        {
+            if (Member == null || dish == null) return;
+            EventBus<StaffWorkDone>.Publish(new StaffWorkDone(Member.id, dish.id, quality));
+            if (quality >= 0.8f && m_Random.Value() < 0.35f) Show(m_Faces.content);
+        }
+
+        /// <summary>Gunta fills the pot, then tastes it: a nod for a good batch, a frown for a ragged one.</summary>
+        void OnChopped(float score)
+        {
+            if (Member == null) return;
+            RecipeDefinition stew = m_Session?.Pot?.Recipe;
+            EventBus<StaffWorkDone>.Publish(new StaffWorkDone(Member.id, stew != null ? stew.id : string.Empty, score));
+            ShowLater(score >= 0.7f ? m_Faces.content : score < 0.45f ? m_Faces.frown : null, 1.5f);
+        }
         const float k_Arrive = 0.2f;
         const float k_Resume = 0.35f;
 
@@ -49,7 +168,9 @@ namespace Hearthdelve.Tavern.Scene
         public bool AtGoal { get; private set; }
         /// <summary>Standing at the post of their job.</summary>
         public bool AtPost => AtGoal && m_Goal != null && Vector2.Distance(m_Goal.position, Post) < 0.01f;
-        public Vector2 Post => m_Director != null ? m_Director.Layout.PostFor(Assignment) : (Vector2)transform.position;
+        public Vector2 Post => m_Director != null
+            ? m_Director.Layout.PostFor(Assignment) + (Assignment == StaffStation.None ? m_RestOffset : Vector2.zero)
+            : (Vector2)transform.position;
         public Ticket Carrying => m_Carrying;
         public bool IsCooking => (m_Cook != null && m_Cook.IsBusy) || (m_PotCook != null && m_PotCook.IsBusy);
 
@@ -90,13 +211,32 @@ namespace Hearthdelve.Tavern.Scene
             if (session != m_Session)
             {
                 // A new evening: new jobs.
+                if (m_Session != null) m_Session.CustomerLeft -= OnCustomerLeft;
                 m_Session = session;
+                if (m_Session != null) m_Session.CustomerLeft += OnCustomerLeft;
+                m_Tidy = null;
                 m_Cook = null;
                 m_PotCook = null;
                 DropCarry();
             }
             if (!m_Director.IsServing && m_Carrying != null) DropCarry();
-            Walk(m_Director.IsServing ? Work(Time.deltaTime) : Post);
+            Walk(m_Director.IsServing ? Work(Time.deltaTime) : HasTask ? Task(Time.deltaTime) : Post);
+            if (m_PendingFace != null && Time.time >= m_PendingAt)
+            {
+                Show(m_PendingFace);
+                m_PendingFace = null;
+            }
+        }
+
+        Vector2 Task(float dt)
+        {
+            if (!WorkingTask) return m_TaskAt;
+            m_TaskLeft -= dt;
+            if (m_TaskLeft > 0f) return m_TaskAt;
+            System.Action done = m_TaskDone;
+            m_TaskDone = null;
+            done();
+            return Post;
         }
 
         /// <summary>Does the job for this frame; returns where to be.</summary>
@@ -107,13 +247,21 @@ namespace Hearthdelve.Tavern.Scene
                 case StaffStation.Grill:
                 case StaffStation.Tap:
                     if (!AtPost) return Post;
-                    m_Cook ??= new StaffCook(m_Session, m_Director.Minigames, Assignment == StaffStation.Grill ? CookStation.Grill : CookStation.Tap,
-                        Member.skill, Member.qualityCap, Member.restBetweenJobs, m_Random);
+                    if (m_Cook == null)
+                    {
+                        m_Cook = new StaffCook(m_Session, m_Director.Minigames, Assignment == StaffStation.Grill ? CookStation.Grill : CookStation.Tap,
+                            Member.skill, Member.qualityCap, Member.restBetweenJobs, m_Random);
+                        m_Cook.Cooked += OnCooked;
+                    }
                     m_Cook.Tick(dt);
                     return Post;
                 case StaffStation.StewPot:
                     if (!AtPost) return Post;
-                    m_PotCook ??= new StaffPotCook(m_Session, m_Director.Minigames, Member.skill, Member.qualityCap, Member.restBetweenJobs, m_Random);
+                    if (m_PotCook == null)
+                    {
+                        m_PotCook = new StaffPotCook(m_Session, m_Director.Minigames, Member.skill, Member.qualityCap, Member.restBetweenJobs, m_Random);
+                        m_PotCook.Chopped += OnChopped;
+                    }
                     m_PotCook.Tick(dt);
                     return Post;
                 case StaffStation.Serving:
@@ -130,6 +278,19 @@ namespace Hearthdelve.Tavern.Scene
                 if (m_Rest > 0f)
                 {
                     m_Rest -= dt;
+                    return Post;
+                }
+                // Between plates: a table a guest just left gets a wipe first (a plate waiting comes first, though).
+                if (m_Tidy.HasValue && m_Session.NextToServe(includeSpares: false) == null)
+                {
+                    Vector2 table = m_Tidy.Value;
+                    if (!AtGoal || Vector2.Distance(transform.position, table) > 0.3f) return table;
+                    if (m_TidyLeft <= 0f) m_TidyLeft = m_TidySeconds;
+                    m_TidyLeft -= dt;
+                    if (m_TidyLeft > 0f) return table;
+                    m_Tidy = null;
+                    Tidied++;
+                    Show(m_Faces.content, 1f);
                     return Post;
                 }
                 if (!AtPost) return Post;
@@ -176,7 +337,10 @@ namespace Hearthdelve.Tavern.Scene
             if (AtGoal && Vector2.Distance(transform.position, seat.SitPoint) <= m_Serving.Settings.arriveDistance + 0.5f)
             {
                 m_Serving.Deliver(KeeperWork.ShortestWalk(m_PickedUpAt, transform.position));
-                if (!m_Session.Deliver(m_Carrying, m_For, Mathf.Min(m_Serving.Evaluate(), Member.qualityCap))) m_Session.PutBack(m_Carrying);
+                float served = Mathf.Min(m_Serving.Evaluate(), Member.qualityCap);
+                RecipeDefinition dish = m_Carrying.Recipe;
+                if (!m_Session.Deliver(m_Carrying, m_For, served)) m_Session.PutBack(m_Carrying);
+                else EventBus<StaffWorkDone>.Publish(new StaffWorkDone(Member.id, dish != null ? dish.id : string.Empty, served));
                 FinishDelivery();
                 return Post;
             }

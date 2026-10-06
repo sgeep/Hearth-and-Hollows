@@ -11,6 +11,8 @@ namespace Hearthdelve.Tavern.Scene
         Grill,
         Tap,
         StewPot,
+        /// <summary>The Butcher Block (4f Checkpoint C): used from the Prep screen, at mise en place.</summary>
+        ButcherBlock,
         Pass,
         Seat,
         Door,

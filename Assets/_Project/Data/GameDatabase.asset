@@ -20,6 +20,13 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 76aa54dff8405604f936226823101473, type: 2}
   - {fileID: 11400000, guid: 043e0099fdffbae4d85cd360d8627bd1, type: 2}
   - {fileID: 11400000, guid: 344c2706f235a2141b4b9e5b7a0f5ef6, type: 2}
+  - {fileID: 11400000, guid: 6b979a830d693914886fb2386d12ee49, type: 2}
+  - {fileID: 11400000, guid: cd4d86ccf4d17134fa29529be3196e91, type: 2}
+  - {fileID: 11400000, guid: f319e1dd79257c247b2bb6f7fab674ab, type: 2}
+  - {fileID: 11400000, guid: e7b3167f0efd596489d8c93714a292af, type: 2}
+  - {fileID: 11400000, guid: 4b340e077390d3249ab64e0a43c9be07, type: 2}
+  - {fileID: 11400000, guid: 83278ad9c6ca00344933ab1defc1b013, type: 2}
+  - {fileID: 11400000, guid: c329976497ea86e4fba6c5db56341ad7, type: 2}
   upgrades:
   - {fileID: 11400000, guid: 4bdf724a0931d1941b9f1dd698a21ef7, type: 2}
   - {fileID: 11400000, guid: 1db60a3ba8d26f64999cfd19c30059c9, type: 2}
@@ -136,6 +143,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e929fa97d6c88f840b48a594f457f89a, type: 2}
   - {fileID: 11400000, guid: 12fe484b62845d744832997ac0a248c3, type: 2}
   - {fileID: 11400000, guid: 60227874e41c92f439ce2a56af0f6784, type: 2}
+  - {fileID: 11400000, guid: 40ccba2ce9bd36e4a8c9e719dfd53e8a, type: 2}
+  - {fileID: 11400000, guid: 956005fe1fe79ad4aa2ea2b6f21a7295, type: 2}
+  - {fileID: 11400000, guid: 53da2b2543fa418499748f4120e6d5ec, type: 2}
+  - {fileID: 11400000, guid: e1b0fd3425156c04f926c859aa1e588e, type: 2}
+  - {fileID: 11400000, guid: 7a58036ee83a2084d88fcfe99b87ead1, type: 2}
+  - {fileID: 11400000, guid: 81bb279fefa795843b59ed008cece3f8, type: 2}
+  - {fileID: 11400000, guid: 4500ec3f2bc8b1d42ad6f90ebf4489b1, type: 2}
+  - {fileID: 11400000, guid: c64ec2c469e4f2a4693e6d59637b1f7e, type: 2}
+  - {fileID: 11400000, guid: 6d70a0c8ccc96ff43abf378c249773b7, type: 2}
   startingFurniture: {fileID: 11400000, guid: 882ec47c6abb7974ebe602fc3e2d5a6f, type: 2}
   finishes:
   - {fileID: 11400000, guid: 383ea424dc0f9a44f9e6854334978ae4, type: 2}
@@ -152,6 +168,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fbb070ab3f3789249b2a690156273411, type: 2}
   - {fileID: 11400000, guid: f59e6ea1aedde9a489181b9dd35d6987, type: 2}
   palettes: {fileID: 11400000, guid: 70c541004a6729f46ae17f1f6fd32f0e, type: 2}
+  bossTrophies:
+  - bossId: larder_troll
+    trophy: {fileID: 11400000, guid: c64ec2c469e4f2a4693e6d59637b1f7e, type: 2}
+  market: {fileID: 11400000, guid: 547503ddeff44774c8c800e55aefbfa6, type: 2}
   catalog: {fileID: 11400000, guid: d8eac911cc3734e46b213a4593c0e4b6, type: 2}
   newGameGold: 0
   allowDebugFill: 0

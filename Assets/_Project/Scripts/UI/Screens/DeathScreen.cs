@@ -24,6 +24,12 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] SatchelSlotView[] m_Slots = Array.Empty<SatchelSlotView>();
         [SerializeField] Button m_Confirm;
         [SerializeField] Button m_KeepNothing;
+        [SerializeField, Tooltip("Furnishings found on the delve (4f Checkpoint C): lost with it, never in the Lockbox.")]
+        LocalizedSuperText m_CuriosLost;
+
+        public string CuriosLostText => m_CuriosLost != null && m_CuriosLost.gameObject.activeSelf ? m_CuriosLost.GetComponent<SuperTextMesh>()?.text : null;
+
+        public void ConfigureCurios(LocalizedSuperText curiosLost) => m_CuriosLost = curiosLost;
 
         Action<int> m_OnChosen;
         Satchel m_Satchel;
@@ -83,6 +89,13 @@ namespace Hearthdelve.UI.Screens
             }
             if (m_KeepNothing != null) m_KeepNothing.gameObject.SetActive(!empty);
             if (m_Chosen != null) m_Chosen.gameObject.SetActive(!empty);
+            if (m_CuriosLost != null)
+            {
+                var curios = request.Curios;
+                bool any = curios != null && curios.Count > 0;
+                m_CuriosLost.gameObject.SetActive(any);
+                if (any) m_CuriosLost.Set(LocKeys.DeathCuriosLost, LocKeys.FurnitureList(curios));
+            }
             ShowChoice();
             m_Panel.SetActive(true);
             Select(first != null ? first : m_Confirm != null ? m_Confirm.gameObject : null);

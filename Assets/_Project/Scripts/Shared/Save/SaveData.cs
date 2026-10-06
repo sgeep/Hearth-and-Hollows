@@ -43,6 +43,15 @@ namespace Hearthdelve.Shared.Save
         public List<string> finishes = new();
         /// <summary>Version 6: the highest catalogue tier announced (D14).</summary>
         public int tierAnnounced;
+        /// <summary>Version 7 (4f Checkpoint C): pieces found or earned and not yet seen in storage (the "new" badge).</summary>
+        public List<string> newPieces = new();
+        /// <summary>Version 7: a boss trophy waiting for its homecoming in Decorate Mode (empty: none).</summary>
+        public string homecoming;
+        /// <summary>
+        /// Set only while migrating a version 6 save: starting pieces it never had (the Butcher Block) are given once, into
+        /// storage, marked new. Never written by a save.
+        /// </summary>
+        [NonSerialized] public bool grantNewStarters;
     }
 
     [Serializable]

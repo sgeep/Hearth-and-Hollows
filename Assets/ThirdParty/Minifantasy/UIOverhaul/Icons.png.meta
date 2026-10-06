@@ -282,6 +282,94 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Icons_Chest
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 400
+        width: 8
+        height: 8
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a08bf0323e1d3d6cece56c8b2c03ce32
+      internalID: -477245947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons_Heart
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 384
+        width: 8
+        height: 8
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3a5298d5491e7c5e6f6246cfde5776a2
+      internalID: -2133920992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons_Droplet
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 384
+        width: 8
+        height: 8
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0095b11d707caa44181352ca40721e2f
+      internalID: -1083573354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons_Book
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 400
+        width: 8
+        height: 8
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 753769013813ef790d59072ae3619057
+      internalID: -1632090746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -298,7 +386,11 @@ TextureImporter:
     nameFileIdTable:
       Icons_ArrowDown: 259622444
       Icons_ArrowUp: -697436249
+      Icons_Book: -1632090746
+      Icons_Chest: -477245947
+      Icons_Droplet: -1083573354
       Icons_Food: 56035651
+      Icons_Heart: -2133920992
       Icons_Lightning: 1563092157
       Icons_MagicSpark: 230560272
       Icons_Swords: 1669112149

@@ -36,6 +36,9 @@ namespace Hearthdelve.Tavern.Staff
         public ChopMinigame Minigame { get; private set; }
         public bool IsBusy => Minigame != null;
 
+        /// <summary>A batch chopped and on the fire, with how well (0–1, the staff cap applied).</summary>
+        public event Action<float> Chopped;
+
         public void Tick(float deltaTime)
         {
             if (m_Session.IsOver) return;
@@ -61,8 +64,10 @@ namespace Hearthdelve.Tavern.Staff
 
             Minigame.Tick(deltaTime, m_Player.NextInput(deltaTime));
             if (!Minigame.IsComplete) return;
-            m_Session.FinishChopping(this, Mathf.Min(Minigame.Evaluate(), m_QualityCap));
+            float score = Mathf.Min(Minigame.Evaluate(), m_QualityCap);
+            m_Session.FinishChopping(this, score);
             Finish();
+            Chopped?.Invoke(score);
         }
 
         void Finish()

@@ -45,6 +45,71 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] LocalizedSuperText m_ChopProgress;
         [SerializeField] LocalizedSuperText m_ChopPrompt;
 
+        [Header("Butcher Block (4f Checkpoint C)")]
+        [SerializeField] GameObject m_Butcher;
+        [SerializeField] RectTransform m_ButcherBoard;
+        [SerializeField] Image m_ButcherPart;
+        [SerializeField, Tooltip("The cut lines' dots, line after line.")] Image[] m_ButcherDots = System.Array.Empty<Image>();
+        [SerializeField, Min(1)] int m_DotsPerLine = 7;
+        [SerializeField] RectTransform m_ButcherKnife;
+        [SerializeField] RectTransform m_ButcherTimer;
+        [SerializeField] LocalizedSuperText m_ButcherTitle;
+        [SerializeField] LocalizedSuperText m_ButcherPrompt;
+        string m_LastButcherTitle;
+
+        static readonly Color k_LineUncut = new(0.98f, 0.92f, 0.75f, 0.9f);
+
+        public void ConfigureButcher(GameObject root, RectTransform board, Image part, Image[] dots, int dotsPerLine, RectTransform knife, RectTransform timer,
+            LocalizedSuperText title, LocalizedSuperText prompt)
+        {
+            m_Butcher = root;
+            m_ButcherBoard = board;
+            m_ButcherPart = part;
+            m_ButcherDots = dots;
+            m_DotsPerLine = dotsPerLine;
+            m_ButcherKnife = knife;
+            m_ButcherTimer = timer;
+            m_ButcherTitle = title;
+            m_ButcherPrompt = prompt;
+        }
+
+        void DrawButcher(ButcherMinigame b)
+        {
+            ButcherSettings s = b.Settings;
+            // The board spans the same share of the screen the pointer is mapped onto (KeeperWork).
+            SpanX(m_ButcherBoard, s.boardLeft, s.boardLeft + s.boardWidth);
+            IngredientItem part = KeeperWork.Instance != null ? KeeperWork.Instance.ButcheringPart : default;
+            string title = part.IsValid ? Loc.Get(part.Definition.displayName) : string.Empty;
+            if (title != m_LastButcherTitle)
+            {
+                m_LastButcherTitle = title;
+                m_ButcherTitle?.Set(TavernLocKeys.ButcherPanelTitle, title);
+                if (m_ButcherPart != null)
+                {
+                    m_ButcherPart.sprite = part.IsValid ? part.Definition.icon : null;
+                    m_ButcherPart.enabled = m_ButcherPart.sprite != null;
+                }
+            }
+            for (int i = 0; i < m_ButcherDots.Length; i++)
+            {
+                int line = i / m_DotsPerLine, dot = i % m_DotsPerLine;
+                Image image = m_ButcherDots[i];
+                bool shown = line < b.LineCount;
+                image.gameObject.SetActive(shown);
+                if (!shown) continue;
+                float t = (dot + 0.5f) / m_DotsPerLine;
+                var rect = (RectTransform)image.transform;
+                rect.anchorMin = rect.anchorMax = new Vector2(b.LineAt(line, t), 1f - t);
+                rect.anchoredPosition = Vector2.zero;
+                if (b.IsCut(line)) image.color = Color.Lerp(k_CutBad, k_CutGood, b.LineScore(line));
+                else if (b.Stroke == line && t <= b.StrokeProgress) image.color = b.OnTrack ? k_CutGood : new Color(0.95f, 0.65f, 0.3f);
+                else image.color = k_LineUncut;
+            }
+            m_ButcherKnife.anchorMin = m_ButcherKnife.anchorMax = new Vector2(b.Knife, b.Stroke >= 0 ? 1f - b.StrokeProgress : 1f);
+            m_ButcherKnife.anchoredPosition = Vector2.zero;
+            SpanX(m_ButcherTimer, 0f, Mathf.Clamp01(b.TimeLeft / Mathf.Max(0.01f, s.timeLimit)));
+        }
+
         [SerializeField] LocalizedSuperText m_StepAway;
         [SerializeField, Tooltip("A wash over the box for a moment: gold for a perfect or clean result, red for a burn or overflow.")]
         Image m_Flash;
@@ -132,6 +197,8 @@ namespace Hearthdelve.UI.Tavern
                 case nameof(TavernMoments.cleanPour):
                 case nameof(TavernMoments.lineReached):
                 case nameof(TavernMoments.chopDone):
+                case nameof(TavernMoments.butcherClean):
+                case nameof(TavernMoments.butcherDone):
                     m_FlashColour = m_GoodFlash;
                     break;
                 case nameof(TavernMoments.burned):
@@ -162,6 +229,7 @@ namespace Hearthdelve.UI.Tavern
                 case GrillMinigame grill: DrawGrill(grill); break;
                 case TapMinigame tap: DrawTap(tap); break;
                 case ChopMinigame chop: DrawChop(chop); break;
+                case ButcherMinigame butcher: DrawButcher(butcher); break;
             }
         }
 
@@ -171,6 +239,8 @@ namespace Hearthdelve.UI.Tavern
             if (m_Grill != null) m_Grill.SetActive(game is GrillMinigame);
             if (m_Tap != null) m_Tap.SetActive(game is TapMinigame);
             if (m_Chop != null) m_Chop.SetActive(game is ChopMinigame);
+            if (m_Butcher != null) m_Butcher.SetActive(game is ButcherMinigame);
+            m_LastButcherTitle = null;
             if (m_StepAway != null) m_StepAway.gameObject.SetActive(game != null);
             m_LastGrillSide = m_LastChopTitle = m_LastChopProgress = null;
             if (game != null && !m_PromptsSet) SetPrompts();
@@ -184,6 +254,7 @@ namespace Hearthdelve.UI.Tavern
             m_GrillPrompt?.Set(TavernLocKeys.GrillPrompt, action);
             m_TapPrompt?.Set(TavernLocKeys.TapPrompt, action, aim);
             m_ChopPrompt?.Set(TavernLocKeys.ChopPrompt, aim, action);
+            m_ButcherPrompt?.Set(TavernLocKeys.ButcherPrompt, action);
             m_StepAway?.Set(TavernLocKeys.HintStepAway, InputHints.Binding(InputMaps.Minigame, MinigameActions.Cancel));
         }
 

@@ -28,6 +28,14 @@ MonoBehaviour:
   baseValue: 5
   icon: {fileID: 1116164551, guid: 5cf04ff3b466e864b895005363e64277, type: 3}
   placeholderColor: {r: 0.4, g: 0.25, b: 0.35, a: 1}
+  source: 0
+  butchering:
+    cut: {fileID: 11400000, guid: c329976497ea86e4fba6c5db56341ad7, type: 2}
+    minCuts: 1
+    maxCuts: 3
+    thresholds:
+    - 0.5
+    - 0.85
   references:
     version: 2
     RefIds: []

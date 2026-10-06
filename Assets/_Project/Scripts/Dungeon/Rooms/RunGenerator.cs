@@ -200,19 +200,24 @@ namespace Hearthdelve.Dungeon.Rooms
         static RewardKind PickRewardKind(FloorTuning t, RunTuning tuning, SeededRandom random)
         {
             float power = HasPowers(tuning) ? t.powerWeight : 0f;
-            float total = t.goldWeight + t.ingredientWeight + power;
+            // Curios last, so a run without a pool rolls exactly as before.
+            float curio = HasCurios(tuning) ? t.curioWeight : 0f;
+            float total = t.goldWeight + t.ingredientWeight + power + curio;
             if (total <= 0f) return RewardKind.Gold;
             float roll = random.Value() * total;
             if (roll < t.goldWeight) return RewardKind.Gold;
-            return roll < t.goldWeight + t.ingredientWeight ? RewardKind.Ingredient : RewardKind.Power;
+            if (roll < t.goldWeight + t.ingredientWeight) return RewardKind.Ingredient;
+            return roll < t.goldWeight + t.ingredientWeight + power ? RewardKind.Power : RewardKind.Curio;
         }
 
         static bool HasPowers(RunTuning tuning) => tuning.powers != null && tuning.powers.Any(p => p != null);
+        static bool HasCurios(RunTuning tuning) => tuning.curios != null && tuning.curios.entries.Any(e => e?.piece != null && e.inRoomCaches);
 
         /// <summary>The payload for a reward of the given kind on this floor (Gold, or which part, how many, how good).</summary>
         static RoomReward RollReward(RewardKind kind, int floor, FloorTuning t, RunTuning tuning, SeededRandom random)
         {
             if (kind == RewardKind.Power && HasPowers(tuning)) return RoomReward.Power();
+            if (kind == RewardKind.Curio && HasCurios(tuning)) return RoomReward.Curio();
             if (kind == RewardKind.Ingredient)
             {
                 var options = (tuning.ingredientRewards ?? Array.Empty<IngredientRewardOption>())

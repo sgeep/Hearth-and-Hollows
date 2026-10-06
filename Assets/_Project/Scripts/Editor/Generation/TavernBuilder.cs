@@ -67,7 +67,11 @@ namespace Hearthdelve.Editor
             ProjectConfigurator.ConfigureAll();
             InputActionsBuilder.Build(force: false);
             MinifantasyImporter.ImportAll();
+            // 4f Checkpoint C: the market staples, butchered cuts and the Biome 1 menu.
+            CellarMenuContent.Build();
+            StaffContent.Build();
             LocalizationBuilder.Build();
+            LookTestContent.BuildHaptics();
             TavernStationContent.AssignDishIcons();
             NpcContent.Built npcs = NpcContent.Build();
             AddCarryViewToPlayer();
@@ -254,16 +258,20 @@ namespace Hearthdelve.Editor
 
             var pip = (GameObject)PrefabUtility.InstantiatePrefab(npcs.Pip);
             pip.transform.position = new Vector3(25.5f, 5.5f, 0f);
+            // Gunta Ashbelly, the cook (4f Checkpoint C): in the kitchen from the first evening.
+            var gunta = (GameObject)PrefabUtility.InstantiatePrefab(npcs.Gunta);
+            gunta.transform.position = new Vector3(24.5f, 9.5f, 0f);
 
             var director = root.gameObject.AddComponent<TavernDirector>();
             director.Configure(AssetDatabase.LoadAssetAtPath<TavernContent>(k_ContentPath), layout, npcs.Customer.GetComponent<CustomerAgent>(), pip.GetComponent<StaffAgent>());
+            director.ConfigureCook(gunta.GetComponent<StaffAgent>());
             root.gameObject.AddComponent<TavernDebugKeys>();
             // The keeper's stations, pass and seats are handed over by the area's furniture as it builds.
             root.gameObject.AddComponent<KeeperWork>();
 
             // Pip from an earlier run of this updater.
             foreach (StaffAgent extra in Object.FindObjectsByType<StaffAgent>(FindObjectsInactive.Include))
-                if (extra.gameObject != pip) Object.DestroyImmediate(extra.gameObject);
+                if (extra.gameObject != pip && extra.gameObject != gunta) Object.DestroyImmediate(extra.gameObject);
         }
 
         // ------------------------------------------------------------------ stations and serving (step 3)
@@ -318,6 +326,8 @@ namespace Hearthdelve.Editor
             FurnitureLooks.Build(furniture.Database);
             FurnitureCatalog.Built catalogue = FurnitureCatalog.Build(furniture.Database, furniture.Definitions.Keys);
             if (catalogue.Warnings.Count > 0) Debug.LogWarning($"[Hearthdelve] The furniture catalogue has {catalogue.Warnings.Count} warnings.");
+            // 4f Checkpoint C: the troll's trophy and the Cellars' discoveries come from the catalogue.
+            CurioContent.LinkTrophies(furniture.Database);
             return furniture;
         }
 

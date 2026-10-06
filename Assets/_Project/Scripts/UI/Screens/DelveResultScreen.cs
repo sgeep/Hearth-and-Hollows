@@ -22,6 +22,10 @@ namespace Hearthdelve.UI.Screens
         LocalizedSuperText m_Gold;
         [SerializeField, Tooltip("A boss felled on the delve (4e sign-off).")]
         LocalizedSuperText m_Boss;
+        [SerializeField, Tooltip("Furnishings found (4f Checkpoint C): brought home, or lost.")]
+        LocalizedSuperText m_Curios;
+        [SerializeField, Tooltip("A boss's trophy earned on the delve: it hangs in the Sunken Flagon whatever the delve's end.")]
+        LocalizedSuperText m_Trophy;
         [SerializeField] SatchelSlotView[] m_Slots = Array.Empty<SatchelSlotView>();
         [SerializeField] Button m_Continue;
         [SerializeField] LocalizedSuperText m_ContinueLabel;
@@ -34,6 +38,14 @@ namespace Hearthdelve.UI.Screens
         public Button Continue => m_Continue;
         /// <summary>The boss line, if a boss was felled on the delve shown.</summary>
         public bool ShowsBoss => m_Boss != null && m_Boss.gameObject.activeSelf;
+        public string CuriosText => m_Curios != null && m_Curios.gameObject.activeSelf ? m_Curios.GetComponent<SuperTextMesh>()?.text : null;
+        public string TrophyText => m_Trophy != null && m_Trophy.gameObject.activeSelf ? m_Trophy.GetComponent<SuperTextMesh>()?.text : null;
+
+        public void ConfigureFinds(LocalizedSuperText curios, LocalizedSuperText trophy)
+        {
+            m_Curios = curios;
+            m_Trophy = trophy;
+        }
 
         public void Configure(GameObject panel, LocalizedSuperText title, LocalizedSuperText summary, SatchelSlotView[] slots, Button proceed, LocalizedSuperText proceedLabel,
             LocalizedSuperText gold = null, LocalizedSuperText boss = null)
@@ -81,6 +93,24 @@ namespace Hearthdelve.UI.Screens
                 bool felled = Report.BossesDefeated.Count > 0;
                 m_Boss.gameObject.SetActive(felled);
                 if (felled) m_Boss.Set(LocKeys.ResultBoss, Loc.UI(LocKeys.BossName(Report.BossesDefeated[0])));
+            }
+            if (m_Curios != null)
+            {
+                bool kept = Report.CuriosKept.Count > 0, lost = Report.CuriosLost.Count > 0;
+                m_Curios.gameObject.SetActive(kept || lost);
+                if (kept) m_Curios.Set(LocKeys.ResultCuriosKept, LocKeys.FurnitureList(Report.CuriosKept));
+                else if (lost) m_Curios.Set(LocKeys.ResultCuriosLost, LocKeys.FurnitureList(Report.CuriosLost));
+            }
+            if (m_Trophy != null)
+            {
+                // A first victory's trophy (D10): granted with the victory, whatever the delve's end.
+                var flow = Shared.Game.GameFlow.Instance;
+                Shared.Customization.FurnitureDefinition trophy = null;
+                if (flow != null && flow.Database != null && flow.State != null)
+                    foreach (string boss in Report.BossesDefeated)
+                        trophy ??= Shared.Game.TrophyRules.Unearned(flow.State, flow.Database.bossTrophies, boss);
+                m_Trophy.gameObject.SetActive(trophy != null);
+                if (trophy != null) m_Trophy.Set(LocKeys.ResultTrophy, LocKeys.FurnitureName(trophy.id));
             }
             for (int i = 0; i < m_Slots.Length; i++)
             {

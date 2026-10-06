@@ -24,6 +24,7 @@ namespace Hearthdelve.Tavern.Scene
         [Tooltip("A new colourway or palette: a soft brush.")] public MMF_Player restyle;
         [Tooltip("A wall or floor finish laid.")] public MMF_Player finish;
         [Tooltip("Off to another room.")] public MMF_Player area;
+        [Tooltip("A boss trophy goes up for the first time: a heavy thud, a bright chime, a warm rumble.")] public MMF_Player homecoming;
     }
 
     /// <summary>
@@ -74,6 +75,7 @@ namespace Hearthdelve.Tavern.Scene
                 DecorateMoment.Restyle => m_Moments.restyle,
                 DecorateMoment.Finish => m_Moments.finish,
                 DecorateMoment.Area => m_Moments.area,
+                DecorateMoment.Homecoming => m_Moments.homecoming,
                 _ => null,
             };
             if (player != null) player.PlayFeedbacks();

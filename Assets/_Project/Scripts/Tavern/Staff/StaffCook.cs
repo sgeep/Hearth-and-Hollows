@@ -41,6 +41,9 @@ namespace Hearthdelve.Tavern.Staff
         public IMinigame Minigame { get; private set; }
         public bool IsBusy => Current != null;
 
+        /// <summary>A dish came off the station, with its quality (0–1, the staff cap applied).</summary>
+        public event Action<RecipeDefinition, float> Cooked;
+
         public void Tick(float deltaTime)
         {
             if (m_Session.IsOver) return;
@@ -69,8 +72,11 @@ namespace Hearthdelve.Tavern.Staff
             Minigame.Tick(deltaTime, m_Player.NextInput(deltaTime));
             if (!Minigame.IsComplete) return;
 
-            m_Session.FinishCooking(Current, Mathf.Min(Minigame.Evaluate(), m_QualityCap));
+            float quality = Mathf.Min(Minigame.Evaluate(), m_QualityCap);
+            RecipeDefinition dish = Current.Recipe;
+            m_Session.FinishCooking(Current, quality);
             Finish();
+            Cooked?.Invoke(dish, quality);
         }
 
         void Finish()

@@ -27,5 +27,7 @@ namespace Hearthdelve.Tavern.Scene
         public TapConfig tap;
         public ServingConfig serving;
         public StewConfig stew;
+        [Tooltip("The Butcher Block (4f Checkpoint C).")]
+        public ButcherConfig butcher;
     }
 }

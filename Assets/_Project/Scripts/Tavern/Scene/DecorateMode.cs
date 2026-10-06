@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Hearthdelve.Core;
+using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Game;
@@ -30,6 +31,8 @@ namespace Hearthdelve.Tavern.Scene
         Restyle,
         /// <summary>A floor or wall finish laid.</summary>
         Finish,
+        /// <summary>A boss trophy goes up for the first time (4f Checkpoint C): the bigger moment.</summary>
+        Homecoming,
         /// <summary>Off to another area of the property (4f step 6).</summary>
         Area,
     }
@@ -150,6 +153,23 @@ namespace Hearthdelve.Tavern.Scene
             m_LastPointer = m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
             Refresh();
             MomentPlayed?.Invoke(DecorateMoment.Enter);
+            OfferHomecoming();
+        }
+
+        /// <summary>The trophy on the cursor waiting for its first place on the wall (null once it's up, or put away).</summary>
+        public string HomecomingPiece { get; private set; }
+
+        /// <summary>
+        /// A boss trophy earned and not yet hung (plan §16): offered once, already on the cursor, the first time Decorate Mode
+        /// opens after it was earned. Put away instead, it waits in storage like any other piece.
+        /// </summary>
+        void OfferHomecoming()
+        {
+            string pending = Area?.State.PendingHomecoming;
+            if (string.IsNullOrEmpty(pending)) return;
+            Area.State.PendingHomecoming = null;
+            if (TakeFromStorage(pending)) HomecomingPiece = pending;
+            Changed?.Invoke();
         }
 
         /// <summary>Starts working on an area: its layout copied, the cursor in the middle of its floor, the camera on it.</summary>
@@ -470,9 +490,20 @@ namespace Hearthdelve.Tavern.Scene
                 if (m_Layout.Resolve(rider) == null) m_Layout.Remove(rider.uid);
             }
             m_Riders.Clear();
+            string placed = Carried.definition;
             Carried = null;
             m_From = null;
             Rebuild();
+            // Facts for later reactions (4g): what went where, and a trophy's first time up.
+            string areaId = Area.Area.Id;
+            EventBus<FurniturePlaced>.Publish(new FurniturePlaced(placed, areaId));
+            if (placed == HomecomingPiece)
+            {
+                HomecomingPiece = null;
+                EventBus<TrophyDisplayed>.Publish(new TrophyDisplayed(placed, areaId));
+                MomentPlayed?.Invoke(DecorateMoment.Homecoming);
+                return;
+            }
             MomentPlayed?.Invoke(DecorateMoment.Place);
         }
 

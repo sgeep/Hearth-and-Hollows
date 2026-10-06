@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a637b5a1d0604e49a78011113afc742, type: 3}
+  m_Name: ButcherConfig
+  m_EditorClassIdentifier: Hearthdelve.Tavern::Hearthdelve.Tavern.Minigames.ButcherConfig
+  butcher:
+    edgeMargin: 0.18
+    slant: 0.16
+    strokeSeconds: 1
+    perfectDistance: 0.03
+    falloff: 0.14
+    knifeSpeed: 0.9
+    timeLimit: 9
+    cleanStroke: 0.8
+    boardLeft: 0.3
+    boardWidth: 0.4
+    autoMaxError: 0.12
+    autoMaxHesitation: 0.6

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe8bc1d0216a7749bd8db2dfc85391f, type: 3}
+  m_Name: CurioPool_Cellars
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Run.CurioPool
+  entries:
+  - piece: {fileID: 11400000, guid: 43845f88a3258e64fbc61798ca2e47be, type: 2}
+    weight: 1
+    droppedBy:
+    - giant_spider
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: aa237a20ad3b9ce459e62178193965d1, type: 2}
+    weight: 0.6
+    droppedBy:
+    - giant_spider
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 4500ec3f2bc8b1d42ad6f90ebf4489b1, type: 2}
+    weight: 0.5
+    droppedBy:
+    - giant_spider
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 956005fe1fe79ad4aa2ea2b6f21a7295, type: 2}
+    weight: 1
+    droppedBy:
+    - green_slime
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 53da2b2543fa418499748f4120e6d5ec, type: 2}
+    weight: 1
+    droppedBy:
+    - bat
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 40ccba2ce9bd36e4a8c9e719dfd53e8a, type: 2}
+    weight: 1
+    droppedBy: []
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: e1b0fd3425156c04f926c859aa1e588e, type: 2}
+    weight: 0.8
+    droppedBy: []
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 7a58036ee83a2084d88fcfe99b87ead1, type: 2}
+    weight: 0.8
+    droppedBy: []
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 81bb279fefa795843b59ed008cece3f8, type: 2}
+    weight: 0.5
+    droppedBy: []
+    inRoomCaches: 1
+  - piece: {fileID: 11400000, guid: 7f8a1addf2450f348b6a83c467637e05, type: 2}
+    weight: 0.4
+    droppedBy: []
+    inRoomCaches: 1
+  enemyDropChance: 0.04
+  maxEnemyDropsPerDelve: 2
+  firstCopyWeight: 3
+  fallbackGoldMin: 25
+  fallbackGoldMax: 40

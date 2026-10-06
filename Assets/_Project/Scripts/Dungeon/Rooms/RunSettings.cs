@@ -22,6 +22,8 @@ namespace Hearthdelve.Dungeon.Rooms
         public GoldPickup goldPickup;
         [Tooltip("A power room's reward: touched, it offers three run powers.")]
         public Hearthdelve.Dungeon.Powers.PowerPickup powerPickup;
+        [Tooltip("A furnishing discovery on the floor (4f Checkpoint C): a curio room's reward, or a rare enemy drop.")]
+        public CurioPickup curioPickup;
         [Tooltip("Lit in the room before the boss's arena once it's clear (4e playtest).")]
         public Campfire campfire;
 

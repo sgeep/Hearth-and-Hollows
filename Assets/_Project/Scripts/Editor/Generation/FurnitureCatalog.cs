@@ -75,6 +75,9 @@ namespace Hearthdelve.Editor
 
         public static CatalogJson Load() => JsonUtility.FromJson<CatalogJson>(File.ReadAllText(JsonPath));
 
+        /// <summary>A sheet source under the project (a derived composite) rather than in the raw packs.</summary>
+        public const string DerivedPrefix = "derived:";
+
         public static string SheetFile(string key) => $"Furniture_{key}";
         public static string SheetPath(string key) => $"{EditorPaths.Minifantasy}/{Pack}/{SheetFile(key)}.png";
 
@@ -171,10 +174,14 @@ namespace Hearthdelve.Editor
             EditorPaths.Ensure($"{EditorPaths.Minifantasy}/{Pack}");
 
             // The source images: the raw packs when present, else the copies already in the repo (same coordinates).
+            // "derived:" sources are composites of Minifantasy pixels built by our own tools into the repo (the troll's
+            // trophy, Tools/furniture/trophy.py), recorded in docs/ASSET_MAP.md.
             var images = new Dictionary<string, Texture2D>();
             foreach (SheetJson s in data.sheets)
             {
-                string raw = Path.Combine(EditorPaths.MinifantasySource, s.source);
+                string raw = s.source.StartsWith(DerivedPrefix, StringComparison.Ordinal)
+                    ? s.source.Substring(DerivedPrefix.Length)
+                    : Path.Combine(EditorPaths.MinifantasySource, s.source);
                 string copy = SheetPath(s.key);
                 string from = File.Exists(raw) ? raw : File.Exists(copy) ? copy : null;
                 if (from == null)

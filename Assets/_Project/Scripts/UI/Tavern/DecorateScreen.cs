@@ -158,7 +158,13 @@ namespace Hearthdelve.UI.Tavern
             if (mode.Carried != null)
             {
                 string name = PieceName(mode.Carried.definition);
-                if (mode.CarriedCheck.IsValid)
+                if (mode.CarriedCheck.IsValid && mode.Carried.definition == mode.HomecomingPiece)
+                {
+                    // A trophy's homecoming: it asks where it should hang.
+                    m_Piece.Set(DecorateLocKeys.Homecoming, name);
+                    SetColor(m_Piece, m_Plain);
+                }
+                else if (mode.CarriedCheck.IsValid)
                 {
                     m_Piece.Set(DecorateLocKeys.Carrying, name);
                     SetColor(m_Piece, m_Plain);

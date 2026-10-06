@@ -247,8 +247,11 @@ namespace Hearthdelve.Tavern.Scene
                 if (layout != null) layout.SetFurniture(m_Seats, posts);
                 KeeperWork keeper = FindInScene<KeeperWork>();
                 if (keeper != null)
+                {
                     keeper.Configure(stations.GetValueOrDefault(StationKind.Grill), stations.GetValueOrDefault(StationKind.Tap),
                         stations.GetValueOrDefault(StationKind.StewPot), pass, seatUses.ToArray());
+                    keeper.ConfigureButcherBlock(stations.GetValueOrDefault(StationKind.ButcherBlock));
+                }
             }
 
             ApplyFinishes();
@@ -304,6 +307,7 @@ namespace Hearthdelve.Tavern.Scene
                 StationKind.Grill => TavernInteractableKind.Grill,
                 StationKind.Tap => TavernInteractableKind.Tap,
                 StationKind.StewPot => TavernInteractableKind.StewPot,
+                StationKind.ButcherBlock => TavernInteractableKind.ButcherBlock,
                 _ => null,
             },
             _ => null,
@@ -484,6 +488,10 @@ namespace Hearthdelve.Tavern.Scene
                 foreach (var (placed, renderer) in renderers)
                     if (placed.Art.workingFrames != null && placed.Art.workingFrames.Length > 0)
                         renderer.gameObject.AddComponent<KitchenView>().Configure(renderer, renderer.sprite, placed.Art.workingFrames);
+            if (d.function == FurnitureFunction.Station && d.station == StationKind.ButcherBlock)
+                foreach (var (placed, renderer) in renderers)
+                    if (placed.Art.workingFrames != null && placed.Art.workingFrames.Length > 0)
+                        renderer.gameObject.AddComponent<ButcherBlockView>().Configure(renderer, renderer.sprite, placed.Art.workingFrames);
         }
 
         void DressStewPot(ResolvedFurniture piece, Transform art)

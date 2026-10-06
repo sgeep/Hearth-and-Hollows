@@ -91,6 +91,7 @@ namespace Hearthdelve.Editor
             settings.goldPickup = BuildGoldPickup();
             settings.powerPickup = BuildPowerPickup();
             settings.campfire = BuildCampfire();
+            BuildCurios(settings);
             // Step 4's powers: the assets are refreshed (art) but their amounts are kept; the list is filled once.
             Hearthdelve.Shared.Run.RunPowerDefinition[] powers = BuildPowers();
             if (settings.tuning.powers == null || settings.tuning.powers.Length == 0) settings.tuning.powers = powers;
@@ -222,6 +223,56 @@ namespace Hearthdelve.Editor
             return LookTestContent.SavePrefab(root, CampfirePrefab).GetComponent<Campfire>();
         }
 
+        /// <summary>
+        /// Furnishing discoveries (4f Checkpoint C): the pickup is rebuilt every run; the Cellars pool is made once (its tuning
+        /// is kept) and the troll's trophy linked.
+        /// </summary>
+        static void BuildCurios(RunSettings settings)
+        {
+            LookTestContent.BuildHaptics();
+            Hearthdelve.Shared.Game.GameDatabase database = CurioContent.Database();
+            CurioContent.LinkTrophies(database);
+            settings.curioPickup = BuildCurioPickup();
+            if (settings.tuning.curios == null) settings.tuning.curios = CurioContent.BuildCellarPool(database);
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+        }
+
+        public const string CurioPickupPrefab = EditorPaths.Prefabs + "/Dungeon/CurioPickup.prefab";
+
+        /// <summary>
+        /// A furnishing found (4f Checkpoint C): a small chest under a twinkling star with a cool violet glow, unlit like the
+        /// other pickups, and a chime with the discovery haptic. Nothing like the coin, a part or a power's spark.
+        /// </summary>
+        static CurioPickup BuildCurioPickup()
+        {
+            var root = new GameObject("CurioPickup") { layer = LayerMask.NameToLayer(Layers.Pickup) };
+            var trigger = root.AddComponent<CircleCollider2D>();
+            trigger.isTrigger = true;
+            trigger.radius = 0.5f;
+            trigger.offset = new Vector2(0f, 0.3f);
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            SpriteRenderer chest = LookTestContent.AddSprite(root.transform, "Chest", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Chest"),
+                SortingLayers.YSorted, 0, new Vector3(0f, 0.3f, 0f));
+            SpriteRenderer glint = LookTestContent.AddSprite(root.transform, "Glint", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "MagicSpark"),
+                SortingLayers.YSorted, 1, new Vector3(0.22f, 0.55f, 0f));
+            if (unlit != null)
+            {
+                chest.sharedMaterial = unlit;
+                glint.sharedMaterial = unlit;
+            }
+            Light2D glow = LookTestBuilder.Light("Glow", new Vector3(0f, 0.4f, 0f), Light2D.LightType.Point);
+            glow.transform.SetParent(root.transform, false);
+            glow.color = new Color(0.62f, 0.55f, 1f);
+            glow.intensity = 0.9f;
+            glow.pointLightInnerRadius = 0.25f;
+            glow.pointLightOuterRadius = 2.2f;
+            MMF_Player feedback = LookTestContent.Feedback(root.transform, "Feedback_Discovery", null, 0f, LookTestContent.Sfx("PH_Discovery"),
+                LookTestContent.Pattern(HapticIds.DiscoveryFound));
+            root.AddComponent<CurioPickup>().Configure(chest.transform, glint, feedback);
+            return LookTestContent.SavePrefab(root, CurioPickupPrefab).GetComponent<CurioPickup>();
+        }
+
         /// <summary>A room's Gold reward: a bobbing coin (unlit, so it reads on a dim floor, like the parts) that adds to the run's Gold.</summary>
         static GoldPickup BuildGoldPickup()
         {
@@ -262,6 +313,8 @@ namespace Hearthdelve.Editor
 
         static void UpdateRun(RunSettings settings)
         {
+            BuildSounds();
+            BuildCurios(settings);
             Scene scene = EditorSceneManager.OpenScene(EditorPaths.DungeonScene, OpenSceneMode.Single);
             // The HUD and the result screen (step 3: run Gold) are rebuilt with the run.
             DungeonUI.RebuildScreens(UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI"));
@@ -302,7 +355,8 @@ namespace Hearthdelve.Editor
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Swords"),
                 MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"),
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Food"),
-                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Lightning"));
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Lightning"),
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Chest"));
             EditorUtility.SetDirty(runner);
         }
 
@@ -355,6 +409,13 @@ namespace Hearthdelve.Editor
                 (LookTestContent.Noise(n) * 0.5f + Sin(t, 70f - 40f * t) * 0.9f) * Mathf.Exp(-t * 14f) * 0.8f);
             LookTestContent.WriteWav("PH_GateRise", 0.5f, (t, n) =>
                 (LookTestContent.Noise(n) * 0.35f + Sin(t, 900f) * 0.15f) * (0.6f + 0.4f * Sin(t, 22f)) * Mathf.Sin(t / 0.5f * Mathf.PI) * 0.6f);
+            // A furnishing found (4f Checkpoint C): three bright bell notes, rising, unlike the coin or the power.
+            LookTestContent.WriteWav("PH_Discovery", 0.7f, (t, n) =>
+            {
+                float note = t < 0.12f ? 1320f : t < 0.24f ? 1660f : 1980f;
+                float local = t < 0.12f ? t : t < 0.24f ? t - 0.12f : t - 0.24f;
+                return (Sin(t, note) * 0.5f + Sin(t, note * 2f) * 0.15f) * Mathf.Exp(-local * 7f) * 0.45f;
+            });
             // A power taken: a rising shimmer.
             LookTestContent.WriteWav("PH_PowerUp", 0.6f, (t, n) =>
                 (Sin(t, 520f + 700f * t) * 0.5f + Sin(t, 1040f + 1400f * t) * 0.25f) * Mathf.Sin(t / 0.6f * Mathf.PI) * 0.35f);

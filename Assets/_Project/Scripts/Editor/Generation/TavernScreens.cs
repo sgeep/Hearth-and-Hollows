@@ -150,8 +150,61 @@ namespace Hearthdelve.Editor
             Button descend = BottomButton(panel, "Descend", LoopLocKeys.MorningDescend, 0f, 156f, out _);
             UiFeedbackContent.Commit(descend);
             Button decorate = BottomButton(panel, "Decorate", DecorateLocKeys.Button, 117f, 70f, out _);
-            root.gameObject.AddComponent<MorningScreen>().Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend, decorate);
+            // The Brackenford market (4f Checkpoint C): opposite Decorate, its list over the panel.
+            Button marketButton = BottomButton(panel, "Market", LoopLocKeys.MarketButton, -117f, 70f, out _);
+            MorningScreen morning = root.gameObject.AddComponent<MorningScreen>();
+            morning.Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend, decorate);
+            morning.ConfigureMarket(marketButton, BuildMarket(root));
             panel.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// The Brackenford market list (4f Checkpoint C): the purse, a row per staple (its icon and name, how many are in the
+        /// storeroom, and a buy button with the price), a note, and done.
+        /// </summary>
+        static MarketPanel BuildMarket(RectTransform root)
+        {
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(232f, 132f), Vector2.zero);
+            panel.name = "Market";
+            DungeonUI.Title(panel, LoopLocKeys.MarketTitle);
+            var topLeft = new Vector2(0f, 1f);
+            LocalizedSuperText purse = Label(panel, "Purse", LoopLocKeys.MarketPurse, 6f, k_Label, TextAnchor.MiddleLeft, topLeft, new Vector2(10f, -20f), new Vector2(110f, Line));
+            var rows = new MarketRow[6];
+            Button previous = null;
+            var buttons = new System.Collections.Generic.List<Button>();
+            for (int i = 0; i < rows.Length; i++)
+            {
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(10f, -33f - i * 13f), new Vector2(212f, 12f));
+                RectTransform iconRect = Rect(row, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
+                Image icon = DungeonUI.AddImage(iconRect, null, Color.white);
+                LocalizedSuperText name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(46f, Line));
+                LocalizedSuperText stock = Label(row, "Stock", LoopLocKeys.MarketHave, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(58f, 0f), new Vector2(84f, Line));
+                // Anchored right, a small button's position is its right edge: 144–212, clear of the count.
+                Button buy = SmallButton(row, "Buy", LoopLocKeys.MarketBuy, new Vector2(1f, 0.5f), Vector2.zero, 68f, out LocalizedSuperText buyLabel);
+                UiFeedbackContent.Commit(buy);
+                rows[i] = new MarketRow { root = row.gameObject, icon = icon, name = name, stock = stock, buy = buy, buyLabel = buyLabel };
+                buttons.Add(buy);
+                previous = buy;
+            }
+            LocalizedSuperText message = Label(panel, "Message", LoopLocKeys.MarketShort, 6f, new Color(0.62f, 0.2f, 0.12f), TextAnchor.MiddleRight, topLeft,
+                new Vector2(222f - 110f, -20f), new Vector2(110f, Line));
+            Button done = SmallButton(panel, "Done", LoopLocKeys.MarketDone, new Vector2(0.5f, 0f), new Vector2(0f, 6f), 80f, out _);
+            // Up and down through the buy buttons, then done.
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                var navigation = new Navigation
+                {
+                    mode = Navigation.Mode.Explicit,
+                    selectOnUp = i > 0 ? buttons[i - 1] : done,
+                    selectOnDown = i < buttons.Count - 1 ? buttons[i + 1] : done,
+                };
+                buttons[i].navigation = navigation;
+            }
+            done.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = buttons[^1], selectOnDown = buttons[0] };
+            MarketPanel market = root.gameObject.AddComponent<MarketPanel>();
+            market.Configure(panel.gameObject, purse, rows, done, message);
+            panel.gameObject.SetActive(false);
+            return market;
         }
 
         // ------------------------------------------------------------------ Night
@@ -458,8 +511,8 @@ namespace Hearthdelve.Editor
             // The storeroom: what came back from the dungeon, as satchel-style slots.
             SatchelSlotView[] stock = Storeroom(panel, out LocalizedSuperText empty);
 
-            // Tonight's menu: a card per dish.
-            var cards = new DishCard[8];
+            // Tonight's menu: a card per dish, three rows a page (4f Checkpoint C: the staff-and-tools row sits under them).
+            var cards = new DishCard[6];
             for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, k_CardsTop), 66f);
             // When nothing can be cooked: a banner over the (dimmed) cards, so closing for the night is the clear choice.
             RectTransform banner = Rect(panel, "NothingBanner", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -10f), new Vector2(296f, Line + 6f), new Color(0.95f, 0.85f, 0.62f));
@@ -467,15 +520,74 @@ namespace Hearthdelve.Editor
             // 4f: when the layout keeps the doors shut, the banner says why and offers Decorate Mode.
             Button decorate = SmallButton(banner, "Decorate", DecorateLocKeys.Button, new Vector2(1f, 0.5f), new Vector2(-3f, 0f), 60f, out _);
 
-            Button staff = BottomButton(panel, "Staff", TavernLocKeys.PrepStaffJob, -107f, 80f, out LocalizedSuperText staffLabel);
-            Button close = BottomButton(panel, "Close", LoopLocKeys.PrepClose, -6f, 114f, out _);
-            Button open = BottomButton(panel, "Open", TavernLocKeys.PrepOpen, 101f, 92f, out _);
+            // The staff and the kitchen's tools: Pip's job, Gunta's job, the Butcher Block, the menu's next page.
+            Button staff = SmallButton(panel, "Staff", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-114f, 28f), 80f, out LocalizedSuperText staffLabel);
+            Button cook = SmallButton(panel, "Cook", TavernLocKeys.PrepStaffJob, new Vector2(0.5f, 0f), new Vector2(-30f, 28f), 84f, out LocalizedSuperText cookLabel);
+            Button butcher = SmallButton(panel, "Butcher", TavernLocKeys.PrepButcher, new Vector2(0.5f, 0f), new Vector2(52f, 28f), 76f, out _);
+            Button page = SmallButton(panel, "Page", TavernLocKeys.PrepPage, new Vector2(0.5f, 0f), new Vector2(122f, 28f), 60f, out LocalizedSuperText pageLabel);
+            Button close = BottomButton(panel, "Close", LoopLocKeys.PrepClose, -62f, 114f, out _);
+            Button open = BottomButton(panel, "Open", TavernLocKeys.PrepOpen, 62f, 114f, out _);
             UiFeedbackContent.Commit(open);
-            root.gameObject.AddComponent<PrepScreen>().Configure(panel.gameObject, stock, empty, tonight, cards, staff, staffLabel, close, open, nothing, fill.gameObject, banner.gameObject,
-                decorate);
+            PrepScreen prep = root.gameObject.AddComponent<PrepScreen>();
+            prep.Configure(panel.gameObject, stock, empty, tonight, cards, staff, staffLabel, close, open, nothing, fill.gameObject, banner.gameObject, decorate);
+            prep.ConfigureKitchen(cook, cookLabel, butcher, BuildButcher(root), page, pageLabel);
             decorate.gameObject.SetActive(false);
             // The screen object stays active (it listens); the panel shows and hides.
             panel.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// The Butcher Block's list (4f Checkpoint C): the parts in the storeroom that break down, each with "cut it" and
+        /// "Gunta cuts it", a line for what the last cut gave, and done.
+        /// </summary>
+        static ButcherPanel BuildButcher(RectTransform root)
+        {
+            // 312 wide: a part's name, how many, the most cuts it gives, and who cuts it, each in its own column.
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(312f, 164f), Vector2.zero);
+            panel.name = "Butcher";
+            DungeonUI.Title(panel, TavernLocKeys.ButcherTitle);
+            var topLeft = new Vector2(0f, 1f);
+            LocalizedSuperText intro = Label(panel, "Intro", TavernLocKeys.ButcherIntro, 6f, k_Label, TextAnchor.UpperLeft, topLeft, new Vector2(10f, -18f), new Vector2(292f, Line * 2));
+            var rows = new ButcherRow[5];
+            for (int i = 0; i < rows.Length; i++)
+            {
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(10f, -46f - i * 16f), new Vector2(292f, 14f));
+                Image icon = DungeonUI.AddImage(Rect(row, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)), null, Color.white);
+                LocalizedSuperText name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(113f, Line));
+                LocalizedSuperText count = Label(row, "Count", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(126f, 0f), new Vector2(20f, Line));
+                LocalizedSuperText yield = Label(row, "Yield", TavernLocKeys.ButcherYield, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(148f, 0f), new Vector2(44f, Line));
+                // Anchored right, a small button's position is its right edge: "cut it" 196–236, the staff 238–292.
+                Button yourself = SmallButton(row, "Yourself", TavernLocKeys.ButcherYourself, new Vector2(1f, 0.5f), new Vector2(-56f, 0f), 40f, out _);
+                Button staff = SmallButton(row, "Staff", TavernLocKeys.ButcherStaff, new Vector2(1f, 0.5f), Vector2.zero, 54f, out LocalizedSuperText staffLabel);
+                UiFeedbackContent.Commit(yourself);
+                UiFeedbackContent.Commit(staff);
+                rows[i] = new ButcherRow { root = row.gameObject, icon = icon, name = name, count = count, yield = yield, yourself = yourself, staff = staff, staffLabel = staffLabel };
+            }
+            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, new Color(0.12f, 0.33f, 0.55f), TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
+                new Vector2(0f, 26f), new Vector2(292f, Line));
+            Button done = SmallButton(panel, "Done", TavernLocKeys.ButcherDone, new Vector2(0.5f, 0f), new Vector2(0f, 6f), 80f, out _);
+            for (int i = 0; i < rows.Length; i++)
+            {
+                rows[i].yourself.navigation = new Navigation
+                {
+                    mode = Navigation.Mode.Explicit,
+                    selectOnUp = i > 0 ? rows[i - 1].yourself : done,
+                    selectOnDown = i < rows.Length - 1 ? rows[i + 1].yourself : done,
+                    selectOnRight = rows[i].staff,
+                };
+                rows[i].staff.navigation = new Navigation
+                {
+                    mode = Navigation.Mode.Explicit,
+                    selectOnUp = i > 0 ? rows[i - 1].staff : done,
+                    selectOnDown = i < rows.Length - 1 ? rows[i + 1].staff : done,
+                    selectOnLeft = rows[i].yourself,
+                };
+            }
+            done.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnUp = rows[^1].yourself, selectOnDown = rows[0].yourself };
+            ButcherPanel butcher = root.gameObject.AddComponent<ButcherPanel>();
+            butcher.Configure(panel.gameObject, intro, rows, message, done);
+            panel.gameObject.SetActive(false);
+            return butcher;
         }
 
         /// <summary>
@@ -537,9 +649,14 @@ namespace Hearthdelve.Editor
             }
             // The takings, set apart under a rule.
             RectTransform takingsRow = Rect(panel, "TakingsRow", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(224f, 172f));
-            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -38f), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
-            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, -41f, 104f);
-            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, -41f, 104f);
+            Rect(takingsRow, "Rule", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -36f), new Vector2(120f, 1f), new Color(k_Title.r, k_Title.g, k_Title.b, 0.35f));
+            TextLine(takingsRow, "TakingsLabel", TavernLocKeys.ResultsTakings, k_Label, TextAnchor.UpperRight, -4f, -38f, 104f);
+            LocalizedSuperText takings = TextLine(takingsRow, "Takings", TavernLocKeys.PrepValue, k_Accent, TextAnchor.UpperLeft, 4f, -38f, 104f);
+            // Pip keeps the books (4f Checkpoint C): the takings come from Pip's ledger.
+            RectTransform ledger = Rect(takingsRow, "Ledger", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, -55f), new Vector2(104f, 10f));
+            DungeonUI.AddImage(Rect(ledger, "Book", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)),
+                MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Icons", "Book"), Color.white);
+            Label(ledger, "Text", TavernLocKeys.ResultsLedger, 6f, k_Note, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(120f, Line));
             Button done = BottomButton(panel, "Done", TavernLocKeys.ResultsAgain, 0f, 144f, out LocalizedSuperText doneLabel);
             UiFeedbackContent.Commit(done);
             root.gameObject.AddComponent<EveningResultsScreen>().Configure(panel.gameObject, note, labels, lines, takingsRow.gameObject, takings, done, doneLabel);

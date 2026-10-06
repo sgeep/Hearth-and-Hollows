@@ -29,13 +29,19 @@ MonoBehaviour:
     categories: 0
     count: 1
     optional: 0
-  baseValue: 12
+  - match: 0
+    ingredient: {fileID: 11400000, guid: cd4d86ccf4d17134fa29529be3196e91, type: 2}
+    categories: 0
+    count: 1
+    optional: 1
+  baseValue: 13
   flavors: 1
   icon: {fileID: 182355060, guid: 864a5e0876ecf174a86a2a0035332fa2, type: 3}
   placeholderColor: {r: 0.78, g: 0.42, b: 0.3, a: 1}
   mealBuff:
     kind: 1
     amount: 20
+  menuVersion: 2
   references:
     version: 2
     RefIds: []

@@ -58,6 +58,8 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] Color m_Ink = new(0.24f, 0.16f, 0.12f);
         [SerializeField] Color m_Locked = new(0.5f, 0.45f, 0.4f);
         [SerializeField] Color m_Short = new(0.62f, 0.2f, 0.12f);
+        [SerializeField, Tooltip("A piece not yet seen since it was found or earned (4f Checkpoint C).")]
+        Color m_New = new(0.12f, 0.33f, 0.55f);
         [SerializeField, Min(0.05f)] float m_RepeatDelay = 0.3f;
         [SerializeField, Min(0.02f)] float m_RepeatRate = 0.08f;
 
@@ -434,7 +436,13 @@ namespace Hearthdelve.UI.Tavern
                     row.name.Set(TavernLocKeys.Plain, DecorateScreen.PieceName(d.id));
                     int stored = mode.Stored(d.id);
                     PurchaseProblem problem = mode.CanBuy(d);
-                    if (stored > 0) row.info.Set(DecorateLocKeys.RowStored, stored);
+                    // Found in the Hollows or earned, and not yet looked at (4f Checkpoint C): "new", in the discovery colour.
+                    if (mode.Area.State.IsNew(d.id))
+                    {
+                        row.info.Set(DecorateLocKeys.RowNew);
+                        ink = m_New;
+                    }
+                    else if (stored > 0) row.info.Set(DecorateLocKeys.RowStored, stored);
                     else if (problem == PurchaseProblem.Locked)
                     {
                         row.info.Set(DecorateLocKeys.RowLocked, FurnitureShop.RenownFor(d.catalogTier, mode.Thresholds));
@@ -479,13 +487,17 @@ namespace Hearthdelve.UI.Tavern
             }
 
             FurnitureDefinition d = SelectedPiece;
+            // Looked at: no longer new (the row keeps its badge until the list is filled again).
+            mode.Area.State.ClearNew(d.id);
             SetIcon(d.Icon());
             m_PieceName.Set(TavernLocKeys.Plain, DecorateScreen.PieceName(d.id));
             m_Description.gameObject.SetActive(!string.IsNullOrEmpty(d.descriptionKey));
             if (!string.IsNullOrEmpty(d.descriptionKey)) m_Description.Set(d.descriptionKey);
             SetTier(d.catalogTier, d.ForSale ? d.price : -1);
             int stored = mode.Stored(d.id), placed = mode.Placed(d.id);
-            m_Counts.Set(DecorateLocKeys.Counts, stored + placed, placed, stored);
+            // A unique piece says so here (the source line has no room): its counts are only ever one.
+            if (!d.unique) m_Counts.Set(DecorateLocKeys.Counts, stored + placed, placed, stored);
+            else m_Counts.Set(DecorateLocKeys.Unique);
             string source = SourceText(d);
             m_Source.gameObject.SetActive(source.Length > 0);
             if (source.Length > 0) m_Source.Set(TavernLocKeys.Plain, source);
@@ -534,7 +546,6 @@ namespace Hearthdelve.UI.Tavern
             if ((d.sources & FurnitureSource.Discovery) != 0) parts.Add(Loc.UI(DecorateLocKeys.SourceDiscovery));
             if ((d.sources & FurnitureSource.Boss) != 0) parts.Add(Loc.UI(DecorateLocKeys.SourceBoss));
             if ((d.sources & FurnitureSource.Story) != 0) parts.Add(Loc.UI(DecorateLocKeys.SourceStory));
-            if (d.unique) parts.Add(Loc.UI(DecorateLocKeys.Unique));
             return string.Join(" · ", parts);
         }
 

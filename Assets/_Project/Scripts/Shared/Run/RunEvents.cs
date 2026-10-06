@@ -121,12 +121,15 @@ namespace Hearthdelve.Shared.Run
         public readonly Satchel Satchel;
         public readonly DefeatReason Reason;
         public readonly Action<int> OnChosen;
+        /// <summary>Furnishings found on the delve (4f Checkpoint C): lost with it, never in the Lockbox.</summary>
+        public readonly IReadOnlyList<string> Curios;
 
-        public DeathScreenRequested(Satchel satchel, DefeatReason reason, Action<int> onChosen)
+        public DeathScreenRequested(Satchel satchel, DefeatReason reason, Action<int> onChosen, IReadOnlyList<string> curios = null)
         {
             Satchel = satchel;
             Reason = reason;
             OnChosen = onChosen;
+            Curios = curios ?? Array.Empty<string>();
         }
     }
 
@@ -185,6 +188,20 @@ namespace Hearthdelve.Shared.Run
             FadeSeconds = fadeSeconds;
             Floor = floor;
             Seed = seed;
+        }
+    }
+
+    /// <summary>A furnishing was picked up in the Hollows (4f Checkpoint C): run-bound until the delve ends well.</summary>
+    public readonly struct CurioFound : IEvent
+    {
+        public readonly string FurnitureId;
+        /// <summary>How many the delve carries now.</summary>
+        public readonly int Total;
+
+        public CurioFound(string furnitureId, int total)
+        {
+            FurnitureId = furnitureId;
+            Total = total;
         }
     }
 

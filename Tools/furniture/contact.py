@@ -69,7 +69,11 @@ def check(image, rect, where, warnings):
 def main():
     scale = int(sys.argv[1]) if len(sys.argv) > 1 else 3
     data = load()
-    sheets = {s["key"]: Image.open(os.path.join(RAW, s["source"])).convert("RGBA") for s in data["sheets"]}
+    def source(path):
+        # "derived:" sheets are composites built into the repo (Tools/furniture/trophy.py).
+        return path[len("derived:"):] if path.startswith("derived:") else os.path.join(RAW, path)
+
+    sheets = {s["key"]: Image.open(source(s["source"])).convert("RGBA") for s in data["sheets"]}
     sets = {s["id"]: s["variants"] for s in data["variantSets"]}
     warnings = []
     ids = set()

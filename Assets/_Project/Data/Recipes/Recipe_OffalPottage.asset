@@ -30,17 +30,23 @@ MonoBehaviour:
     count: 1
     optional: 0
   - match: 0
-    ingredient: {fileID: 11400000, guid: a9638819317ee6f4f971a403a0c1b350, type: 2}
+    ingredient: {fileID: 11400000, guid: 6b979a830d693914886fb2386d12ee49, type: 2}
     categories: 0
     count: 1
     optional: 0
-  baseValue: 8
-  flavors: 65
+  - match: 0
+    ingredient: {fileID: 11400000, guid: f319e1dd79257c247b2bb6f7fab674ab, type: 2}
+    categories: 0
+    count: 1
+    optional: 1
+  baseValue: 9
+  flavors: 48
   icon: {fileID: 79052897, guid: 864a5e0876ecf174a86a2a0035332fa2, type: 3}
   placeholderColor: {r: 0.5, g: 0.3, b: 0.34, a: 1}
   mealBuff:
     kind: 0
     amount: 0
+  menuVersion: 2
   references:
     version: 2
     RefIds: []

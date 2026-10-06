@@ -21,6 +21,11 @@ namespace Hearthdelve.Dungeon.Rooms
         Gold,
         /// <summary>A run power, chosen one of three when the room is clear (step 4). The offer is drawn then, from the run's seed.</summary>
         Power,
+        /// <summary>
+        /// A furnishing discovery (4f Checkpoint C): which piece is drawn when the room is clear (it depends on what's owned),
+        /// from the run's curio pool; with nothing left to give, run gold instead.
+        /// </summary>
+        Curio,
     }
 
     /// <summary>A room's reward: its kind and payload.</summary>
@@ -45,12 +50,14 @@ namespace Hearthdelve.Dungeon.Rooms
         public static RoomReward Gold(int amount) => new(RewardKind.Gold, "", Quality.Standard, amount);
         public static RoomReward Ingredient(string id, Quality quality, int count) => new(RewardKind.Ingredient, id, quality, count);
         public static RoomReward Power() => new(RewardKind.Power, "", Quality.Standard, 1);
+        public static RoomReward Curio() => new(RewardKind.Curio, "", Quality.Standard, 1);
 
         public override string ToString() => Kind switch
         {
             RewardKind.Gold => $"Gold {Amount}",
             RewardKind.Ingredient => $"{ItemId} {Quality} x{Amount}",
             RewardKind.Power => "power",
+            RewardKind.Curio => "curio",
             _ => "-",
         };
     }

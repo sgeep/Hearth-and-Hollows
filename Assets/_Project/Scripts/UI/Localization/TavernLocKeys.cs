@@ -28,6 +28,24 @@ namespace Hearthdelve.UI.Localization
         public const string StepChop = "tavern.step.chop";
         public const string StepSimmer = "tavern.step.simmer";
         public const string PrepStaffJob = "tavern.prep.staff_job";
+        // 4f Checkpoint C: the Butcher Block at Prep, Gunta's job, the menu's pages, Pip's ledger.
+        public const string StationButcherBlock = "station.butcher_block";
+        public const string PrepButcher = "tavern.prep.butcher";
+        public const string PrepPage = "tavern.prep.page";
+        public const string ButcherTitle = "butcher.title";
+        public const string ButcherIntro = "butcher.intro";
+        public const string ButcherYield = "butcher.yield";
+        public const string ButcherYourself = "butcher.yourself";
+        public const string ButcherStaff = "butcher.staff";
+        public const string ButcherNone = "butcher.none";
+        public const string ButcherNoBlock = "butcher.no_block";
+        public const string ButcherBusy = "butcher.busy";
+        public const string ButcherWorking = "butcher.working";
+        public const string ButcherResult = "butcher.result";
+        public const string ButcherDone = "butcher.done";
+        public const string ButcherPanelTitle = "butcher.panel_title";
+        public const string ButcherPrompt = "butcher.prompt";
+        public const string ResultsLedger = "results.ledger";
         public const string PrepNothingCookable = "tavern.prep.nothing_cookable";
         public const string PrepFillKey = "tavern.prep.fill_key";
         public const string ResultsStayedShut = "results.stayed_shut";
@@ -112,6 +130,23 @@ namespace Hearthdelve.UI.Localization
             (StepChop, "chop"),
             (StepSimmer, "simmer"),
             (PrepStaffJob, "{0}: {1}"),
+            (StationButcherBlock, "butcher block"),
+            (PrepButcher, "butcher block"),
+            (PrepPage, "dishes {0}/{1}"),
+            (ButcherTitle, "the butcher block"),
+            (ButcherIntro, "cut a part yourself, or hand it to {0}. a cleaner cut gives more cuts."),
+            (ButcherYield, "up to {0}"),
+            (ButcherYourself, "cut it"),
+            (ButcherStaff, "{0}"),
+            (ButcherNone, "nothing here to butcher: spider legs and bat wings break down into cuts."),
+            (ButcherNoBlock, "the butcher block is in storage: put it out in decorate."),
+            (ButcherBusy, "{0} is busy."),
+            (ButcherWorking, "{0} is at the block..."),
+            (ButcherResult, "+{0} {1}"),
+            (ButcherDone, "done"),
+            (ButcherPanelTitle, "butcher the {0}"),
+            (ButcherPrompt, "move the knife · hold {0}: cut"),
+            (ResultsLedger, "from Pip's ledger"),
             (PrepNothingCookable, "nothing in the storeroom makes a dish tonight."),
             (PrepFillKey, "F4: fill storeroom"),
 

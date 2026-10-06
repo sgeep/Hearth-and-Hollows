@@ -937,6 +937,22 @@
             "file": "Furniture_dungeon",
             "sprites": [
                 {
+                    "name": "iron_cage_0_0",
+                    "x": 200,
+                    "y": 24,
+                    "w": 8,
+                    "h": 8,
+                    "px": 4
+                },
+                {
+                    "name": "iron_cage_0_1",
+                    "x": 216,
+                    "y": 24,
+                    "w": 8,
+                    "h": 8,
+                    "px": 4
+                },
+                {
                     "name": "knight_statue_0_0",
                     "x": 24,
                     "y": 48,
@@ -1030,6 +1046,38 @@
                     "y": 58,
                     "w": 8,
                     "h": 12,
+                    "px": 4
+                },
+                {
+                    "name": "slime_jars_0_0",
+                    "x": 129,
+                    "y": 8,
+                    "w": 22,
+                    "h": 8,
+                    "px": 11
+                },
+                {
+                    "name": "spider_brazier_0_0",
+                    "x": 202,
+                    "y": 43,
+                    "w": 12,
+                    "h": 11,
+                    "px": 6
+                },
+                {
+                    "name": "tattered_banner_0_0",
+                    "x": 136,
+                    "y": 30,
+                    "w": 8,
+                    "h": 9,
+                    "px": 4
+                },
+                {
+                    "name": "tattered_banner_0_1",
+                    "x": 144,
+                    "y": 30,
+                    "w": 8,
+                    "h": 9,
                     "px": 4
                 }
             ]
@@ -2774,6 +2822,27 @@
             ]
         },
         {
+            "file": "Furniture_piles",
+            "sprites": [
+                {
+                    "name": "cellar_stores_0_0",
+                    "x": 13,
+                    "y": 55,
+                    "w": 23,
+                    "h": 16,
+                    "px": 11
+                },
+                {
+                    "name": "junk_heap_0_0",
+                    "x": 11,
+                    "y": 80,
+                    "w": 26,
+                    "h": 15,
+                    "px": 13
+                }
+            ]
+        },
+        {
             "file": "Furniture_pots",
             "sprites": [
                 {
@@ -3232,6 +3301,75 @@
             ]
         },
         {
+            "file": "Furniture_skull_candles",
+            "sprites": [
+                {
+                    "name": "skull_candle_0_0_0",
+                    "x": 12,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_1",
+                    "x": 44,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_2",
+                    "x": 76,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_3",
+                    "x": 108,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_4",
+                    "x": 140,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_5",
+                    "x": 172,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_6",
+                    "x": 204,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                },
+                {
+                    "name": "skull_candle_0_0_7",
+                    "x": 236,
+                    "y": 11,
+                    "w": 7,
+                    "h": 8,
+                    "px": 3
+                }
+            ]
+        },
+        {
             "file": "Furniture_tavern",
             "sprites": [
                 {
@@ -3664,6 +3802,19 @@
                     "w": 7,
                     "h": 12,
                     "px": 3
+                }
+            ]
+        },
+        {
+            "file": "Furniture_trophy",
+            "sprites": [
+                {
+                    "name": "trophy_larder_troll_0_0",
+                    "x": 0,
+                    "y": 0,
+                    "w": 26,
+                    "h": 21,
+                    "px": 13
                 }
             ]
         },

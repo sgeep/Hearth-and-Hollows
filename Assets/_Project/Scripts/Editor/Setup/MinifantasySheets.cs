@@ -96,6 +96,8 @@ namespace Hearthdelve.Editor
         const string k_GladiatorGate = "All_Exclusives_20261002/Addons/Towns_I_II/Gladiator_Arena/Tileset/Animated Gate";
         const string k_TrueHeroesIcons = "All_Exclusives_20261002/Icons/16x16px/True_Heroes_I&II_16x16px_Skill_Icons";
         const string k_Miscellany = "All_Exclusives_20261002/Icons/8x8px/_Miscellany_Icons_(Coins, Torches, MMO_UI, etc.)";
+        const string k_FoodPrep = "Minifantasy_CraftingAndProfessions2_v1.0/Minifantasy_CraftingAndProfessions2_Assets/Crafting_Professions/Food_Preparation";
+        const string k_PotionHerbs = "Minifantasy_CraftingAndProfessions_v1.0/Minifantasy_CraftingAndProfessions_Assets/Gathering_Professions/Harvesting";
 
         public const string Creatures = "Creatures";
         public const string Dungeon = "Dungeon";
@@ -111,6 +113,10 @@ namespace Hearthdelve.Editor
         public const string AdventurersCampsite = "AdventurersCampsite";
         public const string UserInterface = "UserInterface";
         public const string CraftingAndProfessions = "CraftingAndProfessions";
+        /// <summary>Farm add-on icons (4f Checkpoint C): the market's eggs and malt.</summary>
+        public const string FarmIcons = "FarmIcons";
+        /// <summary>Pip's and Gunta's looks (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
+        public const string Staff = "Staff";
         public const string DwarvenKingdom = "DwarvenKingdom";
         public const string GladiatorArena = "GladiatorArena";
         public const string MiscellanyIcons = "MiscellanyIcons";
@@ -221,6 +227,10 @@ namespace Hearthdelve.Editor
             foreach (string anim in new[] { "Idle", "Walk", "Attack", "Dmg", "Jump", "SpinDie", "ChargedAttack" })
             {
                 sheets.Add(Character($"{k_Townsfolk}/HumanTownsfolk{anim}.png", Creatures, $"HumanTownsfolk{anim}"));
+                // 4f Checkpoint C: Pip and Gunta, derived sheets in the same layout (idle and walk only).
+                if (anim is "Idle" or "Walk")
+                    foreach (string who in new[] { "Pip", "Gunta" })
+                        sheets.Add(Character($"derived:Tools/characters/derived/{who}{anim}.png", Staff, $"{who}{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
             }
 
@@ -286,7 +296,14 @@ namespace Hearthdelve.Editor
             sheets.Add(new Sheet
             {
                 Source = $"{k_Emotions}/_Emotions.png", Pack = UIOverhaul, File = "Emotions", Mode = SliceMode.Rects,
-                Rects = new[] { new SheetRect("Thinking", 136, 88, 8, 8, k_Centre), new SheetRect("Angry", 72, 40, 8, 8, k_Centre) },
+                Rects = new[]
+                {
+                    new SheetRect("Thinking", 136, 88, 8, 8, k_Centre), new SheetRect("Angry", 72, 40, 8, 8, k_Centre),
+                    // 4f Checkpoint C: wordless reactions of patrons, Pip and Gunta (D18).
+                    new SheetRect("Heart", 104, 88, 8, 8, k_Centre), new SheetRect("Happy", 8, 8, 8, 8, k_Centre),
+                    new SheetRect("Surprised", 40, 56, 8, 8, k_Centre), new SheetRect("Content", 72, 72, 8, 8, k_Centre),
+                    new SheetRect("Frown", 88, 24, 8, 8, k_Centre), new SheetRect("Sweat", 24, 88, 8, 8, k_Centre),
+                },
             });
 
             // Dungeon room.
@@ -384,7 +401,47 @@ namespace Hearthdelve.Editor
                     new SheetRect("Drumstick", 136, 8, 8, 8, k_Centre),
                     new SheetRect("BrownStew", 40, 64, 8, 8, k_Centre),
                     new SheetRect("RedStew", 64, 64, 8, 8, k_Centre),
+                    // 4f Checkpoint C: the rest of the Biome 1 menu.
+                    new SheetRect("OnionBroth", 56, 64, 8, 8, k_Centre),
+                    new SheetRect("FriedEgg", 16, 56, 8, 8, k_Centre),
+                    new SheetRect("WingsPlate", 128, 16, 8, 8, k_Centre),
+                    new SheetRect("SteakPlate", 112, 16, 8, 8, k_Centre),
+                    new SheetRect("MeatPlatter", 120, 16, 8, 8, k_Centre),
                 },
+            });
+            // 4f Checkpoint C: market staples, cuts and the mushrooms (Crafting And Professions II's preparation-table
+            // ingredients; the mushroom's powder from Crafting And Professions I's potion herbs).
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_DishIcons}/Minifantasy_CraftingAndProfessions2PreparationTableIngredients.png", Pack = CraftingAndProfessions, File = "PrepIngredients",
+                Mode = SliceMode.Rects,
+                Rects = new[]
+                {
+                    new SheetRect("Bread", 8, 8, 8, 8, k_Centre), new SheetRect("Onion", 16, 8, 8, 8, k_Centre), new SheetRect("Herbs", 40, 8, 8, 8, k_Centre),
+                    new SheetRect("Mushroom", 64, 8, 8, 8, k_Centre), new SheetRect("Steak", 8, 56, 8, 8, k_Centre), new SheetRect("Slices", 8, 72, 8, 8, k_Centre),
+                },
+            });
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_PotionHerbs}/Minifantasy_CraftingAndProfessionsPotionHerbs.png", Pack = CraftingAndProfessions, File = "PotionHerbs", Mode = SliceMode.Rects,
+                Rects = new[] { new SheetRect("SporePowder", 24, 80, 8, 8, k_Centre) },
+            });
+            sheets.Add(new Sheet
+            {
+                Source = "All_Exclusives_20261002/Icons/8x8px/Farm_Animal_Product_Icons/FarmAnimalProductIcons.png", Pack = FarmIcons, File = "AnimalProducts",
+                Mode = SliceMode.Rects, Rects = new[] { new SheetRect("BrownEgg", 16, 40, 8, 8, k_Centre) },
+            });
+            sheets.Add(new Sheet
+            {
+                Source = "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Crops/Minifantasy_FarmSeedsAndCrops.png", Pack = FarmIcons, File = "Crops",
+                Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Wheat", 64, 72, 8, 8, k_Centre) },
+            });
+            // The Butcher Block (4f Checkpoint C, D17): Crafting And Professions II's preparation table, idle and at work.
+            sheets.Add(new Sheet { Source = $"{k_FoodPrep}/Minifantasy_CraftingAndProfessions2PreparationTableProp.png", Pack = CraftingAndProfessions, File = "PrepTable", Pivot = k_BottomLeft });
+            sheets.Add(new Sheet
+            {
+                Source = $"{k_FoodPrep}/Minifantasy_CraftingAndProfessions2PreparationTableWorking.png", Pack = CraftingAndProfessions, File = "PrepTableWorking",
+                Mode = SliceMode.Grid, Cell = new Vector2Int(32, 32), Pivot = k_BottomLeft,
             });
             sheets.Add(new Sheet
             {
@@ -434,6 +491,13 @@ namespace Hearthdelve.Editor
                     new SheetRect("Food", 536, 40, 8, 8, k_Centre),
                     // 4d step 4: a power room's door sign, and its spark.
                     new SheetRect("Lightning", 504, 40, 8, 8, k_Centre),
+                    // 4f Checkpoint C: a curio room's door sign and the run's curio counter (the chest), and the wordless
+                    // emotes of patrons and staff (the heart, the bead of sweat).
+                    new SheetRect("Chest", 496, 24, 8, 8, k_Centre),
+                    // Pip's ledger on the evening's results.
+                    new SheetRect("Book", 416, 24, 8, 8, k_Centre),
+                    new SheetRect("Heart", 472, 40, 8, 8, k_Centre),
+                    new SheetRect("Droplet", 552, 40, 8, 8, k_Centre),
                 },
             });
 
@@ -458,7 +522,12 @@ namespace Hearthdelve.Editor
             sheets.Add(new Sheet
             {
                 Source = $"{k_Miscellany}/Miscellany_1.png", Pack = MiscellanyIcons, File = "Miscellany", Mode = SliceMode.Rects,
-                Rects = new[] { new SheetRect("GoldCoin", 0, 0, 8, 8, k_Centre) },
+                Rects = new[]
+                {
+                    new SheetRect("GoldCoin", 0, 0, 8, 8, k_Centre),
+                    // 4f Checkpoint C: Brackenford ale's tankard.
+                    new SheetRect("FullBeer", 0, 64, 8, 8, k_Centre),
+                },
             });
 
             // UI and icons.

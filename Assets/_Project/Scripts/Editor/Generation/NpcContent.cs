@@ -23,6 +23,7 @@ namespace Hearthdelve.Editor
     {
         public const string CustomerPrefab = EditorPaths.Prefabs + "/Tavern/Customer.prefab";
         public const string PipPrefab = EditorPaths.Prefabs + "/Tavern/Pip.prefab";
+        public const string GuntaPrefab = EditorPaths.Prefabs + "/Tavern/Gunta.prefab";
         const string k_Npcs = EditorPaths.Animations + "/Npc";
         const string k_UnlitSprite = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
         /// <summary>Back to front: the order <see cref="NpcAppearancePool.Layers"/> returns.</summary>
@@ -32,6 +33,7 @@ namespace Hearthdelve.Editor
         {
             public GameObject Customer;
             public GameObject Pip;
+            public GameObject Gunta;
         }
 
         public static Built Build()
@@ -40,7 +42,24 @@ namespace Hearthdelve.Editor
             SpriteAnimationSet shadow = Set("NpcShadow", "NpcShadowIdle", "NpcShadowWalk");
             BuildPools(sets);
             AssetDatabase.SaveAssets();
-            return new Built { Customer = BuildCustomer(shadow), Pip = BuildPip(Set("Pip", "ButcherIdle", "ButcherWalk"), shadow) };
+            // 4f Checkpoint C: Pip's halfling look and Gunta's, replacing the Butcher stand-in.
+            return new Built
+            {
+                Customer = BuildCustomer(shadow),
+                Pip = BuildStaff("Pip", PipPrefab, StaffSet("Pip"), shadow, 3.2f, Vector2.zero),
+                Gunta = BuildStaff("Gunta", GuntaPrefab, StaffSet("Gunta"), shadow, 2.8f, new Vector2(1.25f, 0f)),
+            };
+        }
+
+        /// <summary>A member of staff's idle and walk (the derived sheets, in the Creatures pack's layout).</summary>
+        static SpriteAnimationSet StaffSet(string who)
+        {
+            EditorPaths.Ensure(k_Npcs);
+            return LookTestContent.CreateOrUpdate<SpriteAnimationSet>($"{k_Npcs}/{who}.asset", set => set.animations = new List<SpriteAnim>
+            {
+                LookTestContent.Anim(CharacterAnim.Idle, MinifantasySheets.Staff, $"{who}Idle", 16, 4, 0.2f, true),
+                LookTestContent.Anim(CharacterAnim.Walk, MinifantasySheets.Staff, $"{who}Walk", 4, 4, 0.15f, true),
+            });
         }
 
         /// <summary>An idle and walk set from two imported sheets (<paramref name="idleFile"/>, <paramref name="walkFile"/>).</summary>
@@ -183,12 +202,17 @@ namespace Hearthdelve.Editor
 
             root.AddComponent<CustomerAgent>().Configure(look, back, fill, bubble.gameObject, icon,
                 MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Thinking"), MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Angry"));
+            root.GetComponent<CustomerAgent>().ConfigureEmotes(MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Surprised"));
             return LookTestContent.SavePrefab(root, CustomerPrefab);
         }
 
-        static GameObject BuildPip(SpriteAnimationSet set, SpriteAnimationSet shadowSet)
+        /// <summary>
+        /// A member of staff (Pip, Gunta): a walker with their look, a plate over the head when carrying, and a face for their
+        /// wordless reactions (4f Checkpoint C).
+        /// </summary>
+        static GameObject BuildStaff(string name, string path, SpriteAnimationSet set, SpriteAnimationSet shadowSet, float walkSpeed, Vector2 restOffset)
         {
-            GameObject root = Walker("Pip");
+            GameObject root = Walker(name);
             var model = new GameObject("Model");
             model.transform.SetParent(root.transform, false);
             root.GetComponent<Character>().CharacterModel = model;
@@ -197,10 +221,28 @@ namespace Hearthdelve.Editor
             var look = model.AddComponent<LayeredSpriteAnimator>();
             look.Configure(new[] { body }, shadow, shadowSet);
             look.SetAppearance(new[] { set });
-            root.GetComponent<CharacterMovement>().WalkSpeed = 3.2f;
-            root.AddComponent<StaffAgent>();
+            root.GetComponent<CharacterMovement>().WalkSpeed = walkSpeed;
+            StaffAgent agent = root.AddComponent<StaffAgent>();
             TavernStationContent.AddCarryView(root);
-            return LookTestContent.SavePrefab(root, PipPrefab);
+            // The emote sits where a carried plate would, a little higher: a face over the head.
+            var emoteRoot = new GameObject("Emote").transform;
+            emoteRoot.SetParent(root.transform, false);
+            emoteRoot.localPosition = new Vector3(0f, 2.25f, 0f);
+            SpriteRenderer face = LookTestContent.AddSprite(emoteRoot, "Face", null, SortingLayers.Above, 6, Vector3.zero);
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>(k_UnlitSprite);
+            if (unlit != null) face.sharedMaterial = unlit;
+            NpcEmote emote = emoteRoot.gameObject.AddComponent<NpcEmote>();
+            emote.Configure(face);
+            agent.ConfigureLook(emote, restOffset, new StaffFaces
+            {
+                happy = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Happy"),
+                content = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Content"),
+                frown = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Frown"),
+                surprised = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Surprised"),
+                sweat = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Sweat"),
+                heart = MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Heart"),
+            });
+            return LookTestContent.SavePrefab(root, path);
         }
     }
 }

@@ -9,9 +9,12 @@ namespace Hearthdelve.Shared.Game
     /// <summary>What a delve brought back.</summary>
     public sealed class DelveReport
     {
-        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost, IEnumerable<string> bosses = null)
+        DelveReport(DelveOutcome outcome, List<IngredientStack> haul, int partsLost, int goldSecured, int goldLost, IEnumerable<string> bosses = null,
+            IEnumerable<string> curiosKept = null, IEnumerable<string> curiosLost = null)
         {
             BossesDefeated = bosses != null ? new List<string>(bosses) : new List<string>();
+            CuriosKept = curiosKept != null ? new List<string>(curiosKept) : new List<string>();
+            CuriosLost = curiosLost != null ? new List<string>(curiosLost) : new List<string>();
             Outcome = outcome;
             Haul = haul;
             PartsLost = partsLost;
@@ -28,6 +31,10 @@ namespace Hearthdelve.Shared.Game
         public int GoldLost { get; }
         /// <summary>Bosses defeated on the delve (4e). A victory is a victory: recorded even if the delve then ends in death.</summary>
         public IReadOnlyList<string> BossesDefeated { get; }
+        /// <summary>Furnishings found on the delve that come home (extraction): owned when the delve completes (D9).</summary>
+        public IReadOnlyList<string> CuriosKept { get; }
+        /// <summary>Furnishings found on the delve and lost with it (death). The Lockbox never holds them.</summary>
+        public IReadOnlyList<string> CuriosLost { get; }
 
         public int PartsBroughtBack
         {
@@ -40,21 +47,21 @@ namespace Hearthdelve.Shared.Game
         }
 
         /// <summary>Left through the exit: everything in the satchel comes home (freshness as it is now), and the run's Gold with it.</summary>
-        public static DelveReport Extraction(Satchel satchel, int runGold = 0, IEnumerable<string> bosses = null)
+        public static DelveReport Extraction(Satchel satchel, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null)
         {
             var haul = new List<IngredientStack>();
             if (satchel != null)
                 foreach (var slot in satchel.Slots)
                     if (!slot.IsEmpty) haul.Add(slot);
-            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0, bosses);
+            return new DelveReport(DelveOutcome.Extracted, haul, 0, Math.Max(0, runGold), 0, bosses, curios);
         }
 
         /// <summary>Died: only the Lockbox stack comes home; the run's Gold is lost.</summary>
-        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0, IEnumerable<string> bosses = null)
+        public static DelveReport Death(DeathPenaltyResult result, int runGold = 0, IEnumerable<string> bosses = null, IEnumerable<string> curios = null)
         {
             var haul = new List<IngredientStack>();
             if (result.KeptSomething) haul.Add(result.Kept);
-            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold), bosses);
+            return new DelveReport(DelveOutcome.Died, haul, result.ItemsLost, 0, Math.Max(0, runGold), bosses, null, curios);
         }
 
         /// <summary>Debug skip: nothing brought back.</summary>
@@ -93,7 +100,8 @@ namespace Hearthdelve.Shared.Game
         /// Back from the night's delve: the haul goes into the storeroom, the run's Gold into the purse, the delve meal is
         /// used up, and it's night.
         /// </summary>
-        public static void CompleteDelve(GameState state, DelveReport report)
+        public static void CompleteDelve(GameState state, DelveReport report, Func<string, Customization.FurnitureDefinition> furniture = null,
+            IEnumerable<BossTrophy> trophies = null)
         {
             Require(state, DayPhase.Delve);
             if (report == null) throw new ArgumentNullException(nameof(report));
@@ -106,6 +114,15 @@ namespace Hearthdelve.Shared.Game
             state.Today.DelveGold += report.GoldSecured;
             state.Today.DelveGoldLost += report.GoldLost;
             foreach (string boss in report.BossesDefeated) state.SetBossClears(boss, state.TimesDefeated(boss) + 1);
+            // Furnishings found on the delve: owned now if they came home (D9), marked new in storage.
+            foreach (string id in report.CuriosKept)
+            {
+                Customization.FurnitureDefinition definition = furniture?.Invoke(id);
+                if (definition != null && state.Furniture.Receive(definition)) state.Today.CuriosKept++;
+            }
+            state.Today.CuriosLost += report.CuriosLost.Count;
+            // A boss's trophy (D10): granted with the victory, whatever the delve's end.
+            TrophyRules.GrantEarned(state, trophies);
             state.Meal = MealBuff.None;
             state.Cycle.AdvanceTo(DayPhase.Night);
         }
@@ -140,6 +157,19 @@ namespace Hearthdelve.Shared.Game
             Require(state, DayPhase.Daytime);
             if (state.Meal.IsActive || !meal.IsActive) return false;
             state.Meal = meal;
+            return true;
+        }
+
+        /// <summary>
+        /// Buys one offer at a supply source (the Brackenford market; daytime only): gold out, the goods straight into the
+        /// storeroom, Standard and fresh (D19). False when it can't be afforded.
+        /// </summary>
+        public static bool Buy(GameState state, Inventory.SupplySource source, Inventory.SupplyOffer offer)
+        {
+            Require(state, DayPhase.Daytime);
+            if (!Inventory.SupplyRules.CanAfford(state.Gold, offer)) return false;
+            state.Gold -= offer.price;
+            state.Storeroom.Add(Inventory.SupplyRules.Delivery(source, offer));
             return true;
         }
 

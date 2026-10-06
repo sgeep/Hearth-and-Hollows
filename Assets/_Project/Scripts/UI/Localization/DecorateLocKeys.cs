@@ -12,6 +12,7 @@ namespace Hearthdelve.UI.Localization
         public const string Hover = "decorate.hover";
         public const string HoverMore = "decorate.hover_more";
         public const string Carrying = "decorate.carrying";
+        public const string Homecoming = "decorate.homecoming";
         public const string CantGo = "decorate.cant_go";
         public const string Empty = "decorate.empty";
         /// <summary>The controls while browsing, with each binding filled in for the device in use.</summary>
@@ -64,6 +65,7 @@ namespace Hearthdelve.UI.Localization
         public const string RowStored = "catalog.row.stored";
         public const string RowLocked = "catalog.row.locked";
         public const string RowNotSold = "catalog.row.not_sold";
+        public const string RowNew = "catalog.row.new";
         public const string RowInUse = "catalog.row.in_use";
         public const string RowOwned = "catalog.row.owned";
         public const string Counts = "catalog.counts";
@@ -119,6 +121,7 @@ namespace Hearthdelve.UI.Localization
             (Hover, "{0}"),
             (HoverMore, "{0} · {1} more here"),
             (Carrying, "carrying: {0}"),
+            (Homecoming, "{0}: where should they hang?"),
             (CantGo, "{0} can't go there: {1}"),
             (Empty, "an empty spot"),
             (Controls, "{0} pick up · {1} turn · {2} flip · {3} put away · {4} undo · {5} catalog · {6} colors · {7} other room · {8} check · {9} done"),
@@ -167,6 +170,7 @@ namespace Hearthdelve.UI.Localization
             (RowStored, "{0} stored"),
             (RowLocked, "Renown {0}"),
             (RowNotSold, "not for sale"),
+            (RowNew, "new"),
             (RowInUse, "in use"),
             (RowOwned, "owned"),
             (Counts, "{1} placed · {2} stored"),
@@ -219,6 +223,7 @@ namespace Hearthdelve.UI.Localization
 
             (FurnitureDescription("tavern_bar"), "the bar and its taps, where every evening starts."),
             (FurnitureDescription("kitchen_range"), "the kitchen range. it stands against the back wall, where its chimney goes."),
+            (FurnitureDescription("butcher_block"), "a scarred prep table and a heavy knife. big parts go in; neat cuts come out."),
             (FurnitureDescription("stew_pot"), "a cauldron over a floor fire. the stew in it has opinions."),
             (FurnitureDescription("pass_table"), "the pass, where plates wait to be carried out."),
             (FurnitureDescription("table_round_a"), "a round tavern table with room for two chairs."),
@@ -233,6 +238,7 @@ namespace Hearthdelve.UI.Localization
 
             (Furniture("tavern_bar"), "bar and taps"),
             (Furniture("kitchen_range"), "kitchen range"),
+            (Furniture("butcher_block"), "butcher block"),
             (Furniture("stew_pot"), "stew pot"),
             (Furniture("pass_table"), "pass"),
             (Furniture("table_round_a"), "round table"),

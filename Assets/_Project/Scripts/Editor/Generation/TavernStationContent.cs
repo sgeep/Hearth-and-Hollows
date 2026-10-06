@@ -157,6 +157,36 @@ namespace Hearthdelve.Editor
             RectTransform timer = Fill(timerBack, "Timer", new Color(1f, 0.82f, 0.3f));
             panel.ConfigureChop(chopGroup.gameObject, board, food, lines, cuts, knife, timer, chopTitle, chopProgress, chopPrompt);
 
+            // The Butcher Block (4f Checkpoint C): the part shown three times its size on a board, its cut lines as dots
+            // (they colour as they're cut), the knife, and the time left. Like the chop board, it spans the pointer's share.
+            RectTransform butcherGroup = LookTestBuilder.UIRect(root, "Butcher", Vector2.zero, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            butcherGroup.anchorMin = Vector2.zero;
+            butcherGroup.anchorMax = Vector2.one;
+            butcherGroup.sizeDelta = Vector2.zero;
+            RectTransform butcherBox = Box(butcherGroup, "ButcherBox", null, out LocalizedSuperText butcherPrompt);
+            LocalizedSuperText butcherTitle = DungeonUI.Title(butcherBox, TavernLocKeys.ButcherPanelTitle, rule: false);
+            // Between the box's title and its prompt line.
+            RectTransform block = LookTestBuilder.UIRect(butcherGroup, "Board", new Vector2(0.3f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 33f), new Vector2(0f, 21f));
+            block.anchorMax = new Vector2(0.7f, 0f);
+            DungeonUI.AddImage(block, DungeonUI.Pixel(), new Color(0.55f, 0.36f, 0.2f));
+            RectTransform partRect = LookTestBuilder.UIRect(block, "Part", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(16f, 16f));
+            Image partImage = DungeonUI.AddImage(partRect, null, Color.white);
+            const int butcherLines = 3, dotsPerLine = 7;
+            var dots = new Image[butcherLines * dotsPerLine];
+            for (int i = 0; i < dots.Length; i++)
+            {
+                RectTransform dot = LookTestBuilder.UIRect(block, $"Dot{i}", new Vector2(0f, 0f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(2f, 2f));
+                dots[i] = DungeonUI.AddImage(dot, DungeonUI.Pixel(), Color.white);
+            }
+            RectTransform blade = LookTestBuilder.UIRect(block, "Knife", new Vector2(0f, 1f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(3f, 7f));
+            DungeonUI.AddImage(blade, DungeonUI.Pixel(), new Color(0.85f, 0.88f, 0.92f));
+            RectTransform butcherTimerBack = LookTestBuilder.UIRect(block, "TimerBack", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, -2f), Vector2.zero);
+            butcherTimerBack.anchorMax = new Vector2(1f, 0f);
+            butcherTimerBack.sizeDelta = new Vector2(0f, 2f);
+            DungeonUI.AddImage(butcherTimerBack, DungeonUI.Pixel(), new Color(0.15f, 0.1f, 0.08f));
+            RectTransform butcherTimer = Fill(butcherTimerBack, "Timer", new Color(1f, 0.82f, 0.3f));
+            panel.ConfigureButcher(butcherGroup.gameObject, block, partImage, dots, dotsPerLine, blade, butcherTimer, butcherTitle, butcherPrompt);
+
             // Under every box: how to step away.
             LocalizedSuperText stepAway = LookTestBuilder.Text(root, "StepAway", TavernLocKeys.HintStepAway, 6f, DungeonUI.k_Light, TextAnchor.LowerCenter,
                 new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 0f), new Vector2(240f, 12f));

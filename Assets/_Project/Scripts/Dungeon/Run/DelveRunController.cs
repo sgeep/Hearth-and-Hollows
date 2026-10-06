@@ -37,6 +37,7 @@ namespace Hearthdelve.Dungeon.Run
         public RunLoot Loot { get; } = new();
 
         void PublishGold(int gold) => EventBus<RunGoldChanged>.Publish(new RunGoldChanged(gold));
+        void PublishCurio(string id) => EventBus<CurioFound>.Publish(new CurioFound(id, Loot.Curios.Count));
 
         /// <summary>The powers taken this run (4d step 4); they end with the delve.</summary>
         public RunPowers Powers { get; } = new();
@@ -117,6 +118,7 @@ namespace Hearthdelve.Dungeon.Run
         void OnEnable()
         {
             Loot.GoldChanged += PublishGold;
+            Loot.CurioAdded += PublishCurio;
             EventBus<RoomCleared>.Subscribe(OnRoomCleared);
             EventBus<RoomEntered>.Subscribe(LogRoomEntered);
             EventBus<BossEncounterEnded>.Subscribe(OnBossEnded);
@@ -127,6 +129,7 @@ namespace Hearthdelve.Dungeon.Run
         void OnDisable()
         {
             Loot.GoldChanged -= PublishGold;
+            Loot.CurioAdded -= PublishCurio;
             EventBus<RoomCleared>.Unsubscribe(OnRoomCleared);
             EventBus<RoomEntered>.Unsubscribe(LogRoomEntered);
             EventBus<BossEncounterEnded>.Unsubscribe(OnBossEnded);
@@ -156,7 +159,7 @@ namespace Hearthdelve.Dungeon.Run
             if (IsEnding) return false;
             IsEnding = true;
             Satchel satchel = PlayerSatchel();
-            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold, Loot.BossesDefeated) : DelveReport.Empty;
+            DelveReport report = satchel != null ? DelveReport.Extraction(satchel, Loot.Gold, Loot.BossesDefeated, Loot.Curios) : DelveReport.Empty;
             satchel?.Clear();
             End(report);
             return true;
@@ -176,7 +179,7 @@ namespace Hearthdelve.Dungeon.Run
             Satchel satchel = PlayerSatchel();
             // The death screen shows even with an empty satchel, so the player sees why the delve ended.
             if (satchel == null || EventBus<DeathScreenRequested>.HandlerCount == 0) FinishDefeat(DeathPenalty.KeepNothing);
-            else EventBus<DeathScreenRequested>.Publish(new DeathScreenRequested(satchel, reason, FinishDefeat));
+            else EventBus<DeathScreenRequested>.Publish(new DeathScreenRequested(satchel, reason, FinishDefeat, Loot.Curios));
         }
 
         void FinishDefeat(int keepSlot)
@@ -185,7 +188,7 @@ namespace Hearthdelve.Dungeon.Run
             DeathPenaltyResult result = DeathPenalty.Resolve(satchel, keepSlot, RunCurrency);
             RunCurrency = 0;
             EventBus<DelveEnded>.Publish(new DelveEnded(result));
-            End(DelveReport.Death(result, Loot.Gold, Loot.BossesDefeated));
+            End(DelveReport.Death(result, Loot.Gold, Loot.BossesDefeated, Loot.Curios));
         }
 
         void End(DelveReport report)

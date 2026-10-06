@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
+using Hearthdelve.Core.Minigames;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Economy;
 using Hearthdelve.Shared.Game;
+using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Recipes;
@@ -46,6 +48,8 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] TavernLayout m_Layout;
         [SerializeField] CustomerAgent m_CustomerPrefab;
         [SerializeField] StaffAgent m_Staff;
+        [SerializeField, Tooltip("Gunta, the cook (4f Checkpoint C): a second member of staff with her own job.")]
+        StaffAgent m_Cook;
         [SerializeField, Tooltip("0 = random each evening.")] int m_Seed;
 
         readonly List<RecipeDefinition> m_Menu = new();
@@ -60,6 +64,67 @@ namespace Hearthdelve.Tavern.Scene
         public TavernContent Content => m_Content;
         public TavernLayout Layout => m_Layout;
         public StaffAgent Staff => m_Staff;
+        /// <summary>Gunta's agent (4f Checkpoint C), or null in a scene without her.</summary>
+        public StaffAgent Cook => m_Cook;
+        /// <summary>Gunta's job tonight: a cooking station, or none.</summary>
+        public StaffStation CookAssignment { get; private set; } = StaffStation.None;
+        /// <summary>Gunta Ashbelly, the cook (stable id <c>gunta</c>).</summary>
+        public StaffDefinition CookMember => m_Content != null ? m_Content.staff.Find(s => s != null && s.id == StaffIds.Gunta) : null;
+
+        /// <summary>Everyone on staff tonight (Pip and Gunta).</summary>
+        public IEnumerable<StaffAgent> StaffAgents
+        {
+            get
+            {
+                if (m_Staff != null) yield return m_Staff;
+                if (m_Cook != null) yield return m_Cook;
+            }
+        }
+
+        /// <summary>The member of staff working <paramref name="station"/> tonight, or null.</summary>
+        public StaffAgent StaffAt(StaffStation station)
+        {
+            if (station == StaffStation.None) return null;
+            foreach (StaffAgent agent in StaffAgents)
+                if (agent.Member != null && agent.Assignment == station) return agent;
+            return null;
+        }
+
+        public void ConfigureCook(StaffAgent cook) => m_Cook = cook;
+
+        [SerializeField, Min(0f), Tooltip("Seconds Gunta works a part at the Butcher Block once she's there.")]
+        float m_CookButcherSeconds = 2.5f;
+
+        /// <summary>Is Gunta free to take a part to the Butcher Block (Prep, a block out, her not already at it)?</summary>
+        public bool CookCanButcher => Phase == TavernPhase.Prep && m_Cook != null && CookMember != null && !m_Cook.HasTask
+                                      && KeeperWork.Instance != null && KeeperWork.Instance.ButcherBlock != null;
+
+        /// <summary>Gunta at the Butcher Block now (it works while she's there).</summary>
+        public bool CookButchering => m_Cook != null && m_Cook.WorkingTask;
+
+        /// <summary>
+        /// Gunta breaks down a part (4f Checkpoint C): she walks to the block, works it, and the cuts come from her steady
+        /// hand (the minigame auto-played at her skill, capped like all staff work). <paramref name="done"/> gets the cuts.
+        /// </summary>
+        public bool LetCookButcher(IngredientItem part, Action<IngredientStack> done = null)
+        {
+            if (!CookCanButcher || !part.IsValid || !part.Definition.Butcherable || Storeroom.CountMatching(i => i == part) <= 0) return false;
+            StaffDefinition gunta = CookMember;
+            TavernInteractable block = KeeperWork.Instance.ButcherBlock;
+            return m_Cook.DoTask(block.UsePoint, m_CookButcherSeconds, () =>
+            {
+                ButcherMinigame game = Minigames.CreateButcher(part.Definition.butchering.maxCuts, m_Random);
+                float score = Mathf.Min(MinigameRunner.RunToCompletion(game, MinigameFactory.CreateAutoPlayer(game, gunta.skill, m_Random)), gunta.qualityCap);
+                IngredientStack cuts = ButcherRules.Butcher(Storeroom, part, score);
+                if (!cuts.IsEmpty)
+                {
+                    EventBus<PartButchered>.Publish(new PartButchered(part.Definition.id, cuts.Item.Definition.id, cuts.Count, score, gunta.id));
+                    m_Cook.Show(cuts.Count >= part.Definition.butchering.maxCuts ? m_Cook.Faces.content : m_Cook.Faces.happy);
+                }
+                done?.Invoke(cuts);
+                PrepChanged?.Invoke();
+            });
+        }
         public Storeroom Storeroom { get; private set; }
         public ServiceSession Session { get; private set; }
         public IReadOnlyList<CustomerAgent> Agents => m_Agents;
@@ -67,7 +132,8 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Seats open tonight: the placed furniture's usable seats (4f, D16).</summary>
         public int ActiveSeats { get; private set; }
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
-        public StaffDefinition StaffMember => m_Content != null && m_Content.staff.Count > 0 ? m_Content.staff[0] : null;
+        public StaffDefinition StaffMember => m_Content == null ? null
+            : m_Content.staff.Find(s => s != null && s.id == StaffIds.Pip) ?? m_Content.staff.Find(s => s != null && s.id != StaffIds.Gunta);
         public bool IsServing => Session != null && !Session.IsOver;
         /// <summary>Makes the station minigames (and serving) from the tavern's tuning.</summary>
         public MinigameFactory Minigames { get; private set; }
@@ -117,14 +183,19 @@ namespace Hearthdelve.Tavern.Scene
             m_EveningSeed = m_Seed != 0 ? m_Seed : Environment.TickCount;
             m_Random = new SeededRandom(m_EveningSeed);
             Minigames = new MinigameFactory(m_Content.grill.grill, m_Content.tap.tap, m_Content.serving.serving,
-                m_Content.stew != null ? m_Content.stew.chop : ChopSettings.Default);
+                m_Content.stew != null ? m_Content.stew.chop : ChopSettings.Default,
+                m_Content.butcher != null ? m_Content.butcher.butcher : ButcherSettings.Default);
             // Pip starts the evening carrying plates (the prototype's playtest: most useful there).
             StaffAssignment = StaffMember != null ? StaffStation.Serving : StaffStation.None;
+            // Gunta starts off duty (4f Checkpoint C): the keeper cooks every station until choosing, at Prep, which one
+            // she takes. (Tuning for the playtest: a default station would take the keeper's minigame from the first night.)
+            CookAssignment = StaffStation.None;
         }
 
         void Start()
         {
             if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
+            if (m_Cook != null) m_Cook.Begin(CookAssignment, CookMember, this, m_Random);
             if (m_Flow == null)
             {
                 // Played on its own: one evening from a debug-filled storeroom (F4 fills it again).
@@ -296,6 +367,29 @@ namespace Hearthdelve.Tavern.Scene
         {
             StaffAssignment = StaffMember != null ? station : StaffStation.None;
             if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
+            // Two people can't work one station: Gunta steps away from it.
+            if (StaffAssignment != StaffStation.None && CookAssignment == StaffAssignment)
+            {
+                CookAssignment = StaffStation.None;
+                if (m_Cook != null) m_Cook.Begin(CookAssignment, CookMember, this, m_Random);
+            }
+            PrepChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Puts Gunta on a job (the prep screen; 4f Checkpoint C): the Grill, the Tap, the Stew Pot, or none. She cooks, she
+        /// doesn't carry plates. If Pip is at that station, Pip goes back to serving.
+        /// </summary>
+        public void AssignCook(StaffStation station)
+        {
+            if (station == StaffStation.Serving) station = StaffStation.None;
+            CookAssignment = CookMember != null ? station : StaffStation.None;
+            if (m_Cook != null) m_Cook.Begin(CookAssignment, CookMember, this, m_Random);
+            if (CookAssignment != StaffStation.None && StaffAssignment == CookAssignment)
+            {
+                StaffAssignment = StaffStation.Serving;
+                if (m_Staff != null) m_Staff.Begin(StaffAssignment, StaffMember, this, m_Random);
+            }
             PrepChanged?.Invoke();
         }
 

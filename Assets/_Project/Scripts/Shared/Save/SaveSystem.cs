@@ -17,7 +17,10 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 6;
+        public const int CurrentVersion = 7;
+
+        /// <summary>Starting pieces added in version 7 (4f Checkpoint C); a version 6 save gets them once, in storage.</summary>
+        public static readonly string[] StartersAddedInV7 = { "butcher_block" };
 
         /// <summary>The seat upgrade retired in 4f (D16): seating comes from placed tables and chairs.</summary>
         public const string RetiredSeatUpgrade = "tavern_seats";
@@ -67,6 +70,9 @@ namespace Hearthdelve.Shared.Save
             data.furniture = new FurnitureSaveData { initialized = furniture.Initialized, nextUid = furniture.NextUid, tierAnnounced = furniture.AnnouncedTier };
             data.furniture.finishes.AddRange(furniture.OwnedFinishes);
             data.furniture.finishes.Sort(string.CompareOrdinal);
+            data.furniture.newPieces.AddRange(furniture.NewIds);
+            data.furniture.newPieces.Sort(string.CompareOrdinal);
+            data.furniture.homecoming = furniture.PendingHomecoming ?? string.Empty;
             foreach (var pair in furniture.Owned)
                 data.furniture.owned.Add(new OwnedPieceData { id = pair.Key, count = pair.Value });
             data.furniture.owned.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
@@ -94,7 +100,7 @@ namespace Hearthdelve.Shared.Save
         /// <param name="startingFurniture">Granted when the save has no furniture yet (migrated from version 3).</param>
         public static GameState Restore(SaveData data, Func<string, IngredientDefinition> ingredientById,
             Func<string, bool> upgradeExists, List<string> warnings = null, Func<string, bool> furnitureExists = null,
-            FurnitureStartingLayout startingFurniture = null)
+            FurnitureStartingLayout startingFurniture = null, IEnumerable<BossTrophy> trophies = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             // Saves from before the v0.5 day order name daytime "Morning".
@@ -139,6 +145,8 @@ namespace Hearthdelve.Shared.Save
                 state.Meal = new MealBuff(kind, data.meal.amount, data.meal.recipe);
 
             RestoreFurniture(state.Furniture, data.furniture, furnitureExists ?? (_ => true), startingFurniture, warnings);
+            // A boss beaten before its trophy existed (a 4e save) earns it now, once: the same rule as a fresh victory.
+            TrophyRules.GrantEarned(state, trophies);
             return state;
         }
 
@@ -185,13 +193,18 @@ namespace Hearthdelve.Shared.Save
             }
             furniture.Restore(owned, areas, data.nextUid);
             furniture.RestoreFinishes(data.finishes ?? new List<string>(), finishAreas, data.tierAnnounced);
+            var fresh = new List<string>();
+            foreach (string id in data.newPieces ?? new List<string>())
+                if (!string.IsNullOrEmpty(id) && exists(id)) fresh.Add(id);
+            furniture.RestoreNew(fresh, !string.IsNullOrEmpty(data.homecoming) && exists(data.homecoming) ? data.homecoming : null);
+            if (data.grantNewStarters) furniture.GrantNewStarters(startingFurniture, StartersAddedInV7);
             // Areas and starter finishes added since the save was made (the guest room) arrive with their starting furniture.
             furniture.GrantMissing(startingFurniture);
         }
 
         public static GameState Restore(SaveData data, GameDatabase database, List<string> warnings = null) =>
             Restore(data, database.Ingredient, id => database.Upgrade(id) != null, warnings, id => database.Furniture(id) != null,
-                database.startingFurniture);
+                database.startingFurniture, database.bossTrophies);
 
         public static string ToJson(SaveData data) => JsonUtility.ToJson(data, prettyPrint: true);
 
@@ -208,6 +221,7 @@ namespace Hearthdelve.Shared.Save
             if (data.version == 3) data = MigrateV3(data);
             if (data.version == 4) data = MigrateV4(data);
             if (data.version == 5) data = MigrateV5(data);
+            if (data.version == 6) data = MigrateV6(data);
             return data;
         }
 
@@ -221,6 +235,21 @@ namespace Hearthdelve.Shared.Save
         /// starting finishes and areas new since (the guest room) granted on restore (<see cref="FurnitureState.GrantMissing"/>),
         /// and no tier announced yet, so tiers already reached are announced on the next Night.
         /// </summary>
+        /// <summary>
+        /// v6 → v7 (4f Checkpoint C): new fields only. Nothing is new in storage and no trophy waits; a boss already beaten
+        /// earns its trophy as the save is restored (<see cref="TrophyRules.GrantEarned"/>).
+        /// </summary>
+        static SaveData MigrateV6(SaveData v6)
+        {
+            v6.version = 7;
+            v6.furniture ??= new FurnitureSaveData();
+            v6.furniture.newPieces ??= new List<string>();
+            v6.furniture.homecoming = null;
+            // Pieces in the starting layout since (the Butcher Block, 4f Checkpoint C) arrive in storage, once.
+            v6.furniture.grantNewStarters = v6.furniture.initialized;
+            return v6;
+        }
+
         static SaveData MigrateV5(SaveData v5)
         {
             v5.version = 6;

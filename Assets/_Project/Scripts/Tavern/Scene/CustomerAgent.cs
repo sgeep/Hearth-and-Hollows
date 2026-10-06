@@ -52,6 +52,41 @@ namespace Hearthdelve.Tavern.Scene
         public bool ShowsPatience => m_PatienceFill != null && m_PatienceFill.enabled;
         public Sprite BubbleIcon => m_Bubble != null && m_Bubble.activeSelf ? m_BubbleIcon.sprite : null;
 
+        [SerializeField, Tooltip("A boss trophy on the wall, noticed on sitting down (4f Checkpoint C, D18): a wordless face.")]
+        Sprite m_NoticeTrophy;
+        [SerializeField, Range(0f, 1f), Tooltip("Chance a patron notices a trophy on the wall when they sit down.")]
+        float m_NoticeChance = 0.5f;
+        Sprite m_Emote;
+        float m_EmoteFrom, m_EmoteUntil;
+        int m_Seed;
+
+        /// <summary>Did this patron notice a trophy (tests)?</summary>
+        public bool NoticedTrophy { get; private set; }
+
+        public void ConfigureEmotes(Sprite noticeTrophy) => m_NoticeTrophy = noticeTrophy;
+
+        /// <summary>Shows a face in the bubble from <paramref name="delay"/> seconds for <paramref name="seconds"/> (presentation only).</summary>
+        public void Emote(Sprite face, float seconds, float delay = 0f)
+        {
+            if (face == null) return;
+            m_Emote = face;
+            m_EmoteFrom = Time.time + delay;
+            m_EmoteUntil = m_EmoteFrom + seconds;
+        }
+
+        /// <summary>A trophy among the tavern's furniture (a boss's: never bought, never lost)?</summary>
+        static bool TrophyOnDisplay()
+        {
+            AreaFurniture tavern = AreaFurniture.Tavern;
+            if (tavern == null) return false;
+            foreach (Hearthdelve.Shared.Customization.PlacedFurniture p in tavern.CurrentLayout())
+            {
+                var d = tavern.Definition(p.definition);
+                if (d != null && (d.sources & Hearthdelve.Shared.Customization.FurnitureSource.Boss) != 0) return true;
+            }
+            return false;
+        }
+
         public void Configure(LayeredSpriteAnimator look, SpriteRenderer patienceBack, SpriteRenderer patienceFill, GameObject bubble,
             SpriteRenderer bubbleIcon, Sprite thinking, Sprite upset)
         {
@@ -68,6 +103,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             Logic = logic;
             m_Director = director;
+            m_Seed = seed;
             name = $"Customer_{(logic.Profile != null ? logic.Profile.id : "guest")}_{logic.Id}";
             m_Brain = GetComponent<AIBrain>();
             m_Movement = GetComponent<Character>().FindAbility<CharacterMovement>();
@@ -162,6 +198,12 @@ namespace Hearthdelve.Tavern.Scene
             Place(m_Seat.SitPoint);
             m_Look?.LockFacing(m_Seat.Facing);
             Logic.ArrivedAtSeat();
+            // Some patrons look up at the troll's tusks as they sit (wordless, D18; what they'd say comes with 4g).
+            if (m_NoticeTrophy != null && TrophyOnDisplay() && new System.Random(unchecked(m_Seed * 7919 + 17)).NextDouble() < m_NoticeChance)
+            {
+                NoticedTrophy = true;
+                Emote(m_NoticeTrophy, 1.6f, 0.6f);
+            }
         }
 
         void StandUp()
@@ -204,7 +246,9 @@ namespace Hearthdelve.Tavern.Scene
                 m_PatienceFill.color = Color.Lerp(m_PatienceEmpty, m_PatienceFull, Logic.Patience);
             }
 
+            bool emoting = m_Emote != null && Time.time >= m_EmoteFrom && Time.time < m_EmoteUntil;
             Sprite icon = Time.time < m_UpsetUntil ? m_Upset
+                : emoting ? m_Emote
                 : Logic.State == CustomerState.Ordering ? m_Thinking
                 : Logic.State == CustomerState.WaitingForFood && Logic.Order != null ? Logic.Order.icon
                 : null;

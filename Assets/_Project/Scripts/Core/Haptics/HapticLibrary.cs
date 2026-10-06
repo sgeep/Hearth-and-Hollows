@@ -21,6 +21,12 @@ namespace Hearthdelve.Core.Haptics
         public const string HeartbeatWarning = "Heartbeat.Warning";
         public const string BossTelegraph = "Boss.Telegraph";
         public const string BossPhaseChange = "Boss.PhaseChange";
+        /// <summary>A furnishing found in the Hollows (4f Checkpoint C): a bright, quick shimmer, unlike a coin's tap.</summary>
+        public const string DiscoveryFound = "Discovery.Found";
+        /// <summary>A clean cut at the Butcher Block: one crisp, solid stroke (against <see cref="CutRagged"/>).</summary>
+        public const string CutClean = "Cut.Clean";
+        /// <summary>A trophy's homecoming: a warm, satisfied rumble as it goes up.</summary>
+        public const string Homecoming = "Homecoming";
     }
 
     /// <summary>Every haptic pattern in the game, looked up by id.</summary>

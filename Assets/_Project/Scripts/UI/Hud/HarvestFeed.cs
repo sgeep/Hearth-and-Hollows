@@ -31,18 +31,73 @@ namespace Hearthdelve.UI.Hud
         float m_Fade = 0.5f;
         [SerializeField, Min(1f), Tooltip("Spacing between lines, in canvas pixels.")]
         float m_LineHeight = 9f;
+        [SerializeField, Tooltip("A furnishing found (4f Checkpoint C): the chest beside its line.")]
+        Sprite m_CurioIcon;
+        [SerializeField, Tooltip("A found furnishing's line: its own color, unlike a harvest's.")]
+        Color m_CurioColor = new(0.62f, 0.86f, 1f);
+
+        Color m_TextColor = Color.white;
 
         public HarvestFeedLine[] Lines => m_Lines;
 
-        public void Configure(HarvestFeedLine[] lines) => m_Lines = lines;
+        public void Configure(HarvestFeedLine[] lines, Sprite curioIcon = null)
+        {
+            m_Lines = lines;
+            m_CurioIcon = curioIcon;
+        }
 
         void Awake()
         {
             foreach (HarvestFeedLine line in m_Lines) line.group.alpha = 0f;
+            var first = m_Lines.Length > 0 ? m_Lines[0].text.GetComponent<SuperTextMesh>() : null;
+            if (first != null) m_TextColor = first.color;
         }
 
-        void OnEnable() => EventBus<HarvestFeedback>.Subscribe(Push);
-        void OnDisable() => EventBus<HarvestFeedback>.Unsubscribe(Push);
+        void OnEnable()
+        {
+            EventBus<HarvestFeedback>.Subscribe(Push);
+            EventBus<CurioFound>.Subscribe(PushCurio);
+        }
+
+        void OnDisable()
+        {
+            EventBus<HarvestFeedback>.Unsubscribe(Push);
+            EventBus<CurioFound>.Unsubscribe(PushCurio);
+        }
+
+        /// <summary>A furnishing found: "found: skull candle", with the chest, in the discovery color.</summary>
+        void PushCurio(CurioFound found)
+        {
+            if (m_Lines.Length == 0 || string.IsNullOrEmpty(found.FurnitureId)) return;
+            HarvestFeedLine line = NextLine();
+            line.text.Set(LocKeys.HarvestCurio, LocKeys.FurnitureName(found.FurnitureId));
+            Tint(line, m_CurioColor);
+            line.icon.sprite = m_CurioIcon;
+            line.icon.enabled = m_CurioIcon != null;
+            line.shownAt = Time.time;
+            line.group.alpha = 1f;
+        }
+
+        HarvestFeedLine NextLine()
+        {
+            // The oldest line is reused for the newest, which goes on top.
+            HarvestFeedLine line = m_Lines[m_Lines.Length - 1];
+            for (int i = m_Lines.Length - 1; i > 0; i--) m_Lines[i] = m_Lines[i - 1];
+            m_Lines[0] = line;
+            for (int i = 0; i < m_Lines.Length; i++)
+                ((RectTransform)m_Lines[i].group.transform).anchoredPosition = new Vector2(0f, -i * m_LineHeight);
+            return line;
+        }
+
+        static void Tint(HarvestFeedLine line, Color color)
+        {
+            var stm = line.text.GetComponent<SuperTextMesh>();
+            if (stm != null && stm.color != color)
+            {
+                stm.color = color;
+                stm.Rebuild();
+            }
+        }
 
         /// <summary>The key a harvest result is told with.</summary>
         public static string KeyFor(HarvestFlags flags) =>
@@ -55,12 +110,8 @@ namespace Hearthdelve.UI.Hud
         void Push(HarvestFeedback feedback)
         {
             if (m_Lines.Length == 0 || !feedback.Item.IsValid) return;
-            // The oldest line is reused for the newest, which goes on top.
-            HarvestFeedLine line = m_Lines[m_Lines.Length - 1];
-            for (int i = m_Lines.Length - 1; i > 0; i--) m_Lines[i] = m_Lines[i - 1];
-            m_Lines[0] = line;
-            for (int i = 0; i < m_Lines.Length; i++)
-                ((RectTransform)m_Lines[i].group.transform).anchoredPosition = new Vector2(0f, -i * m_LineHeight);
+            HarvestFeedLine line = NextLine();
+            Tint(line, m_TextColor);
 
             string name = Loc.ItemName(feedback.Item);
             string key = KeyFor(feedback.Flags);

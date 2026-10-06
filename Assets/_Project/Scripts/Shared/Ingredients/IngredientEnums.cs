@@ -16,6 +16,23 @@ namespace Hearthdelve.Shared.Ingredients
         Spice = 1 << 6,
         Liquid = 1 << 7,
         Magical = 1 << 8,
+        /// <summary>Bread, malt and other grain (4f Checkpoint C, D19).</summary>
+        Grain = 1 << 9,
+    }
+
+    /// <summary>
+    /// Where an ingredient usually comes from (GDD §5.1, §5.5). Recipes never ask for a source, only ingredients or
+    /// categories, so later sources (the village shop, farming, ranching, fishing, villagers) plug in without touching them.
+    /// Only the Market and the Hollows have gameplay in 4f.
+    /// </summary>
+    public enum IngredientSource
+    {
+        Hollows,
+        Market,
+        Farm,
+        Ranch,
+        Fishing,
+        Villager,
     }
 
     [Flags]

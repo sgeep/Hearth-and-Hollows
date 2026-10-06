@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 388514b090108da45995e0e90646451a, type: 3}
+  m_Name: Supply_BrackenfordMarket
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Inventory.SupplySource
+  id: brackenford_market
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: Content
+    m_TableEntryReference:
+      m_KeyId: 0
+      m_Key: supply.brackenford_market
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  source: 1
+  offers:
+  - ingredient: {fileID: 11400000, guid: 6b979a830d693914886fb2386d12ee49, type: 2}
+    price: 2
+    bundle: 1
+  - ingredient: {fileID: 11400000, guid: cd4d86ccf4d17134fa29529be3196e91, type: 2}
+    price: 2
+    bundle: 1
+  - ingredient: {fileID: 11400000, guid: f319e1dd79257c247b2bb6f7fab674ab, type: 2}
+    price: 3
+    bundle: 1
+  - ingredient: {fileID: 11400000, guid: e7b3167f0efd596489d8c93714a292af, type: 2}
+    price: 3
+    bundle: 1
+  - ingredient: {fileID: 11400000, guid: 4b340e077390d3249ab64e0a43c9be07, type: 2}
+    price: 2
+    bundle: 1
+  quality: 1
+  references:
+    version: 2
+    RefIds: []

@@ -27,6 +27,15 @@ namespace Hearthdelve.Editor
         {
             EditorPaths.Ensure(EditorPaths.Audio);
             Func<int, float> noise = LookTestContent.Noise;
+            // The Butcher Block (4f Checkpoint C): a soft bite as the knife goes in; a deep, clean cleave (a thock through
+            // to the wood); the cuts sliding apart (three soft slaps).
+            LookTestContent.WriteWav("PH_KnifeIn", 0.1f, (t, n) => noise(n) * Mathf.Exp(-t * 40f) * 0.3f + Sin(t, 300f) * Mathf.Exp(-t * 60f) * 0.2f);
+            LookTestContent.WriteWav("PH_Cleave", 0.28f, (t, n) => noise(n) * Mathf.Exp(-t * 30f) * 0.5f + Sin(t, 120f - 40f * t) * Mathf.Exp(-t * 14f) * 0.8f);
+            LookTestContent.WriteWav("PH_ButcherDone", 0.6f, (t, n) =>
+            {
+                float local = t % 0.16f;
+                return t < 0.48f ? (noise(n) * 0.35f + Sin(t, 180f) * 0.4f) * Mathf.Exp(-local * 30f) * 0.7f : 0f;
+            });
             // Grill: a short hiss when the meat turns; brighter for a perfect flip; a harsh hiss and thump when it burns.
             LookTestContent.WriteWav("PH_Flip", 0.16f, (t, n) => noise(n) * Mathf.Exp(-t * 22f) * 0.45f + Sin(t, 180f) * Mathf.Exp(-t * 40f) * 0.3f);
             LookTestContent.WriteWav("PH_FlipPerfect", 0.32f, (t, n) => noise(n) * Mathf.Exp(-t * 22f) * 0.35f + Sin(t, t < 0.1f ? 880f : 1320f) * Mathf.Exp(-t * 8f) * 0.35f);
@@ -102,6 +111,10 @@ namespace Hearthdelve.Editor
             BuildSounds();
             // Restyling: a short soft brush of noise (4f step 5).
             LookTestContent.WriteWav("PH_Brush", 0.2f, (t, n) => LookTestContent.Noise(n) * Mathf.Sin(t / 0.2f * Mathf.PI) * 0.22f);
+            // A trophy's homecoming (4f Checkpoint C): a heavy wooden thud, then a bright, warm chord.
+            LookTestContent.WriteWav("PH_Homecoming", 1.2f, (t, n) =>
+                (LookTestContent.Noise(n) * 0.5f + Sin(t, 70f - 30f * t) * 0.9f) * Mathf.Exp(-t * 14f) * 0.8f
+                + (t > 0.18f ? (Sin(t, 523f) + Sin(t, 659f) * 0.8f + Sin(t, 784f) * 0.6f) * Mathf.Exp(-(t - 0.18f) * 3f) * 0.16f : 0f));
             var root = new GameObject("Feedback").transform;
             root.SetParent(parent, false);
             var moments = new DecorateMoments
@@ -122,6 +135,7 @@ namespace Hearthdelve.Editor
                 restyle = Moment(root, "Feedback_Restyle", "PH_Brush", HapticIds.TapLight),
                 finish = Moment(root, "Feedback_Finish", "PH_Brush", HapticIds.TapFirm),
                 area = Moment(root, "Feedback_Area", "PH_Whoosh", null),
+                homecoming = Moment(root, "Feedback_Homecoming", "PH_Homecoming", HapticIds.Homecoming),
             };
             var feedback = root.gameObject.AddComponent<DecorateFeedback>();
             feedback.Configure(moments);
@@ -150,6 +164,11 @@ namespace Hearthdelve.Editor
                 cleanCut = Moment(root, "Feedback_CleanCut", "PH_Chop", HapticIds.TapFirm),
                 raggedCut = Moment(root, "Feedback_RaggedCut", "PH_ChopRagged", HapticIds.CutRagged),
                 chopDone = Moment(root, "Feedback_ChopDone", "PH_ChopDone", HapticIds.PulseSuccess, scaled: true),
+                // The Butcher Block (4f Checkpoint C): the knife biting in, a clean cleave or a ragged hack, the cuts sliding apart.
+                butcherStroke = Moment(root, "Feedback_ButcherStroke", "PH_KnifeIn", HapticIds.TapLight),
+                butcherClean = Moment(root, "Feedback_ButcherClean", "PH_Cleave", HapticIds.CutClean),
+                butcherRagged = Moment(root, "Feedback_ButcherRagged", "PH_ChopRagged", HapticIds.CutRagged),
+                butcherDone = Moment(root, "Feedback_ButcherDone", "PH_ButcherDone", HapticIds.PulseSuccess, scaled: true),
                 stewReady = Moment(root, "Feedback_StewReady", "PH_StewReady", null),
                 pickUp = Moment(root, "Feedback_PickUp", "PH_PlateUp", HapticIds.TapLight),
                 putBack = Moment(root, "Feedback_PutBack", "PH_PlateDown", HapticIds.TapLight),

@@ -24,6 +24,16 @@ namespace Hearthdelve.UI.Localization
         public const string MorningCooking = "morning.cooking";
         public const string MorningLoadout = "morning.loadout";
         public const string MorningDescend = "morning.descend";
+        // 4f Checkpoint C: the Brackenford market on the daytime panel.
+        public const string MarketButton = "market.button";
+        public const string MarketTitle = "market.title";
+        public const string MarketPurse = "market.purse";
+        public const string MarketHave = "market.have";
+        public const string MarketBuy = "market.buy";
+        public const string MarketBuyBundle = "market.buy_bundle";
+        public const string MarketShort = "market.short";
+        public const string MarketDone = "market.done";
+        public const string MarketNote = "market.note";
 
         public const string BuffMaxEssence = "buff.max_essence";
         public const string BuffSlowerDrain = "buff.slower_drain";
@@ -105,6 +115,15 @@ namespace Hearthdelve.UI.Localization
             (MorningCooking, "cooking the delve meal..."),
             (MorningLoadout, "tonight's delve bonuses: +{0} satchel slots · +{1} max Essence · Essence drain {2}%"),
             (MorningDescend, "open for the evening"),
+            (MarketButton, "market"),
+            (MarketTitle, "the Brackenford market"),
+            (MarketPurse, "purse: {0} gold"),
+            (MarketHave, "you have {0}"),
+            (MarketBuy, "buy · {0} gold"),
+            (MarketBuyBundle, "buy {1} · {0} gold"),
+            (MarketShort, "not enough gold."),
+            (MarketDone, "done"),
+            (MarketNote, "everyday food, fresh today. the strange stuff comes from below."),
 
             (BuffMaxEssence, "+{0} max Essence"),
             (BuffSlowerDrain, "Essence drain -{0}%"),

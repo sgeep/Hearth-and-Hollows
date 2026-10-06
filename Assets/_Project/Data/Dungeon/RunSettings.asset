@@ -28,6 +28,7 @@ MonoBehaviour:
       goldWeight: 1
       ingredientWeight: 1
       powerWeight: 0.6
+      curioWeight: 0.3
       minGold: 10
       maxGold: 18
       minParts: 1
@@ -47,6 +48,7 @@ MonoBehaviour:
       goldWeight: 1
       ingredientWeight: 1
       powerWeight: 0.6
+      curioWeight: 0.3
       minGold: 18
       maxGold: 30
       minParts: 1
@@ -66,6 +68,7 @@ MonoBehaviour:
       goldWeight: 1
       ingredientWeight: 1
       powerWeight: 0.6
+      curioWeight: 0.3
       minGold: 30
       maxGold: 45
       minParts: 2
@@ -87,6 +90,13 @@ MonoBehaviour:
     - ingredient: {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}
       weight: 0.7
       fromFloor: 2
+    - ingredient: {fileID: 11400000, guid: a9638819317ee6f4f971a403a0c1b350, type: 2}
+      weight: 0.8
+      fromFloor: 1
+    - ingredient: {fileID: 11400000, guid: 043e0099fdffbae4d85cd360d8627bd1, type: 2}
+      weight: 0.5
+      fromFloor: 2
+    curios: {fileID: 11400000, guid: bdc0ca9f02fd77e40ab95b2910f2d8d4, type: 2}
     powers:
     - {fileID: 11400000, guid: dd8eb0a2d110b7d448c7e7ea010be192, type: 2}
     - {fileID: 11400000, guid: 5ac6486793e0a2444a5fbb06014fd14e, type: 2}
@@ -133,4 +143,5 @@ MonoBehaviour:
   spider: {fileID: 7032119628774444274, guid: 682140b0d6791ff439cad7ec6a05f9a4, type: 3}
   goldPickup: {fileID: 5263092997857751594, guid: 6f92e44bc916d5742abcb804f006fe31, type: 3}
   powerPickup: {fileID: 5760000006229281841, guid: 27f59f77929fbd64084c3afec76e387e, type: 3}
+  curioPickup: {fileID: 5694681140218237025, guid: fe9bad9a7e0436c4ca130d3ea89050b7, type: 3}
   campfire: {fileID: 924007973708515414, guid: 9f21946c5a0a3af47aca1bb218757cac, type: 3}

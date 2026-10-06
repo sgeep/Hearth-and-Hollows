@@ -19,7 +19,11 @@ namespace Hearthdelve.Editor
             int copied = 0, missing = 0;
             foreach (Sheet sheet in MinifantasySheets.All)
             {
-                string source = Path.Combine(EditorPaths.MinifantasySource, sheet.Source);
+                // "derived:" sheets are composites of Minifantasy pixels made by our own tools, kept in the repo
+                // (Tools/characters/staff_looks.py: Pip's and Gunta's looks), recorded in docs/ASSET_MAP.md.
+                string source = sheet.Source.StartsWith("derived:", System.StringComparison.Ordinal)
+                    ? sheet.Source.Substring("derived:".Length)
+                    : Path.Combine(EditorPaths.MinifantasySource, sheet.Source);
                 if (!File.Exists(source))
                 {
                     // On a machine without the raw packs, the copies already in the repo are used.

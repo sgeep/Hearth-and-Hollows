@@ -24,6 +24,10 @@ namespace Hearthdelve.Tavern.Scene
         public MMF_Player raggedCut;
         public MMF_Player chopDone;
         public MMF_Player stewReady;
+        [Header("Butcher Block (4f Checkpoint C)")] public MMF_Player butcherStroke;
+        public MMF_Player butcherClean;
+        public MMF_Player butcherRagged;
+        public MMF_Player butcherDone;
         [Header("Serving")] public MMF_Player pickUp;
         public MMF_Player putBack;
         public MMF_Player softBump;
@@ -47,6 +51,7 @@ namespace Hearthdelve.Tavern.Scene
     {
         public const string GrillChannel = "tavern.grill";
         public const string PourChannel = "tavern.pour";
+        public const string ButcherChannel = "tavern.butcher";
 
         [SerializeField] TavernFeedbackConfig m_Config;
         [SerializeField] TavernMoments m_Moments = new();
@@ -69,6 +74,8 @@ namespace Hearthdelve.Tavern.Scene
         public event Action<string> MomentPlayed;
         public float GrillWarning { get; private set; }
         public (float low, float high) PourLevel { get; private set; }
+        /// <summary>The Butcher Block's drag rumble now (0: not cutting).</summary>
+        public float ButcherDrag { get; private set; }
 
         public void Configure(TavernFeedbackConfig config, TavernMoments moments, AudioSource sizzle, AudioSource pour)
         {
@@ -125,6 +132,9 @@ namespace Hearthdelve.Tavern.Scene
                 if (TavernFeedbackRules.ReachedLine(m_LastFill, tap.Total, tap.Settings)) Play(m_Moments.lineReached, nameof(TavernMoments.lineReached));
                 m_LastFill = tap.Total;
             }
+            // The Butcher Block: a smooth, light drag while the knife follows the line; a rough grind off it.
+            ButcherDrag = m_Game is ButcherMinigame butcher && !butcher.IsComplete && butcher.Stroke >= 0 ? (butcher.OnTrack ? 0.15f : 0.45f) : 0f;
+            HapticService.SetContinuous(ButcherChannel, ButcherDrag, ButcherDrag > 0.3f ? 0.1f : ButcherDrag);
             HapticService.SetContinuous(GrillChannel, GrillWarning * 0.6f, GrillWarning);
             HapticService.SetContinuous(PourChannel, PourLevel.low, PourLevel.high);
             // The sound follows the same values as the rumble.
@@ -136,12 +146,32 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (game is GrillMinigame grill) grill.SideFinished += OnSideFinished;
             else if (game is ChopMinigame chop) chop.Cut += OnCut;
+            else if (game is ButcherMinigame butcher)
+            {
+                butcher.StrokeStarted += OnStroke;
+                butcher.StrokeFinished += OnStrokeFinished;
+            }
         }
 
         void Release(IMinigame game)
         {
             if (game is GrillMinigame grill) grill.SideFinished -= OnSideFinished;
             else if (game is ChopMinigame chop) chop.Cut -= OnCut;
+            else if (game is ButcherMinigame butcher)
+            {
+                butcher.StrokeStarted -= OnStroke;
+                butcher.StrokeFinished -= OnStrokeFinished;
+            }
+        }
+
+        void OnStroke(int line) => Play(m_Moments.butcherStroke, nameof(TavernMoments.butcherStroke));
+
+        /// <summary>A stroke through: a crisp, solid cleave when it followed the line, a dull ragged hack when it didn't.</summary>
+        void OnStrokeFinished(int line, float score)
+        {
+            bool clean = m_Game is ButcherMinigame butcher && score >= butcher.Settings.cleanStroke;
+            if (clean) Play(m_Moments.butcherClean, nameof(TavernMoments.butcherClean));
+            else Play(m_Moments.butcherRagged, nameof(TavernMoments.butcherRagged));
         }
 
         void OnSideFinished(int side, float score)
@@ -178,6 +208,11 @@ namespace Hearthdelve.Tavern.Scene
             else if (game is ChopMinigame chop)
             {
                 Play(m_Moments.chopDone, nameof(TavernMoments.chopDone), TavernFeedbackRules.GoodChop(chop.Evaluate(), Settings) ? 1f : 0.5f);
+            }
+            else if (game is ButcherMinigame butcher)
+            {
+                // The cuts sliding apart: fuller the more there are.
+                Play(m_Moments.butcherDone, nameof(TavernMoments.butcherDone), Mathf.Lerp(0.4f, 1f, butcher.Evaluate()));
             }
         }
 
@@ -259,6 +294,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             HapticService.SetContinuous(GrillChannel, 0f, 0f);
             HapticService.SetContinuous(PourChannel, 0f, 0f);
+            HapticService.SetContinuous(ButcherChannel, 0f, 0f);
             SetLoop(m_Sizzle, false, 0f);
             SetLoop(m_Pour, false, 0f);
         }

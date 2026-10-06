@@ -115,6 +115,10 @@ namespace Hearthdelve.Editor
             (HapticIds.HeartbeatWarning, Keys((0f, 0.6f, 0f), (0.06f, 0.6f, 0f), (0.07f, 0f, 0f), (0.17f, 0f, 0f), (0.18f, 0.4f, 0f), (0.24f, 0.4f, 0f), (0.26f, 0f, 0f))),
             (HapticIds.BossTelegraph, Keys((0f, 0f, 0f), (0.6f, 0.7f, 0.1f), (0.7f, 0f, 0f))),
             (HapticIds.BossPhaseChange, Keys((0f, 0.3f, 0.1f), (0.5f, 1f, 0.6f), (0.6f, 1f, 0.6f), (1.2f, 0.2f, 0f), (1.3f, 0f, 0f))),
+            // 4f Checkpoint C.
+            (HapticIds.DiscoveryFound, Keys((0f, 0f, 0.6f), (0.03f, 0f, 0.6f), (0.04f, 0f, 0f), (0.09f, 0f, 0f), (0.1f, 0f, 0.8f), (0.13f, 0f, 0.8f), (0.14f, 0f, 0f), (0.2f, 0f, 0f), (0.21f, 0.2f, 1f), (0.3f, 0.2f, 1f), (0.34f, 0f, 0f))),
+            (HapticIds.CutClean, Keys((0f, 0.8f, 0.9f), (0.04f, 0.8f, 0.9f), (0.06f, 0f, 0f))),
+            (HapticIds.Homecoming, Keys((0f, 0.5f, 0f), (0.15f, 0.9f, 0.2f), (0.3f, 0.6f, 0.1f), (0.6f, 0.3f, 0f), (0.8f, 0f, 0f))),
         };
 
         static HapticKey[] Keys(params (float time, float low, float high)[] keys)

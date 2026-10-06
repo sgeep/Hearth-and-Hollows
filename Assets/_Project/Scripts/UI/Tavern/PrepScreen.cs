@@ -53,6 +53,36 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField, Tooltip("A chosen dish's tile, with gold corners as well.")] Color m_ChosenColour = new(0.98f, 0.86f, 0.5f);
 
         static readonly StaffStation[] k_Jobs = { StaffStation.Serving, StaffStation.Grill, StaffStation.Tap, StaffStation.StewPot, StaffStation.None };
+        /// <summary>Gunta cooks (4f Checkpoint C): a station or off duty, never the plates.</summary>
+        static readonly StaffStation[] k_CookJobs = { StaffStation.Grill, StaffStation.StewPot, StaffStation.Tap, StaffStation.None };
+
+        [SerializeField, Tooltip("Gunta's job (4f Checkpoint C).")] Button m_Cook;
+        [SerializeField] LocalizedSuperText m_CookLabel;
+        [SerializeField, Tooltip("The Butcher Block (mise en place).")] Button m_Butcher;
+        [SerializeField] ButcherPanel m_ButcherPanel;
+        [SerializeField, Tooltip("More dishes than cards: the next page.")] Button m_Page;
+        [SerializeField] LocalizedSuperText m_PageLabel;
+
+        int m_PageIndex;
+        bool m_WasCooking;
+        readonly List<RecipeDefinition> m_All = new();
+
+        public Button CookButton => m_Cook;
+        public Button ButcherButton => m_Butcher;
+        public ButcherPanel Butcher => m_ButcherPanel;
+        public Button PageButton => m_Page;
+        public int Page => m_PageIndex;
+        public int PageCount => Mathf.Max(1, (m_All.Count + m_Cards.Length - 1) / Mathf.Max(1, m_Cards.Length));
+
+        public void ConfigureKitchen(Button cook, LocalizedSuperText cookLabel, Button butcher, ButcherPanel butcherPanel, Button page, LocalizedSuperText pageLabel)
+        {
+            m_Cook = cook;
+            m_CookLabel = cookLabel;
+            m_Butcher = butcher;
+            m_ButcherPanel = butcherPanel;
+            m_Page = page;
+            m_PageLabel = pageLabel;
+        }
 
         TavernDirector m_Director;
         readonly List<RecipeDefinition> m_Recipes = new();
@@ -89,13 +119,23 @@ namespace Hearthdelve.UI.Tavern
         {
             m_Director = TavernDirector.Instance;
             if (m_Director == null) return;
-            m_Recipes.AddRange(m_Director.Content.recipes.Where(r => r != null).Take(m_Cards.Length));
             for (int i = 0; i < m_Cards.Length; i++)
             {
                 int index = i;
                 m_Cards[i].button.onClick.AddListener(() => Toggle(index));
             }
             m_Staff.onClick.AddListener(NextJob);
+            if (m_Cook != null) m_Cook.onClick.AddListener(NextCookJob);
+            if (m_Page != null) m_Page.onClick.AddListener(NextPage);
+            if (m_Butcher != null && m_ButcherPanel != null)
+            {
+                m_Butcher.onClick.AddListener(m_ButcherPanel.Open);
+                m_ButcherPanel.Closed += () =>
+                {
+                    Refresh();
+                    if (EventSystem.current != null) EventSystem.current.SetSelectedGameObject(m_Butcher.gameObject);
+                };
+            }
             m_Close.onClick.AddListener(() => m_Director.CloseForTheNight());
             m_Open.onClick.AddListener(() => m_Director.OpenService());
             if (m_FillHint != null) m_FillHint.SetActive(m_Director.CanDebugFill);
@@ -119,6 +159,30 @@ namespace Hearthdelve.UI.Tavern
             if (card < m_Recipes.Count) m_Director.ToggleMenu(m_Recipes[card]);
         }
 
+        /// <summary>Gunta's next job: the Grill, the Stew Pot, the Tap, or off duty.</summary>
+        public void NextCookJob()
+        {
+            int at = Array.IndexOf(k_CookJobs, m_Director.CookAssignment);
+            m_Director.AssignCook(k_CookJobs[(at + 1) % k_CookJobs.Length]);
+        }
+
+        /// <summary>The menu's next page of dishes (more dishes than cards since 4f Checkpoint C).</summary>
+        public void NextPage()
+        {
+            m_PageIndex = (m_PageIndex + 1) % PageCount;
+            Refresh();
+        }
+
+        // Breaking down a part at the block (or the list of parts) has the screen; Prep comes back after.
+        void Update()
+        {
+            if (m_Director == null) return;
+            bool busy = KeeperWork.Instance != null && KeeperWork.Instance.ActiveCook != null || m_ButcherPanel != null && m_ButcherPanel.IsOpen;
+            if (busy == m_WasCooking) return;
+            m_WasCooking = busy;
+            Refresh();
+        }
+
         public void NextJob()
         {
             int at = Array.IndexOf(k_Jobs, m_Director.StaffAssignment);
@@ -127,7 +191,8 @@ namespace Hearthdelve.UI.Tavern
 
         void Refresh()
         {
-            bool shown = m_Director.Phase == TavernPhase.Prep && !DecorateScreen.IsDecorating;
+            bool busy = KeeperWork.Instance != null && KeeperWork.Instance.ActiveCook != null || m_ButcherPanel != null && m_ButcherPanel.IsOpen;
+            bool shown = m_Director.Phase == TavernPhase.Prep && !DecorateScreen.IsDecorating && !busy;
             bool wasShown = m_Root.activeSelf;
             m_Root.SetActive(shown);
             if (!shown) return;
@@ -141,6 +206,16 @@ namespace Hearthdelve.UI.Tavern
                 if (has) m_Stock[i].Show(stacks[i]);
             }
             m_StockEmpty.gameObject.SetActive(stacks.Count == 0);
+
+            // The dishes the storeroom can make first (and those already chosen), then the rest, a page at a time.
+            m_All.Clear();
+            m_All.AddRange(m_Director.Content.recipes.Where(r => r != null)
+                .OrderByDescending(r => m_Director.Menu.Contains(r) || PrepRules.Makeable(r, storeroom) > 0));
+            m_PageIndex = Mathf.Clamp(m_PageIndex, 0, PageCount - 1);
+            m_Recipes.Clear();
+            m_Recipes.AddRange(m_All.Skip(m_PageIndex * m_Cards.Length).Take(m_Cards.Length));
+            if (m_Page != null) m_Page.gameObject.SetActive(PageCount > 1);
+            m_PageLabel?.Set(TavernLocKeys.PrepPage, m_PageIndex + 1, PageCount);
 
             for (int i = 0; i < m_Cards.Length; i++)
             {
@@ -164,12 +239,16 @@ namespace Hearthdelve.UI.Tavern
                 card.group.alpha = on || makeable > 0 ? 1f : 0.45f;
             }
 
-            bool nothing = !PrepRules.AnythingCookable(m_Recipes, storeroom);
+            bool nothing = !PrepRules.AnythingCookable(m_All, storeroom);
             m_Tonight.gameObject.SetActive(!nothing);
             m_Tonight.Set(TavernLocKeys.PrepTonight, m_Director.Menu.Count, m_Director.MaxMenuSize);
             StaffDefinition pip = m_Director.StaffMember;
             m_Staff.gameObject.SetActive(pip != null);
             if (pip != null) m_StaffLabel.Set(TavernLocKeys.PrepStaffJob, Loc.Get(pip.displayName), Loc.UI(JobKey(m_Director.StaffAssignment)));
+            StaffDefinition gunta = m_Director.CookMember;
+            if (m_Cook != null) m_Cook.gameObject.SetActive(gunta != null);
+            if (gunta != null) m_CookLabel?.Set(TavernLocKeys.PrepStaffJob, Loc.Get(gunta.displayName), Loc.UI(JobKey(m_Director.CookAssignment)));
+            if (m_Butcher != null) m_Butcher.interactable = KeeperWork.Instance != null;
             m_Open.interactable = m_Director.CanOpen;
             // The banner says why the doors can't open: nothing to cook, or (4f, D13) the layout makes service impossible.
             Hearthdelve.Shared.Customization.LayoutReport layout = m_Director.Furnishing;

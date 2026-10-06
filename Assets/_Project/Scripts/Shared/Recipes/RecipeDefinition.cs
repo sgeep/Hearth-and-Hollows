@@ -59,5 +59,7 @@ namespace Hearthdelve.Shared.Recipes
         public Color placeholderColor = Color.white;
         [Tooltip("Buff when eaten for delve meal before a delve. None: not offered at delve meal.")]
         public MealBuffSettings mealBuff;
+        [Tooltip("Which menu pass last set this recipe's ingredients and values (the builder sets them once per pass; later edits are kept). 4f Checkpoint C: 2.")]
+        public int menuVersion;
     }
 }

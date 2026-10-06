@@ -15,6 +15,7 @@ namespace Hearthdelve.Shared.Customization
         readonly Dictionary<string, string> m_Floors = new();
         readonly Dictionary<string, string> m_Walls = new();
         readonly HashSet<string> m_OwnedFinishes = new();
+        readonly HashSet<string> m_New = new();
 
         /// <summary>False until the starting furniture is granted (a new game, or an old save meeting furniture for the first time).</summary>
         public bool Initialized { get; private set; }
@@ -26,6 +27,41 @@ namespace Hearthdelve.Shared.Customization
         public IEnumerable<string> OwnedFinishes => m_OwnedFinishes;
         /// <summary>The highest catalogue tier the Night screen has announced (D14): each opening is announced once.</summary>
         public int AnnouncedTier { get; set; }
+
+        /// <summary>Pieces that arrived from outside the shop (a discovery, a trophy) and haven't been looked at in storage yet.</summary>
+        public IEnumerable<string> NewIds => m_New;
+        public bool IsNew(string definition) => definition != null && m_New.Contains(definition);
+        /// <summary>Seen in storage: no longer new.</summary>
+        public bool ClearNew(string definition) => definition != null && m_New.Remove(definition);
+
+        /// <summary>
+        /// A trophy waiting for its homecoming (4f, plan §16): the next time Decorate Mode opens, it's already on the cursor.
+        /// Null when there's none.
+        /// </summary>
+        public string PendingHomecoming { get; set; }
+
+        /// <summary>
+        /// A piece arriving from outside the shop (a discovery brought home, a boss trophy): owned at once, marked new in
+        /// storage. Uniques are never given twice. Returns false when nothing was given.
+        /// </summary>
+        public bool Receive(FurnitureDefinition definition)
+        {
+            if (definition == null || string.IsNullOrEmpty(definition.id)) return false;
+            if (definition.unique && OwnedCount(definition.id) > 0) return false;
+            AddOwned(definition.id, 1);
+            m_New.Add(definition.id);
+            return true;
+        }
+
+        /// <summary>Restores the new marks and the pending homecoming (SaveSystem, version 7).</summary>
+        public void RestoreNew(IEnumerable<string> newIds, string homecoming)
+        {
+            m_New.Clear();
+            if (newIds != null)
+                foreach (string id in newIds)
+                    if (!string.IsNullOrEmpty(id)) m_New.Add(id);
+            PendingHomecoming = string.IsNullOrEmpty(homecoming) ? null : homecoming;
+        }
 
         public bool OwnsFinish(string id) => !string.IsNullOrEmpty(id) && m_OwnedFinishes.Contains(id);
         public void OwnFinish(string id)
@@ -128,6 +164,27 @@ namespace Hearthdelve.Shared.Customization
                 if (Finish(area.area, FinishKind.Wall) == null) SetFinish(area.area, FinishKind.Wall, area.wall);
             }
             foreach (string finish in start.finishes) OwnFinish(finish);
+        }
+
+        /// <summary>
+        /// A save from before some starting pieces existed (version 6 → 7: the Butcher Block): each of <paramref name="added"/>
+        /// that is in the starting layout and that it has never owned arrives in storage, marked new; its layouts stay exactly
+        /// as they were. (Only the named pieces: a starting piece the player sold stays sold.)
+        /// </summary>
+        public void GrantNewStarters(FurnitureStartingLayout start, ICollection<string> added)
+        {
+            if (start == null || added == null) return;
+            foreach (AreaLayoutData area in start.areas)
+            {
+                // Areas the save doesn't have yet arrive whole, furnished (GrantMissing).
+                if (area?.pieces == null || !m_Areas.ContainsKey(area.area)) continue;
+                foreach (PlacedFurniture p in area.pieces)
+                {
+                    if (p == null || !added.Contains(p.definition) || OwnedCount(p.definition) > 0) continue;
+                    AddOwned(p.definition, 1);
+                    m_New.Add(p.definition);
+                }
+            }
         }
 
         /// <summary>Restores the finishes and the announced tier (SaveSystem; after <see cref="Restore"/>).</summary>
