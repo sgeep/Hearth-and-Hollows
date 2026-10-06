@@ -1,0 +1,37 @@
+{
+    "name": "Hearthdelve.Story.Editor",
+    "rootNamespace": "Hearthdelve.Story.Editor",
+    "references": [
+        "Hearthdelve.Core",
+        "Hearthdelve.Shared",
+        "Hearthdelve.Tavern",
+        "Hearthdelve.UI",
+        "Hearthdelve.Editor",
+        "Hearthdelve.Story",
+        "Hearthdelve.Story.Presentation",
+        "Unity.InputSystem",
+        "Unity.Localization",
+        "Unity.Localization.Editor",
+        "Clavian.SuperTextMesh",
+        "UnityEngine.UI",
+        "PixelCrushers",
+        "PixelCrushersEditor",
+        "DialogueSystem",
+        "DialogueSystemEditor",
+        "QuestMachine",
+        "QuestMachineEditor",
+        "LoveHate",
+        "LoveHateEditor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

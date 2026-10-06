@@ -16,6 +16,8 @@ namespace Hearthdelve.Tavern.Scene
         Pass,
         Seat,
         Door,
+        /// <summary>Someone to talk to (4g): a member of staff, later anyone with something to say.</summary>
+        Person,
     }
 
     /// <summary>What the interaction hint says (the UI turns it into localized text).</summary>
@@ -41,6 +43,8 @@ namespace Hearthdelve.Tavern.Scene
         StewReady,
         /// <summary>"Pip is working here".</summary>
         Staffed,
+        /// <summary>"E: talk to Boog" (4g).</summary>
+        Talk,
     }
 
     /// <summary>The interaction hint's content: its kind, and the name, dish, count or staff member it mentions.</summary>

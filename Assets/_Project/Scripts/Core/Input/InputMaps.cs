@@ -30,8 +30,40 @@ namespace Hearthdelve.Core.Input
         /// <summary>Disables every gameplay map, leaving only UI (menus, death screen).</summary>
         public static void ActivateUIOnly() => Activate(UI);
 
+        /// <summary>The maps enabled now, for <see cref="Restore"/> (a conversation takes the UI map and gives back whatever was on).</summary>
+        public static string[] Snapshot()
+        {
+            var asset = InputSystem.actions;
+            if (asset == null) return System.Array.Empty<string>();
+            var enabled = new System.Collections.Generic.List<string>();
+            foreach (var map in asset.actionMaps)
+                if (map.enabled) enabled.Add(map.name);
+            return enabled.ToArray();
+        }
+
+        /// <summary>Enables exactly the maps in <paramref name="snapshot"/> (UI always stays on).</summary>
+        public static void Restore(string[] snapshot)
+        {
+            var asset = InputSystem.actions;
+            if (asset == null || snapshot == null) return;
+            foreach (var map in asset.actionMaps)
+            {
+                if (map.name == UI || System.Array.IndexOf(snapshot, map.name) >= 0) map.Enable();
+                else map.Disable();
+            }
+        }
+
         public static InputAction Find(string map, string action) =>
             InputSystem.actions?.FindAction($"{map}/{action}", throwIfNotFound: false);
+    }
+
+    /// <summary>The UI map's actions that game code reads (uGUI reads the rest through the input module).</summary>
+    public static class UIActions
+    {
+        public const string Submit = "Submit";
+        public const string Cancel = "Cancel";
+        /// <summary>4g: moves dialogue on (E), beside Submit.</summary>
+        public const string Advance = "Advance";
     }
 
     public static class TavernActions

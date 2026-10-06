@@ -3,6 +3,7 @@ using Hearthdelve.Core.Pathfinding;
 using Hearthdelve.Core.Random;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Shared.Story;
 using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Minigames;
 using Hearthdelve.Tavern.Service;
@@ -174,6 +175,11 @@ namespace Hearthdelve.Tavern.Scene
         float m_Rest;
 
         public StaffDefinition Member { get; private set; }
+        /// <summary>Talking to them (4g): through the story's conversation service, while they stand still with their hands free.</summary>
+        public TavernInteractable Talk => m_Talk;
+        /// <summary>Their stable character id (the same as their staff id).</summary>
+        public string CharacterId => Member == null ? null : Member.character != null ? Member.character.id : Member.id;
+        TavernInteractable m_Talk;
         public StaffStation Assignment { get; private set; } = StaffStation.None;
         /// <summary>Standing where they're going (their post, or the table they're carrying to).</summary>
         public bool AtGoal { get; private set; }
@@ -196,6 +202,14 @@ namespace Hearthdelve.Tavern.Scene
             m_Goal = new GameObject($"{name}_Goal").transform;
             m_Goal.position = transform.position;
             if (m_Brain != null) m_Brain.Target = m_Goal;
+            // Talking to them (4g): the keeper's Interact, like any station; the story decides what's said.
+            var talk = new GameObject("Talk");
+            talk.transform.SetParent(transform, false);
+            m_Talk = talk.AddComponent<TavernInteractable>();
+            m_Talk.Configure(TavernInteractableKind.Person, null, Vector2.zero, 0.9f, null);
+            m_Talk.Describe = () => new TavernHint(TavernHintKind.Talk, staff: Member);
+            m_Talk.Used += _ => StoryServices.Conversations?.Talk(CharacterId);
+            m_Talk.SetAvailable(false);
         }
 
         void OnDestroy()
@@ -217,6 +231,12 @@ namespace Hearthdelve.Tavern.Scene
 
         void Update()
         {
+            // Only while standing still with their hands free: a member of staff walking plates never takes the keeper's Interact.
+            if (m_Talk != null)
+            {
+                IConversationService talk = StoryServices.Conversations;
+                m_Talk.SetAvailable(Member != null && m_Carrying == null && AtGoal && talk != null && !talk.IsTalking && talk.CanTalk(CharacterId));
+            }
             if (m_Director == null) return;
             ServiceSession session = m_Director.Session;
             if (session != m_Session)

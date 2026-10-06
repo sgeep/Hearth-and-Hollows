@@ -3,6 +3,7 @@ using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Shared.Story;
 using UnityEngine;
 
 namespace Hearthdelve.Shared.Game
@@ -125,6 +126,8 @@ namespace Hearthdelve.Shared.Game
         public IReadOnlyDictionary<string, int> UpgradeLevels => m_UpgradeLevels;
         public MealBuff Meal { get; internal set; }
         public DaySummary Today { get; } = new();
+        /// <summary>The story (4g): the opening, the player's profile, relationships, and the dialogue and quest middleware's recorded state.</summary>
+        public StoryState Story { get; } = new();
 
         public int UpgradeLevel(string id) => id != null && m_UpgradeLevels.TryGetValue(id, out int level) ? level : 0;
 

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 674d4efe60b7da94882c24b1da0e7330, type: 3}
+  m_Name: Portrait_gunta
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Characters.PortraitDefinition
+  still: {fileID: 2118659631, guid: 084e31a4454857946836b876f405262f, type: 3}
+  blink: {fileID: 1579759484, guid: 084e31a4454857946836b876f405262f, type: 3}
+  talking:
+  - {fileID: 2118659631, guid: 084e31a4454857946836b876f405262f, type: 3}
+  - {fileID: 1248841522, guid: 084e31a4454857946836b876f405262f, type: 3}
+  - {fileID: -1049761339, guid: 084e31a4454857946836b876f405262f, type: 3}
+  - {fileID: 236433217, guid: 084e31a4454857946836b876f405262f, type: 3}
+  - {fileID: -1269087402, guid: 084e31a4454857946836b876f405262f, type: 3}
+  talkFrameSeconds: 0.12
+  blinkEvery: {x: 2.5, y: 5}
+  blinkSeconds: 0.12

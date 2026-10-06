@@ -27,7 +27,7 @@ namespace Hearthdelve.Tests
         static readonly string[] k_Scenes = { EditorPaths.TavernScene, EditorPaths.DungeonScene, BootBuilder.BootScene, BootBuilder.MainMenuScene };
 
         static Dictionary<string, string> English =>
-            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
+            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
                 .GroupBy(e => e.Item1).ToDictionary(g => g.Key, g => g.First().Item2);
 
         /// <summary>A string's drawn width in game pixels at 1×: the advances, less the last glyph's trailing pixel. A placeholder counts as one digit

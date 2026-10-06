@@ -19,6 +19,11 @@ namespace Hearthdelve.UI.Localization
     {
         public const string UITable = "UI";
         public const string ContentTable = "Content";
+        /// <summary>
+        /// 4g: every line of dialogue, keyed by its entry's Guid field. Written from the Dialogue System database (where English is
+        /// authored) by <c>Hearthdelve → Story → Update Story Content</c>; translations live here.
+        /// </summary>
+        public const string DialogueTable = "Dialogue";
 
         static readonly Dictionary<string, StringTable> s_Tables = new();
 
@@ -37,7 +42,7 @@ namespace Hearthdelve.UI.Localization
         {
             if (IsReady) yield break;
             yield return LocalizationSettings.InitializationOperation;
-            foreach (string name in new[] { UITable, ContentTable })
+            foreach (string name in new[] { UITable, ContentTable, DialogueTable })
             {
                 var handle = LocalizationSettings.StringDatabase.GetTableAsync(name);
                 yield return handle;
@@ -82,6 +87,31 @@ namespace Hearthdelve.UI.Localization
                 Debug.LogWarning($"Localization lookup failed for {table}/{key}: {e.Message}");
                 return $"#{key}";
             }
+        }
+
+        /// <summary>The entry's text, or false when the table (or the key) isn't there: the caller has its own fallback.</summary>
+        public static bool TryGet(string table, string key, out string text)
+        {
+            text = null;
+            if (string.IsNullOrEmpty(key)) return false;
+            try
+            {
+                if (s_Tables.TryGetValue(table, out StringTable loaded))
+                {
+                    StringTableEntry entry = loaded.GetEntry(key);
+                    text = entry?.GetLocalizedString();
+                }
+                else if (Application.platform != RuntimePlatform.WebGLPlayer)
+                {
+                    StringTableEntry entry = LocalizationSettings.StringDatabase.GetTable(table)?.GetEntry(key);
+                    text = entry?.GetLocalizedString();
+                }
+            }
+            catch (Exception)
+            {
+                text = null;
+            }
+            return !string.IsNullOrEmpty(text);
         }
 
         public static string Get(LocalizedString text)

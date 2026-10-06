@@ -87,6 +87,7 @@ namespace Hearthdelve.Editor
                 .With("Left", "<Keyboard>/leftArrow", KM).With("Right", "<Keyboard>/rightArrow", KM);
             Button(ui, "Submit", ("<Keyboard>/enter", KM), ("<Keyboard>/space", KM), ("<Keyboard>/j", KM), ("<Gamepad>/buttonSouth", GP));
             Button(ui, "Cancel", ("<Keyboard>/escape", KM), ("<Gamepad>/buttonEast", GP));
+            AddAdvance(ui);
             ui.AddAction("Point", InputActionType.PassThrough, "<Pointer>/position", expectedControlLayout: "Vector2");
             ui.AddAction("Click", InputActionType.PassThrough, "<Mouse>/leftButton", expectedControlLayout: "Button");
             ui.AddAction("RightClick", InputActionType.PassThrough, "<Mouse>/rightButton", expectedControlLayout: "Button");
@@ -130,6 +131,12 @@ namespace Hearthdelve.Editor
             if (minigame != null && minigame.FindAction(MinigameActions.Point) == null)
             {
                 AddPoint(minigame);
+                changed = true;
+            }
+            var uiMap = asset.FindActionMap(InputMaps.UI);
+            if (uiMap != null && uiMap.FindAction(UIActions.Advance) == null)
+            {
+                AddAdvance(uiMap);
                 changed = true;
             }
             InputActionMap decorate = asset.FindActionMap(InputMaps.Decorate);
@@ -199,6 +206,12 @@ namespace Hearthdelve.Editor
             var stick = map.AddAction(name, InputActionType.Value, expectedControlLayout: "Vector2");
             stick.AddBinding("<Gamepad>/rightStick", groups: GP, processors: "StickDeadzone(min=0.25)");
         }
+
+        /// <summary>
+        /// 4g: the keeper's Interact key also moves dialogue on (talking to someone is E, so the next line is too). Enter, Space
+        /// and the gamepad's A do it through Submit.
+        /// </summary>
+        static void AddAdvance(InputActionMap ui) => Button(ui, UIActions.Advance, ("<Keyboard>/e", KM));
 
         static void AddPoint(InputActionMap map)
         {

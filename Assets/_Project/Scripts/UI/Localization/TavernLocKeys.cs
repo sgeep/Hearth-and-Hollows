@@ -83,6 +83,8 @@ namespace Hearthdelve.UI.Localization
         public const string HintSimmering = "tavern.hint.simmering";
         public const string HintStewReady = "tavern.hint.stew_ready";
         public const string HintStaffed = "tavern.hint.staffed";
+        /// <summary>4g: talking to someone in the room.</summary>
+        public const string HintTalk = "tavern.hint.talk";
         public const string HintStepAway = "tavern.hint.step_away";
         public const string Spill = "serving.spill";
 
@@ -185,6 +187,7 @@ namespace Hearthdelve.UI.Localization
             (HintSimmering, "{0} is simmering"),
             (HintStewReady, "{0}: {1} helpings left"),
             (HintStaffed, "{0} is working here"),
+            (HintTalk, "{0}: talk to {1}"),
             (HintStepAway, "{0}: step away"),
             (Spill, "spill"),
 

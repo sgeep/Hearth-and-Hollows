@@ -285,7 +285,7 @@ namespace Hearthdelve.Tests
         public void Gunta_TradesQualityForConvenience()
         {
             StaffDefinition gunta = UnityEditor.AssetDatabase.LoadAssetAtPath<Hearthdelve.Tavern.Scene.TavernContent>("Assets/_Project/Data/Tavern/TavernContent.asset")
-                .staff.Single(s => s.id == StaffIds.Gunta);
+                .staff.Single(s => s.id == StaffIds.Boog);
             float grill = BalanceReport.StaffScore(gunta, CookStation.Grill);
             Assert.That(grill, Is.LessThan(PlayStyle.Competent.cookScore), "below a competent keeper");
             Assert.That(grill, Is.GreaterThan(0.6f), "but never bad food");

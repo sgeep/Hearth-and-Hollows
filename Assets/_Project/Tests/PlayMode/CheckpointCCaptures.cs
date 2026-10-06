@@ -269,7 +269,7 @@ namespace Hearthdelve.Tests.PlayMode
             Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).First());
             Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).Skip(1).First());
             bool gunta = false;
-            void Done(StaffWorkDone e) => gunta |= e.StaffId == StaffIds.Gunta;
+            void Done(StaffWorkDone e) => gunta |= e.StaffId == StaffIds.Boog;
             EventBus<StaffWorkDone>.Subscribe(Done);
             Time.timeScale = 3f;
             yield return WaitUntil(() => Director.Cook.WorkingTask || Director.Session.Tickets.Any(t => t.State == TicketState.Cooking), 40f, "Gunta grilling");

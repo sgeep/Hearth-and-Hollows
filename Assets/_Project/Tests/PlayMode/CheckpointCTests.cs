@@ -456,7 +456,7 @@ namespace Hearthdelve.Tests.PlayMode
             Time.timeScale = 1f;
             EventBus<PartButchered>.Unsubscribe(ByWhom);
             EventBus<PartButchered>.Unsubscribe(Cut);
-            Assert.That(by, Is.EqualTo(StaffIds.Gunta));
+            Assert.That(by, Is.EqualTo(StaffIds.Boog));
             Assert.That(Director.Storeroom.CountMatching(i => i.Definition == leg && i.Quality == Quality.Fine), Is.EqualTo(fineLegs - 2));
             Assert.That(Director.Storeroom.CountMatching(i => i.Definition == leg.butchering.cut && i.Quality == Quality.Fine), Is.GreaterThan(expected), "her cuts too");
             panel.Close();
@@ -468,7 +468,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Gunta_TakesTheStationSheIsGiven_AndCooksItsOrders_WhilePipServes()
         {
             yield return TavernAtPrep();
-            Assert.That(Director.CookMember?.id, Is.EqualTo(StaffIds.Gunta), "Gunta is here from the first evening");
+            Assert.That(Director.CookMember?.id, Is.EqualTo(StaffIds.Boog), "Gunta is here from the first evening");
             Assert.That(Director.CookAssignment, Is.EqualTo(StaffStation.None), "off duty until she's given a station");
             var prep = Object.FindAnyObjectByType<PrepScreen>();
             prep.CookButton.onClick.Invoke();
@@ -490,11 +490,11 @@ namespace Hearthdelve.Tests.PlayMode
             Director.ArrivalsPaused = true;
             CustomerAgent customer = Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).First());
             Time.timeScale = 4f;
-            yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Gunta), 60f, "Gunta to grill the order");
+            yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Boog), 60f, "Gunta to grill the order");
             yield return WaitUntil(() => work.Any(w => w.StaffId == StaffIds.Pip), 60f, "Pip to carry it");
             Time.timeScale = 1f;
             EventBus<StaffWorkDone>.Unsubscribe(Done);
-            StaffWorkDone gunta = work.First(w => w.StaffId == StaffIds.Gunta);
+            StaffWorkDone gunta = work.First(w => w.StaffId == StaffIds.Boog);
             Assert.That(gunta.RecipeId, Is.EqualTo("grilled_spider_leg"));
             Assert.That(gunta.Quality, Is.LessThanOrEqualTo(Director.CookMember.qualityCap + 1e-4f), "capped like all staff work");
         }
@@ -504,7 +504,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return TavernAtPrep();
             StaffAgent pip = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Pip);
-            StaffAgent gunta = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Gunta);
+            StaffAgent gunta = Director.StaffAgents.Single(a => a.Member != null && a.Member.id == StaffIds.Boog);
             // The cook (id gunta) is Boog, drawn from the Goblin Sapper's sheets.
             foreach (var (agent, who) in new[] { (pip, "Pip"), (gunta, "GoblinSapper") })
             {

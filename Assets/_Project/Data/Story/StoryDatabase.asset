@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 883053d65aced9a438289b2861c58ed4, type: 3}
+  m_Name: StoryDatabase
+  m_EditorClassIdentifier: Hearthdelve.Story::Hearthdelve.Story.StoryDatabase
+  characters:
+  - {fileID: 11400000, guid: d917d0ea984c5a445a61ab9c0025f422, type: 2}
+  - {fileID: 11400000, guid: 1a194fd4f92c47c44a67d297d3d4b23a, type: 2}
+  - {fileID: 11400000, guid: 87ef4ac6c64b8c24cbdeb2843cca19f6, type: 2}
+  deeds:
+  - {fileID: 11400000, guid: 9bd6d3e747d5c004babab4b67b1c1bc3, type: 2}
+  dialogue: {fileID: 11400000, guid: 9e22612ea2c2b32449d9f7c771691b77, type: 2}
+  quests: {fileID: 11400000, guid: f0edfeb6b0886bd4d9a52a5cd06ac28d, type: 2}
+  factions: {fileID: 11400000, guid: 669e2cb7bfcc92d4d980047f4c05c532, type: 2}

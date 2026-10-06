@@ -120,6 +120,21 @@ namespace Hearthdelve.Editor
         public const string FarmIcons = "FarmIcons";
         /// <summary>Pip's look (4f Checkpoint C): derived from the Creatures pack's base humanoids (Tools/characters/staff_looks.py).</summary>
         public const string Staff = "Staff";
+        /// <summary>
+        /// Dialogue portraits (4g): composed from the Portrait Generator's layers by Tools/portraits/compose.py, one strip per
+        /// character (still, blink, four talking mouths; 32×32 each).
+        /// </summary>
+        public const string Portraits = "Portraits";
+        /// <summary>The characters with a portrait recipe (Tools/portraits/&lt;id&gt;.json), by stable id.</summary>
+        public static readonly string[] PortraitIds = { "gunta", "pip" };
+        public const int PortraitFrame = 32;
+
+        public static Sheet PortraitSheet(string id) => new()
+        {
+            Source = $"derived:Tools/portraits/derived/{id}_portrait.png", Pack = Portraits, File = $"{id}_portrait", Mode = SliceMode.Grid,
+            Cell = new Vector2Int(PortraitFrame, PortraitFrame),
+        };
+
         public const string DwarvenKingdom = "DwarvenKingdom";
         public const string GladiatorArena = "GladiatorArena";
         public const string MiscellanyIcons = "MiscellanyIcons";
@@ -236,6 +251,9 @@ namespace Hearthdelve.Editor
                         sheets.Add(Character($"derived:Tools/characters/derived/{who}{anim}.png", Staff, $"{who}{anim}"));
                 sheets.Add(Character($"{k_Townsfolk}/_Shadows/ShadowHumanoid{anim}.png", Creatures, $"ShadowHumanoid{anim}"));
             }
+
+            // Dialogue portraits (4g).
+            foreach (string id in PortraitIds) sheets.Add(PortraitSheet(id));
 
             // Boog, the cook: the Goblin Sapper (32-pixel frames, 100 ms; 20 idle frames, a 10-frame run), with its shadows.
             foreach (string anim in new[] { "Idle", "Run" })

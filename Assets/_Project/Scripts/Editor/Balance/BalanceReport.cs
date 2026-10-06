@@ -111,7 +111,7 @@ namespace Hearthdelve.Editor
 
         static float GuntaGrill()
         {
-            StaffDefinition gunta = Content.staff.FirstOrDefault(s => s != null && s.id == StaffIds.Gunta);
+            StaffDefinition gunta = Content.staff.FirstOrDefault(s => s != null && s.id == StaffIds.Boog);
             return gunta != null ? StaffScore(gunta, CookStation.Grill) : 0.75f;
         }
 

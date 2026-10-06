@@ -6,6 +6,7 @@ using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
+using Hearthdelve.Shared.Story;
 using UnityEngine;
 
 namespace Hearthdelve.Shared.Save
@@ -17,7 +18,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 7;
+        public const int CurrentVersion = 8;
 
         /// <summary>Starting pieces added in version 7 (4f Checkpoint C); a version 6 save gets them once, in storage.</summary>
         public static readonly string[] StartersAddedInV7 = { "butcher_block" };
@@ -90,6 +91,16 @@ namespace Hearthdelve.Shared.Save
                     });
                 data.furniture.areas.Add(saved);
             }
+
+            StoryState story = state.Story;
+            data.story = new StorySaveData
+            {
+                openingComplete = story.OpeningComplete,
+                player = (story.Player ?? new PlayerProfile()).Clone(),
+                dialogue = story.Dialogue ?? string.Empty,
+                quests = story.Quests ?? string.Empty,
+                relationships = story.Relationships ?? new RelationshipData(),
+            };
             return data;
         }
 
@@ -145,9 +156,27 @@ namespace Hearthdelve.Shared.Save
                 state.Meal = new MealBuff(kind, data.meal.amount, data.meal.recipe);
 
             RestoreFurniture(state.Furniture, data.furniture, furnitureExists ?? (_ => true), startingFurniture, warnings);
+            RestoreStory(state.Story, data.story);
             // A boss beaten before its trophy existed (a 4e save) earns it now, once: the same rule as a fresh victory.
             TrophyRules.GrantEarned(state, trophies);
             return state;
+        }
+
+        static void RestoreStory(StoryState story, StorySaveData data)
+        {
+            data ??= new StorySaveData { openingComplete = true };
+            story.OpeningComplete = data.openingComplete;
+            PlayerProfile player = data.player ?? new PlayerProfile();
+            story.Player = new PlayerProfile
+            {
+                name = string.IsNullOrWhiteSpace(player.name) ? PlayerProfile.DefaultName : player.name,
+                body = string.IsNullOrWhiteSpace(player.body) ? PlayerProfile.DefaultBody : player.body,
+            };
+            story.Dialogue = data.dialogue ?? string.Empty;
+            story.Quests = data.quests ?? string.Empty;
+            story.Relationships = data.relationships ?? new RelationshipData();
+            story.Relationships.values ??= new List<RelationshipValueData>();
+            story.Relationships.memories ??= new List<SocialMemoryData>();
         }
 
         static void RestoreFurniture(FurnitureState furniture, FurnitureSaveData data, Func<string, bool> exists,
@@ -222,6 +251,7 @@ namespace Hearthdelve.Shared.Save
             if (data.version == 4) data = MigrateV4(data);
             if (data.version == 5) data = MigrateV5(data);
             if (data.version == 6) data = MigrateV6(data);
+            if (data.version == 7) data = MigrateV7(data);
             return data;
         }
 
@@ -239,6 +269,19 @@ namespace Hearthdelve.Shared.Save
         /// v6 → v7 (4f Checkpoint C): new fields only. Nothing is new in storage and no trophy waits; a boss already beaten
         /// earns its trophy as the save is restored (<see cref="TrophyRules.GrantEarned"/>).
         /// </summary>
+        /// <summary>
+        /// v7 → v8 (4g Checkpoint A): the story arrives. A game saved before 4g has its opening marked done (it never played one,
+        /// and Continue must not send it through the opening or character creation), keeps the keeper's legacy name and look
+        /// (Bram, the townsfolk), and starts with no dialogue, quest or relationship history: nothing is inferred from the day,
+        /// bosses or furniture.
+        /// </summary>
+        static SaveData MigrateV7(SaveData v7)
+        {
+            v7.version = 8;
+            v7.story = new StorySaveData { openingComplete = true, player = new PlayerProfile() };
+            return v7;
+        }
+
         static SaveData MigrateV6(SaveData v6)
         {
             v6.version = 7;

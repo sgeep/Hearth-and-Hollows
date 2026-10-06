@@ -14,13 +14,17 @@ namespace Hearthdelve.Editor
     public static class MinifantasyImporter
     {
         [MenuItem("Hearthdelve/Art/Import Minifantasy", priority = 100)]
-        public static void ImportAll()
+        public static void ImportAll() => Import(MinifantasySheets.All);
+
+        /// <summary>Copies (when changed) and imports these sheets.</summary>
+        public static void Import(IEnumerable<Sheet> sheets)
         {
-            int copied = 0, missing = 0;
-            foreach (Sheet sheet in MinifantasySheets.All)
+            int copied = 0, missing = 0, count = 0;
+            foreach (Sheet sheet in sheets)
             {
+                count++;
                 // "derived:" sheets are composites of Minifantasy pixels made by our own tools, kept in the repo
-                // (Tools/characters/staff_looks.py: Pip's and Gunta's looks), recorded in docs/ASSET_MAP.md.
+                // (Tools/characters/staff_looks.py: Pip's look; Tools/portraits/compose.py: the dialogue portraits), recorded in docs/ASSET_MAP.md.
                 string source = sheet.Source.StartsWith("derived:", System.StringComparison.Ordinal)
                     ? sheet.Source.Substring("derived:".Length)
                     : Path.Combine(EditorPaths.MinifantasySource, sheet.Source);
@@ -44,7 +48,7 @@ namespace Hearthdelve.Editor
                 AssetDatabase.ImportAsset(sheet.AssetPath, ImportAssetOptions.ForceUpdate);
             }
             AssetDatabase.Refresh();
-            Debug.Log($"[Hearthdelve] Minifantasy import: {MinifantasySheets.All.Count} sheets, {copied} copied, {missing} missing.");
+            Debug.Log($"[Hearthdelve] Minifantasy import: {count} sheets, {copied} copied, {missing} missing.");
         }
 
         /// <summary>All sprites of an imported sheet, by name.</summary>

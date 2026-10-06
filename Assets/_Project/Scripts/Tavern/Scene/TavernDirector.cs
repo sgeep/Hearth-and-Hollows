@@ -69,7 +69,7 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Gunta's job tonight: a cooking station, or none.</summary>
         public StaffStation CookAssignment { get; private set; } = StaffStation.None;
         /// <summary>Gunta Ashbelly, the cook (stable id <c>gunta</c>).</summary>
-        public StaffDefinition CookMember => m_Content != null ? m_Content.staff.Find(s => s != null && s.id == StaffIds.Gunta) : null;
+        public StaffDefinition CookMember => m_Content != null ? m_Content.staff.Find(s => s != null && s.id == StaffIds.Boog) : null;
 
         /// <summary>Everyone on staff tonight (Pip and Gunta).</summary>
         public IEnumerable<StaffAgent> StaffAgents
@@ -133,7 +133,7 @@ namespace Hearthdelve.Tavern.Scene
         public int ActiveSeats { get; private set; }
         public StaffStation StaffAssignment { get; private set; } = StaffStation.None;
         public StaffDefinition StaffMember => m_Content == null ? null
-            : m_Content.staff.Find(s => s != null && s.id == StaffIds.Pip) ?? m_Content.staff.Find(s => s != null && s.id != StaffIds.Gunta);
+            : m_Content.staff.Find(s => s != null && s.id == StaffIds.Pip) ?? m_Content.staff.Find(s => s != null && s.id != StaffIds.Boog);
         public bool IsServing => Session != null && !Session.IsOver;
         /// <summary>Makes the station minigames (and serving) from the tavern's tuning.</summary>
         public MinigameFactory Minigames { get; private set; }

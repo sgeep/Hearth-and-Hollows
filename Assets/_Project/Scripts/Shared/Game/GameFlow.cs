@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Save;
+using Hearthdelve.Shared.Story;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -130,6 +131,9 @@ namespace Hearthdelve.Shared.Game
         {
             State = new GameState(1, DayPhase.Delve) { Gold = m_Database != null ? m_Database.newGameGold : 0 };
             State.Furniture.GrantStarter(m_Database != null ? m_Database.startingFurniture : null);
+            // A fresh story (4g): no history, the opening still to play (Step 5). Explicit, never inferred from the day.
+            State.Story.OpeningComplete = false;
+            StoryServices.State?.Clear();
             Save();
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));
@@ -152,6 +156,9 @@ namespace Hearthdelve.Shared.Game
                 return false;
             }
             foreach (var w in LastWarnings) Debug.LogWarning($"[Hearthdelve] Save: {w}");
+            // The story's middleware gets the loaded game's state back before its scene loads (4g).
+            StoryServices.State?.Clear();
+            StoryServices.State?.Restore(State);
             PhaseChanged?.Invoke();
             Load(SceneFor(State.Phase));
             return true;
@@ -160,6 +167,7 @@ namespace Hearthdelve.Shared.Game
         public void QuitToMenu()
         {
             State = null;
+            StoryServices.State?.Clear();
             Load(GameScenes.MainMenu);
         }
 
@@ -226,7 +234,7 @@ namespace Hearthdelve.Shared.Game
         }
 
         /// <summary>
-        /// Buys one offer at the Brackenford market (daytime; 4f Checkpoint C, D19): gold out, the goods into the storeroom,
+        /// Buys one offer at the Kariaston market (daytime; 4f Checkpoint C, D19): gold out, the goods into the storeroom,
         /// and the game saves. False when it can't be afforded.
         /// </summary>
         public bool BuyFromMarket(Inventory.SupplyOffer offer)
@@ -282,6 +290,31 @@ namespace Hearthdelve.Shared.Game
             }
         }
 
+        /// <summary>
+        /// Debug (4g Checkpoint A, Shift+F1): the first boss trophy comes home again: owned, taken down into storage if it's up,
+        /// and waiting for its homecoming in Decorate Mode, so hanging it publishes <see cref="TrophyDisplayed"/> again. Saved.
+        /// Returns its id, or null when there's no trophy in the game.
+        /// </summary>
+        public string DebugTrophyHomecoming()
+        {
+            if (!InGame || m_Database == null || m_Database.bossTrophies == null || m_Database.bossTrophies.Count == 0) return null;
+            Customization.FurnitureDefinition trophy = m_Database.bossTrophies[0]?.trophy;
+            if (trophy == null) return null;
+            Customization.FurnitureState furniture = State.Furniture;
+            if (furniture.OwnedCount(trophy.id) == 0) furniture.Receive(trophy);
+            foreach (string area in new List<string>(furniture.AreaIds))
+            {
+                var kept = new List<Customization.PlacedFurniture>();
+                foreach (Customization.PlacedFurniture p in furniture.Layout(area))
+                    if (p.definition != trophy.id) kept.Add(p);
+                if (kept.Count != furniture.Layout(area).Count) furniture.SetLayout(area, kept);
+            }
+            furniture.PendingHomecoming = trophy.id;
+            StateChanged?.Invoke();
+            Save();
+            return trophy.id;
+        }
+
         /// <summary>Debug: add gold.</summary>
         public void DebugAddGold(int amount)
         {
@@ -295,6 +328,8 @@ namespace Hearthdelve.Shared.Game
             if (!InGame) return;
             try
             {
+                // The story's middleware records its state into the game's first (4g): one save, one file.
+                StoryServices.State?.Capture(State);
                 Store.Write(SaveSystem.ToJson(SaveSystem.Capture(State)));
             }
             catch (Exception e)

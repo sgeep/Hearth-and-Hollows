@@ -37,7 +37,7 @@ namespace Hearthdelve.Editor
                 created.restBetweenJobs = 0.8f;
                 created.placeholderColor = new Color(0.72f, 0.2f, 0.18f);
             });
-            gunta.id = StaffIds.Gunta;
+            gunta.id = StaffIds.Boog;
             gunta.displayName = new LocalizedString(Loc.ContentTable, "staff.gunta");
             EditorUtility.SetDirty(gunta);
 

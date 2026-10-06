@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Hearthdelve.Shared.Story;
 
 namespace Hearthdelve.Shared.Save
 {
@@ -7,9 +8,9 @@ namespace Hearthdelve.Shared.Save
     // them never corrupts a save. Change these only together with a version bump + migration.
 
     /// <summary>
-    /// Current save format (version 6: 4f Checkpoint B's looks and finishes: each piece's colourway and palette, each area's
-    /// floor and wall finish, owned finishes and the catalogue tier last announced; 5 moved 4f's barrels and glasses, 4
-    /// added furniture, 3 the bosses defeated).
+    /// Current save format (version 8: 4g's story; 7: 4f Checkpoint C's new pieces and trophy homecoming; 6: 4f Checkpoint B's
+    /// looks and finishes: each piece's colourway and palette, each area's floor and wall finish, owned finishes and the catalogue
+    /// tier last announced; 5 moved 4f's barrels and glasses, 4 added furniture, 3 the bosses defeated).
     /// </summary>
     [Serializable]
     public sealed class SaveData
@@ -26,6 +27,24 @@ namespace Hearthdelve.Shared.Save
         public List<BossClearData> bosses = new();
         /// <summary>Version 4 (4f): owned furniture and each area's layout.</summary>
         public FurnitureSaveData furniture = new();
+        /// <summary>Version 8 (4g): the story.</summary>
+        public StorySaveData story = new();
+    }
+
+    /// <summary>
+    /// Version 8 (4g Checkpoint A): the story. <see cref="openingComplete"/> is explicit: a new game starts false and plays the Act I
+    /// opening; a save from before 4g is migrated with it true, so Continue never sends an old game through the opening or
+    /// character creation. <see cref="dialogue"/> and <see cref="quests"/> are what the Dialogue System and Quest Machine adapters
+    /// recorded; relationships are Hearth &amp; Hollows' own shape (<see cref="RelationshipData"/>).
+    /// </summary>
+    [Serializable]
+    public sealed class StorySaveData
+    {
+        public bool openingComplete;
+        public PlayerProfile player = new();
+        public string dialogue = string.Empty;
+        public string quests = string.Empty;
+        public RelationshipData relationships = new();
     }
 
     /// <summary>

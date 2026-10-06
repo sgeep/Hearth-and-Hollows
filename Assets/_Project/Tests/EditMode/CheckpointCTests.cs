@@ -377,7 +377,7 @@ namespace Hearthdelve.Tests
         public void Gunta_ButchersSteadily_ButHerCapKeepsTheBestCutsForTheKeeper()
         {
             var tavern = AssetDatabase.LoadAssetAtPath<TavernContent>("Assets/_Project/Data/Tavern/TavernContent.asset");
-            StaffDefinition gunta = tavern.staff.Single(s => s.id == StaffIds.Gunta);
+            StaffDefinition gunta = tavern.staff.Single(s => s.id == StaffIds.Boog);
             Assert.That(tavern.staff.Any(s => s.id == StaffIds.Pip));
             var random = new SeededRandom(4);
             var scores = Enumerable.Range(0, 20).Select(_ =>

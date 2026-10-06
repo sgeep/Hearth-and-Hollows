@@ -52,7 +52,7 @@ namespace Hearthdelve.Editor
             ("customer.adventurer", "adventurer"),
             ("customer.dwarf", "dwarf"),
             ("staff.pip", "Pip"),
-            // 4f Checkpoint C: surface staples from the Brackenford market, butchered cuts, the Biome 1 menu, Gunta.
+            // 4f Checkpoint C: surface staples from the Kariaston market, butchered cuts, the Biome 1 menu, Boog (id gunta).
             ("ingredient.onion", "onions"),
             ("ingredient.herbs", "herbs"),
             ("ingredient.bread", "bread"),
@@ -105,7 +105,7 @@ namespace Hearthdelve.Editor
 
             // The furniture catalogue's names, descriptions and colourways, and the palette ramps, tiers and finishes, come from
             // their own tables (4f Checkpoint B).
-            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English)
+            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English)
                 .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()), k_GeneratedPrefixes);
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();
@@ -117,7 +117,7 @@ namespace Hearthdelve.Editor
         /// </summary>
         static readonly string[] k_GeneratedPrefixes = { "look." };
 
-        static void FillTable(string tableName, IEnumerable<(string key, string english)> entries, string[] prunePrefixes = null)
+        internal static void FillTable(string tableName, IEnumerable<(string key, string english)> entries, string[] prunePrefixes = null)
         {
             var collection = LocalizationEditorSettings.GetStringTableCollection(tableName)
                 ?? LocalizationEditorSettings.CreateStringTableCollection(tableName, EditorPaths.Localization + "/Tables");

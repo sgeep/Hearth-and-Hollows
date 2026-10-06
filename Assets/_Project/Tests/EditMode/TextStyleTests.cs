@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Hearthdelve.Core.Animation;
 using Hearthdelve.Editor;
+using Hearthdelve.Story.Editor;
 using Hearthdelve.UI;
 using Hearthdelve.UI.Localization;
 using NUnit.Framework;
+using PixelCrushers.DialogueSystem;
 using UnityEditor;
 using UnityEditor.Localization;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using CharacterInfo = UnityEngine.CharacterInfo;
 
 namespace Hearthdelve.Tests
 {
@@ -25,8 +28,12 @@ namespace Hearthdelve.Tests
         static Font Font => GameFonts.Load();
 
         static IEnumerable<(string key, string text)> CodeEnglish =>
-            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
-                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English());
+            LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
+                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(DialogueEnglish);
+
+        /// <summary>4g: every line in the Dialogue System database, as a player reads it (its markup removed).</summary>
+        static IEnumerable<(string key, string text)> DialogueEnglish =>
+            StoryDialogue.English(AssetDatabase.LoadAssetAtPath<DialogueDatabase>(StoryPaths.Dialogue)).Select(e => ($"dialogue/{e.key}", StoryDialogue.Readable(e.english)));
 
         /// <summary>Every string in every locale's tables, as stored.</summary>
         static IEnumerable<(string where, string text)> TableStrings()
