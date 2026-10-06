@@ -1054,6 +1054,13 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 26. **Customization rules for 4f** *(2026-10-05)*: the Section 13 Open 9 questions are settled for 4f in `docs/PLAN_4F.md` §22: whole-tile snapping for blocking furniture (quarter tiles for decor); explicit rotation modes including real quarter-turn rotation; per-piece flipping; area-wide floor and wall finishes with fixed structure; movable stations (the Grill wall-bound); owned copies; curios kept on extraction and lost on death, boss trophies never lost; palette-channel recolouring baked into textures; no stat bonuses in 4f. Decor's relationship effects and renaming canonical characters stay open.
 27. **Boog** *(2026-10-05; renamed 2026-10-06)*: the head cook, a goblin (he; drawn from Minifantasy's Goblin Sapper). Formerly Gunta Ashbelly, a dwarf, and before that Gundra Ashbelly; the stable id stays `gunta`.
 
+*Recorded 2026-10-06 (4g Checkpoint B as built; waiting for the owner's playtest):*
+
+44. **The keeper** *(4g Step 4)*: made at New Game: a name (up to 16 letters) and one of four complete Minifantasy bodies (townsfolk, warrior, dwarf, orc), with Minifantasy colourways for skin, hair and clothes; no pronoun choice (dialogue says "you" or the name). Saved in the keeper's profile; a legacy keeper is Bram, the townsfolk.
+45. **The Act I opening** *(4g Step 5)*: arrival day at Tally Ho! (Orik, Boog, Tamsin missing below, the empty storeroom), down the cellar hatch to a first delve taught by one-time prompts, the homecoming that night, then the first evening (the board, cooking, serving, the takings), ending on Boog's question. Explicit stages, saved; an old save is past them.
+46. **Boog's Bomb as built** *(4g Step 6)*: the bomb lies in the second fight cleared on the Cellars' first floor while the quest wants it; lost with a death and found again; brought home by extraction; handed over in Boog's conversation for 60 gold and a deed done for Boog alone (`returned_boogs_bomb`). Declining never closes it. She has no name yet (candidates in `PLAN_4G.md`).
+47. **Dialogue tooling boundary** *(4g Checkpoint B)*: the story tooling seeds each conversation once and never rewrites it; the node editor owns it from then on.
+
 *Recorded 2026-10-06 (after 4g Checkpoint A was built):*
 
 43. **Orik** *(the owner's call, 2026-10-06)*: the server and bookkeeper is **Orik**, a dwarf (he) with a ginger beard, replacing Pip Marrowby, a halfling. His look is the Creatures pack's yellow-bearded dwarf (ginger hair and beard as drawn, a brown leather belt, green clothes); his portrait a ginger-bearded dwarf from the Portrait Generator. The stable id stays `pip`, as Boog's stays `gunta`; his role, values and starting feelings are unchanged.

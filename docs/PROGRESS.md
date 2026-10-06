@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g plan approved; 4g Checkpoint A (Steps 1–3) built, waiting for the owner's playtest**). Next, after that playtest: 4g Checkpoint B (character creation, the Act I opening, Boog's Bomb), then Checkpoint C; then 4h (village and daytime slice) and 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g Checkpoint A signed off; 4g Checkpoint B (Steps 4–6: character creation, the Act I opening, Boog's Bomb) built, waiting for the owner's playtest**). Next, after that playtest: 4g Checkpoint C (Steps 7–8); then 4h (village and daytime slice) and 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1156,6 +1156,21 @@ Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuil
 ### Orik replaces Pip (2026-10-06, the owner's request, after Checkpoint A)
 
 The server and bookkeeper is now **Orik**, a dwarf with a ginger beard (he; GDD Decided 43). His look is the Creatures pack's yellow-bearded dwarf (ginger hair and beard as drawn, brown belt, green clothes; `Tools/characters/staff_looks.py`); his portrait a ginger-bearded dwarf (`Tools/portraits/pip.json`). His name in the Content table and "from Orik's ledger" in the UI; the Dialogue System actor and conversation are renamed (`Orik`, `Orik/Talk`) by a one-off migration in the story builder, lines and Guids unchanged; code constants `StaffIds.Orik`/`CharacterIds.Orik`. The stable id stays `pip` (saves, staff, Love/Hate faction, portrait recipe), and `Pip.prefab`/`Staff_Pip.asset` keep their names. Entries above written before the change still say Pip.
+
+### 4g Checkpoint B: the keeper, the Act I opening and Boog's Bomb (2026-10-06, built; waiting for your playtest)
+
+Checkpoint A was signed off on 2026-10-06. Details as built are in `docs/PLAN_4G.md` ("As built: Checkpoint B").
+
+- **The builder boundary:** conversations are seeded once and logged (`Data/Story/DialogueSeeds.txt`); the node editor owns them from then on (an edit, rename or deletion stands). Checkpoint A's proof conversations were replaced only because they were unedited; the proof quest is retired (a save that has it drops it on load).
+- **Step 4, the keeper:** New Game → the creator (MainMenu) → arrival day. A name (16 letters; typed, or the letters on a gamepad), four complete bodies (townsfolk, warrior, dwarf, orc), Minifantasy colourways for skin, hair and clothes with a live, turning preview; worn in the tavern and the Hollows; the name reaches dialogue (`HH_PlayerName`).
+- **Step 5, the opening:** arrival (`Act1/Arrival`: Orik, Boog, Tamsin missing below, the empty storeroom) with the keeper on foot, then the cellar hatch; the first delve's one-time prompts (move and aim, attack and roll, Essence, the satchel, the finisher, the rope); the homecoming (`Act1/Homecoming`); the first evening's prep (`Act1/FirstEvening`) and takings (`Act1/FirstTakings`), which hand over to Boog's question. Stages are saved (`OpeningStage`).
+- **Step 6, Boog's Bomb:** a real Quest Machine quest and a real conversation (`Boog/Bomb`): accept, ask, or not now (it stays open). The bomb lies in the second fight cleared on the Cellars' first floor; taken home by extraction, lost by a death and found again later (never in the satchel or the Lockbox); handed over for 60 gold and a deed done for Boog alone (`returned_boogs_bomb`: his Affinity and Respect rise; remembered). Persists through save, quit and Continue.
+- **Typewriter:** one speed setting (`Data/Story/DialogueSettings.asset`, 45 characters a second); confirm while revealing finishes the line and stops; the next moves on; choices unlock only once the confirm that brought them up is let go.
+- **Save version 9:** the opening's stage, creation done, prompts seen, the keeper's palette, quest objects. Version 8 saves (Checkpoint A's playtests) skip creation, the opening and the prompts; version 7 saves as before.
+- **Found and fixed on the way:** the opening's first conversation could start under the scene's fade-in (the world pauses while talking, so the cover stayed up and took clicks): beats now wait for the reveal. In the creator, the Enter that opened the letters also closed them in the same frame, and Enter on the letters typed the focused letter as it closed them.
+- **Tests:** EditMode **614/614**. PlayMode **213 passed, 1 failed (HarvestFinisherTests' premium-parts check, intermittent: its fixture passed 5/5 twice in isolation and in the previous full run)**, plus 22 explicit capture fixtures (now with `StoryCheckpointBCaptures`).
+- **Web:** a fresh development build (139 MB) loads; the owner's own version 8 save (day 9) continued straight into the daytime with no creator, arrival or prompts, dropping Checkpoint A's retired quest with one warning and no errors; New Game asked before replacing the save and opened the creator, crisp at the browser's scale; naming worked through the letters. The full playthrough (the opening, the bomb) wasn't done in the browser: the tab was hidden, so it ran no frames and synthetic keys were lost. The PlayMode tests cover that path. The owner's save was backed up first and restored byte for byte.
+- **Known issues:** see the Checkpoint B report; carried forward from Checkpoint A: Quest Machine's message conditions start at the end of a frame (batch tests add the listener as Quest Machine would).
 
 ### Open design questions (Phase 4)
 

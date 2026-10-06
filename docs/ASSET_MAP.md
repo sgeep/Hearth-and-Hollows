@@ -399,3 +399,26 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 - **Orik** (`pip.json`, named by his stable id): dwarf, rosacea skin; happy eyes, a ball nose, normal ears, ginger (`red`) worried brows, short ginger hair, a bushy ginger `lumberjack` beard, a green vest, a smile; light green background. (Until 2026-10-06 the recipe was Pip's: a halfling with brown curls.)
 
 No portrait for the keeper in 4g (decision D4). License: the pack's commercial license allows use and editing in our game; credit Krishna Palacio (art) as for all Minifantasy, and the app is by Pixel_Pincher (`docs/CREDITS.md`).
+
+## The keeper's bodies and the bomb (4g Checkpoint B → `Creatures/`, `GoblinSapper/`)
+
+**Bodies** (Creatures v3.3, `Base_Humanoids`; 32-pixel frames, the Townsfolk's layout: idle 16×4, walk, attack, damage 4×4, charged attack 6×3 stages): imported readable, for recolouring.
+- **Human Townsfolk** (the keeper since 4a): its jump is one row (mirrored for the left), its death `SpinDie` (12).
+- **Human Amazon** ("warrior" in the creator): four-facing jump (4×4), `Die` (12).
+- **Wild Orc** ("orc"): as the Amazon. Every orc in the packs (Base Orc, Wild Orc, the Wise Orc's skin) shares one green.
+- **Dwarf Yellow Beard** ("dwarf"): the pack spells its files `YellowBeardIdle` and `YellowBear<Anim>`, and its shadows `ShadowDwarf<Anim>` or `ShadowDwar<Anim>` (walk, jump, spin); the shadow spin has 11 frames to the body's 12. Imported as `DwarfYellowBeard<Anim>` and `ShadowDwarf<Anim>`.
+
+The other base humanoids (elf, goblin, halfling and the unclothed bases) are out: unclothed, or missing the keeper's animations.
+
+**Colour channels** (sampled from each body's idle sheet; `Editor/Generation/KeeperContent.cs`):
+- Townsfolk: skin `cdac85 ddb78f eec39a facba6`; hair `49240b 5a2b0c 743810 924614 a3511b`; shirt `404e8f 4757a2 5062b3` (the grey legs stay).
+- Amazon: skin as the Townsfolk; hair `a76224 d37631 e99166`; tunic `17461f 2e7238 3d924a`.
+- Dwarf: skin `cb9883 dba28e eeae9a fdb8a8`; hair and beard `a25c0f c27117 dd8a2f`; legs `792e0d 9c3820` (the belt stays).
+- Orc: skin `2e6d34 36803b 3c8f40 439f43 4fad4b`; hair `660f1b 861626 aa2f41`; loincloth `884524 a0522c b35526`.
+
+**Ramps** (`Data/Characters/Keeper/KeeperPalettes.asset`), all from Minifantasy drawings: skins from A Myriad of NPCs' skin layers (the top four of white, pale, brown and black; named light, pale, tan, brown) and the dwarf's own (rosy); orc skins from the orcs and the goblins (moss green, leaf green); hair from A Myriad of NPCs' hair layers (black, blonde, brown, red, white) and the bodies' own (chestnut, ginger, golden, crimson); clothes from A Myriad of NPCs' tops (red, sky blue, purple, turquoise, magenta, orange, yellow, white) and the bodies' own (navy, forest green, rust, leather). A Myriad of NPCs has more skin tones (elf) and the base races more (halfling); not used yet.
+
+**Boog's bomb**: `All_Exclusives/Creatures/Goblin_Sapper/Only_Bomb.png` (320×96, 32-pixel frames): row 0 is the bomb with its fuse sputtering (10 frames, 100 ms), row 1 the fuse burning down to a flash, row 2 the explosion. Only row 0 is used (the quest object on the floor; its first frame is the harvest feed's icon). Imported as `GoblinSapperBomb`.
+
+**The cellar hatch** on arrival day reuses the Dungeon pack's ladder hole (`Holes`, `Ladder`).
+
