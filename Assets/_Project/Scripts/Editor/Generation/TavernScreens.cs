@@ -547,11 +547,11 @@ namespace Hearthdelve.Editor
             panel.name = "Butcher";
             DungeonUI.Title(panel, TavernLocKeys.ButcherTitle);
             var topLeft = new Vector2(0f, 1f);
-            LocalizedSuperText intro = Label(panel, "Intro", TavernLocKeys.ButcherIntro, 6f, k_Label, TextAnchor.UpperLeft, topLeft, new Vector2(10f, -18f), new Vector2(292f, Line * 2));
+            LocalizedSuperText intro = Label(panel, "Intro", TavernLocKeys.ButcherIntro, 6f, k_Label, TextAnchor.UpperLeft, topLeft, new Vector2(10f, -21f), new Vector2(292f, Line * 2));
             var rows = new ButcherRow[5];
             for (int i = 0; i < rows.Length; i++)
             {
-                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(10f, -46f - i * 16f), new Vector2(292f, 14f));
+                RectTransform row = Rect(panel, $"Row{i + 1}", topLeft, topLeft, new Vector2(10f, -48f - i * 16f), new Vector2(292f, 14f));
                 Image icon = DungeonUI.AddImage(Rect(row, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f)), null, Color.white);
                 LocalizedSuperText name = Label(row, "Name", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(11f, 0f), new Vector2(113f, Line));
                 LocalizedSuperText count = Label(row, "Count", TavernLocKeys.Plain, 6f, k_Ink, TextAnchor.MiddleLeft, new Vector2(0f, 0.5f), new Vector2(126f, 0f), new Vector2(20f, Line));

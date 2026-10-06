@@ -168,8 +168,36 @@ namespace Hearthdelve.Tavern.Scene
             string pending = Area?.State.PendingHomecoming;
             if (string.IsNullOrEmpty(pending)) return;
             Area.State.PendingHomecoming = null;
-            if (TakeFromStorage(pending)) HomecomingPiece = pending;
+            if (TakeFromStorage(pending))
+            {
+                HomecomingPiece = pending;
+                CursorToFreeWall();
+            }
             Changed?.Invoke();
+        }
+
+        /// <summary>
+        /// The homecoming opens with the trophy where it can hang (the web check: it opened over the floor, saying "can't go
+        /// there"): the free spot on the back wall nearest its middle, if there is one.
+        /// </summary>
+        void CursorToFreeWall()
+        {
+            if (Carried == null) return;
+            RectInt band = m_Layout.Shape.WallBand;
+            Vector2Int start = Cursor;
+            Vector2Int? best = null;
+            float bestDistance = float.MaxValue;
+            for (int y = band.yMin; y < band.yMax; y++)
+            for (int x = band.xMin; x < band.xMax; x++)
+            {
+                SetCursor(new Vector2Int(x, y));
+                if (!m_Layout.Check(Carried).IsValid) continue;
+                float distance = Mathf.Abs(x - band.center.x) + (y - band.yMin) * 0.01f;
+                if (distance >= bestDistance) continue;
+                bestDistance = distance;
+                best = new Vector2Int(x, y);
+            }
+            SetCursor(best ?? start);
         }
 
         /// <summary>Starts working on an area: its layout copied, the cursor in the middle of its floor, the camera on it.</summary>

@@ -290,6 +290,37 @@ The catalogue's art is defined by `Assets/_Project/Data/Furniture/Catalog/catalo
 
 **Gaps found:** no clothed sitting pose (customers still stand at seats); no back-facing art for the charged attack; no floor tiles in the Elven or Dwarven tilesets that repeat as a whole floor (Elven floors are radial tree rings); the Barracks sheet has footlockers, not beds (the survey above guessed beds); the Shop Indoor candles are unlit wax stubs, so the catalogue's candles come from the Dungeon and Church packs.
 
+## Checkpoint C art (4f, 2026-10-05)
+
+**Furnishing discoveries** (curios; catalogue entries with `sources="Discovery"`, generated like the rest of the catalogue):
+
+| Piece | Sheet key | Source |
+|---|---|---|
+| skull candle (8-frame flame) | skull_candles | `AE/Addons/Dungeon/Sacrifice_Altars/Sacrifice_Candels/Minifantasy_SacrificeCandels_skulls.png` (0,0) 32×32 |
+| slime jars, iron cage (shut or open), spider brazier (with a light), tattered banner (ragged or shredded) | dungeon | the Dungeon pack's `Props/Props.png` (the sheet the knight statue already uses) |
+| cellar stores, delver's junk heap | piles | `AE/Addons/_Miscellany/Piles_Of_Loot_And_Stuff/PilesOfLootAndStuff.png` (13,55) 23×16 and (11,80) 26×15 |
+| cobweb, great cobweb, mimic chest | haunted, chests | already in the catalogue; now found, not bought |
+
+**The Larder Troll's tusks (derived, D22).** `Tools/furniture/trophy.py` writes `Tools/furniture/derived/trophy_larder_troll.png` (26×21), which the catalogue reads through a `derived:` sheet source (a repo path instead of a pack path; `FurnitureCatalog`, `MinifantasyImporter` and `contact.py` all accept it). It is a composite of two Minifantasy drawings:
+- the plaque of the Castles and Strongholds mounted antler head (`Minifantasy_CastlesAndStrongholds_v.2.0/…/Props/Props.png`, crop (12,82)–(26,96)): its clean left half mirrored over the stag's head, the middle filled with the plaque's own wood, the gold tab kept;
+- a curved horn from Giant Bones (`AE/Addons/Desolate_Desert/Giant_Bones/Bones.png`, crop (73,13)–(96,40)), halved to its tip, re-outlined with a 1 px margin, its bone ramp remapped onto yellowed ivory (five colours, dark to light), mirrored into a pair.
+No new colours outside those ramps. Rerun the script to rebuild it.
+
+**Pip and Gunta (derived).** `Tools/characters/staff_looks.py` writes `Tools/characters/derived/{PipIdle,PipWalk,GuntaIdle,GuntaWalk}.png` from the Creatures pack's base humanoids (`Minifantasy_Creatures_v3.3_Commercial_Version/…/Base_Humanoids/`), imported as the `Staff` pack (Idle 16 frames × 4 directions, Walk 4 × 4):
+- **Gunta Ashbelly:** the yellow-bearded dwarf, palette-remapped: the grey helmet becomes a white cook's cap, the orange beard deep auburn, the clothes a cook's red (the apron).
+- **Pip Marrowby:** the base halfling (one cream ramp throughout), coloured by where each pixel sits: brown curls on the head, the face as drawn, a green waistcoat, brown breeches. Outline and shading ramps kept.
+Minifantasy has no dressed halfling, cook or apron layer; these are recolours, not new drawings.
+
+**The kitchen and the market.**
+- The Butcher Block is Crafting And Professions II's preparation table: `…/Crafting_Professions/Food_Preparation/Minifantasy_CraftingAndProfessions2PreparationTableProp.png` (idle) and `…PreparationTableWorking.png` (12 frames of the knife at work), 32×32 cells; the table's drawing is (2,11)–(29,26) in its frame.
+- Staple icons: `…/Craftable_Item_Icons/Minifantasy_CraftingAndProfessions2PreparationTableIngredients.png` (bread (8,8), onion (16,8), herbs (40,8), mushroom (64,8), steak (8,56) for spider-leg cuts, slices (8,72) for bat-wing cuts); eggs from `AE/Icons/8x8px/Farm_Animal_Product_Icons/FarmAnimalProductIcons.png` (16,40); malt as wheat from `Minifantasy_Farm_v3.0/…/Crops/Minifantasy_FarmSeedsAndCrops.png` (64,72); spore sacs from Crafting And Professions' potion herbs (24,80).
+- Dish icons: Brackenford ale is Miscellany's full tankard (0,64); onion broth (56,64), eggs on toast (16,56), crispy bat wings (128,16), spider-leg steaks (112,16) and the bat-wing platter (120,16) from `DishIcons`.
+- UI Overhaul: Icons chest (496,24) for curios, book (416,24) for Pip's ledger; Emotions (16 px grid, centre (16c+8, 16r+8)) heart (104,88), happy (8,8), surprised (40,56), content (72,72), frown (88,24), sweat (24,88) for staff and patron beats.
+
+**Sound:** all placeholders (`PH_Discovery`, `PH_Homecoming`, `PH_KnifeIn`, `PH_Cleave`, `PH_ChopRagged`, `PH_ButcherDone`).
+
+**Gaps:** no sitting or eating pose for Gunta and Pip; no apron or chef's-hat layer (hence the recolour); no "found" chest that differs from the treasure chest icon.
+
 ## Selectors (UI Overhaul → `UIOverhaul/Selectors`)
 
 | Sprite | Rect | What |

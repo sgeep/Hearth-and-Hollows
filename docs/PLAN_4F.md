@@ -361,7 +361,7 @@ Values follow the tiers (everyday about 5–8, better 9–16, signature 20–30)
 
 - **Checkpoint A, the customization foundation (steps 1–2):** furniture as data and Decorate Mode; it locks the expensive architecture (placement, rotation, footprints, saves, validation, nav, movable stations).
 - **Checkpoint B, rich customization (steps 3–6):** the catalogue pipeline and the large first import, buying, storage and Renown tiers, recolouring, the guest room. The question: can I meaningfully personalize the Sunken Flagon and another room?
-- **Checkpoint C, the loop (steps 7–9):** discoveries and the Larder Troll's trophy, the market and recipe rework, the Butcher Block, Gunta and Pip. The question: delve → bring strange things home → cook and use them → improve the tavern.
+- **Checkpoint C, the loop (steps 7–9):** discoveries and the Larder Troll's trophy, the market and recipe rework, the Butcher Block, Gunta and Pip. The question: delve → bring strange things home → cook and use them → improve the tavern. *(Built 2026-10-05/06; what was built and the deviations are in `docs/PROGRESS.md`.)*
 - **Checkpoint D, sign-off (step 10):** requests, integration, balance, saves, web and regression testing.
 
 Within a checkpoint I go on from one step to the next when its tests pass and the work stays inside the approved plan. I stop early only if an approved expensive decision needs to change, the work reveals a major architectural problem, scope would grow materially, saves or existing gameplay regress, or a subjective art or UX judgment from you blocks further work. The web build is checked at the end of each checkpoint, and at any step that changes saves.

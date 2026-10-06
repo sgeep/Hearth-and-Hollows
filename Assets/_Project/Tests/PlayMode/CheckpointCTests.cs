@@ -266,6 +266,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(mode.HomecomingPiece, Is.EqualTo(tusks));
             Assert.That(mode.Carried?.definition, Is.EqualTo(tusks), "already in hand");
             Assert.That(Flow.State.Furniture.PendingHomecoming, Is.Null, "offered once");
+            Assert.That(mode.CarriedCheck.IsValid, "it opens where they can hang");
             Vector2Int? wall = null;
             for (int x = 4; x < 24 && wall == null; x++)
             for (int y = 13; y <= 15 && wall == null; y++)
