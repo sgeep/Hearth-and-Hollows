@@ -29,6 +29,8 @@ namespace Hearthdelve.Editor
         /// <summary>On the dark HUD: labels step back, numbers stand out.</summary>
         static readonly Color k_HudValue = new(1f, 0.9f, 0.6f);
         static readonly Color k_HudLabel = new(0.55f, 0.5f, 0.45f);
+        /// <summary>What the delve gets from the tavern (a delve meal's effect, tonight's bonuses): one colour, apart from the dishes' names.</summary>
+        static readonly Color k_Effect = new(0.3f, 0.2f, 0.45f);
 
         /// <summary>One line of text: 9-pixel capitals, 2-pixel descenders and a pixel between lines.</summary>
         public const float Line = GameFonts.LinePixels;
@@ -158,10 +160,15 @@ namespace Hearthdelve.Editor
             var cards = new DishCard[6];
             // The delve meal cards: the name with its station on the right, then the buff across the card.
             float cardsTop = k_UnderStoreroom - Line - 1f;
-            for (int i = 0; i < cards.Length; i++) cards[i] = Card(panel, i, CardCentre(i, cardsTop), 130f);
+            for (int i = 0; i < cards.Length; i++)
+            {
+                cards[i] = Card(panel, i, CardCentre(i, cardsTop), 130f);
+                // The meal's effect on the delve, under its name, in the delve-effect colour (owner's request, after the type pass).
+                cards[i].amount.GetComponent<SuperTextMesh>().color = k_Effect;
+            }
 
             // What today's delve starts with, from upgrades and delve meal: the tavern feeding the dungeon.
-            LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, new Color(0.3f, 0.2f, 0.45f), TextAnchor.UpperCenter, 0f,
+            LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, k_Effect, TextAnchor.UpperCenter, 0f,
                 cardsTop - 2f * k_CardPitch - k_CardHeight - 1f, 296f);
             // The buttons sit 5 from the panel's foot (the heading took the room the 8 had).
             Button descend = SmallButton(panel, "Descend", LoopLocKeys.MorningDescend, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 156f, out _);
@@ -331,11 +338,20 @@ namespace Hearthdelve.Editor
         {
             RectTransform panel = DungeonUI.Panel(content, new Vector2(304f, 172f), Vector2.zero);
             panel.name = "Catalogue";
+            // The title row in two reserved columns: the page's name over the list (150), the purse right-aligned over the chosen
+            // piece (136: "9999 gold · Renown 100" is 120). Centred, a long page name ran into a three-digit purse.
             LocalizedSuperText tab = DungeonUI.Title(panel, DecorateLocKeys.TabStorage);
             var topLeft = new Vector2(0f, 1f);
-            // The purse at the top left, clear of the page's name in the middle.
-            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -4f),
-                new Vector2(104f, Line));
+            var tabRect = (RectTransform)tab.transform;
+            tabRect.anchorMin = tabRect.anchorMax = tabRect.pivot = topLeft;
+            tabRect.anchoredPosition = new Vector2(8f, -7f);
+            tabRect.sizeDelta = new Vector2(150f, Line);
+            var tabText = tab.GetComponent<SuperTextMesh>();
+            tabText.anchor = TextAnchor.UpperLeft;
+            tabText.alignment = SuperTextMesh.Alignment.Left;
+            tabText.autoWrap = 150f;
+            LocalizedSuperText purse = Label(panel, "Purse", DecorateLocKeys.CatalogPurse, TextStyle.Secondary, k_Note, TextAnchor.UpperRight, new Vector2(1f, 1f),
+                new Vector2(-8f, -7f), new Vector2(136f, Line));
 
             // The list (left, 170 wide): a name (110), and the price or what's stored (72, room for "not for sale";
             // the boxes overlap, the words don't: the catalogue test measures them), per row.

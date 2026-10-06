@@ -1103,6 +1103,12 @@ Secondary and Prompt share Body's metrics; they're named roles so every text say
 - Gold in the tavern HUD fits four digits at 2×; a five-figure night would need the column revisited.
 - The market's "not enough gold." sits close to its panel's edge (unchanged).
 
+**After your first look (2026-10-06):**
+- The catalog's page name ran into the purse once gold reached three digits ("bar and storage", "walls and floors" beside "148 gold · Renown 4"). The title row now has reserved columns: the page's name left over the list (150 px), the purse right-aligned over the chosen piece (136 px; "9999 gold · Renown 100" is 120).
+- Daytime's delve-meal cards show each meal's effect ("+20 max Essence") in the delve-effect purple of "tonight's delve", apart from the dish's name.
+- A new check, `TextOverlapTests` (PlayMode): no two visible texts overlap and none leaves its panel, across Prep's pages, the Butcher Block, Decorate, every catalog page and piece at Renown 0 and 100 with 9999 gold (246 states, 5,842 texts), the layout check, the delve's result, Night, Daytime and the market. It proves itself by catching the old purse position when planted. It found nothing else; Decorate's status line was measured separately (12 px spare at its longest).
+- Tests: EditMode 564/564, PlayMode 203 passed, 0 failed, plus 18 explicit captures. Not rebuilt for the web (builder-only layout and colour changes).
+
 **Waiting for your review before 4g.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
