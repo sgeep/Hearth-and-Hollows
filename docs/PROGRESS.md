@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (4f Checkpoint D, step 10: done; 4f awaiting your final sign-off; Checkpoints A–C approved). Next, after sign-off: 4g (story, quests and character creation), then 4h (village and daytime slice), then 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (the UI foundation pass, typography: done, awaiting your review; 4f Checkpoint D done and awaiting your sign-off; Checkpoints A–C approved). Next, after review: 4g (story, quests and character creation), then 4h (village and daytime slice), then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1063,6 +1063,47 @@ Step 10, the last checkpoint of 4f. Commits `688df57`, `4ffdc7f` and the fixes a
 - The three unrelated files that had been in `Assets/_Project/Fonts/silver/` were no longer there when this checkpoint began (removed or moved outside this work); nothing of theirs was touched or committed.
 
 **4f is waiting for your sign-off.**
+
+### UI foundation pass: a type scale for Silver (2026-10-06, done; awaiting your review)
+
+Before 4g, at your request: a typography hierarchy with the one font, applied conservatively.
+
+**What made the UI look flat.** All 349 texts in the game's scenes were the same size: Silver at 19 (1×), except the menu title and the transition caption at 2×. The builders still asked for m5x7-era sizes (7 for titles, 6 for body, 5 for counts), which `GameFonts` snapped to 1× when Silver replaced m5x7, so even the title/body distinction was lost.
+
+**The finding that shaped it.** Silver is pixel-clean only at whole multiples of 19 on the 320×180 grid (its em is 19 font pixels). There is no clean size *smaller* than body text: half-size text would be unreadable at 320×180, uneven at odd window scales and a second pixel density on screen. You chose the art-grid-only scale.
+
+**The scale** (`Data/UI/TypeScale.asset`, `TextStyle`, `StyledText`; baked by `GameFonts` from the builders through the updaters):
+
+| Style | Size | Line | Used for |
+|---|---:|---:|---|
+| Display | 57 (3×) | 36 | the game's name |
+| Heading | 38 (2×) | 24 | screen titles: Prep, Daytime, Night, Results, the death screen; the transition caption; the tavern HUD's numbers |
+| Body | 19 (1×) | 12 | rows, names, values, descriptions (dialogue in 4g) |
+| Secondary | 19 (1×) | 12 | labels, counts, sources, notes (muted colours) |
+| Prompt | 19 (1×) | 12 | button labels and control lines |
+
+Secondary and Prompt share Body's metrics; they're named roles so every text says what it is and each can be tuned later from one place. Sub-panel titles (market, Butcher Block, catalog, colors, layout check, swap prompt, run power, minigames) and the delve result's title stay 1×: "dragged back to the surface" is 314 px at 2×, wider than the screen allows.
+
+**Layouts fixed along the way.**
+- Results: the 11-pixel line squeeze is gone (a true 12-pixel line); a night's note sits in the row after its last line (the ledger's row only if all eight are used).
+- Prep, Daytime and Night: panels 176 tall; content under the heading band; the storeroom row re-packed so its freshness bars clear the cards; Prep's count sits on the heading's baseline; Prep's kitchen buttons rebalanced so "butcher block" keeps its b (the frame was clipping it before this pass).
+- Decorate: the controls take three lines (the last word, "done", was cut off before); both strips are even heights (two texts sat half a pixel off the grid).
+- Prep's "nothing makes a dish" banner has two lines (its sentence overflowed one).
+- Market buy buttons 74 wide and the death screen's confirm 128, so their labels clear their frames.
+- The tavern HUD's gold, tips and Renown are 2× numbers under 1× labels; the menu icons move down.
+
+**Words.** "spider-leg steaks" is back on screen (Checkpoint D's "spider steaks" shortening undone; the name starts a pixel nearer its icon). The debug "F4: fill storeroom" is "F4: fill" (it shares the heading's row).
+
+**Tests:** EditMode 564/564 (new `TypographyTests`: the scale's styles at whole multiples with room for their glyphs, a broken scale reported, applying a style sets Super Text Mesh exactly, every text in the game's scenes styled from the asset, every fixed English string fitting its box at its style with headings keeping a fifth spare and button labels two pixels inside their frames, Prep's title row on one baseline, the restored name). PlayMode 200 passed, 0 failed, plus 18 explicit captures (new `TypographyLayoutTests`: the results at their fullest on whole lines with nothing overlapping, the HUD's 2× numbers to four digits, "spider-leg steaks" clearing its price; `TypographyCaptures` for before/after at 320×180 in `BatchLogs/typography/`).
+
+**Web:** a fresh build (every build file refetched without the cache) at 1280×720 (canvas scale 4). Checked in the browser: the 3× title and the 1× menu text with even, crisp pixels; the delve result; Night's, Daytime's, Prep's and Results' 2× headings; Prep's count on the heading's baseline and its two-line banner; the market's wider buttons; the tavern HUD's 2× numbers through a short service; Results on whole lines with Pip's ledger; Decorate's three-line controls. No console errors or warnings. The browser held a save from someone playing the build (day 5, written while I was working on code); it was backed up first and written back byte for byte afterwards.
+
+**Known issues:**
+- Accented capitals and CJK glyphs are 11–12 pixels tall on a 12-pixel line, so they touch the line above; a locale that needs them will want a 14-pixel line (one value in the scale).
+- Gold in the tavern HUD fits four digits at 2×; a five-figure night would need the column revisited.
+- The market's "not enough gold." sits close to its panel's edge (unchanged).
+
+**Waiting for your review before 4g.**
 
 Adjustments: the tavern's walkable grid can be explicitly invalidated and rebuilt when the furniture layout changes (in 4c it only builds at scene load; placement itself is 4f), so 4f doesn't have to replace an immutable-layout assumption. `LookTest_Tavern` stays untouched as the 4a baseline.
 
