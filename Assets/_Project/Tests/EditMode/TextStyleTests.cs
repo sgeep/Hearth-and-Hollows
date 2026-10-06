@@ -202,7 +202,8 @@ namespace Hearthdelve.Tests
                         {
                             string name = $"{Path.GetFileNameWithoutExtension(path)}/{text.name}";
                             if (text.font != Font) problems.Add($"{name}: font {text.font}");
-                            if (text.size != GameFonts.Body && text.size != GameFonts.Large) problems.Add($"{name}: size {text.size}");
+                            // A whole multiple of the native size (the type scale: 1×, 2×, 3×; TypographyTests checks each style).
+                            if (text.size < GameFonts.Native || text.size % GameFonts.Native != 0f) problems.Add($"{name}: size {text.size}");
                             if (text.quality != GameFonts.Native || text.filterMode != FilterMode.Point) problems.Add($"{name}: quality {text.quality}, filter {text.filterMode}");
                         }
                         foreach (Canvas canvas in root.GetComponentsInChildren<Canvas>(true))
