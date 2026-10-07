@@ -1,6 +1,6 @@
 # 4g plan: story, quests, character creation and relationship reactivity
 
-> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built and signed off 2026-10-06 (the owner playtested it and verified the node-editor workflow). Checkpoint C (Steps 7–8) built 2026-10-06, waiting for the owner's final 4g playtest and sign-off.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
+> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built and signed off 2026-10-06 (the owner playtested it and verified the node-editor workflow). Checkpoint C (Steps 7–8) built 2026-10-06 and playtested by the owner, with the Old Phi closeout patch: 4g complete, waiting for the final sign-off and the `milestone-4g` tag.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
 
 ## Approval (2026-10-06): the owner's decisions
 

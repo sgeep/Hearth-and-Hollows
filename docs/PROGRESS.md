@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g Checkpoints A and B signed off; Checkpoint C (Steps 7–8: relationship reactivity, the Act I vertical slice and 4g closeout) built, waiting for the owner's final 4g playtest and sign-off**; `milestone-4g` not yet tagged). Next, after sign-off: plan 4h (village and daytime slice), then 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g complete**: Checkpoints A–C built and playtested by the owner, with the Old Phi closeout patch; waiting for the owner's final sign-off and the `milestone-4g` tag). Next, after sign-off: plan 4h (village and daytime slice), then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1176,7 +1176,18 @@ Checkpoint A was signed off on 2026-10-06. Details as built are in `docs/PLAN_4G
   1. In the Unity editor, open Boog/Bomb in the Dialogue System's node editor (*Tools → Pixel Crushers → Dialogue System → Dialogue Editor*, or *Hearthdelve → Story → Capture Boog's Bomb Graph*, which also saves a picture to `BatchLogs/story/DialogueEditor_BoogBomb.png`); edit a line, a condition or a link; run *Hearthdelve → Story → Update Story Content* and check the edit is still there; play it (F1 talks to Boog in a debug build); restore it.
   2. In the web build (`Builds/Web`, served with no-cache headers), with the tab visible: New Game → the creator (keyboard, mouse and gamepad) → arrival (Orik and Boog, the typewriter: confirm finishes a line, the next moves on) → the hatch → the first delve's prompts → home → the first evening → the takings → Boog's question → accept → find the bomb (the second fight on the Cellars' first floor) → die with it or extract → hand it over → save, quit, Continue.
 
-### 4g Checkpoint C: relationship reactivity, the Act I slice and 4g closeout (2026-10-06, built; waiting for your final 4g playtest)
+### 4g closeout patch: Old Phi replaces Old Tamsin (2026-10-06)
+
+The owner playtested Checkpoint C end to end in the browser ("it's fine") and asked for one narrative-canon patch before sign-off.
+
+- **Canon:** the former proprietor of Tally Ho! is **Phi'rai, usually called Old Phi**, a drow, once of **the Fortunate Five**; she rebuilt the tavern with Orik, left for many years, came home decades later and sought him out to hire him again, then vanished into the Hollows (GDD Decided 51, CLAUDE.md). Orik's loyalty is now a lifelong friend's.
+- **Dialogue:** nine lines changed in place (the arrival, the homecoming, the first takings, Boog's bomb, Orik's troll and wish callbacks, Orik's question); Orik calls her Phi, Boog calls her Old Phi, and the keeper, who knows her only from the letter, asks for Phi'rai. Orik's old "hired me for a week, eleven years ago" became three short lines, heard only if you ask: the rebuilding and the Fortunate Five, his years keeping it open alone, her coming home to find him. Applied once by a guarded batch edit through the Dialogue System's API (then deleted); the graphs stay yours to edit, and the seed code matches.
+- **Nothing migrates:** no stable id, save field, quest or Dialogue System variable ever named her (no character asset existed), so v7, v8 and v9 saves load as before and no story or quest state resets.
+- **Validation:** Tamsin is now an old name (string tables, actors and every dialogue entry); CLAUDE.md and the GDD may name her only where they record the change; Orik's history branch is checked; every line fits its box. Older plans and progress notes keep the name they were written with.
+- **Tests:** EditMode **627/627**. PlayMode **219 passed, 0 failed**, 24 explicit capture fixtures skipped (243), including the arrival, troll and bomb conversations with the new lines, Continue, and the v7/v8/v9 round trips.
+- **Web:** not rebuilt for this patch (dialogue text and docs only; the owner chose to stop here). The served build at `5dd8a4d` still has the Tamsin lines; rebuild before the next browser session.
+
+### 4g Checkpoint C: relationship reactivity, the Act I slice and 4g closeout (2026-10-06, complete; playtested by the owner)
 
 Checkpoint B was signed off on 2026-10-06: you playtested it and verified the node-editor workflow (your arrival line, "ahh, you must be …!", is kept). Details as built are in `docs/PLAN_4G.md` ("As built: Checkpoint C").
 
