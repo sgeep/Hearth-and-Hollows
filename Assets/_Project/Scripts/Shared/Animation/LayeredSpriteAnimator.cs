@@ -26,6 +26,16 @@ namespace Hearthdelve.Shared.Animation
         CharacterAnim m_Current = CharacterAnim.Idle;
         float m_Time;
         bool m_FacingLocked;
+        bool m_HeldActive;
+        CharacterAnim m_Held;
+        bool m_OnceActive;
+        CharacterAnim m_Once;
+
+        /// <summary>
+        /// How it's moving, for a character that isn't a TDE character (4h Checkpoint C: a villager walking a path): set each frame
+        /// by its mover; null reads the TDE controller as before.
+        /// </summary>
+        public Vector2? Movement { get; set; }
 
         public Facing4 Facing { get; private set; }
         public CharacterAnim Current => m_Current;
@@ -62,6 +72,32 @@ namespace Hearthdelve.Shared.Animation
 
         public void ReleaseFacing() => m_FacingLocked = false;
 
+        /// <summary>Loops an action instead of standing idle (while not moving) until <see cref="Release"/>; ignored if no layer has it.</summary>
+        public void Hold(CharacterAnim action)
+        {
+            m_HeldActive = HasAnim(action);
+            m_Held = action;
+        }
+
+        public void Release() => m_HeldActive = false;
+
+        /// <summary>Plays an action once (while not moving), then goes back to what it was doing; ignored if no layer has it.</summary>
+        public void PlayOnce(CharacterAnim action)
+        {
+            if (!HasAnim(action)) return;
+            m_OnceActive = true;
+            m_Once = action;
+            m_Current = action;
+            m_Time = 0f;
+        }
+
+        bool HasAnim(CharacterAnim action)
+        {
+            foreach (SpriteAnimationSet set in m_Sets)
+                if (set != null && set.Find(action) != null) return true;
+            return false;
+        }
+
         void Awake()
         {
             Facing = m_InitialFacing;
@@ -70,10 +106,11 @@ namespace Hearthdelve.Shared.Animation
 
         void LateUpdate()
         {
-            Vector2 movement = m_Controller != null ? (Vector2)m_Controller.CurrentMovement : Vector2.zero;
+            Vector2 movement = Movement ?? (m_Controller != null ? (Vector2)m_Controller.CurrentMovement : Vector2.zero);
             bool moving = movement.sqrMagnitude > 0.01f;
             if (!m_FacingLocked && moving) Facing = FacingLogic.FromDirection(movement.x, movement.y, Facing);
-            CharacterAnim wanted = moving ? CharacterAnim.Walk : CharacterAnim.Idle;
+            if (m_OnceActive && (moving || OnceFinished())) m_OnceActive = false;
+            CharacterAnim wanted = moving ? CharacterAnim.Walk : m_OnceActive ? m_Once : m_HeldActive ? m_Held : CharacterAnim.Idle;
             if (wanted != m_Current)
             {
                 m_Current = wanted;
@@ -81,6 +118,16 @@ namespace Hearthdelve.Shared.Animation
             }
             m_Time += Time.deltaTime;
             Show();
+        }
+
+        bool OnceFinished()
+        {
+            foreach (SpriteAnimationSet set in m_Sets)
+            {
+                SpriteAnim anim = set != null ? set.Find(m_Once) : null;
+                if (anim != null) return SpriteAnimationMath.IsFinished(m_Time, anim.For(Facing).Length, anim.frameDuration, false);
+            }
+            return true;
         }
 
         void Show()

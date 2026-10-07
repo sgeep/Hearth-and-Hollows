@@ -167,6 +167,161 @@ MonoBehaviour:
       - 100
       - 0
     percentJudgeParents: 0
+  - id: 6
+    name: maximo
+    description: Character_maximo
+    color: 0
+    parents: 
+    traits:
+    - 0
+    - 80
+    - 60
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 25
+      - 10
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 95
+      - 0
+    - factionID: 6
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
+  - id: 7
+    name: kaloren
+    description: Character_kaloren
+    color: 0
+    parents: 
+    traits:
+    - 60
+    - -20
+    - 70
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 20
+      - 5
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 70
+      - 0
+    - factionID: 7
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
+  - id: 8
+    name: grim
+    description: Character_grim
+    color: 0
+    parents: 
+    traits:
+    - 70
+    - 20
+    - 30
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 0
+      - 0
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 8
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
+  - id: 9
+    name: ogrin
+    description: Character_ogrin
+    color: 0
+    parents: 
+    traits:
+    - 20
+    - 70
+    - 60
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 20
+      - 10
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 60
+      - 0
+    - factionID: 9
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
+  - id: 10
+    name: bart
+    description: Character_bart
+    color: 0
+    parents: 
+    traits:
+    - 20
+    - 40
+    - 50
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 20
+      - 5
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 50
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 80
+      - 0
+    - factionID: 10
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
   traitInheritanceType: 0
   relationshipInheritanceType: 0
-  nextID: 6
+  nextID: 11

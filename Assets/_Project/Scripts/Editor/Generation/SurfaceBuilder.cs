@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hearthdelve.Core;
+using Hearthdelve.Shared.Characters;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Story;
 using Hearthdelve.Shared.Surface;
@@ -45,6 +46,8 @@ namespace Hearthdelve.Editor
             // The village's sheets (the garden's crops and action icons among them) are imported first, then its data.
             MinifantasyImporter.Import(KariastonSheets.Sheets());
             GardenContent.Build();
+            // 4h Checkpoint C: the cast's looks and schedules, before either scene builds its people.
+            VillageContent.Build();
             KariastonBuilder.Ensure(rebuildApproved: false);
             UpdateBoot();
             // The tavern updater adds Tally Ho!'s side (ApplyToTavern) with everything else it maintains.
@@ -134,6 +137,15 @@ namespace Hearthdelve.Editor
 
             GameObject service = GameObject.Find("Service");
             if (service.GetComponent<FiveOClock>() == null) service.AddComponent<FiveOClock>();
+
+            // 4h Checkpoint C: villagers who come in (Maximo's lunch, at the seat nearest the middle of the room). Their copy
+            // here is shown only while their schedule has them here; the village's presence places them.
+            Transform people = new GameObject("Village People").transform;
+            people.SetParent(surface, false);
+            VillageContent.Anchor(people, VillageContent.TavernTable, PropertyArea.TavernId, VillageContent.TavernTableNear, Hearthdelve.Core.Movement.Facing4.FrontRight, tavernSeat: true);
+            Dictionary<string, VillageContent.Figure> figures = VillageContent.Figures();
+            VillageContent.BuildVillager(people, "Maximo", CharacterIds.Maximo, "villager.maximo", PropertyArea.TavernId, figures[CharacterIds.Maximo], null,
+                VillageContent.TavernTableNear, startHidden: true);
 
             BuildClockFace(ui);
             BuildPrepConfirm(ui);

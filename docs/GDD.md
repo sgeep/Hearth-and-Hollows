@@ -320,6 +320,7 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 
 **Bart** (an orc bard; he).
 - *Owner's concept:* an orc bard.
+- **Locked (2026-10-07, the Checkpoint C brief):** **the first Visitor who stayed**: he came through Kariaston years ago, performed, and never really left; he lives in the **painted wagon on the green**. Where Maximo mythologizes heroes, Bart is interested in ordinary people, gossip, songs and stories. Voice: southern Texas, in vocabulary and cadence, never misspelling.
 - *Proposed:* plays in Tally Ho! some evenings, which gives the room music, a regular face and a running joke: his repertoire versus Maximo's songs (the mayor considers himself a fellow artist; Bart considers him a fan). A bard is also the village's news, gossip and rumor-carrier, a natural voice for barks about the keeper's deeds without adding a rumor system.
 - *Hooks:* whether he can play during service (a live-music decor or Renown effect is a later question, not a rule).
 
@@ -1150,6 +1151,8 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 27. **Boog** *(2026-10-05; renamed 2026-10-06)*: the head cook, a goblin (he; drawn from Minifantasy's Goblin Sapper). Formerly Gunta Ashbelly, a dwarf, and before that Gundra Ashbelly; the stable id stays `gunta`.
 
 *Recorded 2026-10-06 (the owner's approval of the 4h plan and its canon):*
+
+63. **Kariaston has people** *(4h Checkpoint C, 2026-10-07; built, waiting for the owner's playtest)*: Maximo, Kaloren, Grim, Ogrin and Bart live in Kariaston on a few broad authored beats a day (morning, midday, afternoon, from five), Musashi at his cart, Boog and Orik at their posts; where everyone is follows from the day, the clock, the story and the world seed and is never saved. **Kaloren brings Ogrin his herbs every third day**, visibly, whether or not the keeper is there; they relieve and never cure. Ogrin has good days out and bad days at his window. Looks: Maximo the blue Knight on foot; Kaloren an old wizard of A Myriad of NPCs (the Lich held back); Grim the Miner; Ogrin a Snowball Wars boy in a red jumper; Bart A Myriad of NPCs' orc in a cowboy hat (the Wise Orc read as an enemy at game scale; the owner's playtest confirms). Grim's livelihood stays open (Open 12).
 
 62. **The keeper's room and the hatch** *(the owner's call, 2026-10-07)*: the upstairs room is the keeper's own room for now (the bed they wake in), not a guest room; the hatch down to the Hollows is in its floor (on arrival day the way down; afterwards a thing to look at, since each night's delve begins from the evening's close). Later the keeper may move into a house of their own (direction, not scope). The tutorial's lines say so (Orik: "her room upstairs is yours an' all"; Boog: "the hatch is right upstairs, in your room!").
 

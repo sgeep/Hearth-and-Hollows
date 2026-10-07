@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Hearthdelve.Editor
@@ -129,7 +130,7 @@ namespace Hearthdelve.Editor
         /// </summary>
         public const string Portraits = "Portraits";
         /// <summary>The characters with a portrait recipe (Tools/portraits/&lt;id&gt;.json), by stable id.</summary>
-        public static readonly string[] PortraitIds = { "gunta", "pip", "musashi" };
+        public static readonly string[] PortraitIds = { "gunta", "pip", "musashi", "maximo", "kaloren", "grim", "ogrin", "bart" };
         public const int PortraitFrame = 32;
 
         public static Sheet PortraitSheet(string id) => new()
@@ -169,6 +170,21 @@ namespace Hearthdelve.Editor
             ("Beard", "LongBeard", "LongBeard", new[] { "black", "brown", "blonde", "red", "white" }),
         };
 
+        /// <summary>
+        /// Layers only Kariaston's people wear (4h Checkpoint C): Kaloren's robe, gloves and long hat; Bart's orc body, boots and
+        /// cowboy hat. Kept apart from <see cref="NpcLayers"/> so the patrons' appearance pools (and their seeded looks) don't change.
+        /// </summary>
+        public static readonly (string category, string folder, string kind, string[] variants)[] CastNpcLayers =
+        {
+            ("Body", "Orc", "Orc", new[] { "greenskin" }),
+            ("Toga", "Togas", "Toga", new[] { "purple" }),
+            ("Gloves", "Gloves", "Gloves", new[] { "white" }),
+            ("Shoes", "Shoes", "Shoes", new[] { "brownleather" }),
+            ("Trousers", "Trousers", "Trousers", new[] { "brownleather" }),
+            ("Hat", "LongHat", "LongHat", new[] { "purple" }),
+            ("Hat", "CowboyHat", "CowboyHat", new[] { "brownleather" }),
+        };
+
         /// <summary>The imported file name of an NPC layer.</summary>
         public static string NpcFile(string anim, string category, string kind, string variant) => $"Npc{anim}_{category}_{kind}_{variant}";
 
@@ -179,7 +195,7 @@ namespace Hearthdelve.Editor
             return category switch
             {
                 "Body" => $"{a}/_Characters/{folder}/{prefix}_{kind}_{variant}.png",
-                "Top" or "Trousers" => $"{a}/Body/{folder}/{prefix}_{kind}_{variant}.png",
+                "Top" or "Trousers" or "Toga" or "Gloves" or "Shoes" => $"{a}/Body/{folder}/{prefix}_{kind}_{variant}.png",
                 // The pack's "Short" hairstyle files have a space before the colour.
                 "Hair" => $"{a}/Head/Hairstyles/{folder}/{prefix}_HumanHair_{kind}{(kind == "Short" ? " " : "")}_{variant}.png",
                 "Hat" => $"{a}/Head/Hats/{folder}/{prefix}_Hat_{kind}_{variant}.png",
@@ -336,7 +352,7 @@ namespace Hearthdelve.Editor
             // 4c customers: the curated layers, idle and walking, and the NPC shadow.
             foreach (string anim in new[] { "Idle", "Walk" })
             {
-                foreach (var (category, folder, kind, variants) in NpcLayers)
+                foreach (var (category, folder, kind, variants) in NpcLayers.Concat(CastNpcLayers))
                 foreach (string variant in variants)
                     sheets.Add(Character(NpcSource(anim, category, folder, kind, variant), MyriadOfNPCs, NpcFile(anim, category, kind, variant)));
                 sheets.Add(Character($"{k_Npcs}/Shadows/Minifantasy_NPCsShadowHumanoid{anim}.png", MyriadOfNPCs, $"NpcShadow{anim}"));
@@ -352,6 +368,8 @@ namespace Hearthdelve.Editor
                     new SheetRect("Thinking", 136, 88, 8, 8, k_Centre), new SheetRect("Angry", 72, 40, 8, 8, k_Centre),
                     // 4f Checkpoint C: wordless reactions of patrons, Orik and Gunta (D18).
                     new SheetRect("Heart", 104, 88, 8, 8, k_Centre), new SheetRect("Happy", 8, 8, 8, 8, k_Centre),
+                    // 4h Checkpoint C: Bart's music.
+                    new SheetRect("Note", 120, 88, 8, 8, k_Centre),
                     new SheetRect("Surprised", 40, 56, 8, 8, k_Centre), new SheetRect("Content", 72, 72, 8, 8, k_Centre),
                     new SheetRect("Frown", 88, 24, 8, 8, k_Centre), new SheetRect("Sweat", 24, 88, 8, 8, k_Centre),
                 },

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1fbfeaf7ad7a634796fde2d0aa7293b, type: 3}
+  m_Name: Schedule_ogrin
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Village.ScheduleDefinition
+  character: ogrin
+  blocks:
+  - from: 480
+    to: 1440
+    anchor: ogrin.window
+    activity: bed
+    conditions:
+    - kind: 0
+      rule: 1
+      number: 0
+      id: 
+      status: 
+      negate: 1
+  - from: 480
+    to: 660
+    anchor: ogrin.yard
+    activity: yard
+    conditions: []
+  - from: 660
+    to: 840
+    anchor: pond.west
+    activity: maps
+    conditions: []
+  - from: 840
+    to: 1020
+    anchor: green.listen
+    activity: listening
+    conditions: []
+  - from: 1020
+    to: 1440
+    anchor: ogrin.window
+    activity: home
+    conditions: []

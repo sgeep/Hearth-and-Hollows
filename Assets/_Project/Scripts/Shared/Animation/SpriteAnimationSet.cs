@@ -28,6 +28,8 @@ namespace Hearthdelve.Shared.Animation
         Wake,
         /// <summary>Eating (the Larder Troll, 4e).</summary>
         Eat,
+        /// <summary>Busy with the hands, looping (4h Checkpoint C: Ogrin drawing maps in the dirt, Grim at work in his yard).</summary>
+        Gather,
     }
 
     /// <summary>One action's frames, for each of the four drawn facings.</summary>

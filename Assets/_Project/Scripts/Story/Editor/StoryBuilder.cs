@@ -175,7 +175,31 @@ namespace Hearthdelve.Story.Editor
             narration.conversation = string.Empty;
             narration.portrait = null;
             EditorUtility.SetDirty(narration);
-            return new List<CharacterDefinition> { player, boog, pip, narration, musashi };
+            // 4h Checkpoint C: Kariaston's people (values: craft, nerve, warmth; PLAN_4H §17). Made once, then tuned on the assets.
+            CharacterDefinition Villager(string id, SocialTraits values, float affinity, float respect, float village, string hub)
+            {
+                CharacterDefinition c = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_{id}.asset", d =>
+                {
+                    d.values = values;
+                    d.affinityToPlayer = affinity;
+                    d.respectForPlayer = respect;
+                    d.affinityToTavern = 50f;
+                    d.affinityToVillage = village;
+                });
+                Configure(c, id, CharacterKind.Villager, new LocalizedString(Loc.ContentTable, $"villager.{id}"), portraits, hub);
+                return c;
+            }
+            // Maximo admires the deed, not the technique; delighted by a delver under his village.
+            CharacterDefinition maximo = Villager(CharacterIds.Maximo, new SocialTraits(0f, 80f, 60f), 25f, 10f, 95f, StoryDialogue.MaximoHub);
+            // Kaloren: warm and careful, wary of daring (he knows what it costs below).
+            CharacterDefinition kaloren = Villager(CharacterIds.Kaloren, new SocialTraits(60f, -20f, 70f), 20f, 5f, 70f, StoryDialogue.KalorenHub);
+            // Grim: a craftsman's eye; he knows what nerve costs; warmth he keeps to himself.
+            CharacterDefinition grim = Villager(CharacterIds.Grim, new SocialTraits(70f, 20f, 30f), 0f, 0f, 50f, StoryDialogue.GrimHub);
+            // Ogrin: loves daring and kindness; a ten-year-old's respect is easily won and loudly given.
+            CharacterDefinition ogrin = Villager(CharacterIds.Ogrin, new SocialTraits(20f, 70f, 60f), 20f, 10f, 60f, StoryDialogue.OgrinHub);
+            // Bart: a good story (warmth, a little nerve).
+            CharacterDefinition bart = Villager(CharacterIds.Bart, new SocialTraits(20f, 40f, 50f), 20f, 5f, 80f, StoryDialogue.BartHub);
+            return new List<CharacterDefinition> { player, boog, pip, narration, musashi, maximo, kaloren, grim, ogrin, bart };
         }
 
         static void Configure(CharacterDefinition c, string id, CharacterKind kind, LocalizedString name, Dictionary<string, PortraitDefinition> portraits, string conversation)

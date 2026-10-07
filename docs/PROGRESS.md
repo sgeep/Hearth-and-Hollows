@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoint A approved**, **Checkpoint B built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint B**; then Checkpoint C (the village has people) once approved; then 4i (menus, options and polish)._
+_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoints A and B approved**, **Checkpoint C built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint C**; then Checkpoint D (the community layer) once approved; then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1228,7 +1228,7 @@ Details, deviations and tests: `docs/PLAN_4H.md`, *As built: Checkpoint A*. Art:
 - **The decorate reminder overlaps the room's top-left corner** in the main tavern room (under the clock, over the bar's back wall); upstairs and outdoors it's clear. Cosmetic; its place is a playtest call.
 - **The tall market cart can hide the keeper** standing right behind it (correct Y-sorting, but the cart's canopy covers a whole figure).
 
-### 4h Checkpoint B: a day's work (2026-10-07, built; waiting for your playtest)
+### 4h Checkpoint B: a day's work (2026-10-07, approved)
 
 Checkpoint A approved (2026-10-07). B adds **Vigor** (six pips a day beside the clock; planting a bed costs 2, tending 1, harvesting nothing; refilled by sleep; at 0 only strenuous work is refused) and the **garden**: four beds behind Tally Ho! (`garden_1`–`garden_4`) growing herbs (2 days, 3 herbs), onions (3 days, 3 onions) or barley (4 days, 2 malt), free seeds, tending once a day for a Fine harvest (at least half the growing days), forgiving (untended crops still grow; ripe ones wait), harvests straight into the storeroom as ordinary stacks. **Save version 10** (world seed, the day's minute and Vigor, the garden); mid-day Continue resumes at the saved minute; every garden action and *begin prep* save. Checkpoint A carry-overs: the decorate reminder moved to the bottom-left corner; the market cart's body reaches up behind its canopy.
 
@@ -1242,6 +1242,16 @@ Tests: EditMode 693/693, PlayMode 235 passed, 0 failed (25 explicit captures and
 **After your B playtest (2026-10-07):** doorways go through when you push their way from anywhere in them (wider triggers; no bounce-back); the day is about 4 minutes; **Musashi** (your new canon: an elf of the Fortunate Five who lost his taste to a curse from the Hollows, brother Toshi missing below) stands at the market cart and talks (`Musashi/Hub`, a first draft for the node editor). Grim no longer runs the market; what he does now is an open question (GDD Open 12).
 
 **Open question for you:** homegrown provenance (above): worth changing ingredient identity for Boog's callbacks, or tracked another way (a day's harvest log) later?
+
+### 4h Checkpoint C: the village has people (2026-10-07, built; waiting for your playtest)
+
+Checkpoint B approved (2026-10-07). C puts **Maximo, Kaloren, Grim, Ogrin and Bart** in Kariaston on a few broad beats a day (morning, midday, afternoon, from five), with **Musashi** at his cart and **Boog and Orik** at their posts under the same schedules. Where everyone is follows from the day, the clock, the story and the v10 world seed, and is never saved (`ScheduleDefinition`, `ScheduleRules`, `VillageDays`, `VillagePresence`). They walk when you can see them and are simply there when you can't; Maximo walks into Tally Ho! for lunch and out again (one of him at a time). **Kaloren brings Ogrin herbs every third day** (9:30, to the cottage door), wordless and visible, whether or not you're there. Ogrin has seeded good days (out: yard, pond, the green) and bad days (in bed, talked to through his window, a light inside). Five first-draft conversations (`Maximo/Hub` … `Bart/Hub`) in 4g's hub shape, seeded once for the node editor; portraits from the Portrait Generator. Details, schedules, art and deviations: `docs/PLAN_4H.md`, *As built: Checkpoint C*.
+
+Tests: EditMode TOTAL_EDIT, PlayMode TOTAL_PLAY. Web: WEB_RESULT.
+
+**Deviations:** Bart is A Myriad of NPCs' orc in a cowboy hat, not the Wise Orc (an armoured warlord with twin swords at game scale). Ogrin's portrait is a halfling stand-in (no child parts). Activities and the herbs are shown with faces and icons, not text barks (D's layer). Grim's livelihood stays open.
+
+**Known issues (Checkpoint C):** villagers walk through each other (their spots are apart); Kariaston's grid bakes on the first walk (a small hitch, once); a villager already walking keeps walking when Decorate Mode opens.
 
 ### Open design questions (Phase 4)
 

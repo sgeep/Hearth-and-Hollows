@@ -21,7 +21,7 @@ namespace Hearthdelve.Story.Dialogue
     /// <item>4g Checkpoint B: <c>HH_OpeningStage()</c> ("Arrival", "FirstDelve", "Homecoming", "FirstEvening", "Complete");
     /// <c>HH_QuestObject("boogs_bomb")</c> ("none", "wanted", "home", "delivered") and <c>HH_HasQuestObject("boogs_bomb")</c> (it's home,
     /// not yet handed over); <c>HH_DeliverQuestObject("boogs_bomb")</c> (hand it over: its reward, once); <c>HH_Deed("returned_boogs_bomb")</c>
-    /// (commit a deed to whoever learns of it); <c>HH_PartsHome()</c> (parts the last delve brought home today).</item>
+    /// (commit a deed to whoever learns of it); <c>HH_PartsHome()</c> (parts the last delve brought home today); <c>HH_Doing(id)</c> and <c>HH_Today(rule)</c> (4h Checkpoint C: the village's day).</item>
     /// </list>
     /// </summary>
     /// <remarks>Called only by reflection from Lua: <see cref="PreserveAttribute"/> keeps the web build's code stripping off them.</remarks>
@@ -32,6 +32,7 @@ namespace Hearthdelve.Story.Dialogue
         {
             "HH_Affinity", "HH_Respect", "HH_Remembers", "HH_QuestState", "HH_GiveQuest", "HH_PlayerName", "HH_Day", "HH_TimesDefeated",
             "HH_OpeningStage", "HH_QuestObject", "HH_HasQuestObject", "HH_DeliverQuestObject", "HH_Deed", "HH_PartsHome",
+            "HH_Doing", "HH_Today",
         };
 
         static StoryHost Host => StoryHost.Instance;
@@ -85,6 +86,26 @@ namespace Hearthdelve.Story.Dialogue
         [Preserve] public static bool HH_Deed(string deedId) => Host != null && Host.CommitDeed(deedId);
 
         [Preserve] public static double HH_PartsHome() => Game?.Today.PartsBroughtBack ?? 0;
+
+        /// <summary>
+        /// 4h Checkpoint C: what a villager is doing now, from their schedule (an activity word: "herbs", "bed", "lunch"…; empty when
+        /// they have none). The schedule decides where people are; the conversation only reads it.
+        /// </summary>
+        [Preserve] public static string HH_Doing(string characterId) => Shared.Village.VillageLife.Doing(characterId);
+
+        /// <summary>4h Checkpoint C: whether today is one of the village's seeded days: "herbs" (Kaloren's visit), "ogrin_well", "vigil".</summary>
+        [Preserve] public static bool HH_Today(string rule)
+        {
+            Shared.Village.ScheduleWorld? world = Shared.Village.VillageLife.World();
+            if (world == null) return false;
+            return rule switch
+            {
+                "herbs" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.HerbDay, world.Value),
+                "ogrin_well" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.OgrinWell, world.Value),
+                "vigil" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.MaximoVigil, world.Value),
+                _ => false,
+            };
+        }
 
         /// <summary>The registered names (tests).</summary>
         public static IReadOnlyList<string> All => Names;

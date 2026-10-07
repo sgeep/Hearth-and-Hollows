@@ -69,6 +69,39 @@ namespace Hearthdelve.Editor
         const string k_MoreVeggies = "All_Exclusives_20261002/Addons/Farm/More_Veggies/MoreVeggies.png";
         const string k_FarmActions = "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Actions/Minifantasy_FarmActionInProgress(16x16).png";
 
+        // 4h Checkpoint C: Kariaston's people. Maximo is the blue Knight on foot (locked); Grim the Miner; Ogrin a Snowball Wars child
+        // (body, boots and a red jumper, with its gathering animation); Kaloren and Bart are A Myriad of NPCs' layers (MinifantasySheets).
+        public const string KnightPack = "KnightJousting";
+        public const string MinerPack = "Miner";
+        public const string SnowballPack = "SnowballWars";
+        const string k_Knight = "All_Exclusives_20261002/Addons/Medieval_Carnival/Knight_Jousting_Add-on_1.5/Knight On Foot";
+        const string k_Miner = "All_Exclusives_20261002/Creatures/Miner";
+        const string k_Snowball = "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Snowball_Wars_Revamped_v1.0/Minifantasy_Snowball_Wars_Revamped_Assets/Characters/Separate_Layers";
+
+        /// <summary>The cast's figure sheets: (pack, imported file, source under the Minifantasy folder).</summary>
+        public static IEnumerable<(string pack, string file, string source)> CastFigures()
+        {
+            foreach (string a in new[] { "Idle", "Walk", "Attack" })
+            {
+                yield return (KnightPack, $"Knight{a}", $"{k_Knight}/Knight_{a}/Knight_{a}_blue.png");
+                yield return (KnightPack, $"Knight{a}Shadow", $"{k_Knight}/Knight_{a}/Knight_{a}_Shadow.png");
+            }
+            foreach (string a in new[] { "Idle", "Walk", "Attack" })
+                yield return (MinerPack, $"Miner{a}", $"{k_Miner}/Minifantasy_Miner{a}.png");
+            yield return (MinerPack, "MinerIdleShadow", $"{k_Miner}/_Shadows/Minifantasy_IdleShadow.png");
+            yield return (MinerPack, "MinerWalkShadow", $"{k_Miner}/_Shadows/Minifantasy_WalkShadow.png");
+            yield return (MinerPack, "MinerAttackShadow", $"{k_Miner}/_Shadows/Minifantasy_MinerAttackShadow.png");
+            foreach (string a in new[] { "Idle", "Walk", "Gather" })
+            {
+                yield return (SnowballPack, $"Child{a}", $"{k_Snowball}/{a}/Characters/{a}_human.png");
+                yield return (SnowballPack, $"ChildBoots{a}", $"{k_Snowball}/{a}/Outfit/Boots/{a}_brown_boots.png");
+                yield return (SnowballPack, $"ChildJumper{a}", $"{k_Snowball}/{a}/Outfit/Jumpers/{a}_red_jumper.png");
+            }
+            yield return (SnowballPack, "ChildIdleShadow", $"{k_Snowball}/Idle/_Shadows/IdleShadow.png");
+            yield return (SnowballPack, "ChildWalkShadow", $"{k_Snowball}/Walk/_Shadows/Walk_Shadow.png");
+            yield return (SnowballPack, "ChildGatherShadow", $"{k_Snowball}/Gather/_Shadows/Gather_Shadow.png");
+        }
+
         static readonly Vector2 k_Centre = new(0.5f, 0.5f);
         static readonly Vector2 k_Bottom = new(0.5f, 0f);
 
@@ -92,6 +125,13 @@ namespace Hearthdelve.Editor
 
         public static IEnumerable<Sheet> Sheets()
         {
+            foreach (var (pack, file, source) in CastFigures())
+                yield return new Sheet
+                {
+                    Source = source, Pack = pack, File = file, Mode = SliceMode.Grid,
+                    Cell = new Vector2Int(MinifantasySheets.CharacterFrame, MinifantasySheets.CharacterFrame), Pivot = MinifantasySheets.FeetPivot,
+                };
+
             var ground = new List<SheetRect>();
             foreach (var (name, c, r) in GroundCells.Concat(WaterCells())) ground.Add(new SheetRect(name, c * 8, r * 8, 8, 8, k_Centre));
             yield return new Sheet { Source = k_Plains, Pack = PlainsPack, File = Tiles, Mode = SliceMode.Rects, Rects = ground.ToArray() };

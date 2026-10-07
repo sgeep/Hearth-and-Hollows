@@ -8,6 +8,8 @@ using Hearthdelve.Shared.Story;
 using Hearthdelve.Shared.Garden;
 using Hearthdelve.Shared.Characters;
 using Hearthdelve.Shared.Animation;
+using Hearthdelve.Shared.Game;
+using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.Village;
@@ -479,7 +481,9 @@ namespace Hearthdelve.Editor
                 through: Vector2.up);
 
             BuildMarket(gameplay);
-            BuildMusashi(gameplay);
+            NavGrid grid = BuildGrid(gameplay);
+            BuildMusashi(gameplay, grid);
+            BuildPeople(gameplay, grid);
             BuildGarden(root, gameplay);
             BuildMemorialLook(gameplay);
             BuildEdges(gameplay);
@@ -513,7 +517,7 @@ namespace Hearthdelve.Editor
         /// Musashi (2026-10-07, the owner's canon), who keeps the market cart: a standing villager in A Myriad of NPCs' layers (an
         /// elf, a black ponytail, a white shirt, dark trousers), talkable in the daytime. His spot is fixed until Checkpoint C's schedules.
         /// </summary>
-        static void BuildMusashi(Transform gameplay)
+        static void BuildMusashi(Transform gameplay, NavGrid grid)
         {
             const string npc = EditorPaths.Animations + "/Npc";
             SpriteAnimationSet Set(string name) => AssetDatabase.LoadAssetAtPath<SpriteAnimationSet>($"{npc}/{name}.asset")
@@ -540,7 +544,65 @@ namespace Hearthdelve.Editor
             talk.transform.SetParent(root.transform, false);
             var interactable = talk.AddComponent<TavernInteractable>();
             interactable.Configure(TavernInteractableKind.Person, null, new Vector2(0f, -0.8f), 1f, null, new[] { new Vector2(-0.9f, 0.1f), new Vector2(0f, 0.9f) });
-            root.AddComponent<Villager>().Configure(CharacterIds.Musashi, "villager.musashi", interactable);
+            Villager villager = root.AddComponent<Villager>();
+            villager.Configure(CharacterIds.Musashi, "villager.musashi", interactable);
+            // 4h Checkpoint C: in the village's presence like everyone else (his schedule keeps him at the cart all day).
+            villager.ConfigurePresence(SurfaceArea.KariastonId, model, look, root.transform.Find("Feet").GetComponent<Collider2D>(),
+                VillageContent.Emote(root.transform, 2.1f), grid, VillageContent.Looks(CharacterIds.Musashi));
+        }
+
+        /// <summary>
+        /// The village's own walking grid (4h Checkpoint C): baked from its buildings and props, held only by its villagers (it never
+        /// becomes the floor's grid: the tavern's is that, loaded beside it).
+        /// </summary>
+        static NavGrid BuildGrid(Transform gameplay)
+        {
+            var go = new GameObject("Village Grid");
+            go.transform.SetParent(gameplay, false);
+            NavGrid grid = go.AddComponent<NavGrid>();
+            grid.Configure(new RectInt((int)Origin.x, (int)Origin.y, Width, Height), LayerMask.GetMask(Layers.Obstacles), global: false);
+            return grid;
+        }
+
+        /// <summary>
+        /// Kariaston's people (4h Checkpoint C): the named places their schedules use, a copy of each villager who lives out here,
+        /// the window glow at Ogrin's, the presence that places them all, and Kaloren's herbs changing hands.
+        /// </summary>
+        static void BuildPeople(Transform gameplay, NavGrid grid)
+        {
+            Transform people = Child(gameplay, "People");
+            Transform anchors = Child(people, "Anchors");
+            // Ogrin's window: a small warm glow while he's in bed behind it.
+            var glow = new GameObject("Ogrin's Window Glow");
+            glow.transform.SetParent(people, false);
+            glow.transform.localPosition = new Vector2(53.0f, 13.6f);
+            Light2D light = glow.AddComponent<Light2D>();
+            light.lightType = Light2D.LightType.Point;
+            light.color = new Color(1f, 0.78f, 0.45f);
+            light.intensity = 1.1f;
+            light.pointLightOuterRadius = 1.3f;
+            light.pointLightInnerRadius = 0.2f;
+            glow.SetActive(false);
+            foreach (var (id, at, facing, window) in VillageContent.KariastonAnchors)
+                VillageContent.Anchor(anchors, id, SurfaceArea.KariastonId, at, facing, window, window ? glow : null);
+
+            Dictionary<string, VillageContent.Figure> figures = VillageContent.Figures();
+            foreach (var (id, name, start) in new[]
+            {
+                (CharacterIds.Maximo, "Maximo", VillageContent.MemorialSquare), (CharacterIds.Kaloren, "Kaloren", VillageContent.KalorenTower),
+                (CharacterIds.Grim, "Grim", VillageContent.GrimYard), (CharacterIds.Ogrin, "Ogrin", VillageContent.OgrinYard),
+                (CharacterIds.Bart, "Bart", VillageContent.BartWagon),
+            })
+            {
+                Vector2 at = VillageContent.KariastonAnchors.First(a => a.id == start).at;
+                VillageContent.BuildVillager(people, name, id, $"villager.{id}", SurfaceArea.KariastonId, figures[id], grid, at);
+            }
+
+            var presence = new GameObject("Village Presence");
+            presence.transform.SetParent(people, false);
+            presence.AddComponent<VillagePresence>();
+            Sprite herbs = AssetDatabase.LoadAssetAtPath<GameDatabase>(EditorPaths.Data + "/GameDatabase.asset")?.Ingredient("herbs")?.icon;
+            presence.AddComponent<HerbVisit>().Configure(herbs, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Heart"));
         }
 
         /// <summary>The garden's four beds (4h Checkpoint B), on the soil painted in the blockout: ids in reading order.</summary>

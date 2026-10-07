@@ -49,6 +49,9 @@ namespace Hearthdelve.Shared.Game
         public List<Garden.CropDefinition> crops = new();
         public Garden.GardenConfig garden;
         public Surface.VigorConfig vigor;
+        [Tooltip("4h Checkpoint C: where each villager spends the surface day (broad authored beats).")]
+        public List<Village.ScheduleDefinition> schedules = new();
+        public Village.VillageLifeConfig villageLife;
 
         public FreshnessSettings Freshness => freshness != null ? freshness.freshness : FreshnessSettings.Default;
         public Surface.VigorSettings Vigor => vigor != null ? vigor.settings : Surface.VigorSettings.Default;

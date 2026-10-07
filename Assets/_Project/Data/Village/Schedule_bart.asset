@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1fbfeaf7ad7a634796fde2d0aa7293b, type: 3}
+  m_Name: Schedule_bart
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Village.ScheduleDefinition
+  character: bart
+  blocks:
+  - from: 480
+    to: 660
+    anchor: bart.wagon
+    activity: tuning
+    conditions: []
+  - from: 660
+    to: 840
+    anchor: market.front
+    activity: gossip
+    conditions: []
+  - from: 840
+    to: 1020
+    anchor: green
+    activity: playing
+    conditions: []
+  - from: 1020
+    to: 1440
+    anchor: bart.wagon
+    activity: home
+    conditions: []

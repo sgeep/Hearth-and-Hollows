@@ -42,6 +42,18 @@ namespace Hearthdelve.Shared.Characters
         /// </summary>
         public const string Musashi = "musashi";
 
+        // 4h Checkpoint C: Kariaston's people (GDD §2.10; their canon is locked there, their routines in their schedules).
+        /// <summary>Maximo: Kariaston's founder and watchman over the Hollows; Karias was his apprentice.</summary>
+        public const string Maximo = "maximo";
+        /// <summary>Kaloren Frosthand: the kind wizard in the tower, who brings Ogrin herbs every third day.</summary>
+        public const string Kaloren = "kaloren";
+        /// <summary>Grim: a dwarf, a former delver, who found Ogrin below and raised him. His livelihood is still open.</summary>
+        public const string Grim = "grim";
+        /// <summary>Ogrin: a boy of about ten, curious and often unwell; he calls Grim "Grim".</summary>
+        public const string Ogrin = "ogrin";
+        /// <summary>Bart: an orc bard, the first Visitor who stayed; lives in the painted wagon on the green.</summary>
+        public const string Bart = "bart";
+
         /// <summary>Generated Visitors are <c>visitor/&lt;day&gt;/&lt;visit&gt;</c>: unique for the evening, never saved.</summary>
         public const string VisitorPrefix = "visitor/";
 

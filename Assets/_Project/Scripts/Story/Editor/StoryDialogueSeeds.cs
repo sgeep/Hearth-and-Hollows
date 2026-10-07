@@ -18,7 +18,7 @@ namespace Hearthdelve.Story.Editor
     {
         public sealed class Cast
         {
-            public Actor Player, Boog, Orik, Narration, Musashi;
+            public Actor Player, Boog, Orik, Narration, Musashi, Maximo, Kaloren, Grim, Ogrin, Bart;
         }
 
         /// <summary>A conversation to seed: its title, and how to write it (into conversation id <c>id</c>, or a new id when −1).</summary>
@@ -55,6 +55,12 @@ namespace Hearthdelve.Story.Editor
             new() { Title = SurfaceConversations.OrikFive, Write = WriteOrikFive },
             // 2026-10-07: Musashi, who keeps the market cart.
             new() { Title = StoryDialogue.MusashiHub, Write = WriteMusashiHub },
+            // 4h Checkpoint C: Kariaston's people.
+            new() { Title = StoryDialogue.MaximoHub, Write = WriteMaximoHub },
+            new() { Title = StoryDialogue.KalorenHub, Write = WriteKalorenHub },
+            new() { Title = StoryDialogue.GrimHub, Write = WriteGrimHub },
+            new() { Title = StoryDialogue.OgrinHub, Write = WriteOgrinHub },
+            new() { Title = StoryDialogue.BartHub, Write = WriteBartHub },
         };
 
         // ---------- The writer ----------
@@ -563,6 +569,271 @@ namespace Hearthdelve.Story.Editor
             w.Link(askHours, five2);
 
             w.Link(w.Start, first, hello);
+        }
+
+        // ---------- Kariaston's people (4h Checkpoint C) ----------
+
+        static string Doing(string who, string activity) => $"HH_Doing(\"{who}\") == \"{activity}\"";
+        const string TrollFelled = "HH_TimesDefeated(\"larder_troll\") >= 1";
+
+        /// <summary>
+        /// Maximo, wherever his day has him (the memorial, lunch at Tally Ho!, watching it, his porch, a vigil): the first time, a
+        /// grand welcome with one honest sentence in it; once each, the troll and the nights below; every time, a greeting for what
+        /// he's doing and his questions. Karias stays a name and a few true words: no sealing, no history lecture.
+        /// </summary>
+        static void WriteMaximoHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.MaximoHub, c.Player, c.Maximo,
+                "Maximo (4h Checkpoint C): the first meeting once, callbacks once, then a greeting for what he's doing (HH_Doing) and his questions.");
+            const string met = "hh_maximo_met";
+            DialogueEntry hark = w.Npc("hark! the new keeper of Tally Ho!, the watch's own tavern! Kariaston bids you welcome, by my mouth.", 0, 1, Unsaid(met), Said(met));
+            DialogueEntry name = w.Npc("i am Maximo: founder of this village, mayor of it, and its watchman, until the Hollows close or i do.", 0, 2);
+            DialogueEntry askFounder = w.Player("you founded Kariaston?", 0, 3);
+            DialogueEntry askWatch = w.Player("a watchman? over what?", 1, 3);
+            DialogueEntry named = w.Npc("i named it. the building was mostly other people. i gave speeches while they lifted things.", 0, 4);
+            DialogueEntry karias = w.Npc("it's named for Karias. my apprentice. he was better than me. i don't say that often. i say it to him.", 0, 5);
+            DialogueEntry under = w.Npc("over what lies under your tavern, and under that. someone must watch it. i volunteered, long ago, loudly.", 1, 4);
+            DialogueEntry ends = w.Npc("i don't go down anymore. you will. so we keep watch from both ends, you and i.", 1, 5);
+            DialogueEntry forth = w.Npc("now! go forth and be magnificent. or open at five. either is a service to the realm.", 0, 6);
+            w.Link(hark, name);
+            w.Link(name, askFounder, askWatch);
+            w.Link(askFounder, named);
+            w.Link(named, karias);
+            w.Link(karias, forth);
+            w.Link(askWatch, under);
+            w.Link(under, ends);
+            w.Link(ends, forth);
+
+            const string troll = "hh_maximo_troll";
+            DialogueEntry felled = w.Npc("the Larder Troll, felled by a keeper of my own village! i shall have a song written. Bart will refuse. i'll write it.", 2, 1,
+                $"{TrollFelled} and {Unsaid(troll)}", Said(troll));
+            DialogueEntry careful = w.Npc("and keeper: come back up. every time. that's the part of the song that matters.", 2, 2);
+            w.Link(felled, careful);
+
+            const string nights = "hh_maximo_nights";
+            DialogueEntry fifth = w.Npc("five nights below, and up again each morning. keep doing that part. i'll keep a lamp lit at this end.", 3, 1,
+                $"HH_Day() >= 6 and {Unsaid(nights)}", Said(nights));
+
+            DialogueEntry proclaim = w.Npc("good morning, keeper! today's proclamation: the weather is adequate. the realm rejoices.", 4, 1, Doing("maximo", "proclaim"));
+            DialogueEntry lunch = w.Npc("ah, the keeper of this fine house! the soup is a triumph. i've proclaimed it. Orik has added it to my book.", 5, 1, Doing("maximo", "lunch"));
+            DialogueEntry watching = w.Npc("i'm watching your tavern. not you: the tavern, and what's under it. carry on being watched.", 6, 1, Doing("maximo", "watch"));
+            DialogueEntry vigil = w.Npc("evening, keeper. i stand with him a while at dusk. he never liked the dark coming on alone.", 7, 1, Doing("maximo", "vigil"));
+            DialogueEntry home = w.Npc("the watchman's day is done. the watch never is. that's the sort of thing i say at bedtime.", 8, 1);
+            DialogueEntry askKarias = w.Player("tell me about Karias.", 5, 3);
+            DialogueEntry askDecree = w.Player("any proclamations?", 6, 3);
+            DialogueEntry bye = w.Player("good day, Maximo.", 7, 3);
+            DialogueEntry staff = w.Npc("he held his staff like a wish come true. the best wizard i ever taught. the only one, but still.", 5, 4);
+            DialogueEntry nose = w.Npc("the statue gets his nose wrong. i keep meaning to say. i never do.", 5, 5);
+            DialogueEntry decree = w.Npc("by order of the mayor: nobody is to be glum before noon. after noon, glum in moderation.", 6, 4);
+            foreach (DialogueEntry greeting in new[] { proclaim, lunch, watching, home }) w.Link(greeting, askKarias, askDecree, bye);
+            w.Link(vigil, askKarias, bye);
+            w.Link(askKarias, staff);
+            w.Link(staff, nose);
+            w.Link(askDecree, decree);
+            w.Link(w.Start, hark, felled, fifth, proclaim, lunch, watching, vigil, home);
+        }
+
+        /// <summary>
+        /// Kaloren Frosthand: kind first, strange second. The first time, a courteous neighbour who likes to be useful; once each, a
+        /// few small oddities (old stonework, breathing) that can be shrugged off; every time, a greeting for what he's doing (on a
+        /// herb day, at Grim and Ogrin's door) and his questions. Nothing says what he is or ties him to Ogrin's illness.
+        /// </summary>
+        static void WriteKalorenHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.KalorenHub, c.Player, c.Kaloren,
+                "Kaloren (4h Checkpoint C): the first meeting once, small oddities once each, then a greeting for what he's doing (HH_Doing) and his questions.");
+            const string met = "hh_kaloren_met";
+            DialogueEntry hello = w.Npc("oh, hello. you must be the new keeper. i'm Kaloren. i live in the tower: the tall thing with the pointed hat.", 0, 1, Unsaid(met), Said(met));
+            DialogueEntry useful = w.Npc("if anything at Tally Ho! needs mending, or warming, or gently persuading, do knock. i like to be useful.", 0, 2);
+            DialogueEntry askStove = w.Player("can you light the stove?", 0, 3);
+            DialogueEntry thanks = w.Player("thank you, Kaloren.", 1, 3);
+            DialogueEntry warm = w.Npc("i can make it warm. i don't do fire. fire and i had a disagreement once, and fire won.", 0, 4);
+            DialogueEntry light = w.Npc("not at all. it's good to see a light on at Tally Ho! again.", 1, 4);
+            w.Link(hello, useful);
+            w.Link(useful, askStove, thanks);
+            w.Link(askStove, warm);
+            w.Link(thanks, light);
+
+            const string stone = "hh_kaloren_stone";
+            DialogueEntry arches = w.Npc("the Cellars under you have lovely stonework. the arches were better before the third collapse.", 2, 1,
+                $"HH_Day() >= 3 and {Unsaid(stone)}", Said(stone));
+            DialogueEntry askThird = w.Player("the third collapse?", 2, 2);
+            DialogueEntry second = w.Npc("did i say third? the second. i read a great deal. very old books. dreadfully old.", 2, 3);
+            w.Link(arches, askThird);
+            w.Link(askThird, second);
+
+            const string breath = "hh_kaloren_breath";
+            DialogueEntry forgot = w.Npc("...forgive me. i was listening so hard i forgot to breathe. it happens at my age.", 3, 1,
+                $"HH_Day() >= 5 and {Unsaid(breath)}", Said(breath));
+
+            DialogueEntry tower = w.Npc("good morning. i was tidying the stairs. there are rather a lot of them. it keeps an old man honest.", 4, 1, Doing("kaloren", "tower"));
+            DialogueEntry reading = w.Npc("i'm reading about the Cellars. whoever wrote this has never been in them. charming, though.", 5, 1, Doing("kaloren", "reading"));
+            DialogueEntry herbs = w.Npc("ah, keeper. Ogrin's herbs. every third day, like the post. they help him. they don't mend him.", 6, 1, Doing("kaloren", "herbs"));
+            DialogueEntry plain = w.Npc("hello again, keeper. a fine day for it, whatever it turns out to be.", 7, 1);
+            DialogueEntry askHerbs = w.Player("where do the herbs grow?", 5, 3);
+            DialogueEntry askCure = w.Player("will they cure him?", 6, 3);
+            DialogueEntry askGloves = w.Player("why the gloves? it's warm out.", 7, 3);
+            DialogueEntry bye = w.Player("see you, Kaloren.", 8, 3);
+            DialogueEntry cold = w.Npc("here and there. the shy ones grow in cold places. i'm good with cold places.", 5, 4);
+            DialogueEntry honest = w.Npc("no. i wish they would. they give him good days, and good days are worth a great deal.", 6, 4);
+            DialogueEntry fine = w.Npc("i feel the cold terribly. or rather, i don't, which is worse. never mind. lovely day.", 7, 4);
+            foreach (DialogueEntry greeting in new[] { tower, reading, plain }) w.Link(greeting, askHerbs, askGloves, bye);
+            w.Link(herbs, askHerbs, askCure, bye);
+            w.Link(askHerbs, cold);
+            w.Link(askCure, honest);
+            w.Link(askGloves, fine);
+            w.Link(w.Start, hello, arches, forgot, tower, reading, herbs, plain);
+        }
+
+        /// <summary>
+        /// Grim (a dwarf: restrained Scots): dry, practical, his own man. The first time, who he is to Phi and to the boy; once each,
+        /// a herb day and the keeper's knife; every time, a greeting for what he's doing and his questions. His livelihood is still
+        /// open, so nothing here says what he does for a living. Ogrin is "the boy"; nobody says "dad".
+        /// </summary>
+        static void WriteGrimHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.GrimHub, c.Player, c.Grim,
+                "Grim (4h Checkpoint C): the first meeting once, callbacks once, then a greeting for what he's doing (HH_Doing) and his questions.");
+            const string met = "hh_grim_met";
+            DialogueEntry heard = w.Npc("you're Phi's keeper. aye, i heard. the whole village heard. Maximo made a speech at the well.", 0, 1, Unsaid(met), Said(met));
+            DialogueEntry grim = w.Npc("Grim. i live in the brown house with the boy. if he asks you for stories, tell him the true ones.", 0, 2);
+            DialogueEntry askPhi = w.Player("you knew Phi?", 0, 3);
+            DialogueEntry askBoy = w.Player("the boy?", 1, 3);
+            DialogueEntry delved = w.Npc("i delved with her, a long while back. her, Musashi and the rest. that's all you'll get on an empty stomach.", 0, 4);
+            DialogueEntry mine = w.Npc("Ogrin. he's mine. no' by blood. he'll talk your ear off about the Hollows. he's never been. he'll no' be going.", 1, 4);
+            w.Link(heard, grim);
+            w.Link(grim, askPhi, askBoy);
+            w.Link(askPhi, delved);
+            w.Link(askBoy, mine);
+
+            const string herbDay = "hh_grim_herbs";
+            DialogueEntry herbs = w.Npc("Kaloren's been by with the herbs. never takes a coin. never says where he picks them. i never ask. we get on.", 2, 1,
+                $"HH_Today(\"herbs\") and {Unsaid(herbDay)}", Said(herbDay));
+            const string knife = "hh_grim_knife";
+            DialogueEntry blade = w.Npc("let's see your knife. ...aye. that'll do. keep it dry, and dinnae lend it to Boog.", 3, 1,
+                $"HH_Day() >= 3 and {Unsaid(knife)}", Said(knife));
+
+            DialogueEntry chores = w.Npc("morning. splitting stone for the wall. it doesnae need splitting. i need to split it.", 4, 1, Doing("grim", "chores"));
+            DialogueEntry errand = w.Npc("Musashi's onions are fine today. i told him so. he cannae taste them, so someone has to.", 5, 1, Doing("grim", "errand"));
+            DialogueEntry pond = w.Npc("watching the boy. from over here, so he doesnae know. he knows.", 6, 1, Doing("grim", "pond"));
+            DialogueEntry home = w.Npc("evening. the boy's in. the kettle's on. that's the day done, near enough.", 7, 1);
+            DialogueEntry askDelver = w.Player("you were a delver?", 5, 3);
+            DialogueEntry askOgrin = w.Player("how's Ogrin?", 6, 3);
+            DialogueEntry bye = w.Player("see you, Grim.", 7, 3);
+            DialogueEntry stopped = w.Npc("aye. a lot of years. then one time i came back up with more than i went down with, and i stopped.", 5, 4);
+            DialogueEntry good = w.Npc("good day today. he's out. dinnae tell him i said so; he'll think he's cured.", 6, 4, "HH_Today(\"ogrin_well\")");
+            DialogueEntry tired = w.Npc("tired. it comes and it goes. Kaloren's herbs help. nothing fixes it.", 7, 4);
+            foreach (DialogueEntry greeting in new[] { chores, errand, pond, home }) w.Link(greeting, askDelver, askOgrin, bye);
+            w.Link(askDelver, stopped);
+            w.Link(askOgrin, good, tired);
+            w.Link(w.Start, heard, herbs, blade, chores, errand, pond, home);
+        }
+
+        /// <summary>
+        /// Ogrin: a ten-year-old with opinions first, a sick child second. The first time (outside, or at his window on a bad day),
+        /// questions about what's really down there; once each, the troll, the herbs and Boog's bomb; every time, a greeting for
+        /// what he's doing and his questions. He calls Grim "Grim"; no line here calls him anything else.
+        /// </summary>
+        static void WriteOgrinHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.OgrinHub, c.Player, c.Ogrin,
+                "Ogrin (4h Checkpoint C): the first meeting once (outside, or at his window), callbacks once, then a greeting for what he's doing (HH_Doing).");
+            const string met = "hh_ogrin_met";
+            string inBed = $"({Doing("ogrin", "bed")} or {Doing("ogrin", "home")})";
+            DialogueEntry window = w.Npc("oh! it's you. the keeper. i'm in bed. it's not catching. it's just me. what's down the hatch? the real stuff.", 0, 1,
+                $"{Unsaid(met)} and {inBed}", Said(met));
+            DialogueEntry outside = w.Npc("you're the new keeper! you go down the hatch! every night! what's down there? the real stuff, not the Grim version.", 1, 1,
+                Unsaid(met), Said(met));
+            DialogueEntry slimes = w.Player("slimes, mostly.", 0, 3);
+            DialogueEntry danger = w.Player("it's dangerous down there.", 1, 3);
+            DialogueEntry knew = w.Npc("i knew it! i drew slimes on my map. Grim said i was guessing. i was guessing correctly.", 0, 4);
+            DialogueEntry looks = w.Npc("everyone says that. i know what dangerous is. i'm asking what it looks like.", 1, 4);
+            DialogueEntry back = w.Npc("come back and tell me things. i've got the Cellars mostly right. the rest is dragons till i know better.", 0, 5);
+            w.Link(window, slimes, danger);
+            w.Link(outside, slimes, danger);
+            w.Link(slimes, knew);
+            w.Link(danger, looks);
+            w.Link(knew, back);
+            w.Link(looks, back);
+
+            const string troll = "hh_ogrin_troll";
+            DialogueEntry big = w.Npc("you killed the Larder Troll? how big? bigger than Grim? bigger than the cart? i'm drawing it bigger than the cart.", 2, 1,
+                $"{TrollFelled} and {Unsaid(troll)}", Said(troll));
+            const string herbs = "hh_ogrin_herbs";
+            DialogueEntry leaves = w.Npc("Kaloren brought the leaves. they taste like a cellar. they work, though. tomorrow's a going-out day, probably.", 3, 1,
+                $"HH_Today(\"herbs\") and {Unsaid(herbs)}", Said(herbs));
+            const string bomb = "hh_ogrin_bomb";
+            DialogueEntry name = w.Npc("is it true Boog keeps a bomb on a shelf? does it have a name? it should have a name. i'd call it Gerald.", 4, 1,
+                $"HH_Day() >= 3 and {Unsaid(bomb)}", Said(bomb));
+
+            DialogueEntry yard = w.Npc("Grim's splitting the same rock again. he says it's for the wall. there is no wall.", 5, 1, Doing("ogrin", "yard"));
+            DialogueEntry maps = w.Npc("i'm drawing the Hollows. this is the Cellars. this is where i think the troll lives. tell me if i'm wrong.", 6, 1, Doing("ogrin", "maps"));
+            DialogueEntry goat = w.Npc("Bart's playing the one about the goat. it's my favorite. the goat wins.", 7, 1, Doing("ogrin", "listening"));
+            DialogueEntry bed = w.Npc("i'm all right. i'm tired in a way sleeping doesn't fix. don't make the face. everyone makes the face.", 8, 1, Doing("ogrin", "bed"));
+            DialogueEntry night = w.Npc("Grim says bed. i say the moon's barely up. Grim wins. Grim always wins. good night, keeper.", 9, 1);
+            DialogueEntry askMap = w.Player("what's on your map?", 6, 3);
+            DialogueEntry askFeel = w.Player("how are you feeling?", 7, 3);
+            DialogueEntry bye = w.Player("bye, Ogrin.", 8, 3);
+            DialogueEntry trade = w.Npc("a lot of question marks. you could fix some. i'll trade you: one true story, one of my drawings.", 6, 4);
+            DialogueEntry interesting = w.Npc("fine. i'm always fine, then i'm not, then i am again. ask me something interesting.", 7, 4);
+            foreach (DialogueEntry greeting in new[] { yard, maps, goat }) w.Link(greeting, askMap, askFeel, bye);
+            w.Link(bed, askMap, bye);
+            w.Link(askMap, trade);
+            w.Link(askFeel, interesting);
+            w.Link(w.Start, window, outside, big, leaves, name, yard, maps, goat, bed, night);
+        }
+
+        /// <summary>
+        /// Bart (an orc bard with a southern Texas voice, in his words and rhythm, never in misspellings): the first Visitor who
+        /// stayed. The first time, who he is and why he never left; once each, the troll's verse and Maximo's song; every time, a
+        /// greeting for what he's doing and his questions. He sings about ordinary people; Maximo makes speeches about heroes.
+        /// </summary>
+        static void WriteBartHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.BartHub, c.Player, c.Bart,
+                "Bart (4h Checkpoint C): the first meeting once, callbacks once, then a greeting for what he's doing (HH_Doing) and his questions.");
+            const string met = "hh_bart_met";
+            DialogueEntry howdy = w.Npc("well now, howdy. you're the keeper. i'm Bart. i play a little, sing a little, and listen a whole lot more.", 0, 1, Unsaid(met), Said(met));
+            DialogueEntry passing = w.Npc("i was passing through on my way someplace else. played one night at Tally Ho!, and i'm still fixing to leave.", 0, 2);
+            DialogueEntry askSing = w.Player("what do you sing about?", 0, 3);
+            DialogueEntry askStay = w.Player("why did you stay?", 1, 3);
+            DialogueEntry folks = w.Npc("folks. ordinary ones. a song about a hero's just a list. a baker who's scared of bread, now that's a song.", 0, 4);
+            DialogueEntry fed = w.Npc("Phi fed me, and folks here kept being interesting. a fellow can't leave in the middle of a good story.", 1, 4);
+            DialogueEntry verse = w.Npc("you do anything worth a verse, i'll hear about it. i always hear about it.", 0, 5);
+            w.Link(howdy, passing);
+            w.Link(passing, askSing, askStay);
+            w.Link(askSing, folks);
+            w.Link(askStay, fed);
+            w.Link(folks, verse);
+            w.Link(fed, verse);
+
+            const string troll = "hh_bart_troll";
+            DialogueEntry heard = w.Npc("heard you laid out the Larder Troll. i'm working on a verse. tell me true: did it roar, or did it scream?", 2, 1,
+                $"{TrollFelled} and {Unsaid(troll)}", Said(troll));
+            DialogueEntry roared = w.Player("it roared.", 2, 2);
+            DialogueEntry screamed = w.Player("it screamed.", 3, 2);
+            DialogueEntry rhymes = w.Npc("roared it is. a scream don't rhyme with nothing, and a roar rhymes with Orik's floor.", 2, 3);
+            DialogueEntry dignity = w.Npc("screamed, huh. i'll put roared. folks want a troll to keep a little dignity.", 3, 3);
+            w.Link(heard, roared, screamed);
+            w.Link(roared, rhymes);
+            w.Link(screamed, dignity);
+            const string mayor = "hh_bart_mayor";
+            DialogueEntry song = w.Npc("Maximo asked me to write a song about him. i said i'd think on it. i've been thinking on it a good long while.", 4, 1,
+                $"HH_Day() >= 4 and {Unsaid(mayor)}", Said(mayor));
+
+            DialogueEntry tuning = w.Npc("morning. just tuning. this string's been sharp since spring. i reckon it's got opinions.", 5, 1, Doing("bart", "tuning"));
+            DialogueEntry gossip = w.Npc("Grim says Musashi's onions are fine. Musashi says Grim's fine. that's about as close as those two get to a hug.", 6, 1, Doing("bart", "gossip"));
+            DialogueEntry playing = w.Npc("this one's about the goat. Ogrin's favorite. the goat wins every verse. that goat's got grit.", 7, 1, Doing("bart", "playing"));
+            DialogueEntry evening = w.Npc("evening, keeper. the wagon's warm and the song's half done. come by tomorrow, i'll have the other half.", 8, 1);
+            DialogueEntry askNews = w.Player("any news?", 6, 3);
+            DialogueEntry askFive = w.Player("a song about the Fortunate Five?", 7, 3);
+            DialogueEntry bye = w.Player("see you, Bart.", 8, 3);
+            DialogueEntry news = w.Npc("Maximo proclaimed the weather adequate again. that's three days running. folks worry he's going soft.", 6, 4);
+            DialogueEntry half = w.Npc("half of one. i won't sing the half i don't know. making things up about real folks gets you a black eye.", 7, 4);
+            foreach (DialogueEntry greeting in new[] { tuning, gossip, playing, evening }) w.Link(greeting, askNews, askFive, bye);
+            w.Link(askNews, news);
+            w.Link(askFive, half);
+            w.Link(w.Start, howdy, heard, song, tuning, gossip, playing, evening);
         }
 
         // ---------- Checkpoint A's proofs (only to recognise them unedited) ----------

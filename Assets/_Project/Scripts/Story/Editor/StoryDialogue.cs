@@ -28,6 +28,12 @@ namespace Hearthdelve.Story.Editor
         public const string OrikHub = "Orik/Hub";
         /// <summary>Musashi at the market cart (2026-10-07).</summary>
         public const string MusashiHub = "Musashi/Hub";
+        /// <summary>4h Checkpoint C: Kariaston's people, each a hub (first meeting, callbacks, then what they're doing).</summary>
+        public const string MaximoHub = "Maximo/Hub";
+        public const string KalorenHub = "Kaloren/Hub";
+        public const string GrimHub = "Grim/Hub";
+        public const string OgrinHub = "Ogrin/Hub";
+        public const string BartHub = "Bart/Hub";
 
         /// <param name="seedLog">The seed log (tests use their own); the project's by default.</param>
         public static DialogueDatabase Ensure(string path, string seedLog = null)
@@ -51,6 +57,11 @@ namespace Hearthdelve.Story.Editor
             // 4h: the voice of things looked at.
             cast.Narration = EnsureActor(db, template, "Narration", CharacterIds.Narration, false);
             cast.Musashi = EnsureActor(db, template, "Musashi", CharacterIds.Musashi, false);
+            cast.Maximo = EnsureActor(db, template, "Maximo", CharacterIds.Maximo, false);
+            cast.Kaloren = EnsureActor(db, template, "Kaloren", CharacterIds.Kaloren, false);
+            cast.Grim = EnsureActor(db, template, "Grim", CharacterIds.Grim, false);
+            cast.Ogrin = EnsureActor(db, template, "Ogrin", CharacterIds.Ogrin, false);
+            cast.Bart = EnsureActor(db, template, "Bart", CharacterIds.Bart, false);
             Seed(db, template, cast, seedLog);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);

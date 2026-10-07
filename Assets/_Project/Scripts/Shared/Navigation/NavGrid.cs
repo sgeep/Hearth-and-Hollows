@@ -34,6 +34,8 @@ namespace Hearthdelve.Shared.Navigation
         RectInt m_Bounds = new(0, 0, 16, 16);
         [SerializeField, Tooltip("Layers whose solid colliders block movement.")]
         LayerMask m_Obstacles;
+        [SerializeField, Tooltip("The floor's grid (Current). Off: a grid only its own users hold, beside another scene's (4h Checkpoint C: Kariaston's, loaded beside the tavern's).")]
+        bool m_Global = true;
 
         GridMap m_Map;
         int m_Version;
@@ -62,16 +64,17 @@ namespace Hearthdelve.Shared.Navigation
             }
         }
 
-        public void Configure(RectInt bounds, LayerMask obstacles)
+        public void Configure(RectInt bounds, LayerMask obstacles, bool global = true)
         {
             m_Bounds = bounds;
             m_Obstacles = obstacles;
+            m_Global = global;
             m_Map = null;
         }
 
         void OnEnable()
         {
-            Current = this;
+            if (m_Global) Current = this;
             EventBus<NavigationLayoutChanged>.Subscribe(OnLayoutChanged);
         }
 

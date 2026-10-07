@@ -868,6 +868,83 @@ The garden works; three changes:
 
 ---
 
+## As built: Checkpoint C, "The village has people" (2026-10-07, built; waiting for the owner's playtest)
+
+Steps 8–10. (§20's market stall for Grim is superseded: Musashi keeps it since 2026-10-07, and Grim's livelihood stays open.) Nothing of D: no Gimp, no Glimmer's light, no villagers at evening service, no Bart performance, no ambient NPC-to-NPC barks, no village deed chatter. The 4-minute day (0.43 s a game minute) is unchanged. `milestone-4h` is not tagged.
+
+### Schedules and presence
+
+- **Pure** (`Shared/Village`): `ScheduleDefinition` (one per character) is a list of `ScheduleBlock { from, to, anchor, activity, conditions }`; **the first block whose time and conditions match wins**, so a special day's block sits before the ordinary one. `ScheduleRules.Resolve(blocks, world, minute)`; `ScheduleRules.Day(...)` lists a day's places (for tuning and tests).
+- **Conditions, deliberately few** (AND, each negatable): `Day(rule)` (the seeded day rules below), `DayAtLeast(n)`, `OpeningComplete`, `QuestObject(id, status)`. No expression language; conversations keep their own conditions.
+- **Day rules** (`VillageDays`, pure, from the v10 world seed + the day, never a random generator): **`HerbDay`** exactly once every three days, the first placed by the seed; **`OgrinWell`** about 60% of days, 85% the day after the herbs (never 100%: they relieve, they don't cure); **`MaximoVigil`** about a third of evenings. Tuning: `Data/Config/VillageLife.asset` (`VillageLifeSettings`, also the walk speed 2.2 tiles/s, the distance at which moves are walked, 26 tiles, and the 30 s cap on a walk).
+- **`VillageLife`** (Shared) answers "where is X now?" from the game's day, clock (its displayed step), story and seed; the story's `HH_Doing(id)` and `HH_Today("herbs" | "ogrin_well" | "vigil")` read it. **No villager position is saved** (a test walks `SaveData` and finds no position or schedule fields).
+- **Anchors** (`ScheduleAnchor`, Hearthdelve.Village) are named transforms owned by their scene: 17 in Kariaston (built by the Kariaston updater, `VillageContent.KariastonAnchors`) and `tavern.table` in Tally Ho! (the seat of today's furniture nearest the room's middle, so Maximo's lunch follows any layout). A **window anchor** hosts someone unseen (Ogrin in bed): the talk point is the window, and a small warm `Light2D` glows there while he's in.
+- **`Villager`** (the 4h component, extended; Musashi's is the same): the layered NPC animator (now drivable without a TDE controller: `Movement`, `Hold`, `PlayOnce`), a grid-A* stroll on **Kariaston's own grid** (a `NavGrid` that doesn't become `NavGrid.Current`, so the tavern's grid is untouched) or the tavern's, a face over the head (`NpcEmote`), and the talk interactable (available only standing, in the free daytime). They're walk-through while walking and solid only when the keeper isn't standing in their spot (feet on the Default layer: the keeper bumps them; the navigation grid doesn't see them). While talking they turn to the keeper.
+- **`VillagePresence`** (one, in Kariaston) places everyone each frame from their schedule: on a load or a new day, everyone is simply where they should be; when a beat changes, they **walk if the keeper is in that area and within 26 tiles of either end**, otherwise they're just there. **Crossing into Tally Ho!**: each character may have a copy per scene (Maximo has two); the copy in the anchor's scene is the one shown; a seen copy walks out of its scene's front door and only then does the other appear at its own door and walk in. **Only one copy is ever shown** (tests check every frame of a crossing). Outside the free daytime, nobody is about.
+- **Boog and Orik** have schedules too (`tavern.kitchen`, `tavern.bar`, all day), so the village knows where they are; their staff agents still place them (no change to working code).
+
+### The day's beats (4-minute day: about 77 real seconds each)
+
+| | Morning 8–11 | Midday 11–14 | Afternoon 14–17 | From 5 (clock rests) |
+|---|---|---|---|---|
+| **Maximo** | the memorial: proclaiming (raises his sword to Karias now and then) | lunch at Tally Ho! (a seat, a content face) | watching Tally Ho! from the path, never closer | home at his porch; on vigil evenings, the memorial |
+| **Kaloren** | his tower door; **herb days 9:30–11 at Grim and Ogrin's door** | reading by the square's east bench | his tower | his tower |
+| **Grim** | his yard, at work (a swing of the pick now and then) | at the market, beside the cart | at the pond (Ogrin's good days) or home | home |
+| **Ogrin** (good day) | the yard by Grim | drawing maps by the pond (crouched) | on the green, listening to Bart (a heart) | in, at his window |
+| **Ogrin** (bad day) | at his window all day: talked to through it, a light inside | | | |
+| **Bart** | by his wagon, tuning (a note) | at the market, gossiping (beside Musashi) | on the green, playing (notes) | his wagon |
+| **Musashi** | at his cart all day | | | |
+
+Two to four places a day each, every stay at least an hour of game time (a test runs every villager over twelve days and three seeds); everyone is somewhere findable and talkable at five; nothing at five starts Prep. Three moments where people are together without the keeper: **the herbs** (below), **midday at the market** (Grim, Bart and Musashi, old friends), **afternoon on the green** (Bart playing, Ogrin listening, Grim watching from the pond, Maximo watching Tally Ho!).
+
+### Kaloren's herbs (the required proof)
+
+On a herb day at 9:30 Kaloren leaves his tower and walks to the cottage door (if the keeper is about), the herbs show over his head, then over Grim's (home in his yard in the morning) or at Ogrin's window, then a warm face; at 11 he goes on to his bench. Wordless; it happens whether or not the keeper sees it, and only on a walked arrival, so a load mid-visit finds him there, done (`HerbVisit.Handovers` stays 0; tested). Grim, Ogrin and Kaloren each have a once-only line on a herb day; Kaloren answers honestly that they don't cure. Nothing ties the herbs to what Kaloren is.
+
+### The cast (figures, portraits, values)
+
+| | World figure (inspected at game scale) | Portrait (Portrait Generator recipe, `Tools/portraits/<id>.json`) | Values (craft, nerve, warmth); affinity, respect |
+|---|---|---|---|
+| **Maximo** | *Knight Jousting 1.5* › Knight On Foot, **blue** (locked); idle, walk, the sword swing as a salute | human, white skin, bald, a grand curled moustache (dali) and goatee, a blue breastplate | 0, 80, 60; 25, 10 |
+| **Kaloren** | *A Myriad of NPCs*: white-skinned human, purple robe (toga), **white gloves**, long white hair and beard, purple long hat. The Lich figure stays unused | human, pale, long white hair and beard, purple robe and tall hat, a smile | 60, −20, 70; 20, 5 |
+| **Grim** | *Miner* (lamp helmet, pick); the attack swing is his yard work | dwarf, bronzed, short black hair, braided black beard, suspicious eyes, brown leather vest | 70, 20, 30; 0, 0 |
+| **Ogrin** | ***Snowball Wars Revamped*** child (body, brown boots, **red jumper**; idle, walk and *gather*, used for drawing maps), 8 px against the keeper's 10. Chosen over *Summer Holidays* (swimwear) | no child parts exist: the **halfling** face (round, small), spiky brown hair, confident brows, red top | 20, 70, 60; 20, 10 |
+| **Bart** | ***A Myriad of NPCs* orc** (green skin, brown trousers and boots, red doublet, **brown leather cowboy hat**) | orc, green, laughing, black moustache, red doublet, cowboy hat | 20, 40, 50; 20, 5 |
+| Musashi | unchanged | unchanged | unchanged |
+
+**Deviation (Bart):** the brief's candidate, the *Wise Orc*, is at game scale an armoured warlord with twin swords about twice the keeper's height; it reads as an enemy. The Myriad orc in a cowboy hat reads as a friendly orc at 8 px (and nods at his voice). Reversible: say if you'd rather the Wise Orc.
+
+All five are tracked Love/Hate stand-ins (9 stand-ins in all) with `CharacterKind.Villager`; deeds don't reach them yet (the village's deed chatter is D).
+
+### Conversations (seeded once; the node editor owns them)
+
+`Maximo/Hub`, `Kaloren/Hub`, `Grim/Hub`, `Ogrin/Hub`, `Bart/Hub`, each in 4g's hub shape: **the first meeting once** (`hh_<id>_met`) → **one-time callbacks** → **a greeting for what they're doing** (`HH_Doing`), then two or three questions; the last greeting has no condition, so there's always something to say. About twenty lines each.
+
+- **Maximo:** a grand welcome to "the watch's own tavern", with one honest line in each branch (Karias "was better than me. i don't say that often. i say it to him"; "i don't go down anymore. you will"). Callbacks: the Larder Troll ("come back up. every time"), day 6 ("keep doing that part. i'll keep a lamp lit at this end"). Karias: a staff "like a wish come true"; "the statue gets his nose wrong". No sealing, no cosmology, no reason he can't go below.
+- **Kaloren:** kind and useful first ("i like to be useful"; he warms things but "fire and i had a disagreement once"). Oddities, once each and shruggable: "the arches were better before the third collapse… did i say third?", forgetting to breathe while listening; the gloves ("i feel the cold terribly. or rather, i don't, which is worse").
+- **Grim** (restrained Scots): "you're Phi's keeper. aye, i heard"; "he's mine. no' by blood"; "i came back up with more than i went down with, and i stopped". His work stays open (splitting stone the wall doesn't need, errands, the pond).
+- **Ogrin:** what's really down there ("not the Grim version"); his maps ("the rest is dragons till i know better"); hates the face people make; would name Boog's bomb Gerald. Calls Grim "Grim"; a test forbids "dad", "father", "papa" and the like in any line by or to him or Grim.
+- **Bart** (southern Texas in words and rhythm: "well now, howdy", "fixing to", "i reckon"): sings about ordinary people, not heroes; still fixing to leave; won't sing the half of the Fortunate Five's song he doesn't know; the troll's verse ("roared it is").
+- A test keeps the mysteries closed in these drafts (no lich, phylactery, undead, sealing or warden).
+
+### Tests
+
+EditMode `VillageScheduleTests` (resolution and boundaries, conditions, the herbs every third day, Ogrin's days, determinism, relaxed authored days, no saved positions, the cast's data, hub shape, the "dad" guard, restraint). PlayMode `VillageCheckpointCTests`: one of each in the village and talkable with their first meeting; walking at a beat when seen and simply there when not; Maximo's lunch crossing (one copy at a time) and back out; Kaloren's herbs and no replay on Continue; Ogrin's good and bad days at his window; five o'clock; save/Continue rebuilding the village; nobody trapping the keeper. An explicit capture test renders the village at 320×180 (`BatchLogs/village_*.png`).
+
+### Known issues
+
+- Villagers walk through other villagers (no crowd avoidance; their spots are apart, and only a few ever move at once).
+- Kariaston's grid is baked once, on the first walk (a small hitch, once a load).
+- A villager walking when Decorate Mode opens in Tally Ho! keeps walking (Maximo only).
+- The herbs' handover and everyone's activities are wordless (faces and the ingredient icon); text barks over heads are D's (the ambient bark layer).
+- Ogrin's portrait is a halfling stand-in (no child parts in the Portrait Generator).
+
+### Manual observation for the playtest (the four-minute day)
+
+Over one full 8:00 → 17:00 day: count each person's moves (planned: Maximo 3, Kaloren 2 or 3, Grim 2 or 3, Ogrin 3 or 0, Bart 3, Musashi 0); check nobody seems to pace mechanically; that you can reach and talk to someone before they move (each stay is at least half a real minute, most about 77 s); that Maximo's walk into and out of Tally Ho! isn't noisy. If it reads frantic, widen the blocks on the schedule assets (`Data/Village/Schedule_*.asset`) rather than the clock.
+
+---
+
 ## Documentation during 4h
 
 - `docs/PLAN_4H.md` (this file): approval record, then "As built" per checkpoint.

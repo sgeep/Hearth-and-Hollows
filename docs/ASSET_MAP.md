@@ -389,7 +389,7 @@ Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image
 | `MedievalCity/CityProps` | Medieval City `Props/Props.png` | Bench, long bench, lamp post, two flower boxes, barrel, crate. |
 | `Farm/FarmProps`, `Farm/FarmTileset` | Farm `Props`, `Tileset` | Haystack, hay pile, bales, scarecrow, trough, bucket; the low fence run (448,120 24×6) and a post. The tileset's soil ring was tried for the beds and left a grass hole in each: the beds use the plains dirt autotile instead. |
 | `Towns/TownsProps` | Towns `Props/Minifantasy_TownsProps.png` | **TankardBoard** (9,86 23×17): Tally Ho!'s standing sign outside; **MenuBoard** (130,92 12×11): the menu board inside the door; **CupboardJars**: the storeroom shelves (furniture since the Checkpoint A playtest, `storeroom_shelves`); **PostSign** (147,94 10×9): the plots' and the closed road's signs; **CupboardJars** (66,244 11×15): the storeroom shelves. |
-| `TravellingMerchant/CartOpen`, `CartClosed` | Travelling Merchant `Merchant_On_Cart/Idle_Shop_Open.png`, `Idle_Shop_Closed_No_Merchant.png` | Frame 0 (64×64) of each: the market cart open (its "shop" sign up, counter down) and packed up after five. The Merchant creature's own stall includes its seller, so the cart (with its pony) stands in until Grim keeps the stall (Checkpoint C). |
+| `TravellingMerchant/CartOpen`, `CartClosed` | Travelling Merchant `Merchant_On_Cart/Idle_Shop_Open.png`, `Idle_Shop_Closed_No_Merchant.png` | Frame 0 (64×64) of each: the market cart open (its "shop" sign up, counter down) and packed up after five. The Merchant creature's own stall includes its seller, so the cart (with its pony) stands in; Musashi keeps it (since 2026-10-07). |
 | `Portraits/PhiFramed` | derived: `Tools/portraits/framed.py` | Phi's portrait (`Tools/portraits/phi.json`: Portrait Generator elf, the purple skin as a drow, long white hair, leather vest), cropped to the face (7,7–25,27) and framed in the colours of Minifantasy's own picture frame (Castles and Strongholds props, the noble portrait); 22×24, hung upstairs. |
 | `ForgottenPlains/PlainsTiles` (water) | Forgotten Plains `Tileset/Minifantasy_ForgottenPlainsTiles.png` | The grass-banked lake, laid out like the dirt autotile: frame one at cells 25–27 × 3–7 (`Water_*`), frame two at 29–31 × 3–7 (`Water2_*`); each part an `AnimatedTile` (`Art/Tiles/Kariaston_Water_*`, 0.4 s a frame, whole-cell colliders). Kariaston's pond (after the Checkpoint A playtest). The dirt-banked lake below (rows 9–13) and the Shallow Water add-on's paler, wadeable tiles are unused. |
 
@@ -401,6 +401,30 @@ Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image
 
 - **In the world:** A Myriad of NPCs' layers, already imported for the patrons: `Body_Elf_elfskin`, `Trousers_Trousers_black`, `Top_Shirt_white`, `Hair_PonyTail_black` (no hat layer has a bandana), with the NPC shadow; idle only, at the market cart's front-left corner (`KariastonBuilder.MusashiSpot`).
 - **Portrait:** `Tools/portraits/musashi.json` (Portrait Generator: elf, soft skin, black middle-part hair under a white bandana, a white vest, narrow eyes, a smile with pitying brows, light khaki background); composed into `derived/musashi_portrait.png` and imported as `Portraits/musashi_portrait`. The ponytail was tried first and hid his ears.
+
+## Kariaston's people (4h Checkpoint C, imported)
+
+Figures registered in `Editor/Setup/KariastonSheets.cs` (`CastFigures`, 32×32 frames, feet pivot, four facing rows); clothing layers in `MinifantasySheets.CastNpcLayers` (kept out of the patrons' appearance pools, so their seeded looks don't change); animation sets in `Data/Animations/Village/` (`VillageContent.Figures`). All inspected at game scale beside the keeper (`BatchLogs/village_*.png` from the explicit capture test).
+
+| Who | Pack folder / files | Source | Notes |
+|---|---|---|---|
+| **Maximo** (locked) | `KnightJousting/KnightIdle`, `KnightWalk`, `KnightAttack` and their `…Shadow` | *Knight Jousting Add-on 1.5* › `Knight On Foot/Knight_{Idle,Walk,Attack}/Knight_*_blue.png`, `Knight_*_Shadow.png` | Idle 16 frames and walk 4 at 200 ms; the 4-frame attack (120 ms) is his salute to Karias's memorial. The red knight, the mounted knight and the King are unused. |
+| **Grim** | `Miner/MinerIdle`, `MinerWalk`, `MinerAttack`, shadows | *All Exclusives › Creatures › Miner* (`Minifantasy_Miner{Idle,Walk,Attack}.png`, `_Shadows/…`) | A dwarf in a lamp helmet with a pick; the 6-frame swing is his yard work. `Minifantasy_MiningAction.png` is a 16×16 spark effect, unused. |
+| **Ogrin** | `SnowballWars/Child{Idle,Walk,Gather}`, `ChildBoots…`, `ChildJumper…`, `Child…Shadow` | *Snowball Wars Revamped* › `Characters/Separate_Layers/{Idle,Walk,Gather}/` (`Characters/*_human.png`, `Outfit/Boots/*_brown_boots.png`, `Outfit/Jumpers/*_red_jumper.png`, `_Shadows`) | **Chosen over *Summer Holidays*** (`SummerHolidaysHuman1–3`: swimwear children) at game scale: a boy in a red jumper reads as a village kid in any weather. 8 px against the keeper's 10. *Gather* (6 frames, 200 ms) is him crouched drawing maps. Hats (santa, wooly, horns) and the snowball layers unused. |
+| **Kaloren** | `AMyriadOfNPCs/Npc{Idle,Walk}_Toga_Toga_purple`, `…_Gloves_Gloves_white`, `…_Hat_LongHat_purple`, with the existing `Body_Human_whiteskin`, `Hair_Long_white`, `Beard_LongBeard_white` | *A Myriad of NPCs* › `Generic_NPCs/{Idle,Walk}/Body/{Togas,Gloves}`, `Head/Hats/LongHat` | Back to front: body, robe, gloves, hair, beard, hat. White gloves in summer are a deliberate oddity. The *Lich* figure stays unused, for a reveal. |
+| **Bart** | `AMyriadOfNPCs/Npc{Idle,Walk}_Body_Orc_greenskin`, `…_Trousers_Trousers_brownleather`, `…_Shoes_Shoes_brownleather`, `…_Hat_CowboyHat_brownleather`, with the existing `Top_Doublet_red` | *A Myriad of NPCs* › `_Characters/Orc`, `Body/{Trousers,Shoes}`, `Head/Hats/CowboyHat` | **Instead of the *Wise Orc*** (the brief's candidate), which at game scale is an armoured warlord with twin swords about twice the keeper's height. No orc plays an instrument in any pack: music is shown with the note emote. |
+| Bart's music | `UIOverhaul/Emotions` **Note** (120,88 8×8) | UI Overhaul `_Emotions.png` | Added beside the existing faces (heart, happy, thinking, content…). |
+| Kaloren's herbs | the existing `herbs` ingredient icon | | Shown over his head, then Grim's. |
+
+**Portraits** (`Tools/portraits/<id>.json` → `compose.py` → `derived/<id>_portrait.png` → `Portraits/<id>_portrait`; Portrait Generator layers, Krishna Palacio):
+
+- **Maximo:** human, white skin; round eyes, big nose, bald; thick white brows; blue breastplate; white goatee and a white *dali* moustache; confident mouth; light blue background. (His face, since the world figure is always helmeted.)
+- **Kaloren:** human, pale; tall eyes, straight nose; long white hair and beard; nice white brows; purple robe and tall hat; a smile; light violet.
+- **Grim:** dwarf, bronzed; suspicious eyes, big nose, bitten ears; short black hair, thick black brows, braided black beard; brown leather vest; pursed mouth; light khaki.
+- **Ogrin:** **halfling** (no child parts in the generator: the round, small halfling face is the stand-in), wheat skin; round eyes, small nose; spiky brown hair, confident brows; red doublet (his jumper); confident mouth; light green.
+- **Bart:** orc, green; happy eyes, flat nose; black brows and *dallas* moustache; red doublet; brown leather cowboy hat; laughing; light salmon.
+
+**Window glow:** Ogrin's window is a URP point light (warm, 1.3 radius) at the cottage's ground-floor right window, on while he's in bed.
 
 ## The garden (4h Checkpoint B, imported → `Farm/`)
 
@@ -422,8 +446,8 @@ Inspected for `docs/PLAN_4H.md` §28–30; the sheet `docs/plan_4h/cast_candidat
 - **Maximo (locked):** *Knight Jousting Add-on 1.5* › `Knight On Foot` › `Knight_Idle/Walk/Attack/Dmg/Die_blue.png` (32×32 frames; idle and walk 200 ms, the rest 100 ms). No crown, no King figure.
 - **Gimp (locked):** *Modern Soldiers* (All Exclusives › Creatures) › `Idle/Walk/Dmg/Die/Soldiers/*_soldier_headband.png`; its `Shot_Diagonal/Orthogonal` animations fire a rifle (unused until the firearms question is answered, GDD §2.10 question 7). Portrait: a half-elf treatment, not a human recipe.
 - **Grim (candidate):** *Miner* (`Minifantasy_MinerIdle/Walk…`), distinct from Orik's yellow-bearded dwarf and the dwarf keeper.
-- **Ogrin (provisional):** a child figure, 8 px tall against the keeper's 10: *Snowball Wars Revamped* (`Characters/Separate_Layers`, human with outfit layers) or *Summer Holidays* (`SummerHolidaysHuman1–3`). Chosen at game scale in 4h Step 8.
-- **Bart (candidate):** *Wise Orc*; fallback *True Heroes II* Bard (human, with ballad and singing animations) recoloured with an orc skin ramp.
+- **Ogrin (provisional):** a child figure, 8 px tall against the keeper's 10: *Snowball Wars Revamped* (`Characters/Separate_Layers`, human with outfit layers) or *Summer Holidays* (`SummerHolidaysHuman1–3`). Chosen at game scale in 4h Step 8. *(Checkpoint C: Snowball Wars; see Kariaston's people.)*
+- **Bart (candidate):** *Wise Orc*; fallback *True Heroes II* Bard (human, with ballad and singing animations) recoloured with an orc skin ramp. *(Checkpoint C: neither; A Myriad of NPCs' orc in a cowboy hat, see Kariaston's people.)*
 - **Kaloren:** *A Myriad Of NPCs* layers (old human); the *Lich* figure (idle, fly, spellcasts) held for a reveal.
 - **Glimmer (current treatment):** *Naughty Fairy* (`Fly_Idle`, `Appear`, `Disappear`).
 - **Phi's portrait:** Portrait Generator elf base with the obsidian skin colourway, in a Towns frame.
