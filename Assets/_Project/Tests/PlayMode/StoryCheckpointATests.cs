@@ -350,7 +350,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Talk(CharacterIds.Orik);
             Assert.That(Time.timeScale, Is.Zero, "the world waits");
             Assert.That(InputMaps.Snapshot(), Is.EqualTo(new[] { InputMaps.UI }), "only the UI map while talking");
-            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "good evening, Bram. the ledger and i are on speaking terms again.")));
+            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "good evening, Bram. the ledger and me are on speaking terms again.")));
             var portrait = Object.FindObjectsByType<UnityEngine.UI.Image>().Single(i => i.name == "Portrait");
             Assert.That(portrait.gameObject.activeInHierarchy, "his portrait");
             Assert.That(Host.Characters.Definition("pip").portrait.talking, Does.Contain(portrait.sprite), "talking while the line is revealed");

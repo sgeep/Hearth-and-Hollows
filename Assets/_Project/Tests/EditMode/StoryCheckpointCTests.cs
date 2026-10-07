@@ -254,7 +254,7 @@ namespace Hearthdelve.Tests
             }
             Assert.That(said, Has.Count.EqualTo(3));
             Assert.That(said[0], Does.Contain("Fortunate Five"));
-            Assert.That(said[1], Does.Contain("i left too"));
+            Assert.That(said[1], Does.Contain("i left an' all"), "(in his Scots since 2026-10-07)");
             Assert.That(said[2], Does.Contain("found me"));
         }
 

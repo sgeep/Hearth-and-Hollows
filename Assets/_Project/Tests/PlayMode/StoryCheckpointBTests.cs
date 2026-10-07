@@ -325,7 +325,7 @@ namespace Hearthdelve.Tests.PlayMode
 
             // The arrival: Orik, a line revealed as it's spoken.
             yield return WaitUntil(() => Box.IsOpen, 3f, "Orik");
-            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "ahh, you must be Bram! Phi's letter said you'd come. it didn't say you'd be this late.")));
+            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "ahh, you must be Bram! Phi's letter said you'd come. it didnae say you'd be this late.")));
             Assert.That(Box.IsRevealing, "revealed as it's spoken");
             Assert.That(Box.CharactersPerSecond, Is.EqualTo(AssetDatabaseFree.Settings.charactersPerSecond), "one tunable speed");
             // A click while revealing finishes the line, and doesn't move on.
@@ -352,10 +352,10 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Press(Key.DownArrow);
             yield return Press(Key.Enter);
             yield return WaitUntil(() => !Box.IsChoosing, 2f, "the choice taken");
-            Assert.That(Box.Line, Is.EqualTo("that's the question, isn't it."));
+            Assert.That(Box.Line, Is.EqualTo("aye, that's the question, isn't it."));
             // The next press (gamepad A) finishes the reveal, the one after moves on.
             yield return PressPad(GamepadButton.South);
-            Assert.That(Box.Line, Is.EqualTo("that's the question, isn't it."));
+            Assert.That(Box.Line, Is.EqualTo("aye, that's the question, isn't it."));
             yield return PressPad(GamepadButton.South);
             Assert.That(Box.Line, Does.StartWith("nine days ago"));
             yield return ToChoice();
@@ -421,7 +421,7 @@ namespace Hearthdelve.Tests.PlayMode
             Director.OpenForEvening();
             yield return InTavern(TavernPhase.Prep, "the first evening");
             yield return WaitUntil(() => Box.IsOpen, 3f, "Orik at the board");
-            Assert.That(Box.Line, Does.StartWith("the board is yours"));
+            Assert.That(Box.Line, Does.StartWith("the board's yours"));
             yield return UntilClosed();
             Assert.That(Flow.State.Story.SeenHints, Does.Contain("beat:first_evening"));
 
@@ -617,7 +617,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Box.Line, Does.StartWith("she's on the shelf over the stove now"));
             yield return UntilClosed();
             yield return Talk(CharacterIds.Orik);
-            Assert.That(Box.Line, Is.EqualTo("Boog's bomb is home. i've entered it in the incident book. in advance."));
+            Assert.That(Box.Line, Is.EqualTo("Boog's bomb is home. i've put it in the incident book. in advance, mind."));
             yield return UntilClosed();
         }
 

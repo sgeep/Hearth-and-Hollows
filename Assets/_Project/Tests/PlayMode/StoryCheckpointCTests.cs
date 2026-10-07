@@ -191,12 +191,12 @@ namespace Hearthdelve.Tests.PlayMode
 
             // Orik, quietly, and Phi.
             yield return Talk(CharacterIds.Orik);
-            Assert.That(Box.Line, Does.StartWith("the Larder Troll is dead. i've moved it from 'risks' to 'resolved'"));
+            Assert.That(Box.Line, Does.StartWith("aye, the Larder Troll is dead. i've moved it from 'risks' to 'resolved'"));
             yield return Next();
             Assert.That(Box.Line, Does.StartWith("Phi went after it"));
             yield return Next();
             yield return Choose("what was she after?");
-            Assert.That(Box.Line, Is.EqualTo("not the troll, she said. whatever it was sitting on."));
+            Assert.That(Box.Line, Is.EqualTo("no' the troll, she said. whatever it was sitting on."));
             yield return ToEnd();
 
             // Said once: next time, their everyday conversations.
@@ -264,7 +264,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Box.Line, Does.StartWith("i saw you at the block. clean cuts"));
             yield return ToEnd();
             yield return Talk(CharacterIds.Orik);
-            Assert.That(Box.Line, Is.EqualTo("you remembered that patron's request, and made it. people come back to places that remember them."));
+            Assert.That(Box.Line, Is.EqualTo("you remembered that patron's request, and made it. folk come back to places that remember them."));
             yield return ToEnd();
         }
 

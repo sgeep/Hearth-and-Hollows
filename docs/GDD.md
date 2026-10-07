@@ -316,6 +316,7 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 - *As first written (the node editor's draft, `Musashi/Hub`):* kind, wry, a little wistful; cooks by smell, sound and other people's faces now ("you can hear a good onion, if you listen"); never self-pitying about the curse ("i hope it chokes"). Toshi is only a name until his quest.
 - *Look:* the Portrait Generator's elf (soft skin), black hair under a cook's white bandana, a white vest; in the world, A Myriad of NPCs' elf with a black ponytail, a white shirt and dark trousers.
 - *Hooks:* Toshi below; the other two of the Fortunate Five; what took his taste, and whether it can be won back.
+- **Voice (the owner's call, 2026-10-07):** a thick Japanese accent, written in his rhythm and diction (clipped and formal, few articles, the odd Japanese word), never in misspellings. Likewise dwarves (Orik, Grim) speak Scots and Bart southern Texan; everyone else plainly for now (CLAUDE.md, *Accents*).
 
 **Bart** (an orc bard; he).
 - *Owner's concept:* an orc bard.
