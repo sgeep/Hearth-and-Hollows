@@ -159,6 +159,7 @@ namespace Hearthdelve.Shared.Game
             State.Story.Player.name = Characters.KeeperRules.CleanName(State.Story.Player.name);
             State.Story.CreationComplete = true;
             State.Story.Opening = OpeningStage.Arrival;
+            StartWorld();
             StartSurfaceDay();
             StoryServices.State?.Clear();
             Save();
@@ -177,6 +178,7 @@ namespace Hearthdelve.Shared.Game
             State.Story.Opening = OpeningStage.Complete;
             State.Story.CreationComplete = true;
             foreach (string hint in OnboardingHints.All) State.Story.SeenHints.Add(hint);
+            StartWorld();
             StartSurfaceDay();
             StoryServices.State?.Clear();
             Save();
@@ -252,8 +254,10 @@ namespace Hearthdelve.Shared.Game
             // The story's middleware gets the loaded game's state back before its scene loads (4g).
             StoryServices.State?.Clear();
             StoryServices.State?.Restore(State);
-            // The surface clock isn't saved before version 10: a loaded day starts in the morning.
-            StartSurfaceDay();
+            // Version 10: a daytime resumes at the minute it was saved (Vigor and the garden came back with the state); anything
+            // else starts its next surface day in the morning as before.
+            if (State.Phase == DayPhase.Daytime && State.Surface.WholeMinute > 0) SurfaceTime.Instance?.Restart();
+            else StartSurfaceDay();
             PhaseChanged?.Invoke();
             Load(ContentFor(State));
             return true;
@@ -274,6 +278,9 @@ namespace Hearthdelve.Shared.Game
         /// </summary>
         public void StartEvening()
         {
+            // 4h Checkpoint B: the day as the keeper leaves it (its minute, Vigor, the garden) is saved before the evening begins;
+            // the evening itself isn't a resume point (quitting during it comes back to this moment of the day).
+            if (State.Phase == DayPhase.Daytime) Save();
             DayRules.StartEvening(State);
             PhaseChanged?.Invoke();
             Load(ContentFor(State));
@@ -348,6 +355,59 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
+        // ---------- The garden (4h Checkpoint B) ----------
+
+        public Surface.VigorSettings VigorSettings => m_Database != null ? m_Database.Vigor : Surface.VigorSettings.Default;
+
+        /// <summary>Prepares and plants a bed (Vigor 2 for now): all or nothing; saved.</summary>
+        public Garden.GardenResult PlantBed(string bedId, Garden.CropDefinition crop)
+        {
+            if (!InGame) return Garden.GardenResult.UnknownBed;
+            Garden.GardenResult result = DayRules.PlantBed(State, bedId, crop, VigorSettings);
+            if (result != Garden.GardenResult.Done) return result;
+            Spent(Surface.VigorActivity.PlantBed);
+            EventBus<CropPlanted>.Publish(new CropPlanted(bedId, crop.id));
+            StateChanged?.Invoke();
+            Save();
+            return result;
+        }
+
+        /// <summary>Tends a growing bed (Vigor 1 for now; once per bed per day); saved.</summary>
+        public Garden.GardenResult TendBed(string bedId)
+        {
+            if (!InGame) return Garden.GardenResult.UnknownBed;
+            Garden.BedState bed = State.Garden.Bed(bedId);
+            Garden.CropDefinition crop = bed != null && m_Database != null ? m_Database.Crop(bed.Crop) : null;
+            Garden.GardenResult result = DayRules.TendBed(State, bedId, crop, VigorSettings);
+            if (result != Garden.GardenResult.Done) return result;
+            Spent(Surface.VigorActivity.TendBed);
+            EventBus<CropTended>.Publish(new CropTended(bedId, crop.id, bed.TendedDays));
+            StateChanged?.Invoke();
+            Save();
+            return result;
+        }
+
+        /// <summary>Harvests a ready bed into the storeroom (free for now); saved.</summary>
+        public Garden.GardenResult HarvestBed(string bedId)
+        {
+            if (!InGame) return Garden.GardenResult.UnknownBed;
+            Garden.BedState bed = State.Garden.Bed(bedId);
+            Garden.CropDefinition crop = bed != null && m_Database != null ? m_Database.Crop(bed.Crop) : null;
+            Garden.GardenResult result = DayRules.HarvestBed(State, bedId, crop, VigorSettings, out Inventory.IngredientStack produce);
+            if (result != Garden.GardenResult.Done) return result;
+            Spent(Surface.VigorActivity.HarvestBed);
+            EventBus<CropHarvested>.Publish(new CropHarvested(bedId, crop.id, produce.Item.Definition.id, produce.Count, produce.Item.Quality));
+            StateChanged?.Invoke();
+            Save();
+            return result;
+        }
+
+        void Spent(Surface.VigorActivity activity)
+        {
+            int cost = VigorSettings.Cost(activity);
+            if (cost > 0) EventBus<VigorSpent>.Publish(new VigorSpent(activity, cost, State.Vigor.Current));
+        }
+
         public bool BuyUpgrade(TavernUpgradeDefinition upgrade)
         {
             if (!DayRules.BuyUpgrade(State, upgrade)) return false;
@@ -367,7 +427,9 @@ namespace Hearthdelve.Shared.Game
         /// <summary>Sleep: overnight freshness loss, the next day's daytime, autosave, fresh tavern scene.</summary>
         public void Sleep()
         {
-            DayRules.Sleep(State, m_Database != null ? m_Database.Freshness : default);
+            // In order: overnight freshness, the new day, the garden's growth (once), Vigor full; then the surface clock's morning.
+            if (m_Database != null) DayRules.Sleep(State, m_Database.Freshness, m_Database.Crop, m_Database.GardenSettings);
+            else DayRules.Sleep(State, default);
             StartSurfaceDay();
             PhaseChanged?.Invoke();
             Save();
@@ -444,6 +506,14 @@ namespace Hearthdelve.Shared.Game
         // ---------- Scenes ----------
 
         static string[] ContentFor(GameState state) => GameScenes.ContentFor(state.Phase, state.Story.Opening);
+
+        /// <summary>A new game's world (4h Checkpoint B): its seed, the starter garden's empty beds, today's Vigor.</summary>
+        void StartWorld()
+        {
+            State.WorldSeed = WorldSeed.New();
+            State.Garden.Ensure(m_Database != null ? m_Database.GardenBeds : null);
+            State.Vigor.Configure(VigorSettings);
+        }
 
         /// <summary>A new surface day (or a loaded one): the clock back to the morning; the next frame announces it.</summary>
         void StartSurfaceDay()

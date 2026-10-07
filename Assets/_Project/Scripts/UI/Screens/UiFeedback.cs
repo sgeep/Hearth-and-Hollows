@@ -17,6 +17,10 @@ namespace Hearthdelve.UI.Screens
         Tick,
         /// <summary>The evening's takings: a chime (no vibration).</summary>
         Takings,
+        /// <summary>Vigor spent on surface work (4h Checkpoint B): a soft tick and a light tap.</summary>
+        Vigor,
+        /// <summary>A harvest into the storeroom (4h Checkpoint B): a small chime and a gentle pulse.</summary>
+        Harvest,
     }
 
     /// <summary>
@@ -31,6 +35,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] MMF_Player m_Buy;
         [SerializeField] MMF_Player m_Tick;
         [SerializeField] MMF_Player m_Takings;
+        [SerializeField] MMF_Player m_Vigor;
+        [SerializeField] MMF_Player m_Harvest;
 
         public static UiFeedback Instance { get; private set; }
         /// <summary>The last moment asked for (tests).</summary>
@@ -43,6 +49,13 @@ namespace Hearthdelve.UI.Screens
             m_Buy = buy;
             m_Tick = tick;
             m_Takings = takings;
+        }
+
+        /// <summary>The surface's moments (4h Checkpoint B).</summary>
+        public void ConfigureSurface(MMF_Player vigor, MMF_Player harvest)
+        {
+            m_Vigor = vigor;
+            m_Harvest = harvest;
         }
 
         void OnEnable() => Instance = this;
@@ -62,6 +75,8 @@ namespace Hearthdelve.UI.Screens
                 UiMoment.Buy => Instance.m_Buy,
                 UiMoment.Tick => Instance.m_Tick,
                 UiMoment.Takings => Instance.m_Takings,
+                UiMoment.Vigor => Instance.m_Vigor,
+                UiMoment.Harvest => Instance.m_Harvest,
                 _ => Instance.m_Confirm,
             };
             if (player != null) player.PlayFeedbacks();

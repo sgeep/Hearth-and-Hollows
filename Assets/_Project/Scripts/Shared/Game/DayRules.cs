@@ -217,14 +217,44 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
-        /// <summary>Overnight: storeroom stock loses a little freshness, and a new day begins.</summary>
-        public static void Sleep(GameState state, in FreshnessSettings freshness)
+        /// <summary>Overnight: storeroom stock loses a little freshness, and a new day begins (no garden growth: see the overload).</summary>
+        public static void Sleep(GameState state, in FreshnessSettings freshness) => Sleep(state, freshness, null, Garden.GardenSettings.Default);
+
+        /// <summary>
+        /// Overnight, in this order (4h Checkpoint B): storeroom stock loses a little freshness; a new day begins; the garden grows
+        /// once for that day (each bed remembers the day it grew, so nothing grows twice); Vigor is full again. The surface clock's
+        /// morning is set by <see cref="GameFlow"/> straight after. Only from the Night, so a second call can't run another night.
+        /// </summary>
+        public static void Sleep(GameState state, in FreshnessSettings freshness, Func<string, Garden.CropDefinition> crops, in Garden.GardenSettings garden)
         {
             Require(state, DayPhase.Night);
             state.Storeroom.Decay(freshness, freshness.overnightLoss);
             state.Today.Reset();
             state.Cycle.AdvanceTo(DayPhase.Daytime);
+            Garden.GardenRules.GrowOvernight(state.Garden, state.Day, crops, garden);
+            state.Vigor.Refill();
         }
+
+        // ---------- the garden (4h Checkpoint B; daytime only) ----------
+
+        public static Garden.GardenResult PlantBed(GameState state, string bedId, Garden.CropDefinition crop, in Surface.VigorSettings vigor) =>
+            Daytime(state) ? Garden.GardenRules.Plant(state.Garden, state.Vigor, bedId, crop, state.Day, vigor) : Garden.GardenResult.UnknownBed;
+
+        public static Garden.GardenResult TendBed(GameState state, string bedId, Garden.CropDefinition crop, in Surface.VigorSettings vigor) =>
+            Daytime(state) ? Garden.GardenRules.Tend(state.Garden, state.Vigor, bedId, crop, state.Day, vigor) : Garden.GardenResult.UnknownBed;
+
+        /// <summary>Harvests a ready bed: its produce goes into the storeroom as an ordinary, fresh stack.</summary>
+        public static Garden.GardenResult HarvestBed(GameState state, string bedId, Garden.CropDefinition crop, in Surface.VigorSettings vigor,
+            out IngredientStack produce)
+        {
+            produce = IngredientStack.Empty;
+            if (!Daytime(state)) return Garden.GardenResult.UnknownBed;
+            Garden.GardenResult result = Garden.GardenRules.Harvest(state.Garden, state.Vigor, bedId, crop, vigor, out produce);
+            if (result == Garden.GardenResult.Done) state.Storeroom.Add(produce);
+            return result;
+        }
+
+        static bool Daytime(GameState state) => state != null && state.Phase == DayPhase.Daytime;
 
         static GameState Require(GameState state, DayPhase phase)
         {

@@ -30,6 +30,8 @@ namespace Hearthdelve.Tavern.Scene
         Inspect,
         /// <summary>The market stall in Kariaston (4h): open from morning until five.</summary>
         MarketStall,
+        /// <summary>A bed of the garden (4h Checkpoint B): plant, tend, harvest.</summary>
+        GardenBed,
     }
 
     /// <summary>What the interaction hint says (the UI turns it into localized text).</summary>
@@ -59,6 +61,8 @@ namespace Hearthdelve.Tavern.Scene
         Talk,
         /// <summary>A plain line with no action (4h: "closed till morning"); <see cref="TavernHint.NameKey"/> is the line's UI key.</summary>
         Note,
+        /// <summary>A growing bed (4h Checkpoint B): "onions: ready in 2 days"; NameKey is the crop's name, Count the days left.</summary>
+        Growing,
     }
 
     /// <summary>The interaction hint's content: its kind, and the name, dish, count or staff member it mentions.</summary>

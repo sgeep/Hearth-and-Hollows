@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4852bff3827da2458860638b22ce260, type: 3}
+  m_Name: GardenConfig
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Garden.GardenConfig
+  bedIds:
+  - garden_1
+  - garden_2
+  - garden_3
+  - garden_4
+  settings:
+    untendedPausesGrowth: 0

@@ -22,11 +22,27 @@ namespace Hearthdelve.Shared.Engine
         /// <summary>The direction looked in, normalised, or zero.</summary>
         public Vector2 Direction { get; private set; }
 
+        Vector2 m_Held;
+        float m_HeldUntil;
+
         void Awake() => m_Character = GetComponent<Character>();
+
+        /// <summary>Faces <paramref name="direction"/> for a moment, whatever the mouse or stick say (4h: working a garden bed).</summary>
+        public void Hold(Vector2 direction, float seconds)
+        {
+            if (direction.sqrMagnitude < 1e-4f) return;
+            m_Held = direction.normalized;
+            m_HeldUntil = Time.unscaledTime + Mathf.Max(0f, seconds);
+        }
 
         void Update()
         {
             Direction = Vector2.zero;
+            if (Time.unscaledTime < m_HeldUntil)
+            {
+                Direction = m_Held;
+                return;
+            }
             if (m_Character.LinkedInputManager is not HearthdelveInputManager input || !input.GameplayMapActive) return;
             if (input.PointerAim)
             {

@@ -8,7 +8,8 @@ namespace Hearthdelve.Shared.Save
     // them never corrupts a save. Change these only together with a version bump + migration.
 
     /// <summary>
-    /// Current save format (version 8: 4g's story; 7: 4f Checkpoint C's new pieces and trophy homecoming; 6: 4f Checkpoint B's
+    /// Current save format (version 10: 4h Checkpoint B's world seed, the surface day's minute and Vigor, and the garden; 9: 4g
+    /// Checkpoint B's opening and keeper; 8: 4g's story; 7: 4f Checkpoint C's new pieces and trophy homecoming; 6: 4f Checkpoint B's
     /// looks and finishes: each piece's colourway and palette, each area's floor and wall finish, owned finishes and the catalogue
     /// tier last announced; 5 moved 4f's barrels and glasses, 4 added furniture, 3 the bosses defeated).
     /// </summary>
@@ -31,6 +32,46 @@ namespace Hearthdelve.Shared.Save
         public StorySaveData story = new();
         /// <summary>Version 9 (4g Checkpoint B): quest objects (by id) and where each is.</summary>
         public List<QuestObjectData> questObjects = new();
+        /// <summary>Version 10: the world's seed (one per game).</summary>
+        public WorldData world = new();
+        /// <summary>Version 10: the surface day in progress (meaningful in the daytime).</summary>
+        public SurfaceData surface = new();
+        /// <summary>Version 10: the garden's beds.</summary>
+        public GardenSaveData garden = new();
+    }
+
+    [Serializable]
+    public sealed class WorldData
+    {
+        public int seed;
+    }
+
+    [Serializable]
+    public sealed class SurfaceData
+    {
+        /// <summary>The surface clock's minute of the day (0: not recorded, the morning).</summary>
+        public int minute;
+        public int vigorSpent;
+    }
+
+    [Serializable]
+    public sealed class GardenSaveData
+    {
+        public bool initialized;
+        public List<BedData> beds = new();
+    }
+
+    /// <summary>One bed, by stable id. Its looks aren't saved: they follow from the crop and its growth.</summary>
+    [Serializable]
+    public sealed class BedData
+    {
+        public string id;
+        public string crop = string.Empty;
+        public int plantedDay;
+        public int grown;
+        public int tendedDays;
+        public int lastTendedDay;
+        public int lastGrownDay;
     }
 
     [Serializable]

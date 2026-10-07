@@ -132,6 +132,12 @@ namespace Hearthdelve.Shared.Game
         /// morning again, which is harmless while nothing in the daytime spends anything.
         /// </summary>
         public Surface.SurfaceClock Surface { get; } = new();
+        /// <summary>Today's Vigor (4h Checkpoint B): strenuous surface work; refilled by sleep.</summary>
+        public Surface.Vigor Vigor { get; } = new();
+        /// <summary>The garden's beds (4h Checkpoint B).</summary>
+        public Garden.GardenState Garden { get; } = new();
+        /// <summary>The world's seed (4h Checkpoint B): one per game, made once (<see cref="Game.WorldSeed"/>).</summary>
+        public int WorldSeed { get; internal set; }
         /// <summary>The story (4g): the opening, the player's profile, relationships, and the dialogue and quest middleware's recorded state.</summary>
         public StoryState Story { get; } = new();
         /// <summary>Quest objects and where each is (4g Checkpoint B): wanted, home or delivered.</summary>

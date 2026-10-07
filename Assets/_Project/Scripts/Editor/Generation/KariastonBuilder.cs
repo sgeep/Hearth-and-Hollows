@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Hearthdelve.Core;
 using Hearthdelve.Shared.Story;
+using Hearthdelve.Shared.Garden;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.Village;
@@ -474,6 +475,7 @@ namespace Hearthdelve.Editor
             door.AddComponent<SurfaceDoor>().Configure(SurfaceDoor.FrontOutside, SurfaceDoor.FrontInside, area, new Vector2(0f, -1.3f));
 
             BuildMarket(gameplay);
+            BuildGarden(root, gameplay);
             BuildMemorialLook(gameplay);
             BuildEdges(gameplay);
 
@@ -490,12 +492,65 @@ namespace Hearthdelve.Editor
             SpriteRenderer open = Put(stall.transform, "Open", Art(KariastonSheets.MerchantPack, KariastonSheets.CartOpen, "Cart"), Vector2.zero);
             SpriteRenderer closed = Put(stall.transform, "Closed", Art(KariastonSheets.MerchantPack, KariastonSheets.CartClosed, "Cart"), Vector2.zero);
             closed.gameObject.SetActive(false);
-            Block(stall.transform, "Body", new Rect(Market.x - 2.6f, Market.y + 0.4f, 5.2f, 2.2f));
+            // Deep enough that nobody stands where the canopy (6¼ tiles of art) hides them whole (the owner's Checkpoint A playtest).
+            Block(stall.transform, "Body", new Rect(Market.x - 2.6f, Market.y + 0.4f, 5.2f, 4.6f));
             var use = new GameObject("Use");
             use.transform.SetParent(stall.transform, false);
             var interactable = use.AddComponent<TavernInteractable>();
             interactable.Configure(TavernInteractableKind.MarketStall, SurfaceLocKeys.Market, new Vector2(0f, -0.3f), 1.4f, null);
             stall.AddComponent<MarketStall>().Configure(interactable, open.gameObject, closed.gameObject, SurfaceLocKeys.MarketClosed);
+        }
+
+        /// <summary>The garden's four beds (4h Checkpoint B), on the soil painted in the blockout: ids in reading order.</summary>
+        public static readonly string[] GardenBedIds = { GardenConfig.Bed1, GardenConfig.Bed2, GardenConfig.Bed3, GardenConfig.Bed4 };
+
+        /// <summary>
+        /// Each bed's gameplay (4h Checkpoint B): one plant per tile (the crop's stage), the interaction (from any side), Farm's
+        /// action icon over it, and the soil it darkens when tended.
+        /// </summary>
+        static void BuildGarden(Transform root, Transform gameplay)
+        {
+            Tilemap soil = root.Find("Ground/Garden Beds")?.GetComponent<Tilemap>();
+            Sprite[] Frames(string name) => Enumerable.Range(0, 4).Select(f => Art(KariastonSheets.FarmPack, KariastonSheets.FarmActions, $"{name}_{f}")).ToArray();
+            Sprite[] plant = Frames("Seed"), tend = Frames("Water"), harvest = Frames("Pull");
+            var garden = new GameObject("Garden").transform;
+            garden.SetParent(gameplay, false);
+            for (int i = 0; i < GardenBeds.Length; i++)
+            {
+                RectInt cells = GardenBeds[i];
+                var bed = new GameObject($"Bed {GardenBedIds[i]}");
+                bed.transform.SetParent(garden, false);
+                bed.transform.localPosition = cells.center;
+                var plants = new List<SpriteRenderer>();
+                for (int x = cells.xMin; x < cells.xMax; x++)
+                for (int y = cells.yMin; y < cells.yMax; y++)
+                {
+                    var go = new GameObject($"Plant {x - cells.xMin},{y - cells.yMin}");
+                    go.transform.SetParent(bed.transform, false);
+                    go.transform.localPosition = new Vector2(x + 0.5f, y + 0.15f) - cells.center;
+                    SpriteRenderer r = go.AddComponent<SpriteRenderer>();
+                    r.sortingLayerName = SortingLayers.YSorted;
+                    r.spriteSortPoint = SpriteSortPoint.Pivot;
+                    if (LookTestContent.LitSpriteMaterial != null) r.sharedMaterial = LookTestContent.LitSpriteMaterial;
+                    r.enabled = false;
+                    plants.Add(r);
+                }
+                var actionGo = new GameObject("Action");
+                actionGo.transform.SetParent(bed.transform, false);
+                actionGo.transform.localPosition = new Vector2(0f, cells.height / 2f + 0.4f);
+                SpriteRenderer action = actionGo.AddComponent<SpriteRenderer>();
+                action.sortingLayerName = SortingLayers.Above;
+                action.sortingOrder = 10;
+                if (LookTestContent.LitSpriteMaterial != null) action.sharedMaterial = LookTestContent.LitSpriteMaterial;
+                action.enabled = false;
+                var use = new GameObject("Use");
+                use.transform.SetParent(bed.transform, false);
+                var interactable = use.AddComponent<TavernInteractable>();
+                float w = cells.width / 2f + 0.45f, h = cells.height / 2f + 0.45f;
+                interactable.Configure(TavernInteractableKind.GardenBed, GardenText.Plant, new Vector2(0f, -h), 1.2f, null,
+                    new[] { new Vector2(0f, h), new Vector2(-w, 0f), new Vector2(w, 0f) });
+                bed.AddComponent<GardenBed>().Configure(GardenBedIds[i], interactable, plants.ToArray(), soil, cells, action, plant, tend, harvest);
+            }
         }
 
         static void BuildMemorialLook(Transform gameplay)

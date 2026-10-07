@@ -122,6 +122,21 @@ namespace Hearthdelve.Editor
             return offer != null ? Mathf.CeilToInt(offer.price / (float)Mathf.Max(1, offer.bundle)) : 0;
         }
 
+        /// <summary>
+        /// The garden's best week (4h Checkpoint B), in market gold: every bed growing its most valuable crop back to back for
+        /// <paramref name="days"/> days, every harvest sold at the market's price. Staples, not riches: it must stay well under
+        /// what a delve night earns.
+        /// </summary>
+        public static int GardenWeekValue(int days = 7)
+        {
+            GameDatabase db = Database;
+            if (db == null) return 0;
+            int best = 0;
+            foreach (Hearthdelve.Shared.Garden.CropDefinition crop in db.crops.Where(c => c != null && c.produce != null))
+                best = Mathf.Max(best, days / crop.growthDays * crop.yield * MarketPrice(crop.produce.id));
+            return best * db.GardenBeds.Count;
+        }
+
         /// <summary>Runs one scenario on the current content.</summary>
         public static Row Run(Scenario s)
         {
@@ -203,6 +218,11 @@ namespace Hearthdelve.Editor
                 EveningResult e = r.Result;
                 sb.AppendLine($"| {s.Name} | {e.Covers} | {e.Gold} | {e.Tips + e.RequestBonus} | {e.Takings} | {r.CostUsed} | {r.ProfitUsed} | {e.Renown:+0;-0;0} |");
             }
+            sb.AppendLine();
+            sb.AppendLine("## The garden (4h Checkpoint B)");
+            sb.AppendLine();
+            sb.AppendLine($"Its best week, every bed harvested back to back and the produce priced at the market: **{GardenWeekValue()} gold** "
+                          + $"({Database.GardenBeds.Count} beds). Staples, never the way to get rich: compare one ordinary delve night above.");
             sb.AppendLine();
             sb.AppendLine("## A part at the Butcher Block (gold of dishes per part)");
             sb.AppendLine();

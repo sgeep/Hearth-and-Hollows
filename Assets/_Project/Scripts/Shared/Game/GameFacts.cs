@@ -38,6 +38,64 @@ namespace Hearthdelve.Shared.Game
         }
     }
 
+    /// <summary>Vigor was spent on strenuous surface work (4h Checkpoint B): what, how much, and how much is left today.</summary>
+    public readonly struct VigorSpent : IEvent
+    {
+        public readonly Surface.VigorActivity Activity;
+        public readonly int Amount;
+        public readonly int Remaining;
+        public VigorSpent(Surface.VigorActivity activity, int amount, int remaining)
+        {
+            Activity = activity;
+            Amount = amount;
+            Remaining = remaining;
+        }
+    }
+
+    /// <summary>A garden bed was prepared and planted (4h Checkpoint B).</summary>
+    public readonly struct CropPlanted : IEvent
+    {
+        public readonly string BedId;
+        public readonly string CropId;
+        public CropPlanted(string bedId, string cropId)
+        {
+            BedId = bedId;
+            CropId = cropId;
+        }
+    }
+
+    /// <summary>A growing bed was tended (once a day), and how many days it has been tended so far.</summary>
+    public readonly struct CropTended : IEvent
+    {
+        public readonly string BedId;
+        public readonly string CropId;
+        public readonly int TendedDays;
+        public CropTended(string bedId, string cropId, int tendedDays)
+        {
+            BedId = bedId;
+            CropId = cropId;
+            TendedDays = tendedDays;
+        }
+    }
+
+    /// <summary>A bed was harvested: what came out (ingredient id), how many and how good, into the storeroom.</summary>
+    public readonly struct CropHarvested : IEvent
+    {
+        public readonly string BedId;
+        public readonly string CropId;
+        public readonly string IngredientId;
+        public readonly int Count;
+        public readonly Ingredients.Quality Quality;
+        public CropHarvested(string bedId, string cropId, string ingredientId, int count, Ingredients.Quality quality)
+        {
+            BedId = bedId;
+            CropId = cropId;
+            IngredientId = ingredientId;
+            Count = count;
+            Quality = quality;
+        }
+    }
+
     /// <summary>Something was bought at the Brackenford market (by ingredient id).</summary>
     public readonly struct MarketPurchase : IEvent
     {

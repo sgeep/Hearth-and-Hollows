@@ -42,6 +42,9 @@ namespace Hearthdelve.Editor
         public static void UpdateSurface()
         {
             ClockConfig();
+            // The village's sheets (the garden's crops and action icons among them) are imported first, then its data.
+            MinifantasyImporter.Import(KariastonSheets.Sheets());
+            GardenContent.Build();
             KariastonBuilder.Ensure(rebuildApproved: false);
             UpdateBoot();
             // The tavern updater adds Tally Ho!'s side (ApplyToTavern) with everything else it maintains.
@@ -132,6 +135,7 @@ namespace Hearthdelve.Editor
 
             BuildClockFace(ui);
             BuildPrepConfirm(ui);
+            BuildGardenPanel(ui);
         }
 
         static PropertyArea Area(string id) =>
@@ -161,7 +165,14 @@ namespace Hearthdelve.Editor
 
         // ---- the canvas
 
-        /// <summary>The clock's face, top left, on a small parchment tab: only in the free daytime.</summary>
+        /// <summary>Pips the HUD has room for (the day's maximum are shown).</summary>
+        const int k_MaxPips = 10;
+
+        /// <summary>
+        /// The surface HUD, top left (only in the free daytime): the clock on a small parchment tab, today's Vigor as a row of
+        /// pips beside it (4h Checkpoint B), a one-line harvest note under it; indoors, the Decorate key's reminder in the bottom
+        /// left corner, clear of the room (Checkpoint A's reminder sat over the room's top-left corner).
+        /// </summary>
         static void BuildClockFace(Canvas ui)
         {
             Transform old = ui.transform.Find("SurfaceClock");
@@ -169,17 +180,36 @@ namespace Hearthdelve.Editor
             RectTransform root = DungeonUI.FullScreen(ui, "SurfaceClock");
             root.SetAsFirstSibling();
             // The panel's visible frame is about 4 px deep with rounded corners: 24 px tall leaves the 12-px line clear of its red rule.
-            RectTransform tab = LookTestBuilder.UIRect(root, "Tab", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -3f), new Vector2(64f, 24f));
+            RectTransform tab = LookTestBuilder.UIRect(root, "Tab", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -1f), new Vector2(64f, 24f));
             DungeonUI.AddImage(tab, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
             LocalizedSuperText text = LookTestBuilder.Text(tab, "Time", SurfaceLocKeys.Clock, TextStyle.Body, DungeonUI.k_Ink, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
-            // Under the tab, indoors only: the Decorate key's reminder.
-            RectTransform hint = LookTestBuilder.UIRect(root, "Decorate", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -28f), new Vector2(90f, 12f));
+
+            // Vigor: small pips right of the tab, each a dark frame round a 4×6 light (full: warm; spent: dark).
+            RectTransform vigor = LookTestBuilder.UIRect(tab, "Vigor", new Vector2(1f, 0.5f), new Vector2(0f, 0.5f), new Vector2(3f, 0f), new Vector2(k_MaxPips * 7f, 8f));
+            var pips = new Image[k_MaxPips];
+            for (int i = 0; i < k_MaxPips; i++)
+            {
+                RectTransform frame = LookTestBuilder.UIRect(vigor, $"Pip {i + 1}", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(i * 7f, 0f), new Vector2(6f, 8f));
+                DungeonUI.AddImage(frame, DungeonUI.Pixel(), new Color(0.1f, 0.07f, 0.06f, 1f));
+                RectTransform light = LookTestBuilder.UIRect(frame, "Light", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(4f, 6f));
+                pips[i] = DungeonUI.AddImage(light, DungeonUI.Pixel(), Color.white);
+            }
+
+            // The harvest's note, under the tab for a moment.
+            RectTransform note = LookTestBuilder.UIRect(root, "Note", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -26f), new Vector2(150f, 24f));
+            DungeonUI.AddImage(note, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
+            LocalizedSuperText noteText = LookTestBuilder.Text(note, "Text", GardenLocKeys.Harvested, TextStyle.Body, DungeonUI.k_Ink, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-12f, 0f));
+
+            // Indoors only: the Decorate key's reminder, bottom left (the room never reaches the screen's bottom-left corner).
+            RectTransform hint = LookTestBuilder.UIRect(root, "Decorate", new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(5f, 3f), new Vector2(90f, 12f));
             LocalizedSuperText decorate = LookTestBuilder.Text(hint, "Text", SurfaceLocKeys.DecorateHint, TextStyle.Secondary, DungeonUI.k_Light, TextAnchor.MiddleLeft,
                 Vector2.zero, Vector2.one, new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
-            root.gameObject.AddComponent<SurfaceClockView>().Configure(tab.gameObject, text, hint.gameObject, decorate);
+            root.gameObject.AddComponent<SurfaceClockView>().Configure(tab.gameObject, text, hint.gameObject, decorate, pips, note.gameObject, noteText);
             tab.gameObject.SetActive(false);
             hint.gameObject.SetActive(false);
+            note.gameObject.SetActive(false);
         }
 
         /// <summary>The menu board's question: begin evening prep now? ("not yet" is the default).</summary>
@@ -196,6 +226,47 @@ namespace Hearthdelve.Editor
             yes.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnRight = no, selectOnLeft = no };
             no.navigation = new Navigation { mode = Navigation.Mode.Explicit, selectOnRight = yes, selectOnLeft = yes };
             root.gameObject.AddComponent<PrepConfirm>().Configure(panel.gameObject, yes, no);
+            panel.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// What to plant (4h Checkpoint B): the starter crops stacked, each with its seedling and days to grow, then "not now".
+        /// Up and down move between them (wrapping); the first crop is selected.
+        /// </summary>
+        static void BuildGardenPanel(Canvas ui)
+        {
+            const int crops = 3;
+            Transform old = ui.transform.Find("GardenPanel");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
+            RectTransform root = DungeonUI.FullScreen(ui, "GardenPanel");
+            // The title's band (its line and rule) above the stacked choices: the first one's top sits 32 px under the panel's top.
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(170f, 130f), Vector2.zero);
+            LocalizedSuperText title = DungeonUI.Title(panel, GardenLocKeys.PanelTitle);
+            var buttons = new Button[crops];
+            var labels = new LocalizedSuperText[crops];
+            var icons = new Image[crops];
+            for (int i = 0; i < crops; i++)
+            {
+                Button button = TavernScreens.SmallButton(panel, $"Crop {i + 1}", GardenLocKeys.PanelCrop, new Vector2(0.5f, 0f), new Vector2(0f, 82f - i * 19f), 130f, out LocalizedSuperText label);
+                RectTransform labelRect = (RectTransform)label.transform;
+                labelRect.offsetMin = new Vector2(14f, labelRect.offsetMin.y);
+                RectTransform icon = LookTestBuilder.UIRect(button.transform, "Icon", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), new Vector2(5f, 2f), new Vector2(8f, 16f));
+                icons[i] = DungeonUI.AddImage(icon, null, Color.white);
+                icons[i].preserveAspect = true;
+                buttons[i] = button;
+                labels[i] = label;
+                // A plain click: the Vigor spent gives the choice its tick and tap (SurfaceClockView), not a second one here.
+            }
+            Button cancel = TavernScreens.SmallButton(panel, "Cancel", GardenLocKeys.PanelCancel, new Vector2(0.5f, 0f), new Vector2(0f, 6f), 80f, out _);
+            var order = new Selectable[] { buttons[0], buttons[1], buttons[2], cancel };
+            for (int i = 0; i < order.Length; i++)
+                order[i].navigation = new Navigation
+                {
+                    mode = Navigation.Mode.Explicit,
+                    selectOnUp = order[(i + order.Length - 1) % order.Length],
+                    selectOnDown = order[(i + 1) % order.Length],
+                };
+            root.gameObject.AddComponent<GardenPanel>().Configure(panel.gameObject, title, buttons, labels, icons, cancel);
             panel.gameObject.SetActive(false);
         }
     }

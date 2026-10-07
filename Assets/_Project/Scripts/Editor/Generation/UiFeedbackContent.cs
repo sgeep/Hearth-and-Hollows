@@ -29,6 +29,9 @@ namespace Hearthdelve.Editor
                 Moment(root, "Feedback_Buy", "PH_UiBuy", HapticIds.PulseSuccess, 0.6f),
                 Moment(root, "Feedback_Tick", "PH_UiTick", null, 0f),
                 Moment(root, "Feedback_Takings", "PH_UiChime", null, 0f));
+            feedback.ConfigureSurface(
+                Moment(root, "Feedback_Vigor", "PH_UiTick", HapticIds.TapLight, 0.3f),
+                Moment(root, "Feedback_Harvest", "PH_UiChime", HapticIds.PulseSuccess, 0.4f));
             return feedback;
         }
 

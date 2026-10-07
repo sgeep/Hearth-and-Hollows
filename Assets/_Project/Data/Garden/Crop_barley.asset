@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d50ee547cd61dce4ab564113d6abaa62, type: 3}
+  m_Name: Crop_barley
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Garden.CropDefinition
+  id: barley
+  nameKey: crop.barley
+  produce: {fileID: 11400000, guid: 4b340e077390d3249ab64e0a43c9be07, type: 2}
+  growthDays: 4
+  yield: 2
+  fineTendedShare: 0.5
+  seeds: {fileID: 1890579288, guid: 36495ffdbb6931a45991bb6927dbbc36, type: 3}
+  sprout: {fileID: -447256840, guid: 36495ffdbb6931a45991bb6927dbbc36, type: 3}
+  growing: {fileID: -1727635049, guid: 36495ffdbb6931a45991bb6927dbbc36, type: 3}
+  ready: {fileID: -643617742, guid: 36495ffdbb6931a45991bb6927dbbc36, type: 3}
+  icon: {fileID: -2100287784, guid: 36495ffdbb6931a45991bb6927dbbc36, type: 3}

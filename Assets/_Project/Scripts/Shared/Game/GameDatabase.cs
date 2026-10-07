@@ -45,7 +45,24 @@ namespace Hearthdelve.Shared.Game
         [Tooltip("Lets F4 / the prep-screen button fill the storeroom during the day loop. Off: service uses only what you bring back.")]
         public bool allowDebugFill;
 
+        [Header("The surface (4h Checkpoint B)")]
+        public List<Garden.CropDefinition> crops = new();
+        public Garden.GardenConfig garden;
+        public Surface.VigorConfig vigor;
+
         public FreshnessSettings Freshness => freshness != null ? freshness.freshness : FreshnessSettings.Default;
+        public Surface.VigorSettings Vigor => vigor != null ? vigor.settings : Surface.VigorSettings.Default;
+        public Garden.GardenSettings GardenSettings => garden != null ? garden.settings : Garden.GardenSettings.Default;
+        public IReadOnlyList<string> GardenBeds => garden != null ? garden.bedIds : new List<string>
+            { Garden.GardenConfig.Bed1, Garden.GardenConfig.Bed2, Garden.GardenConfig.Bed3, Garden.GardenConfig.Bed4 };
+
+        public Garden.CropDefinition Crop(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            foreach (Garden.CropDefinition c in crops)
+                if (c != null && c.id == id) return c;
+            return null;
+        }
 
         public IngredientDefinition Ingredient(string id)
         {

@@ -46,6 +46,9 @@ namespace Hearthdelve.UI.Tavern
                 case TavernHintKind.Staffed: m_Text.Set(TavernLocKeys.HintStaffed, h.Staff != null ? Loc.Get(h.Staff.displayName) : string.Empty); break;
                 case TavernHintKind.Talk: m_Text.Set(TavernLocKeys.HintTalk, key, h.Staff != null ? Loc.Get(h.Staff.displayName) : string.Empty); break;
                 case TavernHintKind.Note: m_Text.Set(h.NameKey); break;
+                case TavernHintKind.Growing:
+                    m_Text.Set(h.Count <= 1 ? GardenLocKeys.ReadyTomorrow : GardenLocKeys.ReadyIn, Loc.UI(h.NameKey), h.Count);
+                    break;
                 default: m_Text.Set(TavernLocKeys.HintUse, key, Loc.UI(h.NameKey)); break;
             }
         }

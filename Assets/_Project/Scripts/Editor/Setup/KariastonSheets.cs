@@ -34,6 +34,24 @@ namespace Hearthdelve.Editor
         public const string TownsProps = "TownsProps";
         public const string CartOpen = "CartOpen";
         public const string CartClosed = "CartClosed";
+        // The garden (4h Checkpoint B): Farm's seeds-and-crops sheet (wheat), More Veggies (onion, spinach), Farm's action icons.
+        public const string FarmCrops = "FarmCrops";
+        public const string MoreVeggies = "MoreVeggies";
+        public const string FarmActions = "FarmActions";
+
+        /// <summary>A crop's cells: the sheet, the group's left edge and the row. Each cell is 8×16, bottom-pivoted, on a 16-px row.</summary>
+        public static readonly (string name, string file, int x, int row)[] Crops =
+        {
+            ("Wheat", FarmCrops, 0, 4),     // Farm: Pumpkin, Eggplant, Berry, Beet, Wheat (left group)
+            ("Onion", MoreVeggies, 80, 2),  // More Veggies: Cabbage, Zucchini, Onion, Green beans (middle group)
+            ("Spinach", MoreVeggies, 0, 1), // More Veggies: Carrot, Spinach, Cucumber, Artichoke (left group): the herb bed
+        };
+
+        /// <summary>The stages of a crop, by its cell's offset in the group: seeds on the ground, three growth states, the grown icon.</summary>
+        public static readonly (string stage, int offset)[] CropStages = { ("Seeds", 24), ("Grow1", 32), ("Grow2", 40), ("Grow3", 48), ("Icon", 64) };
+
+        /// <summary>Farm's animated action icons (four 16×16 frames a row): seeding, watering, pulling up.</summary>
+        public static readonly (string name, int row)[] Actions = { ("Seed", 4), ("Water", 2), ("Pull", 3) };
 
         const string k_Plains = "Minifantasy_ForgottenPlains_v3.6_Commercial_Version/Minifantasy_ForgottenPlains_Assets/Tileset/Minifantasy_ForgottenPlainsTiles.png";
         const string k_Buildings = "Minifantasy_Towns2_v1.5/Minifantasy_Towns2_Assets/Buildings/_Mix_And_Match_Samples/Minifantasy_TownsIIMoreBuildingSamples.png";
@@ -47,6 +65,9 @@ namespace Hearthdelve.Editor
         const string k_FarmTiles = "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Tileset/Minifantasy_FarmTileset.png";
         const string k_TownsProps = "Minifantasy_Towns_v3.0/Minifantasy_Towns_Assets/Props/Minifantasy_TownsProps.png";
         const string k_Cart = "All_Exclusives_20261002/Creatures/Travelling_Merchant/Merchant_On_Cart";
+        const string k_FarmCrops = "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Crops/Minifantasy_FarmSeedsAndCrops.png";
+        const string k_MoreVeggies = "All_Exclusives_20261002/Addons/Farm/More_Veggies/MoreVeggies.png";
+        const string k_FarmActions = "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Actions/Minifantasy_FarmActionInProgress(16x16).png";
 
         static readonly Vector2 k_Centre = new(0.5f, 0.5f);
         static readonly Vector2 k_Bottom = new(0.5f, 0f);
@@ -141,6 +162,22 @@ namespace Hearthdelve.Editor
             farm.Add(new SheetRect("FenceRun", 448, 120, 24, 6, k_Bottom));
             farm.Add(new SheetRect("FencePost", 312, 0, 8, 24, k_Bottom));
             yield return new Sheet { Source = k_FarmTiles, Pack = FarmPack, File = FarmTiles, Mode = SliceMode.Rects, Rects = farm.ToArray() };
+
+            // The garden's crops (4h Checkpoint B): each stage an 8×16 cell, pivoted at its foot.
+            foreach (string file in new[] { FarmCrops, MoreVeggies })
+            {
+                var cells = new List<SheetRect>();
+                foreach (var (name, sheet, x, row) in Crops)
+                    if (sheet == file)
+                        foreach (var (stage, offset) in CropStages)
+                            cells.Add(new SheetRect($"{name}_{stage}", x + offset, row * 16, 8, 16, k_Bottom));
+                yield return new Sheet { Source = file == FarmCrops ? k_FarmCrops : k_MoreVeggies, Pack = FarmPack, File = file, Mode = SliceMode.Rects, Rects = cells.ToArray() };
+            }
+            var actions = new List<SheetRect>();
+            foreach (var (name, row) in Actions)
+                for (int f = 0; f < 4; f++)
+                    actions.Add(new SheetRect($"{name}_{f}", f * 16, row * 16, 16, 16, k_Bottom));
+            yield return new Sheet { Source = k_FarmActions, Pack = FarmPack, File = FarmActions, Mode = SliceMode.Rects, Rects = actions.ToArray() };
             // Towns' props: the standing signboards (Tally Ho!'s tankard board outside, the menu board inside) and the cupboard of jars
             // that is Tally Ho!'s storeroom shelves.
             yield return new Sheet

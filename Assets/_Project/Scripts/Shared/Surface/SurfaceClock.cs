@@ -70,6 +70,9 @@ namespace Hearthdelve.Shared.Surface
         /// <summary>The start of the day.</summary>
         public void Reset(in SurfaceClockSettings settings) => Minute = settings.dayStartMinute;
 
+        /// <summary>From a save (version 10): the minute the day was saved at.</summary>
+        public void Restore(int minute) => Minute = Math.Clamp(minute, 0, 24 * 60 - 1);
+
         /// <summary>Sets the minute directly (tests, debugging), held to the day's start and the cutoff.</summary>
         public void Set(int minute, in SurfaceClockSettings settings) =>
             Minute = Math.Clamp(minute, Math.Min(settings.dayStartMinute, settings.cutoffMinute), settings.cutoffMinute);

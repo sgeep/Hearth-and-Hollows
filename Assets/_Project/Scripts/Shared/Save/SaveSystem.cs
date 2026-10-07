@@ -19,7 +19,7 @@ namespace Hearthdelve.Shared.Save
     /// </summary>
     public static class SaveSystem
     {
-        public const int CurrentVersion = 9;
+        public const int CurrentVersion = 10;
 
         /// <summary>Starting pieces added in version 7 (4f Checkpoint C); a version 6 save gets them once, in storage.</summary>
         public static readonly string[] StartersAddedInV7 = { "butcher_block" };
@@ -109,6 +109,17 @@ namespace Hearthdelve.Shared.Save
             foreach (var pair in state.QuestObjects.All)
                 data.questObjects.Add(new QuestObjectData { id = pair.Key, status = pair.Value.ToString() });
             data.questObjects.Sort((a, b) => string.CompareOrdinal(a.id, b.id));
+
+            // Version 10 (4h Checkpoint B).
+            data.world = new WorldData { seed = state.WorldSeed };
+            data.surface = new SurfaceData { minute = state.Surface.WholeMinute, vigorSpent = state.Vigor.Spent };
+            data.garden = new GardenSaveData { initialized = state.Garden.Initialized };
+            foreach (Garden.BedState b in state.Garden.Beds)
+                data.garden.beds.Add(new BedData
+                {
+                    id = b.Id, crop = b.Crop ?? string.Empty, plantedDay = b.PlantedDay, grown = b.Grown, tendedDays = b.TendedDays,
+                    lastTendedDay = b.LastTendedDay, lastGrownDay = b.LastGrownDay,
+                });
             return data;
         }
 
@@ -117,9 +128,13 @@ namespace Hearthdelve.Shared.Save
         /// <param name="warnings">Receives a line per dropped entry.</param>
         /// <param name="furnitureExists">Whether a furniture id is still in the game (null: every id is kept).</param>
         /// <param name="startingFurniture">Granted when the save has no furniture yet (migrated from version 3).</param>
+        /// <param name="crops">Resolves a crop id (4h; null: every planted crop is kept as saved).</param>
+        /// <param name="gardenBeds">The garden's beds: any the save doesn't have arrive empty (4h; null: none added).</param>
+        /// <param name="vigor">Vigor's tuning (the day's maximum).</param>
         public static GameState Restore(SaveData data, Func<string, IngredientDefinition> ingredientById,
             Func<string, bool> upgradeExists, List<string> warnings = null, Func<string, bool> furnitureExists = null,
-            FurnitureStartingLayout startingFurniture = null, IEnumerable<BossTrophy> trophies = null)
+            FurnitureStartingLayout startingFurniture = null, IEnumerable<BossTrophy> trophies = null,
+            Func<string, Garden.CropDefinition> crops = null, IEnumerable<string> gardenBeds = null, Surface.VigorSettings? vigor = null)
         {
             if (data == null) throw new ArgumentNullException(nameof(data));
             // Saves from before the v0.5 day order name daytime "Morning".
@@ -170,7 +185,38 @@ namespace Hearthdelve.Shared.Save
                     if (q != null && Enum.TryParse(q.status, out QuestObjectStatus status)) state.QuestObjects.Set(q.id, status);
             // A boss beaten before its trophy existed (a 4e save) earns it now, once: the same rule as a fresh victory.
             TrophyRules.GrantEarned(state, trophies);
+            RestoreSurface(state, data, crops, gardenBeds, vigor ?? Surface.VigorSettings.Default, warnings);
             return state;
+        }
+
+        /// <summary>Version 10: the world seed, the surface day's minute and Vigor, and the garden's beds.</summary>
+        static void RestoreSurface(GameState state, SaveData data, Func<string, Garden.CropDefinition> crops, IEnumerable<string> gardenBeds,
+            Surface.VigorSettings vigor, List<string> warnings)
+        {
+            state.WorldSeed = data.world != null ? data.world.seed : 0;
+            if (data.surface != null && data.surface.minute > 0) state.Surface.Restore(data.surface.minute);
+            state.Vigor.Configure(vigor);
+            state.Vigor.Restore(data.surface != null ? data.surface.vigorSpent : 0);
+            var beds = new List<Garden.BedState>();
+            if (data.garden?.beds != null)
+                foreach (BedData b in data.garden.beds)
+                {
+                    if (b == null || string.IsNullOrEmpty(b.id)) continue;
+                    var bed = new Garden.BedState
+                    {
+                        Id = b.id, Crop = b.crop ?? string.Empty, PlantedDay = b.plantedDay, Grown = Math.Max(0, b.grown), TendedDays = Math.Max(0, b.tendedDays),
+                        LastTendedDay = b.lastTendedDay, LastGrownDay = b.lastGrownDay,
+                    };
+                    if (!bed.IsEmpty && crops != null && crops(bed.Crop) == null)
+                    {
+                        warnings?.Add($"Cleared bed '{bed.Id}': unknown crop '{bed.Crop}'.");
+                        bed.Clear();
+                    }
+                    beds.Add(bed);
+                }
+            state.Garden.Restore(data.garden != null && data.garden.initialized, beds);
+            // The starter beds (a save migrated to version 10), and any added since: empty, once each.
+            if (gardenBeds != null) state.Garden.Ensure(gardenBeds);
         }
 
         static void RestoreStory(StoryState story, StorySaveData data)
@@ -252,7 +298,7 @@ namespace Hearthdelve.Shared.Save
 
         public static GameState Restore(SaveData data, GameDatabase database, List<string> warnings = null) =>
             Restore(data, database.Ingredient, id => database.Upgrade(id) != null, warnings, id => database.Furniture(id) != null,
-                database.startingFurniture, database.bossTrophies);
+                database.startingFurniture, database.bossTrophies, database.Crop, database.GardenBeds, database.Vigor);
 
         public static string ToJson(SaveData data) => JsonUtility.ToJson(data, prettyPrint: true);
 
@@ -272,6 +318,7 @@ namespace Hearthdelve.Shared.Save
             if (data.version == 6) data = MigrateV6(data);
             if (data.version == 7) data = MigrateV7(data);
             if (data.version == 8) data = MigrateV8(data);
+            if (data.version == 9) data = MigrateV9(data, json);
             return data;
         }
 
@@ -307,6 +354,20 @@ namespace Hearthdelve.Shared.Save
         /// version 8 save (4g Checkpoint A's playtests included) is past them: its opening is complete, its keeper made (Bram, as
         /// migrated), its prompts seen; no quest objects yet. Continue never sends it through creation or the opening.
         /// </summary>
+        /// <summary>
+        /// v9 → v10 (4h Checkpoint B): the world's seed, made once, from the save's own text (so the same old file always gives the
+        /// same seed until it's saved again as version 10); the surface day at its morning with Vigor full; and the garden, whose
+        /// starter beds arrive empty as the save is restored. Nothing that existed changes.
+        /// </summary>
+        static SaveData MigrateV9(SaveData v9, string json)
+        {
+            v9.version = 10;
+            v9.world = new WorldData { seed = WorldSeed.From(json) };
+            v9.surface = new SurfaceData { minute = Surface.SurfaceClockSettings.Default.dayStartMinute, vigorSpent = 0 };
+            v9.garden = new GardenSaveData { initialized = false };
+            return v9;
+        }
+
         static SaveData MigrateV8(SaveData v8)
         {
             v8.version = 9;
