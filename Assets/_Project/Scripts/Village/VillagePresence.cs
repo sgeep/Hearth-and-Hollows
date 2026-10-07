@@ -55,11 +55,11 @@ namespace Hearthdelve.Village
                 m_Day = day;
                 m_Last.Clear();
             }
-            foreach (KeyValuePair<string, List<Villager>> pair in m_Copies) Update(pair.Key, pair.Value);
+            foreach (KeyValuePair<string, List<Villager>> pair in m_Copies) Resolve(pair.Key, pair.Value);
         }
 
         /// <summary>Forgets what everyone was doing: the next refresh places them all directly (a load, Continue).</summary>
-        public void Reset()
+        public void Forget()
         {
             m_Last.Clear();
             m_Day = -1;
@@ -76,7 +76,7 @@ namespace Hearthdelve.Village
             }
         }
 
-        void Update(string character, List<Villager> copies)
+        void Resolve(string character, List<Villager> copies)
         {
             ScheduleBlock block = VillageLife.Now(character);
             ScheduleAnchor anchor = block != null ? ScheduleAnchor.Find(block.anchor) : null;
