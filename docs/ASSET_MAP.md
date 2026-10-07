@@ -422,3 +422,7 @@ The other base humanoids (elf, goblin, halfling and the unclothed bases) are out
 
 **The cellar hatch** on arrival day reuses the Dungeon pack's ladder hole (`Holes`, `Ladder`).
 
+**The bomb's marker** (4g Checkpoint C): the UI Overhaul `Selectors/Marker` arrow (as over a station), tinted the fuse's orange, bobbing over it.
+
+**A future friendly-monster candidate** (4h / Phase 5 note, nothing built): the Mushroom People (Creatures, exclusive) have idle, jump, damage and die but no attack, which ruled them out as enemies in 4b and makes them a natural first non-hostile creature character.
+

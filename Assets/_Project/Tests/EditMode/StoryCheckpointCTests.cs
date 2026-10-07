@@ -128,6 +128,31 @@ namespace Hearthdelve.Tests
             Assert.That(back.Story.Dialogue, Does.Contain("hh_boog_troll"), "a callback said stays said");
         }
 
+        [Test]
+        public void ACheckpointBSave_ComesBackExactly_AndSavesAgainUnchanged()
+        {
+            // A version 9 save as Checkpoint B wrote it: mid-opening, Boog's bomb wanted, a creator's keeper, memories, dialogue state.
+            var state = new GameState(2, DayPhase.Daytime);
+            state.Story.Opening = OpeningStage.FirstEvening;
+            state.Story.CreationComplete = true;
+            state.Story.Player = new PlayerProfile { name = "Wren", body = "dwarf", palette = "keeper_hair=keeper_hair.red" };
+            foreach (string hint in OnboardingHints.All) state.Story.SeenHints.Add(hint);
+            state.Story.SeenHints.Add("beat:arrival");
+            state.QuestObjects.Want("boogs_bomb");
+            state.Story.Quests = "{\"staticQuestIds\":[\"boogs_bomb\"]}";
+            state.Story.Dialogue = "Variable={hh_boog_bomb=true}";
+            state.Story.Relationships = new RelationshipData
+            {
+                values = { new RelationshipValueData { judge = "gunta", subject = "player", trait = "Respect", value = 11.25f } },
+                memories = { new SocialMemoryData { judge = "gunta", deed = StoryBuilder.ReturnedBoogsBomb, actor = "player", target = "gunta", count = 1, impact = 40f, expires = RelationshipRules.Forever } },
+            };
+            string first = SaveSystem.ToJson(SaveSystem.Capture(state));
+            GameState back = SaveSystem.Restore(SaveSystem.FromJson(first), _ => null, _ => true);
+            string again = SaveSystem.ToJson(SaveSystem.Capture(back));
+            Assert.That(again, Is.EqualTo(first), "restored and saved again: nothing replayed, lost or duplicated");
+            Assert.That((back.Story.Opening, back.QuestObjects.Status("boogs_bomb"), back.Story.Player.name), Is.EqualTo((OpeningStage.FirstEvening, Hearthdelve.Shared.Quests.QuestObjectStatus.Wanted, "Wren")));
+        }
+
         // ---------- The dialogue database ----------
 
         static IEnumerable<(Conversation c, DialogueEntry e, string code)> Code()

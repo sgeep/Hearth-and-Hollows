@@ -1,6 +1,6 @@
 # 4g plan: story, quests, character creation and relationship reactivity
 
-> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built 2026-10-06, waiting for the owner's playtest.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
+> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built and signed off 2026-10-06 (the owner playtested it and verified the node-editor workflow). Checkpoint C (Steps 7–8) built 2026-10-06, waiting for the owner's final 4g playtest and sign-off.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
 
 ## Approval (2026-10-06): the owner's decisions
 
@@ -25,6 +25,30 @@ Where the build differs from §§2–14 below (each for a reason found in the pa
 - **The memory clock** is Pixel Crushers' `GameTime` in manual mode, set to the game day; each deed's memory lasts its `memoryDays` (0: for good). The Dialogue System keeps its own real-time clock.
 - **The proof quest** is `proof_trophy_wall` ("something with teeth": Boog wants a trophy over the bar), completed by the same `TrophyDisplayed` fact as the deed; temporary, replaced by Boog's Bomb in Step 6.
 - **Talking:** staff carry a `Person` interactable (E during service, while they stand still with their hands free); F1 (debug builds) talks to Boog in any tavern phase, Shift+F1 brings the first boss trophy home again.
+
+## As built: Checkpoint C (2026-10-06)
+
+**Deeds** (each from an existing fact, only when remarkable; `RelationshipRules.Qualifies`):
+
+| Deed | From | Learned by | Shows (craft, nerve, warmth) | Memory |
+|---|---|---|---|---|
+| `displayed_trophy` | a boss trophy hung (Checkpoint A) | staff | 0, 80, 0 | for good |
+| `returned_boogs_bomb` | Boog's conversation (Checkpoint B) | Boog | 0, 70, 30 | for good |
+| `felled_larder_troll` | `BossFirstCleared` (the troll; fires once ever) | staff | 50, 70, 0 | for good |
+| `kept_a_wish` | a special request met at quality ≥ 0.9 | staff | 40, 0, 60 | 7 days |
+| `fine_butchery` | the keeper's own cut at score ≥ 0.9 (never Boog's) | Boog | 60, 60, 0 | 3 days |
+
+**Two readings.** Boog values nerve 90, craft 60, warmth 10; Orik warmth 80, craft 40, nerve −30. So the troll earns Boog's respect loudly (85% of the deed's) and Orik's quietly (45%); a kept wish matters more to Orik; a grotesque trophy alone earns Orik's liking but not his respect; the block is Boog's business.
+
+**Repeats** fade 1, ½, ¼, ⅒, then nothing: Love/Hate's acclimatization curve on the stand-ins, used for Respect too (read from the count before this sighting). A forgotten memory makes the deed fresh again.
+
+**Conversations.** Each character opens a hub (`Boog/Hub`, `Orik/Hub`, seeded once): critical story and quest (her return, arrival day) → one-time callbacks (Boog: the troll, combined with his bomb if he remembers it; his bomb, the next time; a wish kept, heard over the stove; a clean cut, and if he respects the keeper enough, "you could work my stove. don't. but you could." Orik: the troll, moved from "risks" to "resolved", and Tamsin, who went after it twice and wouldn't say why; a wish kept, and if he respects the keeper enough, "Tamsin ran it that way") → the everyday Talk conversations. A callback marks a Dialogue System variable and is never repeated; the variables are saved with the dialogue.
+
+**Author edits** (once, only where the entry was exactly as written): the tusks remarks and Orik's incident-book line are said once (they repeated forever above the everyday branches, which hid the bomb offer if the tusks went up first); "about your bomb..." stays after the opening (her shelf line); Orik's homecoming no longer says "1 parts". The owner's arrival line ("ahh, you must be …!") is kept.
+
+**Presentation.** The tavern's day panels (morning, prep, results, night) step aside while someone's talking; Boog's bomb has the target arrow and a stronger, swelling glow. No quest journal: Boog's reminder and the arrow were enough in the Checkpoint B playtest.
+
+**Save:** still version 9 (nothing new in the schema: deeds and callbacks live in the relationship and dialogue blocks).
 
 ## As built: Checkpoint B (2026-10-06)
 
