@@ -74,6 +74,8 @@ namespace Hearthdelve.Core.Input
         public const string LookStick = "LookStick";
         public const string Cancel = "Cancel";
         public const string Pause = "Pause";
+        /// <summary>4h: Decorate Mode from anywhere inside Tally Ho! in the daytime (Tab, or View on a gamepad).</summary>
+        public const string Decorate = "Decorate";
     }
 
     /// <summary>Decorate Mode (4f): controller first; the mouse points at tiles.</summary>

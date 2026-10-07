@@ -6,6 +6,7 @@ using Hearthdelve.Shared.Story;
 using Hearthdelve.Story.Dialogue;
 using Hearthdelve.Story.Quests;
 using Hearthdelve.Story.Relationships;
+using PixelCrushers.DialogueSystem;
 using PixelCrushers.LoveHate;
 using PixelCrushers.QuestMachine;
 using UnityEngine;
@@ -210,6 +211,8 @@ namespace Hearthdelve.Story
         public bool IsTalking => Dialogue != null && Dialogue.IsTalking;
         public bool CanTalk(string characterId) => Dialogue != null && Dialogue.CanTalk(characterId);
         public bool Talk(string characterId) => Dialogue != null && Dialogue.Talk(characterId);
+        public bool HasConversation(string title) => DialogueManager.hasInstance && DialogueManager.masterDatabase != null && DialogueManager.masterDatabase.GetConversation(title) != null;
+        public bool Play(string title) => Dialogue != null && Dialogue.Play(title);
 
         // ---------- IStoryStateParticipant ----------
 

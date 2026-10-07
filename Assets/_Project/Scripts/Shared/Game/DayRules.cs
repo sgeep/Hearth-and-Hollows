@@ -190,9 +190,16 @@ namespace Hearthdelve.Shared.Game
         /// Buys one offer at a supply source (the Brackenford market; daytime only): gold out, the goods straight into the
         /// storeroom, Standard and fresh (D19). False when it can't be afforded.
         /// </summary>
-        public static bool Buy(GameState state, Inventory.SupplySource source, Inventory.SupplyOffer offer)
+        public static bool Buy(GameState state, Inventory.SupplySource source, Inventory.SupplyOffer offer) => Buy(state, source, offer, null);
+
+        /// <summary>
+        /// As above, and only while the market trades (4h): with <paramref name="hours"/>, a purchase after the market has closed
+        /// for the day (by the surface clock) is refused.
+        /// </summary>
+        public static bool Buy(GameState state, Inventory.SupplySource source, Inventory.SupplyOffer offer, Surface.SurfaceClockSettings? hours)
         {
             Require(state, DayPhase.Daytime);
+            if (hours is { } h && !Surface.MarketHours.IsOpen(state.Surface.WholeMinute, h)) return false;
             if (!Inventory.SupplyRules.CanAfford(state.Gold, offer)) return false;
             state.Gold -= offer.price;
             state.Storeroom.Add(Inventory.SupplyRules.Delivery(source, offer));

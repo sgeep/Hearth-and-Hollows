@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc092adc026843d4ca3d6db6c6639bc0, type: 3}
+  m_Name: SurfaceClockConfig
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Surface.SurfaceClockConfig
+  settings:
+    dayStartMinute: 480
+    cutoffMinute: 1020
+    afternoonStartMinute: 720
+    realSecondsPerGameMinute: 3.8888888
+    maxRealSecondsPerFrame: 0.1
+    displayStepMinutes: 10
+    marketOpenMinute: 480
+    marketCloseMinute: 1020
+    pauseIndoors: 0

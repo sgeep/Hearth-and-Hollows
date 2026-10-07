@@ -105,6 +105,16 @@
                     "interactions": "",
                     "initialStateCheck": true,
                     "priority": 0
+                },
+                {
+                    "name": "Decorate",
+                    "type": "Button",
+                    "id": "fa0835b4-1161-43ae-b766-fe2a5d7a39e8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -435,6 +445,28 @@
                     "processors": "StickDeadzone(min=0.25)",
                     "groups": "Gamepad",
                     "action": "LookStick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "acdbf5b8-2ac1-4842-b9ee-eaaf3a873aee",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Decorate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "700c70f7-a6fe-4c65-abfa-bd26d1f72853",
+                    "path": "<Gamepad>/select",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Decorate",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

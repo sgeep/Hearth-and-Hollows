@@ -26,6 +26,10 @@ namespace Hearthdelve.Shared.Story
         bool CanTalk(string characterId);
         /// <summary>Opens their conversation. False if there's none, or one is already open.</summary>
         bool Talk(string characterId);
+        /// <summary>Whether a conversation with this title exists (4h: things to look at, small world moments).</summary>
+        bool HasConversation(string title);
+        /// <summary>Plays a conversation by its title (4h). False if there's none, or one is already open.</summary>
+        bool Play(string title);
     }
 
     /// <summary>

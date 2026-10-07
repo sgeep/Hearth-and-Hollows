@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Hearthdelve.Core.Events;
+using Hearthdelve.Core.Input;
+using Hearthdelve.Shared.Surface;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.Shared.Recipes;
@@ -13,11 +16,22 @@ using UnityEngine.UI;
 
 namespace Hearthdelve.UI.Tavern
 {
+    /// <summary>Which of the daytime panel's two faces is up (4h).</summary>
+    public enum DaytimePanel
+    {
+        None,
+        /// <summary>The storeroom shelves: what's in stock, the meal eaten, what tonight's delve starts with.</summary>
+        Storeroom,
+        /// <summary>A station's delve meals (the Grill's or the Tap's).</summary>
+        Meal,
+    }
+
     /// <summary>
-    /// The daytime placeholder (GDD §3.1, day loop; named for the old morning screen it grew from): what's in the
-    /// storeroom, an optional delve meal (one Grill or Tap dish, cooked at its station's panel; how well it comes out
-    /// scales its buff, which waits for tonight's delve), what tonight's delve starts with from upgrades and the meal,
-    /// and opening for the evening. Out of the way while the meal cooks. The free-roaming village day replaces it later.
+    /// The storeroom and the delve meal (GDD §3.1; named for the old morning screen it grew from). Since 4h it no longer stands in
+    /// for the day: it opens from places in Tally Ho! (the storeroom shelves; the Grill or the Tap for that station's delve meals:
+    /// one dish, cooked at the station's panel, its buff waiting for tonight's delve) and closes back to the keeper on foot. It
+    /// holds the surface clock while it's open. Opening for the evening moved to the menu board, the market outside, decorating
+    /// to the plans and the Decorate key.
     /// </summary>
     public sealed class MorningScreen : MonoBehaviour
     {
@@ -42,7 +56,13 @@ namespace Hearthdelve.UI.Tavern
         bool m_HadMeal;
 
         TavernDirector m_Director;
+        CookStation m_Station = CookStation.Grill;
         readonly List<RecipeDefinition> m_Options = new();
+
+        /// <summary>The face up now (None: closed).</summary>
+        public DaytimePanel Mode { get; private set; }
+        /// <summary>The station whose meals show (Meal).</summary>
+        public CookStation Station => m_Station;
         bool m_Dirty = true;
         bool m_WasShown;
 
@@ -79,12 +99,14 @@ namespace Hearthdelve.UI.Tavern
             m_Director = TavernDirector.Instance;
             m_Root.SetActive(false);
             if (m_Director == null) return;
+            EventBus<DaytimePlaceUsed>.Subscribe(OnPlaceUsed);
             for (int i = 0; i < m_Cards.Length; i++)
             {
                 int index = i;
                 m_Cards[i].button.onClick.AddListener(() => Cook(index));
             }
-            m_Descend.onClick.AddListener(() => m_Director.OpenForEvening());
+            // 4h: the panel's one button takes the keeper back to their feet (opening for the evening is the menu board's).
+            m_Descend.onClick.AddListener(Close);
             if (m_Decorate != null) m_Decorate.onClick.AddListener(() => DecorateMode.Instance?.Enter());
             if (m_MarketButton != null && m_Market != null)
             {
@@ -102,6 +124,8 @@ namespace Hearthdelve.UI.Tavern
 
         void OnDestroy()
         {
+            EventBus<DaytimePlaceUsed>.Unsubscribe(OnPlaceUsed);
+            SurfacePause.Release(this);
             if (m_Director == null) return;
             m_Director.PhaseChanged -= MarkDirty;
             m_Director.PrepChanged -= MarkDirty;
@@ -109,18 +133,54 @@ namespace Hearthdelve.UI.Tavern
 
         void MarkDirty() => m_Dirty = true;
 
+        void OnPlaceUsed(DaytimePlaceUsed e)
+        {
+            if (e.Kind == TavernInteractableKind.Storeroom) OpenStoreroom();
+            else if (e.Kind is TavernInteractableKind.Grill or TavernInteractableKind.Tap) OpenMeal(e.Station);
+        }
+
+        /// <summary>The storeroom shelves (4h): stock, the meal, the delve's bonuses.</summary>
+        public void OpenStoreroom() => Open(DaytimePanel.Storeroom, m_Station);
+
+        /// <summary>A station's delve meals (4h).</summary>
+        public void OpenMeal(CookStation station) => Open(DaytimePanel.Meal, station);
+
+        void Open(DaytimePanel mode, CookStation station)
+        {
+            if (m_Director == null || m_Director.Phase != TavernPhase.Daytime) return;
+            Mode = mode;
+            m_Station = station;
+            m_Dirty = true;
+            m_WasShown = false;
+            SurfacePause.Hold(this);
+            InputMaps.ActivateUIOnly();
+        }
+
+        /// <summary>Back to the keeper on foot.</summary>
+        public void Close()
+        {
+            if (Mode == DaytimePanel.None) return;
+            Mode = DaytimePanel.None;
+            SurfacePause.Release(this);
+            TavernDirector.RestoreInput();
+        }
+
         public void Cook(int card)
         {
             if (card >= m_Options.Count) return;
             RecipeDefinition recipe = m_Options[card];
-            m_Director.CookDelveMeal(recipe);
+            // The station's panel takes over; this one is done.
+            if (m_Director.CookDelveMeal(recipe)) Close();
         }
 
         void LateUpdate()
         {
             if (m_Director == null) return;
+            if (Mode != DaytimePanel.None && m_Director.Phase != TavernPhase.Daytime) Close();
+            // Escape / B closes it, like every other panel.
+            if (Mode != DaytimePanel.None && m_WasShown && BackPressed()) Close();
             // Hidden while delve meal cooks: the station panel has the screen.
-            bool shown = m_Director.Phase == TavernPhase.Daytime && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null) &&
+            bool shown = Mode != DaytimePanel.None && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null) &&
                          !DecorateScreen.IsDecorating && (m_Market == null || !m_Market.IsOpen);
             if (shown != m_Root.activeSelf) m_Root.SetActive(shown);
             if (!shown)
@@ -133,7 +193,7 @@ namespace Hearthdelve.UI.Tavern
             if (!m_WasShown && EventSystem.current != null)
             {
                 // First thing in the morning: the first delve meal you can cook; afterwards (or with none), setting off.
-                DishCard first = m_Cards.FirstOrDefault(c => c.button.gameObject.activeSelf && c.button.interactable);
+                DishCard first = Mode == DaytimePanel.Meal ? m_Cards.FirstOrDefault(c => c.button.gameObject.activeSelf && c.button.interactable) : null;
                 EventSystem.current.SetSelectedGameObject(first != null && !m_Director.HasEatenDelveMeal ? first.button.gameObject : m_Descend.gameObject);
             }
             m_WasShown = true;
@@ -143,7 +203,7 @@ namespace Hearthdelve.UI.Tavern
         {
             m_Dirty = false;
             GameFlow flow = m_Director.Flow;
-            m_Title.Set(LoopLocKeys.MorningTitle, flow != null ? flow.State.Day : 1);
+            m_Title.Set(Mode == DaytimePanel.Meal ? SurfaceLocKeys.PanelMeal : SurfaceLocKeys.PanelStoreroom);
 
             Storeroom storeroom = m_Director.Storeroom;
             List<IngredientStack> stacks = storeroom.Stacks.Where(s => !s.IsEmpty).OrderBy(s => s.Item.Definition.id).ThenByDescending(s => s.Item.Quality).ToList();
@@ -158,7 +218,9 @@ namespace Hearthdelve.UI.Tavern
             MealBuff meal = flow != null ? flow.State.Meal : MealBuff.None;
             // The delve meals the storeroom can make first (the menu has more Grill and Tap dishes than cards), then the rest.
             m_Options.Clear();
+            // 4h: only this station's meals, and only at a station (the shelves show the stock).
             m_Options.AddRange(m_Director.DelveMealOptions()
+                .Where(r => Mode == DaytimePanel.Meal && r.station == m_Station)
                 .OrderByDescending(r => meal.IsActive && meal.RecipeId == r.id)
                 .ThenByDescending(m_Director.CanCookDelveMeal)
                 .Take(m_Cards.Length));
@@ -198,6 +260,10 @@ namespace Hearthdelve.UI.Tavern
             if (meal.IsActive && !m_HadMeal) m_BonusFlashLeft = m_BonusFlashSeconds;
             m_HadMeal = meal.IsActive;
         }
+
+        static bool BackPressed() =>
+            UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame
+            || UnityEngine.InputSystem.Gamepad.current != null && UnityEngine.InputSystem.Gamepad.current.buttonEast.wasPressedThisFrame;
 
         void FlashBonuses()
         {

@@ -178,15 +178,12 @@ namespace Hearthdelve.Editor
             // What today's delve starts with, from upgrades and delve meal: the tavern feeding the dungeon.
             LocalizedSuperText bonuses = TextLine(panel, "Bonuses", LoopLocKeys.MorningNoBonuses, k_Effect, TextAnchor.UpperCenter, 0f,
                 cardsTop - 2f * k_CardPitch - k_CardHeight - 1f, 296f);
-            // The buttons sit 5 from the panel's foot (the heading took the room the 8 had).
-            Button descend = SmallButton(panel, "Descend", LoopLocKeys.MorningDescend, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 156f, out _);
-            UiFeedbackContent.Commit(descend);
-            Button decorate = SmallButton(panel, "Decorate", DecorateLocKeys.Button, new Vector2(0.5f, 0f), new Vector2(117f, 5f), 70f, out _);
-            // The Brackenford market (4f Checkpoint C): opposite Decorate, its list over the panel.
-            Button marketButton = SmallButton(panel, "Market", LoopLocKeys.MarketButton, new Vector2(0.5f, 0f), new Vector2(-117f, 5f), 70f, out _);
+            // 4h: one button, back to the keeper on foot (the evening is the menu board's, the market a stall outside, decorating
+            // the Decorate key's). It sits 5 from the panel's foot (the heading took the room the 8 had).
+            Button back = SmallButton(panel, "Back", SurfaceLocKeys.PanelBack, new Vector2(0.5f, 0f), new Vector2(0f, 5f), 80f, out _);
             MorningScreen morning = root.gameObject.AddComponent<MorningScreen>();
-            morning.Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, descend, decorate);
-            morning.ConfigureMarket(marketButton, BuildMarket(root));
+            morning.Configure(panel.gameObject, title, stock, empty, cards, meal, bonuses, back);
+            morning.ConfigureMarket(null, BuildMarket(root));
             panel.gameObject.SetActive(false);
         }
 

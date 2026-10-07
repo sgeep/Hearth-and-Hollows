@@ -46,6 +46,8 @@ namespace Hearthdelve.Story.Editor
             };
             RenamePipToOrik(db);
             cast.Orik = EnsureActor(db, template, "Orik", CharacterIds.Orik, false);
+            // 4h: the voice of things looked at.
+            cast.Narration = EnsureActor(db, template, "Narration", CharacterIds.Narration, false);
             Seed(db, template, cast, seedLog);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);

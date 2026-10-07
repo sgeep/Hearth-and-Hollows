@@ -63,6 +63,7 @@ namespace Hearthdelve.Editor
             Button(t, "CycleNext", ("<Keyboard>/r", KM), ("<Gamepad>/rightShoulder", GP));
             Button(t, "SpeedUp", ("<Keyboard>/leftShift", KM), ("<Gamepad>/rightTrigger", GP));
             Button(t, "Pause", ("<Keyboard>/escape", KM), ("<Gamepad>/start", GP));
+            Button(t, TavernActions.Decorate, ("<Keyboard>/tab", KM), ("<Gamepad>/select", GP));
 
             // --- Minigame (stub for Phase 2) ---
             var m = asset.AddActionMap(InputMaps.Minigame);
@@ -125,6 +126,12 @@ namespace Hearthdelve.Editor
             if (tavern != null && tavern.FindAction(TavernActions.LookStick) == null)
             {
                 AddRightStick(tavern, TavernActions.LookStick);
+                changed = true;
+            }
+            if (tavern != null && tavern.FindAction(TavernActions.Decorate) == null)
+            {
+                // 4h: decorating from anywhere inside in the daytime.
+                Button(tavern, TavernActions.Decorate, ("<Keyboard>/tab", KM), ("<Gamepad>/select", GP));
                 changed = true;
             }
             var minigame = asset.FindActionMap(InputMaps.Minigame);

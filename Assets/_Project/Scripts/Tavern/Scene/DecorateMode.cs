@@ -124,6 +124,7 @@ namespace Hearthdelve.Tavern.Scene
 
         void OnDestroy()
         {
+            Hearthdelve.Shared.Surface.SurfacePause.Release(this);
             m_MoveReader?.Dispose();
             if (Instance == this) Instance = null;
         }
@@ -132,7 +133,9 @@ namespace Hearthdelve.Tavern.Scene
 
         /// <summary>Decorating is for the quiet parts of the day: the daytime, Prep and the night (never during service).</summary>
         public bool CanEnter => !IsActive && AreaFurniture.Tavern != null && (Director == null ||
-            Director.Phase is TavernPhase.Daytime or TavernPhase.Prep or TavernPhase.Night) && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null);
+            Director.Phase is TavernPhase.Daytime or TavernPhase.Prep or TavernPhase.Night) && (KeeperWork.Instance == null || KeeperWork.Instance.ActiveCook == null)
+            // 4h: only indoors (the village isn't a decoratable area).
+            && (SurfaceArea.Current == null || SurfaceArea.Current.Indoors);
 
         /// <summary>Decorates the area the keeper is in (the tavern, or the guest room when they've gone upstairs).</summary>
         public void Enter()
@@ -149,6 +152,8 @@ namespace Hearthdelve.Tavern.Scene
             Begin(area);
             FindActions();
             IsActive = true;
+            // 4h: decorating holds the surface clock still (it's never a race).
+            Hearthdelve.Shared.Surface.SurfacePause.Hold(this);
             InputMaps.Activate(InputMaps.Decorate);
             m_LastPointer = m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
             Refresh();
@@ -264,11 +269,22 @@ namespace Hearthdelve.Tavern.Scene
             IsActive = false;
             PanelOpen = false;
             ClearGhost();
-            // Back to where the keeper is.
+            // Back to where the keeper is: on foot again in the daytime (4h), the screens otherwise.
             TavernView.Show(PropertyArea.Current);
-            InputMaps.ActivateUIOnly();
+            Hearthdelve.Shared.Surface.SurfacePause.Release(this);
+            TavernDirector.RestoreInput();
             MomentPlayed?.Invoke(DecorateMoment.Leave);
             Changed?.Invoke();
+        }
+
+        InputAction m_DecorateKey;
+
+        /// <summary>4h: the Decorate key (Tab / View) opens Decorate Mode from anywhere inside in the daytime.</summary>
+        void ReadDecorateKey()
+        {
+            if (IsActive || Director == null || Director.Phase != TavernPhase.Daytime) return;
+            m_DecorateKey ??= InputMaps.Find(InputMaps.Tavern, TavernActions.Decorate);
+            if (m_DecorateKey != null && m_DecorateKey.enabled && m_DecorateKey.WasPressedThisFrame() && CanEnter) Enter();
         }
 
         void FindActions()
@@ -298,6 +314,7 @@ namespace Hearthdelve.Tavern.Scene
 
         void Update()
         {
+            ReadDecorateKey();
             if (!IsActive || PanelOpen)
             {
                 // A panel has the controls: its taps aren't the cursor's.

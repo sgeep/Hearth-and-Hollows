@@ -201,6 +201,10 @@ namespace Hearthdelve.Tavern.Scene
             {
                 if (ActiveCook != null || Carrying != null) StopWork();
                 SetAvailability(false);
+                // 4h: in the free daytime the Grill and the Tap cook the delve meal (the panel opens on use).
+                if (m_Director.Phase == TavernPhase.Daytime && ActiveCook == null)
+                    foreach (TavernInteractable station in new[] { m_Grill, m_Tap })
+                        if (station != null) station.SetAvailable(true);
                 return;
             }
             SetAvailability(true);
@@ -234,6 +238,8 @@ namespace Hearthdelve.Tavern.Scene
 
         TavernHint DescribeCook(TavernInteractable station, CookStation cook, StaffStation staffed)
         {
+            // 4h: in the daytime a station cooks the delve meal.
+            if (m_Director != null && m_Director.Phase == TavernPhase.Daytime) return TavernHint.Use(DelveMealHintKey);
             if (StaffWorks(staffed)) return new TavernHint(TavernHintKind.Staffed, staff: StaffOn(staffed));
             Ticket next = Session?.NextToCook(cook);
             return next != null ? new TavernHint(TavernHintKind.Cook, dish: next.Recipe) : TavernHint.Use(station.NameKey);
@@ -276,8 +282,17 @@ namespace Hearthdelve.Tavern.Scene
 
         // ---------- Using things ----------
 
+        /// <summary>UI key of the daytime station hint ("cook a delve meal"), set by the builder.</summary>
+        public static string DelveMealHintKey { get; set; } = "surface.delve_meal";
+
         void OnInteracted(TavernInteracted e)
         {
+            // 4h: in the daytime the Grill and the Tap open the delve meal's choice for that station.
+            if (m_Director != null && m_Director.Phase == TavernPhase.Daytime && ActiveCook == null && e.Kind is TavernInteractableKind.Grill or TavernInteractableKind.Tap)
+            {
+                EventBus<DaytimePlaceUsed>.Publish(new DaytimePlaceUsed(e.Kind, e.Kind == TavernInteractableKind.Tap ? CookStation.Tap : CookStation.Grill));
+                return;
+            }
             if (m_Director == null || !m_Director.IsServing || ActiveCook != null || !FindPlayer()) return;
             ServiceSession session = Session;
             switch (e.Kind)
@@ -425,8 +440,7 @@ namespace Hearthdelve.Tavern.Scene
             ActiveCook = null;
             CookTicket = null;
             ChoppingPot = false;
-            if (m_Director != null && m_Director.IsServing) InputMaps.Activate(InputMaps.Tavern);
-            else InputMaps.ActivateUIOnly();
+            TavernDirector.RestoreInput();
         }
 
         MinigameInput ReadMinigameInput()

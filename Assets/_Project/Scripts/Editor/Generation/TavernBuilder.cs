@@ -94,6 +94,8 @@ namespace Hearthdelve.Editor
             GuestRoomBuilder.BuildFade(ui);
             AddMood();
             AddOpeningHatch();
+            // 4h Checkpoint A: the surface (areas, the front door, the daytime places, five o'clock, the clock and the Prep question).
+            SurfaceBuilder.ApplyToTavern(ui);
             GameFonts.ApplyToOpenScene();
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
@@ -368,6 +370,8 @@ namespace Hearthdelve.Editor
             // band above it; the doorway and the tile inside it kept clear.
             // The stairs up to the guest room and the tile in front of them are kept clear too.
             var reserved = new List<Vector2Int> { new(DoorColumn, (int)FloorBottom), new(DoorColumn, (int)FloorBottom + 1), GuestRoomBuilder.TavernStairsFoot };
+            // 4h: the daytime places (the menu board and its step, the storeroom shelves).
+            reserved.AddRange(SurfaceBuilder.TavernReserved);
             for (int x = GuestRoomBuilder.TavernStairs.xMin; x < GuestRoomBuilder.TavernStairs.xMax; x++)
             for (int y = GuestRoomBuilder.TavernStairs.yMin; y < GuestRoomBuilder.TavernStairs.yMax; y++)
                 reserved.Add(new Vector2Int(x, y));

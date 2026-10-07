@@ -127,6 +127,11 @@ namespace Hearthdelve.Shared.Game
         public IReadOnlyDictionary<string, int> UpgradeLevels => m_UpgradeLevels;
         public MealBuff Meal { get; internal set; }
         public DaySummary Today { get; } = new();
+        /// <summary>
+        /// The surface day's clock (4h Checkpoint A). Not saved until version 10 (Checkpoint B): a loaded day starts at the
+        /// morning again, which is harmless while nothing in the daytime spends anything.
+        /// </summary>
+        public Surface.SurfaceClock Surface { get; } = new();
         /// <summary>The story (4g): the opening, the player's profile, relationships, and the dialogue and quest middleware's recorded state.</summary>
         public StoryState Story { get; } = new();
         /// <summary>Quest objects and where each is (4g Checkpoint B): wanted, home or delivered.</summary>

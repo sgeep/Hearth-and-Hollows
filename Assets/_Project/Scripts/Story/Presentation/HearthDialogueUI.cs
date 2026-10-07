@@ -318,8 +318,14 @@ namespace Hearthdelve.Story.Presentation
             SpeakerId = DialogueAdapter.CharacterId(actor);
             CharacterDefinition character = StoryHost.Instance != null ? StoryHost.Instance.Characters.Definition(SpeakerId) : null;
             bool player = info != null && info.isPlayer;
-            SpeakerName = player ? DialogueText.PlayerName() : character != null ? Loc.Get(character.displayName) : info?.Name ?? string.Empty;
-            m_SpeakerLabel.Set(TavernLocKeys.Plain, SpeakerName);
+            // 4h: something looked at speaks for itself, with no name over it.
+            Conversation spoken = subtitle.dialogueEntry != null && DialogueManager.masterDatabase != null
+                ? DialogueManager.masterDatabase.GetConversation(subtitle.dialogueEntry.conversationID) : null;
+            bool looked = spoken != null && Hearthdelve.Shared.Story.SurfaceConversations.IsInspect(spoken.Title);
+            SpeakerName = looked || SpeakerId == CharacterIds.Narration ? string.Empty
+                : player ? DialogueText.PlayerName() : character != null ? Loc.Get(character.displayName) : info?.Name ?? string.Empty;
+            // No name (a look, the narration voice): an empty label, not "{0}" formatted to nothing (which reads as a missing string).
+            m_SpeakerLabel.Set(string.IsNullOrEmpty(SpeakerName) ? null : TavernLocKeys.Plain, SpeakerName);
             m_Speaker = player || character == null ? null : character.portrait;
             if (m_PortraitFrame != null) m_PortraitFrame.SetActive(m_Speaker != null);
             m_NextBlink = Time.unscaledTime + NextBlinkIn();

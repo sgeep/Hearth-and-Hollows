@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Hearthdelve.Core.Events;
+using Hearthdelve.Core.Input;
+using Hearthdelve.Shared.Surface;
+using Hearthdelve.Tavern.Scene;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
@@ -62,13 +66,27 @@ namespace Hearthdelve.UI.Tavern
             if (m_Root != null) m_Root.SetActive(false);
         }
 
+        // 4h: the market is a stall in Kariaston's square; using it while it trades opens this list.
+        void OnEnable() => EventBus<MarketStallUsed>.Subscribe(OnStallUsed);
+
+        void OnDisable()
+        {
+            EventBus<MarketStallUsed>.Unsubscribe(OnStallUsed);
+            SurfacePause.Release(this);
+        }
+
+        void OnStallUsed(MarketStallUsed _) => Open();
+
         /// <summary>Shown only in the day loop, where there's a purse and a market.</summary>
-        public static bool Available => Market != null && Flow.InGame && Flow.State != null && Flow.State.Phase == DayPhase.Daytime;
+        public static bool Available => Market != null && Flow.InGame && Flow.State != null && Flow.State.Phase == DayPhase.Daytime && SurfaceTime.MarketOpen;
 
         public void Open()
         {
             if (!Available || m_Root == null) return;
             m_Root.SetActive(true);
+            // 4h: browsing holds the surface clock, and the keeper stands still.
+            SurfacePause.Hold(this);
+            InputMaps.ActivateUIOnly();
             m_Message?.gameObject.SetActive(false);
             Fill();
             Select(m_Rows.Length > 0 && m_Rows[0].root.activeSelf ? m_Rows[0].buy.gameObject : m_Done != null ? m_Done.gameObject : null);
@@ -78,6 +96,8 @@ namespace Hearthdelve.UI.Tavern
         {
             if (!IsOpen) return;
             m_Root.SetActive(false);
+            SurfacePause.Release(this);
+            TavernDirector.RestoreInput();
             Closed?.Invoke();
         }
 

@@ -216,6 +216,19 @@ namespace Hearthdelve.Shared.Game
         public TavernPhaseStarted(string phase) => Phase = phase;
     }
 
+    /// <summary>The player chose to begin the evening (4h): the day, and the minute on the surface clock when they did.</summary>
+    public readonly struct EveningPrepChosen : IEvent
+    {
+        public readonly int Day;
+        public readonly int Minute;
+
+        public EveningPrepChosen(int day, int minute)
+        {
+            Day = day;
+            Minute = minute;
+        }
+    }
+
     /// <summary>A quest object was picked up in the Hollows (4g Checkpoint B).</summary>
     public readonly struct QuestObjectFound : IEvent
     {

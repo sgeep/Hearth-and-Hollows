@@ -22,7 +22,10 @@ namespace Hearthdelve.Tavern.Scene
     /// <summary>What's happening in the tavern: the daytime, the evening's three parts, and the night after the delve.</summary>
     public enum TavernPhase
     {
-        /// <summary>Day loop: the daytime placeholder (the storeroom, tonight's delve meal, opening for the evening).</summary>
+        /// <summary>
+        /// Day loop: the free daytime (4h): the keeper wakes upstairs and walks Tally Ho! and Kariaston; the storeroom, the delve
+        /// meal, decorating and the market are places, and the menu board begins the evening when the player chooses.
+        /// </summary>
         Daytime,
         Prep,
         Service,
@@ -216,6 +219,7 @@ namespace Hearthdelve.Tavern.Scene
                 DayPhase.Night => TavernPhase.Night,
                 _ => TavernPhase.Prep,
             });
+            if (Phase == TavernPhase.Daytime) StartCoroutine(WakeUpstairs());
         }
 
         void OnEnable() => EventBus<DebugSkipPhaseRequested>.Subscribe(OnDebugSkip);
@@ -256,13 +260,62 @@ namespace Hearthdelve.Tavern.Scene
             m_Flow.BeginFirstDelve();
         }
 
-        /// <summary>The day is done: open the tavern for the evening.</summary>
+        /// <summary>The player chose to begin the evening (the menu board, after confirming): Prep, and the village unloads.</summary>
         public void OpenForEvening()
         {
             if (Phase != TavernPhase.Daytime || m_Flow == null || m_Flow.IsLoading) return;
             KeeperWork.Instance?.StopWork();
+            EventBus<EveningPrepChosen>.Publish(new EveningPrepChosen(m_Flow.State.Day, m_Flow.State.Surface.WholeMinute));
             m_Flow.StartEvening();
         }
+
+        // ---------- On foot ----------
+
+        /// <summary>The parts of the day the keeper walks Tally Ho! (4h: the free daytime too).</summary>
+        public bool OnFoot => Phase is TavernPhase.Service or TavernPhase.Arrival or TavernPhase.Daytime;
+
+        /// <summary>
+        /// Gives the keeper back their feet after a panel, a station or Decorate Mode closes: the Tavern map while on foot,
+        /// otherwise the UI alone (the evening's screens, the night).
+        /// </summary>
+        public static void RestoreInput()
+        {
+            TavernDirector director = Instance;
+            bool busy = (KeeperWork.Instance != null && KeeperWork.Instance.ActiveCook != null) || (DecorateMode.Instance != null && DecorateMode.Instance.IsActive);
+            if (director != null && director.OnFoot && !busy) InputMaps.Activate(InputMaps.Tavern);
+            else if (!busy) InputMaps.ActivateUIOnly();
+        }
+
+        /// <summary>
+        /// A new day begins upstairs (4h, H3): the keeper wakes beside the bed in the upstairs room (today's guest room) and the
+        /// camera holds there. Waits a frame for the level to place the keeper first.
+        /// </summary>
+        System.Collections.IEnumerator WakeUpstairs()
+        {
+            yield return null;
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            AreaFurniture upstairs = AreaFurniture.Find(PropertyArea.GuestRoomId);
+            if (player == null || upstairs == null || !player.TryGetComponent(out Rigidbody2D body)) yield break;
+            Vector2 at = WakePoint(upstairs);
+            body.position = at;
+            player.transform.position = new Vector3(at.x, at.y, player.transform.position.z);
+            PropertyArea.Current = upstairs.Area;
+            TavernView.Show(upstairs.Area);
+            Woke?.Invoke();
+        }
+
+        /// <summary>Where the keeper wakes: just in front of the bed upstairs, wherever it has been moved; the room's door if there's no bed.</summary>
+        public static Vector2 WakePoint(AreaFurniture upstairs)
+        {
+            PropertyArea area = upstairs.Area;
+            foreach (Shared.Customization.ResolvedFurniture piece in upstairs.Pieces)
+                if (piece?.Definition != null && piece.Definition.id.Contains("bed"))
+                    return area.Origin + new Vector2(piece.Footprint.center.x, piece.Footprint.yMin - 0.6f);
+            return area.Arrival;
+        }
+
+        /// <summary>The keeper woke upstairs (tests).</summary>
+        public event Action Woke;
 
         // ---------- Night (day loop) ----------
 
@@ -345,8 +398,8 @@ namespace Hearthdelve.Tavern.Scene
         void SetPhase(TavernPhase phase)
         {
             Phase = phase;
-            // On foot while serving, and on arrival day (walking the room is the point).
-            if (phase is TavernPhase.Service or TavernPhase.Arrival) InputMaps.Activate(InputMaps.Tavern);
+            // On foot while serving, on arrival day (walking the room is the point) and in the free daytime (4h).
+            if (OnFoot) InputMaps.Activate(InputMaps.Tavern);
             else InputMaps.ActivateUIOnly();
             PhaseChanged?.Invoke();
             // The fact (4g Checkpoint B): the story layer plays the opening's beats when they begin.

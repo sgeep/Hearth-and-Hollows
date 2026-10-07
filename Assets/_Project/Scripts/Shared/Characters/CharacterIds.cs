@@ -30,6 +30,11 @@ namespace Hearthdelve.Shared.Characters
         public const string Boog = "gunta";
         /// <summary>Orik, the dwarf server and bookkeeper (he replaced Pip on 2026-10-06; the id stays).</summary>
         public const string Orik = "pip";
+        /// <summary>
+        /// The voice of things looked at (4h): a speaker with no name and no portrait, so a line like "Phi's chair" can be written
+        /// in the node editor and shown in the dialogue box. Not a person; never tracked.
+        /// </summary>
+        public const string Narration = "narration";
 
         /// <summary>Generated Visitors are <c>visitor/&lt;day&gt;/&lt;visit&gt;</c>: unique for the evening, never saved.</summary>
         public const string VisitorPrefix = "visitor/";

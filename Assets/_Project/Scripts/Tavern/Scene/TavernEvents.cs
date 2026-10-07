@@ -20,6 +20,16 @@ namespace Hearthdelve.Tavern.Scene
         Person,
         /// <summary>The cellar hatch on arrival day (4g Checkpoint B): down to the first delve.</summary>
         Hatch,
+        /// <summary>The storeroom shelves (4h): what's in stock, and tonight's delve meal.</summary>
+        Storeroom,
+        /// <summary>The menu board (4h): begin the evening, when the player chooses.</summary>
+        MenuBoard,
+        /// <summary>The pinned plans (4h): Decorate Mode.</summary>
+        Plans,
+        /// <summary>Something to look at (4h): a one-line conversation in the Dialogue System.</summary>
+        Inspect,
+        /// <summary>The market stall in Kariaston (4h): open from morning until five.</summary>
+        MarketStall,
     }
 
     /// <summary>What the interaction hint says (the UI turns it into localized text).</summary>
@@ -47,6 +57,8 @@ namespace Hearthdelve.Tavern.Scene
         Staffed,
         /// <summary>"E: talk to Boog" (4g).</summary>
         Talk,
+        /// <summary>A plain line with no action (4h: "closed till morning"); <see cref="TavernHint.NameKey"/> is the line's UI key.</summary>
+        Note,
     }
 
     /// <summary>The interaction hint's content: its kind, and the name, dish, count or staff member it mentions.</summary>

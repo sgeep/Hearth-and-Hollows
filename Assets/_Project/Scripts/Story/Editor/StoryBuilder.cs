@@ -154,7 +154,16 @@ namespace Hearthdelve.Story.Editor
                 c.affinityToVillage = 50f;
             });
             Configure(pip, CharacterIds.Orik, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.OrikHub);
-            return new List<CharacterDefinition> { player, boog, pip };
+
+            // 4h: the voice of things looked at (no name, no portrait, never tracked).
+            CharacterDefinition narration = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_narration.asset", c => c.kind = CharacterKind.Story);
+            narration.id = CharacterIds.Narration;
+            narration.kind = CharacterKind.Story;
+            narration.tracked = false;
+            narration.conversation = string.Empty;
+            narration.portrait = null;
+            EditorUtility.SetDirty(narration);
+            return new List<CharacterDefinition> { player, boog, pip, narration };
         }
 
         static void Configure(CharacterDefinition c, string id, CharacterKind kind, LocalizedString name, Dictionary<string, PortraitDefinition> portraits, string conversation)

@@ -51,7 +51,7 @@ namespace Hearthdelve.Tavern.Scene
         }
 
         /// <summary>The parts of the day when the keeper is about the property on foot.</summary>
-        static bool OnFoot => TavernDirector.Instance == null || TavernDirector.Instance.Phase is TavernPhase.Service or TavernPhase.Prep or TavernPhase.Arrival;
+        static bool OnFoot => TavernDirector.Instance == null || TavernDirector.Instance.Phase is TavernPhase.Service or TavernPhase.Prep or TavernPhase.Arrival or TavernPhase.Daytime;
 
         public bool CanPass => m_To != null && !m_Busy && OnFoot && (DecorateMode.Instance == null || !DecorateMode.Instance.IsActive);
 

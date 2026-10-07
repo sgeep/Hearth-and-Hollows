@@ -105,7 +105,7 @@ namespace Hearthdelve.Editor
 
             // The furniture catalogue's names, descriptions and colourways, and the palette ramps, tiers and finishes, come from
             // their own tables (4f Checkpoint B).
-            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English)
+            FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(SurfaceLocKeys.English)
                 .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(KeeperContent.English()).Concat(QuestObjectContent.English), k_GeneratedPrefixes);
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
             AssetDatabase.SaveAssets();

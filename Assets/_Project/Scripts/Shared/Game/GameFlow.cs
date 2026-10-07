@@ -5,6 +5,7 @@ using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Progression;
 using Hearthdelve.Shared.Save;
 using Hearthdelve.Shared.Story;
+using Hearthdelve.Shared.Surface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +19,24 @@ namespace Hearthdelve.Shared.Game
         public const string Tavern = "Tavern";
         /// <summary>The night's delve: the generated Cellars run (4d). <c>Dungeon_TestFloor</c> stays a standalone test bed.</summary>
         public const string Dungeon = "Dungeon";
+        /// <summary>The village (4h): loaded beside the tavern in the free daytime, so stepping outside never reloads anything.</summary>
+        public const string Kariaston = "Kariaston";
+
+        static readonly string[] k_Tavern = { Tavern };
+        static readonly string[] k_Surface = { Tavern, Kariaston };
+        static readonly string[] k_Dungeon = { Dungeon };
+
+        /// <summary>
+        /// The content scenes a part of the day needs (4h, H1): the free daytime is the tavern and the village together (the
+        /// tavern first: it's the active scene); arrival day, the evening and the night are the tavern alone; the delve is
+        /// the dungeon. Pure.
+        /// </summary>
+        public static string[] ContentFor(DayPhase phase, OpeningStage opening) => phase switch
+        {
+            DayPhase.Delve => k_Dungeon,
+            DayPhase.Daytime when opening != OpeningStage.Arrival => k_Surface,
+            _ => k_Tavern,
+        };
     }
 
     /// <summary>
@@ -57,7 +76,7 @@ namespace Hearthdelve.Shared.Game
     {
         [SerializeField] GameDatabase m_Database;
 
-        string m_LoadedScene;
+        readonly List<string> m_Loaded = new();
 
         public static GameFlow Instance { get; private set; }
         /// <summary>Tests point saves at a temp folder.</summary>
@@ -73,7 +92,11 @@ namespace Hearthdelve.Shared.Game
         /// <summary>The screen transition (the Boot scene's fade), if any.</summary>
         public ISceneTransition Transition { get; set; }
         public bool IsLoading { get; private set; }
-        public string LoadedScene => m_LoadedScene;
+        /// <summary>The main content scene (the active one): the tavern, the dungeon or the menu.</summary>
+        public string LoadedScene => m_Loaded.Count > 0 ? m_Loaded[0] : null;
+        /// <summary>Every content scene loaded now (4h: the tavern and the village in the daytime).</summary>
+        public IReadOnlyList<string> LoadedScenes => m_Loaded;
+        public bool IsLoaded(string scene) => m_Loaded.Contains(scene);
         public bool AllowDebugFill => m_Database != null && m_Database.allowDebugFill;
         /// <summary>Messages from the last load (dropped content) or save failure.</summary>
         public List<string> LastWarnings { get; } = new();
@@ -136,10 +159,11 @@ namespace Hearthdelve.Shared.Game
             State.Story.Player.name = Characters.KeeperRules.CleanName(State.Story.Player.name);
             State.Story.CreationComplete = true;
             State.Story.Opening = OpeningStage.Arrival;
+            StartSurfaceDay();
             StoryServices.State?.Clear();
             Save();
             PhaseChanged?.Invoke();
-            Load(SceneFor(State.Phase));
+            Load(ContentFor(State));
         }
 
         /// <summary>
@@ -153,10 +177,11 @@ namespace Hearthdelve.Shared.Game
             State.Story.Opening = OpeningStage.Complete;
             State.Story.CreationComplete = true;
             foreach (string hint in OnboardingHints.All) State.Story.SeenHints.Add(hint);
+            StartSurfaceDay();
             StoryServices.State?.Clear();
             Save();
             PhaseChanged?.Invoke();
-            Load(SceneFor(State.Phase));
+            Load(ContentFor(State));
         }
 
         /// <summary>The opening's arrival (4g Checkpoint B): down the hatch to the first delve. Saved.</summary>
@@ -227,8 +252,10 @@ namespace Hearthdelve.Shared.Game
             // The story's middleware gets the loaded game's state back before its scene loads (4g).
             StoryServices.State?.Clear();
             StoryServices.State?.Restore(State);
+            // The surface clock isn't saved before version 10: a loaded day starts in the morning.
+            StartSurfaceDay();
             PhaseChanged?.Invoke();
-            Load(SceneFor(State.Phase));
+            Load(ContentFor(State));
             return true;
         }
 
@@ -249,7 +276,7 @@ namespace Hearthdelve.Shared.Game
         {
             DayRules.StartEvening(State);
             PhaseChanged?.Invoke();
-            Load(GameScenes.Tavern);
+            Load(ContentFor(State));
         }
 
         /// <summary>
@@ -314,7 +341,7 @@ namespace Hearthdelve.Shared.Game
         public bool BuyFromMarket(Inventory.SupplyOffer offer)
         {
             if (!InGame || m_Database == null || m_Database.market == null) return false;
-            if (!DayRules.Buy(State, m_Database.market, offer)) return false;
+            if (!DayRules.Buy(State, m_Database.market, offer, SurfaceTime.CurrentSettings)) return false;
             EventBus<MarketPurchase>.Publish(new MarketPurchase(offer.ingredient.id, offer.bundle, offer.price));
             StateChanged?.Invoke();
             Save();
@@ -341,9 +368,10 @@ namespace Hearthdelve.Shared.Game
         public void Sleep()
         {
             DayRules.Sleep(State, m_Database != null ? m_Database.Freshness : default);
+            StartSurfaceDay();
             PhaseChanged?.Invoke();
             Save();
-            Load(GameScenes.Tavern);
+            Load(ContentFor(State));
         }
 
         /// <summary>Debug: lets the loaded scene finish its phase; if nothing handles it, skips with nothing gained.</summary>
@@ -415,21 +443,37 @@ namespace Hearthdelve.Shared.Game
 
         // ---------- Scenes ----------
 
-        static string SceneFor(DayPhase phase) => phase == DayPhase.Delve ? GameScenes.Dungeon : GameScenes.Tavern;
+        static string[] ContentFor(GameState state) => GameScenes.ContentFor(state.Phase, state.Story.Opening);
 
-        void Load(string scene) => StartCoroutine(LoadContent(scene));
+        /// <summary>A new surface day (or a loaded one): the clock back to the morning; the next frame announces it.</summary>
+        void StartSurfaceDay()
+        {
+            State.Surface.Reset(SurfaceTime.CurrentSettings);
+            SurfaceTime.Instance?.Restart();
+        }
 
-        IEnumerator LoadContent(string scene)
+        void Load(params string[] scenes) => StartCoroutine(LoadContent(scenes));
+
+        /// <summary>
+        /// Swaps the content scenes for <paramref name="scenes"/> (4h: a content set), behind the cover. Every scene of the
+        /// set is loaded fresh; the first becomes the active one. Scenes outside the set are unloaded.
+        /// </summary>
+        IEnumerator LoadContent(string[] scenes)
         {
             while (IsLoading) yield return null;
             IsLoading = true;
             ISceneTransition transition = Transition;
             if (transition != null) yield return transition.Cover();
-            if (!string.IsNullOrEmpty(m_LoadedScene) && SceneManager.GetSceneByName(m_LoadedScene).isLoaded)
-                yield return SceneManager.UnloadSceneAsync(m_LoadedScene);
-            yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
-            SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene));
-            m_LoadedScene = scene;
+            foreach (string loaded in m_Loaded)
+                if (SceneManager.GetSceneByName(loaded).isLoaded)
+                    yield return SceneManager.UnloadSceneAsync(loaded);
+            m_Loaded.Clear();
+            foreach (string scene in scenes)
+            {
+                yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Additive);
+                m_Loaded.Add(scene);
+                if (m_Loaded.Count == 1) SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene));
+            }
             IsLoading = false;
             if (transition != null) yield return transition.Reveal();
         }

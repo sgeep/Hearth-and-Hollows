@@ -18,7 +18,7 @@ namespace Hearthdelve.Story.Editor
     {
         public sealed class Cast
         {
-            public Actor Player, Boog, Orik;
+            public Actor Player, Boog, Orik, Narration;
         }
 
         /// <summary>A conversation to seed: its title, and how to write it (into conversation id <c>id</c>, or a new id when −1).</summary>
@@ -43,6 +43,16 @@ namespace Hearthdelve.Story.Editor
             // 4g Checkpoint C: who to talk to first, in front of the Talk conversations they fall back to.
             new() { Title = StoryDialogue.BoogHub, Write = WriteBoogHub },
             new() { Title = StoryDialogue.OrikHub, Write = WriteOrikHub },
+            // 4h Checkpoint A: things to look at in Tally Ho! and Kariaston, and five o'clock.
+            new() { Title = SurfaceConversations.PhiPortrait, Write = (db, t, c, id) => WriteLook(db, t, c, id, SurfaceConversations.PhiPortrait,
+                "Phi'rai. Old Phi, to anyone who wanted to keep their teeth.") },
+            new() { Title = SurfaceConversations.Tankards, Write = (db, t, c, id) => WriteLook(db, t, c, id, SurfaceConversations.Tankards,
+                "five tankards, polished, on a shelf nobody drinks from.") },
+            new() { Title = SurfaceConversations.Hatch, Write = (db, t, c, id) => WriteLook(db, t, c, id, SurfaceConversations.Hatch,
+                "the cellar hatch. the Hollows can wait for dark.") },
+            new() { Title = SurfaceConversations.Memorial, Write = (db, t, c, id) => WriteLook(db, t, c, id, SurfaceConversations.Memorial,
+                "Karias. the letters are worn smooth where people touch them.") },
+            new() { Title = SurfaceConversations.OrikFive, Write = WriteOrikFive },
         };
 
         // ---------- The writer ----------
@@ -477,6 +487,34 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry everyday = w.Group("everyday: Orik/Talk", 4, 1, null);
             w.LinkTo(everyday, talk);
             w.Link(w.Start, arriving, resolved, remembered, everyday);
+        }
+
+        // ---------- 4h Checkpoint A: things to look at, and five o'clock ----------
+
+        /// <summary>
+        /// Something looked at (4h): one line in the voice of no one (the narration speaker: no name, no portrait). Seeded once, like
+        /// every conversation; the node editor owns it from then on.
+        /// </summary>
+        static void WriteLook(DialogueDatabase db, Template template, Cast c, int id, string title, string line)
+        {
+            var w = new Writer(db, template, id, title, c.Player, c.Narration,
+                "4h Checkpoint A: something to look at. One line; add more, or conditions, here in the node editor.");
+            DialogueEntry look = w.Npc(line, 0, 1);
+            w.Link(w.Start, look);
+        }
+
+        /// <summary>
+        /// Five o'clock (4h Checkpoint A): Orik notices the village winding down, the first time the keeper is inside Tally Ho! after
+        /// five. Played once (the game records it); nothing ends or starts because of it.
+        /// </summary>
+        static void WriteOrikFive(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, SurfaceConversations.OrikFive, c.Player, c.Orik,
+                "4h Checkpoint A: five o'clock, once. The village winds down; nothing is forced.");
+            DialogueEntry five = w.Npc("that's five. the village is putting its boots by the door.", 0, 1);
+            DialogueEntry yet = w.Npc("we open when you say so. i'll be here, counting.", 0, 2);
+            w.Link(w.Start, five);
+            w.Link(five, yet);
         }
 
         // ---------- Checkpoint A's proofs (only to recognise them unedited) ----------

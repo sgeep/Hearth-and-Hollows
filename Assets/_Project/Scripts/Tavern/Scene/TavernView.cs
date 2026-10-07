@@ -28,7 +28,10 @@ namespace Hearthdelve.Tavern.Scene
         /// <summary>Moves the camera to hold on <paramref name="area"/> (nothing happens without the tavern camera or an area).</summary>
         public static void Show(PropertyArea area)
         {
-            if (area == null || Camera == null) return;
+            if (area == null) return;
+            // 4h: the room is also a surface area (its lights and the clock's indoor flag follow it).
+            if (area.TryGetComponent(out SurfaceArea surface)) SurfaceArea.Enter(surface);
+            if (Camera == null) return;
             Vector3 at = Camera.position;
             Vector2 point = area.CameraPoint;
             if (point == Vector2.zero) return;

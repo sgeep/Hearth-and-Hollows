@@ -618,6 +618,8 @@ namespace Hearthdelve.Editor
                 Rects = new[] { new SheetRect("AlertRed", 22, 116, 5, 10) },
             });
 
+            // 4h Checkpoint A: Kariaston.
+            sheets.AddRange(KariastonSheets.Sheets());
             return sheets;
         }
 
