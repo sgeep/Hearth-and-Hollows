@@ -23,6 +23,9 @@ namespace Hearthdelve.Story.Editor
     {
         public const string BoogTalk = "Boog/Talk";
         public const string OrikTalk = "Orik/Talk";
+        /// <summary>4g Checkpoint C: who to talk to first, in priority order (the quest, then what they remember, then Talk).</summary>
+        public const string BoogHub = "Boog/Hub";
+        public const string OrikHub = "Orik/Hub";
 
         /// <param name="seedLog">The seed log (tests use their own); the project's by default.</param>
         public static DialogueDatabase Ensure(string path, string seedLog = null)

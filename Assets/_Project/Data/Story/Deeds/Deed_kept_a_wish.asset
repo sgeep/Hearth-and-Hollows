@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 945773e93197f434babc4f332ed09c02, type: 3}
-  m_Name: Deed_displayed_trophy
+  m_Name: Deed_kept_a_wish
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Story.DeedDefinition
-  id: displayed_trophy
-  source: 1
+  id: kept_a_wish
+  source: 3
   target: 0
   character: 
   learners: 0
   learnerIds: []
   subject: 
-  minimum: 0
+  minimum: 0.9
   shows:
-    craft: 0
-    nerve: 80
-    warmth: 0
-  impact: 25
-  respect: 15
-  memoryDays: 0
+    craft: 40
+    nerve: 0
+    warmth: 60
+  impact: 15
+  respect: 8
+  memoryDays: 7

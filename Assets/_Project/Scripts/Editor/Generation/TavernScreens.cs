@@ -75,6 +75,14 @@ namespace Hearthdelve.Editor
             BuildMorning(canvas);
             BuildNight(canvas);
             BuildDecorate(canvas);
+            // 4g Checkpoint C: the day's panels step aside while someone's talking.
+            foreach (string name in new[] { "Prep", "Results", "Morning", "Night" })
+            {
+                Transform panel = canvas.transform.Find(name);
+                if (panel == null) continue;
+                if (panel.GetComponent<CanvasGroup>() == null) panel.gameObject.AddComponent<CanvasGroup>();
+                panel.gameObject.AddComponent<StepAsideWhileTalking>();
+            }
         }
 
         /// <summary>A text button anywhere (the plain parchment face, gold when selected).</summary>

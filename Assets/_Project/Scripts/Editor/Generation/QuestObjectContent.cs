@@ -91,12 +91,17 @@ namespace Hearthdelve.Editor
             Light2D glow = LookTestBuilder.Light("Glow", new Vector3(0f, 0.3f, 0f), Light2D.LightType.Point);
             glow.transform.SetParent(root.transform, false);
             glow.color = new Color(1f, 0.55f, 0.2f);
-            glow.intensity = 1.1f;
-            glow.pointLightInnerRadius = 0.2f;
-            glow.pointLightOuterRadius = 2f;
+            glow.intensity = 1.6f;
+            glow.pointLightInnerRadius = 0.3f;
+            glow.pointLightOuterRadius = 2.6f;
+            // The game's target arrow (as over a station), in the fuse's orange: the bomb itself is only a few pixels.
+            SpriteRenderer marker = LookTestContent.AddSprite(root.transform, "Marker", MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Selectors", "Marker"),
+                SortingLayers.YSorted, 2, new Vector3(0f, 0.95f, 0f));
+            marker.color = new Color(1f, 0.62f, 0.25f);
+            if (unlit != null) marker.sharedMaterial = unlit;
             MMF_Player feedback = LookTestContent.Feedback(root.transform, "Feedback_Found", null, 0f, LookTestContent.Sfx("PH_Discovery"),
                 LookTestContent.Pattern(HapticIds.DiscoveryFound));
-            root.AddComponent<QuestObjectPickup>().Configure(sprite, glow, feedback);
+            root.AddComponent<QuestObjectPickup>().Configure(sprite, glow, feedback, marker.transform);
             return LookTestContent.SavePrefab(root, PickupPrefab).GetComponent<QuestObjectPickup>();
         }
     }

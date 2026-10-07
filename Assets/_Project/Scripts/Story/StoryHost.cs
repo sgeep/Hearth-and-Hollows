@@ -80,6 +80,9 @@ namespace Hearthdelve.Story
             EventBus<BossDefeated>.Subscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Subscribe(OnCurioBroughtHome);
             EventBus<TavernPhaseStarted>.Subscribe(OnTavernPhaseStarted);
+            EventBus<BossFirstCleared>.Subscribe(OnBossFirstCleared);
+            EventBus<CustomerRequestCompleted>.Subscribe(OnRequestCompleted);
+            EventBus<PartButchered>.Subscribe(OnPartButchered);
             EventBus<QuestObjectBroughtHome>.Subscribe(OnQuestObjectBroughtHome);
             EventBus<QuestObjectDelivered>.Subscribe(OnQuestObjectDelivered);
         }
@@ -90,6 +93,9 @@ namespace Hearthdelve.Story
             EventBus<BossDefeated>.Unsubscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Unsubscribe(OnCurioBroughtHome);
             EventBus<TavernPhaseStarted>.Unsubscribe(OnTavernPhaseStarted);
+            EventBus<BossFirstCleared>.Unsubscribe(OnBossFirstCleared);
+            EventBus<CustomerRequestCompleted>.Unsubscribe(OnRequestCompleted);
+            EventBus<PartButchered>.Unsubscribe(OnPartButchered);
             EventBus<QuestObjectBroughtHome>.Unsubscribe(OnQuestObjectBroughtHome);
             EventBus<QuestObjectDelivered>.Unsubscribe(OnQuestObjectDelivered);
         }
@@ -178,12 +184,18 @@ namespace Hearthdelve.Story
             });
         }
 
-        /// <summary>Commits every deed the fact defines to the characters who learn of it.</summary>
-        public void Commit(DeedSource source)
+        // 4g Checkpoint C: the few facts that are deeds when they're remarkable (the deed's own subject and minimum decide).
+        void OnBossFirstCleared(BossFirstCleared e) => Commit(DeedSource.BossFirstCleared, e.BossId);
+        void OnRequestCompleted(CustomerRequestCompleted e) => Commit(DeedSource.RequestKept, e.RecipeId, e.Quality, RelationshipRules.Keeper);
+        void OnPartButchered(PartButchered e) => Commit(DeedSource.PartButchered, e.PartId, e.Score, e.By);
+
+        /// <summary>Commits every deed the fact makes (<see cref="RelationshipRules.Qualifies"/>) to the characters who learn of it.</summary>
+        public void Commit(DeedSource source, string subject = null, float measure = 1f, string by = null)
         {
             if (Relationships == null || m_Database == null) return;
-            foreach (DeedDefinition deed in RelationshipRules.DeedsFor(source, m_Database.deeds))
-                Relationships.Commit(deed, RelationshipRules.Learners(deed, Characters.All));
+            foreach (DeedDefinition deed in m_Database.deeds)
+                if (RelationshipRules.Qualifies(deed, source, subject, measure, by))
+                    Relationships.Commit(deed, RelationshipRules.Learners(deed, Characters.All));
         }
 
         void OnReacted(DeedReaction r)

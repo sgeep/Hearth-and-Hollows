@@ -87,8 +87,34 @@ namespace Hearthdelve.Story.Relationships
             member.arousalImportance = 0f;
             member.deedImpactThreshold = 0f;
             member.maxMemories = 50;
+            // Repeats fade fast (4g Checkpoint C): Love/Hate's acclimatization, shaped by the game's own rule.
+            member.acclimatizationCurve = RepeatCurve();
             if (character != null) member.EvaluateRumor = (rumor, source) => Evaluate(member, character, rumor, source);
             return member;
+        }
+
+        /// <summary><see cref="RelationshipRules.RepeatFactor"/> as Love/Hate's curve (by how many times the deed is remembered).</summary>
+        public static AnimationCurve RepeatCurve()
+        {
+            var keys = new Keyframe[5];
+            for (int i = 0; i < keys.Length; i++) keys[i] = new Keyframe(i, RelationshipRules.RepeatFactor(i));
+            var curve = new AnimationCurve(keys) { preWrapMode = WrapMode.Clamp, postWrapMode = WrapMode.Clamp };
+            for (int i = 0; i < keys.Length; i++)
+            {
+                LinearKey(curve, i);
+            }
+            return curve;
+        }
+
+        /// <summary>Straight lines between the keys (no overshoot between whole counts, which are the only ones evaluated anyway).</summary>
+        static void LinearKey(AnimationCurve curve, int i)
+        {
+            Keyframe k = curve[i];
+            float inTangent = i > 0 ? (curve[i].value - curve[i - 1].value) / (curve[i].time - curve[i - 1].time) : 0f;
+            float outTangent = i < curve.length - 1 ? (curve[i + 1].value - curve[i].value) / (curve[i + 1].time - curve[i].time) : 0f;
+            k.inTangent = inTangent;
+            k.outTangent = outTangent;
+            curve.MoveKey(i, k);
         }
 
         /// <summary>

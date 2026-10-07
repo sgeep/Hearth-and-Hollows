@@ -29,7 +29,9 @@ namespace Hearthdelve.Tests
 
         static IEnumerable<(string key, string text)> CodeEnglish =>
             LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
-                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(DialogueEnglish);
+                .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(DialogueEnglish)
+                // 4g Checkpoint B's strings.
+                .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(KeeperContent.English()).Concat(QuestObjectContent.English);
 
         /// <summary>4g: every line in the Dialogue System database, as a player reads it (its markup removed).</summary>
         static IEnumerable<(string key, string text)> DialogueEnglish =>

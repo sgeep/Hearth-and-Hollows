@@ -40,6 +40,9 @@ namespace Hearthdelve.Story.Editor
             new() { Title = OpeningRules.Homecoming, Write = WriteHomecoming },
             new() { Title = OpeningRules.FirstEvening, Write = WriteFirstEvening },
             new() { Title = OpeningRules.FirstTakings, Write = WriteFirstTakings },
+            // 4g Checkpoint C: who to talk to first, in front of the Talk conversations they fall back to.
+            new() { Title = StoryDialogue.BoogHub, Write = WriteBoogHub },
+            new() { Title = StoryDialogue.OrikHub, Write = WriteOrikHub },
         };
 
         // ---------- The writer ----------
@@ -371,6 +374,105 @@ namespace Hearthdelve.Story.Editor
             w.Link(ask, toBomb);
             w.LinkTo(toBomb, bomb);
             w.Link(w.Start, takings);
+        }
+
+        // ---------- Checkpoint C: the hubs (priority) and what they remember ----------
+
+        /// <summary>A callback said once: true until its entry has played (a Dialogue System variable, saved with the dialogue).</summary>
+        static string Unsaid(string flag) => $"not Variable[\"{flag}\"]";
+        static string Said(string flag) => $"Variable[\"{flag}\"] = true";
+        static string Remembers(string who, string deed) => $"HH_Remembers(\"{who}\", \"{deed}\")";
+
+        /// <summary>
+        /// Talking to Boog (4g Checkpoint C), in priority order: his bomb coming home (the quest) and arrival day first; then, once
+        /// each, what he remembers the keeper doing (the troll, his bomb, a wish kept, a clean cut); then Boog/Talk, his everyday
+        /// conversation. Reorder or rewrite freely in the node editor: the first branch whose condition holds is taken.
+        /// </summary>
+        static void WriteBoogHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            Conversation bomb = Find(db, BoogBomb), talk = Find(db, StoryDialogue.BoogTalk);
+            var w = new Writer(db, template, id, StoryDialogue.BoogHub, c.Player, c.Boog,
+                "Boog, any time (4g Checkpoint C): the quest first, then one-time callbacks to what he remembers, then Boog/Talk.");
+            DialogueEntry handOver = w.Group("critical: her return", 0, 1, BombHome);
+            w.LinkTo(handOver, bomb);
+            DialogueEntry arriving = w.Group("critical: arrival day", 1, 1, Arriving);
+            w.LinkTo(arriving, talk);
+
+            // The troll (his respect for nerve, loudly), with his bomb if he remembers that too.
+            const string troll = "hh_boog_troll";
+            DialogueEntry killed = w.Npc("you killed the Larder Troll. the actual Larder Troll. the one that eats the Cellars.", 2, 1,
+                $"{Remembers("gunta", "felled_larder_troll")} and {Unsaid(troll)}", Said(troll));
+            DialogueEntry both = w.Npc("first my bomb, now the troll. you're the best thing to happen to this kitchen since the stove.", 2, 2,
+                Remembers("gunta", "returned_boogs_bomb"));
+            DialogueEntry right = w.Npc("i've said for years it was edible. now it's dead, and i'm right.", 3, 2);
+            DialogueEntry edible = w.Player("is it edible?", 2, 3);
+            DialogueEntry nearly = w.Player("it nearly ate me.", 3, 3);
+            DialogueEntry brave = w.Npc("parts of it. the brave parts. i'll find out which.", 2, 4);
+            DialogueEntry word = w.Npc("nearly. best word in the language.", 3, 4);
+            w.Link(killed, both, right);
+            w.Link(both, edible, nearly);
+            w.Link(right, edible, nearly);
+            w.Link(edible, brave);
+            w.Link(nearly, word);
+
+            // His bomb, the next time they talk.
+            const string shelf = "hh_boog_bomb";
+            DialogueEntry listener = w.Npc("i told her about you. the bomb. i tell her things. she's a good listener, for a bomb.", 4, 1,
+                $"{Remembers("gunta", "returned_boogs_bomb")} and {Unsaid(shelf)}", Said(shelf));
+
+            // A wish kept: he heard it from the kitchen.
+            const string wish = "hh_boog_wish";
+            DialogueEntry thanks = w.Npc("someone asked for something special and got it. i heard them say thank you. over the stove. the stove's loud.", 5, 1,
+                $"{Remembers("gunta", "kept_a_wish")} and {Unsaid(wish)}", Said(wish));
+
+            // A clean cut at the block: what he respects most, after explosions.
+            const string block = "hh_boog_butchery";
+            DialogueEntry gristle = w.Npc("i saw you at the block. clean cuts. you didn't flinch at the gristle. i flinch at the gristle, and i love gristle.", 6, 1,
+                $"{Remembers("gunta", "fine_butchery")} and {Unsaid(block)}", Said(block));
+            DialogueEntry stove = w.Npc("you could work my stove. don't. but you could.", 6, 2, "HH_Respect(\"gunta\") >= 25");
+            w.Link(gristle, stove);
+
+            DialogueEntry everyday = w.Group("everyday: Boog/Talk", 7, 1, null);
+            w.LinkTo(everyday, talk);
+            w.Link(w.Start, handOver, arriving, killed, listener, thanks, gristle, everyday);
+        }
+
+        /// <summary>
+        /// Talking to Orik (4g Checkpoint C): arrival day first; then, once each, what he remembers (the troll, quietly, and Tamsin;
+        /// a wish kept, which he respects more than Boog does); then Orik/Talk, his everyday conversation.
+        /// </summary>
+        static void WriteOrikHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            Conversation talk = Find(db, StoryDialogue.OrikTalk);
+            var w = new Writer(db, template, id, StoryDialogue.OrikHub, c.Player, c.Orik,
+                "Orik, any time (4g Checkpoint C): arrival day first, then one-time callbacks to what he remembers, then Orik/Talk.");
+            DialogueEntry arriving = w.Group("critical: arrival day", 0, 1, Arriving);
+            w.LinkTo(arriving, talk);
+
+            // The troll: a line in the ledger, and Tamsin.
+            const string troll = "hh_orik_troll";
+            DialogueEntry resolved = w.Npc("the Larder Troll is dead. i've moved it from 'risks' to 'resolved'. first entry in that column in years.", 1, 1,
+                $"{Remembers("pip", "felled_larder_troll")} and {Unsaid(troll)}", Said(troll));
+            DialogueEntry twice = w.Npc("Tamsin went after it, you know. twice. she came back both times and wouldn't say a word about it.", 1, 2);
+            DialogueEntry after = w.Player("what was she after?", 1, 3);
+            DialogueEntry back = w.Player("she'll come back.", 2, 3);
+            DialogueEntry guarding = w.Npc("not the troll, she said. whatever it was sitting on.", 1, 4);
+            DialogueEntry chair = w.Npc("she always has. i keep her chair dusted. don't tell Boog i dust things. he'll want to compare.", 2, 4);
+            w.Link(resolved, twice);
+            w.Link(twice, after, back);
+            w.Link(after, guarding);
+            w.Link(back, chair);
+
+            // A wish kept: follow-through is what he respects.
+            const string wish = "hh_orik_wish";
+            DialogueEntry remembered = w.Npc("you remembered that patron's request, and made it. people come back to places that remember them.", 3, 1,
+                $"{Remembers("pip", "kept_a_wish")} and {Unsaid(wish)}", Said(wish));
+            DialogueEntry tamsinWay = w.Npc("Tamsin ran it that way. i'd started to think i was the only one who remembered how.", 3, 2, "HH_Respect(\"pip\") >= 15");
+            w.Link(remembered, tamsinWay);
+
+            DialogueEntry everyday = w.Group("everyday: Orik/Talk", 4, 1, null);
+            w.LinkTo(everyday, talk);
+            w.Link(w.Start, arriving, resolved, remembered, everyday);
         }
 
         // ---------- Checkpoint A's proofs (only to recognise them unedited) ----------

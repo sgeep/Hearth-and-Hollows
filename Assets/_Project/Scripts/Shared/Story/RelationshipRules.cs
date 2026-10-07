@@ -57,11 +57,41 @@ namespace Hearthdelve.Shared.Story
                 {
                     DeedLearners.Everyone => true,
                     DeedLearners.Target => deed.target == DeedTarget.Character && c.id == deed.character,
+                    DeedLearners.Named => deed.learnerIds != null && System.Array.IndexOf(deed.learnerIds, c.id) >= 0,
                     _ => c.kind == CharacterKind.Staff,
                 };
                 if (learns) yield return c.id;
             }
         }
+
+        /// <summary>
+        /// Whether a fact makes <paramref name="deed"/> (4g Checkpoint C): its source, its subject if it names one, its measure at or
+        /// above the deed's minimum, and only the keeper's own doing (staff work is theirs, not the player's).
+        /// </summary>
+        public static bool Qualifies(DeedDefinition deed, DeedSource source, string subject = null, float measure = 1f, string by = null)
+        {
+            if (deed == null || source == DeedSource.None || deed.source != source) return false;
+            if (!string.IsNullOrEmpty(deed.subject) && deed.subject != subject) return false;
+            if (measure < deed.minimum) return false;
+            return string.IsNullOrEmpty(by) || by == Keeper;
+        }
+
+        /// <summary>What facts call the keeper when they say who did something.</summary>
+        public const string Keeper = "keeper";
+
+        /// <summary>
+        /// How much a repeat still counts (4g Checkpoint C), by how many times the judge already remembers it: all of it the first
+        /// time, then half, a quarter, a tenth, and nothing from the fifth. Applied to Affinity (as Love/Hate's acclimatization) and
+        /// to Respect alike. A memory that's been forgotten makes the deed fresh again.
+        /// </summary>
+        public static float RepeatFactor(int timesRemembered) => timesRemembered switch
+        {
+            <= 0 => 1f,
+            1 => 0.5f,
+            2 => 0.25f,
+            3 => 0.1f,
+            _ => 0f,
+        };
 
         /// <summary>The deeds a fact commits.</summary>
         public static IEnumerable<DeedDefinition> DeedsFor(DeedSource source, IEnumerable<DeedDefinition> deeds)

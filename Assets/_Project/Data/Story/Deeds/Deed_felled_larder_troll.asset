@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 945773e93197f434babc4f332ed09c02, type: 3}
-  m_Name: Deed_displayed_trophy
+  m_Name: Deed_felled_larder_troll
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Story.DeedDefinition
-  id: displayed_trophy
-  source: 1
+  id: felled_larder_troll
+  source: 2
   target: 0
   character: 
   learners: 0
   learnerIds: []
-  subject: 
+  subject: larder_troll
   minimum: 0
   shows:
-    craft: 0
-    nerve: 80
+    craft: 50
+    nerve: 70
     warmth: 0
-  impact: 25
+  impact: 30
   respect: 15
   memoryDays: 0

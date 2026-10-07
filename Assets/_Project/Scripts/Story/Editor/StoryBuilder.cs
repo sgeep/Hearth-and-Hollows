@@ -142,7 +142,7 @@ namespace Hearthdelve.Story.Editor
                 c.affinityToTavern = 60f;
                 c.affinityToVillage = 20f;
             });
-            Configure(boog, CharacterIds.Boog, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.gunta"), portraits, StoryDialogue.BoogTalk);
+            Configure(boog, CharacterIds.Boog, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.gunta"), portraits, StoryDialogue.BoogHub);
 
             // Orik: looks after people and the books; the Hollows worry him.
             CharacterDefinition pip = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_pip.asset", c =>
@@ -153,7 +153,7 @@ namespace Hearthdelve.Story.Editor
                 c.affinityToTavern = 90f;
                 c.affinityToVillage = 50f;
             });
-            Configure(pip, CharacterIds.Orik, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.OrikTalk);
+            Configure(pip, CharacterIds.Orik, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.OrikHub);
             return new List<CharacterDefinition> { player, boog, pip };
         }
 
@@ -163,8 +163,10 @@ namespace Hearthdelve.Story.Editor
             c.kind = kind;
             c.displayName = name;
             c.portrait = portraits.TryGetValue(id, out PortraitDefinition p) ? p : null;
-            // Empty, or the conversation's old title (Pip/Talk became Orik/Talk, 2026-10-06): the builder's own title.
-            if (string.IsNullOrEmpty(c.conversation) || c.conversation == "Pip/Talk") c.conversation = conversation;
+            // Empty, or one of the builder's own earlier titles (Pip/Talk became Orik/Talk; Checkpoint C's hubs put the Talk
+            // conversations behind the quest and the callbacks): the builder's current one. A title set by hand is kept.
+            if (string.IsNullOrEmpty(c.conversation) || c.conversation is "Pip/Talk" or StoryDialogue.BoogTalk or StoryDialogue.OrikTalk)
+                c.conversation = conversation;
             c.tracked = true;
             EditorUtility.SetDirty(c);
         }
@@ -185,6 +187,9 @@ namespace Hearthdelve.Story.Editor
 
         public const string DisplayedTrophy = "displayed_trophy";
         public const string ReturnedBoogsBomb = "returned_boogs_bomb";
+        public const string FelledLarderTroll = "felled_larder_troll";
+        public const string KeptAWish = "kept_a_wish";
+        public const string FineButchery = "fine_butchery";
 
         static List<DeedDefinition> Deeds()
         {
@@ -218,7 +223,40 @@ namespace Hearthdelve.Story.Editor
             bomb.character = CharacterIds.Boog;
             bomb.learners = DeedLearners.Target;
             EditorUtility.SetDirty(bomb);
-            return new List<DeedDefinition> { trophy, bomb };
+
+            // 4g Checkpoint C: the few remarkable things the household notices. Each made once (tune it on the asset); the
+            // values decide who's impressed by what (Boog: nerve and craft; Orik: warmth and craft, not nerve).
+            DeedDefinition troll = Deed(FelledLarderTroll, DeedSource.BossFirstCleared, DeedTarget.Tavern, DeedLearners.Staff,
+                new SocialTraits(50f, 70f, 0f), impact: 30f, respect: 15f, memoryDays: 0);
+            troll.subject = "larder_troll";
+            EditorUtility.SetDirty(troll);
+            DeedDefinition wish = Deed(KeptAWish, DeedSource.RequestKept, DeedTarget.Tavern, DeedLearners.Staff,
+                new SocialTraits(40f, 0f, 60f), impact: 15f, respect: 8f, memoryDays: 7, minimum: 0.9f);
+            DeedDefinition butchery = Deed(FineButchery, DeedSource.PartButchered, DeedTarget.Tavern, DeedLearners.Named,
+                new SocialTraits(60f, 60f, 0f), impact: 10f, respect: 8f, memoryDays: 3, minimum: 0.9f);
+            butchery.learnerIds = new[] { CharacterIds.Boog };
+            EditorUtility.SetDirty(butchery);
+            return new List<DeedDefinition> { trophy, bomb, troll, wish, butchery };
+        }
+
+        /// <summary>A deed asset made once with these values (later runs set only its id, source, target and learners).</summary>
+        static DeedDefinition Deed(string id, DeedSource source, DeedTarget target, DeedLearners learners, SocialTraits shows, float impact, float respect,
+            int memoryDays, float minimum = 0f)
+        {
+            DeedDefinition deed = LoadOrCreate<DeedDefinition>($"{StoryPaths.Deeds}/Deed_{id}.asset", d =>
+            {
+                d.shows = shows;
+                d.impact = impact;
+                d.respect = respect;
+                d.memoryDays = memoryDays;
+                d.minimum = minimum;
+            });
+            deed.id = id;
+            deed.source = source;
+            deed.target = target;
+            deed.learners = learners;
+            EditorUtility.SetDirty(deed);
+            return deed;
         }
 
         // ---------- Love/Hate ----------
