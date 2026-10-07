@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g Checkpoint A signed off; 4g Checkpoint B (Steps 4–6: character creation, the Act I opening, Boog's Bomb) built, waiting for the owner's playtest**). Next, after that playtest: 4g Checkpoint C (Steps 7–8); then 4h (village and daytime slice) and 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g Checkpoints A and B signed off; Checkpoint C (Steps 7–8: relationship reactivity, the Act I vertical slice and 4g closeout) built, waiting for the owner's final 4g playtest and sign-off**; `milestone-4g` not yet tagged). Next, after sign-off: plan 4h (village and daytime slice), then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1175,6 +1175,18 @@ Checkpoint A was signed off on 2026-10-06. Details as built are in `docs/PLAN_4G
 - **Waiting for the owner's acceptance checks (not done until the owner reports them):**
   1. In the Unity editor, open Boog/Bomb in the Dialogue System's node editor (*Tools → Pixel Crushers → Dialogue System → Dialogue Editor*, or *Hearthdelve → Story → Capture Boog's Bomb Graph*, which also saves a picture to `BatchLogs/story/DialogueEditor_BoogBomb.png`); edit a line, a condition or a link; run *Hearthdelve → Story → Update Story Content* and check the edit is still there; play it (F1 talks to Boog in a debug build); restore it.
   2. In the web build (`Builds/Web`, served with no-cache headers), with the tab visible: New Game → the creator (keyboard, mouse and gamepad) → arrival (Orik and Boog, the typewriter: confirm finishes a line, the next moves on) → the hatch → the first delve's prompts → home → the first evening → the takings → Boog's question → accept → find the bomb (the second fight on the Cellars' first floor) → die with it or extract → hand it over → save, quit, Continue.
+
+### 4g Checkpoint C: relationship reactivity, the Act I slice and 4g closeout (2026-10-06, built; waiting for your final 4g playtest)
+
+Checkpoint B was signed off on 2026-10-06: you playtested it and verified the node-editor workflow (your arrival line, "ahh, you must be …!", is kept). Details as built are in `docs/PLAN_4G.md` ("As built: Checkpoint C").
+
+- **Step 7, deeds:** `displayed_trophy`, `returned_boogs_bomb`, and three new ones from existing facts, each only when remarkable: `felled_larder_troll` (the troll's first fall), `kept_a_wish` (a request met at quality 0.9+), `fine_butchery` (the keeper's own cut at 0.9+; Boog's business alone). Boog and Orik read each through their own values; repeats fade 1, ½, ¼, ⅒, then nothing.
+- **Step 7, dialogue:** each character opens a hub (critical story and quest → one-time callbacks to what they remember → their everyday conversation). Boog: the troll (with his bomb, if he remembers it), his bomb, a wish kept, a clean cut. Orik: the troll and Tamsin, a wish kept. No numbers shown anywhere.
+- **Fixed on the way:** the tusks remark repeated forever above Boog's everyday branch, hiding the bomb offer if the tusks went up first (and Orik's tusks and incident-book lines hid his greeting): all said once now. An unset Dialogue System variable isn't nil to Lua's `not`, so once-only conditions compare with `~= true`. Respect's repeat damping read one count too far. Orik no longer says "1 parts".
+- **Step 8, presentation:** the tavern's day panels step aside while someone talks (the dialogue box covered the night's summary); Boog's bomb has the target arrow and a stronger glow. No quest journal (deferred to a later UI/daytime milestone).
+- **Save:** still version 9; v7 → 9, v8 → 9 and v9 round trips covered by EditMode and PlayMode tests (no duplicate deeds, rewards paid once, callbacks not repeated, memories kept, Quest Machine not replayed).
+- **Tests (2026-10-06):** EditMode **625/625**. PlayMode **219 passed, 0 failed**, 24 explicit capture fixtures skipped (243). The intermittent finisher test was fixed in the Checkpoint B closeout (`edf8234`).
+- **Web:** a fresh development build (139 MB). The end-to-end browser playthrough is pending: the browser tab was hidden (0 fps) when checked, so it isn't counted.
 
 ### Open design questions (Phase 4)
 
