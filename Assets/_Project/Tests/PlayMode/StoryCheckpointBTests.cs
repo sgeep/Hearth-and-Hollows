@@ -367,6 +367,8 @@ namespace Hearthdelve.Tests.PlayMode
             // On foot: the hatch, used like a station.
             var hatch = Object.FindAnyObjectByType<OpeningHatch>();
             Assert.That(hatch.IsOpen, "the hatch is there on arrival day");
+            PropertyArea room = PropertyArea.All.First(a => a.Id == PropertyArea.GuestRoomId);
+            Assert.That(room.Bounds.Contains(Vector2Int.FloorToInt((Vector2)hatch.transform.position - room.Origin)), "in the keeper's room upstairs (2026-10-07)");
             var keeper = Object.FindAnyObjectByType<TavernInteractor>();
             Teleport(keeper, hatch.Interactable.UsePoint);
             yield return null;
@@ -392,7 +394,9 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Boog", "you're back! that's the important part. the other important part was food.")));
             yield return UntilClosed();
             Assert.That(Flow.State.Story.Opening, Is.EqualTo(OpeningStage.FirstEvening));
-            Assert.That(Object.FindAnyObjectByType<OpeningHatch>().IsOpen, Is.False, "the hatch was for arrival day");
+            OpeningHatch after = Object.FindAnyObjectByType<OpeningHatch>();
+            Assert.That(after.IsOpen, "it stays in the floor of the keeper's room");
+            Assert.That(after.Interactable.IsAvailable, Is.False, "but it's the way down only on arrival day (a look in the daytime)");
         }
 
         /// <summary>The settings asset as the box reads it (via the box, so the test needs no editor API).</summary>

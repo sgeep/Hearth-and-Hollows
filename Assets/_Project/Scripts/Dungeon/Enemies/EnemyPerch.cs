@@ -24,6 +24,9 @@ namespace Hearthdelve.Dungeon.Enemies
         bool m_Checked;
         bool m_HasPerch;
 
+        /// <summary>Placed in the open on purpose (2026-10-07): it flies, never hangs, and nothing warns about it.</summary>
+        public bool InOpen { get; set; }
+
         /// <summary>True while hanging asleep from its wall.</summary>
         public bool IsPerched { get; private set; }
 
@@ -52,6 +55,11 @@ namespace Hearthdelve.Dungeon.Enemies
         void Check()
         {
             m_Checked = true;
+            if (InOpen)
+            {
+                m_HasPerch = false;
+                return;
+            }
             Physics2D.SyncTransforms();
             m_HasPerch = WallAbove(transform.position, m_ProbeHeight);
             if (!m_HasPerch)

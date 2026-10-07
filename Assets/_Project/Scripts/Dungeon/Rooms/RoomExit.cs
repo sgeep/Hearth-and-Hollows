@@ -28,6 +28,8 @@ namespace Hearthdelve.Dungeon.Rooms
 
         Coroutine m_Animation;
         bool m_Raised;
+        Vector3 m_MarkerHome;
+        bool m_HomeKnown;
 
         /// <summary>Which exit of the room this is, left to right.</summary>
         public int Index => m_Index;
@@ -97,6 +99,33 @@ namespace Hearthdelve.Dungeon.Rooms
             }
             m_Animation = null;
         }
+
+        /// <summary>
+        /// The sign stays readable (2026-10-07, the owner's playtests): where the HUD (the Essence bar, its icon, the run's gold) would
+        /// cover it on screen, it steps straight down just clear of it, still over its own doorway; it goes home once uncovered.
+        /// </summary>
+        void LateUpdate()
+        {
+            if (m_Marker == null) return;
+            if (!m_HomeKnown)
+            {
+                m_MarkerHome = m_Marker.transform.localPosition;
+                m_HomeKnown = true;
+            }
+            m_Marker.transform.localPosition = m_MarkerHome;
+            Camera camera = Camera.main;
+            if (!m_Marker.enabled || m_Marker.sprite == null || camera == null || !camera.orthographic) return;
+            Bounds bounds = m_Marker.bounds;
+            Vector2 min = camera.WorldToScreenPoint(bounds.min), max = camera.WorldToScreenPoint(bounds.max);
+            float drop = Hearthdelve.Core.Presentation.ScreenReservations.DropToClear(Rect.MinMaxRect(min.x, min.y, max.x, max.y),
+                Hearthdelve.Core.Presentation.ScreenReservations.Current());
+            if (drop <= 0f) return;
+            float worldPerPixel = camera.orthographicSize * 2f / Mathf.Max(1, camera.pixelHeight);
+            m_Marker.transform.position -= new Vector3(0f, drop * worldPerPixel, 0f);
+        }
+
+        /// <summary>Where the sign is drawn now (tests).</summary>
+        public Vector3 MarkerPosition => m_Marker != null ? m_Marker.transform.position : transform.position;
 
         void OnTriggerEnter2D(Collider2D other) => Enter(other);
         void OnTriggerStay2D(Collider2D other) => Enter(other);

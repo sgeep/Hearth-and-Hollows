@@ -52,7 +52,7 @@ namespace Hearthdelve.Dungeon.Rooms
         /// <summary>Places one enemy of the run's encounter on its spawn point.</summary>
         public GameObject Spawn(EncounterSpawn spawn, GameObject prefab)
         {
-            Transform[] points = spawn.Kind == EnemyKind.Bat ? m_PerchSpawns : m_GroundSpawns;
+            Transform[] points = spawn.Kind == EnemyKind.Bat && !spawn.InOpen ? m_PerchSpawns : m_GroundSpawns;
             if (prefab == null) return null;
             Vector3 at;
             if (spawn.Kind == EnemyKind.Boss) at = BossPoint();
@@ -60,6 +60,8 @@ namespace Hearthdelve.Dungeon.Rooms
             else return null;
             GameObject enemy = Instantiate(prefab, at, Quaternion.identity, m_Enemies);
             enemy.name = prefab.name;
+            // A bat placed in the open flies there on purpose (no wall to hang from, and no warning about it).
+            if (spawn.InOpen && enemy.TryGetComponent(out Hearthdelve.Dungeon.Enemies.EnemyPerch perch)) perch.InOpen = true;
             return enemy;
         }
 

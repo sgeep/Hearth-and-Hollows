@@ -61,8 +61,17 @@ namespace Hearthdelve.Editor
         /// <summary>The inside face of the tavern's right wall.</summary>
         const float k_RightWallFace = 27.5f;
 
-        /// <summary>Where you arrive in the tavern coming down: just below the stairs' foot.</summary>
-        public static readonly Vector2 TavernArrival = new(26.9f, 10.6f);
+        /// <summary>
+        /// Where you arrive in the tavern coming down: beside the flight's bottom step, on its left, where the art says you'd step
+        /// off (after the owner's Checkpoint B playtest; it was below the foot).
+        /// </summary>
+        public static readonly Vector2 TavernArrival = new(24.9f, 12.3f);
+
+        /// <summary>The way onto the flight from the left (its drawn bottom step) and the arrival tile: kept clear of furniture.</summary>
+        public static readonly Vector2Int[] TavernStairsApproach = { new(24, 12), new(25, 12), new(25, 13) };
+
+        /// <summary>The hatch down to the Hollows, in the keeper's room (the owner's call, 2026-10-07), and the tile in front of it.</summary>
+        public static readonly Vector2Int HatchCell = new(14, 4);
 
         public static void Build(PropertyArea tavern, FurnitureContent.Built furniture, TavernContent content)
         {
@@ -104,7 +113,8 @@ namespace Hearthdelve.Editor
 
             PropertyArea area = root.GetComponent<PropertyArea>() ?? root.gameObject.AddComponent<PropertyArea>();
             area.Configure(PropertyArea.GuestRoomId, AreaKind.GuestRoom, Origin, new RectInt(0, 0, Width, Height), new RectInt(1, FloorBottom, Width - 2, FloorTop - FloorBottom),
-                new RectInt(1, FloorTop, Width - 2, Height - FloorTop), new[] { new Vector2Int(DoorColumn, FloorBottom), new Vector2Int(DoorColumn, FloorBottom + 1) });
+                new RectInt(1, FloorTop, Width - 2, Height - FloorTop),
+                new[] { new Vector2Int(DoorColumn, FloorBottom), new Vector2Int(DoorColumn, FloorBottom + 1), HatchCell, HatchCell + Vector2Int.down });
             area.SetView(Origin + new Vector2(Width / 2f, Height / 2f), Origin + new Vector2(DoorColumn + 0.5f, FloorBottom + 1.4f), DecorateLocKeys.AreaGuestRoom);
             AreaFinishes finishes = root.GetComponent<AreaFinishes>() ?? root.gameObject.AddComponent<AreaFinishes>();
             finishes.Configure(floor, new RectInt(0, FloorBottom, Width, FloorTop - FloorBottom), wall, new RectInt(0, FloorTop, Width, Height - FloorTop));
@@ -160,11 +170,12 @@ namespace Hearthdelve.Editor
             trigger.isTrigger = true;
             // The whole foot tile, from the stew pot's side to the wall (4h, after the owner's Checkpoint A playtest: a keeper
             // walking up the gap along the stew pot slid past a trigger that covered only its right two-thirds).
-            // Down to the top of the row below, too: pushing up anywhere in the foot's gap (or against the flight) goes up. Someone
-            // arriving at its bottom edge is walking down, away from it, so they never bounce straight back (the B playtest).
-            trigger.size = new Vector2(1.34f, 1.0f);
-            trigger.offset = new Vector2(-0.22f, -0.15f);
-            foot.AddComponent<AreaPassage>().Configure(tavern, guest, through: Vector2.up);
+            // The flight rises from its bottom step on the left toward the wall (the owner's B playtest: the art says you step on
+            // from the left). The trigger covers the step's left side and the tile below the foot; pushing right or up in it goes
+            // up. Someone arriving beside it is outside it and walking away, so never bounces back.
+            trigger.size = new Vector2(1.9f, 2.0f);
+            trigger.offset = new Vector2(-0.4875f, 0.35f);
+            foot.AddComponent<AreaPassage>().Configure(tavern, guest, through: new Vector2(1f, 1f));
         }
 
         /// <summary>The black cover for the fade between areas, over everything on the tavern's canvas.</summary>

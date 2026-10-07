@@ -150,9 +150,11 @@ namespace Hearthdelve.Dungeon.Rooms
 
             void Place(EnemyKind kind)
             {
-                List<int> points = kind == EnemyKind.Bat ? perches : ground;
+                // A bat sleeps on a wall perch, or (sometimes, and whenever no perch is left) flies in the open on a ground spawn.
+                bool open = kind == EnemyKind.Bat && ground.Count > 0 && (perches.Count == 0 || random.Value() < tuning.batInOpenChance);
+                List<int> points = kind == EnemyKind.Bat && !open ? perches : ground;
                 if (points.Count == 0) return;
-                node.Encounter.Add(new EncounterSpawn(kind, points[0]));
+                node.Encounter.Add(new EncounterSpawn(kind, points[0], open));
                 points.RemoveAt(0);
             }
 
@@ -184,7 +186,8 @@ namespace Hearthdelve.Dungeon.Rooms
         {
             var kinds = new List<EnemyKind>();
             if (ground) kinds.Add(EnemyKind.Slime);
-            if (perch) kinds.Add(EnemyKind.Bat);
+            // Bats need a perch or open ground (2026-10-07: they can fly in the room's middle).
+            if (perch || ground) kinds.Add(EnemyKind.Bat);
             if (ground) kinds.Add(EnemyKind.Spider);
             float total = kinds.Sum(tuning.Weight);
             if (total <= 0f) return kinds.Count > 0 ? kinds[0] : EnemyKind.Slime;

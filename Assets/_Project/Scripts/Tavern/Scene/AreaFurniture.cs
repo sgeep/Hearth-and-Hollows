@@ -183,6 +183,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (m_Area == null) m_Area = GetComponent<PropertyArea>();
             GrantMissingStoreroom();
+            ClearTheWays();
             Build(CurrentLayout());
         }
 
@@ -190,6 +191,24 @@ namespace Hearthdelve.Tavern.Scene
         /// A save from before the storeroom shelves were furniture (4h, after the Checkpoint A playtest): they arrive once, where the
         /// starting room has them or on the nearest free tile (<see cref="FunctionalGrants"/>).
         /// </summary>
+        /// <summary>
+        /// A layout made before a tile was reserved (2026-10-07: the stairs' approach, the hatch) keeps its ways clear: a piece on a
+        /// reserved tile moves to its starting spot or the nearest free one (<see cref="LayoutRepair"/>).
+        /// </summary>
+        void ClearTheWays()
+        {
+            if (m_Area == null || Database == null || Game == null) return;
+            Vector2Int? Starting(string definition)
+            {
+                if (Database.startingFurniture == null) return null;
+                foreach (PlacedFurniture p in Database.startingFurniture.Layout(m_Area.Id))
+                    if (p != null && p.definition == definition) return p.cell;
+                return null;
+            }
+            int moved = LayoutRepair.ClearReserved(State, Shape(), Definition, m_Area.Id, Starting);
+            if (moved > 0) Debug.Log($"[Hearthdelve] {moved} piece(s) moved off {m_Area.Id}'s ways.");
+        }
+
         void GrantMissingStoreroom()
         {
             if (m_Area == null || m_Area.Kind != AreaKind.Tavern || Database == null || Game == null) return;

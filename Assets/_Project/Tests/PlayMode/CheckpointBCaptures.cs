@@ -109,7 +109,7 @@ namespace Hearthdelve.Tests.PlayMode
             new("dwarven_chair", 11, 5, 2, "wood"),
             new("dwarven_tankards", 0, 0, 0, host: 11), new("dwarven_tankards", 0, 0, 2, host: 20), new("candle", 0, 0, host: 2),
             new("dwarven_keg", 25, 3), new("dwarven_keg", 26, 3), new("dwarven_keg", 26, 4), new("dwarven_barrel_stack", 23, 3),
-            new("dwarven_great_tun", 16, 10), new("dwarven_chest", 10, 9, variant: "slate"),
+            new("dwarven_great_tun", 13, 10), new("dwarven_chest", 10, 9, variant: "slate"),
             new("dwarven_lantern", 1, 2, variant: "amber"), new("dwarven_lantern", 21, 2, variant: "teal"), new("dwarven_lantern", 1, 9, variant: "red"),
             new("dwarven_banner", 8, 14, variant: "red"), new("dwarven_banner", 13, 14, variant: "amber"), new("dwarven_banner", 18, 14, variant: "teal"),
             new("dwarven_banner", 22, 14, variant: "red"),

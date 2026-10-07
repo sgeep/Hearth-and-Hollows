@@ -52,12 +52,16 @@ namespace Hearthdelve.Editor
             RectTransform flashRect = LookTestBuilder.UIRect(trough, "Flash", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(40f, 6f));
             Image flash = AddImage(flashRect, Pixel(), new Color(1f, 1f, 1f, 0.8f));
             flash.enabled = false;
+            // The top-left block is spoken for: a door's reward sign never hides under it (2026-10-07).
+            icon.gameObject.AddComponent<Hearthdelve.UI.Hud.ScreenReservation>();
+            trough.gameObject.AddComponent<Hearthdelve.UI.Hud.ScreenReservation>();
             var bar = trough.gameObject.AddComponent<Hearthdelve.UI.Hud.EssenceBar>();
             bar.Configure(fill);
             bar.ConfigureArt(UISprite("BarFillBlue"), UISprite("BarFillRed"), flash);
 
             // The run's unbanked Gold (4d step 3): a coin and the amount under the bar, once there is some.
             RectTransform gold = LookTestBuilder.UIRect(root, "RunGold", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(4f, -18f), new Vector2(60f, 12f));
+            gold.gameObject.AddComponent<Hearthdelve.UI.Hud.ScreenReservation>();
             RectTransform coin = LookTestBuilder.UIRect(gold, "Coin", new Vector2(0f, 0.5f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(8f, 8f));
             AddImage(coin, MinifantasyImporter.Sprite(MinifantasySheets.MiscellanyIcons, "Miscellany", "GoldCoin"), Color.white);
             LocalizedSuperText amount = LookTestBuilder.Text(gold, "Amount", LocKeys.HudRunGold, 6f, new Color(1f, 0.85f, 0.45f), TextAnchor.UpperLeft,

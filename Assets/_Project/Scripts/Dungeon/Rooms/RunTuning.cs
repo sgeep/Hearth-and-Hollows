@@ -25,6 +25,8 @@ namespace Hearthdelve.Dungeon.Rooms
         [Tooltip("How often each enemy is chosen (bats need a perch; with none free, another kind is chosen).")]
         [Min(0f)] public float slimeWeight = 1f;
         [Min(0f)] public float batWeight = 0.3f;
+        [Range(0f, 1f), Tooltip("A bat flies in the open (on a ground spawn, in the room's middle) instead of sleeping on a wall perch this often; always when no perch is left.")]
+        public float batInOpenChance = 0.35f;
         [Min(0f)] public float spiderWeight = 0.2f;
 
         [Header("Room rewards (4d step 3)")]

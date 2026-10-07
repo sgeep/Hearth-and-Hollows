@@ -38,6 +38,8 @@ namespace Hearthdelve.Tests
             };
             shape.Reserved.UnionWith(new[] { new Vector2Int(26, 11), new Vector2Int(26, 12), new Vector2Int(26, 13) });
             shape.Reserved.UnionWith(new[] { new Vector2Int(15, 2), new Vector2Int(15, 3) });
+            // The stairs' approach from the left, where the flight's bottom step is drawn, and the arrival tile (2026-10-07).
+            shape.Reserved.UnionWith(new[] { new Vector2Int(24, 12), new Vector2Int(25, 12), new Vector2Int(25, 13) });
             for (int i = 0; i < 6; i++) shape.Queue.Add(new Vector2(12.25f - i, 2.6f));
             return shape;
         }
@@ -96,8 +98,10 @@ namespace Hearthdelve.Tests
         public void AWalledOffStation_KeepsTheDoorsShut()
         {
             FurnitureLayout layout = Starting();
-            // Barrels all round the stew pot's front and back spots and its sides.
-            foreach (var (x, y) in new[] { (23, 10), (24, 10), (25, 10), (26, 10), (23, 11), (23, 12), (23, 13), (26, 11), (26, 12), (26, 13), (24, 13), (25, 13) })
+            // Barrels all round the stew pot (2×2), wherever the starting room puts it (left of the range since 2026-10-07).
+            Vector2Int pot = layout.Pieces.Single(p => p.definition == "stew_pot").cell;
+            for (int x = pot.x - 1; x <= pot.x + 2; x++)
+            for (int y = pot.y - 1; y <= pot.y + 2; y++)
                 if (layout.Check(New("cellar_barrel", x, y)).IsValid) layout.Add(New("cellar_barrel", x, y));
             LayoutReport report = LayoutCheck.For(layout.Shape, layout.ResolveAll());
             Assert.That(report.Issues.Any(i => i.Kind == LayoutIssueKind.StationUnreachable && i.Station == StationKind.StewPot && i.Blocking));

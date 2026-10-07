@@ -38,6 +38,7 @@ namespace Hearthdelve.UI.Localization
             (Plans, "decorate"),
             (LookPortrait, "look at the portrait"),
             (LookMemorial, "read the memorial"),
+            ("surface.look.hatch", "look at the hatch"),
             (Market, "browse the market"),
             (MarketClosed, "the market's packed up till morning"),
             (PanelStoreroom, "storeroom"),

@@ -391,7 +391,9 @@ namespace Hearthdelve.Editor
 
             Place("tavern_bar", 1, 11);
             Place("kitchen_range", 19, 12);
-            Place("stew_pot", 24, 11);
+            // Left of the range (after the owner's B playtest: at (24, 11) it blocked the stairs' bottom step), a row out from the
+            // back wall so it can still be used from behind (the 4c playtests).
+            Place("stew_pot", 17, 11);
             Place("pass_table", 20, 8);
             // Tables at (4.5, 7), (9.5, 7) and (18.5, 4), with a chair 1.25 tiles either side, a quarter tile up (the chairs'
             // own offset). (4e set the third table's group half a tile off the grid, at 18; after the Checkpoint A playtest it

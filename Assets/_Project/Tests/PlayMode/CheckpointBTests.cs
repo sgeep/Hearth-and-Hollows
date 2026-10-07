@@ -268,7 +268,7 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Store();
             Mode.SwitchArea();
             Assert.That(Mode.Area, Is.SameAs(Guest));
-            Assert.That(Screen.TitleText, Does.Contain("the guest room"));
+            Assert.That(Screen.TitleText, Does.Contain("your room"), "the keeper's own room since 2026-10-07");
             Assert.That((Vector2)TavernView.Camera.position, Is.EqualTo(Guest.Area.CameraPoint), "the camera holds on the guest room");
             Assert.That(Mode.Stored("tavern_chair"), Is.EqualTo(1), "one storage for the whole property");
             Assert.That(Mode.TakeFromStorage("tavern_chair"));

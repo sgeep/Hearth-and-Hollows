@@ -298,7 +298,10 @@ namespace Hearthdelve.Editor
             var interactable = use.AddComponent<TavernInteractable>();
             // The keeper stands at its lower edge, as at a station.
             interactable.Configure(TavernInteractableKind.Hatch, TavernLocKeys.Hatch, new Vector2(0f, -0.7f), 1f, null);
-            root.AddComponent<OpeningHatch>().Configure(interactable, visual, new Vector2(6.5f, 5.5f));
+            // 2026-10-07 (the owner's call): the way down is in the keeper's room upstairs, on a tile its layout keeps clear.
+            Vector2 spot = GuestRoomBuilder.Origin + GuestRoomBuilder.HatchCell + new Vector2(0.5f, 0.5f);
+            root.AddComponent<OpeningHatch>().Configure(interactable, visual, spot, fixedSpot: true, lookKey: "surface.look.hatch",
+                lookConversation: Hearthdelve.Shared.Story.SurfaceConversations.Hatch);
         }
 
         internal static void AddCarryViewToPlayer()
@@ -370,6 +373,7 @@ namespace Hearthdelve.Editor
             // band above it; the doorway and the tile inside it kept clear.
             // The stairs up to the guest room and the tile in front of them are kept clear too.
             var reserved = new List<Vector2Int> { new(DoorColumn, (int)FloorBottom), new(DoorColumn, (int)FloorBottom + 1), GuestRoomBuilder.TavernStairsFoot };
+            reserved.AddRange(GuestRoomBuilder.TavernStairsApproach);
             // 4h: the daytime places (the menu board and its step, the storeroom shelves).
             reserved.AddRange(SurfaceBuilder.TavernReserved);
             for (int x = GuestRoomBuilder.TavernStairs.xMin; x < GuestRoomBuilder.TavernStairs.xMax; x++)

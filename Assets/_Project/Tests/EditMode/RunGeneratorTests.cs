@@ -43,6 +43,23 @@ namespace Hearthdelve.Tests
             Assert.That(seen, Is.SupersetOf(new[] { RoomKind.Extraction, RoomKind.Descent, RoomKind.Combat, RoomKind.Arena }));
         }
 
+        /// <summary>2026-10-07 (the owner's playtest): bats don't only hang from walls; some fly in the room's open middle.</summary>
+        [Test]
+        public void Bats_SometimesFlyInTheOpen_OnGroundSpawns_AndStillOnPerches()
+        {
+            int open = 0, perched = 0;
+            foreach (int seed in k_Seeds)
+            foreach (FloorGraph floor in Generate(seed).Floors)
+            foreach (FloorNode node in floor.Nodes)
+            foreach (EncounterSpawn spawn in node.Encounter.Where(e => e.Kind == EnemyKind.Bat))
+            {
+                if (spawn.InOpen) open++;
+                else perched++;
+            }
+            Assert.That(open, Is.GreaterThan(0), "some bats in the open");
+            Assert.That(perched, Is.GreaterThan(0), "and some still asleep on the walls");
+        }
+
         [Test]
         public void TheSameSeed_GivesTheSameRun_AndSeedsDiffer()
         {
@@ -147,8 +164,8 @@ namespace Hearthdelve.Tests
                     Assert.That(room.Kind, Is.EqualTo(node.Kind), at);
                     Assert.That(room.Exits, Is.GreaterThanOrEqualTo(node.Next.Count), $"{at}: enough exits");
                     foreach (EncounterSpawn spawn in node.Encounter)
-                        Assert.That(spawn.Point, Is.LessThan(spawn.Kind == EnemyKind.Bat ? room.PerchSpawns : room.GroundSpawns), $"{at}: a real spawn point");
-                    Assert.That(node.Encounter.Select(e => (e.Kind == EnemyKind.Bat, e.Point)), Is.Unique, $"{at}: one enemy per point");
+                        Assert.That(spawn.Point, Is.LessThan(spawn.Kind == EnemyKind.Bat && !spawn.InOpen ? room.PerchSpawns : room.GroundSpawns), $"{at}: a real spawn point");
+                    Assert.That(node.Encounter.Select(e => (e.Kind == EnemyKind.Bat && !e.InOpen, e.Point)), Is.Unique, $"{at}: one enemy per point");
                     if (node.Kind == RoomKind.Combat)
                     {
                         Assert.That(node.Encounter.Count, Is.InRange(1, tuning.maxEnemies), at);

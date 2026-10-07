@@ -161,7 +161,7 @@ namespace Hearthdelve.UI.Localization
             (StationButcherBlock, "butcher block"),
 
             (AreaTavern, "Tally Ho!"),
-            (AreaGuestRoom, "the guest room"),
+            (AreaGuestRoom, "your room"),
 
             (CatalogPurse, "{0} gold · Renown {1}"),
             (TabStorage, "in storage"),

@@ -16,23 +16,39 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField, Tooltip("Where it would like to be (world); the nearest open tile is used.")]
         Vector2 m_Preferred = new(5.5f, 4.5f);
         [SerializeField, Min(1)] int m_SearchRadius = 6;
+        [SerializeField, Tooltip("Its tile is reserved in its room: it lies exactly there, always shown (2026-10-07: the keeper's room).")]
+        bool m_FixedSpot;
+        [SerializeField, Tooltip("Outside arrival day: the prompt to look at it (UI key) and the line it plays.")]
+        string m_LookKey;
+        [SerializeField] string m_LookConversation;
 
         TavernDirector m_Director;
 
         public TavernInteractable Interactable => m_Interactable;
         public bool IsOpen => m_Visual != null && m_Visual.activeSelf;
 
-        public void Configure(TavernInteractable interactable, GameObject visual, Vector2 preferred)
+        public void Configure(TavernInteractable interactable, GameObject visual, Vector2 preferred, bool fixedSpot = false, string lookKey = null,
+            string lookConversation = null)
         {
             m_Interactable = interactable;
             m_Visual = visual;
             m_Preferred = preferred;
+            m_FixedSpot = fixedSpot;
+            m_LookKey = lookKey;
+            m_LookConversation = lookConversation;
         }
+
+        bool Arriving => m_Director != null && m_Director.Phase == TavernPhase.Arrival;
 
         void Start()
         {
             m_Director = TavernDirector.Instance;
-            if (m_Interactable != null) m_Interactable.Used += _ => m_Director?.GoDownHatch();
+            if (m_Interactable != null)
+            {
+                m_Interactable.Used += _ => Use();
+                // Arrival day: down into the Hollows; any other free daytime: a look at it.
+                if (m_FixedSpot) m_Interactable.Describe = () => TavernHint.Use(Arriving || string.IsNullOrEmpty(m_LookKey) ? m_Interactable.NameKey : m_LookKey);
+            }
             if (m_Director != null) m_Director.PhaseChanged += Refresh;
             Refresh();
         }
@@ -42,21 +58,45 @@ namespace Hearthdelve.Tavern.Scene
             if (m_Director != null) m_Director.PhaseChanged -= Refresh;
         }
 
+        void Use()
+        {
+            if (Arriving) m_Director?.GoDownHatch();
+            else if (!string.IsNullOrEmpty(m_LookConversation)) Hearthdelve.Shared.Story.StoryServices.Conversations?.Play(m_LookConversation);
+        }
+
         void Refresh()
         {
-            bool open = m_Director != null && m_Director.Phase == TavernPhase.Arrival;
-            if (open) Place();
-            if (m_Visual != null) m_Visual.SetActive(open);
+            bool arriving = Arriving;
+            bool daytime = m_Director != null && m_Director.Phase == TavernPhase.Daytime;
+            // A fixed hatch is always there (a hole in the keeper's floor); the old one appeared only on arrival day.
+            bool shown = m_FixedSpot || arriving;
+            if (shown) Place();
+            if (m_Visual != null) m_Visual.SetActive(shown);
+            bool usable = arriving || (m_FixedSpot && daytime && !string.IsNullOrEmpty(m_LookConversation));
             if (m_Interactable != null)
             {
-                m_Interactable.gameObject.SetActive(open);
-                m_Interactable.SetAvailable(open);
+                m_Interactable.gameObject.SetActive(shown);
+                m_Interactable.SetAvailable(usable);
             }
+        }
+
+        void Update()
+        {
+            // Not while someone's talking (a look is a conversation too).
+            if (!m_FixedSpot || m_Interactable == null) return;
+            bool talking = Hearthdelve.Shared.Story.StoryServices.Conversations != null && Hearthdelve.Shared.Story.StoryServices.Conversations.IsTalking;
+            bool usable = !talking && (Arriving || (m_Director != null && m_Director.Phase == TavernPhase.Daytime && !string.IsNullOrEmpty(m_LookConversation)));
+            if (usable != m_Interactable.IsAvailable) m_Interactable.SetAvailable(usable);
         }
 
         /// <summary>The open tile nearest the preferred spot, with an open tile under it for the keeper to stand on.</summary>
         void Place()
         {
+            if (m_FixedSpot)
+            {
+                transform.position = m_Preferred;
+                return;
+            }
             NavGrid grid = NavGrid.Current;
             if (grid == null || !grid.IsBaked)
             {

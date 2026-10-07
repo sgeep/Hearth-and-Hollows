@@ -18,16 +18,19 @@ namespace Hearthdelve.Dungeon.Rooms
     public readonly struct EncounterSpawn
     {
         public readonly EnemyKind Kind;
-        /// <summary>Index into the room's ground spawns (or its perches, for a bat).</summary>
+        /// <summary>Index into the room's ground spawns (or its perches, for a bat that isn't <see cref="InOpen"/>).</summary>
         public readonly int Point;
+        /// <summary>A bat flying in the open, on a ground spawn, rather than asleep on a perch (2026-10-07).</summary>
+        public readonly bool InOpen;
 
-        public EncounterSpawn(EnemyKind kind, int point)
+        public EncounterSpawn(EnemyKind kind, int point, bool inOpen = false)
         {
             Kind = kind;
             Point = point;
+            InOpen = inOpen;
         }
 
-        public override string ToString() => $"{Kind}@{Point}";
+        public override string ToString() => InOpen ? $"{Kind}@{Point}(open)" : $"{Kind}@{Point}";
     }
 
     /// <summary>A room of a floor's graph: what it is for, which authored room it uses, its encounter and where its exits lead.</summary>

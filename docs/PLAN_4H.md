@@ -858,6 +858,14 @@ The garden works; three changes:
 - **A day of about 4 minutes:** 0.43 real seconds per game minute (35 minutes, then 12, now about 4), while the day has little to fill it; to lengthen as activities arrive. The asset migrates from either earlier default.
 - **Musashi** (the owner's new canon; GDD §2.10, Decided 61): the elf who keeps the market stands at the cart's front-left corner (A Myriad of NPCs' elf, black ponytail, white shirt), talkable in the daytime (`Villager`, the `Person` interaction), his first-draft hub `Musashi/Hub` seeded once (the first meeting: who he is, the Fortunate Five, the taste the Hollows took; then four things to ask, Toshi named only), his portrait from `Tools/portraits/musashi.json`, a tracked Love/Hate character (values craft 80, nerve 30, warmth 60). The cart is still where you buy; he doesn't move yet (Checkpoint C's schedules). His quest for Toshi is later.
 
+### More from the owner's playtests (2026-10-07)
+
+- **The stew pot** starts left of the range (17, 12); at (24, 11) it blocked the stairs. A layout made before keeps its pieces, except any on a newly reserved tile, which moves once to its starting spot or the nearest free one (`LayoutRepair`).
+- **The stairs** are entered as drawn: from the flight's left, where its bottom step is (pushing right or up), with the arrival beside it at (24.9, 12.3) and the approach tiles reserved.
+- **The keeper's room:** the upstairs room is the keeper's (player-facing "your room"), with **the hatch to the Hollows in its floor** at (14, 4) (its tiles reserved): the way down on arrival day, a look ("the way down, in the floor of your room...") on any free daytime after. Six tutorial and everyday lines say where it is now (a one-off author's edit, each still as written). A house of their own comes later (direction).
+- **Door signs never under the HUD:** the HUD's top-left block (the Essence icon and bar, the run's gold) registers its screen area (`ScreenReservation`, `Core.Presentation.ScreenReservations`), and a door's reward sign that would be covered steps straight down just clear of it, back home when uncovered.
+- **Bats in the open:** an encounter puts a bat on a ground spawn (flying, awake-looking) instead of a wall perch 35% of the time (`FloorTuning.batInOpenChance`), and always when no perch is left.
+
 ---
 
 ## Documentation during 4h
