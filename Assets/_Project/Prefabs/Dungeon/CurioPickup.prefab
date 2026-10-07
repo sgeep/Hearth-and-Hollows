@@ -324,7 +324,7 @@ MonoBehaviour:
   m_Light2DProvider:
     rid: -2
   m_SelectionSources:
-    rid: 2696332523653038080
+    rid: 2696332524535414784
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.62, g: 0.55, b: 1, a: 1}
   m_Intensity: 0.9
@@ -370,7 +370,7 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 2696332523653038080
+    - rid: 2696332524535414784
       type: {class: Light2DProviderSources, ns: UnityEngine.Rendering.Universal, asm: Unity.RenderPipelines.Universal.2D.Runtime}
       data:
         m_SelectedHashCode: 3
@@ -514,8 +514,8 @@ MonoBehaviour:
   DebugActive: 0
   InScriptDrivenPause: 0
   FeedbacksList:
-  - rid: 2696332523653038081
-  - rid: 2696332523653038082
+  - rid: 2696332524535414785
+  - rid: 2696332524535414786
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -531,11 +531,11 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 2696332523653038081
+    - rid: 2696332524535414785
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
       data:
         Active: 1
-        UniqueID: 1930069185
+        UniqueID: -785145018
         Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
@@ -657,11 +657,11 @@ MonoBehaviour:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    - rid: 2696332523653038082
+    - rid: 2696332524535414786
       type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
       data:
         Active: 1
-        UniqueID: 1229063255
+        UniqueID: 479525407
         Label: Haptic Discovery.Found
         OriginalLabel: 
         ChannelMode: 0

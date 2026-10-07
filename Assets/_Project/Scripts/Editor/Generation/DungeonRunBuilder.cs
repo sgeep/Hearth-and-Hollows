@@ -324,6 +324,8 @@ namespace Hearthdelve.Editor
             DungeonUI.RebuildScreens(UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI"));
             var runner = UnityEngine.Object.FindAnyObjectByType<RoomRunner>(FindObjectsInactive.Include);
             ConfigureRunner(runner, settings);
+            // Development builds' delve keys (F4 Essence, F6 god mode), on the runner's object.
+            if (runner.GetComponent<DungeonDebugKeys>() == null) runner.gameObject.AddComponent<DungeonDebugKeys>();
             Canvas canvas = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).First(c => c.name == "UI");
             BuildDebugLabel(canvas);
             BuildRoomFade(canvas);
