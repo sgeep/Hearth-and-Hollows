@@ -373,7 +373,30 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | Larder Troll (boss, 4e) | Exclusive (`Ancient_Troll`) | Imported in 4e step 1 (see below). Replaces the Mother Slime candidate (2026-10-05). |
 | Mushroom People | Creatures (exclusive) | Deferred (4b decision): it has idle, jump, damage and die, but **no attack animation**. |
 
-## 4h survey (planning, 2026-10-06; nothing imported yet)
+## Kariaston and Tally Ho!'s daytime places (4h Checkpoint A, imported)
+
+Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image's top-left), imported to `Assets/ThirdParty/Minifantasy/<Pack>/`. Built into `Kariaston.unity` once by `KariastonBuilder` (the blockout is hand-owned after that) and into the tavern by `SurfaceBuilder`.
+
+| Pack folder / file | Source | What we cut |
+|---|---|---|
+| `ForgottenPlains/PlainsTiles` | Forgotten Plains `Tileset/Minifantasy_ForgottenPlainsTiles.png` | Grass (eight cells: (1–4,1), (2,4), (3,5), (4,6), (2,7)); the dirt-on-grass autotile (cells 7–9 × 3–5: corners and edges, (8,4) solid; inner corners (7,6) NW, (8,6) NE, (7,7) SW, (8,7) SE); the stone square, same layout at cells 12–14. Paths and the beds use dirt, the square stone; regions at least two cells wide. |
+| `TownsII/BuildingSamples` | Towns II `Buildings/_Mix_And_Match_Samples/…MoreBuildingSamples.png` | Nine whole premade buildings. Used: **ThatchedHall** (9,264 118×105) = Tally Ho!'s outside; **BlueRoofHall** (13,28 110×93) = Maximo's house; **BrownCottage** (319,160 58×64) = Grim and Ogrin's cottage. The two halls sort at their wings' wall foot (18 px and 17 px above the art's base: the porch steps reach lower), so someone beside the porch draws in front of the wall. |
+| `WizardTower/TowerExterior` | Wizard Tower add-on `Exterior/Wizard_Tower_Exterior.png` (64×136) | Kaloren's tower, whole. |
+| `CaravansAndWagons/CaravansAndWagons` | Caravans And Wagons add-on `Tileset/CaravansAndWagons.png` | **PaintedWagon** (302,229 28×61: the green wagon from the front, door and steps) = Bart's wagon. |
+| `TownMonuments/Monuments` | Town Monuments add-on | Karias's memorial: **Pedestal** (40,16 16×27), the weathered bronze **Figure** (8,201 15×17) on it, a bronze **Plaque** (296,244 16×12) in front. A sorting group keeps them one object. |
+| `AnimatedWell/WellStatic` | Animated Well add-on `WellStaticFrames.png` | The first frame (0,0 24×24). |
+| `PlantsAndFoliage/PlainsFoliage` | Plants & Foliage `Plains_And_Forests/Forgotten_Plains.png` | Four tree sizes (pivots where the trunk meets the ground) and six bushes/shrubs. |
+| `MedievalCity/CityProps` | Medieval City `Props/Props.png` | Bench, long bench, lamp post, two flower boxes, barrel, crate. |
+| `Farm/FarmProps`, `Farm/FarmTileset` | Farm `Props`, `Tileset` | Haystack, hay pile, bales, scarecrow, trough, bucket; the low fence run (448,120 24×6) and a post. The tileset's soil ring was tried for the beds and left a grass hole in each: the beds use the plains dirt autotile instead. |
+| `Towns/TownsProps` | Towns `Props/Minifantasy_TownsProps.png` | **TankardBoard** (9,86 23×17): Tally Ho!'s standing sign outside; **MenuBoard** (130,92 12×11): the menu board inside the door; **PostSign** (147,94 10×9): the plots' and the closed road's signs; **CupboardJars** (66,244 11×15): the storeroom shelves. |
+| `TravellingMerchant/CartOpen`, `CartClosed` | Travelling Merchant `Merchant_On_Cart/Idle_Shop_Open.png`, `Idle_Shop_Closed_No_Merchant.png` | Frame 0 (64×64) of each: the market cart open (its "shop" sign up, counter down) and packed up after five. The Merchant creature's own stall includes its seller, so the cart (with its pony) stands in until Grim keeps the stall (Checkpoint C). |
+| `Portraits/PhiFramed` | derived: `Tools/portraits/framed.py` | Phi's portrait (`Tools/portraits/phi.json`: Portrait Generator elf, the purple skin as a drow, long white hair, leather vest), cropped to the face (7,7–25,27) and framed in the colours of Minifantasy's own picture frame (Castles and Strongholds props, the noble portrait); 22×24, hung upstairs. |
+
+**Village layout** (village cells, origin (200, 0), 72×48; `KariastonBuilder`): Tally Ho! north-centre (porch steps at (36, 30.75)); a dirt path down to the stone square (29–42 × 11–22: the memorial, the well, the market cart, benches, lamps); the main road along y 7–9 with spurs up to Maximo's door (west), Grim and Ogrin's (east of the square) and Kaloren's tower (far east); Bart's wagon on the green west of the square; the garden (four 3×2 beds, fences, scarecrow, hay) west of Tally Ho!; three fenced empty plots east of it and south of the road; the road east closed by a fence and a sign; trees round the edges, bushes along the south.
+
+**Gaps noted in 4h A:** no clash-free wall spot in the main room for the five tankards (deferred); no plans sprite chosen (the Decorate key covers it); the cellar hatch isn't shown in the daytime (its look is deferred).
+
+## 4h survey (planning, 2026-10-06)
 
 Inspected for `docs/PLAN_4H.md` §28–30; the sheet `docs/plan_4h/cast_candidates.png` shows the figures at true scale beside the keeper and Orik.
 

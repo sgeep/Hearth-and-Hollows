@@ -1,6 +1,6 @@
 # 4h plan: walkable Kariaston and the daytime life-sim slice
 
-> **Status: approved 2026-10-06 for Checkpoint A planning and implementation** (the owner's decisions on H1–H15 and the canon in §0.1, below), unless the first architecture proof finds a serious technical blocker. Nothing of 4h is built yet. 4g is complete (signed off 2026-10-06, tag `milestone-4g`); its proposed Checkpoint D (the new cast) is folded into this plan. Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
+> **Status: approved 2026-10-06** (the owner's decisions on H1–H15 and the canon in §0.1, below). **Checkpoint A is built (2026-10-07) and waiting for the owner's playtest**; see *As built: Checkpoint A* near the end. B, C and D are not started. 4g is complete (signed off 2026-10-06, tag `milestone-4g`); its proposed Checkpoint D (the new cast) is folded into this plan. Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
 
 **The question 4h answers:** *does living in Tally Ho! and Kariaston feel good enough that I want to spend time there even when nothing is pushing me toward an objective?*
 
@@ -687,6 +687,80 @@ Fishing (and its minigame), ranching, foraging and gathering; seasons, weather, 
 - Familiar faces at dinner make service feel like the village's evening.
 - Ogrin's light makes me curious, and nothing explains it.
 - Full regression green, web build working, the save chain intact.
+
+---
+
+## As built: Checkpoint A, "I can live here" (2026-10-07, built; waiting for the owner's playtest)
+
+Steps 1–4. Nothing of B, C or D is built: no Vigor, crops, save version 10, world seed, mid-day saving, resident villagers, schedules, Gimp, Glimmer, named patrons, fishing, ranching, seasons or weather. `milestone-4h` is not tagged.
+
+### Scenes and the way between them
+
+- **`Kariaston.unity`** is its own scene, loaded additively beside `Tavern.unity` in the free daytime (H1). `GameFlow` now loads a **content set**: the daytime (after the opening's arrival) is {Tavern, Kariaston}, a delve is {Dungeon}, everything else is {Tavern}; one cover and reveal per set. `GameFlow.LoadedScenes` and `IsLoaded(scene)` replace the single loaded scene (`LoadedScene` stays: the first of the set).
+- **World placement:** Kariaston's origin is (200, 0), 72×48 tiles, so its tilemaps, colliders and grid never overlap the tavern's.
+- **The front door** (`SurfaceDoor`, Tavern assembly): two doors that find each other by id (`tallyho.front.inside` at the tavern's door, `tallyho.front.outside` on Tally Ho!'s step in the village). Walking into one fades (0.18 s), moves the keeper to its partner's arrival point, enters that place's `SurfaceArea` and publishes the same passage events as the stairs. Only in the free daytime, never while decorating or loading. Doors are instant: no scene loads.
+- **`SurfaceArea`** (Tavern assembly): one per place (`tavern`, `guest_room`, `kariaston`), saying whether it's indoors, how the camera behaves there (*Hold* on a point for the rooms; *Follow* the keeper clamped to bounds in the village) and which 2D lights belong to it. Entering one switches lights **off before on**, because URP's 2D renderer allows only one enabled global light per sorting layer: Kariaston's daylight is authored **disabled** and lit only when the keeper is outside.
+- **`SurfaceCamera`** (order −200) places the tavern's virtual camera transform directly each frame (*Hold* or *Follow* through `ViewBounds.Clamp`). It doesn't use Cinemachine's own follow, so the tavern's camera and the village's share one vcam with no blend; the smooth-scrolling rules (no damping, LateUpdate brain, the presentation anchor) still hold.
+- **Layout ownership (H13):** `KariastonBuilder` (*Hearthdelve → Generate → Kariaston*) painted the blockout once; tiles and dressing now belong to the scene. The idempotent updater (`SurfaceBuilder.UpdateSurfaceBatch`, also run with the tavern updater) rebuilds only `Kariaston/Gameplay`: the daylight, the area, the door, the market stall, the memorial's look and the edges. `-rebuildScene` regenerates the whole scene, only with the owner's go-ahead.
+- **Assemblies (H15):** pure rules in `Shared/Surface` (`SurfaceClock`, `MarketHours`, `SurfacePause`); `SurfaceTime` in `Shared/Game` (Boot); the new `Hearthdelve.Village` holds the village's own behaviours (`MarketStall`, `SurfaceDaylight`) and references Core, Shared and Tavern, never Dungeon or Pixel Crushers (`StoryTests` checks). `SurfaceArea`, `SurfaceDoor` and `SurfaceCamera` live in Tavern because both scenes use them and the keeper is Tavern's.
+
+### Kariaston
+
+(A capture of the whole map: `KariastonBuilder.CaptureBatch` writes `BatchLogs/kariaston.png`.)
+
+72×48 tiles of Minifantasy plains and paths. **Tally Ho!** stands at the top centre (its door at (36, 30.9) in village tiles) with a path straight down to **the square** (14×12 of flagstones): the Karias memorial, the well, lamps, benches and **the market cart**. Around the square: **Maximo's house** (the large blue-roofed hall, west), **Bart's painted wagon** beside it, **Grim and Ogrin's cottage** (the dark timber house, east) and **Kaloren's tower** (far east). **The garden**, four empty dirt beds behind a fence with a scarecrow, is on Tally Ho!'s own ground to the west; **three empty plots** are fenced (two north-east, one south-east). Trees and flowers close every edge; there's no road out yet.
+
+This flips the plan's sketch north–south (Tally Ho! at the top, the square below it): the door opens straight onto the path to the square, which read better on screen.
+
+**Traversal** at the keeper's 6 tiles/s, along the paths: the door to the square under 2 s, to the market about 3 s, to the garden about 4 s, to Maximo's house or Kaloren's tower about 7 s. Nothing is near the plan's 12–15 s ceiling; the playtest decides whether the village wants more room (the layout is the scene's now).
+
+### The surface clock
+
+- `SurfaceClock` (pure, `Shared/Surface`) holds the minute of the day; `SurfaceTime` (Boot) advances it with **`Time.unscaledDeltaTime`, capped at 0.1 s a frame**, never the wall clock (the Web build can't jump it). Tunables are on `Data/Config/SurfaceClockConfig.asset`: day 08:00, cutoff 17:00, afternoon from 12:00, **3.89 real seconds per game minute (9 hours ≈ 35 real minutes)**, a 10-minute display step, market 08:00–17:00, and `pauseIndoors` (off; the playtest's comparison switch).
+- **It stands still** (each a named reason, `SurfaceTime.Instance.Still`): outside the free daytime or the opening's arrival, at the cutoff, while loading or covered by a transition, while talking, under a full-screen menu (`MenuPause`), while held (`SurfacePause`: Decorate Mode, the storeroom and meal panel, the market, the Prep question), and when the window loses focus. Deviation from §8: the unscaled time and explicit reasons instead of scaled time, so a frozen `timeScale` (dialogue sets it to 0) and a held panel are told apart in tests and in the HUD.
+- **Bands:** morning, afternoon, evening (17:00). `SurfaceTimeChanged` (each display step) and `SurfaceBandStarted` go on the `EventBus`.
+- **Not saved in A:** the clock is `GameState.Surface`, outside the save. Every new day (new game, Continue, Sleep) starts at 08:00; quitting mid-day and continuing restarts the day at 08:00 (mid-day saving is B's, with version 10).
+- **The face:** a quiet "8:40 am" tab in the top corner in the daytime only, moving in 10-minute steps, with "Tab: decorate" under it while indoors.
+- **Daylight:** `SurfaceDaylight` colours Kariaston's global light over the day (soft morning, plain noon, gold toward five, dusk held after).
+
+### 5 PM
+
+The clock stops at 17:00; the market cart closes (its closed look; using it says "the market's packed up till morning"); Kariaston's light holds at dusk. If the keeper is in Tally Ho!, Orik says it once (`Orik/Five`: "that's five. the village is putting its boots by the door." / "we open when you say so. i'll be here, counting."); outdoors, the cue waits until they come in. **Nothing forces Prep**: the keeper can walk, decorate, check the shelves, cook the meal, and begin the evening whenever they choose.
+
+### Where each of the Morning panel's functions went
+
+| Morning panel | Checkpoint A |
+|---|---|
+| Storeroom | **The storeroom shelves** (a cupboard of jars in the kitchen corner): the panel opens on the stock; Escape, B or *back* closes it |
+| Delve meal | **The Grill and the Tap** in the daytime: each opens the meal list for its own station; cooking is the same minigame |
+| Market | **The market cart** in Kariaston's square, 08:00–17:00 |
+| Decorate | **The Decorate key** (Tab / View) anywhere inside Tally Ho! in the daytime and at night, shown under the clock |
+| Open for the evening | **The menu board** by the door: "begin evening prep? the rest of the day goes by." → *begin prep* / *not yet* |
+
+The panel itself is kept as the storeroom-and-meal view (`MorningScreen`, modes *Storeroom* and *Meal*); it no longer opens on its own.
+
+### Waking and the house
+
+- The keeper wakes **upstairs**, in front of the bed in the guest room (H3; `TavernDirector.WakeUpstairs`), and walks down the stairs.
+- **Inspectables:** Phi's portrait upstairs (the Portrait Generator's elf, framed: `Tools/portraits/phi.json`, `framed.py`) and the Karias memorial in the square, each a one-line conversation in the node editor (`Inspect/PhiPortrait`, `Inspect/Memorial`), spoken by an unnamed **narration** voice (the box hides the speaker for `Inspect/` titles).
+
+### Deviations from the plan
+
+- **The portrait hangs upstairs**, not by the bar: the bar's wall holds the trophy spot and the tavern's wall decor. Its line still lands where the keeper wakes.
+- **No plans book**: the Decorate key with its reminder under the clock does the job; a book on the bar would have been a second way to the same key.
+- **The tankards and the hatch** are seeded as conversations (`Inspect/Tankards`, `Inspect/Hatch`) but not placed: the shelf and the hatch need their own art and spots, better decided with the room's decor in C/D.
+- **The market is a cart** (*Towns Props*' open and closed cart) standing in for Grim's stall: Grim isn't in A, so the stall is just the market.
+- **The camera** moves the vcam transform rather than using Cinemachine's follow (above).
+- **Inspectables in the plan's list** (Phi's chair, the trophy, Orik's incident book) aren't built; two are, to test the idea.
+- **The bed as a second way to sleep** isn't built (the Night panel's button stays the only way).
+- **The early Web smoke** after Step 1 wasn't run on its own: the Web build was smoke-tested once, at the end, covering both lists.
+
+### Tests
+
+- EditMode: `SurfaceClockTests` (33: the clock's advance, cap, cutoff, bands, face, market hours, pause holds, the scene-free rule that nothing reads `Time.time` for the hour).
+- PlayMode: `SurfaceCheckpointATests` (9: waking upstairs; the stairs; the front door, its lights and camera; the clock's pauses; the Decorate key indoors only; the market before and after five; five o'clock with no forced Prep and the board's confirmation; Prep before five; the storeroom and the delve meal).
+- **Web smoke (2026-10-07):** from a save temporarily set to the daytime (the owner's save backed up first and restored after): woke upstairs at 8:00 am with Phi's portrait on the wall; down the stairs; the Grill offered the delve meal; the menu board asked "begin evening prep?" and *not yet* backed out; out of the front door into daylit Kariaston with the camera following; read the memorial; opened the market at the cart. It found one bug, fixed before handover: a nameless line (the look) showed `#tavern.plain` as its speaker; the clock test now checks the box for missing strings, and the rebuilt Web build shows Phi's portrait line with no name. The page was a hidden tab, so the clock correctly stood still as unfocused; its running is covered by the PlayMode tests.
+- The day-loop, Checkpoint C/D, text-overlap and capture tests now walk the day the player's way (`DaytimeActions`: the menu board and yes, the stall, the shelves) instead of the retired buttons; the tavern's recorded starting room adds the door, the board and the shelves.
 
 ---
 

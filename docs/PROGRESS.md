@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g complete**, signed off by the owner 2026-10-06, tag `milestone-4g`; Checkpoint D's proposal folded into 4h). Next: **4h Checkpoint A** (the 4h plan, `docs/PLAN_4H.md`, approved 2026-10-06 with new canon for Maximo, Karias, Grim, Ogrin, Kaloren and Gimp; implementation not started); then 4i (menus, options and polish)._
+_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoint A built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint A**; then Checkpoint B (Vigor and the garden) once approved; then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1208,6 +1208,23 @@ Seven people join the cast (GDD §2.10, Decided 51): villagers **Kaloren Frostha
 **Old Phi (2026-10-07, the owner's request):** Old Tamsin is now **Old Phi** (Phi'rai, a drow, of the Fortunate Five; GDD Decided 52). Entries above keep the old name. *(Done in the 4g closeout patch: the nine lines now say Phi, and no stable id ever named her.)*
 
 **Orik's history (2026-10-07, the owner's request):** Phi's old friend; ran Tally Ho! in her absence, left when the Hollows grew too dangerous, sought out and rehired by Phi (GDD Decided 53). *(Replaced in the 4g closeout patch at the owner's request: three short lines, heard only if asked.)*
+
+### 4h Checkpoint A: I can live here (2026-10-07, built; waiting for your playtest)
+
+The free daytime is walked, not a panel. The keeper wakes upstairs by the bed, walks down, and goes out of Tally Ho!'s front door into **Kariaston** (its own scene, loaded beside the tavern for the daytime; the door is a short fade). A soft **surface clock** runs from 8:00 am to 5:00 pm in about 35 real minutes and stands still for talking, menus, transitions, decorating and lost focus. At five the market packs up, the light turns gold, and Orik mentions it once; nothing forces the evening.
+
+Every Morning-panel function moved to a place: the storeroom shelves (the stock), the Grill and the Tap (tonight's delve meal), the market cart in the square (8–5), the Decorate key indoors (Tab / View, shown under the clock), and the menu board by the door ("begin evening prep?"). Inspectables: Phi's portrait upstairs and the Karias memorial, one line each from the node editor.
+
+Kariaston, 72×48 tiles: Tally Ho! at the top with its garden (four empty beds), the square (memorial, well, market), Maximo's house, Bart's wagon, Grim and Ogrin's cottage, Kaloren's tower, three fenced empty plots; nobody lives in it yet (C). Nothing from B–D: no Vigor, crops, save version 10 or mid-day saves, villagers or schedules.
+
+Details, deviations and tests: `docs/PLAN_4H.md`, *As built: Checkpoint A*. Art: `docs/ASSET_MAP.md`, *Kariaston and Tally Ho!'s daytime places*.
+
+**Known issues (Checkpoint A):**
+- **The day restarts at 8:00 on Continue**: the clock isn't saved until B's version 10.
+- **The village is empty**: no villagers until C; the houses are silhouettes, with no doors to knock on.
+- **Seeded but unplaced:** `Inspect/Tankards` and `Inspect/Hatch` exist in the dialogue database, waiting for their spots.
+- **The decorate reminder overlaps the room's top-left corner** in the main tavern room (under the clock, over the bar's back wall); upstairs and outdoors it's clear. Cosmetic; its place is a playtest call.
+- **The tall market cart can hide the keeper** standing right behind it (correct Y-sorting, but the cart's canopy covers a whole figure).
 
 ### Open design questions (Phase 4)
 
