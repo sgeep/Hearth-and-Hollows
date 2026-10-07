@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g complete**: Checkpoints A–C built and playtested by the owner, with the Old Phi closeout patch; waiting for the owner's final sign-off and the `milestone-4g` tag). Next, after sign-off: plan 4h (village and daytime slice), then 4i (menus, options and polish)._
+_Last updated: 2026-10-06 (**4f complete**, tag `milestone-4f`; **4g complete**, signed off by the owner 2026-10-06, tag `milestone-4g`; Checkpoint D's proposal folded into 4h). Next: the 4h plan (walkable Kariaston and the daytime life-sim slice, `docs/PLAN_4H.md`), awaiting approval; then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
