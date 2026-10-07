@@ -117,8 +117,10 @@ namespace Hearthdelve.Editor
             door.transform.localPosition = new Vector2(DoorColumn + 0.5f, FloorBottom + 0.25f);
             var doorTrigger = door.AddComponent<BoxCollider2D>();
             doorTrigger.isTrigger = true;
-            doorTrigger.size = new Vector2(0.9f, 0.5f);
-            door.AddComponent<AreaPassage>().Configure(area, tavern);
+            // Wide and deep enough to find without aiming; pushing down in it goes down (after the owner's B playtest).
+            doorTrigger.size = new Vector2(1.4f, 0.8f);
+            doorTrigger.offset = new Vector2(0f, 0.1f);
+            door.AddComponent<AreaPassage>().Configure(area, tavern, through: Vector2.down);
 
             AddStairs(tavern, area);
         }
@@ -158,9 +160,11 @@ namespace Hearthdelve.Editor
             trigger.isTrigger = true;
             // The whole foot tile, from the stew pot's side to the wall (4h, after the owner's Checkpoint A playtest: a keeper
             // walking up the gap along the stew pot slid past a trigger that covered only its right two-thirds).
-            trigger.size = new Vector2(1.34f, 0.7f);
-            trigger.offset = new Vector2(-0.22f, 0f);
-            foot.AddComponent<AreaPassage>().Configure(tavern, guest);
+            // Down to the top of the row below, too: pushing up anywhere in the foot's gap (or against the flight) goes up. Someone
+            // arriving at its bottom edge is walking down, away from it, so they never bounce straight back (the B playtest).
+            trigger.size = new Vector2(1.34f, 1.0f);
+            trigger.offset = new Vector2(-0.22f, -0.15f);
+            foot.AddComponent<AreaPassage>().Configure(tavern, guest, through: Vector2.up);
         }
 
         /// <summary>The black cover for the fade between areas, over everything on the tavern's canvas.</summary>

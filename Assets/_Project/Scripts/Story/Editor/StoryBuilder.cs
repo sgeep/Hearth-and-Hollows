@@ -155,6 +155,18 @@ namespace Hearthdelve.Story.Editor
             });
             Configure(pip, CharacterIds.Orik, CharacterKind.Staff, new LocalizedString(Loc.ContentTable, "staff.pip"), portraits, StoryDialogue.OrikHub);
 
+            // Musashi (2026-10-07): keeps the market cart. A cook at heart who can't taste any more: he values craft and warmth,
+            // and has seen enough of the Hollows to respect nerve without loving it. Fond of anyone Phi chose.
+            CharacterDefinition musashi = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_musashi.asset", c =>
+            {
+                c.values = new SocialTraits(80f, 30f, 60f);
+                c.affinityToPlayer = 15f;
+                c.respectForPlayer = 5f;
+                c.affinityToTavern = 60f;
+                c.affinityToVillage = 70f;
+            });
+            Configure(musashi, CharacterIds.Musashi, CharacterKind.Villager, new LocalizedString(Loc.ContentTable, "villager.musashi"), portraits, StoryDialogue.MusashiHub);
+
             // 4h: the voice of things looked at (no name, no portrait, never tracked).
             CharacterDefinition narration = LoadOrCreate<CharacterDefinition>($"{StoryPaths.Characters}/Character_narration.asset", c => c.kind = CharacterKind.Story);
             narration.id = CharacterIds.Narration;
@@ -163,7 +175,7 @@ namespace Hearthdelve.Story.Editor
             narration.conversation = string.Empty;
             narration.portrait = null;
             EditorUtility.SetDirty(narration);
-            return new List<CharacterDefinition> { player, boog, pip, narration };
+            return new List<CharacterDefinition> { player, boog, pip, narration, musashi };
         }
 
         static void Configure(CharacterDefinition c, string id, CharacterKind kind, LocalizedString name, Dictionary<string, PortraitDefinition> portraits, string conversation)

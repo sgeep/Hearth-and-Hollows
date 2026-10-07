@@ -189,6 +189,67 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Vector2.Distance(Keeper.position, PropertyArea.Current.Arrival), Is.LessThan(1.5f), "the keeper is in the room");
         }
 
+        /// <summary>
+        /// The owner's Checkpoint B playtest: doorways mustn't need an exact line. In a doorway and pushing the way through goes
+        /// through (even against the stairs' flight); standing in one doesn't; arriving never bounces back.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Doorways_GoThroughWhenPushed_FromAnywhereInThem_AndNeverBounceBack()
+        {
+            yield return Daytime();
+            AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId);
+            AreaPassage up = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId);
+            Bounds stairs = up.GetComponent<Collider2D>().bounds, guestDoor = down.GetComponent<Collider2D>().bounds;
+
+            // Off-centre in the guest room's doorway, pushing down.
+            Teleport(Keeper, new Vector2(guestDoor.min.x + 0.15f, guestDoor.max.y + 0.3f));
+            yield return Frames(3);
+            Hold(Key.S);
+            yield return WaitUntil(() => PropertyArea.Current.Id == PropertyArea.TavernId, 3f, "down from the room's doorway's edge");
+            // Still holding down at the stairs' foot: no bounce back up.
+            yield return new WaitForSecondsRealtime(0.8f);
+            ReleaseKeys();
+            Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.TavernId), "arriving walking away never goes back");
+
+            // Standing in the stairs' foot, hugging the stew pot's side: nothing until pushed up.
+            Teleport(Keeper, new Vector2(stairs.min.x + 0.3f, stairs.center.y - 0.2f));
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.TavernId), "standing in a doorway isn't going through it");
+            Hold(Key.W);
+            yield return WaitUntil(() => PropertyArea.Current.Id == PropertyArea.GuestRoomId, 3f, "up from the gap's left edge");
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+
+            // Up against the flight itself (blocked), pushing: still up.
+            down.Pass(Keeper);
+            yield return Frames(3);
+            Teleport(Keeper, new Vector2(stairs.center.x, stairs.max.y - 0.1f));
+            yield return Frames(2);
+            Hold(Key.W);
+            yield return WaitUntil(() => PropertyArea.Current.Id == PropertyArea.GuestRoomId, 3f, "up while pressed against the flight");
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+
+            // The front door, caught at its edge, both ways.
+            down.Pass(Keeper);
+            yield return Frames(3);
+            SurfaceDoor inside = SurfaceDoor.Find(SurfaceDoor.FrontInside), outside = SurfaceDoor.Find(SurfaceDoor.FrontOutside);
+            Bounds front = inside.GetComponent<Collider2D>().bounds;
+            Teleport(Keeper, new Vector2(front.max.x - 0.15f, front.max.y + 0.3f));
+            yield return Frames(2);
+            Hold(Key.S);
+            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.KariastonId, 3f, "out through the door's edge");
+            yield return new WaitForSecondsRealtime(0.8f);
+            ReleaseKeys();
+            Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.KariastonId), "no bounce back in");
+            Bounds step = outside.GetComponent<Collider2D>().bounds;
+            Teleport(Keeper, new Vector2(step.min.x + 0.15f, step.min.y - 0.3f));
+            yield return Frames(2);
+            Hold(Key.W);
+            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.TavernId, 3f, "back in through the step's edge");
+            ReleaseKeys();
+        }
+
         /// <summary>From the middle of the room, east along the corridor under the stew pot, then north into the stairs.</summary>
         IEnumerator WalkUpTheStairs(AreaPassage up)
         {

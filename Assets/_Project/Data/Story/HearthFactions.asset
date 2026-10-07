@@ -136,6 +136,37 @@ MonoBehaviour:
       - 100
       - 0
     percentJudgeParents: 0
+  - id: 5
+    name: musashi
+    description: Character_musashi
+    color: 0
+    parents: 
+    traits:
+    - 80
+    - 30
+    - 60
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - 15
+      - 5
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 60
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 70
+      - 0
+    - factionID: 5
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
   traitInheritanceType: 0
   relationshipInheritanceType: 0
-  nextID: 5
+  nextID: 6

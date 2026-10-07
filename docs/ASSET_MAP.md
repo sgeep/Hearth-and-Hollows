@@ -397,6 +397,11 @@ Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image
 
 **Gaps noted in 4h A:** no clash-free wall spot in the main room for the five tankards (deferred); no plans sprite chosen (the Decorate key covers it); the cellar hatch isn't shown in the daytime (its look is deferred).
 
+## Musashi (2026-10-07)
+
+- **In the world:** A Myriad of NPCs' layers, already imported for the patrons: `Body_Elf_elfskin`, `Trousers_Trousers_black`, `Top_Shirt_white`, `Hair_PonyTail_black` (no hat layer has a bandana), with the NPC shadow; idle only, at the market cart's front-left corner (`KariastonBuilder.MusashiSpot`).
+- **Portrait:** `Tools/portraits/musashi.json` (Portrait Generator: elf, soft skin, black middle-part hair under a white bandana, a white vest, narrow eyes, a smile with pitying brows, light khaki background); composed into `derived/musashi_portrait.png` and imported as `Portraits/musashi_portrait`. The ponytail was tried first and hid his ears.
+
 ## The garden (4h Checkpoint B, imported → `Farm/`)
 
 Registered in `Editor/Setup/KariastonSheets.cs` (`Crops`, `CropStages`, `Actions`). Each crop cell is 8×16, pivoted at its foot, on a 16-px row; a crop's group is 80 px wide: seed pack (8), one seed (16), seeds (24), growth 1–3 (32, 40, 48), grown icon (64).

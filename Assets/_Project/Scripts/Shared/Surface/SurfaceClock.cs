@@ -26,7 +26,7 @@ namespace Hearthdelve.Shared.Surface
         public int cutoffMinute;
         [Tooltip("When the afternoon begins (720 = 12:00).")]
         public int afternoonStartMinute;
-        [Min(0.05f), Tooltip("Real seconds per game minute while the clock runs (1.3: 8:00 to 17:00 in about 12 minutes).")]
+        [Min(0.05f), Tooltip("Real seconds per game minute while the clock runs (0.43: 8:00 to 17:00 in about 4 minutes).")]
         public float realSecondsPerGameMinute;
         [Min(0.01f), Tooltip("The most real time one frame may add (a stalled or suspended frame never skips the day).")]
         public float maxRealSecondsPerFrame;
@@ -43,8 +43,9 @@ namespace Hearthdelve.Shared.Surface
             dayStartMinute = 8 * 60,
             cutoffMinute = 17 * 60,
             afternoonStartMinute = 12 * 60,
-            // 8:00 to 17:00 in about 12 real minutes (the owner's call after the Checkpoint A playtest: 3x the first 35).
-            realSecondsPerGameMinute = 35f / 3f * 60f / (9 * 60),
+            // 8:00 to 17:00 in about 4 real minutes (the owner's call after the Checkpoint B playtest: 3x faster again, while the
+            // day has little to fill it; to lengthen as activities arrive). It was 35 minutes, then 12.
+            realSecondsPerGameMinute = 35f / 9f * 60f / (9 * 60),
             maxRealSecondsPerFrame = 0.1f,
             displayStepMinutes = 10,
             marketOpenMinute = 8 * 60,

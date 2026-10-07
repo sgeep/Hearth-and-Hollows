@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Hearthdelve.Core;
+using Hearthdelve.Core.Animation;
 using Hearthdelve.Shared.Story;
 using Hearthdelve.Shared.Garden;
+using Hearthdelve.Shared.Characters;
+using Hearthdelve.Shared.Animation;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.Village;
@@ -471,10 +474,12 @@ namespace Hearthdelve.Editor
             door.transform.localPosition = TallyHoDoor;
             var trigger = door.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(1.1f, 0.5f);
-            door.AddComponent<SurfaceDoor>().Configure(SurfaceDoor.FrontOutside, SurfaceDoor.FrontInside, area, new Vector2(0f, -1.3f));
+            trigger.size = new Vector2(1.6f, 0.7f);
+            door.AddComponent<SurfaceDoor>().Configure(SurfaceDoor.FrontOutside, SurfaceDoor.FrontInside, area, new Vector2(0f, -1.3f),
+                through: Vector2.up);
 
             BuildMarket(gameplay);
+            BuildMusashi(gameplay);
             BuildGarden(root, gameplay);
             BuildMemorialLook(gameplay);
             BuildEdges(gameplay);
@@ -499,6 +504,43 @@ namespace Hearthdelve.Editor
             var interactable = use.AddComponent<TavernInteractable>();
             interactable.Configure(TavernInteractableKind.MarketStall, SurfaceLocKeys.Market, new Vector2(0f, -0.3f), 1.4f, null);
             stall.AddComponent<MarketStall>().Configure(interactable, open.gameObject, closed.gameObject, SurfaceLocKeys.MarketClosed);
+        }
+
+        /// <summary>Where Musashi stands (village cells): at the market cart's front-left corner, facing the square.</summary>
+        public static readonly Vector2 MusashiSpot = new(36.9f, 12.5f);
+
+        /// <summary>
+        /// Musashi (2026-10-07, the owner's canon), who keeps the market cart: a standing villager in A Myriad of NPCs' layers (an
+        /// elf, a black ponytail, a white shirt, dark trousers), talkable in the daytime. His spot is fixed until Checkpoint C's schedules.
+        /// </summary>
+        static void BuildMusashi(Transform gameplay)
+        {
+            const string npc = EditorPaths.Animations + "/Npc";
+            SpriteAnimationSet Set(string name) => AssetDatabase.LoadAssetAtPath<SpriteAnimationSet>($"{npc}/{name}.asset")
+                ?? throw new InvalidOperationException($"Kariaston: no NPC layer '{name}' (run the NPC content).");
+            var root = new GameObject("Musashi");
+            root.transform.SetParent(gameplay, false);
+            root.transform.localPosition = MusashiSpot;
+            var model = new GameObject("Model");
+            model.transform.SetParent(root.transform, false);
+            SpriteRenderer Layer(string name, int order)
+            {
+                SpriteRenderer r = LookTestContent.AddSprite(model.transform, name, null, SortingLayers.YSorted, order, Vector3.zero);
+                r.spriteSortPoint = SpriteSortPoint.Pivot;
+                return r;
+            }
+            SpriteRenderer shadow = Layer("Shadow", 0);
+            // Back to front, as the patrons: body, trousers, top, beard (none), hair.
+            SpriteRenderer[] layers = { Layer("Body", 1), Layer("Trousers", 2), Layer("Top", 3), Layer("Beard", 4), Layer("Head", 5) };
+            var look = model.AddComponent<LayeredSpriteAnimator>();
+            look.Configure(layers, shadow, Set("NpcShadow"));
+            look.SetAppearance(new[] { Set("Body_Elf_elfskin"), Set("Trousers_Trousers_black"), Set("Top_Shirt_white"), null, Set("Hair_PonyTail_black") });
+            LookTestBuilder.Solid(root.transform, "Feet", new Vector2(0f, 0.15f), new Vector2(0.6f, 0.3f));
+            var talk = new GameObject("Talk");
+            talk.transform.SetParent(root.transform, false);
+            var interactable = talk.AddComponent<TavernInteractable>();
+            interactable.Configure(TavernInteractableKind.Person, null, new Vector2(0f, -0.8f), 1f, null, new[] { new Vector2(-0.9f, 0.1f), new Vector2(0f, 0.9f) });
+            root.AddComponent<Villager>().Configure(CharacterIds.Musashi, "villager.musashi", interactable);
         }
 
         /// <summary>The garden's four beds (4h Checkpoint B), on the soil painted in the blockout: ids in reading order.</summary>

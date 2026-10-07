@@ -18,7 +18,7 @@ namespace Hearthdelve.Story.Editor
     {
         public sealed class Cast
         {
-            public Actor Player, Boog, Orik, Narration;
+            public Actor Player, Boog, Orik, Narration, Musashi;
         }
 
         /// <summary>A conversation to seed: its title, and how to write it (into conversation id <c>id</c>, or a new id when −1).</summary>
@@ -53,6 +53,8 @@ namespace Hearthdelve.Story.Editor
             new() { Title = SurfaceConversations.Memorial, Write = (db, t, c, id) => WriteLook(db, t, c, id, SurfaceConversations.Memorial,
                 "Karias. the letters are worn smooth where people touch them.") },
             new() { Title = SurfaceConversations.OrikFive, Write = WriteOrikFive },
+            // 2026-10-07: Musashi, who keeps the market cart.
+            new() { Title = StoryDialogue.MusashiHub, Write = WriteMusashiHub },
         };
 
         // ---------- The writer ----------
@@ -515,6 +517,52 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry yet = w.Npc("we open when you say so. i'll be here, counting.", 0, 2);
             w.Link(w.Start, five);
             w.Link(five, yet);
+        }
+
+        // ---------- Musashi (the owner's canon, 2026-10-07) ----------
+
+        /// <summary>
+        /// Musashi at the market cart: the first time, who he is (the Fortunate Five, the taste the Hollows took); every time after,
+        /// a word about the produce and four things to ask (cooking blind, the curse, family, the hours). Toshi is only a name here:
+        /// the quest to find him is later. A draft to rewrite in the node editor.
+        /// </summary>
+        static void WriteMusashiHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.MusashiHub, c.Player, c.Musashi,
+                "Musashi at the market cart (2026-10-07): the first meeting once, then his everyday talk. Toshi's quest comes later.");
+            const string met = "hh_musashi_met";
+            DialogueEntry first = w.Npc("ah. Phi's new keeper. Orik said you'd find the cart. he says everyone does, eventually.", 0, 1, Unsaid(met), Said(met));
+            DialogueEntry name = w.Npc("i'm Musashi. i sell what grows, what's caught, and what Grim swears is fresh.", 0, 2);
+            DialogueEntry knewPhi = w.Player("you knew Phi?", 0, 3);
+            DialogueEntry good = w.Player("what's good today?", 1, 3);
+            DialogueEntry five = w.Npc("we were five, once. Phi, Grim, me, and two more. people called us the Fortunate Five. we were, mostly.", 0, 4);
+            DialogueEntry everything = w.Npc("everything, i'm told. i can't taste a thing. the Hollows took that. so you'll have to tell me.", 1, 4);
+            w.Link(first, name);
+            w.Link(name, knewPhi, good);
+            w.Link(knewPhi, five);
+            w.Link(good, everything);
+
+            DialogueEntry hello = w.Npc("morning, [lua(HH_PlayerName())]. the onions are loud today. you can hear a good onion, if you listen.", 3, 1);
+            DialogueEntry askCook = w.Player("how do you cook without tasting?", 3, 2);
+            DialogueEntry askCurse = w.Player("what happened, down there?", 4, 2);
+            DialogueEntry askFamily = w.Player("any family?", 5, 2);
+            DialogueEntry askHours = w.Player("when do you close?", 6, 2);
+            DialogueEntry bye = w.Player("see you later.", 7, 2);
+            DialogueEntry blind = w.Npc("i don't, anymore. i smell, i listen, and i watch faces. yours will do.", 3, 3);
+            DialogueEntry curse = w.Npc("something down there liked my cooking too much. it took the taste for itself. i hope it chokes.", 4, 3);
+            DialogueEntry sell = w.Npc("so now i sell. someone should make something good with all this, even if i can't tell.", 4, 4);
+            DialogueEntry brother = w.Npc("a brother. Toshi. he went further down than any of us, and he hasn't come back up.", 5, 3);
+            DialogueEntry name2 = w.Npc("if you ever hear his name below, tell me. that's all i ask.", 5, 4);
+            DialogueEntry five2 = w.Npc("at five. after that, the onions need their sleep. so do i.", 6, 3);
+            w.Link(hello, askCook, askCurse, askFamily, askHours, bye);
+            w.Link(askCook, blind);
+            w.Link(askCurse, curse);
+            w.Link(curse, sell);
+            w.Link(askFamily, brother);
+            w.Link(brother, name2);
+            w.Link(askHours, five2);
+
+            w.Link(w.Start, first, hello);
         }
 
         // ---------- Checkpoint A's proofs (only to recognise them unedited) ----------

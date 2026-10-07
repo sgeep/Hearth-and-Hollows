@@ -273,5 +273,24 @@ namespace Hearthdelve.Tests
                     bad.Add($"{doc}: {line.Trim().Substring(0, System.Math.Min(120, line.Trim().Length))}");
             Assert.That(bad, Is.Empty, string.Join("\n", bad));
         }
+
+        // ---------- Musashi (the owner's canon, 2026-10-07) ----------
+
+        [Test]
+        public void Musashi_IsATrackedVillager_WithHisPortraitAndHub()
+        {
+            CharacterDefinition musashi = Story.characters.Single(c => c != null && c.id == CharacterIds.Musashi);
+            Assert.That((musashi.kind, musashi.tracked, musashi.conversation), Is.EqualTo((CharacterKind.Villager, true, StoryDialogue.MusashiHub)));
+            Assert.That(musashi.portrait, Is.Not.Null);
+            Assert.That(musashi.portrait.still, Is.Not.Null);
+            Assert.That(musashi.displayName.TableEntryReference.Key, Is.EqualTo("villager.musashi"));
+            Conversation hub = Dialogue.GetConversation(StoryDialogue.MusashiHub);
+            Assert.That(hub, Is.Not.Null, "seeded");
+            Actor actor = Dialogue.GetActor(hub.ConversantID);
+            Assert.That(actor.Name, Is.EqualTo("Musashi"));
+            string lines = string.Join(" ", hub.dialogueEntries.Select(e => e.DialogueText));
+            Assert.That(lines, Does.Contain("Fortunate Five").And.Contain("Toshi").And.Contain("taste"), "who he is, in his first draft");
+            Assert.That(Story.factions.GetFactionID(CharacterIds.Musashi), Is.GreaterThan(0), "a Love/Hate stand-in of his own");
+        }
     }
 }

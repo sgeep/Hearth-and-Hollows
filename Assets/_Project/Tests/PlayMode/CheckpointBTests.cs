@@ -376,6 +376,17 @@ namespace Hearthdelve.Tests.PlayMode
             if (drawn > lines) problems.Add($"{label.name}: \"{text.text}\" takes {drawn} lines (room for {lines})");
         }
 
+        /// <summary>Walks the keeper into a doorway the way through, a step a physics frame (from just outside it).</summary>
+        static IEnumerator StepInto(Rigidbody2D keeper, AreaPassage passage, Vector2 way)
+        {
+            Vector2 centre = passage.transform.position;
+            for (int i = 0; i < 12 && !passage.Busy; i++)
+            {
+                keeper.position = centre + way * (-0.6f + i * 0.1f);
+                yield return new WaitForFixedUpdate();
+            }
+        }
+
         [UnityTest]
         public IEnumerator TheCornerStairs_LeadUpToTheGuestRoom_AndItsDoorLeadsBackDown()
         {
@@ -390,7 +401,9 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Tavern.Area.Fixtures, Has.Member(new Rect(26f, 12f, 1f, 2f)));
 
             // Walked onto the stairs' foot: the screen fades, and the keeper is upstairs.
-            keeper.position = up.transform.position;
+            // (Since the B playtest a doorway needs the keeper to go the way through, not only to stand in it: this scene alone
+            // has no input manager, so the keeper is stepped up into it.)
+            yield return StepInto(keeper, up, Vector2.up);
             yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "the guest room");
             yield return WaitUntil(() => !up.Busy, 3f, "the fade back in");
             Assert.That(Vector2.Distance(keeper.position, Guest.Area.Arrival), Is.LessThan(0.6f));
@@ -403,7 +416,7 @@ namespace Hearthdelve.Tests.PlayMode
             Mode.Leave();
 
             // Down through the door: the keeper stands just below the stairs' foot, clear of it.
-            keeper.position = down.transform.position;
+            yield return StepInto(keeper, down, Vector2.down);
             yield return WaitUntil(() => PropertyArea.Current == Tavern.Area, 3f, "down through the door");
             yield return WaitUntil(() => !down.Busy, 3f, "the fade back in");
             Assert.That(Vector2.Distance(keeper.position, Tavern.Area.Arrival), Is.LessThan(0.6f));
@@ -414,7 +427,7 @@ namespace Hearthdelve.Tests.PlayMode
             // Mid-service the stairs work, and the end of the evening brings the keeper back down.
             Director.OpenDebugEvening();
             yield return null;
-            keeper.position = up.transform.position;
+            yield return StepInto(keeper, up, Vector2.up);
             yield return WaitUntil(() => PropertyArea.Current == Guest.Area, 3f, "upstairs mid-service");
             yield return WaitUntil(() => !up.Busy, 3f, "the fade");
             Director.EndServiceNow();

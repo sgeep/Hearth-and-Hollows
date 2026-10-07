@@ -36,15 +36,20 @@ namespace Hearthdelve.Tavern.Scene
         [SerializeField] PropertyArea m_To;
         [SerializeField, Tooltip("The area this way leads out of.")] PropertyArea m_From;
         [SerializeField, Min(0f)] float m_FadeSeconds = 0.25f;
+        [SerializeField, Tooltip("The way through (world direction): pushing that way in the doorway goes through. Zero: stepping in does.")]
+        Vector2 m_Through;
 
         bool m_Busy;
+        Vector2 m_LastSeen;
+        bool m_Tracked;
 
         public PropertyArea To => m_To;
         public PropertyArea From => m_From;
         public bool Busy => m_Busy;
 
-        public void Configure(PropertyArea from, PropertyArea to, float fadeSeconds = 0.25f)
+        public void Configure(PropertyArea from, PropertyArea to, float fadeSeconds = 0.25f, Vector2 through = default)
         {
+            m_Through = through;
             m_From = from;
             m_To = to;
             m_FadeSeconds = fadeSeconds;
@@ -55,10 +60,21 @@ namespace Hearthdelve.Tavern.Scene
 
         public bool CanPass => m_To != null && !m_Busy && OnFoot && (DecorateMode.Instance == null || !DecorateMode.Instance.IsActive);
 
-        void OnTriggerEnter2D(Collider2D other)
+        void OnTriggerEnter2D(Collider2D other) => Consider(other, entering: true);
+
+        void OnTriggerStay2D(Collider2D other) => Consider(other, entering: false);
+
+        void OnTriggerExit2D(Collider2D other)
         {
-            if (!CanPass || other.attachedRigidbody == null || !other.attachedRigidbody.CompareTag("Player")) return;
-            StartCoroutine(Go(other.attachedRigidbody));
+            if (other.attachedRigidbody != null && other.attachedRigidbody.CompareTag("Player")) m_Tracked = false;
+        }
+
+        /// <summary>In the doorway and pushing the way through (<see cref="Doorway"/>): through it goes.</summary>
+        void Consider(Collider2D other, bool entering)
+        {
+            if (other.attachedRigidbody == null || !other.attachedRigidbody.CompareTag("Player")) return;
+            bool going = Doorway.GoingThrough(other.attachedRigidbody, m_Through, entering, ref m_LastSeen, ref m_Tracked);
+            if (going && CanPass) StartCoroutine(Go(other.attachedRigidbody));
         }
 
         void Update()

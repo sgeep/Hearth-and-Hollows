@@ -326,6 +326,30 @@ namespace Hearthdelve.Tests.PlayMode
 
         static Hearthdelve.Shared.Save.GardenSaveData SavedGarden() => Flow.PeekSave().garden;
 
+        // ---------- Musashi (the owner's canon, 2026-10-07) ----------
+
+        [UnityTest]
+        public IEnumerator Musashi_StandsByTheCart_AndTalks_WithHisNameAndFace()
+        {
+            yield return Daytime();
+            Villager musashi = Villager.Find(Hearthdelve.Shared.Characters.CharacterIds.Musashi);
+            Assert.That(musashi, Is.Not.Null, "in Kariaston");
+            Assert.That(Vector2.Distance(musashi.transform.position, DaytimeActions.Stall.transform.position), Is.LessThan(4f), "by the market cart");
+            yield return Frames(2);
+            Assert.That(musashi.Talk.IsAvailable, "free to talk in the daytime");
+            Assert.That(musashi.Talk.Hint, Is.EqualTo(new TavernHint(TavernHintKind.Talk, "villager.musashi")));
+            musashi.Talk.Use();
+            yield return Frames(3);
+            Assert.That(StoryServices.Conversations.IsTalking);
+            var box = Find<Hearthdelve.Story.Presentation.HearthDialogueUI>();
+            Assert.That(box.SpeakerName, Is.EqualTo("Musashi"));
+            Assert.That(box.GetComponentsInChildren<SuperTextMesh>().Select(t => t.text), Has.Some.Contains("Musashi"), "he says who he is");
+            Assert.That(musashi.Talk.IsAvailable, Is.False, "not while talking");
+            DialogueManager.StopAllConversations();
+            yield return Frames(3);
+            Assert.That(OnFootNow);
+        }
+
         // ---------- Checkpoint A's carry-overs ----------
 
         [UnityTest]

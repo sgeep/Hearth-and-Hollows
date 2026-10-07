@@ -34,12 +34,12 @@ namespace Hearthdelve.Tests
         // ---------- The clock ----------
 
         [Test]
-        public void TheDefault_RunsEightToFive_InAboutTwelveMinutes()
+        public void TheDefault_RunsEightToFive_InAboutFourMinutes()
         {
             SurfaceClockSettings s = Settings;
             Assert.That((s.dayStartMinute, s.cutoffMinute, s.afternoonStartMinute), Is.EqualTo((480, 1020, 720)));
             float realMinutes = (s.cutoffMinute - s.dayStartMinute) * s.realSecondsPerGameMinute / 60f;
-            Assert.That(realMinutes, Is.InRange(10f, 14f), "a day that moves (3x the first playtest's 35 minutes)");
+            Assert.That(realMinutes, Is.InRange(3f, 5f), "a short day while there's little to fill it (35 minutes, then 12, now about 4)");
             Assert.That((s.marketOpenMinute, s.marketCloseMinute), Is.EqualTo((480, 1020)));
             Assert.That(s.pauseIndoors, Is.False, "the clock runs indoors for the first playtest");
         }

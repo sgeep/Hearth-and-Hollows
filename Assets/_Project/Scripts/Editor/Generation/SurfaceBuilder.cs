@@ -73,9 +73,10 @@ namespace Hearthdelve.Editor
             LookTestContent.CreateOrUpdate<SurfaceClockConfig>(ClockConfigPath, c =>
             {
                 if (c.settings.realSecondsPerGameMinute <= 0f) c.settings = SurfaceClockSettings.Default;
-                // Once: the first playtest's 35-minute day becomes 3x faster, unless the asset has been tuned since.
-                if (Mathf.Abs(c.settings.realSecondsPerGameMinute - 35f * 60f / 540f) < 0.01f)
-                    c.settings.realSecondsPerGameMinute = SurfaceClockSettings.Default.realSecondsPerGameMinute;
+                // Once: an earlier default day (35 minutes, then 12) becomes today's, unless the asset has been tuned since.
+                foreach (float earlier in new[] { 35f * 60f / 540f, 35f / 3f * 60f / 540f })
+                    if (Mathf.Abs(c.settings.realSecondsPerGameMinute - earlier) < 0.01f)
+                        c.settings.realSecondsPerGameMinute = SurfaceClockSettings.Default.realSecondsPerGameMinute;
             });
 
         /// <summary>Boot, in place: the one surface clock beside GameFlow.</summary>
@@ -115,8 +116,9 @@ namespace Hearthdelve.Editor
             door.transform.position = new Vector2(TavernBuilder.DoorColumn + 0.5f, TavernBuilder.FloorBottom + 0.22f);
             var trigger = door.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(0.9f, 0.45f);
-            door.AddComponent<SurfaceDoor>().Configure(SurfaceDoor.FrontInside, SurfaceDoor.FrontOutside, tavernSurface, new Vector2(0f, 1.3f));
+            trigger.size = new Vector2(1.4f, 0.7f);
+            door.AddComponent<SurfaceDoor>().Configure(SurfaceDoor.FrontInside, SurfaceDoor.FrontOutside, tavernSurface, new Vector2(0f, 1.3f),
+                through: Vector2.down);
 
             Transform places = new GameObject("Daytime Places").transform;
             places.SetParent(surface, false);

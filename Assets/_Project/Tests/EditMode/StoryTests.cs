@@ -380,6 +380,8 @@ namespace Hearthdelve.Tests
         public void EveryConditionAndScript_RunsInTheDialogueSystemsLua()
         {
             StoryLua.Register();
+            // The Dialogue System always gives conversations its Variable table; bare Lua here needs one for flags like hh_musashi_met.
+            Lua.Run("if Variable == nil then Variable = {} end");
             try
             {
                 foreach (string name in StoryLua.All)

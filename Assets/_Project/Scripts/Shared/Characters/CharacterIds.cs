@@ -36,6 +36,12 @@ namespace Hearthdelve.Shared.Characters
         /// </summary>
         public const string Narration = "narration";
 
+        /// <summary>
+        /// Musashi (2026-10-07, the owner's canon): an elf who keeps the Kariaston market cart. Once of the Fortunate Five with Phi and
+        /// Grim, a friend of Orik's; a curse from the Hollows took his taste. His brother Toshi is missing below (a later quest).
+        /// </summary>
+        public const string Musashi = "musashi";
+
         /// <summary>Generated Visitors are <c>visitor/&lt;day&gt;/&lt;visit&gt;</c>: unique for the evening, never saved.</summary>
         public const string VisitorPrefix = "visitor/";
 

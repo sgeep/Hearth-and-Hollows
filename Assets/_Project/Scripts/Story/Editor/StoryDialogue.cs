@@ -26,6 +26,8 @@ namespace Hearthdelve.Story.Editor
         /// <summary>4g Checkpoint C: who to talk to first, in priority order (the quest, then what they remember, then Talk).</summary>
         public const string BoogHub = "Boog/Hub";
         public const string OrikHub = "Orik/Hub";
+        /// <summary>Musashi at the market cart (2026-10-07).</summary>
+        public const string MusashiHub = "Musashi/Hub";
 
         /// <param name="seedLog">The seed log (tests use their own); the project's by default.</param>
         public static DialogueDatabase Ensure(string path, string seedLog = null)
@@ -48,6 +50,7 @@ namespace Hearthdelve.Story.Editor
             cast.Orik = EnsureActor(db, template, "Orik", CharacterIds.Orik, false);
             // 4h: the voice of things looked at.
             cast.Narration = EnsureActor(db, template, "Narration", CharacterIds.Narration, false);
+            cast.Musashi = EnsureActor(db, template, "Musashi", CharacterIds.Musashi, false);
             Seed(db, template, cast, seedLog);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);

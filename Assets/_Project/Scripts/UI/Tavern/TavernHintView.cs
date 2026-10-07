@@ -44,7 +44,11 @@ namespace Hearthdelve.UI.Tavern
                 case TavernHintKind.Simmering: m_Text.Set(TavernLocKeys.HintSimmering, dish); break;
                 case TavernHintKind.StewReady: m_Text.Set(TavernLocKeys.HintStewReady, dish, h.Count); break;
                 case TavernHintKind.Staffed: m_Text.Set(TavernLocKeys.HintStaffed, h.Staff != null ? Loc.Get(h.Staff.displayName) : string.Empty); break;
-                case TavernHintKind.Talk: m_Text.Set(TavernLocKeys.HintTalk, key, h.Staff != null ? Loc.Get(h.Staff.displayName) : string.Empty); break;
+                // Staff by their definition; a villager (2026-10-07) by the Content table key in the hint.
+                case TavernHintKind.Talk:
+                    m_Text.Set(TavernLocKeys.HintTalk, key, h.Staff != null ? Loc.Get(h.Staff.displayName)
+                        : !string.IsNullOrEmpty(h.NameKey) ? Loc.Get(Loc.ContentTable, h.NameKey) : string.Empty);
+                    break;
                 case TavernHintKind.Note: m_Text.Set(h.NameKey); break;
                 case TavernHintKind.Growing:
                     m_Text.Set(h.Count <= 1 ? GardenLocKeys.ReadyTomorrow : GardenLocKeys.ReadyIn, Loc.UI(h.NameKey), h.Count);

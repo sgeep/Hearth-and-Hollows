@@ -307,9 +307,15 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 
 **Grim and Ogrin** (a dwarf, Grim, he; and Ogrin, he).
 - **Locked (2026-10-06, Decided 55):** Grim is a dwarf and a **former delver**. On a delve into the Hollows he found a human-looking infant, alive, beside two dead adults he assumes were the parents, and brought him home to Kariaston and raised him: Ogrin. Ogrin aged impossibly fast (to about ten in a year or two), then the ageing stopped abruptly; since then he has been chronically ill, with bouts of severe exhaustion. Grim doesn't know what Ogrin is, why he aged so, or what happened below; he loves him deeply. Ogrin calls him **Grim**; a later beat where Ogrin first calls him **Dad** is reserved and never spent casually. Ogrin is central to Glimmer's questline (below).
-- **Locked (2026-10-06, the 4h plan, H7):** Grim runs the market stall as his ordinary livelihood, one part of who he is besides Ogrin. *(Superseded: "spends everything he earns on Ogrin's remedies".)*
+- *Superseded (2026-10-07, Decided 61):* Grim ran the market stall (H7, 2026-10-06); **Musashi** keeps it now. Grim was one of **the Fortunate Five** with Phi and Musashi. What Grim does for a living now is open (Open 12).
 - *Proposed:* Grim is gruff, fair and practical, has a dry warmth he hides and a delver's unromantic knowledge of the Hollows. Ogrin is bright, curious and opinionated: he draws maps of the Hollows from what he overhears, collects the keeper's stories, loves Bart's songs and Boog's explosions from a distance, hates onion broth and being called brave or fragile; good days at the stall, bad days at his window. The relationship with Bram grows through care, not deeds of nerve.
 - *Hooks:* what Ogrin is and what happened below; Glimmer.
+
+**Musashi** (an elf; he) *(the owner's canon, 2026-10-07, Decided 61)*.
+- **Locked:** Musashi keeps the **Kariaston market** (the cart in the square, where he stands). An old friend of Phi's, Grim's and Orik's, and one of **the Fortunate Five**, Phi and Grim's adventuring party. He always loved cooking, and lost his sense of taste to a curse from the Hollows; now he sells ingredients in the hope that others will make good things with them, even if he can't taste them. His brother **Toshi** is missing in the Hollows; finding him will be a quest (later).
+- *As first written (the node editor's draft, `Musashi/Hub`):* kind, wry, a little wistful; cooks by smell, sound and other people's faces now ("you can hear a good onion, if you listen"); never self-pitying about the curse ("i hope it chokes"). Toshi is only a name until his quest.
+- *Look:* the Portrait Generator's elf (soft skin), black hair under a cook's white bandana, a white vest; in the world, A Myriad of NPCs' elf with a black ponytail, a white shirt and dark trousers.
+- *Hooks:* Toshi below; the other two of the Fortunate Five; what took his taste, and whether it can be won back.
 
 **Bart** (an orc bard; he).
 - *Owner's concept:* an orc bard.
@@ -1144,6 +1150,8 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 
 *Recorded 2026-10-06 (the owner's approval of the 4h plan and its canon):*
 
+61. **Musashi** *(the owner's call, 2026-10-07)*: an elf who keeps the Kariaston market cart (replacing Grim as its keeper, H7); a friend of Phi, Grim and Orik and a member of the Fortunate Five (Phi and Grim's party); a cook who lost his taste to a curse from the Hollows and sells ingredients so others can make what he can't taste; his brother Toshi is missing in the Hollows (a quest to come). Canonical (not renameable). Built 2026-10-07: standing at the cart, talkable (`Musashi/Hub`), with his portrait.
+
 54. **The sealing and the founding** *(locked)*: a source of evil opened beneath this region and its army caused a great war; Karias, Maximo's former apprentice and a great wizard, gave his life to seal it, with Maximo among those who sealed it; the seal is imperfect and what seeps through is the Hollows; Maximo founded Kariaston as a watch and named it for Karias; people gathered round the watch, and Tally Ho! with them. Maximo will not, and probably cannot, return below (the reason is a future story decision). Revealed in play through people and places, not cosmology (Section 2.1).
 55. **Grim and Ogrin** *(locked)*: Grim, a dwarf and former delver, found the infant Ogrin beside two dead adults in the Hollows and raised him; Ogrin aged to about ten in a year or two, stopped, and has been chronically ill since; Grim doesn't know what he is. Ogrin calls him Grim; "Dad" is a reserved later beat. Grim runs the market stall as his livelihood.
 56. **Gimp** *(locked)*: a half-elf hunter and ranger, nomadic and abrasive, who likes almost no one but Boog and Phi, starts standoffish toward Bram, loves rifles and explosives, and lives in and around the Hollows; world figure `soldier_headband`.
@@ -1252,6 +1260,10 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
     - firearms (Gimp loves rifles: recommended as rare personal property, never a player weapon; before 4h Checkpoint D);
     - how Glimmer's failed guardianship relates to Maximo's sealing;
     - why Maximo cannot return to the Hollows (a future story decision).
+    - *(2026-10-07, Musashi)* what Grim does for a living now that Musashi keeps the market;
+    - who the other two of the Fortunate Five were, and whether Orik ever travelled with them;
+    - Toshi: what took him below and what became of him (his quest's shape), and what cursed Musashi's taste (the same thing?);
+    - names that sit close together: Musashi and Maximo.
 
 ---
 

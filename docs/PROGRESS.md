@@ -1239,6 +1239,8 @@ Tests: EditMode 693/693, PlayMode 235 passed, 0 failed (25 explicit captures and
 - **A tended bed's grass rim darkens with its soil** (the tint covers the bed's whole autotile, edges included).
 - **F8 through the evening** can carry the first-evening introduction (Orik, Boog) onto the delve's result screen (the debug skip, not play).
 
+**After your B playtest (2026-10-07):** doorways go through when you push their way from anywhere in them (wider triggers; no bounce-back); the day is about 4 minutes; **Musashi** (your new canon: an elf of the Fortunate Five who lost his taste to a curse from the Hollows, brother Toshi missing below) stands at the market cart and talks (`Musashi/Hub`, a first draft for the node editor). Grim no longer runs the market; what he does now is an open question (GDD Open 12).
+
 **Open question for you:** homegrown provenance (above): worth changing ingredient identity for Boog's callbacks, or tracked another way (a day's harvest log) later?
 
 ### Open design questions (Phase 4)
