@@ -146,7 +146,9 @@ namespace Hearthdelve.Tests
                 values = { new RelationshipValueData { judge = "gunta", subject = "player", trait = "Respect", value = 11.25f } },
                 memories = { new SocialMemoryData { judge = "gunta", deed = StoryBuilder.ReturnedBoogsBomb, actor = "player", target = "gunta", count = 1, impact = 40f, expires = RelationshipRules.Forever } },
             };
-            string first = SaveSystem.ToJson(SaveSystem.Capture(state));
+            // As a real save is: written once by the game (a bare state's furniture isn't set up yet; loading sets it up).
+            GameState loaded = SaveSystem.Restore(SaveSystem.FromJson(SaveSystem.ToJson(SaveSystem.Capture(state))), _ => null, _ => true);
+            string first = SaveSystem.ToJson(SaveSystem.Capture(loaded));
             GameState back = SaveSystem.Restore(SaveSystem.FromJson(first), _ => null, _ => true);
             string again = SaveSystem.ToJson(SaveSystem.Capture(back));
             Assert.That(again, Is.EqualTo(first), "restored and saved again: nothing replayed, lost or duplicated");
