@@ -75,7 +75,7 @@ Where each lens most often matters in Hearth & Hollows:
 |---|---|
 | Essential Experience | The start of every feature: the satisfying kill-and-harvest, the busy evening service, a rare dish carried out to the table, a neighbour you know walking in to eat |
 | Fun | Whether a moment is enjoyable, not only correct: hits, minigames, serving |
-| Curiosity | Rooms behind doors, unfamiliar monster parts, Test Kitchen experiments, Old Tamsin's disappearance |
+| Curiosity | Rooms behind doors, unfamiliar monster parts, Test Kitchen experiments, Old Phi's disappearance |
 | Problem Solving | Planning a delve around what the menu needs; routing service through a busy room |
 | Elemental Tetrad | Checking that mechanics, story, aesthetics and technology pull the same way (a dish's preparation, its icon, its sound and its lore) |
 | Flow | Minigame length and difficulty; service pacing; the rhythm of fights and choices in a delve |
@@ -177,7 +177,7 @@ The story unfolds in four acts, advanced by reaching new depths of the Hollows a
 | **Bram Holloway** | Protagonist, tavern keeper and delver |
 | **Boog** (goblin) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
 | **Orik** (dwarf) | Server and bookkeeper; runs the floor during service *(renamed 2026-10-06: formerly Pip Marrowby, a halfling)* |
-| **Old Tamsin** | Former owner/mentor, vanished in the Hollows; central mystery |
+| **Old Phi** (Phi'rai, a drow) | Former proprietor of Tally Ho! and the keeper's mentor, vanished in the Hollows; central mystery. Once an adventurer of the **Fortunate Five**, she helped rebuild Tally Ho!, left for many years, and came back decades later to settle down and run it *(renamed 2026-10-07: formerly Old Tamsin; Section 2.10)* |
 | **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
 | **Sylvaris** (elf) | Herbalist and scout; unlocks herb garden and brewing depth *(v0.5: a natural fit for farming; Section 2.9)* |
 | **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder *(v0.5: the fortification role no longer has a home; Section 2.9)* |
@@ -293,7 +293,7 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 **Kaloren Frosthand** (wizard, secretly a lich; he).
 - *Owner's concept:* became a lich in the Hollows, somehow regained his memories and left; his phylactery is still down there. Despite this he is a nice, kind person.
 - *Proposed:* a gentle, courteous scholar who is slightly too cold to the touch, wears gloves in summer, and never eats at the tavern (he orders, and admires the plate). The comedy is in near misses: he forgets to breathe in conversation, knows a little too much about how the Cellars were built. The warmth is real: he chose to come back up and be a neighbour.
-- *Hooks:* the phylactery is the obvious long quest (a quest object deep in the Hollows; whether the keeper returns it, hides it, or something else is the owner's story decision). He is living proof that the Hollows can change a person and that the change can be survived, which matters to anyone wondering what happened to Old Tamsin.
+- *Hooks:* the phylactery is the obvious long quest (a quest object deep in the Hollows; whether the keeper returns it, hides it, or something else is the owner's story decision). He is living proof that the Hollows can change a person and that the change can be survived, which matters to anyone wondering what happened to Old Phi.
 
 **Maximo** (elderly human, the eccentric mayor of Kariaston; he).
 - *Owner's concept:* in the spirit of Don Quixote. His friend **Karias**, Kariaston's namesake, was his Sancho: a young elf wizard Maximo mentored. Karias was killed while they were in the Hollows, and Maximo has never gone back.
@@ -326,15 +326,23 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 - *Proposed:* a small light with opinions: curious about everything, easily distracted, delighted by words she has just learned, and suddenly, briefly ancient when something in the Hollows reminds her of what she was. She fits Section 2.1: ages ago something was sealed beneath the earth and the seals are failing; Glimmer was one of the seal's guardians. Her questline (Phase 5 or later): the keeper helps her remember; the bond with Ogrin heals him and makes her whole, at a cost the story decides.
 - *Reading taken (to confirm):* "heal and fuse with Ogrin" is read as one act, a bond in which Glimmer heals Ogrin and is herself restored by it, much as Syl and Kaladin's bond restores Syl.
 
+#### Old Phi (renamed 2026-10-07)
+
+**Old Phi** (Phi'rai, a drow; she) replaces Old Tamsin as the former proprietor of Tally Ho!, the mentor who vanished in the Hollows and the Act I mystery.
+- *Owner's concept:* an adventurer who helped rebuild Tally Ho!, then left for many years, and returned decades later to settle down and run the tavern. Usually called "Old Phi". She would bring up stories of her old adventuring party, **the Fortunate Five**.
+- *As built (unchanged):* nine days before the keeper arrives she went down into the Hollows, "a week at most"; her letter leaves Tally Ho! to the keeper; she hired Orik "for a week" eleven years ago and never said the week was over; she let Boog keep his bomb; she went after the Larder Troll twice and wouldn't say why. All of that fits her. Her stable id stays `tamsin` (like `gunta` and `pip`).
+- *Proposed:* since she's missing, her stories reach the player through others: Orik's ledger and his memory of her, Boog's kitchen lore, and things she left in Tally Ho! (a curio from the Five, a letter, a carving). A drow is long-lived, so "decades" sits easily: she rebuilt Tally Ho! young, by drow reckoning, and came back still able to delve.
+- *Questions:* who the other four of the Fortunate Five were, and whether any of them are in Kariaston now (Kaloren, ageless as a lich, would be the natural candidate; Maximo only if his late-life adventuring overlapped hers), or whether one of them is what she went down after.
+
 #### Through-lines (proposed, for the owner)
 
-- **The Hollows take memory.** Kaloren lost his and got it back; Glimmer lost hers. If that is a property of the Hollows rather than a coincidence, it is a quiet thread for Tamsin's disappearance and for the Warden Below.
-- **Everyone has lost someone below.** Maximo lost Karias, Grim may lose Ogrin, Kaloren lost himself, Glimmer lost her purpose, Orik's family went down for three hundred years, Tally Ho! lost Tamsin. The keeper is the one who goes down and comes back.
+- **The Hollows take memory.** Kaloren lost his and got it back; Glimmer lost hers. If that is a property of the Hollows rather than a coincidence, it is a quiet thread for Phi's disappearance and for the Warden Below.
+- **Everyone has lost someone below.** Maximo lost Karias, Grim may lose Ogrin, Kaloren lost himself, Glimmer lost her purpose, Orik's family went down for three hundred years, Tally Ho! lost Phi. The keeper is the one who goes down and comes back.
 - **Pairs.** Boog and Gimp (explosives), Maximo and Bart (songs), Grim and Ogrin (family), Ogrin and Glimmer (the bond), Kaloren and Maximo (both survivors of the Hollows, one who went back and one who never will). These are the first pairs for "react to other residents" (Section 2.7).
 
 #### Questions for the owner (also in Section 13, Open 12)
 
-1. **When Kariaston got its name.** If Karias died in Maximo's old age, the village was named (or renamed) within living memory, yet Tally Ho! is old (Tamsin hired Orik eleven years ago; adventurers drank there before exploring the upper Hollows). Did Maximo rename an existing village, or found it? (Recommended: he renamed it when he became mayor; what it was called before is open, and Brackenford is not reused.)
+1. **When Kariaston got its name.** If Karias died in Maximo's old age, the village was named (or renamed) within living memory, yet Tally Ho! is old (Phi helped rebuild it decades ago and hired Orik eleven years ago; adventurers drank there before exploring the upper Hollows). Did Maximo rename an existing village, or found it? (Recommended: he renamed it when he became mayor; what it was called before is open, and Brackenford is not reused.)
 2. **Karias: elf or half-elf.** The campaign notes say half-elf; the brief says elf. These docs say elf until told otherwise.
 3. **A secret lich among neighbourly liches.** Section 2.8 makes skeletons and liches ordinary neighbours, so Kaloren's secret can't simply be "I'm a lich". Recommended: what he hides is where and how he became one (the Hollows made him) and that his phylactery is still below; whether other villagers know is the owner's call.
 4. **Glimmer and the Warden Below.** A failed guardian of the seal and an antagonist called "the Warden" overlap in role and name. Are they the same order, enemies, or is "Warden" due for a rename?
@@ -1125,6 +1133,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 
 *Recorded 2026-10-07 (the owner's cast):*
 
+52. **Old Phi** *(the owner's call, 2026-10-07)*: Tally Ho!'s former proprietor and the keeper's missing mentor is **Old Phi** (Phi'rai, a drow; she), replacing Old Tamsin: an adventurer of **the Fortunate Five** who helped rebuild Tally Ho!, left for many years and came back decades later to run it. The stable id stays `tamsin`. The game's dialogue still says Tamsin until those lines are edited (Section 2.10).
 51. **The Kariaston cast** *(the owner's call, 2026-10-07)*: new villagers **Kaloren Frosthand** (a kind wizard, secretly a lich made in the Hollows, his phylactery still below), **Maximo** (the elderly, Quixote-like mayor; Kariaston is named for his friend and sidekick **Karias**, a young elf wizard he mentored, killed in the Hollows; Maximo has never gone back), **Grim and Ogrin** (a dwarf and the sick orphan human boy he looks after) and **Bart** (an orc bard); **Orik** confirmed as the dwarf bartender who replaced Pip (entry 43). New **Hollowers**, people who live in the Hollows and aren't enemies: **Gimp** (comes up to the tavern to talk explosives with Boog) and **Glimmer** (a whimsical fey spirit, once a guardian meant to seal the Hollows, who failed and forgot her past; a later questline heals and fuses her with Ogrin). Names, kinds and concepts are the owner's; the details in Section 2.10 are proposed. All are canonical characters (not renameable, Decided 16). Questions: Open 12.
 
 *Recorded 2026-10-06 (4g Checkpoint C as built; waiting for the owner's final 4g playtest):*
@@ -1136,7 +1145,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 *Recorded 2026-10-06 (4g Checkpoint B as built; signed off 2026-10-06):*
 
 44. **The keeper** *(4g Step 4)*: made at New Game: a name (up to 16 letters) and one of four complete Minifantasy bodies (townsfolk, warrior, dwarf, orc), with Minifantasy colourways for skin, hair and clothes; no pronoun choice (dialogue says "you" or the name). Saved in the keeper's profile; a legacy keeper is Bram, the townsfolk.
-45. **The Act I opening** *(4g Step 5)*: arrival day at Tally Ho! (Orik, Boog, Tamsin missing below, the empty storeroom), down the cellar hatch to a first delve taught by one-time prompts, the homecoming that night, then the first evening (the board, cooking, serving, the takings), ending on Boog's question. Explicit stages, saved; an old save is past them.
+45. **The Act I opening** *(4g Step 5)*: arrival day at Tally Ho! (Orik, Boog, Phi, then called Tamsin, missing below, the empty storeroom), down the cellar hatch to a first delve taught by one-time prompts, the homecoming that night, then the first evening (the board, cooking, serving, the takings), ending on Boog's question. Explicit stages, saved; an old save is past them.
 46. **Boog's Bomb as built** *(4g Step 6)*: the bomb lies in the second fight cleared on the Cellars' first floor while the quest wants it; lost with a death and found again; brought home by extraction; handed over in Boog's conversation for 60 gold and a deed done for Boog alone (`returned_boogs_bomb`). Declining never closes it. She has no name yet (candidates in `PLAN_4G.md`).
 47. **Dialogue tooling boundary** *(4g Checkpoint B)*: the story tooling seeds each conversation once and never rewrites it; the node editor owns it from then on.
 

@@ -1194,6 +1194,8 @@ Checkpoint B was signed off on 2026-10-06: you playtested it and verified the no
 
 Seven people join the cast (GDD §2.10, Decided 51): villagers **Kaloren Frosthand**, **Maximo** (Kariaston named for his lost friend **Karias**), **Grim and Ogrin**, **Bart**, with **Orik** confirmed; and the first **Hollowers**, **Gimp** and **Glimmer**. Character roots drawn from the owner's campaign notes (Maximo's tannery past, his songs and speeches, his mentoring of Karias; Gimp's gunpowder and friendship with Boog), without importing the campaigns' wider lore. A **4g Checkpoint D** (Steps 9–12: the cast as data, Gimp at the bar after Boog's Bomb, one Glimmer glimpse in the Cellars, the village named in Boog's and Orik's talk) is proposed in `docs/PLAN_4G.md`, awaiting approval; the alternative is closing 4g as built and taking the cast to 4h, whose four households would be Maximo, Kaloren, Grim and Ogrin, and Bart. Open questions for the owner: GDD §13 Open 12 (when Kariaston got its name, Karias elf or half-elf, Kaloren's secret, Glimmer and the Warden Below, close names, Gimp's kind, firearms). Nothing built.
 
+**Old Phi (2026-10-07, the owner's request):** Old Tamsin is now **Old Phi** (Phi'rai, a drow, of the Fortunate Five; GDD Decided 52). The stable id stays `tamsin`; entries above keep the old name. The game's nine dialogue lines still say Tamsin until they're edited (proposed with Checkpoint D).
+
 ### Open design questions (Phase 4)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.

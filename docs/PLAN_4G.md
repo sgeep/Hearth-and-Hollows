@@ -16,6 +16,8 @@
 
 ## Proposed: Checkpoint D, the new cast (2026-10-07, awaiting approval)
 
+*Old Tamsin is now **Old Phi** (Phi'rai, a drow; GDD Decided 52). This plan's older sections keep "Tamsin" as a historical record; the stable id stays `tamsin`.*
+
 The owner added seven people to the cast on 2026-10-07 (GDD §2.10, Decided 51) and asked that they shape 4g. Checkpoint C is built and waiting for the final playtest, and villagers proper (homes, schedules, a walkable Kariaston, named patrons) are 4h's. So this proposes one more small checkpoint before `milestone-4g`: the cast enters the game where 4g's systems already reach (the tavern at night, the Cellars, Boog's and Orik's talk) and nothing that needs the village is built early.
 
 **Experience target:** *the village exists before the player can walk it, and the Hollows have people in them.* The player hears Kariaston's names from Boog and Orik, meets Boog's strange friend from below at the bar, and once, in the Cellars, meets a light that talks.
@@ -38,6 +40,7 @@ The owner added seven people to the cast on 2026-10-07 (GDD §2.10, Decided 51) 
 
 **Step 12, the village in conversation.**
 - New one-time branches in Boog's and Orik's hubs (author's edits, made once where the hub is still as written) and a few everyday lines that name Kariaston's people: the mayor's proclamations, the song Bart won't stop playing, Grim buying remedies, the wizard who never eats. Each is a seed, so 4h's first meetings land on people the player has heard of.
+- Old Phi's name in the game: the nine Dialogue lines that say Tamsin (Arrival, Homecoming, FirstTakings, Boog/Bomb, Orik/Talk, Orik's callbacks) become Phi, as one author's edit where each line is still as written; the proper-noun list in `TextStyleTests` and the tests that quote those lines follow. If Checkpoint D isn't approved, this is a small edit on its own.
 - Nothing about Kaloren's secret, Karias's death or the phylactery is said yet: those are 4h's and the story's.
 
 **Tests:** characters complete and valid (ids, kinds, values, names in the Content table); the faction database matches the characters; Gimp's presence rule (never before the bomb, guaranteed the first night after, seeded after that); Glimmer's meeting fires once and survives save and Continue; `TypographyTests` and `TextStyleTests` over the new lines; save stays version 9 (the new state is dialogue variables and existing quest state).
