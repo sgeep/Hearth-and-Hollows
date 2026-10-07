@@ -1,6 +1,6 @@
 # 4h plan: walkable Kariaston and the daytime life-sim slice
 
-> **Status: approved 2026-10-06** (the owner's decisions on H1–H15 and the canon in §0.1, below). **Checkpoint A is built (2026-10-07) and waiting for the owner's playtest**; see *As built: Checkpoint A* near the end. B, C and D are not started. 4g is complete (signed off 2026-10-06, tag `milestone-4g`); its proposed Checkpoint D (the new cast) is folded into this plan. Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
+> **Status: approved 2026-10-06** (the owner's decisions on H1–H15 and the canon in §0.1, below). **Checkpoint A is approved (2026-10-07); Checkpoint B is built (2026-10-07) and waiting for the owner's playtest**; see *As built* near the end. C and D are not started. 4g is complete (signed off 2026-10-06, tag `milestone-4g`). Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
 
 **The question 4h answers:** *does living in Tally Ho! and Kariaston feel good enough that I want to spend time there even when nothing is pushing me toward an objective?*
 
@@ -772,6 +772,82 @@ The owner's verdict: everything else works well. Five changes:
 - **A pond:** Forgotten Plains' own lake tiles (two frames, animated, solid), stepped 12×4 in the meadow between Maximo's house and the garden path, a tree on its north-west bank and the bench to its east. Added to the hand-owned scene once by `KariastonBuilder.AddPondBatch` (it touches nothing else, and does nothing if a pond is there); a freshly generated village paints it too.
 - **The storeroom shelves are furniture now** (they stood in the way, by the stairs' corridor): a unique working piece (`storeroom_shelves`, *Stations* in the catalog, a new `FurnitureFunction.Storeroom`) that Decorate Mode moves like the stations, starting below the barrels against the east wall (26, 7). A save from before gets them once, where the starting room has them or on the nearest free tile (`FunctionalGrants`; a unique piece can't be sold or lost, so "owns none" means "never had them": no save-version bump). The fixed fixture, its reserved tile and its layout fixture are gone.
 - **Back up the stairs after a trip outside:** not reproduced in automated play (walking through both doors on foot, then along the corridor and up, passes, with the shelves in either place), so the likeliest cause was fixed: the stairs' trigger covered only the right two-thirds of the one-tile gap beside the stew pot, so a keeper walking up along the stew pot slid past it. It now covers the whole foot tile (`GuestRoomBuilder`), and `AfterKariaston_TheKeeperWalksBackUpTheStairs` walks it. If it still happens, it needs the exact route.
+
+## As built: Checkpoint B, "A day's work" (2026-10-07, built; waiting for the owner's playtest)
+
+Steps 5–7. Nothing of C or D: no villagers, schedules, cast, Gimp or Glimmer; the world seed exists and nothing reads it yet. `milestone-4h` is not tagged.
+
+### Vigor
+
+- **Pure** (`Shared/Surface/Vigor`): `Max`, `Spent`, `Current`, `CanAfford(cost)`, `Spend(cost)` (all or nothing), `Refill()`, `Restore(spent)`. Only `Spent` is state (saved); the maximum and every cost are tuning, so a retune never strands a save.
+- **Tuning** (`Data/Config/VigorConfig.asset`, `VigorSettings`): **6 a day; prepare and plant a bed 2; tend a bed 1; harvest 0** (the approved B test values). Costs are named by `VigorActivity` (PlantBed, TendBed, HarvestBed); a later activity adds an entry and a cost, nothing else.
+- **Refill:** only in `DayRules.Sleep`. Nothing else restores it in 4h.
+- **Never spent by** walking, the stairs, the doors, talking, looking, shopping, the storeroom, the delve meal, decorating, the menu board and Prep, service or the delve (tests walk each at 0). At 0 nothing ends, advances, forces Prep, weakens service or touches Essence: an empty bed says "too tired to dig a bed today" and a growing one just says when it'll be ready.
+- **HUD:** six small pips right of the clock tab (warm when full, dark when spent), only in the free daytime; spending pops the spent pips (a 0.22 s squash), with a soft tick and a light tap (`UiMoment.Vigor`: `PH_UiTick` + Tap.Light at 0.3, through the named-haptics path; a no-op on the Web).
+
+### The garden
+
+- **Four fixed beds** on Tally Ho!'s grounds (Checkpoint A's soil), stable ids **`garden_1`** (top left) … **`garden_4`** (bottom right), listed in `Data/Garden/GardenConfig.asset`. State is `GardenState` (beds by id) of `BedState`: `Crop` (id, empty when bare), `PlantedDay`, `Grown` (nights grown), `TendedDays`, `LastTendedDay`, `LastGrownDay`. A bed knows nothing of its shape; the scene's `GardenBed` (Hearthdelve.Village, built by the Kariaston updater) shows it.
+- **Rules** (`GardenRules`, pure): plant (empty bed, Vigor 2) → tend (growing, once per bed per day, Vigor 1; the planting day counts) → grow (one step per new day) → harvest (ready, free) → empty. Every refusal changes nothing. **Forgiving:** an untended crop still grows, never dies or rots; a ready crop waits indefinitely. `GardenSettings.untendedPausesGrowth` (off) is the stricter rule for the playtest to try.
+- **Growth** runs inside `DayRules.Sleep`, keyed to the new day: a bed grows only if `LastGrownDay < day`, so reloads, scene loads and repeated calls never double-grow, and `Sleep` itself only runs from the Night.
+- **The night, in order:** storeroom freshness; the new day; the garden's growth (once); Vigor full; then (`GameFlow`) the surface clock's morning.
+- **Interaction:** an empty bed opens the planting choice (`GardenPanel`: the three crops with their seedlings and days, then "not now"; up and down wrap; Escape or B backs out; the clock is held); a growing bed offers "tend the bed" until tended today, then "onions: ready in 2 days" (a new `TavernHintKind.Growing`); a ready bed offers "harvest". The keeper turns to the bed (`PlayerLook.Hold`) while Farm's animated icon plays over it (seeding, watering, pulling); tended today, the bed's soil is darker; each bed shows one plant per tile at the crop's stage (seeds, sprouting, growing, ready).
+
+### Crops (`Data/Garden/Crop_*.asset`, `CropDefinition`)
+
+| Crop | Produces | Days | Yield | Art | Fine with |
+|---|---|---|---|---|---|
+| herbs | herbs | 2 | 3 | More Veggies: Spinach | 1 tended day |
+| onions | onion | 3 | 3 | More Veggies: Onion | 2 tended days |
+| barley | malt | 4 | 2 | Farm: Wheat | 2 tended days |
+
+**Tending → quality:** tended on at least half its growing days (`fineTendedShare` 0.5, rounded up) → **Fine**, otherwise **Standard** (the existing `Quality` enum; no new tiers).
+
+### Into the storeroom
+
+A harvest is an ordinary `IngredientStack` (the crop's ingredient, Fine or Standard, fresh) added to the storeroom with the existing merge rules: no farm inventory. It's cookable at once (a test cooks the delve meal at the Grill from homegrown herbs). A one-line note says what went in ("3 fine herbs into the storeroom"), with a small chime and pulse (`UiMoment.Harvest`).
+
+**Provenance (deviation, as the brief allowed):** not built. An ingredient's identity (definition, quality, prep) is what stacks merge on; an origin tag would have to join it and would ripple through equality, saves, the satchel, the storeroom, recipe matching and staff, and split homegrown Standard herbs from market ones. `CropHarvested` doesn't need it; `ServedHomegrown` waits for a decision (§ open questions).
+
+**Economy:** unchanged prices. `BalanceReport` has a garden row (its best week, every bed harvested back to back, at market prices: **72 gold**, 4 beds of herbs); `SurfaceCheckpointBTests` checks that a garden-only week (a market night every night plus that) never beats a delve week, and that the garden's best week is under a quarter of one.
+
+### Save version 10
+
+```
+world   { seed }                                     // one per game, made once
+surface { minute, vigorSpent }                       // the day in progress
+garden  { initialized, beds: [ { id, crop, plantedDay, grown, tendedDays, lastTendedDay, lastGrownDay } ] }
+```
+
+- **v9 → v10:** the world seed from a stable hash of the save's own text (FNV-1a; the same old file always gives the same seed until it's re-saved as v10), the surface minute at 8:00, Vigor full, and the starter beds empty (`GardenState.Ensure` on restore: once, and any bed added to the tuning later arrives empty the same way). Nothing that existed changes. v7 and v8 go through the existing chain, then this step.
+- **New games:** a fresh seed, the four beds, Vigor full.
+- **Mid-day Continue:** the daytime resumes at its saved minute with its Vigor and garden; the keeper wakes in Tally Ho! (upstairs, as every daytime starts); no exact position is saved.
+- **Autosaves added:** after planting, tending, harvesting, and on *begin prep* (the day as it was left, saved just before the evening begins; the evening itself isn't a resume point). Market purchases already saved. Nothing saves on walking or the clock's ticking.
+- **Never saved:** derived looks (stages, tints), NPC positions.
+
+### Checkpoint A's carry-overs
+
+- **The decorate reminder** now sits in the bottom-left corner (the room never reaches it); the clock tab moved up 2 px, and the Vigor pips sit beside it in the top margin.
+- **The market cart's** solid body reaches 4.6 tiles up behind it (was 2.2), so nobody stands where the canopy (6¼ tiles of art) hides them whole.
+
+### Deviations
+
+- No provenance (above).
+- The tend action has no keeper body animation (the approved workaround: facing plus the action icon).
+- The planting choice is a small panel on the tavern canvas (like the menu board's question), not a world-space menu.
+
+### Tests
+
+- EditMode `SurfaceCheckpointBTests` (30): tuning; Vigor's spend, exact cost, refusal, floor, refill, sleep and that the rest of the day's rules never touch it; planting, refusal at low Vigor, occupied and unknown beds, daytime only; tending once a day; maturity for herbs, onions and barley untended; growth once per day and across a save; ripe crops waiting; the stricter switch; the Fine threshold per crop; harvest (free, fresh, into the storeroom, bed emptied); v10 round trip and stability; unknown crops; v9, v8 and v7 → v10; the migrated seed's stability; no re-grant; a new bed in the tuning; the garden-week balance.
+- PlayMode `SurfaceCheckpointBTests` (6): pips and planting and tending through the bed and the panel (selection, navigation, cancel, feedback fact, visuals); everything at 0 Vigor (walking, the clock, the doors, the stairs, talking, decorating, the market, Prep, the delve with Essence untouched, no Vigor beside Essence); growth across days, the harvest into the storeroom and the delve meal cooked from it; mid-day save, quit and Continue; the autosaves; the cart and the reminder.
+- Two older story tests asserted the save "stays version 9"; they now assert the current version with the same meaning. `TextOverlapTests` now also checks the planting choice and the HUD.
+- **Results:** EditMode 693/693; PlayMode 235 passed, 0 failed, 25 skipped (the explicit captures and the stairs diagnosis).
+
+### Web smoke (2026-10-07)
+
+On the owner's own browser save (a genuine version 9 save, day 2, daytime; backed up to IndexedDB `hh_backup_4hb` first and restored after): it migrated to version 10 on Continue (seed made, morning, Vigor full, four empty beds; the storeroom shelves arrived in the owner's rearranged tavern by themselves); the HUD at 320×180 (the clock clear of its frame, six pips beside it, the decorate reminder bottom left); down the stairs, out of the door, along the path to the garden; "plant a crop" → the choice (keyboard: down to onions, Enter; the same UI navigation a controller uses) → two pips spent, the seeding icon, seeds in the bed; "tend the bed" → one pip, the watering icon, darker soil; a full page reload and Continue → 8:10 am, three pips, the bed as left (the IDBFS file read back as version 10 with its seed, minute, Vigor and the bed); then three nights (F8 and the Night panel's sleep): the save showed the onions growing once a night (grown 1, 2, 3 with `lastGrownDay` 3, 4, 5), Vigor full and 8:00 each morning. It found one bug, fixed before handover: the planting choice's first button covered its title (the panel is now taller, and the overlap test checks it).
+
+Not done in the browser: walking back to harvest (the tab was hidden, and the game throttled to a crawl), so the harvest into the storeroom and cooking from it are covered by PlayMode only; a real gamepad (keyboard navigation drives the same UI path); haptics (the Web build has none: the named patterns no-op). Hidden-tab time can't distort growth (growth is per new day, never per second) and the clock stands still while unfocused. The fresh build after the panel fix was not smoke-tested again.
 
 ---
 

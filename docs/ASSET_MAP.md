@@ -397,6 +397,18 @@ Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image
 
 **Gaps noted in 4h A:** no clash-free wall spot in the main room for the five tankards (deferred); no plans sprite chosen (the Decorate key covers it); the cellar hatch isn't shown in the daytime (its look is deferred).
 
+## The garden (4h Checkpoint B, imported → `Farm/`)
+
+Registered in `Editor/Setup/KariastonSheets.cs` (`Crops`, `CropStages`, `Actions`). Each crop cell is 8×16, pivoted at its foot, on a 16-px row; a crop's group is 80 px wide: seed pack (8), one seed (16), seeds (24), growth 1–3 (32, 40, 48), grown icon (64).
+
+| Pack folder / file | Source | What we cut |
+|---|---|---|
+| `Farm/FarmCrops` | Farm `Crops/Minifantasy_FarmSeedsAndCrops.png` (240×88; crops left to right then down: pumpkin, eggplant, berry, beet, **wheat** / tomato, sunflower, corn, rice, lettuce / potato, radish, garlic, cauliflower, pepper) | **Wheat** (left group, row 4): seeds, growth 1–3, icon = the barley bed (it yields malt). |
+| `Farm/MoreVeggies` | Farm add-on *More Veggies* `MoreVeggies.png` (240×72; carrot, **spinach**, cucumber, artichoke / cabbage, zucchini, **onion**, green beans / broccoli, celery, asparagus, ginger) | **Onion** (middle group, row 2) = the onion bed; **Spinach** (left group, row 1), leafy, = the herb bed. |
+| `Farm/FarmActions` | Farm `Actions/Minifantasy_FarmActionInProgress(16x16).png` (64×144: nine actions of four 16×16 frames) | **Seed** (row 4) over a bed being planted, **Water** (row 2) over a bed being tended, **Pull** (row 3) over a bed being harvested. Unused rows: hoe, dig, milk, shears, meat, basket. |
+
+The beds' soil is Checkpoint A's dirt autotile (Forgotten Plains), darkened by tint on the day a bed is tended. No farming body animations for the keeper (Minifantasy's *Farming Animations* exist only for the bare race bodies, not the four clothed keeper bodies; the approved workaround): the keeper turns to the bed while the action icon plays.
+
 ## 4h survey (planning, 2026-10-06)
 
 Inspected for `docs/PLAN_4H.md` §28–30; the sheet `docs/plan_4h/cast_candidates.png` shows the figures at true scale beside the keeper and Orik.

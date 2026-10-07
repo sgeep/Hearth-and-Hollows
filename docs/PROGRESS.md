@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoint A built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint A**; then Checkpoint B (Vigor and the garden) once approved; then 4i (menus, options and polish)._
+_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoint A approved**, **Checkpoint B built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint B**; then Checkpoint C (the village has people) once approved; then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1227,6 +1227,19 @@ Details, deviations and tests: `docs/PLAN_4H.md`, *As built: Checkpoint A*. Art:
 - **Seeded but unplaced:** `Inspect/Tankards` and `Inspect/Hatch` exist in the dialogue database, waiting for their spots.
 - **The decorate reminder overlaps the room's top-left corner** in the main tavern room (under the clock, over the bar's back wall); upstairs and outdoors it's clear. Cosmetic; its place is a playtest call.
 - **The tall market cart can hide the keeper** standing right behind it (correct Y-sorting, but the cart's canopy covers a whole figure).
+
+### 4h Checkpoint B: a day's work (2026-10-07, built; waiting for your playtest)
+
+Checkpoint A approved (2026-10-07). B adds **Vigor** (six pips a day beside the clock; planting a bed costs 2, tending 1, harvesting nothing; refilled by sleep; at 0 only strenuous work is refused) and the **garden**: four beds behind Tally Ho! (`garden_1`–`garden_4`) growing herbs (2 days, 3 herbs), onions (3 days, 3 onions) or barley (4 days, 2 malt), free seeds, tending once a day for a Fine harvest (at least half the growing days), forgiving (untended crops still grow; ripe ones wait), harvests straight into the storeroom as ordinary stacks. **Save version 10** (world seed, the day's minute and Vigor, the garden); mid-day Continue resumes at the saved minute; every garden action and *begin prep* save. Checkpoint A carry-overs: the decorate reminder moved to the bottom-left corner; the market cart's body reaches up behind its canopy.
+
+Tests: EditMode 693/693, PlayMode 235 passed, 0 failed (25 explicit captures and a diagnosis skipped). Web: smoke-tested on your own save (migrated v9 → v10, planted, tended, reloaded, slept three nights); harvest and cooking checked in PlayMode only (hidden tab). Details, deviations and the playtest checklist: `docs/PLAN_4H.md`, *As built: Checkpoint B*.
+
+**Known issues (Checkpoint B):**
+- **No homegrown provenance** on ingredients (a deliberate stop: an origin tag would change stack identity everywhere); `ServedHomegrown` waits for your call.
+- **A tended bed's grass rim darkens with its soil** (the tint covers the bed's whole autotile, edges included).
+- **F8 through the evening** can carry the first-evening introduction (Orik, Boog) onto the delve's result screen (the debug skip, not play).
+
+**Open question for you:** homegrown provenance (above): worth changing ingredient identity for Boog's callbacks, or tracked another way (a day's harvest log) later?
 
 ### Open design questions (Phase 4)
 
