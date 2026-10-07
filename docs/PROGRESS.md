@@ -1196,6 +1196,8 @@ Seven people join the cast (GDD §2.10, Decided 51): villagers **Kaloren Frostha
 
 **Old Phi (2026-10-07, the owner's request):** Old Tamsin is now **Old Phi** (Phi'rai, a drow, of the Fortunate Five; GDD Decided 52). The stable id stays `tamsin`; entries above keep the old name. The game's nine dialogue lines still say Tamsin until they're edited (proposed with Checkpoint D).
 
+**Orik's history (2026-10-07, the owner's request):** Phi's old friend; ran Tally Ho! in her absence, left when the Hollows grew too dangerous, sought out and rehired by Phi (GDD Decided 53). His built "hired me for a week... eleven years ago" line reads as the rehire; nothing to change.
+
 ### Open design questions (Phase 4)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.

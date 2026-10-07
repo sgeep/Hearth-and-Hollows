@@ -176,7 +176,7 @@ The story unfolds in four acts, advanced by reaching new depths of the Hollows a
 |---|---|
 | **Bram Holloway** | Protagonist, tavern keeper and delver |
 | **Boog** (goblin) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
-| **Orik** (dwarf) | Server and bookkeeper; runs the floor during service *(renamed 2026-10-06: formerly Pip Marrowby, a halfling)* |
+| **Orik** (dwarf) | Server, bartender and bookkeeper; runs the floor during service. Phi's old friend: ran Tally Ho! in her absence, left when the Hollows grew too dangerous, and was sought out and rehired when she returned *(renamed 2026-10-06: formerly Pip Marrowby, a halfling; history 2026-10-07)* |
 | **Old Phi** (Phi'rai, a drow) | Former proprietor of Tally Ho! and the keeper's mentor, vanished in the Hollows; central mystery. Once an adventurer of the **Fortunate Five**, she helped rebuild Tally Ho!, left for many years, and came back decades later to settle down and run it *(renamed 2026-10-07: formerly Old Tamsin; Section 2.10)* |
 | **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
 | **Sylvaris** (elf) | Herbalist and scout; unlocks herb garden and brewing depth *(v0.5: a natural fit for farming; Section 2.9)* |
@@ -311,7 +311,10 @@ The owner's call on 2026-10-07 (Decided 51): seven people join the cast, five wh
 - *Proposed:* plays in Tally Ho! some evenings, which gives the room music, a regular face and a running joke: his repertoire versus Maximo's songs (the mayor considers himself a fellow artist; Bart considers him a fan). A bard is also the village's news, gossip and rumor-carrier, a natural voice for barks about the keeper's deeds without adding a rumor system.
 - *Hooks:* whether he can play during service (a live-music decor or Renown effect is a later question, not a rule).
 
-**Orik** (a dwarf with a ginger beard; he). Already in the game (Decided 43): the server, bookkeeper and, in the owner's words, bartender of Tally Ho!. Unchanged; listed so the cast is complete.
+**Orik** (a dwarf with a ginger beard; he). Already in the game (Decided 43): the server, bookkeeper and, in the owner's words, bartender of Tally Ho!.
+- *Owner's history (2026-10-07, Decided 53):* an old friend of Phi's. She hired him, and he helped run Tally Ho! while she was away. When the Hollows became too dangerous he eventually left; when Phi came back she sought him out and hired him again.
+- *Fit with what's built:* his line "she hired me for a week. that was eleven years ago. she never said the week was over" reads as the **rehire**: eleven years ago Phi found him and talked him back "for a week". His refusal to go below ("my family went down for three hundred years... i came up. i'm staying up") and his dry caution about the Hollows now have a second root: he once ran the place over a hole that got too dangerous, and walked away. Nothing built contradicts it; a line that says he ran Tally Ho! before is new writing for later.
+- *Proposed:* this makes Orik the keeper of Phi's history: he knew her before and after, kept the books through her absence, and is the person most shaken (and least willing to show it) that she hasn't come back. Whether he knew the Fortunate Five is open.
 
 #### Hollowers
 
@@ -1133,6 +1136,7 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 
 *Recorded 2026-10-07 (the owner's cast):*
 
+53. **Orik's history** *(the owner's call, 2026-10-07)*: Orik is an old friend of Phi's. She hired him and he helped run Tally Ho! in her absence; when the Hollows became too dangerous he eventually left; Phi sought him out and hired him again (read as the rehire "for a week" eleven years ago in his existing line).
 52. **Old Phi** *(the owner's call, 2026-10-07)*: Tally Ho!'s former proprietor and the keeper's missing mentor is **Old Phi** (Phi'rai, a drow; she), replacing Old Tamsin: an adventurer of **the Fortunate Five** who helped rebuild Tally Ho!, left for many years and came back decades later to run it. The stable id stays `tamsin`. The game's dialogue still says Tamsin until those lines are edited (Section 2.10).
 51. **The Kariaston cast** *(the owner's call, 2026-10-07)*: new villagers **Kaloren Frosthand** (a kind wizard, secretly a lich made in the Hollows, his phylactery still below), **Maximo** (the elderly, Quixote-like mayor; Kariaston is named for his friend and sidekick **Karias**, a young elf wizard he mentored, killed in the Hollows; Maximo has never gone back), **Grim and Ogrin** (a dwarf and the sick orphan human boy he looks after) and **Bart** (an orc bard); **Orik** confirmed as the dwarf bartender who replaced Pip (entry 43). New **Hollowers**, people who live in the Hollows and aren't enemies: **Gimp** (comes up to the tavern to talk explosives with Boog) and **Glimmer** (a whimsical fey spirit, once a guardian meant to seal the Hollows, who failed and forgot her past; a later questline heals and fuses her with Ogrin). Names, kinds and concepts are the owner's; the details in Section 2.10 are proposed. All are canonical characters (not renameable, Decided 16). Questions: Open 12.
 
