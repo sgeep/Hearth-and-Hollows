@@ -1186,7 +1186,9 @@ Checkpoint B was signed off on 2026-10-06: you playtested it and verified the no
 - **Step 8, presentation:** the tavern's day panels step aside while someone talks (the dialogue box covered the night's summary); Boog's bomb has the target arrow and a stronger glow. No quest journal (deferred to a later UI/daytime milestone).
 - **Save:** still version 9; v7 → 9, v8 → 9 and v9 round trips covered by EditMode and PlayMode tests (no duplicate deeds, rewards paid once, callbacks not repeated, memories kept, Quest Machine not replayed).
 - **Tests (2026-10-06):** EditMode **625/625**. PlayMode **219 passed, 0 failed**, 24 explicit capture fixtures skipped (243). The intermittent finisher test was fixed in the Checkpoint B closeout (`edf8234`).
-- **Web:** a fresh development build (139 MB). The end-to-end browser playthrough is pending: the browser tab was hidden (0 fps) when checked, so it isn't counted.
+- **Web:** a fresh development build (`5dd8a4d`). Browser pass in a visible tab (~145 fps): New Game, the creator, the arrival (typewriter: a press mid-reveal finishes the line, the next advances; choices by keyboard), the first delve, the homecoming over the stepped-aside night panel, Continue after a reload, a full extraction, service with Boog on the grill, the first takings and Boog's offer accepted, and the bomb found in the second cleared room ("found: Boog's bomb!"). No new console errors (only the browser extension's own messages). The owner completed the rest of the playthrough themselves and reported it fine (2026-10-06).
+- **Found in the browser (balance, not changed):** if the first delve ends in death, the keeper has no food and 0 gold, so the first evening has to stay shut, and the first takings and Boog's offer wait at least a day. Worth a look when balancing the opening.
+- **Dungeon debug keys in the day loop:** F4 (refill Essence) and F6 (god mode) now also work in the Dungeon scene of the real day loop, in development builds only (`DungeonDebugKeys`).
 
 ### Open design questions (Phase 4)
 
@@ -1430,9 +1432,9 @@ When `Tavern` or `Dungeon_TestFloor` (or `Dungeon`) is played on its own (no Boo
 | 1 / 2 / 3 / 4 | Weapon element: none / fire / ice / poison |
 | F2 | Toggle screen shake |
 | F3 | Toggle hit-stop |
-| F4 | Refill Essence |
+| F4 | Refill Essence (also in the day loop's Dungeon scene, development builds) |
 | F5 | Set Essence to 3 |
-| F6 | God mode |
+| F6 | God mode (also in the day loop's Dungeon scene, development builds) |
 | F7 | Restart |
 
 ## Regenerating and verifying
