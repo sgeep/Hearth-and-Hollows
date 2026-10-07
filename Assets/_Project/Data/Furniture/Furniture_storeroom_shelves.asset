@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a454cf12ef9d3e347af1cc8664ee4cf8, type: 3}
+  m_Name: Furniture_storeroom_shelves
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Customization.FurnitureDefinition
+  id: storeroom_shelves
+  nameKey: furniture.storeroom_shelves
+  descriptionKey: furniture.storeroom_shelves.description
+  category: 9
+  theme: 0
+  layer: 1
+  rotation: 0
+  flippable: 0
+  wallBound: 0
+  function: 5
+  station: 0
+  useNameKey: surface.storeroom
+  reach: 1.1
+  price: 0
+  unique: 1
+  catalogTier: 0
+  sources: 1
+  sellBack: 0.5
+  variants: []
+  paletteChannels: []
+  facings:
+  - turns: 0
+    size: {x: 1, y: 1}
+    art:
+    - name: Cupboard
+      sprite: {fileID: 1554086397, guid: b6dc10fe011829f45943059d9327ecc7, type: 3}
+      frames: []
+      frameSeconds: 0.12
+      workingFrames: []
+      position: {x: 0.5, y: 0.05}
+      sortingLayer: Characters
+      order: 0
+      variantSprites: []
+      variantFrames: []
+    grouped: 0
+    groupPoint: {x: 0, y: 0}
+    bodies:
+    - serializedVersion: 2
+      x: 0.05
+      y: 0.05
+      width: 0.9
+      height: 0.5
+    seats: []
+    interactPoint: {x: 0.5, y: 0.35000002}
+    usePoints:
+    - {x: 0.5, y: -0.5}
+    - {x: -0.45, y: 0.3}
+    - {x: 1.45, y: 0.3}
+    hasStaffPost: 0
+    staffPost: {x: 0, y: 0}
+    highlight:
+      serializedVersion: 2
+      x: 0.05
+      y: 0.05
+      width: 0.9
+      height: 1.3
+    surfaces: []
+    lights: []
+    slots: []
+    statusPoint: {x: 0, y: 0}

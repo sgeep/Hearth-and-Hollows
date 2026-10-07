@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Hearthdelve.Editor
@@ -60,10 +61,18 @@ namespace Hearthdelve.Editor
             ("Stone_BL", 12, 5), ("Stone_B", 13, 5), ("Stone_BR", 14, 5), ("Stone_InNW", 12, 6), ("Stone_InNE", 13, 6), ("Stone_InSW", 12, 7), ("Stone_InSE", 13, 7),
         };
 
+        /// <summary>
+        /// The lake's two animation frames (grass-banked), laid out exactly like the dirt autotile 18 and 22 columns to its right:
+        /// "Water_TL" … for frame one, "Water2_TL" … for frame two.
+        /// </summary>
+        public static IEnumerable<(string name, int column, int row)> WaterCells() =>
+            GroundCells.Where(g => g.name.StartsWith("Dirt_"))
+                .SelectMany(g => new[] { ("Water" + g.name.Substring(4), g.column + 18, g.row), ("Water2" + g.name.Substring(4), g.column + 22, g.row) });
+
         public static IEnumerable<Sheet> Sheets()
         {
             var ground = new List<SheetRect>();
-            foreach (var (name, c, r) in GroundCells) ground.Add(new SheetRect(name, c * 8, r * 8, 8, 8, k_Centre));
+            foreach (var (name, c, r) in GroundCells.Concat(WaterCells())) ground.Add(new SheetRect(name, c * 8, r * 8, 8, 8, k_Centre));
             yield return new Sheet { Source = k_Plains, Pack = PlainsPack, File = Tiles, Mode = SliceMode.Rects, Rects = ground.ToArray() };
 
             // Towns II's premade buildings, whole (each a finished exterior with its door at the bottom). The two halls sort at the

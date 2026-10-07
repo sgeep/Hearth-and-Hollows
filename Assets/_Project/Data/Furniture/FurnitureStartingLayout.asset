@@ -176,6 +176,16 @@ MonoBehaviour:
       variant: 
       palette: 
     - uid: 17
+      definition: storeroom_shelves
+      cell: {x: 26, y: 7}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 18
       definition: bottle_shelves
       cell: {x: 2, y: 14}
       turns: 0
@@ -185,7 +195,7 @@ MonoBehaviour:
       anchor: 0
       variant: 
       palette: 
-    - uid: 18
+    - uid: 19
       definition: wall_sign
       cell: {x: 17, y: 15}
       turns: 0
@@ -195,7 +205,7 @@ MonoBehaviour:
       anchor: 0
       variant: 
       palette: 
-    - uid: 19
+    - uid: 20
       definition: wall_fireplace
       cell: {x: 14, y: 14}
       turns: 0
@@ -205,7 +215,7 @@ MonoBehaviour:
       anchor: 0
       variant: 
       palette: 
-    - uid: 20
+    - uid: 21
       definition: low_shelf
       cell: {x: 24, y: 14}
       turns: 0
@@ -215,17 +225,17 @@ MonoBehaviour:
       anchor: 0
       variant: 
       palette: 
-    - uid: 21
+    - uid: 22
       definition: shelf_glasses
       cell: {x: 0, y: 0}
       turns: 0
       flipped: 0
       nudge: {x: 0, y: 0}
-      host: 20
+      host: 21
       anchor: 0
       variant: 
       palette: 
-    - uid: 22
+    - uid: 23
       definition: butcher_block
       cell: {x: 22, y: 3}
       turns: 0

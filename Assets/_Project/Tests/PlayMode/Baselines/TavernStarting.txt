@@ -16,11 +16,11 @@ collider|BoxCollider2D|20.5000,12.0000..22.5000,13.0000|trigger False|layer Obst
 collider|BoxCollider2D|22.2500,3.0000..25.6250,4.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|24.0000,11.5000..25.5000,12.8750|trigger False|layer Obstacles
 collider|BoxCollider2D|24.7500,8.0000..25.7500,9.0000|trigger False|layer Obstacles
-collider|BoxCollider2D|25.0500,9.0500..25.9500,9.5500|trigger False|layer Obstacles
 collider|BoxCollider2D|25.7500,8.0000..26.7500,9.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|25.7500,9.0000..26.7500,10.0000|trigger False|layer Obstacles
+collider|BoxCollider2D|26.0475,11.3000..27.3875,12.0000|trigger True|layer Default
+collider|BoxCollider2D|26.0500,7.0500..26.9500,7.5500|trigger False|layer Obstacles
 collider|BoxCollider2D|26.3750,12.0000..27.5000,14.0000|trigger False|layer Obstacles
-collider|BoxCollider2D|26.4875,11.3000..27.3875,12.0000|trigger True|layer Default
 collider|BoxCollider2D|27.5000,0.0000..28.0000,17.0000|trigger False|layer Obstacles
 collider|BoxCollider2D|3.7500,7.0000..5.2500,8.5000|trigger False|layer Obstacles
 collider|BoxCollider2D|5.3750,7.2500..6.1250,8.2500|trigger False|layer Obstacles
@@ -33,7 +33,7 @@ grid|03|#.....................####.#
 grid|04|#...............#####......#
 grid|05|#...............#####......#
 grid|06|#..........................#
-grid|07|#.##########...............#
+grid|07|#.##########..............##
 grid|08|#.##########.......#########
 grid|09|#..................#####.###
 grid|10|#..........................#
@@ -56,7 +56,7 @@ interactable|Seat||reach 1.4000|use 3.2500,7.2500|highlight CornerBL@2.6250,7.02
 interactable|Seat||reach 1.4000|use 5.7500,7.2500|highlight CornerBL@5.1250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@6.3750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@5.1250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@6.3750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@5.7500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Seat||reach 1.4000|use 8.2500,7.2500|highlight CornerBL@7.6250,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@8.8750,7.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@7.6250,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@8.8750,9.1250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@8.2500,9.2500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|StewPot|station.stew_pot|reach 1.0000|use 24.7500,10.9000;24.7500,13.4500|highlight CornerBL@23.8750,11.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@25.6250,11.3750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@23.8750,13.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@25.6250,13.0250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@24.7500,13.1500/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
-interactable|Storeroom|surface.storeroom|reach 1.0000|use 24.5000,9.4500|highlight none
+interactable|Storeroom|surface.storeroom|reach 1.1000|use 26.5000,6.5000;25.5500,7.3000;27.4500,7.3000|highlight CornerBL@25.9250,6.9250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@27.0750,6.9250/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@25.9250,8.4750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@27.0750,8.4750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@26.5000,8.6000/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 interactable|Tap|station.tap|reach 1.0000|use 2.6000,10.4500|highlight CornerBL@1.4750,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerBR@3.5250,11.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTL@1.4750,13.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;CornerTR@3.5250,13.8750/Above/0/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default;Marker@2.5000,14.0000/Above/1/1.0000,0.8200,0.3000,1.0000/Sprite-Unlit-Default
 kitchen view|19.0000,11.6250|idle Kitchen|working 8
 layout|door 13.5000,2.4000|seats 6
@@ -117,7 +117,7 @@ sprite|TavernIndoor_props_Sign|17.0000,15.2500|rot 0.0000|scale 1.0000,1.0000|fl
 sprite|TavernIndoor_props_TableRoundA|18.5000,4.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_TableRoundA|4.5000,7.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TavernIndoor_props_TableRoundB|9.5000,7.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
-sprite|TownsProps_CupboardJars|25.5000,9.0500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
+sprite|TownsProps_CupboardJars|26.5000,7.0500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|TownsProps_MenuBoard|15.5000,2.0500|rot 0.0000|scale 1.0000,1.0000|flip False,False|Characters/0|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 sprite|WallFireplace_0_0|15.5000,14.0000|rot 0.0000|scale 1.0000,1.0000|flip False,False|Ground/3|1.0000,1.0000,1.0000,1.0000|Sprite-Lit-Default|ungrouped
 stew view|24.7500,11.5000|Back@24.7500,13.6000/12.0000,3.0000/Above/0/0.0800,0.0600,0.0600,1.0000;Cauldron@24.7500,11.5000/1.0000,1.0000/Characters/1/1.0000,1.0000,1.0000,1.0000;CornerBL@23.8750,11.3750/1.0000,1.0000/Above/0/1.0000,0.8200,0.3000,1.0000;CornerBR@25.6250,11.3750/1.0000,1.0000/Above/0/1.0000,0.8200,0.3000,1.0000;CornerTL@23.8750,13.0250/1.0000,1.0000/Above/0/1.0000,0.8200,0.3000,1.0000;CornerTR@25.6250,13.0250/1.0000,1.0000/Above/0/1.0000,0.8200,0.3000,1.0000;Fill@24.1250,13.6000/0.0000,1.0000/Above/1/1.0000,0.6600,0.3000,1.0000;Fire@24.7500,11.3750/1.0000,1.0000/Characters/0/1.0000,1.0000,1.0000,1.0000;Marker@24.7500,13.1500/1.0000,1.0000/Above/1/1.0000,0.8200,0.3000,1.0000;Pip1@24.0000,13.2250/2.0000,2.0000/Above/1/1.0000,0.8200,0.3500,1.0000;Pip2@24.3750,13.2250/2.0000,2.0000/Above/1/1.0000,0.8200,0.3500,1.0000;Pip3@24.7500,13.2250/2.0000,2.0000/Above/1/1.0000,0.8200,0.3500,1.0000;Pip4@25.1250,13.2250/2.0000,2.0000/Above/1/1.0000,0.8200,0.3500,1.0000;Pip5@25.5000,13.2250/2.0000,2.0000/Above/1/1.0000,0.8200,0.3500,1.0000

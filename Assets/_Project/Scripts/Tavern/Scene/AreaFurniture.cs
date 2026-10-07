@@ -182,7 +182,26 @@ namespace Hearthdelve.Tavern.Scene
         void Awake()
         {
             if (m_Area == null) m_Area = GetComponent<PropertyArea>();
+            GrantMissingStoreroom();
             Build(CurrentLayout());
+        }
+
+        /// <summary>
+        /// A save from before the storeroom shelves were furniture (4h, after the Checkpoint A playtest): they arrive once, where the
+        /// starting room has them or on the nearest free tile (<see cref="FunctionalGrants"/>).
+        /// </summary>
+        void GrantMissingStoreroom()
+        {
+            if (m_Area == null || m_Area.Kind != AreaKind.Tavern || Database == null || Game == null) return;
+            FurnitureDefinition shelves = Definition(FunctionalGrants.StoreroomShelves);
+            if (shelves == null) return;
+            Vector2Int preferred = new(26, 7);
+            if (Database.startingFurniture != null)
+                foreach (PlacedFurniture p in Database.startingFurniture.Layout(m_Area.Id))
+                    if (p != null && p.definition == shelves.id) preferred = p.cell;
+            var layout = new FurnitureLayout(Shape(), Definition, CurrentLayout());
+            if (FunctionalGrants.GrantOnce(State, layout, m_Area.Id, shelves, preferred, out bool placed))
+                Debug.Log($"[Hearthdelve] The storeroom shelves arrived {(placed ? "in the tavern" : "in storage")}.");
         }
 
         /// <summary>Resolves a placement in this area (null if its definition is unknown or it can't stand that way).</summary>
@@ -310,6 +329,7 @@ namespace Hearthdelve.Tavern.Scene
                 StationKind.ButcherBlock => TavernInteractableKind.ButcherBlock,
                 _ => null,
             },
+            FurnitureFunction.Storeroom => TavernInteractableKind.Storeroom,
             _ => null,
         };
 
@@ -377,6 +397,8 @@ namespace Hearthdelve.Tavern.Scene
                 useObject.position = piece.InteractPoint;
                 use = Interactable(useObject, kind.Value, piece.Definition.useNameKey, piece.UsePoints, piece.Definition.reach,
                     RelativeTo(piece.Highlight, piece.InteractPoint));
+                // The storeroom opens its panel in the daytime, like the room's other daytime places.
+                if (piece.Definition.function == FurnitureFunction.Storeroom) useObject.gameObject.AddComponent<DaytimeFixture>();
             }
 
             Dress(piece, art, renderers);

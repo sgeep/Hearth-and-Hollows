@@ -33,11 +33,11 @@ namespace Hearthdelve.Tests
                 Door = new Vector2(13.5f, 2.4f),
                 Rest = new Vector2(25.5f, 5.5f),
                 // The stairs up to the guest room: back-right corner, their flight solid, their cells and foot kept clear.
-                // 4h: the menu board by the door and the storeroom shelves stand on the floor (SurfaceBuilder.TavernFixtures).
-                Fixtures = { new Rect(26f, 12f, 1f, 2f), new Rect(15f, 2f, 1f, 1f), new Rect(25f, 9f, 1f, 1f) },
+                // 4h: the menu board stands by the door (SurfaceBuilder.TavernFixtures).
+                Fixtures = { new Rect(26f, 12f, 1f, 2f), new Rect(15f, 2f, 1f, 1f) },
             };
             shape.Reserved.UnionWith(new[] { new Vector2Int(26, 11), new Vector2Int(26, 12), new Vector2Int(26, 13) });
-            shape.Reserved.UnionWith(new[] { new Vector2Int(15, 2), new Vector2Int(15, 3), new Vector2Int(25, 9) });
+            shape.Reserved.UnionWith(new[] { new Vector2Int(15, 2), new Vector2Int(15, 3) });
             for (int i = 0; i < 6; i++) shape.Queue.Add(new Vector2(12.25f - i, 2.6f));
             return shape;
         }
@@ -165,12 +165,58 @@ namespace Hearthdelve.Tests
         {
             FurnitureLayout layout = Starting();
             Assert.That(layout.Check(New("cellar_barrel", 24, 8)).IsValid, "beside the barrel at (25, 8)");
-            // (25, 9) is the storeroom shelves' since 4h: the next free neighbour is above the barrel at (26, 9).
-            Assert.That(layout.Check(New("cellar_barrel", 25, 9)).IsValid, Is.False, "not on the storeroom shelves' tile");
-            Assert.That(layout.Check(New("cellar_barrel", 26, 10)).IsValid, "on top of the one at (26, 9)");
+            Assert.That(layout.Check(New("cellar_barrel", 25, 9)).IsValid, "on top of it, beside the one at (26, 9)");
             PlacedFurniture moved = Piece(layout, "cellar_barrel", new Vector2Int(25, 8));
             layout.Remove(moved.uid);
             Assert.That(layout.Check(moved).IsValid, "and back where it came from");
+        }
+
+        // ---------- The storeroom shelves (4h, after the Checkpoint A playtest) ----------
+
+        static FurnitureState WithoutShelves(params PlacedFurniture[] extra)
+        {
+            var state = new FurnitureState();
+            var pieces = Database.startingFurniture.Layout("tavern").Where(p => p.definition != FunctionalGrants.StoreroomShelves).Select(p => p.Clone()).ToList();
+            pieces.AddRange(extra);
+            state.SetLayout("tavern", pieces);
+            return state;
+        }
+
+        static bool Grant(FurnitureState state, out bool placed) => FunctionalGrants.GrantOnce(state,
+            new FurnitureLayout(Tavern(), Database.Furniture, state.Layout("tavern")), "tavern", Database.Furniture(FunctionalGrants.StoreroomShelves),
+            new Vector2Int(26, 7), out placed);
+
+        [Test]
+        public void TheStoreroomShelves_StartBelowTheBarrels_AndTheRoomStillOpens()
+        {
+            FurnitureLayout layout = Starting();
+            Assert.That(layout.Pieces.Single(p => p.definition == FunctionalGrants.StoreroomShelves).cell, Is.EqualTo(new Vector2Int(26, 7)));
+            FurnitureDefinition shelves = Database.Furniture(FunctionalGrants.StoreroomShelves);
+            Assert.That((shelves.function, shelves.unique, shelves.CanSell), Is.EqualTo((FurnitureFunction.Storeroom, true, false)), "one, never sold");
+            Assert.That(LayoutCheck.For(layout.Shape, layout.ResolveAll()).CanOpen);
+        }
+
+        [Test]
+        public void AnOlderSave_GetsTheShelvesOnce_InTheirCorner()
+        {
+            FurnitureState state = WithoutShelves();
+            Assert.That(Grant(state, out bool placed) && placed);
+            Assert.That(state.Layout("tavern").Single(p => p.definition == FunctionalGrants.StoreroomShelves).cell, Is.EqualTo(new Vector2Int(26, 7)));
+            Assert.That(state.OwnedCount(FunctionalGrants.StoreroomShelves), Is.EqualTo(1));
+            Assert.That(Grant(state, out _), Is.False, "never twice");
+            Assert.That(state.OwnedCount(FunctionalGrants.StoreroomShelves), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AnOlderSave_WithTheCornerTaken_GetsTheShelvesOnTheNearestFreeTile()
+        {
+            FurnitureState state = WithoutShelves(New("cellar_barrel", 26, 7));
+            Assert.That(Grant(state, out bool placed) && placed);
+            PlacedFurniture shelves = state.Layout("tavern").Single(p => p.definition == FunctionalGrants.StoreroomShelves);
+            Assert.That(shelves.cell, Is.Not.EqualTo(new Vector2Int(26, 7)));
+            Assert.That(Vector2Int.Distance(shelves.cell, new Vector2Int(26, 7)), Is.LessThan(2f), "next to where it would have stood");
+            var layout = new FurnitureLayout(Tavern(), Database.Furniture, state.Layout("tavern"));
+            Assert.That(layout.Check(shelves).IsValid);
         }
 
         [Test]

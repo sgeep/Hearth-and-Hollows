@@ -45,6 +45,13 @@ namespace Hearthdelve.Editor
         public static readonly RectInt Square = new(29, 11, 14, 12);
         public static readonly RectInt[] GardenBeds = { new(15, 37, 3, 2), new(19, 37, 3, 2), new(15, 33, 3, 2), new(19, 33, 3, 2) };
         public static readonly RectInt[] Plots = { new(48, 30, 8, 7), new(58, 30, 8, 7), new(50, 1, 8, 5) };
+        /// <summary>
+        /// The pond (added after the Checkpoint A playtest, the owner's request): the meadow between Maximo's house and the garden
+        /// path, a tree at its north-west bank and the bench to its east. Stepped, two cells thick everywhere (the autotile's rule).
+        /// </summary>
+        public static readonly RectInt[] Pond = { new(7, 24, 12, 2), new(9, 26, 8, 2) };
+        /// <summary>Seconds per frame of the water's two-frame ripple (Minifantasy suggests 200–300 ms).</summary>
+        const float k_WaterFrameSeconds = 0.4f;
 
         const string k_Root = "Kariaston";
         const string k_Gameplay = "Gameplay";
@@ -177,6 +184,47 @@ namespace Hearthdelve.Editor
             for (int y = Square.yMin; y < Square.yMax; y++)
                 square.Add(new Vector2Int(x, y));
             Paint(stone, square, "Stone");
+            PaintPond(grid);
+        }
+
+        /// <summary>The pond's own tilemap under the ground grid: animated lake tiles, solid (nobody wades in).</summary>
+        static void PaintPond(Grid grid)
+        {
+            Tilemap pond = LookTestBuilder.Layer(grid, "Pond", SortingLayers.Floor, 2, solid: true);
+            var cells = new HashSet<Vector2Int>();
+            foreach (RectInt r in Pond)
+                for (int x = r.xMin; x < r.xMax; x++)
+                for (int y = r.yMin; y < r.yMax; y++)
+                    cells.Add(new Vector2Int(x, y));
+            Paint(pond, cells, "Water");
+        }
+
+        /// <summary>Batch, once: <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.AddPondBatch</c> adds the pond to the existing,
+        /// hand-owned village (nothing else is touched; does nothing if a Pond tilemap is already there).</summary>
+        public static void AddPondBatch()
+        {
+            try
+            {
+                MinifantasyImporter.Import(KariastonSheets.Sheets());
+                var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+                GameObject rootGo = scene.GetRootGameObjects().FirstOrDefault(g => g.name == k_Root);
+                Grid ground = rootGo != null ? rootGo.transform.Find("Ground")?.GetComponent<Grid>() : null;
+                if (ground == null) throw new InvalidOperationException($"{ScenePath} has no {k_Root}/Ground grid.");
+                if (ground.transform.Find("Pond") != null) Debug.Log("[Hearthdelve] Kariaston already has its pond.");
+                else
+                {
+                    PaintPond(ground);
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                    Debug.Log("[Hearthdelve] Kariaston's pond added.");
+                }
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
         }
 
         /// <summary>Autotiles a region (at least two cells wide everywhere) with the edge, corner and inner-corner pieces.</summary>
@@ -191,11 +239,25 @@ namespace Hearthdelve.Editor
                     !n ? "T" : !s ? "B" : !w ? "L" : !e ? "R" :
                     !cells.Contains(c + new Vector2Int(-1, 1)) ? "InNW" : !cells.Contains(c + new Vector2Int(1, 1)) ? "InNE" :
                     !cells.Contains(c + new Vector2Int(-1, -1)) ? "InSW" : !cells.Contains(c + new Vector2Int(1, -1)) ? "InSE" : "C";
-                map.SetTile(new Vector3Int(c.x, c.y, 0), GroundTile($"{kind}_{part}"));
+                map.SetTile(new Vector3Int(c.x, c.y, 0), kind == "Water" ? WaterTile(part) : GroundTile($"{kind}_{part}"));
             }
         }
 
         static Tile GroundTile(string name) => SheetTile(KariastonSheets.PlainsPack, KariastonSheets.Tiles, name, $"Kariaston_{name}");
+
+        /// <summary>One lake part, its two frames rippling; a whole-cell collider.</summary>
+        static AnimatedTile WaterTile(string part)
+        {
+            Sprite one = MinifantasyImporter.Sprite(KariastonSheets.PlainsPack, KariastonSheets.Tiles, $"Water_{part}");
+            Sprite two = MinifantasyImporter.Sprite(KariastonSheets.PlainsPack, KariastonSheets.Tiles, $"Water2_{part}");
+            if (one == null || two == null) throw new InvalidOperationException($"Kariaston: no water sprites for {part}.");
+            return LookTestContent.CreateOrUpdate<AnimatedTile>($"{EditorPaths.Tiles}/Kariaston_Water_{part}.asset", tile =>
+            {
+                tile.m_AnimatedSprites = new[] { one, two };
+                tile.m_MinSpeed = tile.m_MaxSpeed = 1f / k_WaterFrameSeconds;
+                tile.m_TileColliderType = Tile.ColliderType.Grid;
+            });
+        }
 
         static Tile SheetTile(string pack, string file, string name, string asset)
         {

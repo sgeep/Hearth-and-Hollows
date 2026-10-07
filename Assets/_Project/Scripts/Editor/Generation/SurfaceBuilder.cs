@@ -30,9 +30,11 @@ namespace Hearthdelve.Editor
         const string k_Surface = "Surface";
 
         /// <summary>The tavern cells the daytime places stand on, kept clear of furniture: the menu board by the door, its step, the storeroom shelves.</summary>
-        public static readonly Vector2Int[] TavernReserved = { new(15, 2), new(15, 3), new(25, 9) };
+        public static readonly Vector2Int[] TavernReserved = { new(15, 2), new(15, 3) };
         /// <summary>The menu board and the storeroom shelves (area tiles): solid fixtures the layout check walks round.</summary>
-        public static readonly Rect[] TavernFixtures = { new(15f, 2f, 1f, 1f), new(25f, 9f, 1f, 1f) };
+        public static readonly Rect[] TavernFixtures = { new(15f, 2f, 1f, 1f) };
+        /// <summary>Fixtures given up since (the storeroom shelves became furniture after the Checkpoint A playtest).</summary>
+        static readonly Rect[] k_RetiredFixtures = { new(25f, 9f, 1f, 1f) };
                 /// <summary>Phi's portrait on the upstairs room's back wall (area tiles): wall decor can't hang behind it.</summary>
         public static readonly Rect PortraitWall = new(7f, 10f, 3f, 3f);
 
@@ -68,6 +70,9 @@ namespace Hearthdelve.Editor
             LookTestContent.CreateOrUpdate<SurfaceClockConfig>(ClockConfigPath, c =>
             {
                 if (c.settings.realSecondsPerGameMinute <= 0f) c.settings = SurfaceClockSettings.Default;
+                // Once: the first playtest's 35-minute day becomes 3x faster, unless the asset has been tuned since.
+                if (Mathf.Abs(c.settings.realSecondsPerGameMinute - 35f * 60f / 540f) < 0.01f)
+                    c.settings.realSecondsPerGameMinute = SurfaceClockSettings.Default.realSecondsPerGameMinute;
             });
 
         /// <summary>Boot, in place: the one surface clock beside GameFlow.</summary>
@@ -96,7 +101,7 @@ namespace Hearthdelve.Editor
             SurfaceOf(upstairs, isDefault: false, ambient);
             upstairs.SetFixtures(PortraitWall);
             // The menu board and the storeroom shelves stand on the floor: the layout check walks round them, like the stairs.
-            tavern.SetFixtures(tavern.Fixtures.Where(f => !TavernFixtures.Contains(f)).Concat(TavernFixtures).ToArray());
+            tavern.SetFixtures(tavern.Fixtures.Where(f => !TavernFixtures.Contains(f) && !k_RetiredFixtures.Contains(f)).Concat(TavernFixtures).ToArray());
 
             GameObject camera = GameObject.Find(TavernView.CameraName);
             if (camera.GetComponent<SurfaceCamera>() == null) camera.AddComponent<SurfaceCamera>();
@@ -115,9 +120,7 @@ namespace Hearthdelve.Editor
             // The menu board, standing just inside the door: the evening begins here, when the player says.
             Fixture(places, "Menu Board", Sprite(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "MenuBoard"), new Vector2(15.5f, 2.05f),
                 TavernInteractableKind.MenuBoard, SurfaceLocKeys.MenuBoard, new Vector2(0f, 1.1f), solid: new Vector2(0.8f, 0.4f));
-            // The storeroom shelves, in the barrels' corner of the kitchen.
-            Fixture(places, "Storeroom Shelves", Sprite(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "CupboardJars"), new Vector2(25.5f, 9.05f),
-                TavernInteractableKind.Storeroom, SurfaceLocKeys.Storeroom, new Vector2(-1f, 0.4f), solid: new Vector2(0.9f, 0.5f));
+            // The storeroom shelves are furniture now (FurnitureContent): placed in the room, movable in Decorate Mode.
             // Phi's portrait, upstairs, on the wall by the bed the keeper wakes in.
             Vector2 portrait = upstairs.Origin + new Vector2(PortraitWall.center.x, PortraitWall.yMin);
             DaytimeFixture look = Fixture(places, "Phi's Portrait", MinifantasyImporter.Sprites(MinifantasySheets.Portraits, "PhiFramed").Values.First(), portrait,
@@ -165,12 +168,13 @@ namespace Hearthdelve.Editor
             if (old != null) Object.DestroyImmediate(old.gameObject);
             RectTransform root = DungeonUI.FullScreen(ui, "SurfaceClock");
             root.SetAsFirstSibling();
-            RectTransform tab = LookTestBuilder.UIRect(root, "Tab", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -3f), new Vector2(56f, 16f));
+            // The panel's visible frame is about 4 px deep with rounded corners: 24 px tall leaves the 12-px line clear of its red rule.
+            RectTransform tab = LookTestBuilder.UIRect(root, "Tab", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -3f), new Vector2(64f, 24f));
             DungeonUI.AddImage(tab, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
             LocalizedSuperText text = LookTestBuilder.Text(tab, "Time", SurfaceLocKeys.Clock, TextStyle.Body, DungeonUI.k_Ink, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             // Under the tab, indoors only: the Decorate key's reminder.
-            RectTransform hint = LookTestBuilder.UIRect(root, "Decorate", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -20f), new Vector2(90f, 12f));
+            RectTransform hint = LookTestBuilder.UIRect(root, "Decorate", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(5f, -28f), new Vector2(90f, 12f));
             LocalizedSuperText decorate = LookTestBuilder.Text(hint, "Text", SurfaceLocKeys.DecorateHint, TextStyle.Secondary, DungeonUI.k_Light, TextAnchor.MiddleLeft,
                 Vector2.zero, Vector2.one, new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
             root.gameObject.AddComponent<SurfaceClockView>().Configure(tab.gameObject, text, hint.gameObject, decorate);

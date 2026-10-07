@@ -156,7 +156,10 @@ namespace Hearthdelve.Editor
             foot.transform.localPosition = new Vector2(left + width / 2f, -0.35f);
             var trigger = foot.AddComponent<BoxCollider2D>();
             trigger.isTrigger = true;
-            trigger.size = new Vector2(0.9f, 0.7f);
+            // The whole foot tile, from the stew pot's side to the wall (4h, after the owner's Checkpoint A playtest: a keeper
+            // walking up the gap along the stew pot slid past a trigger that covered only its right two-thirds).
+            trigger.size = new Vector2(1.34f, 0.7f);
+            trigger.offset = new Vector2(-0.22f, 0f);
             foot.AddComponent<AreaPassage>().Configure(tavern, guest);
         }
 

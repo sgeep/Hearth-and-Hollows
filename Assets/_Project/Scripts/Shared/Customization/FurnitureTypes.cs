@@ -41,6 +41,8 @@ namespace Hearthdelve.Shared.Customization
         Station,
         /// <summary>Where finished plates wait.</summary>
         Pass,
+        /// <summary>The storeroom shelves (4h): what's in stock, from the free daytime.</summary>
+        Storeroom,
     }
 
     public enum StationKind

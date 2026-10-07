@@ -1217,6 +1217,8 @@ Every Morning-panel function moved to a place: the storeroom shelves (the stock)
 
 Kariaston, 72×48 tiles: Tally Ho! at the top with its garden (four empty beds), the square (memorial, well, market), Maximo's house, Bart's wagon, Grim and Ogrin's cottage, Kaloren's tower, three fenced empty plots; nobody lives in it yet (C). Nothing from B–D: no Vigor, crops, save version 10 or mid-day saves, villagers or schedules.
 
+**After your playtest (2026-10-07):** the clock runs 3× faster (8 am to 5 pm in about 12 minutes), its face has room for its digits, Kariaston has a pond between Maximo's house and the garden, the storeroom shelves are furniture you can move in Decorate Mode (starting below the barrels, out of the stairs' way), and the stairs' trigger covers the whole gap beside the stew pot (the stuck-stairs report wasn't reproduced; that was the likeliest cause).
+
 Details, deviations and tests: `docs/PLAN_4H.md`, *As built: Checkpoint A*. Art: `docs/ASSET_MAP.md`, *Kariaston and Tally Ho!'s daytime places*.
 
 **Known issues (Checkpoint A):**

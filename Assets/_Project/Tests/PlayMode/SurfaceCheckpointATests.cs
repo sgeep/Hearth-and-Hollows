@@ -5,6 +5,7 @@ using System.Linq;
 using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Dungeon.Rooms;
+using Hearthdelve.Shared.Customization;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Recipes;
@@ -149,6 +150,70 @@ namespace Hearthdelve.Tests.PlayMode
             up.Pass(Keeper);
             yield return Frames(2);
             Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.GuestRoomId));
+        }
+
+        /// <summary>The owner's Checkpoint A playtest: after a trip into the village, walking back up to the room on foot.</summary>
+        [UnityTest]
+        public IEnumerator AfterKariaston_TheKeeperWalksBackUpTheStairs()
+        {
+            yield return Daytime();
+            SurfaceDoor inside = SurfaceDoor.Find(SurfaceDoor.FrontInside), outside = SurfaceDoor.Find(SurfaceDoor.FrontOutside);
+            AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId);
+            AreaPassage up = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId);
+            down.Pass(Keeper);
+            yield return Frames(2);
+            // Out and back in through the doors on foot (their fades and busy flags, as in play).
+            Teleport(Keeper, inside.transform.position + new Vector3(0f, 1.5f, 0f));
+            yield return Frames(2);
+            Hold(Key.S);
+            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.KariastonId, 3f, "outside");
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+            Hold(Key.W);
+            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.TavernId, 3f, "back inside");
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That((PropertyArea.Current.Id, SurfaceArea.Current.Id), Is.EqualTo((PropertyArea.TavernId, SurfaceArea.TavernId)));
+            Assert.That(up.CanPass, "the stairs work after coming back in");
+
+            // On foot, the way a player comes: along the kitchen's corridor past the barrels, then up into the stairs' foot.
+            yield return WalkUpTheStairs(up);
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.GuestRoomId));
+            // What the player sees: the room, lit, with the keeper in it.
+            Transform view = GameObject.Find(TavernView.CameraName).transform;
+            Assert.That((Vector2)view.position, Is.EqualTo(SurfaceArea.Current.HoldPoint), "the camera holds on the room");
+            Assert.That(SurfaceArea.Current.Lights.All(l => l.enabled), "the room is lit");
+            Assert.That(SurfaceArea.Find(SurfaceArea.KariastonId).Lights.Any(l => l.enabled), Is.False, "the village's daylight is off");
+            Assert.That(Vector2.Distance(Keeper.position, PropertyArea.Current.Arrival), Is.LessThan(1.5f), "the keeper is in the room");
+        }
+
+        /// <summary>From the middle of the room, east along the corridor under the stew pot, then north into the stairs.</summary>
+        IEnumerator WalkUpTheStairs(AreaPassage up)
+        {
+            Collider2D stairs = up.GetComponent<Collider2D>();
+            Teleport(Keeper, new Vector2(21.5f, 10.5f));
+            yield return Frames(2);
+            Hold(Key.D);
+            yield return WaitUntil(() => Keeper.position.x >= stairs.bounds.min.x + 0.05f, 4f, "along the corridor to the stairs' column");
+            Hold(Key.W);
+            yield return WaitUntil(() => PropertyArea.Current.Id == PropertyArea.GuestRoomId, 4f, "up in the room");
+        }
+
+        /// <summary>Why the stairs failed in the owner's playtest: with the shelves where Checkpoint A stood them, the corridor is shut.</summary>
+        [UnityTest, Explicit("diagnosis")]
+        public IEnumerator Diagnosis_TheOldShelvesSpot_BlocksTheStairs()
+        {
+            yield return Daytime();
+            AreaFurniture tavern = AreaFurniture.Find(PropertyArea.TavernId);
+            var moved = tavern.CurrentLayout().Select(p => p.Clone()).ToList();
+            moved.Single(p => p.definition == FunctionalGrants.StoreroomShelves).cell = new Vector2Int(25, 9);
+            tavern.Commit(moved);
+            yield return Frames(2);
+            Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId).Pass(Keeper);
+            yield return Frames(2);
+            yield return WalkUpTheStairs(Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId));
         }
 
         [UnityTest]
@@ -355,6 +420,16 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator TheStoreroomShelves_AndTheStations_OpenTheStoreroomAndTheDelveMeal()
         {
             yield return Daytime();
+            // The shelves are furniture (after the owner's playtest): placed in the tavern's layout, movable like the stations.
+            AreaFurniture tavern = AreaFurniture.Find(PropertyArea.TavernId);
+            PlacedFurniture shelves = tavern.CurrentLayout().Single(p => p.definition == FunctionalGrants.StoreroomShelves);
+            Assert.That(shelves.cell, Is.EqualTo(new Vector2Int(26, 7)), "out of the way, below the barrels");
+            var moved = tavern.CurrentLayout().Select(p => p.Clone()).ToList();
+            moved.Single(p => p.uid == shelves.uid).cell = new Vector2Int(25, 6);
+            tavern.Commit(moved);
+            yield return Frames(2);
+            Assert.That(Vector2.Distance(Place(TavernInteractableKind.Storeroom).transform.position, new Vector2(25.5f, 6.35f)), Is.LessThan(0.6f),
+                "the shelves' use moved with them");
             MorningScreen panel = Find<MorningScreen>();
             Place(TavernInteractableKind.Storeroom).Use();
             yield return Frames(3);

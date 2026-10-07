@@ -762,6 +762,17 @@ The panel itself is kept as the storeroom-and-meal view (`MorningScreen`, modes 
 - **Web smoke (2026-10-07):** from a save temporarily set to the daytime (the owner's save backed up first and restored after): woke upstairs at 8:00 am with Phi's portrait on the wall; down the stairs; the Grill offered the delve meal; the menu board asked "begin evening prep?" and *not yet* backed out; out of the front door into daylit Kariaston with the camera following; read the memorial; opened the market at the cart. It found one bug, fixed before handover: a nameless line (the look) showed `#tavern.plain` as its speaker; the clock test now checks the box for missing strings, and the rebuilt Web build shows Phi's portrait line with no name. The page was a hidden tab, so the clock correctly stood still as unfocused; its running is covered by the PlayMode tests.
 - The day-loop, Checkpoint C/D, text-overlap and capture tests now walk the day the player's way (`DaytimeActions`: the menu board and yes, the stall, the shelves) instead of the retired buttons; the tavern's recorded starting room adds the door, the board and the shelves.
 
+
+### After the owner's Checkpoint A playtest (2026-10-07)
+
+The owner's verdict: everything else works well. Five changes:
+
+- **The clock runs 3× faster:** 1.30 real seconds per game minute, so 8:00 to 17:00 takes about 12 real minutes (was 35). The asset was migrated once (only if it still held the old default); `SurfaceClockSettings.Default` and `SurfaceClockTests` follow.
+- **The clock's face was cramped:** its digits ran into the parchment tab's red rule (the panel's visible frame is about 4 px deep with rounded corners, and the tab was 16 px around a 12-px line). The tab is now 64×24, and the decorate reminder sits 8 px lower.
+- **A pond:** Forgotten Plains' own lake tiles (two frames, animated, solid), stepped 12×4 in the meadow between Maximo's house and the garden path, a tree on its north-west bank and the bench to its east. Added to the hand-owned scene once by `KariastonBuilder.AddPondBatch` (it touches nothing else, and does nothing if a pond is there); a freshly generated village paints it too.
+- **The storeroom shelves are furniture now** (they stood in the way, by the stairs' corridor): a unique working piece (`storeroom_shelves`, *Stations* in the catalog, a new `FurnitureFunction.Storeroom`) that Decorate Mode moves like the stations, starting below the barrels against the east wall (26, 7). A save from before gets them once, where the starting room has them or on the nearest free tile (`FunctionalGrants`; a unique piece can't be sold or lost, so "owns none" means "never had them": no save-version bump). The fixed fixture, its reserved tile and its layout fixture are gone.
+- **Back up the stairs after a trip outside:** not reproduced in automated play (walking through both doors on foot, then along the corridor and up, passes, with the shelves in either place), so the likeliest cause was fixed: the stairs' trigger covered only the right two-thirds of the one-tile gap beside the stew pot, so a keeper walking up along the stew pot slid past it. It now covers the whole foot tile (`GuestRoomBuilder`), and `AfterKariaston_TheKeeperWalksBackUpTheStairs` walks it. If it still happens, it needs the exact route.
+
 ---
 
 ## Documentation during 4h

@@ -237,6 +237,27 @@ namespace Hearthdelve.Editor
                 });
             });
 
+            // The storeroom shelves (4h, after the Checkpoint A playtest): Towns' cupboard of jars, where the stock is checked in the
+            // daytime. Movable like the stations, one of it, never needed to open; the keeper uses it from the front.
+            yield return Define(FunctionalGrants.StoreroomShelves, "furniture." + FunctionalGrants.StoreroomShelves, FurnitureCategory.Stations, d =>
+            {
+                d.function = FurnitureFunction.Storeroom;
+                d.useNameKey = Hearthdelve.UI.Localization.SurfaceLocKeys.Storeroom;
+                d.reach = 1.1f;
+                d.unique = true;
+                Sprite cupboard = MinifantasyImporter.Sprite(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "CupboardJars");
+                var at = new Vector2(0.5f, 0.05f);
+                d.facings.Add(new FurnitureFacing
+                {
+                    size = Vector2Int.one,
+                    art = { Art("Cupboard", cupboard, at) },
+                    bodies = { new Rect(0.05f, 0.05f, 0.9f, 0.5f) },
+                    interactPoint = at + new Vector2(0f, 0.3f),
+                    usePoints = { at + new Vector2(0f, -0.55f), at + new Vector2(-0.95f, 0.25f), at + new Vector2(0.95f, 0.25f) },
+                    highlight = new Rect(0.05f, 0.05f, 0.9f, 1.3f),
+                });
+            });
+
             // The pass: a long table where plates wait, usable from either side; the server waits just below it.
             yield return Define("pass_table", "furniture.pass_table", FurnitureCategory.Stations, d =>
             {
@@ -388,6 +409,8 @@ namespace Hearthdelve.Editor
             Place("cellar_barrel", 26, 8);
             Place("cellar_barrel", 26, 9);
             Place("cellar_barrel", 25, 8);
+            // The storeroom shelves (4h): below the barrels against the east wall, a corner nobody walks through.
+            Place(FunctionalGrants.StoreroomShelves, 26, 7);
             // The back wall.
             Place("bottle_shelves", 2, 14);
             // Right of the fireplace (4f Checkpoint D): the stretch between the bottle shelves and the fireplace stays open,
