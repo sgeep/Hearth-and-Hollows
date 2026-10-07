@@ -307,7 +307,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(animator.Set.name, Does.StartWith("Anim_KeeperDwarf").And.Contain("keeper_hair"));
             Assert.That(Lua.Run("return HH_PlayerName()").asString, Is.EqualTo("Wren"));
             yield return WaitUntil(() => Box.IsOpen, 3f, "the arrival's conversation");
-            Assert.That(Box.Line, Does.StartWith("you'll be Wren. Tamsin's letter"));
+            Assert.That(Box.Line, Does.StartWith("ahh, you must be Wren! Tamsin's letter"), "the owner's line");
             DialogueManager.StopAllConversations();
         }
 
@@ -325,7 +325,7 @@ namespace Hearthdelve.Tests.PlayMode
 
             // The arrival: Orik, a line revealed as it's spoken.
             yield return WaitUntil(() => Box.IsOpen, 3f, "Orik");
-            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "you'll be Bram. Tamsin's letter said you'd come. it didn't say you'd be this late.")));
+            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "ahh, you must be Bram! Tamsin's letter said you'd come. it didn't say you'd be this late.")));
             Assert.That(Box.IsRevealing, "revealed as it's spoken");
             Assert.That(Box.CharactersPerSecond, Is.EqualTo(AssetDatabaseFree.Settings.charactersPerSecond), "one tunable speed");
             // A click while revealing finishes the line, and doesn't move on.
@@ -335,7 +335,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             yield return null;
             Assert.That((Box.IsRevealing, Box.IsOpen, Box.IsChoosing), Is.EqualTo((false, true, false)), "the whole line, still there");
-            Assert.That(Box.Line, Does.StartWith("you'll be Bram"));
+            Assert.That(Box.Line, Does.StartWith("ahh, you must be Bram"));
 
             // Holding the confirm that moves on brings up the choices, but can't take one.
             Hold(Key.Enter);
@@ -607,10 +607,15 @@ namespace Hearthdelve.Tests.PlayMode
                 Is.EqualTo(("successful", QuestObjectStatus.Delivered, gold + 60)));
             Assert.That(Host.Relationships.Remembers("gunta", "returned_boogs_bomb"));
             Assert.That(Lua.Run("return HH_DeliverQuestObject(\"boogs_bomb\")").asBool, Is.False, "never handed over twice");
+            // Checkpoint C: he tells her about you, once; then she can still be asked about (the shelf).
+            yield return Talk(CharacterIds.Boog);
+            Assert.That(Box.Line, Does.StartWith("i told her about you"));
+            yield return UntilClosed();
             yield return Talk(CharacterIds.Boog);
             yield return ToChoice();
-            Assert.That((Box.ResponseCount, Box.ChoiceText(0)), Is.EqualTo((1, "carry on.")), "nothing more to ask about her");
-            yield return Choose("carry on.");
+            yield return Choose("about your bomb...");
+            Assert.That(Box.Line, Does.StartWith("she's on the shelf over the stove now"));
+            yield return UntilClosed();
             yield return Talk(CharacterIds.Orik);
             Assert.That(Box.Line, Is.EqualTo("Boog's bomb is home. i've entered it in the incident book. in advance."));
             yield return UntilClosed();

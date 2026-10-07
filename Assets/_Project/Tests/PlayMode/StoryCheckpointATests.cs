@@ -238,9 +238,18 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
             Assert.That(Flow.State.Furniture.PendingHomecoming, Is.EqualTo("trophy_larder_troll"));
 
-            // Before: Boog hasn't seen them. (Checkpoint B: his everyday branch, with his bomb to ask about; Checkpoint A's proof
-            // quest is retired, and Boog's Bomb has its own tests.)
-            Assert.That((Social.Affinity("gunta"), Social.Respect("gunta"), Social.Remembers("gunta", "displayed_trophy")), Is.EqualTo((10f, 0f, false)));
+            // Before: Boog hasn't seen them. The troll's fall is a deed of its own (Checkpoint C): it's the baseline here, and the
+            // first thing he talks about. Then his everyday branch, with his bomb to ask about.
+            float boogAffinity0 = Social.Affinity("gunta"), boogRespect0 = Social.Respect("gunta"), pipAffinity0 = Social.Affinity("pip"), pipRespect0 = Social.Respect("pip");
+            Assert.That(Social.Remembers("gunta", "displayed_trophy"), Is.False);
+            Assert.That(Social.Remembers("gunta", "felled_larder_troll"), "the troll's first fall");
+            yield return Talk(CharacterIds.Boog);
+            Assert.That(Box.Line, Does.StartWith("you killed the Larder Troll"));
+            yield return NextLine();
+            yield return NextLine();
+            yield return WaitUntil(() => Box.IsChoosing, 2f, "the troll's choices");
+            yield return Press(Key.Enter);
+            yield return UntilClosed();
             yield return Talk(CharacterIds.Boog);
             Assert.That((Box.SpeakerId, Box.SpeakerName), Is.EqualTo(("gunta", "Boog")));
             Assert.That(Box.Line, Does.StartWith("the stove's hot"));
@@ -257,16 +266,16 @@ namespace Hearthdelve.Tests.PlayMode
             yield return HangTheTusks();
             Assert.That(Social.Remembers("gunta", "displayed_trophy") && Social.Remembers("pip", "displayed_trophy"), "both remember");
             float boogAffinity = Social.Affinity("gunta"), boogRespect = Social.Respect("gunta"), pipAffinity = Social.Affinity("pip");
-            Assert.That(boogAffinity, Is.GreaterThan(10f), "Boog likes the keeper more (Love/Hate's evaluation)");
-            Assert.That(boogRespect, Is.EqualTo(13.5f).Within(0.01f), "and respects them: 15 × the nerve match (0.9)");
-            Assert.That(pipAffinity, Is.GreaterThan(20f), "Orik likes it too");
-            Assert.That(Social.Respect("pip"), Is.EqualTo(5f).Within(0.01f), "but isn't impressed by monster parts");
+            Assert.That(boogAffinity, Is.GreaterThan(boogAffinity0), "Boog likes the keeper more (Love/Hate's evaluation)");
+            Assert.That(boogRespect - boogRespect0, Is.EqualTo(13.5f).Within(0.01f), "and respects them: 15 × the nerve match (0.9)");
+            Assert.That(pipAffinity, Is.GreaterThan(pipAffinity0), "Orik likes it too");
+            Assert.That(Social.Respect("pip"), Is.EqualTo(pipRespect0).Within(0.01f), "but isn't impressed by monster parts");
             DecorateMode.Instance.Leave();
             yield return null;
 
             // Saved with the layout.
             StorySaveData saved = SavedGame().story;
-            Assert.That(saved.relationships.values.Any(v => v.judge == "gunta" && v.subject == "player" && v.trait == "Respect" && Mathf.Abs(v.value - 13.5f) < 0.01f));
+            Assert.That(saved.relationships.values.Any(v => v.judge == "gunta" && v.subject == "player" && v.trait == "Respect" && Mathf.Abs(v.value - boogRespect) < 0.01f));
             Assert.That(saved.relationships.memories.Select(m => (m.judge, m.deed)), Is.SupersetOf(new[] { ("gunta", "displayed_trophy"), ("pip", "displayed_trophy") }));
             Assert.That(saved.dialogue, Is.Not.Empty);
 
@@ -299,13 +308,14 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Social.Respect("gunta"), Is.EqualTo(boogRespect).Within(1e-3f));
             Assert.That(Social.Affinity("pip"), Is.EqualTo(pipAffinity).Within(1e-3f));
             Assert.That((Social.Remembers("gunta", "displayed_trophy"), Social.TimesSeen("gunta", "displayed_trophy")), Is.EqualTo((true, 1)));
+            // Said once (Checkpoint C), and the dialogue's own state came back too: his everyday branch, not the tusks again.
             yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("you hung the Larder Troll's tusks over the bar"), "the same branch after Continue");
-            yield return NextLine();
+            Assert.That(Box.Line, Does.StartWith("the stove's hot"), "the tusks remark stays said after Continue");
             yield return NextLine();
             yield return WaitUntil(() => Box.IsChoosing, 2f, "the choices");
+            yield return Press(Key.DownArrow);
             yield return Press(Key.Enter);
-            yield return UntilClosed();
+            yield return WaitUntil(() => !Box.IsOpen, 2f, "carry on");
 
             // Hanging them again (Shift+F1's way): the same deed, less fresh.
             float respectBefore = Social.Respect("gunta");

@@ -379,7 +379,7 @@ namespace Hearthdelve.Story.Editor
         // ---------- Checkpoint C: the hubs (priority) and what they remember ----------
 
         /// <summary>A callback said once: true until its entry has played (a Dialogue System variable, saved with the dialogue).</summary>
-        static string Unsaid(string flag) => $"not Variable[\"{flag}\"]";
+        static string Unsaid(string flag) => $"Variable[\"{flag}\"] ~= true";
         static string Said(string flag) => $"Variable[\"{flag}\"] = true";
         static string Remembers(string who, string deed) => $"HH_Remembers(\"{who}\", \"{deed}\")";
 

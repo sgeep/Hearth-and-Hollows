@@ -128,10 +128,12 @@ namespace Hearthdelve.Story.Relationships
             // A repeat is one they already remember (Love/Hate's own test). Its pooled rumors keep a stale count, so a first
             // sighting's count is set here rather than trusted.
             Rumor remembered = member.longTermMemory.Find(r => r.actorFactionID == rumor.actorFactionID && r.targetFactionID == rumor.targetFactionID && r.tag == rumor.tag);
+            // Read before Love/Hate's evaluation, which counts this sighting into the memory it updates (4g Checkpoint C).
+            int seenBefore = remembered != null ? remembered.count : 0;
             Rumor result = member.DefaultEvaluateRumor(rumor, source);
             if (result == null || !m_Deeds.TryGetValue(rumor.tag, out DeedDefinition deed)) return result;
             if (remembered == null) result.count = 1;
-            float acclimatization = remembered == null ? 1f : member.acclimatizationCurve.Evaluate(remembered.count);
+            float acclimatization = remembered == null ? 1f : member.acclimatizationCurve.Evaluate(seenBefore);
             float respect = RelationshipRules.RespectChange(deed.respect, RelationshipRules.Alignment(judge.values, deed.shows), acclimatization);
             if (!Mathf.Approximately(respect, 0f))
                 Database.ModifyPersonalRelationshipTrait(member.factionID, rumor.actorFactionID, RespectTrait, respect);

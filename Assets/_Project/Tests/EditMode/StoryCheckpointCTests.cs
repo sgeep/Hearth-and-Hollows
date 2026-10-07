@@ -163,7 +163,7 @@ namespace Hearthdelve.Tests
             var set = new HashSet<string>();
             foreach (var (c, e, code) in Code())
             {
-                foreach (Match m in Regex.Matches(code, @"not Variable\[""(hh_[a-z_]+)""\]")) read.Add(m.Groups[1].Value);
+                foreach (Match m in Regex.Matches(code, @"Variable\[""(hh_[a-z_]+)""\]\s*~=\s*true")) read.Add(m.Groups[1].Value);
                 foreach (Match m in Regex.Matches(code, @"Variable\[""(hh_[a-z_]+)""\]\s*=\s*true")) set.Add(m.Groups[1].Value);
             }
             Assert.That(read, Is.Not.Empty);
@@ -187,7 +187,7 @@ namespace Hearthdelve.Tests
             // Everything the opening and the quest need is reachable whatever Boog remembers: the memory remarks above the bomb
             // offer in Boog/Talk are said once, never every time.
             foreach (DialogueEntry e in talk.dialogueEntries.Where(e => e.conditionsString != null && e.conditionsString.Contains("HH_Remembers")))
-                Assert.That(e.conditionsString, Does.Contain("not Variable["), $"Boog/Talk {e.id} is said once");
+                Assert.That(e.conditionsString, Does.Contain("~= true"), $"Boog/Talk {e.id} is said once");
         }
 
         // ---------- Old names ----------

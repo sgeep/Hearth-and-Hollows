@@ -2001,7 +2001,7 @@ MonoBehaviour:
         destinationDialogueID: 3
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "displayed_trophy") and HH_Respect("gunta") >= 10 and not Variable["hh_boog_tusks"]'
+      conditionsString: 'HH_Remembers("gunta", "displayed_trophy") and HH_Respect("gunta") >= 10 and Variable["hh_boog_tusks"] ~= true'
       userScript: Variable["hh_boog_tusks"] = true
       onExecute:
         m_PersistentCalls:
@@ -2759,7 +2759,7 @@ MonoBehaviour:
         destinationDialogueID: 2
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "displayed_trophy") and not Variable["hh_orik_tusks"]'
+      conditionsString: 'HH_Remembers("pip", "displayed_trophy") and Variable["hh_orik_tusks"] ~= true'
       userScript: Variable["hh_orik_tusks"] = true
       onExecute:
         m_PersistentCalls:
@@ -2977,7 +2977,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_QuestObject("boogs_bomb") == "delivered" and not Variable["hh_orik_incident"]'
+      conditionsString: 'HH_QuestObject("boogs_bomb") == "delivered" and Variable["hh_orik_incident"] ~= true'
       userScript: Variable["hh_orik_incident"] = true
       onExecute:
         m_PersistentCalls:
@@ -6132,7 +6132,7 @@ MonoBehaviour:
         destinationDialogueID: 5
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "felled_larder_troll") and not Variable["hh_boog_troll"]'
+      conditionsString: 'HH_Remembers("gunta", "felled_larder_troll") and Variable["hh_boog_troll"] ~= true'
       userScript: Variable["hh_boog_troll"] = true
       onExecute:
         m_PersistentCalls:
@@ -6539,7 +6539,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_Remembers("gunta", "returned_boogs_bomb") and not Variable["hh_boog_bomb"]'
+      conditionsString: 'HH_Remembers("gunta", "returned_boogs_bomb") and Variable["hh_boog_bomb"] ~= true'
       userScript: Variable["hh_boog_bomb"] = true
       onExecute:
         m_PersistentCalls:
@@ -6592,7 +6592,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_Remembers("gunta", "kept_a_wish") and not Variable["hh_boog_wish"]'
+      conditionsString: 'HH_Remembers("gunta", "kept_a_wish") and Variable["hh_boog_wish"] ~= true'
       userScript: Variable["hh_boog_wish"] = true
       onExecute:
         m_PersistentCalls:
@@ -6651,7 +6651,7 @@ MonoBehaviour:
         destinationDialogueID: 13
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "fine_butchery") and not Variable["hh_boog_butchery"]'
+      conditionsString: 'HH_Remembers("gunta", "fine_butchery") and Variable["hh_boog_butchery"] ~= true'
       userScript: Variable["hh_boog_butchery"] = true
       onExecute:
         m_PersistentCalls:
@@ -6998,7 +6998,7 @@ MonoBehaviour:
         destinationDialogueID: 3
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "felled_larder_troll") and not Variable["hh_orik_troll"]'
+      conditionsString: 'HH_Remembers("pip", "felled_larder_troll") and Variable["hh_orik_troll"] ~= true'
       userScript: Variable["hh_orik_troll"] = true
       onExecute:
         m_PersistentCalls:
@@ -7346,7 +7346,7 @@ MonoBehaviour:
         destinationDialogueID: 9
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "kept_a_wish") and not Variable["hh_orik_wish"]'
+      conditionsString: 'HH_Remembers("pip", "kept_a_wish") and Variable["hh_orik_wish"] ~= true'
       userScript: Variable["hh_orik_wish"] = true
       onExecute:
         m_PersistentCalls:
