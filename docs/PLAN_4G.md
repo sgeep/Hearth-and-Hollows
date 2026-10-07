@@ -1,6 +1,6 @@
 # 4g plan: story, quests, character creation and relationship reactivity
 
-> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built and signed off 2026-10-06 (the owner playtested it and verified the node-editor workflow). Checkpoint C (Steps 7–8) built 2026-10-06, waiting for the owner's final 4g playtest and sign-off.** 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
+> **Status: approved 2026-10-06, with the owner's decisions below. Checkpoint A (Steps 1–3) built and signed off 2026-10-06. Checkpoint B (Steps 4–6) built and signed off 2026-10-06 (the owner playtested it and verified the node-editor workflow). Checkpoint C (Steps 7–8) built 2026-10-06, waiting for the owner's final 4g playtest and sign-off.** *(2026-10-07)* A Checkpoint D for the owner's new cast (Steps 9–12) is **proposed, awaiting approval** (below). 4f is complete (signed off 2026-10-06; tag `milestone-4f`).
 
 ## Approval (2026-10-06): the owner's decisions
 
@@ -13,6 +13,40 @@
 - **D5 replaced:** the first quest is **Boog's Bomb** (his favorite bomb, lost in the Hollows, wanted back for "research"), not Tamsin's strongbox. Step 6.
 - **D6:** quest objects are lost on death before extraction and obtainable again while the quest is active; never in the Satchel or the Lockbox; kept on extraction; a modest per-object policy.
 - **D4:** no keeper portrait in 4g. **D7:** old saves skip the opening through explicit story state; new games play it.
+
+## Proposed: Checkpoint D, the new cast (2026-10-07, awaiting approval)
+
+The owner added seven people to the cast on 2026-10-07 (GDD §2.10, Decided 51) and asked that they shape 4g. Checkpoint C is built and waiting for the final playtest, and villagers proper (homes, schedules, a walkable Kariaston, named patrons) are 4h's. So this proposes one more small checkpoint before `milestone-4g`: the cast enters the game where 4g's systems already reach (the tavern at night, the Cellars, Boog's and Orik's talk) and nothing that needs the village is built early.
+
+**Experience target:** *the village exists before the player can walk it, and the Hollows have people in them.* The player hears Kariaston's names from Boog and Orik, meets Boog's strange friend from below at the bar, and once, in the Cellars, meets a light that talks.
+
+**Step 9, the cast as data.**
+- A `CharacterDefinition` for each: `maximo`, `kaloren`, `grim`, `ogrin`, `bart`, `gimp`, `glimmer` (stable ids; `karias` too, for things said about him). Kinds: villager or Hollower (a new `CharacterKind` value; species-agnostic, as the architecture requires).
+- Values on the existing traits (craft, nerve, warmth), so each reads deeds their own way. First reading: Maximo nerve 80, warmth 70, craft 0 (he admires the deed, not the technique); Kaloren warmth 70, craft 60, nerve −20; Grim craft 60, warmth 40; Bart nerve 50, warmth 50 (a good story); Gimp nerve 90, craft 70, warmth 0; Glimmer warmth 60, nerve 30; Ogrin warmth 80. Tuned on the assets.
+- The Love/Hate faction database regenerated from the characters (never by hand). Only characters who appear in Checkpoint D get stand-ins that learn deeds (Gimp, Glimmer); the others are data until 4h.
+- Portraits for Gimp and Glimmer through `Tools/portraits` (Portrait Generator recipes). Whether the Portrait Generator can make a fey spirit is checked first; if it can't, Glimmer speaks with a small animated light instead of a face, recorded in `docs/ASSET_MAP.md`.
+- Art found through the catalog CSVs first: a figure for Gimp (a different look from Orik's yellow-bearded dwarf, which the keeper's dwarf body also uses), and a light, wisp or spirit for Glimmer.
+
+**Step 10, Gimp, the first Hollower.**
+- After Boog's Bomb is done (the quest's success, a saved state), Gimp is at the bar with Boog on some nights after the delve (Night phase; seeded, about one night in three, tuned on an asset; the first time guaranteed the night after the bomb comes home). He came up the hatch.
+- Talking to him uses the existing `Person` interactable. `Gimp/Hub` (seeded once, like every conversation): the first meeting (Boog introduces his oldest friend from below), one-time callbacks to deeds he hears of (he reads the troll and the bomb through nerve and craft), and an everyday conversation about fuses, blast radii and the upper Hollows with Boog chiming in.
+- No changes to service, customers or seating: he isn't a patron yet. That waits for 4h's named patrons.
+
+**Step 11, a first glimpse of Glimmer.**
+- Once, the first time the keeper reaches the Cellars' second floor after Boog's Bomb, a small light drifts in a cleared room and speaks (`Glimmer/FirstMeeting`): curious, distracted, delighted by the keeper's name, and briefly ancient ("i was supposed to keep something shut. i think. was it a door?") before she drifts off. Said once (a Dialogue System variable), never a quest; her questline is Phase 5 or later.
+- Safe ground while she talks (the world pauses during conversations already).
+
+**Step 12, the village in conversation.**
+- New one-time branches in Boog's and Orik's hubs (author's edits, made once where the hub is still as written) and a few everyday lines that name Kariaston's people: the mayor's proclamations, the song Bart won't stop playing, Grim buying remedies, the wizard who never eats. Each is a seed, so 4h's first meetings land on people the player has heard of.
+- Nothing about Kaloren's secret, Karias's death or the phylactery is said yet: those are 4h's and the story's.
+
+**Tests:** characters complete and valid (ids, kinds, values, names in the Content table); the faction database matches the characters; Gimp's presence rule (never before the bomb, guaranteed the first night after, seeded after that); Glimmer's meeting fires once and survives save and Continue; `TypographyTests` and `TextStyleTests` over the new lines; save stays version 9 (the new state is dialogue variables and existing quest state).
+
+**What you'd do in the editor:** compose Gimp's and Glimmer's portraits in the Portrait Generator app if the recipe route doesn't fit; playtest the night with Gimp and the Glimmer meeting; edit the seeded writing in the node editor as you like.
+
+**Not in Checkpoint D:** Maximo, Kaloren, Grim, Ogrin and Bart in person (4h: the four households of the village slice), Bart playing in the tavern, Gimp as a patron, Glimmer's questline, the phylactery, any new save version.
+
+**Alternative:** close 4g as built and move all of this to 4h's plan.
 
 ## As built: Checkpoint A (2026-10-06)
 

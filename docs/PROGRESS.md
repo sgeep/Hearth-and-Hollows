@@ -1190,6 +1190,10 @@ Checkpoint B was signed off on 2026-10-06: you playtested it and verified the no
 - **Found in the browser (balance, not changed):** if the first delve ends in death, the keeper has no food and 0 gold, so the first evening has to stay shut, and the first takings and Boog's offer wait at least a day. Worth a look when balancing the opening.
 - **Dungeon debug keys in the day loop:** F4 (refill Essence) and F6 (god mode) now also work in the Dungeon scene of the real day loop, in development builds only (`DungeonDebugKeys`).
 
+### The Kariaston cast (2026-10-07, the owner's request; docs only)
+
+Seven people join the cast (GDD §2.10, Decided 51): villagers **Kaloren Frosthand**, **Maximo** (Kariaston named for his lost friend **Karias**), **Grim and Ogrin**, **Bart**, with **Orik** confirmed; and the first **Hollowers**, **Gimp** and **Glimmer**. Character roots drawn from the owner's campaign notes (Maximo's tannery past, his songs and speeches, his mentoring of Karias; Gimp's gunpowder and friendship with Boog), without importing the campaigns' wider lore. A **4g Checkpoint D** (Steps 9–12: the cast as data, Gimp at the bar after Boog's Bomb, one Glimmer glimpse in the Cellars, the village named in Boog's and Orik's talk) is proposed in `docs/PLAN_4G.md`, awaiting approval; the alternative is closing 4g as built and taking the cast to 4h, whose four households would be Maximo, Kaloren, Grim and Ogrin, and Bart. Open questions for the owner: GDD §13 Open 12 (when Kariaston got its name, Karias elf or half-elf, Kaloren's secret, Glimmer and the Warden Below, close names, Gimp's kind, firearms). Nothing built.
+
 ### Open design questions (Phase 4)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
