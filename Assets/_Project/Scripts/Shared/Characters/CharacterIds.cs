@@ -15,7 +15,7 @@ namespace Hearthdelve.Shared.Characters
         Visitor,
         /// <summary>A Visitor who settled on one of the village's plots (Phase 5): persistent, generated look, authored modular dialogue.</summary>
         Resident,
-        /// <summary>Anyone else the story needs (Old Tamsin, Ser Aldric Vane).</summary>
+        /// <summary>Anyone else the story needs (Old Phi, Ser Aldric Vane).</summary>
         Story,
     }
 

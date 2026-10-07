@@ -151,15 +151,15 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry askResearch = w.Player("so what's the research, Boog?", 1, 3);
             DialogueEntry yours = w.Player("she's all yours.", 2, 3);
             DialogueEntry first = w.Npc("...she's the first thing i ever made that went off when i meant her to. before her, things went off when they wanted.", 1, 4);
-            DialogueEntry tamsin = w.Npc("Tamsin let me keep her. she said everyone needs one thing that does what they hoped it would.", 1, 5);
+            DialogueEntry phi = w.Npc("Old Phi let me keep her. she said everyone needs one thing that does what they hoped it would.", 1, 5);
             DialogueEntry reward = w.Npc("here. for your trouble. i was saving it for fuses.", 2, 6,
                 script: $"if HH_HasQuestObject({Bomb}) then HH_Deed(\"returned_boogs_bomb\"); HH_DeliverQuestObject({Bomb}) end");
             DialogueEntry remember = w.Npc("you went all the way down for her. i won't forget it, keeper.", 2, 7);
             w.Link(found, scratch);
             w.Link(scratch, askResearch, yours);
             w.Link(askResearch, first);
-            w.Link(first, tamsin);
-            w.Link(tamsin, reward);
+            w.Link(first, phi);
+            w.Link(phi, reward);
             w.Link(yours, reward);
             w.Link(reward, remember);
 
@@ -243,7 +243,7 @@ namespace Hearthdelve.Story.Editor
 
         /// <summary>
         /// Orik, any time: the tusks (Checkpoint A), arrival day, Boog's bomb home, and otherwise the ledger, with three things to
-        /// ask him (Tamsin, why he won't go down, the books).
+        /// ask him (Phi, why he won't go down, the books).
         /// </summary>
         static void WriteOrikTalk(DialogueDatabase db, Template template, Cast c, int id)
         {
@@ -261,15 +261,19 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry incident = w.Npc("Boog's bomb is home. i've entered it in the incident book. in advance.", 2, 1, BombDelivered);
 
             DialogueEntry hello = w.Npc("good evening, [lua(HH_PlayerName())]. the ledger and i are on speaking terms again.", 3, 1);
-            DialogueEntry askTamsin = w.Player("tell me about Tamsin.", 3, 2);
+            DialogueEntry askPhi = w.Player("tell me about Phi.", 3, 2);
             DialogueEntry askDown = w.Player("why won't you go down?", 4, 2);
             DialogueEntry askBooks = w.Player("how are the books?", 5, 2);
             DialogueEntry never = w.Player("never mind.", 6, 2);
-            DialogueEntry week = w.Npc("she hired me for a week. that was eleven years ago. she never said the week was over.", 3, 3);
+            DialogueEntry rebuilt = w.Npc("we rebuilt this place together, long ago. she'd been one of the Fortunate Five. the road kept calling her.", 3, 3);
+            DialogueEntry left = w.Npc("she left, and i kept it open without her for years. when the Hollows turned bad, i left too.", 3, 4);
+            DialogueEntry late = w.Npc("decades later she came home, found me, and said i was late for work. so i came back.", 3, 5);
             DialogueEntry family = w.Npc("my family went down for three hundred years. somebody had to come up and count what they left.", 4, 3);
             DialogueEntry red = w.Npc("in the red. a cheerful sort of red. we've had worse reds.", 5, 3);
-            w.Link(hello, askTamsin, askDown, askBooks, never);
-            w.Link(askTamsin, week);
+            w.Link(hello, askPhi, askDown, askBooks, never);
+            w.Link(askPhi, rebuilt);
+            w.Link(rebuilt, left);
+            w.Link(left, late);
             w.Link(askDown, family);
             w.Link(askBooks, red);
 
@@ -278,16 +282,16 @@ namespace Hearthdelve.Story.Editor
 
         // ---------- The Act I opening (Step 5) ----------
 
-        /// <summary>Arrival day: Orik and Boog meet the new keeper; Tamsin is missing below; the storeroom is empty; the hatch is there.</summary>
+        /// <summary>Arrival day: Orik and Boog meet the new keeper; Phi is missing below; the storeroom is empty; the hatch is there.</summary>
         static void WriteArrival(DialogueDatabase db, Template template, Cast c, int id)
         {
             var w = new Writer(db, template, id, OpeningRules.Arrival, c.Player, c.Orik,
                 "Act I opening: the keeper arrives at Tally Ho! (played once, as arrival day begins). Ends with the keeper free to walk to the hatch.");
-            DialogueEntry late = w.Npc("you'll be [lua(HH_PlayerName())]. Tamsin's letter said you'd come. it didn't say you'd be this late.", 0, 1);
+            DialogueEntry late = w.Npc("ahh, you must be [lua(HH_PlayerName())]! Phi's letter said you'd come. it didn't say you'd be this late.", 0, 1);
             DialogueEntry road = w.Player("the road was long.", 0, 2);
-            DialogueEntry where = w.Player("where is Tamsin?", 1, 2);
+            DialogueEntry where = w.Player("where is Phi'rai?", 1, 2);
             DialogueEntry question = w.Npc("that's the question, isn't it.", 1, 3);
-            DialogueEntry nine = w.Npc("nine days ago she went down into the Hollows. she said a week at most. Tamsin is never late. not once in eleven years.", 0, 4);
+            DialogueEntry nine = w.Npc("nine days ago she went down into the Hollows. she said a week at most. Phi is never late. never, in all these years.", 0, 4);
             DialogueEntry yours = w.Npc("her letter says if she isn't back, Tally Ho! is yours to keep. so you're the keeper now. i'm Orik. i keep the books.", 0, 5);
             DialogueEntry fire = w.Say(c.Boog, "and i'm Boog! i keep the fire. mostly in the stove.", 0, 6);
             DialogueEntry list = w.Npc("Boog cooks. Boog also keeps a list of the things he's set alight. it's longer than the menu.", 0, 7);
@@ -313,7 +317,7 @@ namespace Hearthdelve.Story.Editor
             w.Link(w.Start, late);
         }
 
-        /// <summary>Home from the first delve (that night): what came up becomes supper. Boog is delighted; Orik counts it, and remembers Tamsin.</summary>
+        /// <summary>Home from the first delve (that night): what came up becomes supper. Boog is delighted; Orik counts it, and remembers Phi.</summary>
         static void WriteHomecoming(DialogueDatabase db, Template template, Cast c, int id)
         {
             var w = new Writer(db, template, id, OpeningRules.Homecoming, c.Player, c.Boog,
@@ -321,7 +325,7 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry supper = w.Npc("you're back! and you brought... let me see. oh. oh, that's a whole supper.", 0, 1, "HH_PartsHome() > 0");
             DialogueEntry counted = w.Say(c.Orik, "i've counted it. [lua(HH_PartsHome())] parts. by my sums that's an evening. a small one.", 0, 2);
             DialogueEntry cooking = w.Npc("you see? the Hollows go in, supper comes out. that's all cooking is.", 0, 3);
-            DialogueEntry smell = w.Say(c.Orik, "Tamsin used to come up that hatch smelling just like you do now. i never asked what of.", 0, 4);
+            DialogueEntry smell = w.Say(c.Orik, "Phi used to come up that hatch smelling just like you do now. i never asked what of.", 0, 4);
             DialogueEntry besides = w.Player("what else did she bring up?", 0, 5);
             DialogueEntry whatSmell = w.Player("what do i smell like?", 1, 5);
             DialogueEntry answers = w.Say(c.Orik, "answers, sometimes. never to anything i'd asked.", 0, 6);
@@ -365,7 +369,7 @@ namespace Hearthdelve.Story.Editor
             Conversation bomb = Find(db, BoogBomb);
             var w = new Writer(db, template, id, OpeningRules.FirstTakings, c.Player, c.Orik,
                 "Act I opening: the first night's takings (played once). Leads into Boog/Bomb; the opening is complete when it ends.");
-            DialogueEntry takings = w.Npc("that's the first night's takings. Tamsin's first night was worse. i have it written down.", 0, 1);
+            DialogueEntry takings = w.Npc("that's the first night's takings. Phi's first night was worse. i have it written down.", 0, 1);
             DialogueEntry second = w.Npc("she used to say the first night is for finding out what's wrong with the second.", 0, 2);
             DialogueEntry ask = w.Say(c.Boog, "keeper. can i ask you something? a small thing. a medium thing.", 0, 3);
             DialogueEntry toBomb = w.Group("to Boog/Bomb", 0, 4, null);
@@ -438,7 +442,7 @@ namespace Hearthdelve.Story.Editor
         }
 
         /// <summary>
-        /// Talking to Orik (4g Checkpoint C): arrival day first; then, once each, what he remembers (the troll, quietly, and Tamsin;
+        /// Talking to Orik (4g Checkpoint C): arrival day first; then, once each, what he remembers (the troll, quietly, and Phi;
         /// a wish kept, which he respects more than Boog does); then Orik/Talk, his everyday conversation.
         /// </summary>
         static void WriteOrikHub(DialogueDatabase db, Template template, Cast c, int id)
@@ -449,11 +453,11 @@ namespace Hearthdelve.Story.Editor
             DialogueEntry arriving = w.Group("critical: arrival day", 0, 1, Arriving);
             w.LinkTo(arriving, talk);
 
-            // The troll: a line in the ledger, and Tamsin.
+            // The troll: a line in the ledger, and Phi.
             const string troll = "hh_orik_troll";
             DialogueEntry resolved = w.Npc("the Larder Troll is dead. i've moved it from 'risks' to 'resolved'. first entry in that column in years.", 1, 1,
                 $"{Remembers("pip", "felled_larder_troll")} and {Unsaid(troll)}", Said(troll));
-            DialogueEntry twice = w.Npc("Tamsin went after it, you know. twice. she came back both times and wouldn't say a word about it.", 1, 2);
+            DialogueEntry twice = w.Npc("Phi went after it, you know. twice. she came back both times and wouldn't say a word about it.", 1, 2);
             DialogueEntry after = w.Player("what was she after?", 1, 3);
             DialogueEntry back = w.Player("she'll come back.", 2, 3);
             DialogueEntry guarding = w.Npc("not the troll, she said. whatever it was sitting on.", 1, 4);
@@ -467,8 +471,8 @@ namespace Hearthdelve.Story.Editor
             const string wish = "hh_orik_wish";
             DialogueEntry remembered = w.Npc("you remembered that patron's request, and made it. people come back to places that remember them.", 3, 1,
                 $"{Remembers("pip", "kept_a_wish")} and {Unsaid(wish)}", Said(wish));
-            DialogueEntry tamsinWay = w.Npc("Tamsin ran it that way. i'd started to think i was the only one who remembered how.", 3, 2, "HH_Respect(\"pip\") >= 15");
-            w.Link(remembered, tamsinWay);
+            DialogueEntry phiWay = w.Npc("Phi ran it that way. i'd started to think i was the only one who remembered how.", 3, 2, "HH_Respect(\"pip\") >= 15");
+            w.Link(remembered, phiWay);
 
             DialogueEntry everyday = w.Group("everyday: Orik/Talk", 4, 1, null);
             w.LinkTo(everyday, talk);

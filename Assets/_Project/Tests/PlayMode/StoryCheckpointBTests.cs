@@ -307,7 +307,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(animator.Set.name, Does.StartWith("Anim_KeeperDwarf").And.Contain("keeper_hair"));
             Assert.That(Lua.Run("return HH_PlayerName()").asString, Is.EqualTo("Wren"));
             yield return WaitUntil(() => Box.IsOpen, 3f, "the arrival's conversation");
-            Assert.That(Box.Line, Does.StartWith("ahh, you must be Wren! Tamsin's letter"), "the owner's line");
+            Assert.That(Box.Line, Does.StartWith("ahh, you must be Wren! Phi's letter"), "the owner's line");
             DialogueManager.StopAllConversations();
         }
 
@@ -325,7 +325,7 @@ namespace Hearthdelve.Tests.PlayMode
 
             // The arrival: Orik, a line revealed as it's spoken.
             yield return WaitUntil(() => Box.IsOpen, 3f, "Orik");
-            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "ahh, you must be Bram! Tamsin's letter said you'd come. it didn't say you'd be this late.")));
+            Assert.That((Box.SpeakerName, Box.Line), Is.EqualTo(("Orik", "ahh, you must be Bram! Phi's letter said you'd come. it didn't say you'd be this late.")));
             Assert.That(Box.IsRevealing, "revealed as it's spoken");
             Assert.That(Box.CharactersPerSecond, Is.EqualTo(AssetDatabaseFree.Settings.charactersPerSecond), "one tunable speed");
             // A click while revealing finishes the line, and doesn't move on.
@@ -348,7 +348,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             yield return null;
             Assert.That((Box.IsChoosing, Box.ChoicesLocked), Is.EqualTo((true, false)), "let go: the choices are open");
-            Assert.That((Box.ChoiceText(0), Box.ChoiceText(1)), Is.EqualTo(("the road was long.", "where is Tamsin?")));
+            Assert.That((Box.ChoiceText(0), Box.ChoiceText(1)), Is.EqualTo(("the road was long.", "where is Phi'rai?")));
             yield return Press(Key.DownArrow);
             yield return Press(Key.Enter);
             yield return WaitUntil(() => !Box.IsChoosing, 2f, "the choice taken");
@@ -586,7 +586,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Choose("so what's the research, Boog?");
             Assert.That(Box.Line, Does.StartWith("...she's the first thing i ever made"));
             yield return NextLine();
-            Assert.That(Box.Line, Does.StartWith("Tamsin let me keep her"));
+            Assert.That(Box.Line, Does.StartWith("Old Phi let me keep her"));
             yield return NextLine();
             Assert.That(Box.Line, Does.StartWith("here. for your trouble"));
             Assert.That(Flow.State.Gold, Is.EqualTo(gold + 60), "the reward, from Hearth & Hollows");

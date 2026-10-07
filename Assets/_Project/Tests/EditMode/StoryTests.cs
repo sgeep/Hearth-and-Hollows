@@ -56,7 +56,7 @@ namespace Hearthdelve.Tests
             Assert.That(CharacterIds.Boog, Is.EqualTo("gunta"), "Boog's id never changes (saves, staff, events)");
             Assert.That(StaffIds.Boog, Is.EqualTo(CharacterIds.Boog));
             Assert.That(StaffIds.Orik, Is.EqualTo(CharacterIds.Orik));
-            Assert.That(CharacterIds.IsAuthored("gunta") && CharacterIds.IsAuthored("old_tamsin"));
+            Assert.That(CharacterIds.IsAuthored("gunta") && CharacterIds.IsAuthored("old_phi"));
             Assert.That(CharacterIds.IsAuthored("Gunta") || CharacterIds.IsAuthored("visitor/1/2") || CharacterIds.IsAuthored(""), Is.False);
             Assert.That(CharacterIds.Visitor(3, 17), Is.EqualTo("visitor/3/17"));
             Assert.That(CharacterIds.IsVisitor("visitor/3/17") && !CharacterIds.IsVisitor("visitor/x"));
@@ -66,7 +66,7 @@ namespace Hearthdelve.Tests
         public void TheDirectory_ResolvesEveryKindOfPerson_TheSameWay()
         {
             var boog = Character("gunta", CharacterKind.Staff, true);
-            var villager = Character("old_tamsin", CharacterKind.Villager, true);
+            var villager = Character("old_phi", CharacterKind.Villager, true);
             var resident = Character("settled_visitor_1", CharacterKind.Resident, true);
             var directory = new CharacterDirectory(new[] { boog, villager, Character("gunta", CharacterKind.Story, false), null });
             Assert.That(directory.All.Count(), Is.EqualTo(2), "a duplicate id or a missing character isn't added");
@@ -125,13 +125,13 @@ namespace Hearthdelve.Tests
             var cast = new[]
             {
                 Character("player", CharacterKind.Player, true), Character("gunta", CharacterKind.Staff, true), Character("pip", CharacterKind.Staff, true),
-                Character("old_tamsin", CharacterKind.Villager, true), Character("passer_by", CharacterKind.Villager, false),
+                Character("old_phi", CharacterKind.Villager, true), Character("passer_by", CharacterKind.Villager, false),
             };
             var deed = ScriptableObject.CreateInstance<DeedDefinition>();
             deed.learners = DeedLearners.Staff;
             Assert.That(RelationshipRules.Learners(deed, cast), Is.EqualTo(new[] { "gunta", "pip" }));
             deed.learners = DeedLearners.Everyone;
-            Assert.That(RelationshipRules.Learners(deed, cast), Is.EqualTo(new[] { "gunta", "pip", "old_tamsin" }));
+            Assert.That(RelationshipRules.Learners(deed, cast), Is.EqualTo(new[] { "gunta", "pip", "old_phi" }));
             deed.source = DeedSource.TrophyDisplayed;
             Assert.That(RelationshipRules.DeedsFor(DeedSource.TrophyDisplayed, new[] { deed, null }), Is.EqualTo(new[] { deed }));
             Assert.That(RelationshipRules.DeedsFor(DeedSource.None, new[] { deed }), Is.Empty, "dialogue-only deeds come from no fact");

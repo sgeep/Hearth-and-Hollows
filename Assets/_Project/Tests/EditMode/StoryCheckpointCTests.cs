@@ -222,7 +222,7 @@ namespace Hearthdelve.Tests
         [Test]
         public void PlayerFacingText_UsesTheCurrentNames()
         {
-            var old = new[] { "Pip", "Gunta", "Gundra", "Ashbelly", "Marrowby", "Brackenford", "Sunken Flagon" };
+            var old = new[] { "Pip", "Gunta", "Gundra", "Ashbelly", "Marrowby", "Brackenford", "Sunken Flagon", "Tamsin" };
             var bad = new List<string>();
             foreach (var collection in LocalizationEditorSettings.GetStringTableCollections())
             foreach (var table in collection.StringTables)
@@ -232,6 +232,45 @@ namespace Hearthdelve.Tests
                     bad.Add($"{collection.TableCollectionName}/{entry.Key}: {name}");
             foreach (Actor a in Dialogue.actors)
                 if (old.Contains(a.Name)) bad.Add($"actor {a.Name}");
+            foreach (Conversation c in Dialogue.conversations)
+            foreach (DialogueEntry e in c.dialogueEntries)
+            foreach (string name in old)
+                if (!string.IsNullOrEmpty(e.DialogueText) && Regex.IsMatch(e.DialogueText, $@"\b{name}\b"))
+                    bad.Add($"{c.Title} [{e.id}]: {name}");
+            Assert.That(bad, Is.Empty, string.Join("\n", bad));
+        }
+
+        /// <summary>Asked about Phi, Orik tells it in three short beats, only when asked: the rebuilding, his years alone, her finding him.</summary>
+        [Test]
+        public void OrikTalk_TellsPhisHistoryOnlyWhenAsked()
+        {
+            Conversation talk = Dialogue.GetConversation(StoryDialogue.OrikTalk);
+            DialogueEntry ask = talk.dialogueEntries.Single(e => e.DialogueText == "tell me about Phi.");
+            var said = new List<string>();
+            for (DialogueEntry e = ask; e.outgoingLinks.Count == 1; )
+            {
+                e = talk.GetDialogueEntry(e.outgoingLinks[0].destinationDialogueID);
+                said.Add(e.DialogueText);
+            }
+            Assert.That(said, Has.Count.EqualTo(3));
+            Assert.That(said[0], Does.Contain("Fortunate Five"));
+            Assert.That(said[1], Does.Contain("i left too"));
+            Assert.That(said[2], Does.Contain("found me"));
+        }
+
+        /// <summary>
+        /// Old Phi (Phi'rai) replaced Old Tamsin on 2026-10-06. The current canon (CLAUDE.md, the GDD) may name Tamsin only where it
+        /// records that change; older plans and progress notes describe earlier builds and keep the old name.
+        /// </summary>
+        [Test]
+        public void CurrentCanon_NamesOldPhi()
+        {
+            string root = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.dataPath, ".."));
+            var bad = new List<string>();
+            foreach (string doc in new[] { "CLAUDE.md", "docs/GDD.md" })
+            foreach (string line in System.IO.File.ReadAllLines(System.IO.Path.Combine(root, doc)))
+                if (line.Contains("Tamsin") && !Regex.IsMatch(line, "replac|formerly|renamed", RegexOptions.IgnoreCase))
+                    bad.Add($"{doc}: {line.Trim().Substring(0, System.Math.Min(120, line.Trim().Length))}");
             Assert.That(bad, Is.Empty, string.Join("\n", bad));
         }
     }

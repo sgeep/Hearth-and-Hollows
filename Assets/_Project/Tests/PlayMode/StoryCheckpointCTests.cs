@@ -189,11 +189,11 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Box.Line, Does.StartWith("parts of it. the brave parts"));
             yield return ToEnd();
 
-            // Orik, quietly, and Tamsin.
+            // Orik, quietly, and Phi.
             yield return Talk(CharacterIds.Orik);
             Assert.That(Box.Line, Does.StartWith("the Larder Troll is dead. i've moved it from 'risks' to 'resolved'"));
             yield return Next();
-            Assert.That(Box.Line, Does.StartWith("Tamsin went after it"));
+            Assert.That(Box.Line, Does.StartWith("Phi went after it"));
             yield return Next();
             yield return Choose("what was she after?");
             Assert.That(Box.Line, Is.EqualTo("not the troll, she said. whatever it was sitting on."));

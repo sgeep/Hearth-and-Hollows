@@ -616,7 +616,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: Tamsin let me keep her. she said everyone needs one thing that does what they hoped it would.
+        value: Old Phi let me keep her. she said everyone needs one thing that does what they hoped it would.
         type: 0
         typeString: 
       - title: Sequence
@@ -2001,7 +2001,7 @@ MonoBehaviour:
         destinationDialogueID: 3
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "displayed_trophy") and HH_Respect("gunta") >= 10 and Variable["hh_boog_tusks"] ~= true'
+      conditionsString: HH_Remembers("gunta", "displayed_trophy") and HH_Respect("gunta") >= 10 and Variable["hh_boog_tusks"] ~= true
       userScript: Variable["hh_boog_tusks"] = true
       onExecute:
         m_PersistentCalls:
@@ -2759,7 +2759,7 @@ MonoBehaviour:
         destinationDialogueID: 2
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "displayed_trophy") and Variable["hh_orik_tusks"] ~= true'
+      conditionsString: HH_Remembers("pip", "displayed_trophy") and Variable["hh_orik_tusks"] ~= true
       userScript: Variable["hh_orik_tusks"] = true
       onExecute:
         m_PersistentCalls:
@@ -2977,7 +2977,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_QuestObject("boogs_bomb") == "delivered" and Variable["hh_orik_incident"] ~= true'
+      conditionsString: HH_QuestObject("boogs_bomb") == "delivered" and Variable["hh_orik_incident"] ~= true
       userScript: Variable["hh_orik_incident"] = true
       onExecute:
         m_PersistentCalls:
@@ -3088,7 +3088,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: tell me about Tamsin.
+        value: tell me about Phi.
         type: 0
         typeString: 
       - title: Sequence
@@ -3318,7 +3318,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: she hired me for a week. that was eleven years ago. she never said the week was over.
+        value: we rebuilt this place together, long ago. she'd been one of the Fortunate Five. the road kept calling her.
         type: 0
         typeString: 
       - title: Sequence
@@ -3336,7 +3336,13 @@ MonoBehaviour:
       delaySimStatus: 0
       falseConditionAction: 
       conditionPriority: 2
-      outgoingLinks: []
+      outgoingLinks:
+      - originConversationID: 2
+        originDialogueID: 11
+        destinationConversationID: 2
+        destinationDialogueID: 14
+        isConnector: 0
+        priority: 2
       conditionsString: 
       userScript: 
       onExecute:
@@ -3452,6 +3458,118 @@ MonoBehaviour:
         serializedVersion: 2
         x: 1020
         y: 200
+        width: 160
+        height: 30
+    - id: 14
+      fields:
+      - title: Title
+        value: 
+        type: 0
+        typeString: 
+      - title: Description
+        value: 
+        type: 0
+        typeString: 
+      - title: Actor
+        value: 3
+        type: 5
+        typeString: CustomFieldType_Actor
+      - title: Conversant
+        value: 1
+        type: 5
+        typeString: CustomFieldType_Actor
+      - title: Menu Text
+        value: 
+        type: 0
+        typeString: 
+      - title: Dialogue Text
+        value: she left, and i kept it open without her for years. when the Hollows turned bad, i left too.
+        type: 0
+        typeString: 
+      - title: Sequence
+        value: 
+        type: 0
+        typeString: 
+      - title: Guid
+        value: e34b986e-b732-4ea9-9b1b-fd30e90c0910
+        type: 0
+        typeString: 
+      conversationID: 2
+      isRoot: 0
+      isGroup: 0
+      nodeColor: 
+      delaySimStatus: 0
+      falseConditionAction: 
+      conditionPriority: 2
+      outgoingLinks:
+      - originConversationID: 2
+        originDialogueID: 14
+        destinationConversationID: 2
+        destinationDialogueID: 15
+        isConnector: 0
+        priority: 2
+      conditionsString: 
+      userScript: 
+      onExecute:
+        m_PersistentCalls:
+          m_Calls: []
+      canvasRect:
+        serializedVersion: 2
+        x: 620
+        y: 260
+        width: 160
+        height: 30
+    - id: 15
+      fields:
+      - title: Title
+        value: 
+        type: 0
+        typeString: 
+      - title: Description
+        value: 
+        type: 0
+        typeString: 
+      - title: Actor
+        value: 3
+        type: 5
+        typeString: CustomFieldType_Actor
+      - title: Conversant
+        value: 1
+        type: 5
+        typeString: CustomFieldType_Actor
+      - title: Menu Text
+        value: 
+        type: 0
+        typeString: 
+      - title: Dialogue Text
+        value: decades later she came home, found me, and said i was late for work. so i came back.
+        type: 0
+        typeString: 
+      - title: Sequence
+        value: 
+        type: 0
+        typeString: 
+      - title: Guid
+        value: 93c452db-550b-4dd2-9668-417d624f9915
+        type: 0
+        typeString: 
+      conversationID: 2
+      isRoot: 0
+      isGroup: 0
+      nodeColor: 
+      delaySimStatus: 0
+      falseConditionAction: 
+      conditionPriority: 2
+      outgoingLinks: []
+      conditionsString: 
+      userScript: 
+      onExecute:
+        m_PersistentCalls:
+          m_Calls: []
+      canvasRect:
+        serializedVersion: 2
+        x: 620
+        y: 320
         width: 160
         height: 30
     entryGroups: []
@@ -3584,7 +3702,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: ahh, you must be [lua(HH_PlayerName())]! Tamsin's letter said you'd come. it didn't say you'd be this late.
+        value: ahh, you must be [lua(HH_PlayerName())]! Phi's letter said you'd come. it didn't say you'd be this late.
         type: 0
         typeString: 
       - title: Sequence
@@ -3708,7 +3826,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: where is Tamsin?
+        value: where is Phi'rai?
         type: 0
         typeString: 
       - title: Sequence
@@ -3826,7 +3944,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: nine days ago she went down into the Hollows. she said a week at most. Tamsin is never late. not once in eleven years.
+        value: nine days ago she went down into the Hollows. she said a week at most. Phi is never late. never, in all these years.
         type: 0
         typeString: 
       - title: Sequence
@@ -4700,7 +4818,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: Tamsin used to come up that hatch smelling just like you do now. i never asked what of.
+        value: Phi used to come up that hatch smelling just like you do now. i never asked what of.
         type: 0
         typeString: 
       - title: Sequence
@@ -5616,7 +5734,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: that's the first night's takings. Tamsin's first night was worse. i have it written down.
+        value: that's the first night's takings. Phi's first night was worse. i have it written down.
         type: 0
         typeString: 
       - title: Sequence
@@ -6132,7 +6250,7 @@ MonoBehaviour:
         destinationDialogueID: 5
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "felled_larder_troll") and Variable["hh_boog_troll"] ~= true'
+      conditionsString: HH_Remembers("gunta", "felled_larder_troll") and Variable["hh_boog_troll"] ~= true
       userScript: Variable["hh_boog_troll"] = true
       onExecute:
         m_PersistentCalls:
@@ -6539,7 +6657,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_Remembers("gunta", "returned_boogs_bomb") and Variable["hh_boog_bomb"] ~= true'
+      conditionsString: HH_Remembers("gunta", "returned_boogs_bomb") and Variable["hh_boog_bomb"] ~= true
       userScript: Variable["hh_boog_bomb"] = true
       onExecute:
         m_PersistentCalls:
@@ -6592,7 +6710,7 @@ MonoBehaviour:
       falseConditionAction: 
       conditionPriority: 2
       outgoingLinks: []
-      conditionsString: 'HH_Remembers("gunta", "kept_a_wish") and Variable["hh_boog_wish"] ~= true'
+      conditionsString: HH_Remembers("gunta", "kept_a_wish") and Variable["hh_boog_wish"] ~= true
       userScript: Variable["hh_boog_wish"] = true
       onExecute:
         m_PersistentCalls:
@@ -6651,7 +6769,7 @@ MonoBehaviour:
         destinationDialogueID: 13
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("gunta", "fine_butchery") and Variable["hh_boog_butchery"] ~= true'
+      conditionsString: HH_Remembers("gunta", "fine_butchery") and Variable["hh_boog_butchery"] ~= true
       userScript: Variable["hh_boog_butchery"] = true
       onExecute:
         m_PersistentCalls:
@@ -6998,7 +7116,7 @@ MonoBehaviour:
         destinationDialogueID: 3
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "felled_larder_troll") and Variable["hh_orik_troll"] ~= true'
+      conditionsString: HH_Remembers("pip", "felled_larder_troll") and Variable["hh_orik_troll"] ~= true
       userScript: Variable["hh_orik_troll"] = true
       onExecute:
         m_PersistentCalls:
@@ -7032,7 +7150,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: Tamsin went after it, you know. twice. she came back both times and wouldn't say a word about it.
+        value: Phi went after it, you know. twice. she came back both times and wouldn't say a word about it.
         type: 0
         typeString: 
       - title: Sequence
@@ -7346,7 +7464,7 @@ MonoBehaviour:
         destinationDialogueID: 9
         isConnector: 0
         priority: 2
-      conditionsString: 'HH_Remembers("pip", "kept_a_wish") and Variable["hh_orik_wish"] ~= true'
+      conditionsString: HH_Remembers("pip", "kept_a_wish") and Variable["hh_orik_wish"] ~= true
       userScript: Variable["hh_orik_wish"] = true
       onExecute:
         m_PersistentCalls:
@@ -7380,7 +7498,7 @@ MonoBehaviour:
         type: 0
         typeString: 
       - title: Dialogue Text
-        value: Tamsin ran it that way. i'd started to think i was the only one who remembered how.
+        value: Phi ran it that way. i'd started to think i was the only one who remembered how.
         type: 0
         typeString: 
       - title: Sequence

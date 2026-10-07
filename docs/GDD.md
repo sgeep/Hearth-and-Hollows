@@ -75,7 +75,7 @@ Where each lens most often matters in Hearth & Hollows:
 |---|---|
 | Essential Experience | The start of every feature: the satisfying kill-and-harvest, the busy evening service, a rare dish carried out to the table, a neighbour you know walking in to eat |
 | Fun | Whether a moment is enjoyable, not only correct: hits, minigames, serving |
-| Curiosity | Rooms behind doors, unfamiliar monster parts, Test Kitchen experiments, Old Tamsin's disappearance |
+| Curiosity | Rooms behind doors, unfamiliar monster parts, Test Kitchen experiments, Old Phi's disappearance |
 | Problem Solving | Planning a delve around what the menu needs; routing service through a busy room |
 | Elemental Tetrad | Checking that mechanics, story, aesthetics and technology pull the same way (a dish's preparation, its icon, its sound and its lore) |
 | Flow | Minigame length and difficulty; service pacing; the rhythm of fights and choices in a delve |
@@ -176,8 +176,8 @@ The story unfolds in four acts, advanced by reaching new depths of the Hollows a
 |---|---|
 | **Bram Holloway** | Protagonist, tavern keeper and delver |
 | **Boog** (goblin) | Head cook and mentor for cooking mechanics; gruff, obsessed with flavor |
-| **Orik** (dwarf) | Server and bookkeeper; runs the floor during service *(renamed 2026-10-06: formerly Pip Marrowby, a halfling)* |
-| **Old Tamsin** | Former owner/mentor, vanished in the Hollows; central mystery |
+| **Orik** (dwarf) | Server and bookkeeper; runs the floor during service; Phi's old friend, who kept Tally Ho! running in her absence *(renamed 2026-10-06: formerly Pip Marrowby, a halfling)* |
+| **Phi'rai, "Old Phi"** (drow) | Former proprietor of Tally Ho!, once one of the Fortunate Five; vanished in the Hollows; central mystery *(replaced Old Tamsin, 2026-10-06)* |
 | **Ser Aldric Vane** | Disgraced knight who arrives in Act II; unlocks weapon training |
 | **Sylvaris** (elf) | Herbalist and scout; unlocks herb garden and brewing depth *(v0.5: a natural fit for farming; Section 2.9)* |
 | **Grukka Stonejaw** (orc) | Warband chief; blacksmith and fortification builder *(v0.5: the fortification role no longer has a home; Section 2.9)* |
@@ -1059,11 +1059,12 @@ Two full games in one is ambitious, especially for a small team. Recommended gua
 48. **Relationship reactivity in 4g** *(Step 7)*: a handful of remarkable deeds (the troll's first fall, Boog's bomb returned, a special request met very well, a fine cut at the block, the trophy over the bar), read differently by Boog (nerve, craft) and Orik (warmth, craft); repeats fade to nothing; callbacks are said once, in a priority order that never hides the story or a quest. No meters, hearts or numbers: whether the full game wants them is decided later.
 49. **Tally Ho! as a home and social space** *(for 4h)*: the daytime tavern is a place to be (wander, talk, see regulars and Visitors, decorate, go out into a walkable Kariaston) without the day advancing, not a chain of management screens.
 50. **Friendly monsters** *(direction for 4h / Phase 5)*: Kariaston's population is mixed, including selected friendly monsters; some authored creatures met in the Hollows may go *encounter → recurring visitor → Inn guest → possible resident*. Never arbitrary enemies. A first candidate in owned art: the Mushroom People (Creatures; idle, jump, hurt and die, no attack, which is why they never became an enemy).
+51. **Old Phi replaces Old Tamsin** *(the owner's call, 2026-10-06)*: Phi'rai, usually called Old Phi, is a drow and the former proprietor of Tally Ho!. An adventurer in her youth, one of **the Fortunate Five** (her old party), she helped rebuild Tally Ho! and worked it with Orik; she then left Kariaston and spent many years away adventuring, while Orik kept the tavern running until the Hollows grew too dangerous and he left too. Decades later she came home to settle, took Tally Ho! back, sought out her old friend Orik and hired him again, which is why his loyalty to her and the tavern runs far deeper than an employee's. She later disappeared into the Hollows, which is where the keeper's story begins. Most of this comes out gradually, through Orik, objects and later conversations, never as an opening exposition dump. **The Fortunate Five** are history, character texture, occasional anecdotes and future hooks; the owner's tabletop campaign is not imported wholesale, and little of their lore is established yet. Orik stays dry, exact, practical, loyal and unwilling to go meaningfully into the Hollows; his feelings about her disappearance carry the weight of a lifelong friend, not a recent employee. No stable id or save data named her, so nothing migrates.
 
 *Recorded 2026-10-06 (4g Checkpoint B as built; signed off 2026-10-06):*
 
 44. **The keeper** *(4g Step 4)*: made at New Game: a name (up to 16 letters) and one of four complete Minifantasy bodies (townsfolk, warrior, dwarf, orc), with Minifantasy colourways for skin, hair and clothes; no pronoun choice (dialogue says "you" or the name). Saved in the keeper's profile; a legacy keeper is Bram, the townsfolk.
-45. **The Act I opening** *(4g Step 5)*: arrival day at Tally Ho! (Orik, Boog, Tamsin missing below, the empty storeroom), down the cellar hatch to a first delve taught by one-time prompts, the homecoming that night, then the first evening (the board, cooking, serving, the takings), ending on Boog's question. Explicit stages, saved; an old save is past them.
+45. **The Act I opening** *(4g Step 5)*: arrival day at Tally Ho! (Orik, Boog, Phi missing below, the empty storeroom), down the cellar hatch to a first delve taught by one-time prompts, the homecoming that night, then the first evening (the board, cooking, serving, the takings), ending on Boog's question. Explicit stages, saved; an old save is past them.
 46. **Boog's Bomb as built** *(4g Step 6)*: the bomb lies in the second fight cleared on the Cellars' first floor while the quest wants it; lost with a death and found again; brought home by extraction; handed over in Boog's conversation for 60 gold and a deed done for Boog alone (`returned_boogs_bomb`). Declining never closes it. She has no name yet (candidates in `PLAN_4G.md`).
 47. **Dialogue tooling boundary** *(4g Checkpoint B)*: the story tooling seeds each conversation once and never rewrites it; the node editor owns it from then on.
 
