@@ -102,7 +102,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return InTavern(TavernPhase.Night);
             Object.FindAnyObjectByType<NightScreen>().SleepButton.onClick.Invoke();
             yield return InTavern(TavernPhase.Daytime);
-            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return InTavern(TavernPhase.Prep);
             Director.SetMenu(new[] { System.Linq.Enumerable.First(Director.Content.recipes, r => r.id == "grilled_spider_leg") });
             Director.OpenService();

@@ -150,7 +150,7 @@ namespace Hearthdelve.Tests.PlayMode
             Flow.DebugAddGold(30);
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
             yield return Shot("daytime_with_market");
-            daytime.MarketButton.onClick.Invoke();
+            DaytimeActions.OpenMarket();
             yield return null;
             daytime.Market.Rows[0].buy.onClick.Invoke();
             daytime.Market.Rows[2].buy.onClick.Invoke();
@@ -158,7 +158,7 @@ namespace Hearthdelve.Tests.PlayMode
             daytime.Market.Done.onClick.Invoke();
 
             // Dying with a curio: the death screen and the result say what was lost.
-            daytime.DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return InTavern(TavernPhase.Prep);
             Object.FindAnyObjectByType<PrepScreen>().CloseButton.onClick.Invoke();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon && LevelManager.HasInstance &&

@@ -222,8 +222,13 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime, 30f, "daytime");
             yield return null;
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
-            Check(daytime.MarketButton.transform.parent, "Daytime", problems);
-            daytime.MarketButton.onClick.Invoke();
+            // 4h: the daytime panel opens from the storeroom shelves; the market from its stall.
+            DaytimeActions.OpenStoreroom();
+            yield return null;
+            yield return null;
+            Check(daytime.DescendButton.transform.parent, "Daytime", problems);
+            daytime.Close();
+            DaytimeActions.OpenMarket();
             yield return null;
             Check(daytime.Market.Rows[0].root.transform.parent, "the market", problems);
             Report(problems);

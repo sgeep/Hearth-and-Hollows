@@ -169,7 +169,7 @@ namespace Hearthdelve.Tests.PlayMode
             if ((cover = Object.FindAnyObjectByType<TransitionScreen>()) != null) yield return WaitUntil(() => !cover.IsCovering, 10f, "the cover to lift");
             yield return new WaitForSecondsRealtime(0.3f);
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
-            daytime.MarketButton.onClick.Invoke();
+            DaytimeActions.OpenMarket();
             daytime.Market.Rows[1].buy.onClick.Invoke();
             daytime.Market.Rows[3].buy.onClick.Invoke();
             yield return Shot("market");

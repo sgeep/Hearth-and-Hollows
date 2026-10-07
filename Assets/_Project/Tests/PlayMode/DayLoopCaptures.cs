@@ -75,7 +75,7 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/day_morning_ate.png");
 
             // The evening, kept shut; the way down; the delve result; the night.
-            morning.DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "evening");
             yield return new WaitForSeconds(0.6f);
             TavernEveningCaptures.Capture("BatchLogs/day_evening.png");

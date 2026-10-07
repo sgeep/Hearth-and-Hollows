@@ -121,7 +121,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         static IEnumerator OpenForTheEvening()
         {
-            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return InTavern(TavernPhase.Prep, "the evening's prep");
             yield return null;
         }
@@ -327,16 +327,16 @@ namespace Hearthdelve.Tests.PlayMode
             yield return ExtractAndGoHome();
             yield return SleepIntoDaytime();
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
-            Assert.That(daytime.MarketButton.gameObject.activeInHierarchy, "the market is a daytime errand");
+            Assert.That(DaytimeActions.Stall.IsOpen, "the market is a daytime errand (4h: a stall in Kariaston's square)");
             Flow.DebugAddGold(20);
             int purchases = 0;
             void Bought(MarketPurchase e) => purchases++;
             EventBus<MarketPurchase>.Subscribe(Bought);
-            daytime.MarketButton.onClick.Invoke();
+            DaytimeActions.OpenMarket();
             yield return null;
             MarketPanel market = daytime.Market;
             Assert.That(market.IsOpen);
-            Assert.That(daytime.IsShown, Is.False, "the daytime panel steps aside");
+            Assert.That(daytime.IsShown, Is.False, "no other panel over it");
             SupplySource source = Flow.Database.market;
             int Row(string id) => source.offers.FindIndex(o => o.ingredient.id == id);
             int gold = Flow.State.Gold;
@@ -350,7 +350,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().storeroom.Any(s => s.ingredient == "bread"), "saved after buying");
             market.Done.onClick.Invoke();
             yield return null;
-            Assert.That(daytime.IsShown);
+            Assert.That(market.IsOpen, Is.False);
+            Assert.That(Hearthdelve.Core.Input.InputMaps.Find(Hearthdelve.Core.Input.InputMaps.Tavern, Hearthdelve.Core.Input.TavernActions.Interact).enabled, "back on foot");
 
             // The evening: eggs on toast is on the menu's first page (it can be made), served, and in Orik's ledger.
             yield return OpenForTheEvening();

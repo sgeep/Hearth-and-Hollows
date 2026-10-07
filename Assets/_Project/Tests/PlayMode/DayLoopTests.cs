@@ -23,6 +23,7 @@ using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
 using Hearthdelve.UI.Tavern;
 using MoreMountains.TopDownEngine;
+using Hearthdelve.Core.Events;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -103,7 +104,7 @@ namespace Hearthdelve.Tests.PlayMode
         /// <summary>Daytime is done: open the tavern for the evening's prep.</summary>
         static IEnumerator OpenForTheEvening()
         {
-            Object.FindAnyObjectByType<MorningScreen>().DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return InTavern(TavernPhase.Prep, "the evening's prep");
         }
 
@@ -194,9 +195,13 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Director.InDayLoop);
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
             yield return null;
+            // 4h: the day is walked; the delve meal is cooked at its station (the Grill's place opens its meals).
+            Assert.That(daytime.IsShown, Is.False, "no morning panel");
+            EventBus<DaytimePlaceUsed>.Publish(new DaytimePlaceUsed(TavernInteractableKind.Grill, CookStation.Grill));
+            yield return null;
+            yield return null;
             Assert.That(daytime.IsShown);
-            Assert.That(ShownText(daytime), Has.Some.EqualTo("daytime · day 2").And.Some.EqualTo("open for the evening"));
-            Assert.That(GameObject.Find("Controls"), Is.Null, "no walking controls over the daytime panel");
+            Assert.That(ShownText(daytime), Has.Some.EqualTo("tonight's delve meal"));
             int card = daytime.Options.ToList().IndexOf(GrilledLeg);
             Assert.That(card, Is.GreaterThanOrEqualTo(0), "grilled spider leg makes a delve meal");
             daytime.Cook(card);
@@ -209,8 +214,13 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Meal.Kind, Is.EqualTo(MealBuffKind.MaxEssence), "eaten: the buff waits for tonight's delve");
             float bonus = Flow.Loadout.MaxEssenceBonus;
             Assert.That(bonus, Is.GreaterThan(0f));
+            Assert.That(daytime.IsShown, Is.False, "back on foot after cooking");
+            DaytimeActions.OpenStoreroom();
+            yield return null;
+            yield return null;
             Assert.That(daytime.IsShown);
             Assert.That(ShownText(daytime), Has.Some.StartsWith("tonight's delve: Essence +"));
+            daytime.Close();
 
             // The evening: the meal is still waiting; one dish served, Results, and close up to head below.
             yield return OpenForTheEvening();

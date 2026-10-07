@@ -146,14 +146,14 @@ namespace Hearthdelve.Tests.PlayMode
             // ---------- Day 2: the market, the Butcher Block, Gunta and Orik, a special request ----------
             yield return InTavern(TavernPhase.Daytime, "the second day");
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
-            daytime.MarketButton.onClick.Invoke();
+            DaytimeActions.OpenMarket();
             yield return null;
             SupplySource market = Flow.Database.market;
             int Row(string id) => market.offers.FindIndex(o => o.ingredient.id == id);
             foreach (string staple in new[] { "herbs", "herbs", "eggs", "bread" }) daytime.Market.Rows[Row(staple)].buy.onClick.Invoke();
             daytime.Market.Done.onClick.Invoke();
             Assert.That(Flow.State.Storeroom.CountMatching(i => i.Definition.id == "herbs"), Is.EqualTo(2));
-            daytime.DescendButton.onClick.Invoke();
+            DaytimeActions.BeginEvening();
             yield return InTavern(TavernPhase.Prep, "the evening's prep");
 
             // A leg broken down by hand: a clean cut.

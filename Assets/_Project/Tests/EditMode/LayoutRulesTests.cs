@@ -33,9 +33,11 @@ namespace Hearthdelve.Tests
                 Door = new Vector2(13.5f, 2.4f),
                 Rest = new Vector2(25.5f, 5.5f),
                 // The stairs up to the guest room: back-right corner, their flight solid, their cells and foot kept clear.
-                Fixtures = { new Rect(26f, 12f, 1f, 2f) },
+                // 4h: the menu board by the door and the storeroom shelves stand on the floor (SurfaceBuilder.TavernFixtures).
+                Fixtures = { new Rect(26f, 12f, 1f, 2f), new Rect(15f, 2f, 1f, 1f), new Rect(25f, 9f, 1f, 1f) },
             };
             shape.Reserved.UnionWith(new[] { new Vector2Int(26, 11), new Vector2Int(26, 12), new Vector2Int(26, 13) });
+            shape.Reserved.UnionWith(new[] { new Vector2Int(15, 2), new Vector2Int(15, 3), new Vector2Int(25, 9) });
             for (int i = 0; i < 6; i++) shape.Queue.Add(new Vector2(12.25f - i, 2.6f));
             return shape;
         }
@@ -163,7 +165,9 @@ namespace Hearthdelve.Tests
         {
             FurnitureLayout layout = Starting();
             Assert.That(layout.Check(New("cellar_barrel", 24, 8)).IsValid, "beside the barrel at (25, 8)");
-            Assert.That(layout.Check(New("cellar_barrel", 25, 9)).IsValid, "on top of it, beside the one at (26, 9)");
+            // (25, 9) is the storeroom shelves' since 4h: the next free neighbour is above the barrel at (26, 9).
+            Assert.That(layout.Check(New("cellar_barrel", 25, 9)).IsValid, Is.False, "not on the storeroom shelves' tile");
+            Assert.That(layout.Check(New("cellar_barrel", 26, 10)).IsValid, "on top of the one at (26, 9)");
             PlacedFurniture moved = Piece(layout, "cellar_barrel", new Vector2Int(25, 8));
             layout.Remove(moved.uid);
             Assert.That(layout.Check(moved).IsValid, "and back where it came from");

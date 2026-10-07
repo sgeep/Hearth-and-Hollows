@@ -426,7 +426,7 @@ namespace Hearthdelve.Tests
                      {
                          "Assets/_Project/Scripts/Core/Hearthdelve.Core.asmdef", "Assets/_Project/Scripts/Shared/Hearthdelve.Shared.asmdef",
                          "Assets/_Project/Scripts/Dungeon/Hearthdelve.Dungeon.asmdef", "Assets/_Project/Scripts/Tavern/Hearthdelve.Tavern.asmdef",
-                         "Assets/_Project/Scripts/UI/Hearthdelve.UI.asmdef",
+                         "Assets/_Project/Scripts/UI/Hearthdelve.UI.asmdef", "Assets/_Project/Scripts/Village/Hearthdelve.Village.asmdef",
                      })
             {
                 string json = System.IO.File.ReadAllText(path);

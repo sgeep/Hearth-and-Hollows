@@ -386,7 +386,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(up.To, Is.SameAs(Guest.Area));
             Assert.That(down.To, Is.SameAs(Tavern.Area));
             Assert.That(up.transform.position.x, Is.GreaterThan(26f), "in the back-right corner");
-            Assert.That(Tavern.Area.Fixtures.Single(), Is.EqualTo(new Rect(26f, 12f, 1f, 2f)));
+            // The stairs' flight is a fixture (4h adds the menu board's and the storeroom shelves', SurfaceBuilder.TavernFixtures).
+            Assert.That(Tavern.Area.Fixtures, Has.Member(new Rect(26f, 12f, 1f, 2f)));
 
             // Walked onto the stairs' foot: the screen fades, and the keeper is upstairs.
             keeper.position = up.transform.position;
