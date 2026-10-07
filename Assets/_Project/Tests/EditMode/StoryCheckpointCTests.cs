@@ -117,7 +117,7 @@ namespace Hearthdelve.Tests
             };
             state.Story.Dialogue = "Variable={hh_boog_troll=true}";
             SaveData saved = SaveSystem.FromJson(SaveSystem.ToJson(SaveSystem.Capture(state)));
-            Assert.That(saved.version, Is.EqualTo(9), "Checkpoint C adds no schema: the save stays version 9");
+            Assert.That(saved.version, Is.EqualTo(SaveSystem.CurrentVersion), "4g Checkpoint C added no schema of its own");
             GameState back = SaveSystem.Restore(saved, _ => null, _ => true);
             Assert.That(back.Story.Relationships.memories.Select(m => (m.judge, m.deed, m.target, m.count, m.expires)), Is.EqualTo(new[]
             {

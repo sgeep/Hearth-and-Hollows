@@ -231,6 +231,16 @@ namespace Hearthdelve.Tests.PlayMode
             DaytimeActions.OpenMarket();
             yield return null;
             Check(daytime.Market.Rows[0].root.transform.parent, "the market", problems);
+            daytime.Market.Done.onClick.Invoke();
+            yield return null;
+            // 4h Checkpoint B: the planting choice, and the surface HUD (the clock, Vigor, a harvest's note).
+            var garden = Object.FindAnyObjectByType<GardenPanel>(FindObjectsInactive.Include);
+            garden.Open(Hearthdelve.Shared.Garden.GardenConfig.Bed1);
+            yield return null;
+            yield return null;
+            Check(garden.CropButtons[0].transform.parent, "the planting choice", problems);
+            garden.Close();
+            Check(GameObject.Find("SurfaceClock").transform.Find("Tab"), "the clock", problems);
             Report(problems);
         }
     }

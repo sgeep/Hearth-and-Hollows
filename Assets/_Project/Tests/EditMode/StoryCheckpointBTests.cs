@@ -145,7 +145,7 @@ namespace Hearthdelve.Tests
             json = json.Replace("\"openingComplete\": true", "\"openingComplete\": false");
             Assert.That(json, Does.Not.Contain("openingStage").And.Not.Contain("questObjects"), "a genuine version 8 file");
             SaveData migrated = SaveSystem.FromJson(json);
-            Assert.That(migrated.version, Is.EqualTo(9));
+            Assert.That(migrated.version, Is.EqualTo(SaveSystem.CurrentVersion), "through version 9 and on");
             GameState state = SaveSystem.Restore(migrated, _ => null, _ => true);
             Assert.That((state.Story.Opening, state.Story.CreationComplete), Is.EqualTo((OpeningStage.Complete, true)),
                 "a Checkpoint A playtest save never goes back through creation or the opening");
