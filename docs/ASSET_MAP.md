@@ -373,6 +373,24 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | Larder Troll (boss, 4e) | Exclusive (`Ancient_Troll`) | Imported in 4e step 1 (see below). Replaces the Mother Slime candidate (2026-10-05). |
 | Mushroom People | Creatures (exclusive) | Deferred (4b decision): it has idle, jump, damage and die, but **no attack animation**. |
 
+## 4h survey (planning, 2026-10-06; nothing imported yet)
+
+Inspected for `docs/PLAN_4H.md` §28–30; the sheet `docs/plan_4h/cast_candidates.png` shows the figures at true scale beside the keeper and Orik.
+
+**Figures (approved 2026-10-06):**
+- **Maximo (locked):** *Knight Jousting Add-on 1.5* › `Knight On Foot` › `Knight_Idle/Walk/Attack/Dmg/Die_blue.png` (32×32 frames; idle and walk 200 ms, the rest 100 ms). No crown, no King figure.
+- **Gimp (locked):** *Modern Soldiers* (All Exclusives › Creatures) › `Idle/Walk/Dmg/Die/Soldiers/*_soldier_headband.png`; its `Shot_Diagonal/Orthogonal` animations fire a rifle (unused until the firearms question is answered, GDD §2.10 question 7). Portrait: a half-elf treatment, not a human recipe.
+- **Grim (candidate):** *Miner* (`Minifantasy_MinerIdle/Walk…`), distinct from Orik's yellow-bearded dwarf and the dwarf keeper.
+- **Ogrin (provisional):** a child figure, 8 px tall against the keeper's 10: *Snowball Wars Revamped* (`Characters/Separate_Layers`, human with outfit layers) or *Summer Holidays* (`SummerHolidaysHuman1–3`). Chosen at game scale in 4h Step 8.
+- **Bart (candidate):** *Wise Orc*; fallback *True Heroes II* Bard (human, with ballad and singing animations) recoloured with an orc skin ramp.
+- **Kaloren:** *A Myriad Of NPCs* layers (old human); the *Lich* figure (idle, fly, spellcasts) held for a reveal.
+- **Glimmer (current treatment):** *Naughty Fairy* (`Fly_Idle`, `Appear`, `Disappear`).
+- **Phi's portrait:** Portrait Generator elf base with the obsidian skin colourway, in a Towns frame.
+
+**Village, garden, market:** *Towns* (tileset, props, hens), *Towns II* (brick, stucco and plank buildings, windmill, bridge), *Medieval City* (props), *Forgotten Plains* and *More Grass Variations*, *Plants & Foliage* (Plains and Forests), *Wall Of Trees*, *Wizard Tower* (Kaloren), *Caravans And Wagons* (Bart), *Animated Well*, *Town Monuments* (Karias's memorial), *Wooden Bridge*, *8x8 Flags*, *Outdoor Lanterns*; *Farm* (`SeedsAndCrops`: pumpkin, eggplant, berry, beet, wheat, tomato, sunflower, corn, rice, lettuce, potato, radish, garlic, cauliflower, pepper; `ActionInProgress` 16×16 animated action icons; tileset), *More Veggies* (carrot, spinach, cucumber, artichoke, cabbage, zucchini, **onion**, green beans, broccoli, celery, asparagus, ginger); the market from *Merchant* (`Stall`, `Stall Setup`, `Stall Pack Back`) or *Travelling Merchant* (shop opening and closing).
+
+**Gaps found (4h):** *Farming Animations*, *Writing Down* and *Sleeping Animations* exist only for the bare race bodies, not the four clothed keeper bodies (workaround: an existing pose plus the Farm action icons); no child parts in the Portrait Generator (Ogrin); no orc playing an instrument (Bart). No unowned pack verified to fill them.
+
 ## Known gaps
 
 - **No rat with an attack** (the reason the Giant Rat was replaced).

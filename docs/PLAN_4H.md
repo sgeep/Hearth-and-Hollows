@@ -1,6 +1,6 @@
 # 4h plan: walkable Kariaston and the daytime life-sim slice
 
-> **Status: proposed 2026-10-06, awaiting the owner's approval.** Nothing of 4h is built. 4g is complete (signed off 2026-10-06, tag `milestone-4g`); its proposed Checkpoint D (the new cast) is folded into this plan. Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
+> **Status: approved 2026-10-06 for Checkpoint A planning and implementation** (the owner's decisions on H1–H15 and the canon in §0.1, below), unless the first architecture proof finds a serious technical blocker. Nothing of 4h is built yet. 4g is complete (signed off 2026-10-06, tag `milestone-4g`); its proposed Checkpoint D (the new cast) is folded into this plan. Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
 
 **The question 4h answers:** *does living in Tally Ho! and Kariaston feel good enough that I want to spend time there even when nothing is pushing me toward an objective?*
 
@@ -16,37 +16,53 @@ Lenses behind the plan: the *Lens of the Toy* (walking around the village should
 
 ---
 
-## 0. Decisions for the owner
+## 0. Decisions (approved 2026-10-06)
 
-Everything below is a recommendation unless marked locked. These are the calls I need from you before building; each has a recommendation, and the ones marked **expensive** are hard to undo later (§38).
-
-| # | Decision | Recommendation | Cost to reverse |
+| # | Decision | As approved | Cost to reverse |
 |---|---|---|---|
-| H1 | Scene structure | **Kariaston is its own scene, loaded additively beside `Tavern.unity` during the daytime**; doors are passages (a short fade), like the guest-room stairs (§7) | **expensive** |
-| H2 | Checkpoints | **Four**, not three: A *I can live here*, B *a day's work* (Vigor and the garden), C *the village has people*, D *this is a community* (§3) | low |
-| H3 | Where Bram sleeps and wakes | **The upstairs room** (today's guest room) is Bram's until the Inn takes guests in Phase 5; the bed is the Sleep interaction | low |
-| H4 | Farm representation | **A few fixed garden beds with ids** (not a free tile grid) on Tally Ho!'s grounds (§11) | **expensive** |
-| H5 | Crop maintenance rule | **Tending is optional and only helps** (quality); untended crops still grow. A tuning switch can make untended days pause growth if the playtest wants more care (§11) | low |
-| H6 | Seeds | **Free and unlimited** for the three starter crops in 4h; costs are Vigor, bed space and days. A seed economy is Phase 5 | low |
-| H7 | Market keeper | **Grim keeps the market stall** (he sells staples and spends it on Ogrin's remedies); the existing market's offers are unchanged | low |
-| H8 | Art per character | As in §28 (King for Maximo, Myriad layers for Kaloren, Miner for Grim, a child from Snowball Wars/Summer Holidays for Ogrin, Wise Orc for Bart, Hunter for Gimp, Naughty Fairy for Glimmer); see `docs/plan_4h/cast_candidates.png` | medium |
-| H9 | Bart's role | **The first Visitor who stayed**: came through years ago, never left, lives in a painted wagon on the green, plays the green by day and Tally Ho! some evenings (§21) | low |
-| H10 | Gimp's visits | **Comes up the cellar hatch in the afternoon on visit days** (the first the day after Boog's bomb comes home, or day 6 at the latest; then about one day in three, never two in a row), sits at the bar with Boog, goes back down before Prep (§23) | low |
-| H11 | Glimmer in 4h | **Surface hint only**: on some evenings a small light at Ogrin's window, which he calls "my light". No Hollows meeting, no explanation (§24) | low |
-| H12 | Named villagers as evening patrons | **Yes, in Checkpoint D** (the roadmap's 4h item): 0–2 a night from whoever is free; generated customers become Visitors (§25) | medium |
-| H13 | Village layout ownership | **The generator makes the first blockout once; after that the tilemaps are yours** (hand-edit in Unity like the dialogue graphs); the updater only adds or updates named gameplay objects (§7) | **expensive** |
-| H14 | Save | **One bump, to version 10, in Checkpoint B** (surface time, Vigor, the garden, a per-game world seed) (§31) | medium |
-| H15 | New assembly | Pure rules in `Shared`; village MonoBehaviours in a new **`Hearthdelve.Village`** assembly that may reference Tavern (never Dungeon) (§7) | medium |
+| H1 | Scene structure | **Locked.** Kariaston is its own scene, loaded additively beside `Tavern.unity` in the daytime; doors are a short-fade passage, and stepping outside must feel essentially instant (§7). Reopened only if the Step 1 architecture proof finds a serious technical problem | **expensive** |
+| H2 | Checkpoints | **Four:** A *I can live here*, B *a day's work*, C *the village has people*, D *this is a community* (§3) | low |
+| H3 | Where Bram sleeps and wakes | **Upstairs in Tally Ho!**: the guest room is effectively Bram's room until the Inn's guests need it (Phase 5) | low |
+| H4 | Farm representation | **Four fixed garden beds with stable ids** for the slice, and a deliberate Hearth & Hollows farming model unless later playtesting makes a compelling case for free-grid farming; built so that a migration stays possible (§11) | **expensive** |
+| H5 | Crop maintenance | **Tending is optional and improves quality; ordinary crops never die from missed tending.** "Untended pauses growth" is a tuning option only (§11) | low |
+| H6 | Seeds | **Free and unlimited** starter seeds in 4h; a seed economy is later production scope | low |
+| — | Vigor and crop tuning | **Approved as test values, not balance:** 6 Vigor; prepare and plant a bed 2; tend 1; harvest 0; herbs 2 days, onions 3, barley 4. Tuned only after the Checkpoint B playtest (§10, §12) | low |
+| H7 | Market keeper | **Grim runs the market stall** as his ordinary livelihood and one part of who he is besides Ogrin (not "every coin goes to remedies") (§14, §20) | low |
+| H8 | Figures | Maximo **blue Knight on foot (locked)**; Kaloren old wizard from NPC layers, the Lich held for a reveal; Grim **Miner** (candidate); Ogrin the better child of Snowball Wars / Summer Holidays, **provisional until seen at game scale**; Bart **Wise Orc** (candidate); Gimp **`soldier_headband` (locked)**; Glimmer **Naughty Fairy** (current treatment) (§28) | medium |
+| H9 | Bart | **The first Visitor who stayed**: came through, remained, lives in the painted wagon on the green, sometimes performs at Tally Ho!. No large backstory in 4h (§21) | low |
+| H10 | Gimp's visits | **First visit after Boog's bomb comes home, day 6 at the latest; after that irregular and nomadic** ("Gimp shows up when Gimp shows up"), seeded underneath, never two days running (§23) | low |
+| H11 | Glimmer | **An unexplained light at Ogrin's window only.** No name, guardian story, fusion, questline or meeting in 4h (§24) | low |
+| H12 | Villagers as patrons | **Yes, in Checkpoint D**, lightly: about 0–2 familiar faces a service (§25) | medium |
+| H13 | Village layout ownership | **Generated once; the tilemaps are then hand-owned Unity content.** Tooling maintains named gameplay objects only and never regenerates over manual edits (§7) | **expensive** |
+| H14 | Save | **One bump to version 10 in Checkpoint B**: the per-game world seed, the daytime clock, Vigor, the garden. NPC locations stay derived from day + time + story (§31) | medium |
+| H15 | Assemblies | **Pure clock, Vigor, farming and schedule rules in `Shared`; village MonoBehaviours in a new `Hearthdelve.Village`.** Village and Tavern code never depend on Dungeon implementation details (§7) | medium |
+| Q4 | Phi's portrait | **Approved:** a framed portrait of Phi'rai in Tally Ho!, made with the Portrait Generator's drow treatment (§22) | low |
 
-Questions for you that don't block Checkpoint A (answer any time before C):
+Questions answered at approval: Grim's history (§20, locked), Kaloren and Ogrin (§19, locked), how Kariaston got its name (founded by Maximo, §0.1), Phi's portrait (approved), Gimp's kind (half-elf, locked).
 
-- Q1. Grim's history: how he came to look after Ogrin. I won't invent it; the dialogue can deflect until you choose (§20 offers two shapes).
-- Q2. Is Kaloren the one who makes Ogrin's remedies (kind, refuses payment)? It ties three people together without defining the illness (§19).
-- Q3. Maximo and the name: renamed an existing village when he became mayor (the GDD's recommendation), or founded it?
-- Q4. A portrait of Phi over the bar (a Portrait Generator drow, obsidian skin, in a frame from the Towns props)? It makes her present in the room; it also fixes her face.
-- Q5. Gimp's kind: human (the Hunter figure, matching the campaign's tanned woodsman) unless you say otherwise.
+### 0.1 Canon locked at approval (2026-10-06)
 
----
+Recorded in the GDD (§2.1, §2.2, §2.5, §2.10, Decided 54–60) and CLAUDE.md. 4h reveals this through people, places and partial stories, never as a cosmology lecture.
+
+**Kariaston exists because of the Hollows.** Long ago a source of evil opened beneath this region; an enormous force poured out of it into the surface world and caused a great war. **Karias**, a great wizard and once **Maximo**'s apprentice, gave his life to seal it; Maximo was among those who performed the sealing. The seal held, but not perfectly: small remnants of what lies beyond still seep through, and those remnants are what people now call **the Hollows**. Afterwards Maximo **founded Kariaston**, named it for Karias, and vowed to watch over the Hollows for as long as he lives. People gathered around that watch: glory-seekers, fortune-seekers, people who supply delvers, ordinary settlers and, in time, a few friendly monsters and stranger neighbours. All of them needed somewhere to drink, which is part of how Tally Ho! came to matter. Maximo will not go back into the Hollows, and probably **cannot**; the reason is a future story decision.
+
+**Grim and Ogrin.** Grim is a dwarf and a **former delver**. On a delve he found a human-looking infant, alive, beside two dead adults he assumes were the parents, and brought him home to Kariaston. That child is Ogrin. Ogrin aged impossibly fast (to about ten in a year or two), then stopped abruptly; since then he has been chronically ill, with bouts of severe exhaustion. Grim doesn't know what Ogrin is, why he aged so, or what happened below; he loves him deeply. Ogrin calls him **Grim**. A future beat where Ogrin first calls him **Dad** is reserved and never spent in everyday dialogue.
+
+**Kaloren and Ogrin.** Kaloren brings Ogrin herbs that make him feel better, **once every three days**; they ease the symptoms and cure nothing. Not connected (yet) to Kaloren's lichdom.
+
+**Gimp.** A **half-elf** hunter and ranger: nomadic, abrasive, something of a nutjob, dislikes most people, hates cities, loves guns (rifles above all). The exceptions are **Boog** (dangerous explosives, mutual enthusiasm) and **Phi** (he knew and liked her: since he likes almost no one, that says something about her). He starts standoffish toward Bram and doesn't warm up because Bram is the protagonist. He lives in or around the Hollows but wanders: below for a while, in the forest or up a tree, gone for stretches, out of the area entirely, back to see Boog.
+
+**Every major character has their own relationship with the Hollows**, and that is the centre of Kariaston's history: Maximo helped seal the evil and founded the village to guard it; Karias died sealing it; Phi went back into it after retiring; Grim went in and brought Ogrin out; Ogrin seems changed by something connected to it; Kaloren was transformed by it and left part of himself below; Gimp chooses to live around it; Bram keeps choosing to go down. The Hollows are the settlement's gravitational centre, not a dungeon attached to a farming town.
+
+### 0.2 Still open (none blocks Checkpoint A)
+
+| Question | Needed by | Note |
+|---|---|---|
+| **Firearms in the world.** Gimp loves rifles and his figure carries one; the GDD said "bombs and gunpowder, no firearms" | Checkpoint D (Gimp) | Recommendation: rifles exist as rare personal property of odd people like Gimp (seen, talked about), never a player weapon in this phase |
+| **When the sealing happened, and Maximo's age.** Orik's built line ("my family went down for three hundred years") puts the Hollows at least three centuries old, and Tally Ho! has decades of history, so Maximo, a human, has watched for a very long time | Checkpoint C (Maximo's lines) | Leave unspecified in 4h dialogue ("long ago"); it's tied to the future decision about why he can't go back |
+| **Glimmer and the sealing.** She was a guardian meant to help seal or protect against the Hollows and failed; Maximo's sealing held | before Glimmer's questline (not 4h) | Same event, an earlier attempt, or a different guard; also "the Warden Below" (GDD Open 12) |
+| **Ogrin's figure** | Checkpoint C (Step 8) | seen at game scale |
+| **Karias: elf or half-elf** | Checkpoint C (the memorial's inscription) | the docs say elf |
 
 ## 1. Current repo baseline relevant to 4h
 
@@ -240,7 +256,7 @@ VigorConfig (asset): basePips, activity costs (by activity id), whether harvesti
 - **At 0 Vigor:** strenuous actions show "too tired for that today" and do nothing; everything else works.
 - **Presentation:** a row of small pips next to the clock (surface HUD only; never in the Hollows, where the Essence bar alone speaks), spending one dims it with a short feedback (squash, soft sound, a light haptic tick); 0 shows the row greyed.
 
-**Initial tuning (for the B playtest, not locked):**
+**Initial tuning (approved as test values for the B playtest, not balance; tuned only after it):**
 
 | | Start | Range to try |
 |---|---|---|
@@ -256,7 +272,8 @@ With 4 beds and 6 pips, the keeper can't plant everything and tend everything on
 
 ## 11. The farm and garden slice
 
-- **Representation (H4):** a handful of **fixed garden beds**, each an object with a stable id (`garden_1`…`garden_4`), a 3×2-tile footprint and its own crop state. Not a free tile grid: fixed beds are simpler to save, test and present, and match the "fixed sites, not city-building" principle. More beds later are more ids.
+- **Representation (H4, approved):** **four fixed garden beds**, each an object with a stable id (`garden_1`…`garden_4`), a 3×2-tile footprint and its own crop state. This is **a deliberate Hearth & Hollows farming model**, kept unless later playtesting gives a compelling reason to move to free-grid farming. More beds later are more ids.
+- **Keeping a grid migration possible:** the rules never assume beds are few, fixed or rectangular. `GardenRules` works on a list of `PlotState`s keyed by a plot id string (a bed today; a cell id such as `garden@12,4` could be one later); a bed's footprint is data on the bed, not in the rules; the save stores plots by id, not by bed index; crops know nothing about the plot's shape; and the interaction finds "the plot under the keeper" through one query that a grid could answer too. What a grid would add later (tilling, per-tile placement) is new code, not a rewrite.
 - **The loop:**
   1. *Prepare and plant* (Vigor 2): pick a crop from a short list at the bed (seeds free, H6); the bed shows seeds.
   2. *Grow over days*: one growth day per night, at sleep.
@@ -301,77 +318,89 @@ Malt from barley is a simplification (the threshing and malting are off-screen);
 Small, authored, data-driven:
 
 - **`ScheduleDefinition`** (ScriptableObject, one per character): a list of **blocks** `{from, to, anchor id, activity, condition}`; the first block whose time and condition match wins. Activities: `stand`, `sit`, `wander(radius)`, `work` (an animation), `home` (not visible), `visit`.
-- **Conditions** (pure, small): `everyNthDay(n, offset)`, `chance(p)` (seeded by the world seed + day + character), `storyFlag` (a Hearth & Hollows flag or opening stage), `questObject(id, status)`, `weekdayless` by design (no calendar). Combined with AND only.
+- **Conditions** (pure, small): `everyNthDay(n, offset)`, `chance(p)` (seeded by the world seed + day + character), `irregular(minGap, maxGap)` (a seeded sequence of gaps, so a visitor's days have no visible period), `storyFlag` (a Hearth & Hollows flag or opening stage), `questObject(id, status)`. No calendar by design. Combined with AND only.
+- **Routines between characters** are ordinary blocks on both schedules. The first: **Kaloren's herbs** (§19), every third day (`everyNthDay(3)`, offset by the world seed): mid-morning he leaves the tower, walks to Grim and Ogrin's cottage, hands over the herbs (a short bark exchange), and goes on with his day. The player may happen to see it; nothing requires them to.
 - **`ScheduleRules.Resolve(schedule, day, minute, world)`** → the block. Pure, EditMode-tested; the whole village's positions are a function of `day + minute + story`, so **no NPC transform is ever saved**.
 - **Anchors:** named transforms in either scene (`square.memorial`, `tavern.bar.stool3`, `cottage.window`…). A block names an anchor; the scene that owns it hosts the character.
 - **`SurfaceCast`** (one per loaded scene) spawns the characters whose current block is in its scene, and on each `SurfaceTimeChanged` re-resolves: if the new anchor is in the same scene and the character is visible, they **walk** there (grid A*, a few at a time); otherwise they **appear** there. Crossing scenes (Maximo going into Tally Ho! for lunch) is walk to the door, disappear, appear inside the door.
 - **`VillagerAgent`**: thin MonoBehaviour, the existing `CharacterSpriteAnimator` and A* movement, a talk interactable bound to the character's `CharacterDefinition.conversation`, an optional bark bubble.
 - **Discoverability:** important characters always have a findable daytime block; a hub conversation never depends on the minute unless the line is optional texture.
 
-## 16. Recommended initial cast per checkpoint
+## 16. Initial cast per checkpoint
 
 | Checkpoint | Who appears | How much |
 |---|---|---|
-| A | Boog, Orik (daytime posts, existing hubs) | presence + talk only |
+| A | Boog, Orik (daytime posts, existing hubs); Phi's portrait | presence + talk only |
 | B | (none new) | the garden is the test |
-| C | Maximo, Kaloren, Grim, Ogrin, Bart | a definition, figure, portrait, schedule, a hub with a first meeting and an everyday branch, 2–4 callbacks, a few barks each |
-| D | Gimp; Glimmer's hint; villagers as patrons; Bart's evening performance | the community layer |
-| (throughout) | Old Phi, Karias, the Fortunate Five | objects, memorial, talk |
+| C | Maximo, Kaloren, Grim, Ogrin, Bart | a definition, figure, portrait, schedule, a hub with a first meeting and an everyday branch, 2–4 callbacks, a few barks each; Kaloren's herb routine |
+| D | Gimp; Glimmer's light; villagers as patrons; Bart's evening performance | the community layer |
+| (throughout) | Old Phi, Karias, the Fortunate Five | the portrait, objects, the memorial, talk |
 
-Smallest amount that makes Kariaston specific: five residents, one recurring visitor from below, two absent people.
-
----
+Smallest amount that makes Kariaston specific: five residents, one wandering friend from below, two absent people.
 
 ## 17. Character relationship web
 
-The rule: everyone has opinions of someone other than Bram. *Proposed* entries are first readings for you to correct; locked facts are marked.
+The rule: everyone has opinions of someone other than Bram, and almost everyone has their own history with the Hollows (§0.1). *Locked* entries are canon; *proposed* ones are first readings for the owner to correct.
 
 | Pair | What's there before Bram | Shown in 4h by |
 |---|---|---|
-| **Phi ↔ Orik** | *(locked)* old friends; he ran Tally Ho! in her absence, left when the Hollows got bad, she found him again | his hub; her chair; the ledger in two hands |
-| **Phi ↔ Maximo** | *Proposed:* he considered her the only real adventurer in Kariaston, a "fellow member of the profession"; she humoured him and once told him no, kindly, about going down together | his talk; a toast he still makes |
-| **Phi ↔ Boog** | *(built)* she let him keep his bomb; *proposed:* she's the only one who ever ate his experiments first | Boog's lines |
+| **Phi ↔ Orik** | *Locked:* old friends; he ran Tally Ho! in her absence, left when the Hollows got bad, she found him again | his hub; her chair; her portrait; the ledger in two hands |
+| **Phi ↔ Maximo** | *Proposed:* the founder and the delver who came home; he counted her among the few who understood what the village is for; she once told him no, kindly, when he asked her to promise she'd stop going down | his talk; a toast he still makes |
+| **Phi ↔ Boog** | *Built:* she let him keep his bomb; *proposed:* she's the only one who ever ate his experiments first | Boog's lines |
+| **Phi ↔ Gimp** | *Locked:* he knew and liked her, which almost no one can say | one grudging line from Gimp |
 | **Fortunate Five ↔ village** | *Proposed:* five tankards on Tally Ho!'s shelf that nobody drinks from; Bart knows half a song about them and refuses to sing the half he doesn't know | inspectable; Bart bark |
-| **Maximo ↔ Karias** | *(locked)* mentor and friend; Karias died in the Hollows; Maximo never went back; the village bears his name | memorial; Maximo's grief under the comedy |
+| **Maximo ↔ Karias** | *Locked:* master and apprentice; Karias died sealing the source; Maximo helped seal it, founded Kariaston in his name and keeps watch | the memorial; the founder's grief under the comedy |
+| **Maximo ↔ the village** | *Locked:* founder and watchman; *proposed:* most villagers love him and humour him, few know what he actually did | barks; his proclamations |
 | **Maximo ↔ Orik** | *Proposed:* the mayoral account, a tab Orik keeps "in a separate book, for my health" | barks; Orik's talk |
 | **Maximo ↔ Boog** | *Proposed:* Maximo wants Boog's explosions for civic fireworks; Boog wants a civic budget for explosions | NPC barks |
-| **Maximo ↔ Bart** | *(GDD proposal)* Maximo thinks they're fellow artists; Bart thinks Maximo is a fan | barks on the green |
+| **Maximo ↔ Bart** | *Proposed:* Maximo thinks they're fellow artists; Bart thinks Maximo is a fan, and doesn't know he's singing to the man who saved the world | barks on the green |
 | **Kaloren ↔ Kariaston** | *Proposed:* the helpful wizard everyone asks to warm their ovens, who never does it with fire | talk; barks |
-| **Kaloren ↔ the Hollows** | *(locked, hidden)* became a lich there, came back, phylactery below | near-misses only (§19) |
-| **Kaloren ↔ Maximo** | *Proposed:* two survivors of the Hollows, one who went down and came back strange, one who never went back; neither knows the other's half | they share a bench; one optional exchange |
-| **Grim ↔ Ogrin** | *(locked)* the dwarf who looks after the sick orphan boy | together on good days; the window on bad ones |
+| **Kaloren ↔ the Hollows** | *Locked, hidden:* became a lich there, came back, phylactery below | near-misses only (§19) |
+| **Kaloren ↔ Ogrin and Grim** | *Locked:* the herbs every third day; *proposed:* Grim trusts him with Ogrin and never asks where the herbs come from | the routine (§15) |
+| **Kaloren ↔ Maximo** | *Proposed:* two survivors of the Hollows, one who came back changed, one who can't go back; neither knows the other's half | they share a bench; one optional exchange |
+| **Grim ↔ Ogrin** | *Locked:* the former delver who found him below and raised him | together at the stall on good days; the window on bad ones |
+| **Grim ↔ the Hollows** | *Locked:* a former delver; *proposed:* he doesn't talk about it, and looks at the keeper's satchel the way old soldiers look at a uniform | his talk with the keeper |
 | **Grim ↔ Orik** | *Proposed:* two dwarves who agree on nothing but weights and measures; Grim weighs, Orik counts | NPC barks at the stall |
-| **Boog ↔ Gimp** | *(locked)* old friends; explosives | D's visit |
+| **Boog ↔ Gimp** | *Locked:* old friends; dangerous explosives | D's visit |
+| **Gimp ↔ everyone else** | *Locked:* dislikes most people, hates cities | he avoids the square; short barks |
 | **Bart ↔ Tally Ho!** | *Proposed:* plays there some evenings for supper; Orik pays him in stew and complaints | D's performance |
-| **Ogrin ↔ Glimmer** | *(locked, future)* her questline; *4h:* "my light" at his window, unexplained | D's hint |
+| **Ogrin ↔ Glimmer** | *Locked, future:* her questline; *4h:* "my light" at his window, unexplained | D's hint |
 | **Ogrin ↔ Boog** | *Proposed:* Ogrin's favourite person to watch; Boog promises him "a small explosion, for your birthday" | barks |
 
-Love/Hate: Maximo, Kaloren, Grim, Ogrin, Bart and Gimp get tracked `CharacterDefinition`s with values (craft, nerve, warmth) so the existing deeds reach them through the same rules. Proposed values: Maximo nerve 80, warmth 60, craft 0 (admires the deed, not the technique); Kaloren warmth 70, craft 60, nerve −20; Grim craft 70, warmth 30, nerve 0; Ogrin nerve 70, warmth 60; Bart warmth 50, nerve 40 (a good story); Gimp nerve 90, craft 70. Deed learners grow a `Villagers` group (by kind) so the troll's fall reaches the village. NPC-to-NPC feelings stay authored text, not simulated (no rumour networks, Decided 37).
+Love/Hate: Maximo, Kaloren, Grim, Ogrin, Bart and Gimp get tracked `CharacterDefinition`s with values (craft, nerve, warmth) so the existing deeds reach them through the same rules. Proposed values: Maximo nerve 80, warmth 60, craft 0 (admires the deed, not the technique); Kaloren warmth 70, craft 60, nerve −20; Grim craft 70, warmth 30, nerve 20 (he knows what nerve costs); Ogrin nerve 70, warmth 60; Bart warmth 50, nerve 40 (a good story); Gimp nerve 90, craft 70, warmth −20, with a **low starting affinity** toward the keeper so he begins standoffish. Deed learners grow a `Villagers` group (by kind) so the troll's fall reaches the village. NPC-to-NPC feelings stay authored text, not simulated (no rumour networks, Decided 37).
 
-## 18. Maximo and Karias
+## 18. Maximo, Karias and the founding
 
-- **Look:** the King figure (old, white beard, a crown he insists is a "chain of office", red cape), H8. His old armour (the Jousting Knight) is a later costume for a civic occasion.
-- **Routine:** a proclamation at the memorial mid-morning (a bark to the square, audible if near), lunch at Tally Ho! (sits at a table in the daytime tavern: someone is always sitting in Tally Ho! at noon), afternoon "inspecting the defences" (a fence), home at five; after five on some days he stands at the memorial alone.
-- **The contradiction, shown not told:** he talks about adventure like scripture and **walks round the hatch** when he's in Tally Ho!. His hub reads `HH_TimesDefeated` and the keeper's delve count: first delighted ("a delver! under my village!"), later, at a threshold, one quiet line that is about Karias without naming him.
-- **Karias:** present through the memorial (an inscription line, inspectable), Maximo's stories (his staff "held like a wish come true", from your notes), the village's name, and nothing else. No twist, no survival.
-- **First meeting:** a grand welcome speech with one honest sentence in the middle.
+- **Who he is (locked, §0.1):** the founder of Kariaston and its watchman over the Hollows, who helped seal the evil that once nearly destroyed the world and lost his apprentice Karias doing it. He keeps a vow to watch for as long as he lives. He does not, and probably cannot, go back into the Hollows; **why he can't is a future story decision** and nothing in 4h hints at a specific reason.
+- **How he behaves:** still the Don Quixote: theatrical, heroic, eccentric, romantic about adventure, funny. The contrast is now sharper: under the speeches is a man who really did save the world, and almost nobody in his own village quite believes how much.
+- **Look (locked):** the **blue Knight on foot** from *Knight Jousting* (helmeted, always in his old armour). His age and face live in his portrait. The humour comes from him, not from the costume.
+- **Routine:** a proclamation at Karias's memorial mid-morning (a bark to the square), lunch at Tally Ho! (someone always sitting in Tally Ho! at noon), afternoon "inspecting the watch": he walks the village's edge and looks toward the hatch from the doorway of Tally Ho!, never closer; home at five; on some evenings he stands at the memorial alone.
+- **The keeper's delves:** his hub reads the keeper's delves (`HH_TimesDefeated`, the delve count). First delighted and grand ("a delver! keeping watch with me, from below!"); later, past a threshold, one quiet line about what the Hollows cost, about Karias without naming the sealing.
+- **Karias:** present through the memorial (a short inscription), Maximo's stories and the village's name. 4h never explains the sealing's cosmology, the war, or what lies beyond the seal; a partial line or two (the memorial, Maximo on a good day) is the most it says. No twist, no survival.
+- **First meeting:** a grand welcome speech for the new keeper of "the watch's own tavern", with one honest sentence in the middle.
 
 ## 19. Kaloren: presentation and foreshadowing
 
-- **What the player knows:** a courteous, helpful wizard in the tower; slightly cold to the touch; gloves in summer; orders at Tally Ho!, admires the plate and doesn't eat (D); knows a little too much about how the cellars were built.
-- **What stays hidden:** that he's a lich, that the Hollows made him, the phylactery. Nothing in 4h confirms any of it.
-- **Near-misses (three or four, each once):** forgetting to breathe while listening; a comment about the Cellars' stonework "before the third collapse"; looking at the hatch too long (the opposite of Maximo, who won't look at it); declining to be warmed by the fire ("i'm fine. i'm always fine").
-- **Look:** a Myriad NPC composition (old human, albino skin, long white hair and beard, the long hat, a robe colourway) in the layered NPC pipeline already used for patrons. The Lich figure is kept for whenever the story wants a reveal.
-- **Kindness first:** his hub is mostly him being useful and gentle; the strangeness is seasoning. If Q2 is yes, he makes Ogrin's remedies and won't take payment.
+- **What the player knows:** a courteous, helpful wizard in the tower; slightly cold to the touch; gloves in summer; orders at Tally Ho!, admires the plate and doesn't eat (D); knows a little too much about how the cellars were built; brings Ogrin herbs.
+- **What stays hidden:** that he's a lich, that the Hollows made him, the phylactery. Nothing in 4h confirms any of it, and **nothing ties his nature to Ogrin's condition**.
+- **The herbs (locked, §0.1):** every third day he walks from his tower to Grim and Ogrin's cottage with herbs that ease Ogrin's symptoms and cure nothing, then goes on with his day (§15). The player may witness it; it happens whether or not they do. If asked, he's kind and vague about where the herbs grow; if asked whether they cure Ogrin, he's honest that they don't.
+- **Near-misses (three or four, each once):** forgetting to breathe while listening; a remark about the Cellars' stonework "before the third collapse"; looking at the hatch too long (the opposite of Maximo, who won't come near it); declining to be warmed by the fire ("i'm fine. i'm always fine").
+- **Look:** a Myriad NPC composition (old human, albino skin, long white hair and beard, the long hat, a robe colourway) in the layered NPC pipeline already used for patrons. The Lich figure is held for whenever the story wants a reveal.
+- **Kindness first:** his hub is mostly him being useful and gentle; the strangeness is seasoning.
 
 ## 20. Grim and Ogrin
 
-- **Grim** (H7): keeps the market stall; gruff, fair, never haggles, charges the same to everyone; every coin goes to remedies. Not only "worried guardian": he has a trade, a rivalry (Orik), opinions (about the keeper's knife, about Bart's volume) and a dry warmth he hides.
-  - *History (Q1) is yours.* Two shapes to choose from later, neither used in 4h: (a) Ogrin's parents were his friends; (b) he found Ogrin, the way you find a stray, and never decided to keep him, he just did. Until then Grim deflects: "he's mine. that's the whole story."
-- **Ogrin:** bright, curious, opinionated; draws maps of the Hollows from what he overhears and asks the keeper to correct them; collects the keeper's stories ("what did you fight?", reading the delve facts and curios brought home); loves Bart's songs and watching Boog's explosions from a safe distance; hates onion broth and being called brave.
-  - *Agency:* he wants to see the hatch; he gives the keeper names for monsters ("that's not a slime, that's a Gerald"); he trades his maps for stories.
-  - *Good and bad days:* seeded by the world seed (about two good days in three). Good days he's at the stall or on the green with Grim; bad days he talks to the keeper **through his window**. The illness is never named or described (your call).
-- **Looks:** Grim the Miner figure (distinct from Orik's yellow beard and the dwarf keeper); Ogrin a child figure from *Snowball Wars* or *Summer Holidays* (8 px tall against the keeper's 10), chosen on the sheet in Step 8.
+**Locked history (§0.1):** Grim, a dwarf and former delver, found Ogrin as an infant below, beside two dead adults, and raised him in Kariaston. Ogrin aged to about ten in a year or two, then stopped, and has been chronically ill and often exhausted since. Grim doesn't know what Ogrin is or what happened; he loves him. Ogrin calls him Grim; "Dad" is reserved for a later beat.
+
+- **Grim** keeps the **market stall** as his livelihood (H7): gruff, fair, never haggles, charges everyone the same, proud of good onions. More than a worried guardian: a trade, a past (a delver who stopped), a rivalry with Orik, opinions about the keeper's knife and Bart's volume, and a dry warmth he hides. His past comes out slowly: he knows the Hollows and won't romanticise them; he looks at the keeper's satchel like a man remembering. He doesn't tell the finding story in 4h beyond, at most, one guarded line once trusted ("i found him. down there. that's all i know, and it's more than i'd like.").
+- **Ogrin** is his own person first:
+  - bright, curious, opinionated; draws **maps of the Hollows** from what he overhears and asks the keeper to correct them; collects the keeper's stories ("what did you fight?", from the delve facts and curios brought home);
+  - loves Bart's songs and watching Boog's explosions from a safe distance; hates onion broth and being called brave or fragile;
+  - *agency:* he wants to see the hatch; he names the keeper's monsters ("that's not a slime, that's a Gerald"); he trades his maps for stories;
+  - *the mystery, lightly:* he doesn't remember being a baby "because i was only one for a bit"; he finds the hatch fascinating, not frightening. Nothing explains it.
+- **Good and bad days:** seeded by the world seed (about two good days in three; tunable). Good days: at the stall with Grim or on the green. Bad days: in bed, talking to the keeper **through his window**. The days after Kaloren's herbs lean good. The illness and exhaustion are shown, never named or explained.
+- **Dialogue rule:** no 4h line has Ogrin call Grim "dad" or "father", and no line resolves what he is. (A validation test guards the first.)
+- **Looks:** Grim the **Miner** figure (current candidate; distinct from Orik's yellow beard and the dwarf keeper). Ogrin a child figure from *Snowball Wars* or *Summer Holidays* (8 px tall against the keeper's 10), **provisional until both are seen at game scale** in Step 8.
 
 ## 21. Bart
 
@@ -383,19 +412,25 @@ Love/Hate: Maximo, Kaloren, Grim, Ogrin, Bart and Gimp get tracked `CharacterDef
 
 ## 22. Old Phi and Orik
 
-- Orik's history stays as built (the three lines heard if you ask). In 4h it gains **places**: her chair by the hearth (inspectable; he dusts it, "don't tell Boog"), the ledger written in two hands, the five tankards.
+- Orik's history stays as built (the three lines heard if you ask). In 4h it gains **places**: her chair by the hearth (inspectable; he dusts it, "don't tell Boog"), the ledger written in two hands, the five tankards, and **her portrait** (approved).
+- **Phi's portrait (Checkpoint A):** a framed Portrait Generator drow (elf ears, obsidian skin, consistent with her established look) hung in Tally Ho!'s main room, inspectable: "Phi'rai. Old Phi, to anyone who wanted to keep their teeth." It makes her present in the room and explains nothing about her disappearance. The portrait itself is made in the Portrait Generator (§40); the frame is a Towns prop.
 - Orik's daytime hub gets one or two lines tied to the new world: the village asking after her (Maximo, Bart), and the first time the keeper sleeps upstairs ("that was her room once. it's a room. sleep in it.").
+- Gimp's single grudging line about her (D) is the strongest hint 4h gives that she was more than a landlady.
 - Not in 4h: why she went back down, the Fortunate Five's history, any letter beyond the one built.
 
 ## 23. Gimp: the visitor proof
 
-**The experience:** the Hollows have neighbours, and Boog had a life before you.
+**The experience:** the Hollows have neighbours, Boog had a life before you, and not everyone is glad you're here.
 
-- **Visit rule (H10, pure and seeded):** first visit the day after Boog's bomb comes home, or day 6, whichever is first; then about one day in three, never two days running. Derived from `day + world seed + story`; nothing saved but a Dialogue System "has met" variable.
-- **The visit:** at about 14:00 the cellar hatch in Tally Ho! opens and Gimp climbs out (the hatch prop already exists from the opening). Boog leaves the stove; the two sit at the bar with a ledger of blast radii. They bark to each other (pairs, §27). At 16:30, or when Prep begins, he goes back down.
-- **Talking:** `Gimp/Hub` (seeded once): first meeting (Boog introduces his oldest friend from below, mid-argument), an everyday conversation (fuses, the upper Hollows, Boog chiming in), and a few once-only callbacks to deeds he hears of (the troll, the bomb). Hearth & Hollows owns when he's there; the graph owns what he says.
-- **Architecture proof:** Gimp is a `CharacterDefinition` (a new kind value `Hollower`, H8 note: shown to the player only as a person, never a category), with a schedule whose blocks are conditional visits. That is the whole of *encounter → recurring visitor* the architecture needs; *guest* and *resident* stay Phase 5.
-- **Look:** the Hunter (a tanned woodsman, your campaign Gimp), distinct from Boog's Goblin Sapper. His portrait: a human with the "engineer" goggles from the Portrait Generator.
+**Locked canon (§0.1):** a half-elf hunter and ranger; nomadic, abrasive, something of a nutjob; dislikes most people and hates cities; loves rifles; likes Boog (explosives) and liked Phi; starts standoffish toward Bram.
+
+- **Visit rule (H10):** the first visit is the day after Boog's bomb comes home, or day 6, whichever is first. After that, an `irregular` seeded rule: gaps of roughly 1–5 days, never two days running, with an occasional longer absence ("he's gone off somewhere"); the player's impression is that Gimp shows up when Gimp shows up. Derived from `day + world seed + story`; nothing saved but Dialogue System variables.
+- **The visit:** in the afternoon the cellar hatch in Tally Ho! opens and Gimp climbs out (the hatch prop already exists from the opening). Boog drops whatever he's doing; the two sit at the bar arguing blast radii. He leaves back down the hatch before Prep (or at about 16:30), without saying goodbye to anyone but Boog.
+- **The first meeting (seeded once, then yours):** Boog is overjoyed and introduces his oldest friend from below; Gimp looks at the keeper as an unwanted complication ("this is the new one? smaller than i pictured. no. the same size. i just pictured them gone."), asks Boog why the keeper is still standing there, and turns back to the fuse. The keeper's choices can't win him over today.
+- **After:** `Gimp/Hub` grows slowly: an everyday branch that is mostly Gimp talking to Boog while the keeper is tolerated; once-only callbacks to deeds he respects (the troll, through his values: nerve and craft); one line about Phi, gruff and unexpectedly fond. His affinity starts low; warming up is earned through deeds he values, never automatic.
+- **Where he isn't:** he never walks into the square (cities, people); if he leaves by the front door at all, it's straight for the trees.
+- **Architecture proof:** Gimp is a `CharacterDefinition` with a new kind value `Hollower` (never shown to the player as a category) and a schedule whose blocks are irregular visits. That is all of *encounter → recurring visitor* the architecture needs; *guest* and *resident* stay Phase 5.
+- **Look (locked):** `soldier_headband` from *Modern Soldiers* (All Exclusives › Creatures): idle, walk, damage, death; its rifle-firing animations are not used in 4h (see the firearms question, §0.2). **Portrait:** not a human recipe by default: the closest Portrait Generator treatment for a half-elf (elf ears with a human face and tanned skin, or the elf base with a rougher colourway), chosen in Step 12.
 
 ## 24. Glimmer foreshadowing
 
@@ -438,7 +473,7 @@ Love/Hate: Maximo, Kaloren, Grim, Ogrin, Bart and Gimp get tracked `CharacterDef
 
 ## 28. Minifantasy assets proposed
 
-Catalog first (`C:\Dev\Minifantasy\List`), sheets inspected for this plan; exact cells are recorded in `docs/ASSET_MAP.md` as each is imported. The figure choices are on `docs/plan_4h/cast_candidates.png` (true scale, with the keeper and Orik for reference).
+Catalog first (`C:\Dev\Minifantasy\List`), sheets inspected for this plan; exact cells are recorded in `docs/ASSET_MAP.md` as each is imported. The figures as approved are on `docs/plan_4h/cast_candidates.png` (true scale, with the keeper and Orik for reference; regenerated at approval).
 
 **Tally Ho! and grounds**
 - Exterior: *Towns II* wooden plank or stucco building tileset (walls, roof, door, windows), *Slate Roof And Humble Chimney*, the tankard hanging sign (*Towns* props / *Shop Signs Medieval City*), *Outdoor Lanterns*.
@@ -460,13 +495,14 @@ Catalog first (`C:\Dev\Minifantasy\List`), sheets inspected for this plan; exact
 **People** (H8)
 | Character | Figure | Portrait (Portrait Generator) |
 |---|---|---|
-| Maximo | *King* (walk, idle; crown and cape) | human, old, white beard, a hat or none (no crown in the generator) |
+| Maximo | **blue Knight on foot** (*Knight Jousting Add-on 1.5*, `Knight On Foot`: idle, walk, attack, damage, die), **locked** | human, old, white beard |
 | Kaloren | *A Myriad Of NPCs* layers (human albino, long white hair and beard, long hat, robe) | human, albino skin, robe, white beard |
-| Grim | *Miner* | dwarf, gruff |
-| Ogrin | *Snowball Wars* or *Summer Holidays* child figure | gap: no child parts; the smallest human or halfling face with "innocent" eyes as an approximation |
-| Bart | *Wise Orc* (fallback: *True Heroes II* Bard with an orc skin ramp) | orc |
-| Gimp | *Hunter* | human with the "engineer" goggles |
-| Glimmer | *Naughty Fairy* (fly, appear, disappear; desaturated) | none: she's a light |
+| Grim | *Miner* (current candidate) | dwarf, gruff |
+| Ogrin | *Snowball Wars* or *Summer Holidays* child figure, **provisional** until both are seen at game scale | gap: no child parts; the smallest human or halfling face with "innocent" eyes as an approximation |
+| Bart | *Wise Orc* (current candidate; fallback *True Heroes II* Bard with an orc skin ramp) | orc |
+| Gimp | **`soldier_headband`** (*Modern Soldiers*, All Exclusives › Creatures: idle, walk, damage, die), **locked** | half-elf: the closest Portrait Generator treatment (elf ears, tanned human face), chosen in Step 12 |
+| Glimmer | *Naughty Fairy* (fly, appear, disappear; desaturated), the current treatment | none: she's a light |
+| Old Phi | none (absent) | **a drow** (elf, obsidian skin) for her framed portrait in Tally Ho! (approved) |
 | Merchant stall extras (D) | Visitors from the existing *Myriad* pools | none |
 
 ## 29. Real art gaps
@@ -475,7 +511,8 @@ Catalog first (`C:\Dev\Minifantasy\List`), sheets inspected for this plan; exact
 2. **A child portrait for Ogrin.** The Portrait Generator has no child parts. **Workaround:** the closest small human or halfling face; or Ogrin speaks without a portrait (a framed silhouette), which suits a boy you mostly see through a window. Your call in Step 8.
 3. **An orc playing an instrument.** No orc figure has a playing animation. **Workaround:** the Wise Orc with music-note emotes and an instrument prop beside him (*Musical Instrument Icons*), or the human Bard recoloured.
 4. **Ogrin in bed.** *Sleeping Animations* are adult base bodies. **Workaround:** the window (we never see inside the cottage in 4h).
-5. **No dedicated mayor.** The King's crown is the joke ("chain of office"); if it reads wrong, the Myriad layers make an elderly man with a doublet.
+5. **Maximo's face.** The Knight's helmet hides his face and age at 8 px; his portrait carries both, and his voice does the rest. No gap to fill.
+6. **Gimp's rifle.** `soldier_headband`'s attack animations fire a rifle; whether a rifle exists in the world (carried, mentioned, never a player weapon) is the firearms question (§0.2).
 
 ## 30. Optional unowned purchases
 
@@ -517,7 +554,7 @@ A Checkpoint A save is version 9 (the clock isn't saved yet: Continue starts the
 - **Market hours:** open window, closed window, `DayRules.Buy` refuses when closed.
 - **Schedules:** resolution by time; conditions (every-Nth, chance, story flag, quest object); determinism for a seed; Gimp's visit rule (never before the bomb or day 6, the first guaranteed, never two in a row); Ogrin's good days; patrons tonight.
 - **Save:** version 10 round trip; 9 → 10, 8 → 10, 7 → 10 migrations; the seed stable across loads; no garden double grant.
-- **Story data:** every new character complete (id, kind, name in the table, portrait, conversation, values); faction database matches; hubs follow the priority order; once-only flags use `~= true`; new English fits its boxes and passes the style and glyph checks; Tamsin and other old names absent.
+- **Story data:** every new character complete (id, kind, name in the table, portrait, conversation, values); faction database matches; hubs follow the priority order; once-only flags use `~= true`; new English fits its boxes and passes the style and glyph checks; Tamsin and other old names absent. No 4h line has Ogrin call Grim "dad" or "father" (the reserved beat).
 - **Balance:** a garden-only week never beats a delve week (`RenownAndBalanceTests`).
 
 ## 34. PlayMode test plan
@@ -587,18 +624,19 @@ Fishing (and its minigame), ranching, foraging and gathering; seasons, weather, 
 
 ## 40. Manual Unity and editor work for you
 
-1. **Portraits** (Steps 8, 12): compose Maximo, Kaloren, Grim, Ogrin (or decide none), Bart and Gimp in the Portrait Generator app if the recipe route (`Tools/portraits`) can't express them; I'll give exact recipes and steps.
-2. **Dialogue:** edit the seeded first drafts in the node editor as you like (hubs, first meetings, barks, inspectables).
-3. **Kariaston's tiles:** after the first generation (Step 2), hand-paint and arrange as you wish; the updater won't touch tiles.
-4. **Playtests** at each checkpoint's end (the acceptance criteria below), including a controller pass for the garden's haptics.
-5. Answers to Q1–Q5 when convenient.
+1. **Portraits** (Steps 3, 8, 12): Phi's drow portrait for the frame (Step 3); Maximo, Kaloren, Grim, Ogrin (or decide none), Bart and Gimp (half-elf) in the Portrait Generator app if the recipe route (`Tools/portraits`) can't express them; I'll give exact recipes and steps.
+2. **Ogrin's figure:** pick between the two children once both are in the village (Step 8).
+3. **Dialogue:** edit the seeded first drafts in the node editor as you like (hubs, first meetings, barks, inspectables).
+4. **Kariaston's tiles:** after the first generation (Step 2), hand-paint and arrange as you wish; the updater won't touch tiles.
+5. **Playtests** at each checkpoint's end (the acceptance criteria below), including a controller pass for the garden's haptics.
+6. The open questions in §0.2 before the checkpoint that needs each.
 
 ## 41. Implementation order
 
 **Checkpoint A: I can live here**
 1. *Surface architecture:* `GameFlow` content sets; `Kariaston.unity` created once with a blockout; `SurfaceDoor` passages; area camera bounds and lighting switch; `Hearthdelve.Village` assembly. Prove loading, doors and lights on web early.
 2. *Kariaston in real art:* the layout above with Towns/Farm/Plains art, Tally Ho!'s exterior, the square, the four households (unoccupied), the garden's beds (inert), plots, edges. ASSET_MAP records.
-3. *Tally Ho! as home:* Daytime walking; waking upstairs; storeroom shelves; stations for the delve meal; Decorate key and book; the menu board → Prep; Boog and Orik daytime posts; inspectables; the market stall (no keeper yet) with its panel; `MorningScreen` retired.
+3. *Tally Ho! as home:* Daytime walking; waking upstairs; Phi's framed portrait; storeroom shelves; stations for the delve meal; Decorate key and book; the menu board → Prep; Boog and Orik daytime posts; inspectables; the market stall (no keeper yet) with its panel; `MorningScreen` retired.
 4. *The clock:* `SurfaceClock`, pause reasons, bands, the 5 PM wind-down, daylight curve, HUD clock, market hours, `HH_Time`. Tests; web build; **stop for the A playtest.**
 
 **Checkpoint B: A day's work**
@@ -607,13 +645,13 @@ Fishing (and its minigame), ranching, foraging and gathering; seasons, weather, 
 7. *Save version 10* and migrations; daytime autosaves; Continue mid-day. Tests; web; **stop for the B playtest.**
 
 **Checkpoint C: The village has people**
-8. *The cast as data:* `CharacterDefinition`s (Maximo, Kaloren, Grim, Ogrin, Bart, plus Karias and Phi as untracked story ids), figures, portraits, faction regeneration, values, the `Villagers` learner group.
-9. *Schedules and presence:* `ScheduleDefinition`, `ScheduleRules`, anchors, `SurfaceCast`, `VillagerAgent`; Boog and Orik moved onto schedules; Grim at the stall; Ogrin's good days and window.
+8. *The cast as data:* `CharacterDefinition`s (Maximo, Kaloren, Grim, Ogrin, Bart, plus Karias and Phi as untracked story ids), figures (Ogrin's chosen at game scale), portraits, faction regeneration, values, the `Villagers` learner group.
+9. *Schedules and presence:* `ScheduleDefinition`, `ScheduleRules`, anchors, `SurfaceCast`, `VillagerAgent`; Boog and Orik moved onto schedules; Grim at the stall; Ogrin's good days and window; Kaloren's herb routine.
 10. *First conversations:* hubs seeded once (first meeting, everyday, a few callbacks each), memorial and other inspectables, `HH_Here`, `HH_Band`. Tests; web; **stop for the C playtest.**
 
 **Checkpoint D: This is a community**
 11. *The web between them:* NPC-to-NPC barks (`AmbientBarks`, pairs), deed callbacks for villagers, Maximo's delve-count lines, Orik's new lines.
-12. *Gimp:* `Hollower` kind, visit rule, the hatch, the bar with Boog, `Gimp/Hub`.
+12. *Gimp:* `Hollower` kind, the irregular visit rule, the hatch, the bar with Boog, `Gimp/Hub` (standoffish first meeting), his half-elf portrait.
 13. *Evenings:* named villager patrons; Bart's performance spot; Glimmer's light; daytime Visitors.
 14. *Closeout:* full regression, web build and visible-tab smoke test, docs, the report; **stop for the final 4h playtest.**
 
@@ -638,12 +676,14 @@ Fishing (and its minigame), ranching, foraging and gathering; seasons, weather, 
 **C: The village has people**
 - I can find each villager without a guide and remember who they are after one meeting.
 - Routines make the village feel alive (I notice Maximo has moved) and are never annoying (important people are findable).
-- Each character has a distinct voice; Maximo is funny and sad, Kaloren kind and slightly wrong, Grim gruff and fond, Ogrin his own person, Bart unlike Maximo.
+- Each character has a distinct voice; Maximo is funny and, underneath, the man who kept watch; Kaloren kind and slightly wrong; Grim gruff and fond, more than Ogrin's guardian; Ogrin his own person, not his illness; Bart unlike Maximo.
+- I've seen (or could have seen) Kaloren take Ogrin his herbs without it being about me.
+- The Hollows feel like the reason the village exists, learned from people and places, not from a lecture.
 - None of the mysteries is answered; several are now questions I'm asking.
 
 **D: This is a community**
 - People talk to each other, not only to me, and I overhear things I wasn't meant to.
-- Gimp coming up the hatch makes the Hollows feel like part of the world, and Boog's friendship feels older than my arrival.
+- Gimp coming up the hatch makes the Hollows feel like part of the world, Boog's friendship feels older than my arrival, and Gimp's coldness toward me feels like his, not a bug; his visits feel irregular, not scheduled.
 - Familiar faces at dinner make service feel like the village's evening.
 - Ogrin's light makes me curious, and nothing explains it.
 - Full regression green, web build working, the save chain intact.
