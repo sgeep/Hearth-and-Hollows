@@ -15,12 +15,16 @@ MonoBehaviour:
   tracks:
   - cue: 2
     clip: {fileID: 8300000, guid: e762b3fa52832af428a53555ccfcdbee, type: 3}
+    level: 1
   - cue: 1
     clip: {fileID: 8300000, guid: 13e74acdbf1a60a47944a21f1cef98e7, type: 3}
+    level: 0.75
   - cue: 3
     clip: {fileID: 8300000, guid: ac0bf09de24e8924f9f66f52afd59256, type: 3}
+    level: 1
   - cue: 4
     clip: {fileID: 8300000, guid: fc491b9969fa9994aa4ea6fbd1e12565, type: 3}
+    level: 1
   volume: 0.5625
   effectsInHollows: 0.75
   fadeSeconds: 1.5

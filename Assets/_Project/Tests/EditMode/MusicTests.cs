@@ -56,6 +56,9 @@ namespace Hearthdelve.Tests
             var config = AssetDatabase.LoadAssetAtPath<MusicConfig>(MusicContent.ConfigPath);
             Assert.That(config, Is.Not.Null);
             Assert.That(config.volume, Is.EqualTo(0.5625f).Within(1e-4f), "a quarter down, twice");
+            Assert.That(config.Level(MusicCue.Day), Is.EqualTo(0.75f).Within(1e-4f), "Quirkii a quarter under the rest");
+            foreach (MusicCue other in new[] { MusicCue.Decorate, MusicCue.Service, MusicCue.Cellars })
+                Assert.That(config.Level(other), Is.EqualTo(1f).Within(1e-4f), $"{other} at the music volume");
             Assert.That(config.effectsInHollows, Is.EqualTo(0.75f).Within(1e-4f));
             foreach (MusicCue cue in new[] { MusicCue.Day, MusicCue.Decorate, MusicCue.Service, MusicCue.Cellars })
             {

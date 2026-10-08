@@ -21,6 +21,7 @@ namespace Hearthdelve.Shared.Audio
             /// <summary>0–1 along the fade (the source's volume is this times the music volume).</summary>
             public float Level;
             public bool PauseAtSilence;
+            public MusicCue Cue;
         }
 
         readonly Dictionary<MusicCue, Voice> m_Voices = new();
@@ -93,7 +94,7 @@ namespace Hearthdelve.Shared.Audio
                 source.spatialBlend = 0f;
                 source.ignoreListenerPause = true;
                 source.volume = 0f;
-                m_Voices[to] = voice = new Voice { Source = source };
+                m_Voices[to] = voice = new Voice { Source = source, Cue = to };
             }
             voice.Target = 1f;
             voice.PauseAtSilence = false;
@@ -130,7 +131,7 @@ namespace Hearthdelve.Shared.Audio
                 }
                 float level = Mathf.MoveTowards(v.Level, v.Target, step);
                 v.Level = level;
-                v.Source.volume = Mathf.Min(1f, level * m_Config.volume / Mathf.Max(0.01f, AudioListener.volume));
+                v.Source.volume = Mathf.Min(1f, level * m_Config.volume * m_Config.Level(v.Cue) / Mathf.Max(0.01f, AudioListener.volume));
                 if (v.Target > 0f || level > 0f || !v.Source.isPlaying) continue;
                 if (v.PauseAtSilence) v.Source.Pause();
                 else
