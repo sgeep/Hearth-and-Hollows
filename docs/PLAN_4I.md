@@ -272,7 +272,9 @@ EditMode `FirstImpressionsTests` (quit plan per phase, pause rules, device rule,
 6. Switch between keyboard and controller: do the prompts follow without flickering?
 7. Does everything look at home at 320×180?
 
-## As built: 4i-B, "Settings and accessibility" (2026-10-08; waiting for the owner's playtest)
+## As built: 4i-B, "Settings and accessibility" (2026-10-08; signed off by the owner 2026-10-08)
+
+**Signed off by the owner (2026-10-08)** after the checklist, except the controller items (no real controller available): "everything works as described". Two notes from the playtest were fixed before sign-off (commit 5d20b427): the web fullscreen line didn't change until the tab was reopened (the browser switches a moment after it's asked; the line now shows the choice at once and follows the browser), and Musashi drew over the keeper standing in front of him (his figure had no sorting group; `FigureSortingTests` now checks every layered figure). The sign-off's notes on relaxed timing and fast clicks were left blank. The owner has a controller since (2026-10-08): the controller checks (4i-A's, and 4i-B's items 1 and 4) are carried onto 4i-C's playtest checklist. Carried into 4i-C: fast clicks on an Options line. Not tagged: `milestone-4i` waits for 4i-D.
 
 Approved as written in §4i-B with D4 and D6 (2026-10-08), with the owner's details: Options on the main menu between New Game and Controls and in the pause menu; tabs Audio, Feel, Display, Accessibility, Controls; 5% volume steps heard at once; a sample rumble on vibration changes; a separate options file that survives New Game; the Hollows' quarter-down on the mixer; routing only through generators and updaters. Carried from 4i-A: the menu's message band and Esc during a fade. **Save version stays 10.** Not tagged.
 

@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A signed off** (2026-10-08); **4i-B built**, waiting for the owner's playtest. Next: **your 4i-B playtest**; 4i-C only after its approval._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C approved** (2026-10-08, with D5), in progress._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1303,7 +1303,9 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
-### 4i-B: settings and accessibility (2026-10-08; waiting for the owner's playtest)
+### 4i-B: settings and accessibility (2026-10-08; signed off 2026-10-08)
+
+**Signed off by the owner (2026-10-08)** after the checklist, except the controller items (no real controller available): "everything works as described". Two notes from the playtest were fixed before sign-off (commit 5d20b427): the web fullscreen line didn't change until the tab was reopened (the browser switches a moment after it's asked; the line now shows the choice at once and follows the browser), and Musashi drew over the keeper standing in front of him (his figure had no sorting group; `FigureSortingTests` now checks every layered figure). After those fixes: EditMode 805 passed, 0 failed; PlayMode 283 passed, 0 failed. The sign-off's notes on relaxed timing and fast clicks were left blank. The owner has a controller since (2026-10-08): the controller checks (4i-A's, and 4i-B's items 1 and 4) are carried onto 4i-C's playtest checklist. Carried into 4i-C: fast clicks on an Options line. Not tagged: `milestone-4i` waits for 4i-D.
 
 Approved as written (PLAN_4I §4i-B, with D4 and D6) with the owner's details. Details, changes from the plan, the full list of options and the playtest checklist: `docs/PLAN_4I.md`, *As built: 4i-B*. Save version still 10. Not tagged.
 
