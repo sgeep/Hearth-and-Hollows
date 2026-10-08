@@ -302,6 +302,26 @@ namespace Hearthdelve.Shared.Save
 
         public static string ToJson(SaveData data) => JsonUtility.ToJson(data, prettyPrint: true);
 
+        /// <summary>
+        /// Reads a save without throwing (4i-A): its data if it can be used, or why not (unreadable, or from a newer version of the
+        /// game, which this build mustn't touch).
+        /// </summary>
+        public static SaveCheck Check(string json)
+        {
+            try
+            {
+                return new SaveCheck(FromJson(json), SaveProblem.None, null);
+            }
+            catch (NotSupportedException e)
+            {
+                return new SaveCheck(null, SaveProblem.Newer, e.Message);
+            }
+            catch (Exception e)
+            {
+                return new SaveCheck(null, SaveProblem.Unreadable, e.Message);
+            }
+        }
+
         /// <summary>Reads any known version, migrating older ones to the current format.</summary>
         public static SaveData FromJson(string json)
         {
@@ -483,27 +503,76 @@ namespace Hearthdelve.Shared.Save
         }
     }
 
+    /// <summary>Why a save can't be used (4i-A).</summary>
+    public enum SaveProblem
+    {
+        None,
+        /// <summary>There's no file.</summary>
+        Missing,
+        /// <summary>The file is there but can't be read (damaged, empty, not a save).</summary>
+        Unreadable,
+        /// <summary>A save from a newer version of the game: never loaded or overwritten without the player's say-so.</summary>
+        Newer,
+    }
+
+    /// <summary>A save file looked at: its data when usable, otherwise the problem (and the reader's message, for the log).</summary>
+    public readonly struct SaveCheck
+    {
+        public readonly SaveData Data;
+        public readonly SaveProblem Problem;
+        public readonly string Detail;
+
+        public SaveCheck(SaveData data, SaveProblem problem, string detail)
+        {
+            Data = data;
+            Problem = problem;
+            Detail = detail;
+        }
+
+        public bool Usable => Problem == SaveProblem.None && Data != null;
+        public static SaveCheck Missing => new(null, SaveProblem.Missing, null);
+    }
+
     /// <summary>
     /// The single save slot on disk. Writes go to a temp file first so a crash can't leave half a save. On the web, each
     /// write and delete is flushed to the browser's storage (<see cref="WebStorage"/>).
+    /// <para>
+    /// 4i-A: before each write, the save being replaced is kept as the **backup** if it reads cleanly, so there's always a last
+    /// good save to fall back on; one that doesn't read is set aside (<see cref="UnreadablePath"/>) rather than destroyed, and never
+    /// replaces the backup. A save from a newer version is never touched here: the menu asks before a new game replaces it.
+    /// </para>
     /// </summary>
     public sealed class SaveStore
     {
         public const string FileName = "save_slot_1.json";
+        public const string BackupFileName = "save_slot_1.backup.json";
+        public const string UnreadableFileName = "save_slot_1.unreadable.json";
 
         public SaveStore(string directory)
         {
             Directory = directory;
             FilePath = Path.Combine(directory, FileName);
+            BackupPath = Path.Combine(directory, BackupFileName);
+            UnreadablePath = Path.Combine(directory, UnreadableFileName);
         }
 
         public string Directory { get; }
         public string FilePath { get; }
+        public string BackupPath { get; }
+        public string UnreadablePath { get; }
         public bool Exists => File.Exists(FilePath);
+        public bool BackupExists => File.Exists(BackupPath);
 
         public void Write(string json)
         {
             System.IO.Directory.CreateDirectory(Directory);
+            if (File.Exists(FilePath))
+            {
+                // The save about to be replaced: kept as the backup when it's good; set aside (not lost) when it isn't.
+                SaveProblem current = SaveSystem.Check(SafeRead(FilePath)).Problem;
+                if (current == SaveProblem.None) File.Copy(FilePath, BackupPath, true);
+                else File.Copy(FilePath, UnreadablePath, true);
+            }
             string temp = FilePath + ".tmp";
             File.WriteAllText(temp, json);
             if (File.Exists(FilePath)) File.Delete(FilePath);
@@ -512,6 +581,28 @@ namespace Hearthdelve.Shared.Save
         }
 
         public string Read() => File.ReadAllText(FilePath);
+
+        /// <summary>The save, looked at.</summary>
+        public SaveCheck CheckMain() => Exists ? SaveSystem.Check(SafeRead(FilePath)) : SaveCheck.Missing;
+
+        /// <summary>The backup (the last good save before the current one), looked at.</summary>
+        public SaveCheck CheckBackup() => BackupExists ? SaveSystem.Check(SafeRead(BackupPath)) : SaveCheck.Missing;
+
+        static string SafeRead(string path)
+        {
+            try
+            {
+                return File.ReadAllText(path);
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return null;
+            }
+        }
 
         public void Delete()
         {

@@ -63,7 +63,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             m_HintShown = m_Target != null;
             m_ShownHint = m_Target != null ? m_Target.Hint : default;
-            EventBus<TavernInteractHint>.Publish(new TavernInteractHint(m_HintShown, m_ShownHint));
+            EventBus<TavernInteractHint>.Publish(new TavernInteractHint(m_HintShown, m_ShownHint, m_Target != null ? m_Target.Kind : default));
         }
 
         void OnDisable()

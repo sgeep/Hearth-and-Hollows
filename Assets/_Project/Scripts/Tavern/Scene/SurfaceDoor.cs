@@ -121,6 +121,7 @@ namespace Hearthdelve.Tavern.Scene
             if (property != null) PropertyArea.Current = property;
             SurfaceArea.Enter(to.m_Area);
             EventBus<AreaPassageEnded>.Publish(new AreaPassageEnded(to.m_FadeSeconds, to.m_Area != null ? to.m_Area.Id : null));
+            if (to.m_Area != null) EventBus<Hearthdelve.Shared.Game.KeeperEnteredArea>.Publish(new Hearthdelve.Shared.Game.KeeperEnteredArea(to.m_Area.Id));
         }
     }
 }

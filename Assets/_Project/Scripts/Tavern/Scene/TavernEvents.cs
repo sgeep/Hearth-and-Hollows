@@ -98,13 +98,16 @@ namespace Hearthdelve.Tavern.Scene
     {
         public readonly bool Visible;
         public readonly TavernHint Hint;
+        /// <summary>What the keeper is facing (4i-A: the first-day prompts key off the garden, the market and the menu board).</summary>
+        public readonly TavernInteractableKind Target;
         /// <summary>Localization key of the target's name (same as <c>Hint.NameKey</c> for a plain "use" hint).</summary>
         public string NameKey => Hint.NameKey;
 
-        public TavernInteractHint(bool visible, TavernHint hint)
+        public TavernInteractHint(bool visible, TavernHint hint, TavernInteractableKind target = default)
         {
             Visible = visible;
             Hint = hint;
+            Target = target;
         }
     }
 

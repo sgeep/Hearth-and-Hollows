@@ -134,17 +134,19 @@ namespace Hearthdelve.Shared.Game
         /// </summary>
         public SaveData PeekSave()
         {
-            if (!HasSave) return null;
-            try
-            {
-                return SaveSystem.FromJson(Store.Read());
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[Hearthdelve] The save can't be read: {e.Message}");
-                return null;
-            }
+            SaveCheck check = CheckSave();
+            if (check.Problem is SaveProblem.Unreadable or SaveProblem.Newer) Debug.LogWarning($"[Hearthdelve] The save can't be read: {check.Detail}");
+            return check.Usable ? check.Data : null;
         }
+
+        /// <summary>The save, looked at (4i-A): usable, missing, unreadable or from a newer version.</summary>
+        public SaveCheck CheckSave() => Store.CheckMain();
+
+        /// <summary>The backup of the last good save before the current one (4i-A), looked at.</summary>
+        public SaveCheck CheckBackup() => Store.CheckBackup();
+
+        /// <summary>A save file is there, whether or not it reads (so New Game asks before replacing it).</summary>
+        public bool AnySaveFile => Store.Exists;
 
         /// <summary>
         /// A new game (4g Checkpoint B), after character creation: the keeper made in the creator arrives at Tally Ho! on day 1
@@ -234,11 +236,14 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
-        /// <summary>Loads the save and resumes at its phase. Returns false if there's no readable save.</summary>
-        public bool Continue()
+        /// <summary>
+        /// Loads the save and resumes at its phase. Returns false if there's no readable save. <paramref name="fromBackup"/> (4i-A):
+        /// the backup instead, when the save itself can't be read; the next save sets the unreadable one aside.
+        /// </summary>
+        public bool Continue(bool fromBackup = false)
         {
             LastWarnings.Clear();
-            SaveData data = PeekSave();
+            SaveData data = fromBackup ? (CheckBackup() is { Usable: true } backup ? backup.Data : null) : PeekSave();
             if (data == null) return false;
             try
             {
@@ -263,11 +268,30 @@ namespace Hearthdelve.Shared.Game
             return true;
         }
 
-        public void QuitToMenu()
+        /// <summary>
+        /// Back to the main menu (4i-A, D2). <paramref name="save"/>: save first (the free day, the night, after banking); otherwise
+        /// the last save stands, and Continue comes back to it. Every pause and hold of the session is let go.
+        /// </summary>
+        public void QuitToMenu(bool save = false)
         {
+            if (save) Save();
             State = null;
             StoryServices.State?.Clear();
+            Engine.MenuPause.Clear();
+            Surface.SurfacePause.Clear();
             Load(GameScenes.MainMenu);
+        }
+
+        /// <summary>
+        /// Quitting while the evening's results show (4i-A, <see cref="QuitKind.BankEvening"/>): the takings banked exactly as closing
+        /// up banks them, and saved (phase Delve, so Continue is the night's delve); no scene loads.
+        /// </summary>
+        public void BankEvening(ServiceReport report)
+        {
+            if (!InGame || State.Phase != DayPhase.Evening) return;
+            DayRules.CompleteService(State, report);
+            PhaseChanged?.Invoke();
+            Save();
         }
 
         // ---------- The day ----------
@@ -312,7 +336,10 @@ namespace Hearthdelve.Shared.Game
         /// Back from the delve: the haul and the run's Gold are applied once and saved at once (phase Night), so a reload
         /// can't apply them again or lose them; then home to the tavern for the night.
         /// </summary>
-        public void CompleteDelve(DelveReport report)
+        public void CompleteDelve(DelveReport report) => CompleteDelve(report, goHome: true);
+
+        /// <summary>As above; <paramref name="goHome"/> false when quitting from the delve's result (4i-A): applied and saved, no scene load.</summary>
+        public void CompleteDelve(DelveReport report, bool goHome)
         {
             DayRules.CompleteDelve(State, report, m_Database != null ? m_Database.Furniture : null, m_Database != null ? m_Database.bossTrophies : null,
                 m_Database != null ? m_Database.QuestObject : null);
@@ -331,7 +358,7 @@ namespace Hearthdelve.Shared.Game
             }
             PhaseChanged?.Invoke();
             Save();
-            Load(GameScenes.Tavern);
+            if (goHome) Load(GameScenes.Tavern);
         }
 
         public bool EatMeal(MealBuff meal)
@@ -495,6 +522,7 @@ namespace Hearthdelve.Shared.Game
                 // The story's middleware records its state into the game's first (4g): one save, one file.
                 StoryServices.State?.Capture(State);
                 Store.Write(SaveSystem.ToJson(SaveSystem.Capture(State)));
+                EventBus<GameSaved>.Publish(new GameSaved(State.Day));
             }
             catch (Exception e)
             {

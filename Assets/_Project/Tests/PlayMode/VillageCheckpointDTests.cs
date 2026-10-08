@@ -424,6 +424,37 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/community_dinner.png");
         }
 
+        // ---------- 4i-A: candidate stills for the main menu's backdrop (run by hand: BatchLogs/menu/*.png) ----------
+
+        [UnityTest, Explicit]
+        public IEnumerator CaptureMenuBackdrops()
+        {
+            const string out_ = "BatchLogs/menu";
+            System.IO.Directory.CreateDirectory(out_);
+            yield return Daytime();
+            Flow.MarkHintSeen(CommunityRules.GimpIntro);
+            Outside();
+            // The keeper out of the picture: the village as it is.
+            foreach (SpriteRenderer r in Keeper.GetComponentsInChildren<SpriteRenderer>(true)) r.enabled = false;
+            var shots = new (string name, Vector2 tile, int minute)[]
+            {
+                ("tallyho_left", new Vector2(51f, 31f), 15 * 60 + 30),
+                ("tallyho_right", new Vector2(22f, 32f), 15 * 60 + 30),
+                ("tallyho_right_low", new Vector2(23f, 29f), 15 * 60 + 30),
+                ("tallyho_left_low", new Vector2(50f, 28f), 15 * 60 + 30),
+            };
+            foreach (var (name, tile, minute) in shots)
+            {
+                KeeperAtVillage(tile);
+                yield return At(minute);
+                yield return new WaitForSecondsRealtime(2.5f);
+                foreach (Canvas c in Object.FindObjectsByType<Canvas>()) c.enabled = false;
+                yield return null;
+                TavernEveningCaptures.Capture($"{out_}/{name}.png");
+                foreach (Canvas c in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include)) c.enabled = true;
+            }
+        }
+
         // ---------- the field guide's shots (run by hand: BatchLogs/guide/*.png) ----------
 
         [UnityTest, Explicit]

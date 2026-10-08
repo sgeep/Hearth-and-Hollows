@@ -267,6 +267,20 @@ namespace Hearthdelve.Shared.Game
         }
     }
 
+    /// <summary>The game was saved (4i-A): the brief "saved" mark.</summary>
+    public readonly struct GameSaved : IEvent
+    {
+        public readonly int Day;
+        public GameSaved(int day) => Day = day;
+    }
+
+    /// <summary>The keeper walked into an area of the property (4i-A): "tavern", "guest_room", "kariaston".</summary>
+    public readonly struct KeeperEnteredArea : IEvent
+    {
+        public readonly string Area;
+        public KeeperEnteredArea(string area) => Area = area;
+    }
+
     /// <summary>A part of the day began in the tavern (4g Checkpoint B): "Daytime", "Arrival", "Prep", "Service", "Results", "Night".</summary>
     public readonly struct TavernPhaseStarted : IEvent
     {

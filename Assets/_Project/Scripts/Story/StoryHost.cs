@@ -81,6 +81,7 @@ namespace Hearthdelve.Story
             EventBus<BossDefeated>.Subscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Subscribe(OnCurioBroughtHome);
             EventBus<TavernPhaseStarted>.Subscribe(OnTavernPhaseStarted);
+            EventBus<KeeperEnteredArea>.Subscribe(OnKeeperEnteredArea);
             EventBus<BossFirstCleared>.Subscribe(OnBossFirstCleared);
             EventBus<CustomerRequestCompleted>.Subscribe(OnRequestCompleted);
             EventBus<PartButchered>.Subscribe(OnPartButchered);
@@ -94,6 +95,7 @@ namespace Hearthdelve.Story
             EventBus<BossDefeated>.Unsubscribe(OnBossDefeated);
             EventBus<CurioBroughtHome>.Unsubscribe(OnCurioBroughtHome);
             EventBus<TavernPhaseStarted>.Unsubscribe(OnTavernPhaseStarted);
+            EventBus<KeeperEnteredArea>.Unsubscribe(OnKeeperEnteredArea);
             EventBus<BossFirstCleared>.Unsubscribe(OnBossFirstCleared);
             EventBus<CustomerRequestCompleted>.Unsubscribe(OnRequestCompleted);
             EventBus<PartButchered>.Unsubscribe(OnPartButchered);
@@ -166,6 +168,15 @@ namespace Hearthdelve.Story
             if (flow == null || !flow.InGame || Dialogue == null) return;
             OpeningBeat? beat = OpeningRules.Beat(flow.State.Story.Opening, e.Phase, flow.State.Story.SeenHints);
             if (beat.HasValue) StartCoroutine(PlayBeat(beat.Value, e.Phase));
+        }
+
+        /// <summary>4i-A: the first free morning's beat plays as the keeper comes down into Tally Ho! in the daytime.</summary>
+        void OnKeeperEnteredArea(KeeperEnteredArea e)
+        {
+            GameFlow flow = GameFlow.Instance;
+            if (flow == null || !flow.InGame || Dialogue == null || flow.State.Phase != DayPhase.Daytime || e.Area != "tavern") return;
+            OpeningBeat? beat = OpeningRules.Beat(flow.State.Story.Opening, OpeningRules.Downstairs, flow.State.Story.SeenHints);
+            if (beat.HasValue) StartCoroutine(PlayBeat(beat.Value, OpeningRules.Downstairs));
         }
 
         System.Collections.IEnumerator PlayBeat(OpeningBeat beat, string phase)

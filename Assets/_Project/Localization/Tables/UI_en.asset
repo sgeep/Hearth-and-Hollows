@@ -263,7 +263,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 21821153173535
-    m_Localized: "{0}: pour \xB7 {1}: tilt, head in the band"
+    m_Localized: "{0}: pour \xB7 {1}: tilt the glass"
     m_Metadata:
       m_Items: []
   - m_Id: 21821153173536
@@ -3424,6 +3424,470 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 2804746969952268
     m_Localized: barley
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286194724864
+    m_Localized: controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862208
+    m_Localized: version {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862209
+    m_Localized: the backup, day {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862210
+    m_Localized: your saved game couldn't be read.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862211
+    m_Localized: your saved game couldn't be read. your last good save is kept as a backup.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862212
+    m_Localized: your saved game is from a newer version of Hearth & Hollows.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862213
+    m_Localized: paused
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862214
+    m_Localized: resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862215
+    m_Localized: quit to menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862216
+    m_Localized: quit game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862217
+    m_Localized: quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862218
+    m_Localized: back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862219
+    m_Localized: arrival day isn't saved part-way. if you quit now, it will start again from the beginning.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862220
+    m_Localized: the evening isn't saved part-way. if you quit now, tonight's prep and service are lost, and you'll continue from just before the evening began.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862221
+    m_Localized: 'if you quit now, this delve is abandoned: what you carry and the delve''s gold are lost. you''ll begin the night''s delve again.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862222
+    m_Localized: saved
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862223
+    m_Localized: controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862224
+    m_Localized: keyboard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862225
+    m_Localized: controller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862226
+    m_Localized: '{0} ({1}/{2})'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862227
+    m_Localized: "left / right: page \xB7 Esc / B: back"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862228
+    m_Localized: the day
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862229
+    m_Localized: the evening
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862230
+    m_Localized: the Hollows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862231
+    m_Localized: decorating
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862232
+    m_Localized: menus and talking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862233
+    m_Localized: walk
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862234
+    m_Localized: WASD / arrows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862235
+    m_Localized: left stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862236
+    m_Localized: look around
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862237
+    m_Localized: mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862238
+    m_Localized: right stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862239
+    m_Localized: use, talk, buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862240
+    m_Localized: E / Space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862241
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862242
+    m_Localized: decorate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862243
+    m_Localized: Tab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862244
+    m_Localized: View
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862245
+    m_Localized: pause
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862246
+    m_Localized: Esc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862247
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862248
+    m_Localized: use a station, serve
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862249
+    m_Localized: E / Space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862250
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862251
+    m_Localized: flip, pour, chop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862252
+    m_Localized: Space / click
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862253
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862254
+    m_Localized: tilt, move the knife
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862255
+    m_Localized: WASD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862256
+    m_Localized: left stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862257
+    m_Localized: step away
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862258
+    m_Localized: Esc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862259
+    m_Localized: B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862260
+    m_Localized: move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862261
+    m_Localized: WASD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862262
+    m_Localized: left stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862263
+    m_Localized: aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862264
+    m_Localized: mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862265
+    m_Localized: right stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862266
+    m_Localized: light combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862267
+    m_Localized: click
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862268
+    m_Localized: X
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862269
+    m_Localized: heavy spin (hold)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862270
+    m_Localized: right click
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862271
+    m_Localized: Y
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862272
+    m_Localized: dodge roll
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862273
+    m_Localized: Space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862274
+    m_Localized: B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862275
+    m_Localized: harvest finisher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862276
+    m_Localized: F
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862277
+    m_Localized: LT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862278
+    m_Localized: rope, swap a part
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862279
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862280
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862281
+    m_Localized: move the cursor
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862282
+    m_Localized: WASD / mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862283
+    m_Localized: left stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862284
+    m_Localized: pick up, place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862285
+    m_Localized: E / click
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862286
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862287
+    m_Localized: turn / flip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862288
+    m_Localized: R / F
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862289
+    m_Localized: X / Y
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862290
+    m_Localized: place to the pixel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862291
+    m_Localized: hold Shift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862292
+    m_Localized: hold LB
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862293
+    m_Localized: put away / undo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862294
+    m_Localized: Del / Z
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862295
+    m_Localized: RT / LT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862296
+    m_Localized: catalog and storage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862297
+    m_Localized: Tab
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862298
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862299
+    m_Localized: colors / other room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862300
+    m_Localized: V / G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862301
+    m_Localized: R3 / L3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862302
+    m_Localized: check the layout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862303
+    m_Localized: C
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862304
+    m_Localized: View
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862305
+    m_Localized: cancel, leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862306
+    m_Localized: Esc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862307
+    m_Localized: B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862308
+    m_Localized: move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862309
+    m_Localized: WASD / arrows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862310
+    m_Localized: left stick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862311
+    m_Localized: choose
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862312
+    m_Localized: Enter / Space
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862313
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862314
+    m_Localized: back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862315
+    m_Localized: Esc
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862316
+    m_Localized: B
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862317
+    m_Localized: next line
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862318
+    m_Localized: E / click
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862319
+    m_Localized: A
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862320
+    m_Localized: planting and tending use Vigor, the pips by the clock. walking and talking don't. sleep refills it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862321
+    m_Localized: Musashi sells everyday ingredients here from eight until five.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3188286240862322
+    m_Localized: the menu board starts evening prep whenever you choose. the day never ends it for you.
     m_Metadata:
       m_Items: []
   references:

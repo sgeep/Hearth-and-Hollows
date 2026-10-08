@@ -391,8 +391,24 @@ namespace Hearthdelve.Tavern.Scene
                 return;
             }
             if (m_Flow.IsLoading) return;
+            m_Flow.CompleteService(EveningReport());
+        }
+
+        ServiceReport EveningReport()
+        {
             ServiceLedger ledger = Session != null ? Session.Ledger : new ServiceLedger();
-            m_Flow.CompleteService(new ServiceReport(ledger.DishesServed, ledger.Gold, ledger.Tips, ledger.Renown, ledger.Walkouts));
+            return new ServiceReport(ledger.DishesServed, ledger.Gold, ledger.Tips, ledger.Renown, ledger.Walkouts);
+        }
+
+        /// <summary>
+        /// Quitting to the menu while the results show (4i-A, D2): the takings are banked exactly as <see cref="FinishEvening"/> banks
+        /// them, and saved, but the delve doesn't load; Continue begins the night's delve. False if there's nothing to bank.
+        /// </summary>
+        public bool BankForQuit()
+        {
+            if (Phase != TavernPhase.Results || m_Flow == null || !m_Flow.InGame || m_Flow.IsLoading) return false;
+            m_Flow.BankEvening(EveningReport());
+            return true;
         }
 
         void SetPhase(TavernPhase phase)

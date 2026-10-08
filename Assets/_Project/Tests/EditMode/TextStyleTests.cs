@@ -31,7 +31,9 @@ namespace Hearthdelve.Tests
             LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
                 .Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(DialogueEnglish)
                 // 4g Checkpoint B's strings.
-                .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(KeeperContent.English()).Concat(QuestObjectContent.English);
+                .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(KeeperContent.English()).Concat(QuestObjectContent.English)
+                // 4h's and 4i-A's strings.
+                .Concat(SurfaceLocKeys.English).Concat(GardenLocKeys.English).Concat(MenuLocKeys.English);
 
         /// <summary>4g: every line in the Dialogue System database, as a player reads it (its markup removed).</summary>
         static IEnumerable<(string key, string text)> DialogueEnglish =>
@@ -88,7 +90,11 @@ namespace Hearthdelve.Tests
             // 4h Checkpoint D.
             "Gimp",
             "Essence", "Renown", "Morale", "Cheer", "Delve", "Marks",
+            // 4h: Vigor is a resource name ("plant a crop · 2 Vigor").
+            "Vigor",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
+            // 4i-A: the controls reference's keys and buttons.
+            "Esc", "Enter", "Tab", "Shift", "Del", "Z", "R", "F", "V", "G", "C", "Y", "LB", "LT", "RT", "R3", "L3", "View", "Start",
         };
 
         /// <summary>

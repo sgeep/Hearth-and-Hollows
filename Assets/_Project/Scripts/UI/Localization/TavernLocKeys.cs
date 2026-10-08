@@ -196,7 +196,7 @@ namespace Hearthdelve.UI.Localization
 
             (GrillPrompt, "{0}: flip in the gold band"),
             (GrillSide, "side {0} of {1}"),
-            (TapPrompt, "{0}: pour · {1}: tilt, head in the band"),
+            (TapPrompt, "{0}: pour · {1}: tilt the glass"),
             (ChopTitle, "chop the {0}"),
             (ChopProgress, "ingredient {0} of {1}"),
             (ChopPrompt, "{0}: move the knife · {1}: chop"),

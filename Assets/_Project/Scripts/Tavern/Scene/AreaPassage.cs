@@ -109,6 +109,7 @@ namespace Hearthdelve.Tavern.Scene
             PropertyArea.Current = m_To;
             TavernView.Show(m_To);
             EventBus<AreaPassageEnded>.Publish(new AreaPassageEnded(m_FadeSeconds, m_To.Id));
+            EventBus<Hearthdelve.Shared.Game.KeeperEnteredArea>.Publish(new Hearthdelve.Shared.Game.KeeperEnteredArea(m_To.Id));
         }
     }
 }

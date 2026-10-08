@@ -94,6 +94,8 @@ namespace Hearthdelve.Editor
             // 2026-10-07: the background music, beside the clock.
             MusicDirector music = flow.GetComponent<MusicDirector>() ?? flow.gameObject.AddComponent<MusicDirector>();
             music.Configure(MusicContent.Build());
+            // 4i-A: the pause menu, its controls page and the saved mark, on Boot's own Menus canvas (rebuilt in place).
+            FirstImpressionsUI.BuildBootMenus();
             // 2026-10-08: the fallback ear, for the moments between one set of scenes and the next.
             if (Object.FindAnyObjectByType<ListenerKeeper>(FindObjectsInactive.Include) == null)
             {
@@ -170,6 +172,8 @@ namespace Hearthdelve.Editor
             BuildClockFace(ui);
             BuildPrepConfirm(ui);
             BuildGardenPanel(ui);
+            // 4i-A (D3): the first free day's prompts, over the interaction hint.
+            FirstImpressionsUI.BuildSurfacePrompts(ui);
         }
 
         /// <summary>

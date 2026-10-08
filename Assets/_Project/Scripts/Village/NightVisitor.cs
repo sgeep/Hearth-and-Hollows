@@ -72,6 +72,7 @@ namespace Hearthdelve.Village
             if (m_Director != null) m_Director.Woke -= OnWoke;
             if (Instance == this) Instance = null;
             SurfacePause.Release(this);
+            Hearthdelve.Shared.Engine.PauseRules.Unblock(this);
             MusicHolds.Release(this);
         }
 
@@ -96,6 +97,8 @@ namespace Hearthdelve.Village
         {
             Playing = true;
             SurfacePause.Hold(this);
+            // 4i-A: no pause menu in the middle of the scene (it plays out, then the morning is ordinary).
+            Hearthdelve.Shared.Engine.PauseRules.Block(this);
             MusicHolds.Hold(this, MusicCue.Silence);
             Night(true);
             if (m_Lantern != null) m_Lantern.enabled = true;
@@ -136,6 +139,7 @@ namespace Hearthdelve.Village
             }
             Night(false);
             SurfacePause.Release(this);
+            Hearthdelve.Shared.Engine.PauseRules.Unblock(this);
             MusicHolds.Release(this);
             GameFlow flow = GameFlow.Instance;
             if (flow != null && flow.InGame && flow.State.Story.SeenHints.Contains(CommunityRules.GimpIntro)) flow.Save();

@@ -62,6 +62,8 @@ namespace Hearthdelve.Core.Input
     {
         public const string Submit = "Submit";
         public const string Cancel = "Cancel";
+        /// <summary>4i-A: the controls reference turns its pages with left and right.</summary>
+        public const string Navigate = "Navigate";
         /// <summary>4g: moves dialogue on (E), beside Submit.</summary>
         public const string Advance = "Advance";
     }

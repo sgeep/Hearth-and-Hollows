@@ -40,6 +40,8 @@ namespace Hearthdelve.Story.Editor
             new() { Title = OpeningRules.Homecoming, Write = WriteHomecoming },
             new() { Title = OpeningRules.FirstEvening, Write = WriteFirstEvening },
             new() { Title = OpeningRules.FirstTakings, Write = WriteFirstTakings },
+            // 4i-A (D3): the first free morning, as the keeper comes downstairs on day 2.
+            new() { Title = OpeningRules.FirstMorning, Write = WriteFirstMorning },
             // 4g Checkpoint C: who to talk to first, in front of the Talk conversations they fall back to.
             new() { Title = StoryDialogue.BoogHub, Write = WriteBoogHub },
             new() { Title = StoryDialogue.OrikHub, Write = WriteOrikHub },
@@ -382,6 +384,31 @@ namespace Hearthdelve.Story.Editor
             w.Link(board, stove);
             w.Link(stove, floor);
             w.Link(w.Start, board);
+        }
+
+        /// <summary>
+        /// The first free morning (4i-A, D3): what the day holds, in the household's own words, once. The village and Musashi's cart,
+        /// the garden, Vigor (strenuous work only), and the menu board starting the evening whenever the keeper likes. No more.
+        /// </summary>
+        static void WriteFirstMorning(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, OpeningRules.FirstMorning, c.Player, c.Orik,
+                "4i-A: the first free morning (played once, as the keeper first comes downstairs on day 2). Orientation, kept short: the village, " +
+                "the market, the garden and Vigor, the menu board.");
+            DialogueEntry yours = w.Npc("there you are. the day's yours till evening, keeper. nobody wants supper at breakfast, ken.", 0, 1);
+            DialogueEntry village = w.Npc("Kariaston's out the front door. Musashi keeps his cart in the square from eight till five.", 0, 2);
+            DialogueEntry garden = w.Say(c.Boog, "the garden's out back. four beds. dig, plant, wait. very boring. very good onions.", 0, 3);
+            DialogueEntry vigor = w.Npc("digging and planting take it out of you, mind. there's only so much Vigor in a day.", 0, 4);
+            DialogueEntry free = w.Say(c.Boog, "walking is free. talking is free. sleep fills you back up.", 0, 5);
+            DialogueEntry board = w.Npc("and when you're ready to open, the menu board by the door starts the evening. no hurry, aye.", 0, 6);
+            DialogueEntry pots = w.Say(c.Boog, "the pots are in a hurry. but fine.", 0, 7);
+            w.Link(w.Start, yours);
+            w.Link(yours, village);
+            w.Link(village, garden);
+            w.Link(garden, vigor);
+            w.Link(vigor, free);
+            w.Link(free, board);
+            w.Link(board, pots);
         }
 
         /// <summary>The first night's takings: Orik's verdict, then Boog has a question (Boog/Bomb), and the opening is over.</summary>

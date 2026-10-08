@@ -180,11 +180,20 @@ namespace Hearthdelve.UI.Tavern
             m_Feedback = FindAnyObjectByType<TavernFeedback>();
             if (m_Feedback != null) m_Feedback.MomentPlayed += OnMoment;
             if (m_Flash != null) m_Flash.enabled = false;
+            InputDevices.Changed += OnDeviceChanged;
         }
 
         void OnDestroy()
         {
             if (m_Feedback != null) m_Feedback.MomentPlayed -= OnMoment;
+            InputDevices.Changed -= OnDeviceChanged;
+        }
+
+        // 4i-A: the prompts name the device the player just switched to, even mid-station.
+        void OnDeviceChanged(InputDeviceKind _)
+        {
+            m_PromptsSet = false;
+            if (Showing != null) SetPrompts();
         }
 
         // What the result looked like, as well as felt and heard; skipped when the player turns flashes off.
@@ -249,13 +258,14 @@ namespace Hearthdelve.UI.Tavern
         void SetPrompts()
         {
             m_PromptsSet = true;
-            string action = InputHints.Binding(InputMaps.Minigame, MinigameActions.Action);
-            string aim = InputHints.Binding(InputMaps.Minigame, MinigameActions.Aim);
+            // 4i-A: the first binding of each only ("Space", "W/A/S/D"), so the line fits its panel; the controls page lists the rest.
+            string action = InputHints.Binding(InputMaps.Minigame, MinigameActions.Action, compact: true);
+            string aim = InputHints.Binding(InputMaps.Minigame, MinigameActions.Aim, compact: true);
             m_GrillPrompt?.Set(TavernLocKeys.GrillPrompt, action);
             m_TapPrompt?.Set(TavernLocKeys.TapPrompt, action, aim);
             m_ChopPrompt?.Set(TavernLocKeys.ChopPrompt, aim, action);
             m_ButcherPrompt?.Set(TavernLocKeys.ButcherPrompt, action);
-            m_StepAway?.Set(TavernLocKeys.HintStepAway, InputHints.Binding(InputMaps.Minigame, MinigameActions.Cancel));
+            m_StepAway?.Set(TavernLocKeys.HintStepAway, InputHints.Binding(InputMaps.Minigame, MinigameActions.Cancel, compact: true));
         }
 
         static void SpanX(RectTransform rect, float from, float to)
