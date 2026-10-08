@@ -215,7 +215,9 @@ The four-checkpoint structure is approved; each checkpoint is built, then stoppe
 
 ---
 
-## As built: 4i-A, "First impressions" (2026-10-08; built, waiting for the owner's playtest)
+## As built: 4i-A, "First impressions" (2026-10-08; signed off by the owner 2026-10-08)
+
+**Signed off by the owner (2026-10-08)** after playing the whole checklist: the menu, the first morning, the hints, pausing in each part of the day, quit and Continue from each moment, switching between keyboard and controller, and 320×180, "all works as described". (The sign-off's note on whether a real controller was used was left blank; a controller check stays on 4i-B's list.) Carried into 4i-B: the menu's save message strip must read clearly over the backdrop (part of the colour and contrast audit), and an Esc pressed while a scene fades in should be queued rather than dropped. Not tagged: `milestone-4i` waits for 4i-D.
 
 ### Quitting, phase by phase (D2)
 

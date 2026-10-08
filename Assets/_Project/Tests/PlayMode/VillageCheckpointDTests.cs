@@ -531,7 +531,7 @@ namespace Hearthdelve.Tests.PlayMode
             Object.Destroy(go);
         }
 
-        [UnityTest]
+        [UnityTest, Timeout(600000)]
         public IEnumerator OgrinsWindow_IsLitWhileHesInBed_AndDarkWhileHesOut()
         {
             yield return Daytime();

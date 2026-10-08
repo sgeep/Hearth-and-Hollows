@@ -1303,7 +1303,9 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
-### 4i-A: first impressions (2026-10-08, built; waiting for your playtest)
+### 4i-A: first impressions (2026-10-08; signed off 2026-10-08)
+
+**Signed off by the owner (2026-10-08)** after playing the whole checklist: the menu, the first morning, the hints, pausing in each part of the day, quit and Continue from each moment, switching between keyboard and controller, and 320×180, "all works as described". (The sign-off's note on whether a real controller was used was left blank; a controller check stays on 4i-B's list.) Carried into 4i-B: the menu's save message strip must read clearly over the backdrop (part of the colour and contrast audit), and an Esc pressed while a scene fades in should be queued rather than dropped. Not tagged: `milestone-4i` waits for 4i-D.
 
 Following the approved plan and the owner's 4i brief (D1–D10, `docs/PLAN_4I.md` §5). Details, the phase-by-phase quit audit and the playtest checklist: `docs/PLAN_4I.md`, *As built: 4i-A*.
 
