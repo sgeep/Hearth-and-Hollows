@@ -22,7 +22,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] LocalizedSuperText[] m_Gamepad;
 
         // On the parchment: the panel titles' red for the device in use, the labels' brown, lighter, for the other.
-        static readonly Color k_Lit = new(0.55f, 0.15f, 0.1f), k_Dim = new(0.62f, 0.5f, 0.4f);
+        static readonly Color k_Lit = Hearthdelve.UI.Typography.UiPalette.Title, k_Dim = new(0.62f, 0.5f, 0.4f);
 
         int m_Page;
         float m_LastX;

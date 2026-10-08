@@ -21,7 +21,7 @@ namespace Hearthdelve.Editor
         static readonly Color k_Muted = new(0.72f, 0.66f, 0.58f);
         static readonly Color k_Gold = DungeonUI.k_Mark;
         static readonly Color k_Warning = new(1f, 0.55f, 0.35f);
-        static readonly Color k_Note = new(0.45f, 0.3f, 0.2f);
+        static readonly Color k_Note = Hearthdelve.UI.Typography.UiPalette.Note;
         static readonly Color k_Card = new(0.82f, 0.66f, 0.46f);
         static readonly Color k_Title = DungeonUI.k_Title;
         static readonly Color k_Label = DungeonUI.k_Label;
@@ -215,7 +215,7 @@ namespace Hearthdelve.Editor
                 buttons.Add(buy);
                 previous = buy;
             }
-            LocalizedSuperText message = Label(panel, "Message", LoopLocKeys.MarketShort, 6f, new Color(0.62f, 0.2f, 0.12f), TextAnchor.MiddleRight, topLeft,
+            LocalizedSuperText message = Label(panel, "Message", LoopLocKeys.MarketShort, 6f, Hearthdelve.UI.Typography.UiPalette.Warning, TextAnchor.MiddleRight, topLeft,
                 new Vector2(222f - 110f, -20f), new Vector2(110f, Line));
             Button done = SmallButton(panel, "Done", LoopLocKeys.MarketDone, new Vector2(0.5f, 0f), new Vector2(0f, 6f), 80f, out _);
             // Up and down through the buy buttons, then done.
@@ -272,7 +272,7 @@ namespace Hearthdelve.Editor
             }
 
             // Beside the buttons, at the left: the game saved.
-            LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, new Color(0.25f, 0.45f, 0.2f), TextAnchor.UpperLeft, -150f, -k_PanelTop + 5f + 14f, 76f,
+            LocalizedSuperText saved = TextLine(panel, "Saved", LoopLocKeys.NightSaved, Hearthdelve.UI.Typography.UiPalette.Good, TextAnchor.UpperLeft, -150f, -k_PanelTop + 5f + 14f, 76f,
                 style: TextStyle.Secondary);
             // A new catalogue tier opened (4f, D14): one line under the upgrades.
             LocalizedSuperText word = TextLine(panel, "Word", TavernLocKeys.Plain, k_Accent, TextAnchor.UpperCenter, 0f, k_ContentTop - 3f * Line - 1f - 3f * 25f, 300f);
@@ -378,7 +378,7 @@ namespace Hearthdelve.Editor
                 };
             }
             LocalizedSuperText empty = Label(panel, "Empty", DecorateLocKeys.EmptyTab, TextStyle.Secondary, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -40f), new Vector2(166f, Line));
-            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, new Color(0.62f, 0.2f, 0.12f), TextAnchor.MiddleLeft, topLeft,
+            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, Hearthdelve.UI.Typography.UiPalette.Warning, TextAnchor.MiddleLeft, topLeft,
                 new Vector2(8f, -120f), new Vector2(166f, Line));
             LocalizedSuperText controls = Label(panel, "Controls", DecorateLocKeys.CatalogControls, TextStyle.Prompt, k_Note, TextAnchor.MiddleLeft, topLeft, new Vector2(8f, -134f),
                 new Vector2(166f, Line));
@@ -610,7 +610,7 @@ namespace Hearthdelve.Editor
                 UiFeedbackContent.Commit(staff);
                 rows[i] = new ButcherRow { root = row.gameObject, icon = icon, name = name, count = count, yield = yield, yourself = yourself, staff = staff, staffLabel = staffLabel };
             }
-            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, new Color(0.12f, 0.33f, 0.55f), TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
+            LocalizedSuperText message = Label(panel, "Message", TavernLocKeys.Plain, 6f, Hearthdelve.UI.Typography.UiPalette.Discovery, TextAnchor.MiddleCenter, new Vector2(0.5f, 0f),
                 new Vector2(0f, 26f), new Vector2(292f, Line));
             Button done = SmallButton(panel, "Done", TavernLocKeys.ButcherDone, new Vector2(0.5f, 0f), new Vector2(0f, 6f), 80f, out _);
             for (int i = 0; i < rows.Length; i++)

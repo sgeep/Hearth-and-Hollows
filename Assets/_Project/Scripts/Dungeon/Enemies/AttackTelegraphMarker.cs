@@ -23,7 +23,17 @@ namespace Hearthdelve.Dungeon.Enemies
         [SerializeField] Shape m_Shape;
         [SerializeField, Tooltip("A sprite renderer (a 1×1 white pixel, tinted) on the floor's sorting layer.")]
         SpriteRenderer m_Mark;
-        [SerializeField] Color m_Colour = new(0.9f, 0.15f, 0.1f, 0.45f);
+        // 4i-B colour audit: brighter than the old deep red (0.9, 0.15, 0.1, 0.45), so the mark stands out from a dark floor by its
+        // lightness too, not by hue alone (under a protanopia simulation the old one was barely lighter than the floor).
+        public static readonly Color DefaultColour = new(1f, 0.4f, 0.22f, 0.55f);
+
+        [SerializeField] Color m_Colour = DefaultColour;
+
+        public Color Colour
+        {
+            get => m_Colour;
+            set => m_Colour = value;
+        }
         [SerializeField, Min(0.1f), Tooltip("Width of a line mark, in tiles.")]
         float m_LineWidth = 1.2f;
 

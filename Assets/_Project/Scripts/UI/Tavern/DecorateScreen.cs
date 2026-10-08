@@ -316,11 +316,11 @@ namespace Hearthdelve.UI.Tavern
                 if (issues.Count == 0)
                 {
                     m_Issues[i].Set(DecorateLocKeys.CheckClear);
-                    SetColor(m_Issues[i], new Color(0.25f, 0.45f, 0.2f));
+                    SetColor(m_Issues[i], Hearthdelve.UI.Typography.UiPalette.Good);
                     continue;
                 }
                 m_Issues[i].Set(TavernLocKeys.Plain, IssueText(issues[i]));
-                SetColor(m_Issues[i], issues[i].Blocking ? new Color(0.6f, 0.15f, 0.1f) : new Color(0.45f, 0.3f, 0.2f));
+                SetColor(m_Issues[i], issues[i].Blocking ? Hearthdelve.UI.Typography.UiPalette.Title : Hearthdelve.UI.Typography.UiPalette.Note);
             }
         }
 

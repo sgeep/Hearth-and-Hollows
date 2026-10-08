@@ -19,11 +19,11 @@ namespace Hearthdelve.Editor
         internal static readonly Color k_Ink = new(0.25f, 0.16f, 0.1f);
         internal static readonly Color k_Light = new(0.95f, 0.92f, 0.85f);
         /// <summary>Text hierarchy on parchment (4c step 6 playtest): titles stand out, labels step back, amounts are marked.</summary>
-        internal static readonly Color k_Title = new(0.55f, 0.15f, 0.1f);
-        internal static readonly Color k_Label = new(0.5f, 0.37f, 0.27f);
-        internal static readonly Color k_Accent = new(0.55f, 0.35f, 0.02f);
+        internal static readonly Color k_Title = Hearthdelve.UI.Typography.UiPalette.Title;
+        internal static readonly Color k_Label = Hearthdelve.UI.Typography.UiPalette.Label;
+        internal static readonly Color k_Accent = Hearthdelve.UI.Typography.UiPalette.Accent;
         /// <summary>Furnishing discoveries (4f Checkpoint C): a cool blue on parchment, and a pale one over the dark HUD.</summary>
-        internal static readonly Color k_Discovery = new(0.12f, 0.33f, 0.55f);
+        internal static readonly Color k_Discovery = Hearthdelve.UI.Typography.UiPalette.Discovery;
         internal static readonly Color k_DiscoveryLight = new(0.62f, 0.86f, 1f);
         /// <summary>A button: one 12-pixel line of text with two pixels above and below.</summary>
         internal const float ButtonHeight = 16f;

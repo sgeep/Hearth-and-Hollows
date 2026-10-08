@@ -57,9 +57,9 @@ namespace Hearthdelve.UI.Tavern
         [SerializeField] Color m_RowPlain = new(0f, 0f, 0f, 0f);
         [SerializeField] Color m_Ink = new(0.24f, 0.16f, 0.12f);
         [SerializeField] Color m_Locked = new(0.5f, 0.45f, 0.4f);
-        [SerializeField] Color m_Short = new(0.62f, 0.2f, 0.12f);
+        [SerializeField] Color m_Short = Hearthdelve.UI.Typography.UiPalette.Warning;
         [SerializeField, Tooltip("A piece not yet seen since it was found or earned (4f Checkpoint C).")]
-        Color m_New = new(0.12f, 0.33f, 0.55f);
+        Color m_New = Hearthdelve.UI.Typography.UiPalette.Discovery;
         [SerializeField, Min(0.05f)] float m_RepeatDelay = 0.3f;
         [SerializeField, Min(0.02f)] float m_RepeatRate = 0.08f;
 
