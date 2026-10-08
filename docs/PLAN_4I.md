@@ -254,6 +254,7 @@ Quit game (desktop) does exactly the same, then closes the application; on the w
 - The version is set by hand (`0.4i-a`); stamping from git is 4i-D.
 - Two English strings changed: the tap prompt ("tilt the glass") and the controls header ("keyboard"). `TextStyleTests` now also covers 4h's surface and garden strings and 4i-A's, and "Vigor" joins the resource names that keep a capital.
 - Gamepad names assume the Xbox layout (as every prompt already did).
+- **Found in the web smoke test and fixed:** the Web player had exception support "None" since the project's first commit, so *any* exception, even one caught, stopped the page behind a blocking alert (an unreadable save froze the browser; this also affected the old menu's own catch). `BuildTools` now builds with "explicitly thrown exceptions only", and the save check recognises the usual damage (empty, cut off, not a save, a bad version) without throwing at all (`SaveSystem.LooksWhole`).
 
 ### Tests
 

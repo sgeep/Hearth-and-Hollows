@@ -1301,7 +1301,7 @@ Following the approved plan and the owner's 4i brief (D1–D10, `docs/PLAN_4I.md
 - **First free morning:** Orik and Boog, once, as the keeper comes downstairs on day 2 (`Act1/FirstMorning`, seeded once); one-time prompts at the garden, the market and the menu board.
 - **Safer saves:** the last good save kept as a backup on every write; unreadable saves set aside and explained (Continue offers the backup); newer-version saves explained and never loaded; New Game asks before replacing any save file; a brief "saved" mark.
 
-Tests: TESTS_IA. Web: WEB_IA.
+Tests: EditMode **778/778**; PlayMode **274 passed, 0 failed** (30 explicit captures skipped), including the new `FirstImpressionsTests` and `FirstImpressionsPlayTests` (18). Web: a development build (153 MB) smoke-tested on the owner's save (backed up first and restored exactly afterwards): the new menu (no Quit in the browser, version shown), Continue, Esc to pause and back, the controls page and its paging, quit to menu (the save kept at the same minute, the backup written), and a deliberately damaged save: the menu explained it and Continue loaded the backup. That test **found a real web bug**: the player had exception support "None" since the project began, so any exception, even a caught one, froze the page; fixed (`BuildTools` builds with explicitly thrown exceptions, and the save check no longer throws on damaged files). No console errors. Not driven in the browser (covered in PlayMode): the first-morning conversation, the prompts, Prep, service and the Hollows, and a controller.
 
 ### Phase 5 (direction approved; order proposed for discussion)
 
