@@ -4,6 +4,7 @@ using Hearthdelve.Core.Events;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Core.Minigames;
 using Hearthdelve.Core.Random;
+using Hearthdelve.Shared.Settings;
 using Hearthdelve.Shared.Economy;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
@@ -146,6 +147,15 @@ namespace Hearthdelve.Tavern.Scene
         public bool IsServing => Session != null && !Session.IsOver;
         /// <summary>Makes the station minigames (and serving) from the tavern's tuning.</summary>
         public MinigameFactory Minigames { get; private set; }
+
+        /// <summary>
+        /// The keeper's own stations (4i-B): <see cref="Minigames"/>, relaxed when the player has asked for relaxed timing. Staff,
+        /// the balance report and everything else use <see cref="Minigames"/>.
+        /// </summary>
+        public MinigameFactory KeeperMinigames => GameOptions.Current.relaxedTiming
+            ? m_RelaxedMinigames ??= AssistRules.Relaxed(Minigames, OptionsRules.RelaxedBandScale, OptionsRules.RelaxedPace)
+            : Minigames;
+        MinigameFactory m_RelaxedMinigames;
         /// <summary>Stops scheduled arrivals (tests, debugging); customers can still be let in with <see cref="SpawnCustomer"/>.</summary>
         public bool ArrivalsPaused { get; set; }
 
@@ -571,7 +581,7 @@ namespace Hearthdelve.Tavern.Scene
             profile ??= m_Arrivals.PickProfile();
             if (profile == null) return null;
             CustomerAgent agent = Instantiate(m_CustomerPrefab, m_Layout.Door, Quaternion.identity);
-            var logic = new CustomerLogic(profile);
+            var logic = new CustomerLogic(profile, OptionsRules.Patience(GameOptions.Current.patientCustomers));
             m_Agents.Add(agent);
             // The look comes from the evening's seed and the customer's id: fixed for their visit, varied between them.
             agent.Initialize(logic, this, unchecked(m_EveningSeed * 31 + logic.Id));

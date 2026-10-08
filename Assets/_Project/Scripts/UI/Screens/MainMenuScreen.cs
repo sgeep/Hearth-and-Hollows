@@ -35,6 +35,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] LocalizedSuperText m_Version;
         [SerializeField] GameObject m_Title;
         [SerializeField] GameObject m_Panel;
+        [SerializeField] Button m_Options;
+        [SerializeField] OptionsScreen m_OptionsScreen;
 
         GameFlow m_Flow;
         bool m_HasSave;
@@ -49,6 +51,15 @@ namespace Hearthdelve.UI.Screens
         public Button ConfirmNo => m_ConfirmNo;
         public CharacterCreatorScreen Creator => m_Creator;
         public ControlsPage ControlsPage => m_ControlsPage;
+        public Button OptionsButton => m_Options;
+        public OptionsScreen Options => m_OptionsScreen;
+
+        /// <summary>4i-B: Options, between New Game and Controls.</summary>
+        public void ConfigureOptions(Button options, OptionsScreen screen)
+        {
+            m_Options = options;
+            m_OptionsScreen = screen;
+        }
         /// <summary>The save problem the menu is showing (its key), or null.</summary>
         public string MessageKey => MessageGroup != null && MessageGroup.alpha > 0f ? m_Message.Key : null;
         /// <summary>Continue would load the backup.</summary>
@@ -109,6 +120,7 @@ namespace Hearthdelve.UI.Screens
             m_ConfirmYes.onClick.AddListener(OpenCreator);
             m_ConfirmNo.onClick.AddListener(() => ShowChoices(m_NewGame));
             if (m_Controls != null) m_Controls.onClick.AddListener(OpenControls);
+            if (m_Options != null) m_Options.onClick.AddListener(OpenOptions);
             if (m_Quit != null)
             {
                 m_Quit.gameObject.SetActive(PauseMenu.CanQuitApplication);
@@ -119,7 +131,22 @@ namespace Hearthdelve.UI.Screens
 
         void Update()
         {
+            if (m_OptionsScreen != null && m_OptionsScreen.IsOpen)
+            {
+                if (m_OptionsScreen.HandleInput()) ShowChoices(m_Options);
+                return;
+            }
             if (m_ControlsPage != null && m_ControlsPage.IsOpen && m_ControlsPage.HandleInput()) ShowChoices(m_Controls);
+        }
+
+        void OpenOptions()
+        {
+            if (m_OptionsScreen == null) return;
+            m_Choices.SetActive(false);
+            SetPanel(false);
+            if (m_Title != null) m_Title.SetActive(false);
+            ShowMessage(false);
+            m_OptionsScreen.Open();
         }
 
         void NewGame()

@@ -42,5 +42,14 @@ namespace Hearthdelve.Shared.Engine
         /// <param name="onPhaseScreen">One of the screens that are the moment itself shows: Prep, the results, the night, the delve's result.</param>
         public static bool CanOpen(bool inGame, bool loading, bool talking, bool blocked, bool onFoot, bool menuPaused, bool onPhaseScreen) =>
             inGame && !loading && !talking && !blocked && ((onFoot && !menuPaused) || onPhaseScreen);
+
+        /// <summary>4i-B: an Esc or Start pressed while a scene fades is kept this long, and opens the menu if it can by then.</summary>
+        public const float QueueSeconds = 2.5f;
+
+        /// <summary>Whether a press made during a fade should be kept: only then, and only in a game (any other refusal is meant).</summary>
+        public static bool Queues(bool inGame, bool loading) => inGame && loading;
+
+        /// <summary>Whether a press kept at <paramref name="pressedAt"/> still counts at <paramref name="now"/>.</summary>
+        public static bool StillQueued(float pressedAt, float now) => pressedAt >= 0f && now - pressedAt <= QueueSeconds;
     }
 }

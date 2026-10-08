@@ -97,7 +97,7 @@ namespace Hearthdelve.Tavern.Scene
             Vector2 at = m_ButcherBlock.UsePoint;
             m_Player.transform.position = at;
             if (m_Player.TryGetComponent(out Rigidbody2D body)) body.position = at;
-            OpenPanel(m_Director.Minigames.CreateButcher(part.Definition.butchering.maxCuts, new Hearthdelve.Core.Random.SeededRandom(UnityEngine.Random.Range(1, int.MaxValue))));
+            OpenPanel(m_Director.KeeperMinigames.CreateButcher(part.Definition.butchering.maxCuts, new Hearthdelve.Core.Random.SeededRandom(UnityEngine.Random.Range(1, int.MaxValue))));
             return true;
         }
 
@@ -308,7 +308,7 @@ namespace Hearthdelve.Tavern.Scene
                     RecipeDefinition batch = session.NextBatch();
                     if (batch == null || !session.StartBatch(batch, this)) break;
                     ChoppingPot = true;
-                    OpenPanel(m_Director.Minigames.CreateChop(session.Pot.ChopItems.Count, m_Random));
+                    OpenPanel(m_Director.KeeperMinigames.CreateChop(session.Pot.ChopItems.Count, m_Random));
                     break;
                 case TavernInteractableKind.Pass:
                     if (Carrying != null)
@@ -340,7 +340,7 @@ namespace Hearthdelve.Tavern.Scene
             Ticket ticket = session.NextToCook(station);
             if (ticket == null || !session.StartCooking(ticket, this)) return;
             CookTicket = ticket;
-            OpenPanel(m_Director.Minigames.CreateCook(station));
+            OpenPanel(m_Director.KeeperMinigames.CreateCook(station));
         }
 
         // ---------- The delve meal (daytime) ----------
@@ -356,7 +356,7 @@ namespace Hearthdelve.Tavern.Scene
             if (used == null) return false;
             DelveMeal = recipe;
             m_DelveMealUsed = used;
-            OpenPanel(m_Director.Minigames.CreateCook(recipe.station));
+            OpenPanel(m_Director.KeeperMinigames.CreateCook(recipe.station));
             return true;
         }
 
@@ -484,7 +484,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (ticket == null || !Session.StartDelivery(ticket, this)) return;
             CarryTicket = ticket;
-            Carrying = m_Director.Minigames.CreateServing();
+            Carrying = m_Director.KeeperMinigames.CreateServing();
             Carrying.Begin();
             m_CarryFrom = m_Player.transform.position;
             if (m_PlayerMovement != null) m_PlayerMovement.MovementSpeed = Carrying.Settings.carrySpeed;

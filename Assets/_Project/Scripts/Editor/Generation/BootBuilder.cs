@@ -182,28 +182,30 @@ namespace Hearthdelve.Editor
                 new Color(0.05f, 0.03f, 0.03f, 0.45f));
             TavernScreens.Label(titleBand, "Title", LoopLocKeys.MenuTitle, TextStyle.Display, new Color(1f, 0.82f, 0.45f), TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(300f, 36f));
 
-            // A save that can't be loaded: said plainly, under the title (hidden otherwise).
-            RectTransform messageStrip = TavernScreens.Rect(root, "Message", centre, centre, new Vector2(0f, 30f), new Vector2(288f, 26f));
-            LocalizedSuperText message = LookTestBuilder.Text(messageStrip, "Text", MenuLocKeys.SaveUnreadable, TextStyle.Body, DungeonUI.k_Light, TextAnchor.MiddleCenter,
-                centre, centre, centre, Vector2.zero, new Vector2(284f, 24f));
+            // A save that can't be loaded: said plainly, under the title (hidden otherwise). 4i-B (the owner's 4i-A note): a full-width
+            // band, nearly opaque, so the words read over any part of the still.
+            RectTransform messageStrip = TavernScreens.Rect(root, "Message", centre, centre, new Vector2(0f, 32f), new Vector2(LookTestBuilder.ReferenceWidth, 28f));
             var messageBack = messageStrip.gameObject.AddComponent<Image>();
             messageBack.sprite = DungeonUI.Pixel();
-            messageBack.color = new Color(0.05f, 0.03f, 0.03f, 0.72f);
+            messageBack.color = new Color(0.05f, 0.03f, 0.03f, 0.9f);
             messageBack.raycastTarget = false;
+            LocalizedSuperText message = LookTestBuilder.Text(messageStrip, "Text", MenuLocKeys.SaveUnreadable, TextStyle.Body, DungeonUI.k_Light, TextAnchor.MiddleCenter,
+                centre, centre, centre, Vector2.zero, new Vector2(284f, 24f));
 
-            RectTransform panel = DungeonUI.Panel(root, new Vector2(150f, 96f), new Vector2(0f, -40f));
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(150f, 106f), new Vector2(0f, -36f));
 
             // Stacked and centred, so the panel looks right with or without Continue and Quit.
-            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(150f, 96f));
+            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(150f, 106f));
             var stack = choices.gameObject.AddComponent<VerticalLayoutGroup>();
             stack.childAlignment = TextAnchor.MiddleCenter;
-            stack.spacing = 2f;
+            stack.spacing = 1f;
             stack.childControlWidth = stack.childControlHeight = false;
             stack.childForceExpandWidth = stack.childForceExpandHeight = false;
             Button continueButton = TavernScreens.SmallButton(choices, "Continue", LoopLocKeys.MenuContinue, centre, Vector2.zero, 110f, out _);
             LocalizedSuperText detail = TavernScreens.Label(choices, "ContinueDetail", LoopLocKeys.MenuContinueFrom, 6f, DungeonUI.k_Label, TextAnchor.MiddleCenter, centre, Vector2.zero, new Vector2(140f, 12f));
-            var gap = TavernScreens.Rect(choices, "Gap", centre, centre, Vector2.zero, new Vector2(10f, 2f));
+            var gap = TavernScreens.Rect(choices, "Gap", centre, centre, Vector2.zero, new Vector2(10f, 1f));
             Button newGame = TavernScreens.SmallButton(choices, "NewGame", LoopLocKeys.MenuNewGame, centre, Vector2.zero, 110f, out _);
+            Button options = TavernScreens.SmallButton(choices, "Options", MenuLocKeys.Options, centre, Vector2.zero, 110f, out _);
             Button controls = TavernScreens.SmallButton(choices, "Controls", MenuLocKeys.Controls, centre, Vector2.zero, 110f, out _);
             Button quit = TavernScreens.SmallButton(choices, "Quit", MenuLocKeys.Quit, centre, Vector2.zero, 110f, out _);
 
@@ -220,10 +222,12 @@ namespace Hearthdelve.Editor
                 corner, corner, corner, new Vector2(-4f, 2f), new Vector2(90f, 12f));
 
             ControlsPage controlsPage = FirstImpressionsUI.BuildControlsPage(root);
+            OptionsScreen optionsScreen = FirstImpressionsUI.BuildOptions(root, controlsPage);
 
             var menu = root.gameObject.AddComponent<MainMenuScreen>();
             menu.Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
             menu.ConfigureFirstImpressions(controls, quit, controlsPage, message, version, titleBand.gameObject, panel.gameObject);
+            menu.ConfigureOptions(options, optionsScreen);
             // 4g Checkpoint B: New Game makes the keeper first.
             menu.ConfigureCreator(KeeperCreatorUI.Build(root));
             UiFeedbackContent.Commit(continueButton);

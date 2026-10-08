@@ -42,6 +42,22 @@ namespace Hearthdelve.UI.Localization
         public const string PageDecorate = "controls.page.decorate";
         public const string PageMenus = "controls.page.menus";
 
+        // ---------- options (4i-B) ----------
+        public const string Options = "menu.options";
+        public const string TabAudio = "options.tab.audio", TabFeel = "options.tab.feel", TabDisplay = "options.tab.display",
+            TabAccess = "options.tab.access", TabControls = "options.tab.controls";
+        public const string OptMaster = "options.master", OptMusic = "options.music", OptEffects = "options.effects";
+        public const string OptShake = "options.shake", OptFlashes = "options.flashes", OptHitStop = "options.hit_stop",
+            OptVibration = "options.vibration", OptIntensity = "options.intensity", OptReduced = "options.reduced";
+        public const string OptFullscreen = "options.fullscreen", OptWindow = "options.window";
+        public const string OptTextSpeed = "options.text_speed", OptRelaxed = "options.relaxed", OptPatient = "options.patient";
+        public const string OptOn = "options.on", OptOff = "options.off", OptLow = "options.low", OptFull = "options.full",
+            OptSlow = "options.slow", OptNormal = "options.normal", OptInstant = "options.instant";
+        public const string OptPercent = "options.percent", OptWindowSize = "options.window_size";
+        public const string ArrowLess = "options.less", ArrowMore = "options.more";
+        public const string OptionsNoteChange = "options.note.change", OptionsNoteDisplay = "options.note.display",
+            OptionsNoteWeb = "options.note.web", OptionsNoteAccess = "options.note.access";
+
         // ---------- the first free day's prompts (4i-A, D3) ----------
         public const string PromptGarden = "prompt.garden";
         public const string PromptMarket = "prompt.market";
@@ -155,6 +171,19 @@ namespace Hearthdelve.UI.Localization
             ("controls.back", "back"), ("controls.back.kb", "Esc"), ("controls.back.pad", "B"),
             ("controls.advance", "next line"), ("controls.advance.kb", "E / click"), ("controls.advance.pad", "A"),
 
+            (Options, "options"),
+            (TabAudio, "audio"), (TabFeel, "feel"), (TabDisplay, "display"), (TabAccess, "accessibility"), (TabControls, "controls"),
+            (OptMaster, "master volume"), (OptMusic, "music"), (OptEffects, "sound effects"),
+            (OptShake, "screen shake"), (OptFlashes, "flashes"), (OptHitStop, "pause on big hits"),
+            (OptVibration, "vibration"), (OptIntensity, "vibration strength"), (OptReduced, "reduced vibration"),
+            (OptFullscreen, "fullscreen"), (OptWindow, "window size"),
+            (OptTextSpeed, "text speed"), (OptRelaxed, "relaxed cooking timing"), (OptPatient, "patient customers"),
+            (OptOn, "on"), (OptOff, "off"), (OptLow, "low"), (OptFull, "full"), (OptSlow, "slow"), (OptNormal, "normal"), (OptInstant, "instant"),
+            (OptPercent, "{0}%"), (OptWindowSize, "{0} × {1}"), (ArrowLess, "«"), (ArrowMore, "»"),
+            (OptionsNoteChange, "left / right: change · Q / E, LB / RB: tab · Esc / B: back"),
+            (OptionsNoteDisplay, "windows come in whole steps of 320 × 180, so every pixel stays sharp."),
+            (OptionsNoteWeb, "the browser keeps its own window; fullscreen fills the screen."),
+            (OptionsNoteAccess, "relaxed timing widens the cooking targets; patient customers wait longer. neither costs you anything. hold E / A to hurry a conversation along."),
             (PromptGarden, "planting and tending use Vigor, the pips by the clock. walking and talking don't. sleep refills it."),
             (PromptMarket, "Musashi sells everyday ingredients here from eight until five."),
             (PromptMenuBoard, "the menu board starts evening prep whenever you choose. the day never ends it for you."),

@@ -45,6 +45,18 @@ namespace Hearthdelve.Tavern.Customers
         public CustomerLogic(CustomerProfile profile)
             : this(profile != null ? profile.traits : CustomerTraits.Default) => Profile = profile;
 
+        /// <summary>4i-B: <paramref name="patience"/> scales how long they wait (patient customers, an accessibility option).</summary>
+        public CustomerLogic(CustomerProfile profile, float patience)
+            : this(Patient(profile != null ? profile.traits : CustomerTraits.Default, patience)) => Profile = profile;
+
+        /// <summary>The traits with their waiting stretched by <paramref name="patience"/> (1 leaves them as they are).</summary>
+        public static CustomerTraits Patient(CustomerTraits traits, float patience)
+        {
+            traits.seatPatience *= patience;
+            traits.orderPatience *= patience;
+            return traits;
+        }
+
         public CustomerLogic(CustomerTraits traits)
         {
             m_Traits = traits;

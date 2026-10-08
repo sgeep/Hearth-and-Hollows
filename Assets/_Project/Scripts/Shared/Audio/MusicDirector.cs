@@ -81,11 +81,12 @@ namespace Hearthdelve.Shared.Audio
             if (m_Config == null) return;
             MusicCue wanted = Wanted;
             if (wanted != Current) Switch(wanted);
-            // Sound effects in the Hollows a quarter down: the listener carries it (every effect plays through it, whatever plays
-            // it), and the music divides it back out so its own level holds.
+            // Sound effects in the Hollows a quarter down (2026-10-07): since 4i-B a mixer parameter (the Effects group), so the
+            // music and the listener are untouched.
             GameFlow flow = GameFlow.Instance;
             bool inGame = flow != null && flow.InGame;
-            AudioListener.volume = MusicRules.EffectsLevel(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, m_Config.effectsInHollows);
+            if (AudioMixerHub.Instance != null)
+                AudioMixerHub.Instance.HollowsLevel = MusicRules.EffectsLevel(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, m_Config.effectsInHollows);
             Fade(Time.unscaledDeltaTime);
         }
 
@@ -106,6 +107,8 @@ namespace Hearthdelve.Shared.Audio
                 source.loop = true;
                 source.playOnAwake = false;
                 source.spatialBlend = 0f;
+                // 4i-B: through the mixer's Music group (the player's Music and Master sliders).
+                source.outputAudioMixerGroup = AudioMixerHub.MusicGroup;
                 source.ignoreListenerPause = true;
                 source.volume = 0f;
                 m_Voices[to] = voice = new Voice { Source = source, Cue = to };
@@ -147,7 +150,7 @@ namespace Hearthdelve.Shared.Audio
                 }
                 float level = Mathf.MoveTowards(v.Level, v.Target, step);
                 v.Level = level;
-                v.Source.volume = Mathf.Min(1f, level * m_Config.volume * m_Config.Level(v.Cue) / Mathf.Max(0.01f, AudioListener.volume));
+                v.Source.volume = Mathf.Min(1f, level * m_Config.volume * m_Config.Level(v.Cue));
                 if (v.Target > 0f || level > 0f || !v.Source.isPlaying) continue;
                 if (v.PauseAtSilence) v.Source.Pause();
                 else

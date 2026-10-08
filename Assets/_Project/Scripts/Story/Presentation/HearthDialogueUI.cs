@@ -2,6 +2,7 @@ using System;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Shared.Characters;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Settings;
 using Hearthdelve.Story.Dialogue;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
@@ -153,8 +154,15 @@ namespace Hearthdelve.Story.Presentation
             SetChoicesVisible(false);
             ShowSpeaker(subtitle);
             Line = DialogueText.Line(subtitle);
-            if (m_BodyText != null) m_BodyText.readDelay = 1f / Mathf.Max(1f, CharactersPerSecond);
+            // 4i-B: the player's text speed (instant writes the line out whole).
+            float speed = OptionsRules.TextSpeedScale(GameOptions.Current.textSpeed);
+            if (m_BodyText != null)
+            {
+                m_BodyText.readDelay = float.IsInfinity(speed) ? 0f : 1f / Mathf.Max(1f, CharactersPerSecond * speed);
+                m_BodyText.speedReadScale = HurrySpeed;
+            }
             m_Body.Set(TavernLocKeys.Plain, Line);
+            m_LineDoneAt = -1f;
             m_TalkTime = 0f;
             if (m_Continue != null) m_Continue.gameObject.SetActive(false);
             Select(null);
@@ -227,6 +235,32 @@ namespace Hearthdelve.Story.Presentation
         void Arm() => m_ArmedAfterFrame = Time.frameCount;
 
         public float CharactersPerSecond => m_Settings != null ? m_Settings.charactersPerSecond : 45f;
+
+        // ---------- 4i-B: hold to hurry ----------
+        /// <summary>A confirm held this long counts as holding, not tapping.</summary>
+        const float HoldAfter = 0.3f;
+        /// <summary>While held, lines write out this many times faster.</summary>
+        const float HurrySpeed = 4f;
+        /// <summary>While held, a finished line stays this long before the conversation moves on (never past a choice).</summary>
+        const float HurryPause = 0.45f;
+        float m_HeldFor;
+        float m_LineDoneAt = -1f;
+
+        /// <summary>Holding a confirm while someone speaks: lines write out quickly and move on by themselves; choices still wait.</summary>
+        void Hurry()
+        {
+            m_HeldFor = m_Mode == Mode.Speaking && ConfirmHeld() ? m_HeldFor + Time.unscaledDeltaTime : 0f;
+            if (m_Mode != Mode.Speaking || m_BodyText == null) return;
+            if (IsRevealing)
+            {
+                m_LineDoneAt = -1f;
+                if (m_HeldFor >= HoldAfter) m_BodyText.SpeedRead();
+                else m_BodyText.RegularRead();
+                return;
+            }
+            if (m_LineDoneAt < 0f) m_LineDoneAt = Time.unscaledTime;
+            if (m_HeldFor >= HoldAfter && Time.unscaledTime - m_LineDoneAt >= HurryPause && Time.frameCount > m_ArmedAfterFrame) Advance();
+        }
         float ContinueBob => m_Settings != null ? m_Settings.continueBob : 0.35f;
 
         /// <summary>Choices can't be taken yet: the confirm that brought them up is still held.</summary>
@@ -259,6 +293,7 @@ namespace Hearthdelve.Story.Presentation
                 if (waiting) m_Continue.anchoredPosition = m_ContinueAt + new Vector2(0f, Mathf.FloorToInt(Time.unscaledTime / ContinueBob) % 2 == 0 ? 0f : -1f);
             }
             if (m_ChoicesLocked && Time.frameCount > m_ArmedAfterFrame && !ConfirmHeld()) m_ChoicesLocked = false;
+            Hurry();
             if (Time.frameCount <= m_ArmedAfterFrame) return;
             if (m_Mode == Mode.Speaking)
             {

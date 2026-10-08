@@ -68,6 +68,79 @@ namespace Hearthdelve.Editor
             return LookTestBuilder.Text(parent, name, key, TextStyle.Body, color, anchor, k_Centre, k_Centre, pivot, new Vector2(x, y), new Vector2(width, Line));
         }
 
+        // ---------- Options (4i-B) ----------
+
+        public const int OptionRows = 6;
+
+        /// <summary>
+        /// The Options screen over a dimmed screen: a parchment panel with five tabs across the top, six lines under them and a note at
+        /// the foot. Its controls tab is <paramref name="controls"/> (the 4i-A controls reference, a sibling).
+        /// </summary>
+        public static OptionsScreen BuildOptions(RectTransform parent, ControlsPage controls)
+        {
+            RectTransform root = LookTestBuilder.UIRect(parent, "Options", k_Centre, k_Centre, Vector2.zero, Vector2.zero);
+            root.anchorMin = Vector2.zero;
+            root.anchorMax = Vector2.one;
+            root.sizeDelta = Vector2.zero;
+            DungeonUI.AddImage(root, DungeonUI.Pixel(), new Color(0.03f, 0.02f, 0.03f, 0.6f)).raycastTarget = true;
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(304f, 172f), Vector2.zero);
+
+            // The tabs, left to right, each just wide enough for its word.
+            var tabKeys = new[] { MenuLocKeys.TabAudio, MenuLocKeys.TabFeel, MenuLocKeys.TabDisplay, MenuLocKeys.TabAccess, MenuLocKeys.TabControls };
+            var widths = new[] { 44f, 40f, 52f, 76f, 56f };
+            var tabs = new Button[tabKeys.Length];
+            float x = -140f;
+            for (int i = 0; i < tabKeys.Length; i++)
+            {
+                tabs[i] = TavernScreens.SmallButton(panel, $"Tab{i}", tabKeys[i], k_Centre, new Vector2(x + widths[i] / 2f, 70f), widths[i], out _);
+                x += widths[i] + 3f;
+            }
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                Navigation n = tabs[i].navigation;
+                n.mode = Navigation.Mode.Explicit;
+                n.selectOnLeft = tabs[(i - 1 + tabs.Length) % tabs.Length];
+                n.selectOnRight = tabs[(i + 1) % tabs.Length];
+                tabs[i].navigation = n;
+            }
+
+            var rows = new OptionRow[OptionRows];
+            for (int i = 0; i < OptionRows; i++) rows[i] = OptionRowAt(panel, i, 47f - i * 17f);
+            LocalizedSuperText note = LookTestBuilder.Text(panel, "Note", MenuLocKeys.OptionsNoteChange, TextStyle.Secondary, k_Label, TextAnchor.MiddleCenter,
+                k_Centre, k_Centre, k_Centre, new Vector2(0f, -65f), new Vector2(284f, 3f * Line));
+
+            var screen = root.gameObject.AddComponent<OptionsScreen>();
+            screen.Configure(root.gameObject, panel.gameObject, tabs, rows, note, controls);
+            root.gameObject.SetActive(false);
+            return screen;
+        }
+
+        /// <summary>One line: its name on the left, "« value »" on the right; the whole line is the selectable (gold when selected).</summary>
+        static OptionRow OptionRowAt(RectTransform panel, int index, float y)
+        {
+            RectTransform rect = TavernScreens.Rect(panel, $"Row{index}", k_Centre, k_Centre, new Vector2(0f, y), new Vector2(276f, 15f));
+            Image back = DungeonUI.AddImage(rect, DungeonUI.Pixel(), Color.white);
+            back.raycastTarget = true;
+            rect.gameObject.AddComponent<CanvasGroup>();
+            LocalizedSuperText label = Text(rect, "Label", MenuLocKeys.OptMaster, k_Ink, TextAnchor.MiddleLeft, -134f, 0f, 150f, left: true);
+            LocalizedSuperText value = Text(rect, "Value", TavernLocKeys.Plain, k_Ink, TextAnchor.MiddleCenter, 82f, 0f, 96f);
+            RectTransform arrows = TavernScreens.Rect(rect, "Arrows", k_Centre, k_Centre, new Vector2(82f, 0f), new Vector2(120f, 15f));
+            Text(arrows, "Less", MenuLocKeys.ArrowLess, k_Title, TextAnchor.MiddleCenter, -54f, 0f, 12f);
+            Text(arrows, "More", MenuLocKeys.ArrowMore, k_Title, TextAnchor.MiddleCenter, 54f, 0f, 12f);
+            var row = rect.gameObject.AddComponent<OptionRow>();
+            row.targetGraphic = back;
+            ColorBlock colors = row.colors;
+            colors.normalColor = new Color(1f, 1f, 1f, 0f);
+            colors.highlightedColor = new Color(1f, 0.86f, 0.45f, 0.55f);
+            colors.selectedColor = new Color(1f, 0.86f, 0.45f, 0.9f);
+            colors.pressedColor = new Color(1f, 0.8f, 0.35f, 1f);
+            colors.disabledColor = new Color(1f, 1f, 1f, 0f);
+            colors.colorMultiplier = 1f;
+            row.colors = colors;
+            row.Configure(label, value, arrows.gameObject);
+            return row;
+        }
+
         // ---------- Boot: the pause menu and the "saved" mark ----------
 
         /// <summary>Boot's Menus canvas, rebuilt in place (it's the tooling's own): the pause menu, its controls page, the saved mark.</summary>
@@ -103,14 +176,15 @@ namespace Hearthdelve.Editor
             DungeonUI.AddImage(root, DungeonUI.Pixel(), new Color(0.03f, 0.02f, 0.03f, 0.55f)).raycastTarget = true;
 
             // The main panel: the title and four buttons (quit game only on desktop).
-            RectTransform main = TavernScreens.Rect(root, "Main", k_Centre, k_Centre, Vector2.zero, new Vector2(150f, 112f));
+            RectTransform main = TavernScreens.Rect(root, "Main", k_Centre, k_Centre, Vector2.zero, new Vector2(150f, 132f));
             DungeonUI.AddImage(main, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
-            TavernScreens.Label(main, "Title", MenuLocKeys.PauseTitle, TextStyle.Heading, k_Title, TextAnchor.MiddleCenter, k_Centre, new Vector2(0f, 38f), new Vector2(130f, 24f));
-            Button resume = TavernScreens.SmallButton(main, "Resume", MenuLocKeys.Resume, k_Centre, new Vector2(0f, 14f), 110f, out _);
-            Button controls = TavernScreens.SmallButton(main, "Controls", MenuLocKeys.Controls, k_Centre, new Vector2(0f, -5f), 110f, out _);
-            Button quitMenu = TavernScreens.SmallButton(main, "QuitToMenu", MenuLocKeys.QuitToMenu, k_Centre, new Vector2(0f, -24f), 110f, out _);
-            Button quitGame = TavernScreens.SmallButton(main, "QuitGame", MenuLocKeys.QuitGame, k_Centre, new Vector2(0f, -43f), 110f, out _);
-            Vertical(resume, controls, quitMenu, quitGame);
+            TavernScreens.Label(main, "Title", MenuLocKeys.PauseTitle, TextStyle.Heading, k_Title, TextAnchor.MiddleCenter, k_Centre, new Vector2(0f, 48f), new Vector2(130f, 24f));
+            Button resume = TavernScreens.SmallButton(main, "Resume", MenuLocKeys.Resume, k_Centre, new Vector2(0f, 24f), 110f, out _);
+            Button options = TavernScreens.SmallButton(main, "Options", MenuLocKeys.Options, k_Centre, new Vector2(0f, 5f), 110f, out _);
+            Button controls = TavernScreens.SmallButton(main, "Controls", MenuLocKeys.Controls, k_Centre, new Vector2(0f, -14f), 110f, out _);
+            Button quitMenu = TavernScreens.SmallButton(main, "QuitToMenu", MenuLocKeys.QuitToMenu, k_Centre, new Vector2(0f, -33f), 110f, out _);
+            Button quitGame = TavernScreens.SmallButton(main, "QuitGame", MenuLocKeys.QuitGame, k_Centre, new Vector2(0f, -52f), 110f, out _);
+            Vertical(resume, options, controls, quitMenu, quitGame);
 
             // The question: what will be lost, then quit or back.
             RectTransform confirm = TavernScreens.Rect(root, "Confirm", k_Centre, k_Centre, Vector2.zero, new Vector2(280f, 76f));
@@ -123,8 +197,10 @@ namespace Hearthdelve.Editor
             confirm.gameObject.SetActive(false);
 
             ControlsPage page = BuildControlsPage(root);
+            OptionsScreen optionsScreen = BuildOptions(root, page);
             var menu = canvas.gameObject.AddComponent<PauseMenu>();
             menu.Configure(root.gameObject, main.gameObject, resume, controls, quitMenu, quitGame, confirm.gameObject, question, yes, no, page);
+            menu.ConfigureOptions(options, optionsScreen);
             root.gameObject.SetActive(false);
         }
 

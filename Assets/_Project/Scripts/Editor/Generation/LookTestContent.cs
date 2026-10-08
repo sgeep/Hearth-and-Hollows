@@ -379,7 +379,7 @@ namespace Hearthdelve.Editor
             player.FeedbacksList ??= new List<MMF_Feedback>();
             if (flashTarget != null) player.AddFeedback(new MMF_SpriteFlash { Label = "Flash", Target = flashTarget });
             if (shake > 0f) player.AddFeedback(new MMF_ScreenShake { Label = "Screen Shake", Force = shake });
-            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached });
+            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects });
             if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
             return player;
         }
@@ -463,7 +463,7 @@ namespace Hearthdelve.Editor
             player.FeedbacksList ??= new List<MMF_Feedback>();
             player.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.06f });
             player.AddFeedback(new MMF_ScreenShake { Label = "Screen Shake", Force = 0.15f });
-            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached });
+            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects });
             if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
             return player;
         }

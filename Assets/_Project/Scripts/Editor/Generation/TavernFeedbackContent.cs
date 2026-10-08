@@ -99,6 +99,7 @@ namespace Hearthdelve.Editor
             source.loop = true;
             source.playOnAwake = false;
             source.volume = 0f;
+            source.outputAudioMixerGroup = AudioMixerBuilder.Effects;
             return source;
         }
 

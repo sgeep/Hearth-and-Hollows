@@ -37,10 +37,13 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] Button m_ConfirmYes;
         [SerializeField] Button m_ConfirmNo;
         [SerializeField] ControlsPage m_ControlsPage;
+        [SerializeField] Button m_Options;
+        [SerializeField] OptionsScreen m_OptionsScreen;
 
         InputAction m_Menu;
         bool m_PausableLastFrame;
         int m_ClosedFrame = -1;
+        float m_QueuedAt = -1f;
         string[] m_Maps;
         bool m_QuitApp;
 
@@ -49,6 +52,15 @@ namespace Hearthdelve.UI.Screens
         public bool IsOpen => m_Root != null && m_Root.activeSelf;
         public bool IsConfirming => m_Confirm != null && m_Confirm.activeSelf;
         public ControlsPage ControlsPage => m_ControlsPage;
+        public Button OptionsButton => m_Options;
+        public OptionsScreen Options => m_OptionsScreen;
+
+        /// <summary>4i-B: Options, from the pause menu.</summary>
+        public void ConfigureOptions(Button options, OptionsScreen screen)
+        {
+            m_Options = options;
+            m_OptionsScreen = screen;
+        }
         public Button ResumeButton => m_Resume;
         public Button ControlsButton => m_Controls;
         public Button QuitMenuButton => m_QuitMenu;
@@ -93,6 +105,7 @@ namespace Hearthdelve.UI.Screens
             m_Menu.Enable();
             m_Resume?.onClick.AddListener(Close);
             m_Controls?.onClick.AddListener(OpenControls);
+            m_Options?.onClick.AddListener(OpenOptions);
             m_QuitMenu?.onClick.AddListener(() => AskQuit(app: false));
             m_QuitGame?.onClick.AddListener(() => AskQuit(app: true));
             m_ConfirmYes?.onClick.AddListener(Quit);
@@ -174,14 +187,43 @@ namespace Hearthdelve.UI.Screens
                 HandleOpen();
                 return;
             }
+            // 4i-B: a press while a scene fades is kept for a moment, not dropped, and opens the menu once the fade is done (if
+            // nothing else, a conversation or a held story moment, has the screen by then).
+            GameFlow flow = GameFlow.Instance;
+            bool pressed = m_Menu.WasPressedThisFrame();
+            if (pressed && PauseRules.Queues(flow != null && flow.InGame, Loading)) m_QueuedAt = Time.unscaledTime;
+            if (m_QueuedAt >= 0f)
+            {
+                if (!PauseRules.StillQueued(m_QueuedAt, Time.unscaledTime)) m_QueuedAt = -1f;
+                else if (!Loading && m_PausableLastFrame && Pausable)
+                {
+                    Open();
+                    return;
+                }
+            }
             // Only if it was pausable last frame too: Esc that just closed a panel doesn't also open the menu.
-            if (m_Menu.WasPressedThisFrame() && m_PausableLastFrame && Time.frameCount != m_ClosedFrame && Pausable) Open();
+            if (pressed && m_PausableLastFrame && Time.frameCount != m_ClosedFrame && Pausable) Open();
+        }
+
+        /// <summary>Scenes are changing, or the transition covers the screen.</summary>
+        static bool Loading
+        {
+            get
+            {
+                GameFlow flow = GameFlow.Instance;
+                return flow != null && (flow.IsLoading || (flow.Transition != null && flow.Transition.IsCovering));
+            }
         }
 
         void LateUpdate() => m_PausableLastFrame = !IsOpen && Pausable;
 
         void HandleOpen()
         {
+            if (m_OptionsScreen != null && m_OptionsScreen.IsOpen)
+            {
+                if (m_OptionsScreen.HandleInput()) ShowMain(m_Options);
+                return;
+            }
             if (m_ControlsPage != null && m_ControlsPage.IsOpen)
             {
                 if (m_ControlsPage.HandleInput()) ShowMain(m_Controls);
@@ -199,6 +241,7 @@ namespace Hearthdelve.UI.Screens
         public void Open()
         {
             if (IsOpen || m_Root == null) return;
+            m_QueuedAt = -1f;
             m_Maps = InputMaps.Snapshot();
             InputMaps.ActivateUIOnly();
             MenuPause.Push();
@@ -210,6 +253,7 @@ namespace Hearthdelve.UI.Screens
         public void Close()
         {
             if (!IsOpen) return;
+            m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             m_Root.SetActive(false);
             ReleaseHolds();
@@ -228,10 +272,18 @@ namespace Hearthdelve.UI.Screens
 
         void ShowMain(Button selected)
         {
+            m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             if (m_Confirm != null) m_Confirm.SetActive(false);
             if (m_Main != null) m_Main.SetActive(true);
             Select(selected != null && selected.gameObject.activeInHierarchy ? selected : m_Resume);
+        }
+
+        void OpenOptions()
+        {
+            if (m_OptionsScreen == null) return;
+            if (m_Main != null) m_Main.SetActive(false);
+            m_OptionsScreen.Open();
         }
 
         void OpenControls()
@@ -300,6 +352,7 @@ namespace Hearthdelve.UI.Screens
             QuitPlan plan = CurrentPlan();
             bool app = m_QuitApp;
             GameFlow flow = GameFlow.Instance;
+            m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             if (m_Confirm != null) m_Confirm.SetActive(false);
             if (IsOpen)

@@ -787,6 +787,7 @@ MonoBehaviour:
   m_ShadowSet: {fileID: 11400000, guid: ed07b638eb8e8d24e86f939c68512a67, type: 2}
   m_ShadowRenderer: {fileID: 5231029977626224506}
   m_InitialFacing: 0
+  m_FaceAim: 0
 --- !u!1 &6119797949261005917
 GameObject:
   m_ObjectHideFlags: 0
@@ -1236,7 +1237,7 @@ MonoBehaviour:
         MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
-        SfxAudioMixerGroup: {fileID: 0}
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
         SpatialBlend: 0
