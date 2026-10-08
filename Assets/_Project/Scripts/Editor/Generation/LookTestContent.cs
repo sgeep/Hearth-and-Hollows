@@ -258,6 +258,28 @@ namespace Hearthdelve.Editor
             return anim;
         }
 
+        /// <summary>
+        /// The keeper's idle without the head turn (the owner's call, 2026-10-08): Minifantasy's 16-frame humanoid idles turn the
+        /// head over frames 8–10 (and blink at 3, 5 and 13). The keeper already faces where the mouse or stick looks, so a turn
+        /// of its own read as wrong; those three frames hold frame 7 instead, so the loop's length and the blinks keep their timing.
+        /// </summary>
+        internal static SpriteAnim StillHead(SpriteAnim idle)
+        {
+            Sprite[] Hold(Sprite[] frames)
+            {
+                if (frames == null || frames.Length < 11) return frames;
+                var held = (Sprite[])frames.Clone();
+                for (int i = 8; i <= 10; i++) held[i] = frames[7];
+                return held;
+            }
+
+            idle.frontRight = Hold(idle.frontRight);
+            idle.frontLeft = Hold(idle.frontLeft);
+            idle.backRight = Hold(idle.backRight);
+            idle.backLeft = Hold(idle.backLeft);
+            return idle;
+        }
+
         /// <summary>One row of a sheet used for every facing (rows that aren't facings, like the charged attack's stages).</summary>
         internal static SpriteAnim AnimRow(CharacterAnim action, string pack, string file, int frames, int row, float frameDuration, bool loop) =>
             new() { action = action, frameDuration = frameDuration, loop = loop, frontRight = MinifantasyImporter.Row(pack, file, row, frames) };
@@ -293,7 +315,7 @@ namespace Hearthdelve.Editor
             const string c = MinifantasySheets.Creatures;
             // Frame durations come from each pack's _AnimationInfo.txt: 200 ms idle and walk, 100 ms the rest.
             human = Set("Anim_HumanTownsfolk",
-                Anim(CharacterAnim.Idle, c, "HumanTownsfolkIdle", 16, 4, 0.2f, true),
+                StillHead(Anim(CharacterAnim.Idle, c, "HumanTownsfolkIdle", 16, 4, 0.2f, true)),
                 Anim(CharacterAnim.Walk, c, "HumanTownsfolkWalk", 4, 4, 0.2f, true),
                 Anim(CharacterAnim.Attack, c, "HumanTownsfolkAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "HumanTownsfolkDmg", 4, 4, 0.1f, false),
@@ -307,7 +329,7 @@ namespace Hearthdelve.Editor
                 MirrorLeft(AnimRow(CharacterAnim.ChargeHold, c, "HumanTownsfolkChargedAttack", 6, 1, 0.1f, true)),
                 MirrorLeft(AnimRow(CharacterAnim.HeavyAttack, c, "HumanTownsfolkChargedAttack", 6, 2, 0.1f, false)));
             humanShadow = Set("Anim_HumanTownsfolk_Shadow",
-                Anim(CharacterAnim.Idle, c, "ShadowHumanoidIdle", 16, 4, 0.2f, true),
+                StillHead(Anim(CharacterAnim.Idle, c, "ShadowHumanoidIdle", 16, 4, 0.2f, true)),
                 Anim(CharacterAnim.Walk, c, "ShadowHumanoidWalk", 4, 4, 0.2f, true),
                 Anim(CharacterAnim.Attack, c, "ShadowHumanoidAttack", 4, 4, 0.1f, false),
                 Anim(CharacterAnim.Hurt, c, "ShadowHumanoidDmg", 4, 4, 0.1f, false),

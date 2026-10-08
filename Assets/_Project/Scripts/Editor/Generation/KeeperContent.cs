@@ -173,7 +173,7 @@ namespace Hearthdelve.Editor
         {
             const string c = MinifantasySheets.Creatures;
             return LookTestContent.Set(name,
-                LookTestContent.Anim(CharacterAnim.Idle, c, $"{file}Idle", 16, 4, 0.2f, true),
+                LookTestContent.StillHead(LookTestContent.Anim(CharacterAnim.Idle, c, $"{file}Idle", 16, 4, 0.2f, true)),
                 LookTestContent.Anim(CharacterAnim.Walk, c, $"{file}Walk", 4, 4, 0.2f, true),
                 LookTestContent.Anim(CharacterAnim.Attack, c, $"{file}Attack", 4, 4, 0.1f, false),
                 LookTestContent.Anim(CharacterAnim.Hurt, c, $"{file}Dmg", 4, 4, 0.1f, false),
@@ -188,7 +188,7 @@ namespace Hearthdelve.Editor
         {
             const string c = MinifantasySheets.Creatures;
             return LookTestContent.Set("Anim_KeeperDwarf_Shadow",
-                LookTestContent.Anim(CharacterAnim.Idle, c, "ShadowDwarfIdle", 16, 4, 0.2f, true),
+                LookTestContent.StillHead(LookTestContent.Anim(CharacterAnim.Idle, c, "ShadowDwarfIdle", 16, 4, 0.2f, true)),
                 LookTestContent.Anim(CharacterAnim.Walk, c, "ShadowDwarfWalk", 4, 4, 0.2f, true),
                 LookTestContent.Anim(CharacterAnim.Attack, c, "ShadowDwarfAttack", 4, 4, 0.1f, false),
                 LookTestContent.Anim(CharacterAnim.Hurt, c, "ShadowDwarfDmg", 4, 4, 0.1f, false),

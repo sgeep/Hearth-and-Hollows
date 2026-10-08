@@ -90,7 +90,8 @@ namespace Hearthdelve.Dungeon.Bosses
             if (m_Brain != null) m_Brain.BrainActive = false;
             m_Movement?.SetMovement(Vector2.zero);
             m_Animator?.Hold(CharacterAnim.Hurt);
-            if (m_Body != null) m_Body.color = m_Boss.frenzy.tint;
+            // Through the flashes' record, so a hit flash showing now can't put the old colour back after it.
+            Hearthdelve.Shared.Haptics.MMF_SpriteFlash.SetResting(m_Body, m_Boss.frenzy.tint);
             m_RoarFeedback?.PlayFeedbacks(transform.position);
             EventBus<BossPhaseChanged>.Publish(new BossPhaseChanged(2));
         }
