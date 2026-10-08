@@ -374,3 +374,65 @@ Approved as written in §4i-B with D4 and D6 (2026-10-08), with the owner's deta
 8. Change some options, quit, relaunch (and reload the web page): still as you left them? Start a New Game: still there?
 9. Press Esc as a door fade or a scene change begins: the pause menu opens when it's done.
 10. The menu with an unreadable save: does the message read clearly? Are the softer text colours (labels, gold, notes) still pleasant and in keeping?
+
+## As built: 4i-C, "Presentation and polish" (2026-10-08; in progress: the non-audio work is built; sound waits for the owner's listening)
+
+Approved as written in §4i-C with D5 (2026-10-08). Order: the sound catalog first, then a listening list for the owner; meanwhile the non-audio work; after approval, import, swap, fill the feedback gaps and balance.
+
+### Sound catalog (D5)
+
+Outside the repo, beside the libraries: `C:\Dev\Music\SFX\_catalog` (`README.md` for the process; `catalog.py` → `catalog.csv` and `packs.csv`; `candidates_4ic.py` → `LISTENING_4iC.md`). 442 sounds (22 minutes) in four packs, all CC0: Kenney RPG Audio (licence file present), Kenney Impact Sounds and Kenney Interface Sounds (published CC0; their licence files aren't in the folder), OwlishMedia's Sound Effects Pack (listed CC0 on OpenGameArt; no licence file). The three Kenney packs are flattened into one folder; the script tells them apart by name. 28 first-hour families have two or three candidates each (264 files), a proposed pick and the gaps no library fills (an air swoosh, a sizzle and fire, creature voices and the troll's roar, a hurt grunt, anything magical, a heartbeat). Nothing is imported until the owner approves.
+
+### What's built so far
+
+- **Credits** (`CreditsScreen`, built by `FirstImpressionsUI.BuildCredits`): from the main menu (after Controls) and the pause menu (after Controls). A parchment panel; its lines come from a new **Credits** string table (authored in `CreditsLocKeys`), at the type scale, drifting up slowly after a moment and scrolled by up/down, the stick or the wheel; HeatleyBros' link is the one selectable line (Enter / A / a click) and opens `https://www.youtube.com/c/heatleybros` through `UrlService` (`Application.OpenURL`; mocked in tests). Esc / B goes back. `CreditsTests` checks every credit `docs/CREDITS.md` names is on it and that the link is the same in both.
+- **One timing for every change of place** (`Shared/Game/PlaceFade`, 0.2 s out and in): Tally Ho!'s front door (was 0.18 s), its stairs (0.25 s) and the Hollows' rooms (0.25 s out, 0.3 s in). Scene changes keep the captioned transition (0.35 s, a 0.7 s hold, 0.45 s) as the day moving on. Existing objects set in place (`PresentationUpdates`); a test checks every one.
+- **The delve's controls line is gone from the day loop** (it overlapped the satchel and named both devices): the first delve's onboarding teaches the controls for the device in use (4g) and the pause menu has them all (4i-A). Run on its own, the test floor keeps it.
+- **The death screen's lone button** stands in the middle when there's nothing to keep.
+- **Icons:** shroom cap and spore sac have had icons since 4f (the known issue was stale). The bat wing keeps the vampire's cape: Minifantasy has no wing icon, and the bat's own drawings (a 6×11 folded wing, 11×4 spread) can't become an 8×8 icon without new drawing.
+- **Notes name one device** (the 4i-A rule): Options' footer and the credits' footer follow the keyboard or the controller, which also put Options' note back on one line.
+- **The keeper's room** (selective polish: the first thing seen each morning): a new game's room adds a wardrobe, a bookcase, a washstand, a lit candle stand and violets on the chest, all from the catalogue and all movable. Saves keep the room their keeper made.
+- **Fast clicks on an Options line (carried from 4i-B): harmless.** Unity's UI reads the mouse once a frame, so clicks the browser driver sent within one frame counted once. A PlayMode test clicks through a simulated mouse at about eight clicks a second (one frame down, six up): four clicks, four steps.
+
+### Feedback audit
+
+From `Hearthdelve → Report → Feedback Audit` (117 feedback players in the prefabs and game scenes) and the code that plays the shared interface moments. "Visual" includes the station panels', bubbles' and HUD's own animation, which isn't in an `MMF_Player`. Every sound is still a placeholder until the swap.
+
+| Player action | Sound | Haptic | Visual | Status |
+|---|---|---|---|---|
+| Walk (Kariaston, Tally Ho!, the Hollows) | — | — | walk animation | **gap: footsteps** (families 1–3) |
+| Go through a door or up the stairs | — | — | the fade | **gap: door and stairs sounds** (14–15) |
+| Talk to someone: the box opens | — | — | box, portrait | **gap: an opening sound** |
+| A line writes out / advance | tick on advance | — | letters, the continue mark | **gap: dialogue blips** (27) |
+| Plant, tend (spend Vigor) | tick | light tap | Vigor pips pop | partial: **an action sound** (26) |
+| Harvest | chime | yes | note, pips | complete |
+| Buy at the market | button click | — | the stock changes | **gap: coins and the buy moment** |
+| Begin the evening (menu board) | commit | light tap | the question | complete |
+| Decorate: pick up, place, store, sell, restyle, buy | yes | yes | selection, ghost | complete |
+| Decorate: turn, flip, undo, enter, leave | yes | — | the piece | complete (light actions, no rumble by design) |
+| Butchery: stroke, clean, ragged, done | yes | yes | cut lines | complete |
+| Chopping: clean, ragged, done | yes | yes | cuts | complete |
+| Grill: flip, perfect flip, burn, sizzle | yes | yes | meter, needle | complete (sizzle has no real source: gap) |
+| Tap: pour, line, spill warning, overflow, done | yes | yes | glass, foam | complete |
+| Plates: pick up, put back, serve, drop, bumps | yes | yes | carried plate | complete |
+| Stew ready; a customer pays or walks out | yes | — | bubbles | complete (not the keeper's own actions) |
+| Results counting, the takings; the night's upgrades | yes | takings no, buy yes | counting | complete |
+| Attack swing (a miss) | — | — | swing animation | **gap: a swing sound** (5) |
+| Hit, heavy hit, finisher, charge levels | yes | yes | shake, hit-stop, the enemy flashes | complete |
+| Dodge roll | yes | — | the roll | partial: **a light rumble** |
+| Hurt | yes | yes | shake, flash | complete |
+| An enemy telegraphs; dies (clean or overkill) | yes | yes | flash, mark, death | complete |
+| Pick up an ingredient, gold, a curio, a power, a quest object | yes | yes | feed, HUD | complete |
+| Satchel full; rooms seal and clear; fall; climb out; campfire; low Essence | yes | yes | prompts, gates, the fade | complete |
+| The Larder Troll: entrance, slam, stun, spoil, frenzy, gulp, defeat | yes | yes (not the gulp) | shake, flash | complete |
+| Menus: buttons, Options steps, the credits' link | yes | commit and buy | selection | complete |
+
+The gaps are filled after the owner approves the sounds (they need the new sounds and, for footsteps, doors and blips, small new hooks through the generators).
+
+### Changes from the plan (so far)
+
+- **The delve's controls line is retired in the day loop**, not moved: onboarding and the controls page cover it, and it named both devices.
+- **"Decide Prep's music"** was settled by the owner on 2026-10-08 (Prep is quiet); nothing to decide in 4i-C.
+- **The pause menu's "about"** is a Credits button, the same screen as the main menu's.
+- **The bat wing icon stays** a stand-in (no Minifantasy source at icon size; new drawing is out of 4i-C's scope).
+- **Selective polish** touched only the keeper's room: the menu backdrop and Kariaston's square already read as finished in captures.

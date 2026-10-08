@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C approved** (2026-10-08, with D5), in progress._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C approved** (2026-10-08, with D5), in progress: the non-audio work built; the sounds wait for the owner's listening (`C:\Dev\Music\SFX\_catalog\LISTENING_4iC.md`)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1373,23 +1373,23 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - ~~**No pause menu**~~ (4i-A built one).
 - ~~**Settings aren't saved**~~ (4i-B: Options, in their own file).
 - **Options on a Windows build is unchecked** (4i-D's build path; checked in the editor and on the web).
-- **Fast repeated clicks on an Options line can be lost on the web** (single clicks and keys step once each).
-- **Options' controls note wraps onto two lines** (it fits its box; shortening it is 4i-C polish).
+- ~~**Fast repeated clicks on an Options line can be lost on the web**~~ (4i-C: only clicks within one frame, as a browser driver sends them; a human pace steps every click, tested).
+- ~~**Options' controls note wraps onto two lines**~~ (4i-C: it names one device, on one line).
 - **The window-size line can't preview**: a desktop window change applies at once, with no "keep these settings?" countdown.
 - ~~**An unreadable save hides Continue** without a message~~ (4i-A: explained, the backup offered, New Game asks).
 - ~~**Station panels' controls lines overflow their boxes**~~ (4i-A: one binding each).
 - ~~**The main menu's Continue detail shows `day {0}, {1}`**~~ (4i-A: fixed).
 - **No pause menu inside Decorate Mode** (by design: its keys own Esc and Start; leave it, then pause).
 - **Music memory on the web:** each track decodes whole (about 65 MB); the day's tune stays decoded under Decorate Mode's (4i-D).
-- **In-game credits are missing**, and HeatleyBros' licence requires one with a working link before release (4i-C).
+- ~~**In-game credits are missing**~~ (4i-C: the Credits screen with HeatleyBros' link).
 - **The day loop starts from `Boot`.** Playing `Tavern`, `Dungeon` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.
-- **No icons for Shroom Cap and Spore Sac** (they come with the Mushroom People), so their storeroom slots at Prep show only the count, quality and freshness.
+- ~~**No icons for Shroom Cap and Spore Sac**~~ (they've had icons since 4f; found stale in 4i-C).
 - **Customers walk through each other:** they don't collide with each other or the player (on purpose: no shoving), and their paths ignore other customers, so two can overlap briefly in an aisle.
 - **No sitting pose:** seated customers use their idle pose on the chair.
 - **Silver doesn't cover Arabic or Hebrew** (it does cover Latin, Greek, Cyrillic, CJK and Thai). There is deliberately no fallback font; `TextStyleTests` checks every string against the font. A decision for when localization is planned.
 - **Silver's license has a budget condition:** CC BY 4.0 (attribution to Poppy Works), but productions over $100,000 USD in total spend or earnings are asked to contact Poppy Works to license it (`docs/THIRD_PARTY.md`). Owner decision before release; no effect on development.
-- **The delve's controls line overlaps the satchel row** for its first few seconds, then fades (as designed in 4b; cosmetic).
-- **The death screen with an empty satchel** shows its one button right of centre (the hidden "keep nothing" button's place stays empty; cosmetic).
+- ~~**The delve's controls line overlaps the satchel row**~~ (4i-C: retired in the day loop).
+- ~~**The death screen with an empty satchel** shows its one button right of centre~~ (4i-C: centred).
 - **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f). It passed in all four complete PlayMode runs during 4d step 5.
 - **Run length and the Essence budget are estimates** (4d step 5): the run log (development builds) measures them; your playtest should replace them.
 - **The delve meal's drain drinks and slow burn are worth less** at a low drain (0.2/s since the playtest); a playtest question, not changed.

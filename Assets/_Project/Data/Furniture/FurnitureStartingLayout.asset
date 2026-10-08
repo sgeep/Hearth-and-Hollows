@@ -309,6 +309,56 @@ MonoBehaviour:
       anchor: 0
       variant: hills
       palette: 
+    - uid: 107
+      definition: plant_violets
+      cell: {x: 0, y: 0}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: 105
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 108
+      definition: wardrobe
+      cell: {x: 10, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 109
+      definition: bookcase
+      cell: {x: 15, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 110
+      definition: washstand
+      cell: {x: 6, y: 8}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
+    - uid: 111
+      definition: candle_stand
+      cell: {x: 1, y: 9}
+      turns: 0
+      flipped: 0
+      nudge: {x: 0, y: 0}
+      host: -1
+      anchor: 0
+      variant: 
+      palette: 
     floor: floor_teal
     wall: wall_cream
   storage: []

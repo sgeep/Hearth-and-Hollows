@@ -436,6 +436,13 @@ namespace Hearthdelve.Editor
             Guest("candle", 0, 0, host: guest[guest.Count - 1].uid);
             Guest("chest", 13, 8, variant: "wood");
             Guest("picture", 3, 10, variant: "hills");
+            // 4i-C (selective polish: the first thing seen each morning): enough to feel lived in, all from the catalogue and all
+            // movable. New games only; a save keeps the room its keeper made. The door (9, 2–3) and the hatch (14, 3–4) stay clear.
+            Guest("plant_violets", 0, 0, host: guest[guest.Count - 2].uid);
+            Guest("wardrobe", 10, 8);
+            Guest("bookcase", 15, 8);
+            Guest("washstand", 6, 8);
+            Guest("candle_stand", 1, 9);
 
             return LookTestContent.CreateOrUpdate<FurnitureStartingLayout>(StartingLayoutPath, s =>
             {
