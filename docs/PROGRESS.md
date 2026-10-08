@@ -1262,7 +1262,7 @@ Checkpoint C approved (2026-10-07). D, following your brief:
 - **Glimmer's light:** a small pale light at Ogrin's window on some evenings (about one in four, after Gimp has come up), unexplained; Ogrin calls it "my light" if asked.
 - **C's issues:** villagers give way to each other, Kariaston's grid is baked at load, and nobody walks through Decorate Mode.
 
-Tests: TESTS_D. Web: WEB_D. Details, deviations and the final playtest checklist: `docs/PLAN_4H.md`, *As built: Checkpoint D*.
+Tests: EditMode 750/750; PlayMode 252 passed and 2 failed in the full run (4g tests that didn't yet know about Gimp: his stand-in, and his night interrupting their day 3), both fixed and passing on rerun; 27 explicit captures skipped. Web: built (153 MB) and smoke-tested on your own save (backed up and restored): Continue mid-morning with no night scene, evening prep, service with Maximo walking in as a familiar face, the delve, the night, sleep, then Gimp's night on the next morning (dark room, lantern, silence, Vigor refilled, the clock held at 8:00), the morning restored, the beat saved, and a reload and Continue without a replay; no console errors. The browser tab was hidden (throttled), so walking the village, the overheard exchanges and Glimmer's light were checked in PlayMode only. Details, deviations and the final playtest checklist: `docs/PLAN_4H.md`, *As built: Checkpoint D*.
 
 **Approved future direction (not built):** a fantasy calendar, festivals, smaller village events, birthdays and eventually seasons (GDD §11.1), as a post-4h milestone to plan.
 **Open story question:** why Gimp hates Maximo, and whether he was at the sealing (GDD §13 Open 12); 4h only shows the hostility.
