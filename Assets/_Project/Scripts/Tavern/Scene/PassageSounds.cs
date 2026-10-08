@@ -15,6 +15,9 @@ namespace Hearthdelve.Tavern.Scene
 
         public MMF_Player Door => m_Door;
         public MMF_Player Stairs => m_Stairs;
+        /// <summary>How many doors and how many stair passages have been heard (tests).</summary>
+        public int Doors { get; private set; }
+        public int StairsHeard { get; private set; }
 
         public void Configure(MMF_Player door, MMF_Player stairs)
         {
@@ -28,7 +31,10 @@ namespace Hearthdelve.Tavern.Scene
         void OnStarted(AreaPassageStarted e)
         {
             MMF_Player player = e.Kind == PassageKind.Door ? m_Door : m_Stairs;
-            if (player != null) player.PlayFeedbacks();
+            if (player == null) return;
+            player.PlayFeedbacks();
+            if (e.Kind == PassageKind.Door) Doors++;
+            else StairsHeard++;
         }
     }
 }

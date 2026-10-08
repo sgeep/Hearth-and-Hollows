@@ -193,10 +193,14 @@ namespace Hearthdelve.Tests.PlayMode
 
             PassageSounds passages = Object.FindAnyObjectByType<PassageSounds>(FindObjectsInactive.Include);
             Assert.That(passages, Is.Not.Null);
+            // As the stairs and the front door announce a crossing (Pass, the test shortcut, skips the fade and the event).
+            Hearthdelve.Core.Events.EventBus<AreaPassageStarted>.Publish(new AreaPassageStarted(0.2f));
+            Hearthdelve.Core.Events.EventBus<AreaPassageStarted>.Publish(new AreaPassageStarted(0.2f, PassageKind.Door));
+            yield return null;
+            Assert.That(passages.StairsHeard, Is.EqualTo(1), "the stairs are heard");
+            Assert.That(passages.Doors, Is.EqualTo(1), "and the door");
             AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).Single(p => p.To != null && p.To.Id == PropertyArea.TavernId);
             down.Pass(Keeper);
-            yield return null;
-            Assert.That(passages.Stairs.IsPlaying, Is.True, "the stairs are heard");
 
             yield return WaitUntil(() => DialogueManager.IsConversationActive, 5f, "the first morning");
             var box = Object.FindAnyObjectByType<HearthDialogueUI>();

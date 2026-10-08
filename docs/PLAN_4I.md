@@ -375,7 +375,7 @@ Approved as written in §4i-B with D4 and D6 (2026-10-08), with the owner's deta
 9. Press Esc as a door fade or a scene change begins: the pause menu opens when it's done.
 10. The menu with an unreadable save: does the message read clearly? Are the softer text colours (labels, gold, notes) still pleasant and in keeping?
 
-## As built: 4i-C, "Presentation and polish" (2026-10-08; in progress: the non-audio work is built; sound waits for the owner's listening)
+## As built: 4i-C, "Presentation and polish" (2026-10-08; waiting for the owner's listening and look playtest)
 
 Approved as written in §4i-C with D5 (2026-10-08). Order: the sound catalog first, then a listening list for the owner; meanwhile the non-audio work; after approval, import, swap, fill the feedback gaps and balance.
 
@@ -419,7 +419,7 @@ From `Hearthdelve → Report → Feedback Audit` (117 feedback players in the pr
 | Results counting, the takings; the night's upgrades | yes | takings no, buy yes | counting | complete |
 | Attack swing (a miss) | — | — | swing animation | **gap: a swing sound** (5) |
 | Hit, heavy hit, finisher, charge levels | yes | yes | shake, hit-stop, the enemy flashes | complete |
-| Dodge roll | yes | — | the roll | partial: **a light rumble** |
+| Dodge roll | yes | — | the roll | complete (no rumble by design since 4b: frequent, it would numb the hits) |
 | Hurt | yes | yes | shake, flash | complete |
 | An enemy telegraphs; dies (clean or overkill) | yes | yes | flash, mark, death | complete |
 | Pick up an ingredient, gold, a curio, a power, a quest object | yes | yes | feed, HUD | complete |
@@ -427,7 +427,7 @@ From `Hearthdelve → Report → Feedback Audit` (117 feedback players in the pr
 | The Larder Troll: entrance, slam, stun, spoil, frenzy, gulp, defeat | yes | yes (not the gulp) | shake, flash | complete |
 | Menus: buttons, Options steps, the credits' link | yes | commit and buy | selection | complete |
 
-The gaps are filled after the owner approves the sounds (they need the new sounds and, for footsteps, doors and blips, small new hooks through the generators).
+The gaps are filled after the owner approves the sounds (they need the new sounds and, for footsteps, doors and blips, small new hooks through the generators). The dodge row was first marked a gap, then corrected: its missing rumble is a 4b decision.
 
 ### Changes from the plan (so far)
 
@@ -436,3 +436,88 @@ The gaps are filled after the owner approves the sounds (they need the new sound
 - **The pause menu's "about"** is a Credits button, the same screen as the main menu's.
 - **The bat wing icon stays** a stand-in (no Minifantasy source at icon size; new drawing is out of 4i-C's scope).
 - **Selective polish** touched only the keeper's room: the menu backdrop and Kariaston's square already read as finished in captures.
+
+### Sound (after the owner's listening, 2026-10-08)
+
+**The owner's choice:** every recommendation from the listening list, except family 15 (stairs, the hatch, the rope), which is option B (Kenney's plank impacts).
+
+**Licences.** All four libraries are CC0 1.0, confirmed on the publishers' pages before import. Notes are kept in `C:\Dev\Music\SFX\_catalog\licences`, and the sounds are recorded in `docs/CREDITS.md` (a courtesy credit, also on the Credits screen) and `docs/THIRD_PARTY.md`.
+
+**Import.** 137 files in `Assets/_Project/Audio/SFX/Library/{Kenney,OwlishMedia,Derived}`, mono, Vorbis. Short effects decompress on load; the pour loop stays compressed in memory. A test checks that nothing beyond the approved list is imported. Eighteen files are edits of approved files, made as copies by `Tools/audio/derive.py`:
+- the tap's 1.6-second seamless pour loop;
+- a half-second watering burst;
+- sixteen of OwlishMedia's impacts (fruit, scrapes, crockery), peak-normalised to −1 dBFS. As recorded they peak near −17 dBFS, some 10 dB under the Kenney packs, too quiet to reach their level at full volume.
+
+**The swap.** `SoundBank` (Editor) holds the families. Each placeholder maps to its family, or a feedback's name does where one placeholder served two moments: the interface tick as Vigor spent, the chime as a harvest. The generators ask it when they build (`LookTestContent.Feedback`, `TavernFeedbackContent`, `UiFeedbackContent`, `StoryScene`). `SoundSwap` (*Hearthdelve → Generate → Swap In the Approved Sounds*) applies it in place; it's idempotent, and a second run changes nothing. Repeated sounds play random variations, never the same footstep twice running, with a little pitch spread.
+
+**The feedback audit's gaps, filled:**
+- **Footsteps** (`Footsteps`, on both keeper prefabs) fall on the walk's two footfalls. Kariaston's paths, Tally Ho!'s boards and the Hollows' stone each have their own set and level.
+- **Doors and stairs** (`PassageSounds`, beside the tavern's feedback): a door closing for the front door, a plank for the stairs, played as the screen covers. The passage event now says which it was.
+- **Dialogue blips** (`DialogueBlips`, on the dialogue box): every third letter as a line is written, never closer than 50 ms. Each speaker has their own pitch (`CharacterDefinition.voicePitch`): Orik 0.85, Grim 0.82, Boog 1.18, Ogrin 1.25, Maximo 0.95, Kaloren 0.78, Bart 0.9, Gimp 1.05; everyone else 1. Silent for a look and the narration.
+- **Other gaps:** the conversation opening is heard; the cleaver's swing (`WeaponUsedMMFeedback`, hit or miss); watering a bed (a new `Water` moment; planting is soil); market purchases (the buy moment). The dodge keeps no rumble: the audit flagged it, but 4b's feedback pass left it out on purpose (it's frequent and would numb the hits), and that stands.
+
+### The sounds by family
+
+All CC0; credit isn't required (credited by courtesy). K is Kenney (RPG Audio, Impact Sounds, Interface Sounds), O is OwlishMedia's Sound Effects Pack, and D is an edit by `Tools/audio/derive.py` of the O file named.
+
+| # | Family | Plays | Files | Source |
+|---|---|---|---|---|
+| 1 | Footsteps, Kariaston | the keeper outdoors | `footstep00–09` | K RPG Audio |
+| 2 | Footsteps, Tally Ho! | the keeper indoors | `footstep_wood_000–004` | K Impact |
+| 3 | Footsteps, the Hollows | the keeper in the delve | `footstep_concrete_000–004` | K Impact |
+| 4 | Dodge | the roll | `cloth1–4` | K RPG Audio |
+| 5 | Swing | every cleaver swing | `drawKnife1–3` | K RPG Audio |
+| 6 | Hit | light hits | `impactPunch_medium_000–004` | K Impact |
+| 7 | Heavy hit | heavy hits, the finisher | `impactPunch_heavy_000–004` | K Impact |
+| 8 | Hurt | the keeper hit | `impactSoft_heavy_000–004` | K Impact |
+| 9 | Telegraph | enemies winding up | `impactBell_heavy_004` | K Impact |
+| 10 | Enemy death | clean kills, overkills | `fruit1–3` | D (O Impacts, normalised) |
+| 11 | Pickups | ingredients | `handleSmallLeather`, `…2` | K RPG Audio |
+| 12 | Satchel full | a pickup refused | `error_004`, `error_008`, `error_001` | K Interface |
+| 13 | Coins | gold picked up, paid, sold | `handleCoins`, `…2` | K RPG Audio |
+| 14 | Doors | Tally Ho!'s front door | `doorClose_1–4` | K RPG Audio |
+| 15 | Stairs, hatch, rope | the stairs, climbing out | `impactPlank_medium_000–004` | K Impact (**option B**) |
+| 16 | Room gates | slam / rise | `impactMining_000–004` / `scrape1–2` | K Impact / D (O, normalised) |
+| 17 | Grill | flips | `flip` | O Impacts |
+| 18 | Tap | the pour loop / the clink and line | `TapPourLoop` / `impactGlass_light_000–004` | D (O Water) / K Impact |
+| 19 | Chopping and butchery | the board / the knife / butchery | `impactWood_light_*` / `chop`, `knifeSlice`, `…2` / `impactWood_medium_*` | K Impact / K RPG Audio / K Impact |
+| 20 | Plates | pick up, set down, serve / a crash | `impactPlate_light_*` / `clamour1–11` | K Impact / D (O, normalised) |
+| 21 | Stew pot | the stew's ready | `metalPot1–3` | K RPG Audio |
+| 22 | Interface confirm, tick | buttons, the conversation opening / ticks | `select_001`, `002`, `007` / `tick_002` | K Interface |
+| 23 | Buy, chime, discovery | upgrades and purchases / the takings / curios, powers, homecomings | `confirmation_001` / `confirmation_002`, `004` / `maximize_004–006` | K Interface |
+| 24 | Back, no | an invalid placement / a walkout | `back_001–004` / `error_005` | K Interface |
+| 25 | Decorating | lift / place / store / turn / undo | `cloth3` / `impactWood_medium_*` / `bookPlace1–2` / `switch_002` / `minimize_007` | K RPG Audio, Impact, Interface |
+| 26 | Garden | plant / tend / harvest | `impactSoft_medium_*` / `GardenWater` / `fruit1–2` | K Impact / D (O Water) / D (O, normalised) |
+| 27 | Dialogue blips | lines being written | `pluck_001–002` | K Interface |
+| 28 | The Larder Troll | slam, stun, fall / gulp, spoil | `impactMining_*` / `gulp1–2` | K Impact / O Impacts |
+
+### Placeholders still left
+
+Twelve sounds have no approved replacement.
+- **Gaps no library fills:** the troll's roar (`PH_TrollRoar`), the grill's sizzle (`PH_SizzleLoop`), the campfire (`PH_Campfire`, `PH_CampfireLow`), low Essence's heartbeat (`PH_Heartbeat`), and the air swoosh of falling into a hole and of Decorate's area change (`PH_Whoosh`).
+- **Not in the first-hour list** (candidates exist in the libraries; a short second listening round would cover them): Decorate's finish and restyle brush (`PH_Brush`), plate bumps (`PH_Bump`), the grill's burn (`PH_Burn`), the charge-up tick (`PH_ChargeTick`), the tap's spill warning (`PH_SpillWarn`) and overflow (`PH_Splash`).
+
+`SoundTests` checks that exactly these twelve are left.
+
+### The audio balance
+
+Measured, not guessed (*Hearthdelve → Report → Sound Levels*, `SoundLevels`). Each family plays at its kind's target loudness (RMS of its sounding part), whatever its library's mastering; a quiet clip plays at full:
+
+| Kind | Target |
+|---|---|
+| Impacts | −16 dBFS |
+| Actions | −20 dBFS |
+| Interface and blips | −24 dBFS |
+| Footsteps | −28 dBFS |
+
+Three families keep a deliberate trim: the swing (0.7: it plays on every attack), doors (0.8) and stairs (0.7).
+
+**Music** (the HeatleyBros WAVs measured: Continue −16.5, Coastal Market −13.0, Quirkii −12.3, Otherworld −10.2 dBFS RMS). The tracks are evened to about −19.5 dBFS as played:
+- Coastal Market 0.85 and Otherworld 0.6 (it was about 4 dB above the rest, and above the Hollows' hits under their quarter-down);
+- Quirkii keeps the owner's 0.75; Continue stays at 1 (already quieter).
+
+**Ducking:** the music steps down 3 dB (`MusicConfig.duckUnderDialogue` 0.7, over 0.4 s) while a conversation is open, so the line and its blips come forward. Set it to 1 to turn it off.
+
+**Mixer groups:** left at 0 dB under the player's sliders, and the Hollows' level is unchanged (the owner's 0.75).
+
+The feedback audit's **gap** rows above are now filled, except where the placeholders above remain.

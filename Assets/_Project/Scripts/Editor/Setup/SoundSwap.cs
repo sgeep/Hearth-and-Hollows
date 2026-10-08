@@ -197,7 +197,10 @@ namespace Hearthdelve.Editor
             return source;
         }
 
-        /// <summary>The keeper: footsteps on the walk's footfalls, and a light rumble with the dodge.</summary>
+        /// <summary>
+        /// The keeper: footsteps on the walk's footfalls. The dodge stays without a rumble (4b's feedback pass: it's frequent and
+        /// would numb the hits); a rumble an earlier run of this pass added is taken off again.
+        /// </summary>
         public static int EquipKeeper(GameObject root, bool hollows)
         {
             int n = 0;
@@ -213,9 +216,9 @@ namespace Hearthdelve.Editor
             }
             Transform dodge = root.transform.Find("Feedback_Dodge");
             var player = dodge != null ? dodge.GetComponent<MMF_Player>() : null;
-            if (player != null && !player.FeedbacksList.OfType<MMF_HapticPattern>().Any())
+            if (player != null && player.FeedbacksList.OfType<MMF_HapticPattern>().Any())
             {
-                player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {HapticIds.TapLight}", Pattern = LookTestContent.Pattern(HapticIds.TapLight) });
+                player.FeedbacksList.RemoveAll(f => f is MMF_HapticPattern);
                 EditorUtility.SetDirty(player);
                 n++;
             }

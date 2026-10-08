@@ -86,14 +86,14 @@ namespace Hearthdelve.Tests.EditMode
         }
 
         [Test]
-        public void TheKeeper_HasFootstepsAndADodgeRumble_AndEveryMeleeWeaponASwing()
+        public void TheKeeper_HasFootsteps_TheDodgeStaysUnfelt_AndEveryMeleeWeaponHasASwing()
         {
             foreach (string path in new[] { LookTestContent.PlayerPrefab, LookTestContent.TavernPlayerPrefab })
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
                 Assert.That(prefab.GetComponentInChildren<Footsteps>(true), Is.Not.Null, path);
                 MMF_Player dodge = prefab.transform.Find("Feedback_Dodge").GetComponent<MMF_Player>();
-                Assert.That(dodge.FeedbacksList.Any(f => f.GetType().Name.Contains("Haptic")), Is.True, $"{path}: the dodge is felt");
+                Assert.That(dodge.FeedbacksList.Any(f => f.GetType().Name.Contains("Haptic")), Is.False, $"{path}: no rumble on the dodge (4b: frequent, it would numb the hits)");
             }
             foreach (GameObject root in PrefabRoots())
             foreach (Weapon weapon in root.GetComponentsInChildren<Weapon>(true))
