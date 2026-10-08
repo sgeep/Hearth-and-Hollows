@@ -27,7 +27,7 @@ namespace Hearthdelve.Tavern.Scene
         SurfaceArea m_Area;
         [SerializeField, Tooltip("Where someone coming through the partner door arrives, relative to this door (clear of its trigger).")]
         Vector2 m_ArrivalOffset = new(0f, 1.2f);
-        [SerializeField, Min(0f)] float m_FadeSeconds = 0.18f;
+        [SerializeField, Min(0f)] float m_FadeSeconds = Hearthdelve.Shared.Game.PlaceFade.Seconds;
         [SerializeField, Tooltip("The way through (world direction): pushing that way in the doorway goes through. Zero: stepping in does.")]
         Vector2 m_Through;
         Vector2 m_LastSeen;
@@ -48,7 +48,7 @@ namespace Hearthdelve.Tavern.Scene
             return null;
         }
 
-        public void Configure(string id, string partner, SurfaceArea area, Vector2 arrivalOffset, float fadeSeconds = 0.18f, Vector2 through = default)
+        public void Configure(string id, string partner, SurfaceArea area, Vector2 arrivalOffset, float fadeSeconds = Hearthdelve.Shared.Game.PlaceFade.Seconds, Vector2 through = default)
         {
             m_Through = through;
             m_Id = id;

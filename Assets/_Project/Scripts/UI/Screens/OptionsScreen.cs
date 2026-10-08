@@ -98,7 +98,8 @@ namespace Hearthdelve.UI.Screens
             {
                 Tab.Display => IsWeb ? MenuLocKeys.OptionsNoteWeb : MenuLocKeys.OptionsNoteDisplay,
                 Tab.Accessibility => MenuLocKeys.OptionsNoteAccess,
-                _ => MenuLocKeys.OptionsNoteChange,
+                // 4i-C: the device in use only (the 4i-A prompt rule), which also keeps the note on one line.
+                _ => InputDevices.Current == InputDeviceKind.Gamepad ? MenuLocKeys.OptionsNoteChangePad : MenuLocKeys.OptionsNoteChange,
             });
             switch (tab)
             {
@@ -197,8 +198,24 @@ namespace Hearthdelve.UI.Screens
             RefreshAll();
         }
 
-        void OnEnable() => GameOptions.Changed += RefreshAll;
-        void OnDisable() => GameOptions.Changed -= RefreshAll;
+        void OnEnable()
+        {
+            GameOptions.Changed += RefreshAll;
+            InputDevices.Changed += OnDeviceChanged;
+        }
+
+        void OnDisable()
+        {
+            GameOptions.Changed -= RefreshAll;
+            InputDevices.Changed -= OnDeviceChanged;
+        }
+
+        /// <summary>The note follows the device; the selected line stays selected.</summary>
+        void OnDeviceChanged(InputDeviceKind _)
+        {
+            if (!IsOpen || m_Tab == Tab.Controls || m_Note == null) return;
+            if (m_Tab is Tab.Audio or Tab.Feel) m_Note.Set(InputDevices.Current == InputDeviceKind.Gamepad ? MenuLocKeys.OptionsNoteChangePad : MenuLocKeys.OptionsNoteChange);
+        }
 
         void RefreshAll()
         {

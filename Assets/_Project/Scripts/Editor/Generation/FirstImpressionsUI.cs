@@ -68,6 +68,75 @@ namespace Hearthdelve.Editor
             return LookTestBuilder.Text(parent, name, key, TextStyle.Body, color, anchor, k_Centre, k_Centre, pivot, new Vector2(x, y), new Vector2(width, Line));
         }
 
+        // ---------- Credits (4i-C) ----------
+
+        /// <summary>
+        /// The credits over a dimmed screen: a parchment panel with its title, a masked viewport of the Credits table's lines (each a
+        /// whole number of 12-pixel lines tall), HeatleyBros' link as a selectable line, and the controls note at the foot.
+        /// </summary>
+        public static CreditsScreen BuildCredits(RectTransform parent)
+        {
+            RectTransform root = LookTestBuilder.UIRect(parent, "Credits", k_Centre, k_Centre, Vector2.zero, Vector2.zero);
+            root.anchorMin = Vector2.zero;
+            root.anchorMax = Vector2.one;
+            root.sizeDelta = Vector2.zero;
+            DungeonUI.AddImage(root, DungeonUI.Pixel(), new Color(0.03f, 0.02f, 0.03f, 0.6f)).raycastTarget = true;
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(304f, 172f), Vector2.zero);
+            Text(panel, "Title", CreditsLocKeys.ScreenTitle, k_Title, TextAnchor.MiddleCenter, 0f, 72f, 280f).Configure(Loc.CreditsTable, CreditsLocKeys.ScreenTitle);
+            TavernScreens.Rect(panel, "Rule", k_Centre, k_Centre, new Vector2(0f, 64f), new Vector2(284f, 1f), k_Label);
+
+            RectTransform viewport = TavernScreens.Rect(panel, "Viewport", k_Centre, k_Centre, new Vector2(0f, -2f), new Vector2(284f, 128f));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var top = new Vector2(0.5f, 1f);
+            RectTransform content = LookTestBuilder.UIRect(viewport, "Content", top, top, Vector2.zero, new Vector2(284f, 0f));
+            float y = -Line * 2f;
+            Button link = null;
+            foreach (var (kind, key, _, lines) in CreditsLocKeys.Lines)
+            {
+                float height = lines * Line;
+                if (kind == CreditsLocKeys.Kind.Gap)
+                {
+                    y -= height;
+                    continue;
+                }
+                var at = new Vector2(0f, y);
+                if (kind == CreditsLocKeys.Kind.Link)
+                {
+                    RectTransform rect = LookTestBuilder.UIRect(content, "Link", top, top, at, new Vector2(200f, height));
+                    Image back = DungeonUI.AddImage(rect, DungeonUI.Pixel(), Color.white);
+                    back.raycastTarget = true;
+                    link = rect.gameObject.AddComponent<Button>();
+                    link.targetGraphic = back;
+                    ColorBlock colors = link.colors;
+                    colors.normalColor = new Color(1f, 1f, 1f, 0f);
+                    colors.highlightedColor = new Color(1f, 0.86f, 0.45f, 0.55f);
+                    colors.selectedColor = new Color(1f, 0.86f, 0.45f, 0.9f);
+                    colors.pressedColor = new Color(1f, 0.8f, 0.35f, 1f);
+                    link.colors = colors;
+                    link.navigation = new Navigation { mode = Navigation.Mode.None };
+                    LookTestBuilder.Text(rect, "Label", key, TextStyle.Body, DungeonUI.k_Discovery, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one,
+                        k_Centre, Vector2.zero, Vector2.zero).Configure(Loc.CreditsTable, key);
+                }
+                else
+                {
+                    TextStyle style = kind == CreditsLocKeys.Kind.Title ? TextStyle.Heading : kind == CreditsLocKeys.Kind.Heading ? TextStyle.Secondary : TextStyle.Body;
+                    Color colour = kind == CreditsLocKeys.Kind.Line ? k_Ink : k_Title;
+                    LookTestBuilder.Text(content, key, key, style, colour, TextAnchor.UpperCenter, top, top, top, at, new Vector2(276f, height))
+                        .Configure(Loc.CreditsTable, key);
+                }
+                y -= height;
+            }
+            // Room to finish: the last line scrolls up to the middle of the viewport.
+            content.sizeDelta = new Vector2(284f, -y + 64f);
+            LocalizedSuperText footer = Text(panel, "Footer", CreditsLocKeys.Back, k_Label, TextAnchor.MiddleCenter, 0f, -74f, 280f);
+            footer.Configure(Loc.CreditsTable, CreditsLocKeys.Back);
+
+            var screen = root.gameObject.AddComponent<CreditsScreen>();
+            screen.Configure(root.gameObject, viewport, content, link, footer);
+            root.gameObject.SetActive(false);
+            return screen;
+        }
+
         // ---------- Options (4i-B) ----------
 
         public const int OptionRows = 6;
@@ -176,15 +245,16 @@ namespace Hearthdelve.Editor
             DungeonUI.AddImage(root, DungeonUI.Pixel(), new Color(0.03f, 0.02f, 0.03f, 0.55f)).raycastTarget = true;
 
             // The main panel: the title and four buttons (quit game only on desktop).
-            RectTransform main = TavernScreens.Rect(root, "Main", k_Centre, k_Centre, Vector2.zero, new Vector2(150f, 132f));
+            RectTransform main = TavernScreens.Rect(root, "Main", k_Centre, k_Centre, Vector2.zero, new Vector2(150f, 152f));
             DungeonUI.AddImage(main, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
-            TavernScreens.Label(main, "Title", MenuLocKeys.PauseTitle, TextStyle.Heading, k_Title, TextAnchor.MiddleCenter, k_Centre, new Vector2(0f, 48f), new Vector2(130f, 24f));
-            Button resume = TavernScreens.SmallButton(main, "Resume", MenuLocKeys.Resume, k_Centre, new Vector2(0f, 24f), 110f, out _);
-            Button options = TavernScreens.SmallButton(main, "Options", MenuLocKeys.Options, k_Centre, new Vector2(0f, 5f), 110f, out _);
-            Button controls = TavernScreens.SmallButton(main, "Controls", MenuLocKeys.Controls, k_Centre, new Vector2(0f, -14f), 110f, out _);
-            Button quitMenu = TavernScreens.SmallButton(main, "QuitToMenu", MenuLocKeys.QuitToMenu, k_Centre, new Vector2(0f, -33f), 110f, out _);
-            Button quitGame = TavernScreens.SmallButton(main, "QuitGame", MenuLocKeys.QuitGame, k_Centre, new Vector2(0f, -52f), 110f, out _);
-            Vertical(resume, options, controls, quitMenu, quitGame);
+            TavernScreens.Label(main, "Title", MenuLocKeys.PauseTitle, TextStyle.Heading, k_Title, TextAnchor.MiddleCenter, k_Centre, new Vector2(0f, 58f), new Vector2(130f, 24f));
+            Button resume = TavernScreens.SmallButton(main, "Resume", MenuLocKeys.Resume, k_Centre, new Vector2(0f, 34f), 110f, out _);
+            Button options = TavernScreens.SmallButton(main, "Options", MenuLocKeys.Options, k_Centre, new Vector2(0f, 15f), 110f, out _);
+            Button controls = TavernScreens.SmallButton(main, "Controls", MenuLocKeys.Controls, k_Centre, new Vector2(0f, -4f), 110f, out _);
+            Button credits = TavernScreens.SmallButton(main, "Credits", MenuLocKeys.Credits, k_Centre, new Vector2(0f, -23f), 110f, out _);
+            Button quitMenu = TavernScreens.SmallButton(main, "QuitToMenu", MenuLocKeys.QuitToMenu, k_Centre, new Vector2(0f, -42f), 110f, out _);
+            Button quitGame = TavernScreens.SmallButton(main, "QuitGame", MenuLocKeys.QuitGame, k_Centre, new Vector2(0f, -61f), 110f, out _);
+            Vertical(resume, options, controls, credits, quitMenu, quitGame);
 
             // The question: what will be lost, then quit or back.
             RectTransform confirm = TavernScreens.Rect(root, "Confirm", k_Centre, k_Centre, Vector2.zero, new Vector2(280f, 76f));
@@ -198,9 +268,11 @@ namespace Hearthdelve.Editor
 
             ControlsPage page = BuildControlsPage(root);
             OptionsScreen optionsScreen = BuildOptions(root, page);
+            CreditsScreen creditsScreen = BuildCredits(root);
             var menu = canvas.gameObject.AddComponent<PauseMenu>();
             menu.Configure(root.gameObject, main.gameObject, resume, controls, quitMenu, quitGame, confirm.gameObject, question, yes, no, page);
             menu.ConfigureOptions(options, optionsScreen);
+            menu.ConfigureCredits(credits, creditsScreen);
             root.gameObject.SetActive(false);
         }
 

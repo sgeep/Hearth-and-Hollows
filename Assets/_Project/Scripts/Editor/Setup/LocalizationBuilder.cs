@@ -116,6 +116,8 @@ namespace Hearthdelve.Editor
             FillTable(Loc.UITable, LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(SurfaceLocKeys.English).Concat(GardenLocKeys.English).Concat(MenuLocKeys.English)
                 .Concat(CreatorLocKeys.English).Concat(OnboardingLocKeys.English).Concat(FurnitureCatalog.English()).Concat(FurnitureLooks.English()).Concat(KeeperContent.English()).Concat(QuestObjectContent.English), k_GeneratedPrefixes);
             FillTable(Loc.ContentTable, ContentEnglish.Concat(ContentEntries));
+            // 4i-C: the credits screen's own table (checked against docs/CREDITS.md by CreditsTests).
+            FillTable(Loc.CreditsTable, CreditsLocKeys.English);
             AssetDatabase.SaveAssets();
         }
 

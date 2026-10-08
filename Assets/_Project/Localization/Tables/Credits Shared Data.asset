@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Credits Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Credits
+  m_TableCollectionNameGuidString: a8bd712bed16c4e4b95d99ea834d2d32
+  m_Entries:
+  - m_Id: 1356083200
+    m_Key: credits.game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1393831936
+    m_Key: credits.art.heading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1393831937
+    m_Key: credits.art.minifantasy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1393831938
+    m_Key: credits.art.portraits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026240
+    m_Key: credits.music.heading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026241
+    m_Key: credits.music.heatleybros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026242
+    m_Key: credits.music.link
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026243
+    m_Key: credits.font.heading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026244
+    m_Key: credits.font.silver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026245
+    m_Key: credits.tools.heading
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026246
+    m_Key: credits.tools.moremountains
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026247
+    m_Key: credits.tools.stm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026248
+    m_Key: credits.tools.pixelcrushers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026249
+    m_Key: credits.tools.unity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026250
+    m_Key: credits.thanks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026251
+    m_Key: credits.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026252
+    m_Key: credits.back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1398026253
+    m_Key: credits.back_pad
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 2696332566870622208
+  references:
+    version: 2
+    RefIds:
+    - rid: 2696332566870622208
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1791497257668

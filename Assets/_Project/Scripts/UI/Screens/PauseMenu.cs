@@ -39,6 +39,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] ControlsPage m_ControlsPage;
         [SerializeField] Button m_Options;
         [SerializeField] OptionsScreen m_OptionsScreen;
+        [SerializeField] Button m_Credits;
+        [SerializeField] CreditsScreen m_CreditsScreen;
 
         InputAction m_Menu;
         bool m_PausableLastFrame;
@@ -54,6 +56,15 @@ namespace Hearthdelve.UI.Screens
         public ControlsPage ControlsPage => m_ControlsPage;
         public Button OptionsButton => m_Options;
         public OptionsScreen Options => m_OptionsScreen;
+        public Button CreditsButton => m_Credits;
+        public CreditsScreen Credits => m_CreditsScreen;
+
+        /// <summary>4i-C: the credits, from the pause menu.</summary>
+        public void ConfigureCredits(Button credits, CreditsScreen screen)
+        {
+            m_Credits = credits;
+            m_CreditsScreen = screen;
+        }
 
         /// <summary>4i-B: Options, from the pause menu.</summary>
         public void ConfigureOptions(Button options, OptionsScreen screen)
@@ -106,6 +117,7 @@ namespace Hearthdelve.UI.Screens
             m_Resume?.onClick.AddListener(Close);
             m_Controls?.onClick.AddListener(OpenControls);
             m_Options?.onClick.AddListener(OpenOptions);
+            m_Credits?.onClick.AddListener(OpenCredits);
             m_QuitMenu?.onClick.AddListener(() => AskQuit(app: false));
             m_QuitGame?.onClick.AddListener(() => AskQuit(app: true));
             m_ConfirmYes?.onClick.AddListener(Quit);
@@ -219,6 +231,11 @@ namespace Hearthdelve.UI.Screens
 
         void HandleOpen()
         {
+            if (m_CreditsScreen != null && m_CreditsScreen.IsOpen)
+            {
+                if (m_CreditsScreen.HandleInput()) ShowMain(m_Credits);
+                return;
+            }
             if (m_OptionsScreen != null && m_OptionsScreen.IsOpen)
             {
                 if (m_OptionsScreen.HandleInput()) ShowMain(m_Options);
@@ -253,6 +270,7 @@ namespace Hearthdelve.UI.Screens
         public void Close()
         {
             if (!IsOpen) return;
+            m_CreditsScreen?.Close();
             m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             m_Root.SetActive(false);
@@ -272,11 +290,19 @@ namespace Hearthdelve.UI.Screens
 
         void ShowMain(Button selected)
         {
+            m_CreditsScreen?.Close();
             m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             if (m_Confirm != null) m_Confirm.SetActive(false);
             if (m_Main != null) m_Main.SetActive(true);
             Select(selected != null && selected.gameObject.activeInHierarchy ? selected : m_Resume);
+        }
+
+        void OpenCredits()
+        {
+            if (m_CreditsScreen == null) return;
+            if (m_Main != null) m_Main.SetActive(false);
+            m_CreditsScreen.Open();
         }
 
         void OpenOptions()
@@ -352,6 +378,7 @@ namespace Hearthdelve.UI.Screens
             QuitPlan plan = CurrentPlan();
             bool app = m_QuitApp;
             GameFlow flow = GameFlow.Instance;
+            m_CreditsScreen?.Close();
             m_OptionsScreen?.Close();
             m_ControlsPage?.Close();
             if (m_Confirm != null) m_Confirm.SetActive(false);

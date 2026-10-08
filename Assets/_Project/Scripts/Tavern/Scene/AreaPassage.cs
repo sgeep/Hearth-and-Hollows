@@ -35,7 +35,7 @@ namespace Hearthdelve.Tavern.Scene
     {
         [SerializeField] PropertyArea m_To;
         [SerializeField, Tooltip("The area this way leads out of.")] PropertyArea m_From;
-        [SerializeField, Min(0f)] float m_FadeSeconds = 0.25f;
+        [SerializeField, Min(0f)] float m_FadeSeconds = Hearthdelve.Shared.Game.PlaceFade.Seconds;
         [SerializeField, Tooltip("The way through (world direction): pushing that way in the doorway goes through. Zero: stepping in does.")]
         Vector2 m_Through;
 
@@ -47,7 +47,7 @@ namespace Hearthdelve.Tavern.Scene
         public PropertyArea From => m_From;
         public bool Busy => m_Busy;
 
-        public void Configure(PropertyArea from, PropertyArea to, float fadeSeconds = 0.25f, Vector2 through = default)
+        public void Configure(PropertyArea from, PropertyArea to, float fadeSeconds = Hearthdelve.Shared.Game.PlaceFade.Seconds, Vector2 through = default)
         {
             m_Through = through;
             m_From = from;

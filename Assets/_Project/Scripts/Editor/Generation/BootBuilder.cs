@@ -192,10 +192,10 @@ namespace Hearthdelve.Editor
             LocalizedSuperText message = LookTestBuilder.Text(messageStrip, "Text", MenuLocKeys.SaveUnreadable, TextStyle.Body, DungeonUI.k_Light, TextAnchor.MiddleCenter,
                 centre, centre, centre, Vector2.zero, new Vector2(284f, 24f));
 
-            RectTransform panel = DungeonUI.Panel(root, new Vector2(150f, 106f), new Vector2(0f, -36f));
+            RectTransform panel = DungeonUI.Panel(root, new Vector2(150f, 124f), new Vector2(0f, -27f));
 
             // Stacked and centred, so the panel looks right with or without Continue and Quit.
-            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(150f, 106f));
+            RectTransform choices = TavernScreens.Rect(panel, "Choices", centre, centre, Vector2.zero, new Vector2(150f, 124f));
             var stack = choices.gameObject.AddComponent<VerticalLayoutGroup>();
             stack.childAlignment = TextAnchor.MiddleCenter;
             stack.spacing = 1f;
@@ -207,6 +207,7 @@ namespace Hearthdelve.Editor
             Button newGame = TavernScreens.SmallButton(choices, "NewGame", LoopLocKeys.MenuNewGame, centre, Vector2.zero, 110f, out _);
             Button options = TavernScreens.SmallButton(choices, "Options", MenuLocKeys.Options, centre, Vector2.zero, 110f, out _);
             Button controls = TavernScreens.SmallButton(choices, "Controls", MenuLocKeys.Controls, centre, Vector2.zero, 110f, out _);
+            Button credits = TavernScreens.SmallButton(choices, "Credits", MenuLocKeys.Credits, centre, Vector2.zero, 110f, out _);
             Button quit = TavernScreens.SmallButton(choices, "Quit", MenuLocKeys.Quit, centre, Vector2.zero, 110f, out _);
 
             RectTransform confirm = TavernScreens.Rect(root, "Confirm", centre, centre, new Vector2(0f, -40f), new Vector2(200f, 64f));
@@ -223,11 +224,13 @@ namespace Hearthdelve.Editor
 
             ControlsPage controlsPage = FirstImpressionsUI.BuildControlsPage(root);
             OptionsScreen optionsScreen = FirstImpressionsUI.BuildOptions(root, controlsPage);
+            CreditsScreen creditsScreen = FirstImpressionsUI.BuildCredits(root);
 
             var menu = root.gameObject.AddComponent<MainMenuScreen>();
             menu.Configure(choices.gameObject, continueButton, detail, newGame, confirm.gameObject, yes, no);
             menu.ConfigureFirstImpressions(controls, quit, controlsPage, message, version, titleBand.gameObject, panel.gameObject);
             menu.ConfigureOptions(options, optionsScreen);
+            menu.ConfigureCredits(credits, creditsScreen);
             // 4g Checkpoint B: New Game makes the keeper first.
             menu.ConfigureCreator(KeeperCreatorUI.Build(root));
             UiFeedbackContent.Commit(continueButton);

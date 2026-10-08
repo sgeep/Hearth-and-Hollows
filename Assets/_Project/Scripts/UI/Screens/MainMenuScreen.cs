@@ -37,6 +37,8 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] GameObject m_Panel;
         [SerializeField] Button m_Options;
         [SerializeField] OptionsScreen m_OptionsScreen;
+        [SerializeField] Button m_Credits;
+        [SerializeField] CreditsScreen m_CreditsScreen;
 
         GameFlow m_Flow;
         bool m_HasSave;
@@ -53,6 +55,15 @@ namespace Hearthdelve.UI.Screens
         public ControlsPage ControlsPage => m_ControlsPage;
         public Button OptionsButton => m_Options;
         public OptionsScreen Options => m_OptionsScreen;
+        public Button CreditsButton => m_Credits;
+        public CreditsScreen Credits => m_CreditsScreen;
+
+        /// <summary>4i-C: the credits, after Controls.</summary>
+        public void ConfigureCredits(Button credits, CreditsScreen screen)
+        {
+            m_Credits = credits;
+            m_CreditsScreen = screen;
+        }
 
         /// <summary>4i-B: Options, between New Game and Controls.</summary>
         public void ConfigureOptions(Button options, OptionsScreen screen)
@@ -121,6 +132,7 @@ namespace Hearthdelve.UI.Screens
             m_ConfirmNo.onClick.AddListener(() => ShowChoices(m_NewGame));
             if (m_Controls != null) m_Controls.onClick.AddListener(OpenControls);
             if (m_Options != null) m_Options.onClick.AddListener(OpenOptions);
+            if (m_Credits != null) m_Credits.onClick.AddListener(OpenCredits);
             if (m_Quit != null)
             {
                 m_Quit.gameObject.SetActive(PauseMenu.CanQuitApplication);
@@ -131,12 +143,27 @@ namespace Hearthdelve.UI.Screens
 
         void Update()
         {
+            if (m_CreditsScreen != null && m_CreditsScreen.IsOpen)
+            {
+                if (m_CreditsScreen.HandleInput()) ShowChoices(m_Credits);
+                return;
+            }
             if (m_OptionsScreen != null && m_OptionsScreen.IsOpen)
             {
                 if (m_OptionsScreen.HandleInput()) ShowChoices(m_Options);
                 return;
             }
             if (m_ControlsPage != null && m_ControlsPage.IsOpen && m_ControlsPage.HandleInput()) ShowChoices(m_Controls);
+        }
+
+        void OpenCredits()
+        {
+            if (m_CreditsScreen == null) return;
+            m_Choices.SetActive(false);
+            SetPanel(false);
+            if (m_Title != null) m_Title.SetActive(false);
+            ShowMessage(false);
+            m_CreditsScreen.Open();
         }
 
         void OpenOptions()

@@ -24,6 +24,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] SatchelSlotView[] m_Slots = Array.Empty<SatchelSlotView>();
         [SerializeField] Button m_Confirm;
         [SerializeField] Button m_KeepNothing;
+        float m_ConfirmX = float.NaN;
         [SerializeField, Tooltip("Furnishings found on the delve (4f Checkpoint C): lost with it, never in the Lockbox.")]
         LocalizedSuperText m_CuriosLost;
 
@@ -88,6 +89,13 @@ namespace Hearthdelve.UI.Screens
                 if (first == null && !stack.IsEmpty) first = m_Slots[i].gameObject;
             }
             if (m_KeepNothing != null) m_KeepNothing.gameObject.SetActive(!empty);
+            // 4i-C: with nothing to keep, the one button left stands in the middle (not in its place beside "keep nothing").
+            if (m_Confirm != null)
+            {
+                var rect = (RectTransform)m_Confirm.transform;
+                if (float.IsNaN(m_ConfirmX)) m_ConfirmX = rect.anchoredPosition.x;
+                rect.anchoredPosition = new Vector2(empty ? 0f : m_ConfirmX, rect.anchoredPosition.y);
+            }
             if (m_Chosen != null) m_Chosen.gameObject.SetActive(!empty);
             if (m_CuriosLost != null)
             {

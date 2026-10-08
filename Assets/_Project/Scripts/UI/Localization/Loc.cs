@@ -24,6 +24,8 @@ namespace Hearthdelve.UI.Localization
         /// authored) by <c>Hearthdelve → Story → Update Story Content</c>; translations live here.
         /// </summary>
         public const string DialogueTable = "Dialogue";
+        /// <summary>4i-C: the credits screen's text, checked against docs/CREDITS.md.</summary>
+        public const string CreditsTable = "Credits";
 
         static readonly Dictionary<string, StringTable> s_Tables = new();
 
@@ -42,7 +44,7 @@ namespace Hearthdelve.UI.Localization
         {
             if (IsReady) yield break;
             yield return LocalizationSettings.InitializationOperation;
-            foreach (string name in new[] { UITable, ContentTable, DialogueTable })
+            foreach (string name in new[] { UITable, ContentTable, DialogueTable, CreditsTable })
             {
                 var handle = LocalizationSettings.StringDatabase.GetTableAsync(name);
                 yield return handle;

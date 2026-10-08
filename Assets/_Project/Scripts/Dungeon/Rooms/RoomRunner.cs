@@ -40,9 +40,9 @@ namespace Hearthdelve.Dungeon.Rooms
         [SerializeField] CinemachineCamera m_Camera;
         [SerializeField] RoomCameraBounds m_CameraBounds;
         [SerializeField, Min(0f), Tooltip("Seconds the screen takes to cover when leaving a room.")]
-        float m_FadeOut = 0.25f;
+        float m_FadeOut = Hearthdelve.Shared.Game.PlaceFade.Seconds;
         [SerializeField, Min(0f), Tooltip("Seconds the screen takes to uncover in the new room.")]
-        float m_FadeIn = 0.3f;
+        float m_FadeIn = Hearthdelve.Shared.Game.PlaceFade.Seconds;
         [SerializeField, Min(0f), Tooltip("Seconds the fall into a hole takes before the screen covers.")]
         float m_FallTime = 0.45f;
         [SerializeField, Tooltip("The gates dropping as a fight starts: sound and haptic together.")]

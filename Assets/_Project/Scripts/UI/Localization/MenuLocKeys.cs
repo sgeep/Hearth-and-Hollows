@@ -44,6 +44,7 @@ namespace Hearthdelve.UI.Localization
 
         // ---------- options (4i-B) ----------
         public const string Options = "menu.options";
+        public const string Credits = "menu.credits";
         public const string TabAudio = "options.tab.audio", TabFeel = "options.tab.feel", TabDisplay = "options.tab.display",
             TabAccess = "options.tab.access", TabControls = "options.tab.controls";
         public const string OptMaster = "options.master", OptMusic = "options.music", OptEffects = "options.effects";
@@ -55,6 +56,7 @@ namespace Hearthdelve.UI.Localization
             OptSlow = "options.slow", OptNormal = "options.normal", OptInstant = "options.instant";
         public const string OptPercent = "options.percent", OptWindowSize = "options.window_size";
         public const string ArrowLess = "options.less", ArrowMore = "options.more";
+        public const string OptionsNoteChangePad = "options.note.change_pad";
         public const string OptionsNoteChange = "options.note.change", OptionsNoteDisplay = "options.note.display",
             OptionsNoteWeb = "options.note.web", OptionsNoteAccess = "options.note.access";
 
@@ -171,7 +173,7 @@ namespace Hearthdelve.UI.Localization
             ("controls.back", "back"), ("controls.back.kb", "Esc"), ("controls.back.pad", "B"),
             ("controls.advance", "next line"), ("controls.advance.kb", "E / click"), ("controls.advance.pad", "A"),
 
-            (Options, "options"),
+            (Options, "options"), (Credits, "credits"),
             (TabAudio, "audio"), (TabFeel, "feel"), (TabDisplay, "display"), (TabAccess, "accessibility"), (TabControls, "controls"),
             (OptMaster, "master volume"), (OptMusic, "music"), (OptEffects, "sound effects"),
             (OptShake, "screen shake"), (OptFlashes, "flashes"), (OptHitStop, "pause on big hits"),
@@ -180,7 +182,8 @@ namespace Hearthdelve.UI.Localization
             (OptTextSpeed, "text speed"), (OptRelaxed, "relaxed cooking timing"), (OptPatient, "patient customers"),
             (OptOn, "on"), (OptOff, "off"), (OptLow, "low"), (OptFull, "full"), (OptSlow, "slow"), (OptNormal, "normal"), (OptInstant, "instant"),
             (OptPercent, "{0}%"), (OptWindowSize, "{0} × {1}"), (ArrowLess, "«"), (ArrowMore, "»"),
-            (OptionsNoteChange, "left / right: change · Q / E, LB / RB: tab · Esc / B: back"),
+            (OptionsNoteChange, "left / right: change · Q / E: tab · Esc: back"),
+            (OptionsNoteChangePad, "left / right: change · LB / RB: tab · B: back"),
             (OptionsNoteDisplay, "windows come in whole steps of 320 × 180, so every pixel stays sharp."),
             (OptionsNoteWeb, "the browser keeps its own window; fullscreen fills the screen."),
             (OptionsNoteAccess, "relaxed timing widens the cooking targets; patient customers wait longer. neither costs you anything. hold E / A to hurry a conversation along."),

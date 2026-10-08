@@ -77,8 +77,10 @@ namespace Hearthdelve.UI.Debugging
                 s_Index = 0;
                 s_Mode = ScrollMode.Smooth;
                 if (m_Label != null) m_Label.gameObject.SetActive(false);
+                // 4i-C: no controls line in the day loop. The first delve's onboarding teaches the controls for the device in use
+                // (4g), and the pause menu has them all (4i-A); the old line named both devices and sat over the satchel row.
                 var hint = transform.Find("Hint");
-                if (hint != null && hint.TryGetComponent(out LocalizedSuperText controls)) controls.Set(LocKeys.DelveControls);
+                if (hint != null) hint.gameObject.SetActive(false);
             }
             Apply();
         }
