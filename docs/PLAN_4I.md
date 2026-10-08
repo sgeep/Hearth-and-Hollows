@@ -271,3 +271,104 @@ EditMode `FirstImpressionsTests` (quit plan per phase, pause rules, device rule,
 5. Quit from the day and Continue (same minute?); quit during Prep or service (is the warning clear?); quit mid-delve (clear?).
 6. Switch between keyboard and controller: do the prompts follow without flickering?
 7. Does everything look at home at 320×180?
+
+## As built: 4i-B, "Settings and accessibility" (2026-10-08; waiting for the owner's playtest)
+
+Approved as written in §4i-B with D4 and D6 (2026-10-08), with the owner's details: Options on the main menu between New Game and Controls and in the pause menu; tabs Audio, Feel, Display, Accessibility, Controls; 5% volume steps heard at once; a sample rumble on vibration changes; a separate options file that survives New Game; the Hollows' quarter-down on the mixer; routing only through generators and updaters. Carried from 4i-A: the menu's message band and Esc during a fade. **Save version stays 10.** Not tagged.
+
+### What was built
+
+- **Options (`OptionsScreen`, `OptionRow`, built by `FirstImpressionsUI.BuildOptions`):** one screen shared by the main menu (between New Game and Controls) and the pause menu (under Resume). Five tabs; Q / E or LB / RB change tab, up / down choose a line, left / right (stick, d-pad, arrows) or a click on either half change it, Esc / B goes back. Every change is saved and applied at once. The Controls tab is 4i-A's controls page.
+- **The options file (D4; `Shared/Settings`: `PlayerOptions`, `OptionsRules`, `OptionsStore`, `GameOptions`):** `options.json` beside the save (IndexedDB on the web, flushed after each write), never in `SaveData`. It's read before the first scene loads (`RuntimeInitializeOnLoadMethod`, BeforeSceneLoad) and applied before the first frame. A missing, damaged or out-of-range file gives the defaults or is brought back into range, and never throws. New Game, Continue and relaunching never touch it.
+- **The mixer (`Audio/GameMixer.mixer`, made by `AudioMixerBuilder` through Unity's own mixer editor API, since there's no public one):** Master with Music and Effects under it, each an exposed volume. `AudioMixerHub` in Boot sets them from the options, in decibels (0% is −80 dB). **The Hollows' quarter-down is now a mixer parameter:** Effects is multiplied by `effectsInHollows` while the delve runs. `AudioListener.volume` is no longer touched, and the music no longer divides it back out.
+- **Routing:** the generators route every new sound to Effects (`LookTestContent`'s feedback sounds, `TavernFeedbackContent`'s loops), and the music director's sources go to Music. A one-time in-place pass (`AudioRouting`, *Hearthdelve → Generate → Route Sounds to the Mixer*) routed the 54 sounds that already existed in the prefabs and the game's scenes, leaving the 4a look scenes as baselines. The hub also sends any unrouted sound in a newly loaded scene to Effects as a safety net. Tests check that nothing in the prefabs or the game's scenes is unrouted.
+- **Feel:** shake off / low (40%) / full, flashes, hit-stop, vibration on/off, its strength (10–100%, dimmed while vibration is off), and reduced vibration. All of them go to `GameSettings`, which the feedback code already honoured. Changing any vibration line fires a sample rumble (`Tap.Firm`).
+- **Display:** desktop has fullscreen (the display's own resolution, borderless) or a window in whole multiples of 320×180 that fit the display (largest by default). The web has only fullscreen (the page's, requested by the click or key). VSync stays on.
+- **Accessibility:** text speed slow (0.55×) / normal / instant, through the dialogue box's reveal (instant writes the line out whole). **Hold to hurry:** holding E, Enter, Space, A or the mouse in a conversation writes lines out 4× faster and moves on after a short pause, but never past a choice (choices stay locked while it's held). **Relaxed cooking timing** (off by default; `Tavern/Minigames/AssistRules`, pure): the keeper's grill, tap, chopping board and Butcher Block get targets 1.6× wider about their centres and a 0.8× pace (meters and knives slower, time limits longer). Scoring is unchanged, so there's no penalty. Staff, the balance report and everyone else use the ordinary factory (`TavernDirector.KeeperMinigames` versus `Minigames`). **Patient customers** (off by default): seat and food patience × 1.6 when a customer is created.
+- **Esc during a fade (carried from 4i-A):** an Esc or Start pressed while a scene changes or the transition covers the screen is kept for 2.5 seconds and opens the pause menu as soon as it may (`PauseRules.Queues`, `StillQueued`). A press refused for any other reason (a panel, a conversation, a story scene) is still meant as a refusal.
+- **The menu's message (carried from 4i-A):** a full-width band at 90% opacity under the title, so "the save can't be read" reads over any part of the still.
+- **Colour and contrast audit:**
+  - Quality (a pip count), freshness (a bar's length), Essence low (a pulse and a different sprite) and requests (a heart or frown icon) already carry their meaning in shape or size as well as hue.
+  - **The Larder Troll's telegraph** relied on hue: under a protanopia simulation the old deep red was barely lighter than the cellar floor (1.07:1). It's now a lighter orange-red at a little more opacity (1.6–1.8:1 above the floor under every simulation, still read as danger).
+  - **Text:** a new check measures every text in the game's scenes against what it sits on. Five secondary tones (labels, gold accents, notes, discovery blue, the "saved" green, warnings, titles) were 2.6–4.4:1 on parchment. They're darkened, keeping their hue, to at least 4.5:1 on all three parchment faces (`UI/Typography/UiPalette`). The generators read the palette, and a one-time in-place pass recoloured the existing 196 (`AccessibilityUpdates`, *Hearthdelve → Generate → Apply the Colour Audit*).
+
+### Changes from the plan
+
+- **No UI slider and no UI mixer group.** Interface sounds play through the same feedback players as everything else, so they're routed to Effects; the owner's rule was a UI slider only if UI sounds have their own group.
+- **Settings live in `Shared`, not `Core`** (`Shared/Settings`), beside `SaveSystem`'s `WebStorage` flush and the existing save-damage check they reuse. The file is `options.json`.
+- **Relaxed timing also covers the Butcher Block**, the keeper's fourth timing minigame; the plan named only the grill, tap and chopping.
+- **Web fullscreen is a line in Options' Display tab**, as the owner specified, not a separate pause-menu button.
+- **No "reset to defaults" button.** `GameOptions.ResetToDefaults` exists for tests and later; with only five tabs it wasn't worth a line yet.
+- **The contrast check is a test (`ContrastTests`)**, at WCAG AA (4.5:1; 3:1 for 2× and 3× headings). It measures boxes, not drawn pixels, so three readings were checked by eye on captures and are listed in the test with their reasons. HUD text over the world isn't measured.
+- **Windows build:** checking Options on a Windows build needs 4i-D's build path, so it's left for 4i-D as instructed. Options was checked in the editor's play mode and on the web build.
+
+### The options and their defaults
+
+| Tab | Option | Values | Default |
+|---|---|---|---|
+| Audio | master volume | 0–100% in 5% steps | 100% |
+| Audio | music | 0–100% in 5% steps (under `MusicConfig`'s authored levels) | 100% |
+| Audio | sound effects | 0–100% in 5% steps (a quarter down in the Hollows, on top) | 100% |
+| Feel | screen shake | off / low / full | full |
+| Feel | flashes | on / off | on |
+| Feel | pause on big hits (hit-stop) | on / off | on |
+| Feel | vibration | on / off | on |
+| Feel | vibration strength | 10–100% in 5% steps | 100% |
+| Feel | reduced vibration | on / off (caps rumble at 40%) | off |
+| Display (desktop) | fullscreen | on / off | on |
+| Display (desktop) | window size | 320×180 × 1 … the largest that fits | the largest that fits |
+| Display (web) | fullscreen | on / off (the browser's) | off |
+| Accessibility | text speed | slow / normal / instant | normal |
+| Accessibility | relaxed cooking timing | on / off | off |
+| Accessibility | patient customers | on / off | off |
+| Controls | the 4i-A controls reference | — | — |
+
+### Balance
+
+*Hearthdelve → Balance → Evening Report* rerun after the assist multipliers: unchanged, because the report and every staff member use the ordinary minigames. Assisted play stays out of the balance targets. `RenownAndBalanceTests` pass.
+
+### Tests
+
+- **EditMode `OptionsTests`:**
+  - volume steps and decibels;
+  - the defaults;
+  - window sizes;
+  - text speed;
+  - out-of-range values brought back;
+  - the file round trip;
+  - a missing or damaged file giving the defaults without throwing;
+  - the options never in `SaveData` (still v10);
+  - feel reaching `GameSettings`;
+  - the mixer's groups and parameters;
+  - every sound in the prefabs and the game's scenes routed, and Boot's hub;
+  - no code lowering the listener;
+  - Options' place in both menus;
+  - relaxed timing's widening and pace, scoring unchanged, and staff untouched;
+  - patient customers;
+  - the Esc queue.
+- **EditMode `ContrastTests`:**
+  - every text in the game's scenes against its panel;
+  - every palette tone on every parchment face;
+  - the telegraph under the deuteranopia and protanopia simulations.
+- **PlayMode `OptionsPlayTests`:**
+  - from the main menu, every tab's lines;
+  - a volume heard on the mixer at once and saved;
+  - vibration strength dimmed with vibration off;
+  - options surviving New Game;
+  - the Hollows lowering effects on the mixer, never the listener, with the music on its own group;
+  - from the pause menu, relaxed timing reaching only the keeper's stations;
+  - patient customers in a real service;
+  - instant and normal text speed in the first-morning conversation.
+
+### Playtest checklist (4i-B)
+
+1. Open Options from the main menu and from the pause menu, on keyboard and on controller. Is every line clear, and does left / right feel right?
+2. Audio: move each slider with sound on. Is the change heard at once (a click on Effects, the tune on Music)? Go down into the Hollows: are effects still a little quieter there, under your own level?
+3. Feel: shake off, low and full in the Hollows; flashes off; hit-stop off.
+4. **Vibration on a real controller:** strength at 10%, 50% and 100%, then reduced vibration on. Is each sample rumble distinctly weaker, and does a hit in the Hollows match?
+5. Display (desktop, in the editor's player or later the Windows build): fullscreen and each window size. Is every pixel crisp? On the web: fullscreen on and off.
+6. Text speed slow, normal and instant in a conversation; hold E or A through one. Does it hurry without skipping a choice?
+7. **Play one evening on relaxed cooking timing:** the grill, the tap, chopping and the Butcher Block. Does it help without feeling like the game plays itself? Then one with patient customers.
+8. Change some options, quit, relaunch (and reload the web page): still as you left them? Start a New Game: still there?
+9. Press Esc as a door fade or a scene change begins: the pause menu opens when it's done.
+10. The menu with an unreadable save: does the message read clearly? Are the softer text colours (labels, gold, notes) still pleasant and in keeping?

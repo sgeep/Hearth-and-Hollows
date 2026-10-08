@@ -94,7 +94,7 @@ namespace Hearthdelve.Tests
             "Vigor",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
             // 4i-A: the controls reference's keys and buttons.
-            "Esc", "Enter", "Tab", "Shift", "Del", "Z", "R", "F", "V", "G", "C", "Y", "LB", "LT", "RT", "R3", "L3", "View", "Start",
+            "Esc", "Enter", "Tab", "Shift", "Del", "Z", "R", "F", "V", "G", "C", "Y", "LB", "RB", "Q", "LT", "RT", "R3", "L3", "View", "Start",
         };
 
         /// <summary>

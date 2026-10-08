@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A built**, waiting for the owner's playtest. Next: **your 4i-A playtest**; 4i-B only after its approval._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A signed off** (2026-10-08); **4i-B built**, waiting for the owner's playtest. Next: **your 4i-B playtest**; 4i-C only after its approval._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1303,6 +1303,21 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
+### 4i-B: settings and accessibility (2026-10-08; waiting for the owner's playtest)
+
+Approved as written (PLAN_4I §4i-B, with D4 and D6) with the owner's details. Details, changes from the plan, the full list of options and the playtest checklist: `docs/PLAN_4I.md`, *As built: 4i-B*. Save version still 10. Not tagged.
+
+- **Options**, from the main menu (between New Game and Controls) and the pause menu: Audio, Feel, Display, Accessibility, Controls (4i-A's page). Controller-friendly lines; every change saved and applied at once.
+- **The options file** (`options.json`, IndexedDB on the web), never in the save, read before the first frame, kept through New Game.
+- **One audio mixer**: master, music and effects in 5% steps, heard at once. The Hollows' quarter-down on the mixer (the listener is left alone). Every sound routed (54 existing ones in place); no UI slider, since interface sounds are effects.
+- **Feel**: shake off / low / full, flashes, hit-stop, vibration with strength and reduced vibration (a sample rumble on each change).
+- **Display**: desktop fullscreen or windows in whole multiples of 320×180; the web's fullscreen.
+- **Accessibility**: text speed slow / normal / instant, hold to hurry (never past a choice), relaxed cooking timing (the keeper's grill, tap, chopping and Butcher Block; no score penalty), patient customers. Both assists off by default.
+- **Carried from 4i-A**: an Esc pressed during a fade opens the pause menu once it's done; the menu's save message on a full-width band.
+- **Colour and contrast audit**: the Larder Troll's telegraph is lighter than the floor, not only redder; secondary text tones darkened to 4.5:1 on parchment (`UiPalette`, 196 applied in place); a contrast test over every text.
+
+Tests: EditMode **804 passed, 0 failed** of 805 (one explicit report skipped; the one first-run failure, `Q` and `RB` not yet known as control labels, fixed and rerun), PlayMode **283 passed, 0 failed** (31 explicit captures skipped), including the new `OptionsTests` (20), `ContrastTests` (3) and `OptionsPlayTests` (4). Evening Report unchanged; `RenownAndBalanceTests` pass. Web: a development build (version `0.4i-b`) smoke-tested with the owner's save backed up first and restored exactly afterwards (same six records, the save the same 22,194 bytes): the menu shows Options between New Game and Controls; music lowered to 85% and effects to 90%; after a page reload both were still applied; the web Display tab offers fullscreen only; no console errors. Noticed: clicks on an option line in very quick succession were partly lost (five fast clicks moved music two steps; single clicks step once each), worth a look at a human pace in the playtest. Not driven in the browser (covered in PlayMode): the Hollows' level, relaxed timing, patient customers, text speed, a controller.
+
 ### 4i-A: first impressions (2026-10-08; signed off 2026-10-08)
 
 **Signed off by the owner (2026-10-08)** after playing the whole checklist: the menu, the first morning, the hints, pausing in each part of the day, quit and Continue from each moment, switching between keyboard and controller, and 320×180, "all works as described". (The sign-off's note on whether a real controller was used was left blank; a controller check stays on 4i-B's list.) Carried into 4i-B: the menu's save message strip must read clearly over the backdrop (part of the colour and contrast audit), and an Esc pressed while a scene fades in should be queued rather than dropped. Not tagged: `milestone-4i` waits for 4i-D.
@@ -1352,9 +1367,13 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - **Vendor prefabs with missing references** after the demo trim are listed in `docs/THIRD_PARTY.md`; we don't use them.
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
-- **The main menu is a plain panel** on a dark background (no art yet); settings come in 4i (`docs/PLAN_4I.md`, 4i-A and 4i-B).
+- ~~**The main menu is a plain panel**~~ (4i-A: the village still and the title).
 - ~~**No pause menu**~~ (4i-A built one).
-- **Settings aren't saved:** `GameSettings` (shake, flash, hit-stop, vibration) resets each launch and has no screen (4i-B).
+- ~~**Settings aren't saved**~~ (4i-B: Options, in their own file).
+- **Options on a Windows build is unchecked** (4i-D's build path; checked in the editor and on the web).
+- **Fast repeated clicks on an Options line can be lost on the web** (single clicks and keys step once each).
+- **Options' controls note wraps onto two lines** (it fits its box; shortening it is 4i-C polish).
+- **The window-size line can't preview**: a desktop window change applies at once, with no "keep these settings?" countdown.
 - ~~**An unreadable save hides Continue** without a message~~ (4i-A: explained, the backup offered, New Game asks).
 - ~~**Station panels' controls lines overflow their boxes**~~ (4i-A: one binding each).
 - ~~**The main menu's Continue detail shows `day {0}, {1}`**~~ (4i-A: fixed).
