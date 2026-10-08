@@ -1,6 +1,6 @@
 # 4h plan: walkable Kariaston and the daytime life-sim slice
 
-> **Status: approved 2026-10-06** (the owner's decisions on H1–H15 and the canon in §0.1, below). **Checkpoint A is approved (2026-10-07); Checkpoint B is built (2026-10-07) and waiting for the owner's playtest**; see *As built* near the end. C and D are not started. 4g is complete (signed off 2026-10-06, tag `milestone-4g`). Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
+> **Status: complete (signed off 2026-10-08, tag `milestone-4h`).** Plan approved 2026-10-06 (the owner's decisions on H1–H15 and the canon in §0.1, below). All four checkpoints built and approved by the owner after playtests: A (2026-10-07), B (2026-10-07), C (2026-10-07), D (2026-10-08); see *As built* near the end, then *Deferred from 4h* and *4h sign-off*. This plan is kept as the historical record; what was built and every deviation are in the *As built* sections. 4g is complete (signed off 2026-10-06, tag `milestone-4g`). Locked and not re-litigated here: a soft daytime clock, the 5 PM world cutoff, player-chosen Evening Prep, and Vigor as the daytime productivity cap (the owner's 4h brief, 2026-10-06).
 
 **The question 4h answers:** *does living in Tally Ho! and Kariaston feel good enough that I want to spend time there even when nothing is pushing me toward an objective?*
 
@@ -690,7 +690,7 @@ Fishing (and its minigame), ranching, foraging and gathering; seasons, weather, 
 
 ---
 
-## As built: Checkpoint A, "I can live here" (2026-10-07, built; waiting for the owner's playtest)
+## As built: Checkpoint A, "I can live here" (2026-10-07; approved by the owner 2026-10-07)
 
 Steps 1–4. Nothing of B, C or D is built: no Vigor, crops, save version 10, world seed, mid-day saving, resident villagers, schedules, Gimp, Glimmer, named patrons, fishing, ranching, seasons or weather. `milestone-4h` is not tagged.
 
@@ -773,7 +773,7 @@ The owner's verdict: everything else works well. Five changes:
 - **The storeroom shelves are furniture now** (they stood in the way, by the stairs' corridor): a unique working piece (`storeroom_shelves`, *Stations* in the catalog, a new `FurnitureFunction.Storeroom`) that Decorate Mode moves like the stations, starting below the barrels against the east wall (26, 7). A save from before gets them once, where the starting room has them or on the nearest free tile (`FunctionalGrants`; a unique piece can't be sold or lost, so "owns none" means "never had them": no save-version bump). The fixed fixture, its reserved tile and its layout fixture are gone.
 - **Back up the stairs after a trip outside:** not reproduced in automated play (walking through both doors on foot, then along the corridor and up, passes, with the shelves in either place), so the likeliest cause was fixed: the stairs' trigger covered only the right two-thirds of the one-tile gap beside the stew pot, so a keeper walking up along the stew pot slid past it. It now covers the whole foot tile (`GuestRoomBuilder`), and `AfterKariaston_TheKeeperWalksBackUpTheStairs` walks it. If it still happens, it needs the exact route.
 
-## As built: Checkpoint B, "A day's work" (2026-10-07, built; waiting for the owner's playtest)
+## As built: Checkpoint B, "A day's work" (2026-10-07; approved by the owner 2026-10-07)
 
 Steps 5–7. Nothing of C or D: no villagers, schedules, cast, Gimp or Glimmer; the world seed exists and nothing reads it yet. `milestone-4h` is not tagged.
 
@@ -868,7 +868,7 @@ The garden works; three changes:
 
 ---
 
-## As built: Checkpoint C, "The village has people" (2026-10-07, built; waiting for the owner's playtest)
+## As built: Checkpoint C, "The village has people" (2026-10-07; approved by the owner 2026-10-07)
 
 Steps 8–10. (§20's market stall for Grim is superseded: Musashi keeps it since 2026-10-07, and Grim's livelihood stays open.) Nothing of D: no Gimp, no Glimmer's light, no villagers at evening service, no Bart performance, no ambient NPC-to-NPC barks, no village deed chatter. The 4-minute day (0.43 s a game minute) is unchanged. `milestone-4h` is not tagged.
 
@@ -933,9 +933,9 @@ EditMode `VillageScheduleTests` (resolution and boundaries, conditions, the herb
 
 ### Known issues
 
-- Villagers walk through other villagers (no crowd avoidance; their spots are apart, and only a few ever move at once).
-- Kariaston's grid is baked once, on the first walk (a small hitch, once a load).
-- A villager walking when Decorate Mode opens in Tally Ho! keeps walking (Maximo only).
+- ~~Villagers walk through other villagers~~ (fixed in D: they give way).
+- ~~Kariaston's grid is baked once, on the first walk~~ (fixed in D: baked at load).
+- ~~A villager walking when Decorate Mode opens in Tally Ho! keeps walking~~ (fixed in D).
 - The herbs' handover and everyone's activities are wordless (faces and the ingredient icon); text barks over heads are D's (the ambient bark layer).
 - Ogrin's portrait is a halfling stand-in (no child parts in the Portrait Generator).
 
@@ -945,9 +945,9 @@ Over one full 8:00 → 17:00 day: count each person's moves (planned: Maximo 3, 
 
 ---
 
-## As built: Checkpoint D, "This is a community" (2026-10-07, built; waiting for the owner's final 4h playtest)
+## As built: Checkpoint D, "This is a community" (2026-10-07; approved by the owner in the final 4h playtest, 2026-10-08)
 
-Steps 11–14, following the owner's Checkpoint D brief, which revised §23 (Gimp's first meeting) and added a new open story direction (Gimp and Maximo). Music (Checkpoint C's follow-up) is unchanged; the night scene holds a new `MusicCue.Silence`. `milestone-4h` is not tagged.
+Steps 11–14, following the owner's Checkpoint D brief, which revised §23 (Gimp's first meeting) and added a new open story direction (Gimp and Maximo). Music (Checkpoint C's follow-up) is unchanged; the night scene holds a new `MusicCue.Silence`. (`milestone-4h` was tagged at the sign-off, below.)
 
 ### Gimp's night (the owner's revision of §23)
 
@@ -1006,6 +1006,29 @@ EditMode `CommunityTests` (Gimp's night due-rule, silence, his irregular visits 
 7. Save and Continue after Gimp's night: it never replays.
 
 ---
+
+### Deferred from 4h (non-blocking; recorded at sign-off, 2026-10-08)
+
+None of these blocked the owner's approval. Each goes to the milestone that owns its system; none is in 4i unless the 4i plan names it.
+
+| Item | Why it's deferred | Where it belongs |
+|---|---|---|
+| **Bart's performance** at dinner (a performance spot, music, a reaction from the room) | New customer behaviour, not an ordinary order | Phase 5 (village life, or a tavern-entertainment pass) |
+| **Daytime Visitors** (plan step 13: transient strangers in Tally Ho! and Kariaston by day) | Left out of the Checkpoint D brief | Phase 5, with the Inn and Visitor promotion |
+| **Kaloren's not eating** (he orders, admires the plate and leaves it: §19) | Needs a "patron who doesn't eat" customer variant | Phase 5, with his lichdom story |
+| **Gimp's rifle layer** (Modern Soldiers `Gun/`) | The firearms question is open | Story decision for the owner |
+| **A walkable night** (Gimp's night is a dark room and a lantern, no night free-roam) | Per the D brief | Phase 5 (with the calendar and events, if ever) |
+| **Inspectables** from §5's list (Phi's chair, the trophy, Orik's incident book); two were built to prove the idea | Content, not system | Phase 5 content, or 4i-C if cheap |
+| **Ogrin's portrait** is a halfling stand-in (the Portrait Generator has no child parts) | Art gap | Art pass; `docs/ASSET_MAP.md` |
+| **Wordless activities** (the herbs' handover, people at work: faces and icons, plus the overheard exchanges) | By design for 4h | Phase 5 content |
+| **Prep's music** (does Prep keep the day's tune or start the evening's?) | Open question from the music pass | 4i-C (audio balance) |
+| **Why Gimp hates Maximo**, and whether he was at the sealing (GDD §13 Open 12) | Open story question, deliberately unanswered | Story decision for the owner |
+| **The bark bubble's on-screen position** was checked in PlayMode and by the owner's D playtest, not separately in a browser by Claude | Batch captures can't show world-anchored UI faithfully | 4i-D regression |
+| **The fantasy calendar, festivals, birthdays, seasons** | Approved future direction, not built (GDD §11.1) | Phase 5 (see the Phase 5 proposal in `docs/PLAN_4I.md`) |
+
+## 4h sign-off (2026-10-08)
+
+**Phase 4h is complete.** The owner approved all four checkpoints after playing each: **A** "I can live here" (2026-10-07), **B** "A day's work" (2026-10-07), **C** "The village has people" (2026-10-07), and **D** "This is a community" (2026-10-08, the final 4h playtest). Approved alongside: the background music (HeatleyBros, 2026-10-07, two quarter-down steps, a silent arrival day, the Hollows' effects a quarter down), the audio-listener and music-loading fix (2026-10-08), and Quirkii a quarter under the other tracks (2026-10-08). Final verification and the tag are recorded in `docs/PROGRESS.md` (*4h complete*). Tagged `milestone-4h`. Next: 4i, planned in `docs/PLAN_4I.md` and not started until approved.
 
 ## Documentation during 4h
 
