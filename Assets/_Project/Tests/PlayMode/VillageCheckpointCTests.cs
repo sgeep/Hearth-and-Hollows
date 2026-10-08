@@ -118,6 +118,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
             yield return Revealed();
             SurfacePause.Hold(m_Hold);
+            // Checkpoint D's night in the keeper's room is D's to test: here it has already happened.
+            Flow.MarkHintSeen(Hearthdelve.Shared.Village.CommunityRules.GimpIntro);
             if (outside) Outside();
             yield return Frames(2);
         }

@@ -481,12 +481,49 @@ namespace Hearthdelve.Tavern.Scene
             Session.RequestFailed += (c, dish, outcome) =>
                 EventBus<CustomerRequestFailed>.Publish(new CustomerRequestFailed(PatronId(c), c.Id, dish != null ? dish.id : null, RequestReason(outcome)));
             m_Arrivals = new ArrivalSchedule(m_Content.service.service, m_Content.customers, m_Random);
+            PlanFamiliarFaces();
             Report = null;
             SetPhase(TavernPhase.Service);
             ServiceOpened?.Invoke();
         }
 
-        static string PatronId(CustomerLogic c) => c.Profile != null ? c.Profile.id : "guest";
+        static string PatronId(CustomerLogic c) => c.CharacterId ?? (c.Profile != null ? c.Profile.id : "guest");
+
+        // ---------- familiar faces (4h Checkpoint D) ----------
+
+        readonly List<NamedPatron> m_Tonight = new();
+        int m_Arrived;
+
+        /// <summary>Tonight's named villagers, in arrival order (0–2; seeded by the world and the day, so a reload keeps the evening).</summary>
+        public IReadOnlyList<NamedPatron> FamiliarFaces => m_Tonight;
+
+        void PlanFamiliarFaces()
+        {
+            m_Tonight.Clear();
+            m_Arrived = 0;
+            if (m_Content.namedPatrons == null || m_Content.namedPatrons.Count == 0 || m_Flow == null || !m_Flow.InGame) return;
+            var candidates = new List<Hearthdelve.Shared.Village.CommunityRules.Patron>();
+            foreach (NamedPatron p in m_Content.namedPatrons)
+                if (p != null && p.profile != null) candidates.Add(new Hearthdelve.Shared.Village.CommunityRules.Patron(p.character, p.chance));
+            foreach (string id in Hearthdelve.Shared.Village.CommunityRules.Tonight(m_Flow.State.WorldSeed, m_Flow.State.Day, candidates))
+                m_Tonight.Add(m_Content.namedPatrons.Find(p => p != null && p.character == id));
+        }
+
+        /// <summary>The named villager due with this arrival (the 2nd and 4th through the door), if any.</summary>
+        NamedPatron NextFamiliarFace()
+        {
+            m_Arrived++;
+            int slot = m_Arrived / 2 - 1;
+            return m_Arrived % 2 == 0 && slot >= 0 && slot < m_Tonight.Count ? m_Tonight[slot] : null;
+        }
+
+        /// <summary>A named villager walks in now (tests, debugging): any customer, in their own look.</summary>
+        public CustomerAgent SpawnFamiliarFace(NamedPatron patron)
+        {
+            CustomerAgent agent = SpawnCustomer(patron.profile);
+            if (agent != null) agent.WearAs(patron.layers, patron.shadow, patron.character);
+            return agent;
+        }
 
         static string RequestReason(RequestOutcome outcome) => outcome switch
         {
@@ -505,7 +542,10 @@ namespace Hearthdelve.Tavern.Scene
             Session.Tick(dt);
             if (Session.IsOver) return;
             CustomerProfile profile = m_Arrivals.Tick(dt, Session.CanAdmitCustomer && !ArrivalsPaused);
-            if (profile != null) SpawnCustomer(profile);
+            if (profile == null) return;
+            NamedPatron familiar = NextFamiliarFace();
+            if (familiar != null && !m_Agents.Exists(a => a.Logic.CharacterId == familiar.character)) SpawnFamiliarFace(familiar);
+            else SpawnCustomer(profile);
         }
 
         /// <summary>A customer walks in through the door (also debug F6). Null if the doors are closed.</summary>

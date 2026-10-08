@@ -8,6 +8,7 @@ using Hearthdelve.Shared.Characters;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Navigation;
 using Hearthdelve.Shared.Village;
+using Hearthdelve.Tavern.Customers;
 using Hearthdelve.Tavern.Scene;
 using Hearthdelve.Village;
 using UnityEditor;
@@ -42,6 +43,11 @@ namespace Hearthdelve.Editor
         public const string OgrinYard = "ogrin.yard", OgrinWindow = "ogrin.window", PondWest = "pond.west", GreenListen = "green.listen";
         public const string BartWagon = "bart.wagon", MarketFront = "market.front", Green = "green", MarketCart = "market.cart";
         public const string TavernKitchen = "tavern.kitchen", TavernBar = "tavern.bar";
+        /// <summary>4h Checkpoint D: Gimp at the table nearest Boog's corner, when he's up.</summary>
+        public const string TavernGimp = "tavern.gimp";
+        public static readonly Vector2 TavernGimpNear = new(20f, 4f);
+        /// <summary>Gimp's visits: in the afternoon, gone well before the evening.</summary>
+        public const int GimpFrom = 14 * 60, GimpUntil = 16 * 60 + 30;
 
         /// <summary>Kariaston's anchors: id, where they stand (village tiles), which way they face, behind a window.</summary>
         public static readonly (string id, Vector2 at, Facing4 facing, bool window)[] KariastonAnchors =
@@ -116,6 +122,11 @@ namespace Hearthdelve.Editor
             {
                 B(Morning, Night, MarketCart, "trading"),
             }),
+            // 4h Checkpoint D: Gimp comes up through the hatch (and down the stairs) to see Boog, now and then, once he's met the keeper.
+            (CharacterIds.Gimp, () => new()
+            {
+                B(GimpFrom, GimpUntil, TavernGimp, "boog", ScheduleCondition.On(DayRule.GimpVisit), ScheduleCondition.After(CommunityRules.GimpIntro)),
+            }),
             // Boog and Orik keep their tavern posts (StaffAgent places them): their schedules say so, for the village's sake.
             (CharacterIds.Boog, () => new() { B(Morning, Night, TavernKitchen, "kitchen") }),
             (CharacterIds.Orik, () => new() { B(Morning, Night, TavernBar, "ledger") }),
@@ -156,7 +167,11 @@ namespace Hearthdelve.Editor
             database.villageLife = LookTestContent.CreateOrUpdate<VillageLifeConfig>(EditorPaths.Config + "/VillageLife.asset", c =>
             {
                 if (c.settings.herbEveryDays <= 0) c.settings = VillageLifeSettings.Default;
+                // Once: Checkpoint D's tuning arrives in an asset made before it (zeros), never undoing a tuning since.
+                if (c.settings.gimpVisitChance <= 0f) c.settings.gimpVisitChance = VillageLifeSettings.Default.gimpVisitChance;
+                if (c.settings.glimmerChance <= 0f) c.settings.glimmerChance = VillageLifeSettings.Default.glimmerChance;
             });
+            BuildPatrons();
             EditorUtility.SetDirty(database);
             AssetDatabase.SaveAssets();
         }
@@ -240,6 +255,17 @@ namespace Hearthdelve.Editor
                     },
                     Shadow = NpcShadow(),
                 },
+                // 4h Checkpoint D: soldier_headband (locked) with a pack on his back; the rifle layer waits on the firearms question.
+                [CharacterIds.Gimp] = new()
+                {
+                    Layers = new[]
+                    {
+                        Set("Gimp_PackBack", Anim(CharacterAnim.Idle, KariastonSheets.SoldiersPack, "GimpPackBackIdle", 16, 0.2f), Anim(CharacterAnim.Walk, KariastonSheets.SoldiersPack, "GimpPackBackWalk", 4, 0.2f)),
+                        Set("Gimp", Anim(CharacterAnim.Idle, KariastonSheets.SoldiersPack, "GimpIdle", 16, 0.2f), Anim(CharacterAnim.Walk, KariastonSheets.SoldiersPack, "GimpWalk", 4, 0.2f)),
+                        Set("Gimp_PackFront", Anim(CharacterAnim.Idle, KariastonSheets.SoldiersPack, "GimpPackFrontIdle", 16, 0.2f), Anim(CharacterAnim.Walk, KariastonSheets.SoldiersPack, "GimpPackFrontWalk", 4, 0.2f)),
+                    },
+                    Shadow = Set("Gimp_Shadow", Anim(CharacterAnim.Idle, KariastonSheets.SoldiersPack, "GimpIdleShadow", 16, 0.2f), Anim(CharacterAnim.Walk, KariastonSheets.SoldiersPack, "GimpWalkShadow", 4, 0.2f)),
+                },
                 // A Myriad orc in a red doublet, boots and a cowboy hat (the Wise Orc is an armoured warlord with two swords at game scale).
                 [CharacterIds.Bart] = new()
                 {
@@ -252,6 +278,56 @@ namespace Hearthdelve.Editor
                 },
             };
         }
+
+        /// <summary>
+        /// Familiar faces at dinner (4h Checkpoint D): who may come, how often, ordering as which kind of customer, in their own looks.
+        /// Made once per character (tune the chances on the tavern content); the looks are refreshed.
+        /// </summary>
+        static readonly (string id, float chance, string profile)[] k_Patrons =
+        {
+            (CharacterIds.Maximo, 0.35f, "Customer_Villager"), (CharacterIds.Bart, 0.25f, "Customer_Villager"),
+            (CharacterIds.Grim, 0.2f, "Customer_Dwarf"), (CharacterIds.Musashi, 0.15f, "Customer_Villager"), (CharacterIds.Kaloren, 0.1f, "Customer_Villager"),
+        };
+
+        static void BuildPatrons()
+        {
+            var tavern = AssetDatabase.LoadAssetAtPath<TavernContent>(EditorPaths.Data + "/Tavern/TavernContent.asset") ?? throw new InvalidOperationException("No tavern content.");
+            Dictionary<string, Figure> figures = Figures();
+            figures[CharacterIds.Musashi] = MusashiFigure();
+            foreach (var (id, chance, profile) in k_Patrons)
+            {
+                NamedPatron p = tavern.namedPatrons.Find(n => n != null && n.character == id);
+                if (p == null) tavern.namedPatrons.Add(p = new NamedPatron { character = id, chance = chance });
+                p.profile = AssetDatabase.LoadAssetAtPath<CustomerProfile>($"{EditorPaths.Data}/Customers/{profile}.asset");
+                p.layers = figures[id].Layers;
+                p.shadow = figures[id].Shadow;
+            }
+            EditorUtility.SetDirty(tavern);
+        }
+
+        /// <summary>Musashi's look as built in Kariaston (A Myriad of NPCs: elf, black trousers, white shirt, black ponytail).</summary>
+        public static Figure MusashiFigure() => new()
+        {
+            Layers = new[] { Npc("Body", "Elf", "elfskin"), Npc("Trousers", "Trousers", "black"), Npc("Top", "Shirt", "white"), Npc("Hair", "PonyTail", "black") },
+            Shadow = NpcShadow(),
+        };
+
+        /// <summary>The overheard pairs in Kariaston (4h Checkpoint D): where their days put them together.</summary>
+        public static List<AmbientMoment> KariastonMoments() => new()
+        {
+            new() { conversation = "Ambient/KalorenGrim", first = CharacterIds.Kaloren, firstDoing = HerbVisit.Activity, second = CharacterIds.Grim, secondDoing = "chores", within = 4.5f },
+            new() { conversation = "Ambient/GrimOgrin", first = CharacterIds.Grim, firstDoing = "chores", second = CharacterIds.Ogrin, secondDoing = "yard", within = 4f },
+            new() { conversation = "Ambient/BartOgrin", first = CharacterIds.Bart, firstDoing = "playing", second = CharacterIds.Ogrin, secondDoing = "listening", within = 3.5f },
+            new() { conversation = "Ambient/MusashiBart", first = CharacterIds.Bart, firstDoing = "gossip", second = CharacterIds.Musashi, within = 4f },
+            new() { conversation = "Ambient/MaximoMusashi", first = CharacterIds.Maximo, firstDoing = "proclaim", second = CharacterIds.Musashi, within = 7f },
+        };
+
+        /// <summary>The overheard pairs in Tally Ho!.</summary>
+        public static List<AmbientMoment> TavernMoments() => new()
+        {
+            new() { conversation = "Ambient/GimpBoog", first = CharacterIds.Gimp, firstDoing = "boog", second = CharacterIds.Boog, within = 10f },
+            new() { conversation = "Ambient/MaximoOrik", first = CharacterIds.Maximo, firstDoing = "lunch", second = CharacterIds.Orik, within = 14f },
+        };
 
         /// <summary>How each looks at what they do: a held action, a flourish, a face now and then.</summary>
         public static List<ActivityLook> Looks(string character)

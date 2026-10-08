@@ -40,7 +40,7 @@ namespace Hearthdelve.Shared.Village
                 Quests.QuestObjectStatus.Home => "home",
                 Quests.QuestObjectStatus.Delivered => "delivered",
                 _ => "none",
-            });
+            }, beat => state.Story.SeenHints.Contains(beat));
         }
 
         /// <summary>The minute the village lives by: the clock's displayed step (routines change on it, never between).</summary>

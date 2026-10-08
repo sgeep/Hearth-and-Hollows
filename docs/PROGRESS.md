@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoints A and B approved**, **Checkpoint C built**, waiting for the owner's playtest). Next: **your playtest of 4h Checkpoint C**; then Checkpoint D (the community layer) once approved; then 4i (menus, options and polish)._
+_Last updated: 2026-10-07 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h Checkpoints A, B and C approved**, **Checkpoint D built**, waiting for the owner's final 4h playtest). Next: **your final 4h playtest**; then `milestone-4h` once approved; then 4i (menus, options and polish)._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1243,7 +1243,7 @@ Tests: EditMode 693/693, PlayMode 235 passed, 0 failed (25 explicit captures and
 
 **Open question for you:** homegrown provenance (above): worth changing ingredient identity for Boog's callbacks, or tracked another way (a day's harvest log) later?
 
-### 4h Checkpoint C: the village has people (2026-10-07, built; waiting for your playtest)
+### 4h Checkpoint C: the village has people (2026-10-07, approved)
 
 Checkpoint B approved (2026-10-07). C puts **Maximo, Kaloren, Grim, Ogrin and Bart** in Kariaston on a few broad beats a day (morning, midday, afternoon, from five), with **Musashi** at his cart and **Boog and Orik** at their posts under the same schedules. Where everyone is follows from the day, the clock, the story and the v10 world seed, and is never saved (`ScheduleDefinition`, `ScheduleRules`, `VillageDays`, `VillagePresence`). They walk when you can see them and are simply there when you can't; Maximo walks into Tally Ho! for lunch and out again (one of him at a time). **Kaloren brings Ogrin herbs every third day** (9:30, to the cottage door), wordless and visible, whether or not you're there. Ogrin has seeded good days (out: yard, pond, the green) and bad days (in bed, talked to through his window, a light inside). Five first-draft conversations (`Maximo/Hub` … `Bart/Hub`) in 4g's hub shape, seeded once for the node editor; portraits from the Portrait Generator. Details, schedules, art and deviations: `docs/PLAN_4H.md`, *As built: Checkpoint C*.
 
@@ -1252,6 +1252,20 @@ Tests: EditMode 724/724, PlayMode 246 passed, 0 failed (26 explicit captures and
 **Deviations:** Bart is A Myriad of NPCs' orc in a cowboy hat, not the Wise Orc (an armoured warlord with twin swords at game scale). Ogrin's portrait is a halfling stand-in (no child parts). Activities and the herbs are shown with faces and icons, not text barks (D's layer). Grim's livelihood stays open.
 
 **Known issues (Checkpoint C):** villagers walk through each other (their spots are apart); Kariaston's grid bakes on the first walk (a small hitch, once); a villager already walking keeps walking when Decorate Mode opens.
+
+### 4h Checkpoint D: this is a community (2026-10-07, built; waiting for your final 4h playtest)
+
+Checkpoint C approved (2026-10-07). D, following your brief:
+- **Gimp's night:** the first morning after a delve of your own (day 3 or later), he climbs out of the hatch in your room in the dark, by his old arrangement with Phi, asks where she is, and goes back down. Once per save; the morning (garden, Vigor, clock, save) is untouched. Afterwards he comes up to see Boog on irregular afternoons (seeded, never two days running), down the stairs from the hatch. He detests Maximo and won't say why.
+- **The village among itself:** seven short overheard exchanges (Grim and Ogrin, Kaloren and Grim, Bart and Ogrin, Bart and Musashi, Maximo and Musashi, Maximo and Orik, Gimp and Boog), each pair once a day, with a quiet of 35 real seconds between any two, one bubble at a time, never during a conversation, a menu or Decorate Mode. Callbacks to the troll and Boog's bomb.
+- **Familiar faces at dinner:** none to two named villagers an evening (seeded), as ordinary customers in their own looks.
+- **Glimmer's light:** a small pale light at Ogrin's window on some evenings (about one in four, after Gimp has come up), unexplained; Ogrin calls it "my light" if asked.
+- **C's issues:** villagers give way to each other, Kariaston's grid is baked at load, and nobody walks through Decorate Mode.
+
+Tests: TESTS_D. Web: WEB_D. Details, deviations and the final playtest checklist: `docs/PLAN_4H.md`, *As built: Checkpoint D*.
+
+**Approved future direction (not built):** a fantasy calendar, festivals, smaller village events, birthdays and eventually seasons (GDD §11.1), as a post-4h milestone to plan.
+**Open story question:** why Gimp hates Maximo, and whether he was at the sealing (GDD §13 Open 12); 4h only shows the hostility.
 
 ### Background music (2026-10-07, after Checkpoint C)
 

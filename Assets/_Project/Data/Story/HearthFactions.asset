@@ -322,6 +322,37 @@ MonoBehaviour:
       - 100
       - 0
     percentJudgeParents: 0
+  - id: 11
+    name: gimp
+    description: Character_gimp
+    color: 0
+    parents: 
+    traits:
+    - 70
+    - 90
+    - -20
+    relationships:
+    - factionID: 0
+      inheritable: 1
+      traits:
+      - -20
+      - 0
+    - factionID: 1
+      inheritable: 1
+      traits:
+      - 30
+      - 0
+    - factionID: 2
+      inheritable: 1
+      traits:
+      - 5
+      - 0
+    - factionID: 11
+      inheritable: 1
+      traits:
+      - 100
+      - 0
+    percentJudgeParents: 0
   traitInheritanceType: 0
   relationshipInheritanceType: 0
-  nextID: 11
+  nextID: 12

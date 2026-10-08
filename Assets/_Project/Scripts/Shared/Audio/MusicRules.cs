@@ -15,6 +15,8 @@ namespace Hearthdelve.Shared.Audio
         Service,
         /// <summary>The first region of the Hollows, the Cellars ("Otherworld"). Later regions add their own cue.</summary>
         Cellars,
+        /// <summary>Held for a quiet story moment (4h Checkpoint D: Gimp in the night): nothing plays.</summary>
+        Silence,
     }
 
     /// <summary>
@@ -26,6 +28,7 @@ namespace Hearthdelve.Shared.Audio
         public static MusicCue Pick(bool inGame, DayPhase phase, MusicCue held, bool arriving = false)
         {
             if (!inGame || arriving) return MusicCue.None;
+            if (held == MusicCue.Silence) return MusicCue.None;
             if (held != MusicCue.None) return held;
             return phase switch
             {

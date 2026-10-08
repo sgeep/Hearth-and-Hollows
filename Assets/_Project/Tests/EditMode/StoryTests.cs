@@ -327,7 +327,7 @@ namespace Hearthdelve.Tests
             Assert.That(table.Count, Is.EqualTo(english.Count), "no stale lines");
         }
 
-        static float Width(string text)
+        internal static float Width(string text)
         {
             Font font = GameFonts.Load();
             font.RequestCharactersInTexture(text, SilverMetrics.NativeSize);
@@ -338,7 +338,7 @@ namespace Hearthdelve.Tests
         }
 
         /// <summary>Lines wrapped at word breaks in <paramref name="width"/> pixels.</summary>
-        static int Lines(string text, float width)
+        internal static int Lines(string text, float width)
         {
             int lines = 1;
             float line = 0f, space = Width(" ") + 1f;

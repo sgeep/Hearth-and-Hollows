@@ -22,6 +22,10 @@ namespace Hearthdelve.Shared.Village
         public float seenWithin;
         [Min(1f), Tooltip("A walk that takes longer than this (a blocked path) ends with them there.")]
         public float longestWalkSeconds;
+        [Range(0f, 1f), Tooltip("4h Checkpoint D: how often Gimp would come up on a given day (never two days running, so fewer in practice).")]
+        public float gimpVisitChance;
+        [Range(0f, 1f), Tooltip("4h Checkpoint D: how often a light shows at Ogrin's window of an evening.")]
+        public float glimmerChance;
 
         public static VillageLifeSettings Default => new()
         {
@@ -32,6 +36,8 @@ namespace Hearthdelve.Shared.Village
             walkSpeed = 2.2f,
             seenWithin = 26f,
             longestWalkSeconds = 30f,
+            gimpVisitChance = 0.4f,
+            glimmerChance = 0.25f,
         };
     }
 
@@ -43,17 +49,21 @@ namespace Hearthdelve.Shared.Village
         public readonly bool OpeningComplete;
         public readonly VillageLifeSettings Settings;
         readonly Func<string, string> m_QuestObject;
+        readonly Func<string, bool> m_Beat;
 
-        public ScheduleWorld(int day, int seed, bool openingComplete, VillageLifeSettings settings, Func<string, string> questObjectStatus = null)
+        public ScheduleWorld(int day, int seed, bool openingComplete, VillageLifeSettings settings, Func<string, string> questObjectStatus = null,
+            Func<string, bool> beatSeen = null)
         {
             Day = day;
             Seed = seed;
             OpeningComplete = openingComplete;
             Settings = settings;
             m_QuestObject = questObjectStatus;
+            m_Beat = beatSeen;
         }
 
         public string QuestObjectStatus(string id) => m_QuestObject != null ? m_QuestObject(id) ?? "none" : "none";
+        public bool BeatSeen(string id) => m_Beat != null && id != null && m_Beat(id);
     }
 
     /// <summary>
@@ -65,6 +75,8 @@ namespace Hearthdelve.Shared.Village
         const uint k_Herbs = 0x48455242;   // "HERB"
         const uint k_Ogrin = 0x4F475249;   // "OGRI"
         const uint k_Vigil = 0x5649474C;   // "VIGL"
+        const uint k_Gimp = 0x47494D50;    // "GIMP"
+        const uint k_Glimmer = 0x474C494D; // "GLIM"
 
         /// <summary>A well-mixed number from the seed, the day and a salt (the same inputs, the same number, on every platform).</summary>
         public static uint Hash(int seed, int day, uint salt)
@@ -101,11 +113,32 @@ namespace Hearthdelve.Shared.Village
 
         public static bool MaximoVigil(int seed, int day, in VillageLifeSettings s) => Unit(seed, day, k_Vigil) < s.maximoVigilChance;
 
+        /// <summary>
+        /// Gimp comes up (4h Checkpoint D): a seeded roll each day, but never two days running, so the gaps are uneven (one day,
+        /// three, five…) and nobody can set a clock by him. Pure and deterministic: worked forward from a few days back.
+        /// </summary>
+        public static bool GimpVisit(int seed, int day, in VillageLifeSettings s)
+        {
+            bool yesterday = false;
+            for (int d = Math.Max(1, day - 14); d <= day; d++)
+            {
+                bool today = !yesterday && Unit(seed, d, k_Gimp) < s.gimpVisitChance;
+                if (d == day) return today;
+                yesterday = today;
+            }
+            return false;
+        }
+
+        /// <summary>A light at Ogrin's window this evening (4h Checkpoint D: seeded, now and then; never explained).</summary>
+        public static bool GlimmerEvening(int seed, int day, in VillageLifeSettings s) => Unit(seed, day, k_Glimmer) < s.glimmerChance;
+
         public static bool Holds(DayRule rule, in ScheduleWorld world) => rule switch
         {
             DayRule.HerbDay => HerbDay(world.Seed, world.Day, world.Settings),
             DayRule.OgrinWell => OgrinWell(world.Seed, world.Day, world.Settings),
             DayRule.MaximoVigil => MaximoVigil(world.Seed, world.Day, world.Settings),
+            DayRule.GimpVisit => GimpVisit(world.Seed, world.Day, world.Settings),
+            DayRule.GlimmerEvening => GlimmerEvening(world.Seed, world.Day, world.Settings),
             _ => false,
         };
     }
@@ -141,6 +174,7 @@ namespace Hearthdelve.Shared.Village
             ScheduleConditionKind.DayAtLeast => world.Day >= c.number,
             ScheduleConditionKind.OpeningComplete => world.OpeningComplete,
             ScheduleConditionKind.QuestObject => string.Equals(world.QuestObjectStatus(c.id), c.status ?? "none", StringComparison.OrdinalIgnoreCase),
+            ScheduleConditionKind.Beat => world.BeatSeen(c.id),
             _ => false,
         };
 

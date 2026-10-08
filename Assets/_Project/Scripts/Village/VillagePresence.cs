@@ -25,7 +25,20 @@ namespace Hearthdelve.Village
 
         public static VillagePresence Instance { get; private set; }
 
+        bool m_Decorating;
+
         void OnEnable() => Instance = this;
+
+        /// <summary>
+        /// The village's grid is baked now, while the scene loads behind the fade, rather than on the first walk (the Checkpoint C
+        /// playtest's one hitch).
+        /// </summary>
+        void Start()
+        {
+            var baked = new HashSet<Hearthdelve.Shared.Navigation.NavGrid>();
+            foreach (Villager v in Villager.All)
+                if (v != null && v.Grid != null && baked.Add(v.Grid)) _ = v.Grid.Map;
+        }
 
         void OnDisable()
         {
@@ -40,6 +53,16 @@ namespace Hearthdelve.Village
         public void Refresh()
         {
             Group();
+            // Decorate Mode holds the people in its room still; afterwards they find their spots in the new layout.
+            bool decorating = DecorateMode.Instance != null && DecorateMode.Instance.IsActive;
+            if (decorating != m_Decorating)
+            {
+                m_Decorating = decorating;
+                if (!decorating)
+                    foreach (Villager v in Villager.All)
+                        if (v != null && v.Area != SurfaceArea.KariastonId) v.Resettle();
+            }
+            if (decorating) return;
             if (!Daytime)
             {
                 foreach (List<Villager> copies in m_Copies.Values)
@@ -85,7 +108,7 @@ namespace Hearthdelve.Village
             Villager host = null;
             if (anchor != null)
                 foreach (Villager v in copies)
-                    if (v.gameObject.scene == anchor.gameObject.scene) host = v;
+                    if (v.Area == anchor.Area) host = v;
 
             // Every other copy goes: out of its door if the keeper is watching, otherwise at once.
             bool othersHere = false;
@@ -134,6 +157,7 @@ namespace Hearthdelve.Village
         /// <summary>Their scene's way in and out: its Tally Ho! front door, on its own side.</summary>
         static Vector2? Door(Villager v)
         {
+            if (v.Entrance is { } own) return own;
             foreach (string id in new[] { SurfaceDoor.FrontOutside, SurfaceDoor.FrontInside })
             {
                 SurfaceDoor door = SurfaceDoor.Find(id);

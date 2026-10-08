@@ -45,6 +45,9 @@ namespace Hearthdelve.Village
         [SerializeField, Tooltip("The grid they walk on (none: the floor's own, NavGrid.Current).")] NavGrid m_Grid;
         [SerializeField] List<ActivityLook> m_Looks = new();
         [SerializeField, Tooltip("Not about until the village's presence places them (a copy in Tally Ho! for a visit).")] bool m_StartHidden;
+        [SerializeField, Tooltip("Their own way in and out of this scene (world), instead of its front door (Gimp: the stairs down from the hatch).")]
+        bool m_HasEntrance;
+        [SerializeField] Vector2 m_Entrance;
 
         readonly List<Vector2> m_Path = new();
         int m_Next;
@@ -60,6 +63,15 @@ namespace Hearthdelve.Village
         public string Area => m_Area;
         public LayeredSpriteAnimator Animator => m_Animator;
         public NpcEmote Emote => m_Emote;
+        public NavGrid Grid => m_Grid;
+        /// <summary>Their own way in and out of this scene, if they have one.</summary>
+        public Vector2? Entrance => m_HasEntrance ? m_Entrance : null;
+
+        public void ConfigureEntrance(Vector2 at)
+        {
+            m_HasEntrance = true;
+            m_Entrance = at;
+        }
 
         /// <summary>Here (in this scene), whether seen or behind a window.</summary>
         public bool Shown { get; private set; } = true;
@@ -127,6 +139,7 @@ namespace Hearthdelve.Village
         void OnDisable()
         {
             s_All.Remove(this);
+            Speakers.Remove(m_CharacterId, transform);
             if (m_Talk == null) return;
             m_Talk.Describe = null;
             m_Talk.Used -= OnUsed;
@@ -164,6 +177,14 @@ namespace Hearthdelve.Village
             Shown = true;
             if (anchor != null) transform.position = anchor.Spot;
             Settle();
+        }
+
+        /// <summary>The scene's furniture moved under them (Decorate Mode): back to their spot, wherever it is now.</summary>
+        public void Resettle()
+        {
+            if (!Shown || At == null) return;
+            if (Walking) Finish(snap: true);
+            else Place(At, Activity);
         }
 
         /// <summary>Walks from where they are to <paramref name="anchor"/>; placed there if no path is found.</summary>
@@ -227,6 +248,7 @@ namespace Hearthdelve.Village
 
         void StartWalking()
         {
+            m_Yielded = 0f;
             m_Next = 0;
             m_Walked = 0f;
             if (m_Animator != null)
@@ -242,6 +264,9 @@ namespace Hearthdelve.Village
         {
             bool indoors = Indoors;
             bool seen = Shown && !indoors;
+            // 4h Checkpoint D: findable by the story for an overheard line while they're about and seen.
+            if (seen) Speakers.Set(m_CharacterId, transform);
+            else Speakers.Remove(m_CharacterId, transform);
             if (m_Model != null && m_Model.activeSelf != seen) m_Model.SetActive(seen);
             if (At != null) At.SetOccupied(Shown && At.Window && !Walking);
             if (m_Feet != null) m_Feet.enabled = seen && !Walking && !KeeperInTheWay();
@@ -316,6 +341,13 @@ namespace Hearthdelve.Village
 
         void Update()
         {
+            // Decorate Mode stops the world in its room: nobody strolls through furniture being moved (4h Checkpoint D).
+            if (DecorateMode.Instance != null && DecorateMode.Instance.IsActive && m_Area != SurfaceArea.KariastonId)
+            {
+                if (m_Animator != null) m_Animator.Movement = Vector2.zero;
+                UpdateTalk();
+                return;
+            }
             if (Walking) Step();
             else if (Shown) Stand();
             UpdateTalk();
@@ -341,8 +373,30 @@ namespace Hearthdelve.Village
                 return;
             }
             Vector2 dir = to.normalized;
+            // Give way (4h Checkpoint D): someone standing or walking just ahead, a moment's pause; then on regardless (walk-through,
+            // as before), so two villagers never lock.
+            if (m_Yielded < k_MostYield && SomeoneAhead(at, dir))
+            {
+                m_Yielded += Time.deltaTime;
+                if (m_Animator != null) m_Animator.Movement = Vector2.zero;
+                return;
+            }
             transform.position = at + dir * step;
             if (m_Animator != null) m_Animator.Movement = dir;
+        }
+
+        const float k_MostYield = 1.2f;
+        float m_Yielded;
+
+        bool SomeoneAhead(Vector2 at, Vector2 dir)
+        {
+            foreach (Villager other in s_All)
+            {
+                if (other == this || !other.Shown || other.Indoors || other.m_Area != m_Area) continue;
+                Vector2 to = (Vector2)other.transform.position - at;
+                if (to.sqrMagnitude < 0.75f * 0.75f && Vector2.Dot(to, dir) > 0.15f) return true;
+            }
+            return false;
         }
 
         void Finish(bool snap)

@@ -74,6 +74,11 @@ namespace Hearthdelve.Editor
         public const string KnightPack = "KnightJousting";
         public const string MinerPack = "Miner";
         public const string SnowballPack = "SnowballWars";
+        // 4h Checkpoint D: Gimp is Modern Soldiers' soldier_headband (locked) with a backpack; Glimmer's light is the Naughty Fairy.
+        public const string SoldiersPack = "ModernSoldiers";
+        public const string FairyPack = "NaughtyFairy";
+        const string k_Soldiers = "All_Exclusives_20261002/Creatures/Modern_Soldiers";
+        const string k_Fairy = "All_Exclusives_20261002/Creatures/Naughty_Fairy";
         const string k_Knight = "All_Exclusives_20261002/Addons/Medieval_Carnival/Knight_Jousting_Add-on_1.5/Knight On Foot";
         const string k_Miner = "All_Exclusives_20261002/Creatures/Miner";
         const string k_Snowball = "All_Exclusives_20261002/Seasonal_Content/Minifantasy_Snowball_Wars_Revamped_v1.0/Minifantasy_Snowball_Wars_Revamped_Assets/Characters/Separate_Layers";
@@ -100,6 +105,14 @@ namespace Hearthdelve.Editor
             yield return (SnowballPack, "ChildIdleShadow", $"{k_Snowball}/Idle/_Shadows/IdleShadow.png");
             yield return (SnowballPack, "ChildWalkShadow", $"{k_Snowball}/Walk/_Shadows/Walk_Shadow.png");
             yield return (SnowballPack, "ChildGatherShadow", $"{k_Snowball}/Gather/_Shadows/Gather_Shadow.png");
+            foreach (string a in new[] { "Idle", "Walk" })
+            {
+                yield return (SoldiersPack, $"Gimp{a}", $"{k_Soldiers}/{a}/Soldiers/{a}_soldier_headband.png");
+                yield return (SoldiersPack, $"GimpPackBack{a}", $"{k_Soldiers}/{a}/Backpack/{a}_backpack1_b.png");
+                yield return (SoldiersPack, $"GimpPackFront{a}", $"{k_Soldiers}/{a}/Backpack/{a}_backpack1_f.png");
+                yield return (SoldiersPack, $"Gimp{a}Shadow", $"{k_Soldiers}/{a}/Soldiers/_Shadow/{a}_shadow.png");
+            }
+            yield return (FairyPack, "FairyFly", $"{k_Fairy}/Fly_Idle.png");
         }
 
         static readonly Vector2 k_Centre = new(0.5f, 0.5f);

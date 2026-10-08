@@ -53,6 +53,8 @@ namespace Hearthdelve.Tavern.Customers
 
         public int Id { get; }
         public CustomerProfile Profile { get; }
+        /// <summary>A named villager at dinner (4h Checkpoint D): their stable id; null for a Visitor.</summary>
+        public string CharacterId { get; set; }
         public CustomerTraits Traits => m_Traits;
         public CustomerState State { get; private set; } = CustomerState.Arriving;
         public Departure Departure { get; private set; }

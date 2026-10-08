@@ -33,6 +33,49 @@ MonoBehaviour:
   staff:
   - {fileID: 11400000, guid: 18f1b867ffa4aaa4cb544fab7add7eaf, type: 2}
   - {fileID: 11400000, guid: 55af5a8545ddb6f4aa5b0bdb71babfd2, type: 2}
+  namedPatrons:
+  - character: maximo
+    chance: 0.35
+    profile: {fileID: 11400000, guid: fbcea82d5b92b8942904d87ea9fae426, type: 2}
+    layers:
+    - {fileID: 11400000, guid: 59952829b3dfcfb4f802e4240d6a707e, type: 2}
+    shadow: {fileID: 11400000, guid: f76e3744e04ab894a875473e28e4d8d2, type: 2}
+  - character: bart
+    chance: 0.25
+    profile: {fileID: 11400000, guid: fbcea82d5b92b8942904d87ea9fae426, type: 2}
+    layers:
+    - {fileID: 11400000, guid: da392ddffa59e294a8ea68308a408333, type: 2}
+    - {fileID: 11400000, guid: 26efeb81627af914891ed56c322efbf5, type: 2}
+    - {fileID: 11400000, guid: 141ee1cd96f7e2a4ca86df5318e536af, type: 2}
+    - {fileID: 11400000, guid: 41d48c2a4f65f944a99db57d719ccc78, type: 2}
+    - {fileID: 11400000, guid: 29a637ec02b564b4b9e6d21cb011452c, type: 2}
+    shadow: {fileID: 11400000, guid: 155f70d944d68af4c8263e2d00542c60, type: 2}
+  - character: grim
+    chance: 0.2
+    profile: {fileID: 11400000, guid: 93039d79b4c97704baed7c5c19f4e444, type: 2}
+    layers:
+    - {fileID: 11400000, guid: 41b1c879932bd364189a59936882d1c2, type: 2}
+    shadow: {fileID: 11400000, guid: d8ca709c96ec1cb4a9ce136ae8e12497, type: 2}
+  - character: musashi
+    chance: 0.15
+    profile: {fileID: 11400000, guid: fbcea82d5b92b8942904d87ea9fae426, type: 2}
+    layers:
+    - {fileID: 11400000, guid: 8dba96ed9f375bb4f99fa8adc4058763, type: 2}
+    - {fileID: 11400000, guid: 458398cdcb5745c46b9a747df7e5e1e8, type: 2}
+    - {fileID: 11400000, guid: f76557d4b6406f04daa7e889ac6461d7, type: 2}
+    - {fileID: 11400000, guid: 078be3605fc04c441afac016767121a8, type: 2}
+    shadow: {fileID: 11400000, guid: 155f70d944d68af4c8263e2d00542c60, type: 2}
+  - character: kaloren
+    chance: 0.1
+    profile: {fileID: 11400000, guid: fbcea82d5b92b8942904d87ea9fae426, type: 2}
+    layers:
+    - {fileID: 11400000, guid: 8728824c9611741418203a773e319770, type: 2}
+    - {fileID: 11400000, guid: 3b42fd07d353f834cbeb0e3ab1845f71, type: 2}
+    - {fileID: 11400000, guid: fbae562b85b4edf4eaa4e65616798675, type: 2}
+    - {fileID: 11400000, guid: 197f168ac48cbe844a9b05df4ed96749, type: 2}
+    - {fileID: 11400000, guid: 67d9c033e9a75874aa8ee54101448946, type: 2}
+    - {fileID: 11400000, guid: d10408ff21d3b8540a86fe6fba59cef4, type: 2}
+    shadow: {fileID: 11400000, guid: 155f70d944d68af4c8263e2d00542c60, type: 2}
   debugStockIngredients:
   - {fileID: 11400000, guid: 98c7efdca280afb42a749aa85b5f9eef, type: 2}
   - {fileID: 11400000, guid: 1d5030355ac523f4eade52bcdc259975, type: 2}

@@ -64,23 +64,29 @@ namespace Hearthdelve.UI.World
         /// A world point's position on the canvas, measured from the camera position the world is
         /// actually drawn from (the snapped one) and rounded to whole art pixels.
         /// </summary>
-        Vector2 CanvasPosition(Vector3 world)
+        Vector2 CanvasPosition(Vector3 world) => ToCanvas(m_Camera, m_PixelPerfect, m_CanvasRect, world);
+
+        /// <summary>
+        /// A world point on a canvas covering the screen, from the camera position the world is drawn from (the snapped one when
+        /// snapping), so it moves in lockstep with the world (also the overheard lines' bubbles, 4h Checkpoint D).
+        /// </summary>
+        public static Vector2 ToCanvas(Camera camera, PixelPerfectCamera pixelPerfect, RectTransform canvasRect, Vector3 world)
         {
-            Vector2 size = m_CanvasRect.rect.size;
-            if (m_PixelPerfect == null || !m_Camera.orthographic)
+            Vector2 size = canvasRect.rect.size;
+            if (pixelPerfect == null || !camera.orthographic)
             {
-                Vector3 viewport = m_Camera.WorldToViewportPoint(world);
+                Vector3 viewport = camera.WorldToViewportPoint(world);
                 return new Vector2(Mathf.Round(viewport.x * size.x), Mathf.Round(viewport.y * size.y));
             }
 
-            int pixelsPerUnit = m_PixelPerfect.assetsPPU;
+            int pixelsPerUnit = pixelPerfect.assetsPPU;
             // Without grid snapping the world is drawn from the camera's real position, unrounded.
-            bool snapping = m_PixelPerfect.gridSnapping != PixelPerfectCamera.GridSnapping.None;
-            Vector3 camera = snapping ? m_PixelPerfect.RoundToPixel(m_Camera.transform.position) : m_Camera.transform.position;
-            Vector2 fromCentre = (Vector2)(world - camera) * pixelsPerUnit;
+            bool snapping = pixelPerfect.gridSnapping != PixelPerfectCamera.GridSnapping.None;
+            Vector3 from = snapping ? pixelPerfect.RoundToPixel(camera.transform.position) : camera.transform.position;
+            Vector2 fromCentre = (Vector2)(world - from) * pixelsPerUnit;
             if (snapping) fromCentre = new Vector2(Mathf.Round(fromCentre.x), Mathf.Round(fromCentre.y));
-            float viewHeight = 2f * m_Camera.orthographicSize * pixelsPerUnit;
-            float viewWidth = viewHeight * m_Camera.aspect;
+            float viewHeight = 2f * camera.orthographicSize * pixelsPerUnit;
+            float viewWidth = viewHeight * camera.aspect;
             return new Vector2((0.5f + fromCentre.x / viewWidth) * size.x, (0.5f + fromCentre.y / viewHeight) * size.y);
         }
 

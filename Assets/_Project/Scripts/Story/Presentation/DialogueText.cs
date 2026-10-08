@@ -27,6 +27,13 @@ namespace Hearthdelve.Story.Presentation
             return Localized(response.destinationEntry, true) ?? fallback;
         }
 
+        /// <summary>An entry's line, outside a conversation (4h Checkpoint D: an overheard line), with its markup applied.</summary>
+        public static string Entry(DialogueEntry entry)
+        {
+            if (entry == null) return string.Empty;
+            return Localized(entry, false) ?? FormattedText.Parse(entry.DialogueText ?? string.Empty).text;
+        }
+
         static string Localized(DialogueEntry entry, bool menu)
         {
             string guid = entry != null ? Field.LookupValue(entry.fields, DialogueAdapter.GuidField) : null;

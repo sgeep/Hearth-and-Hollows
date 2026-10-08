@@ -199,7 +199,13 @@ namespace Hearthdelve.Story.Editor
             CharacterDefinition ogrin = Villager(CharacterIds.Ogrin, new SocialTraits(20f, 70f, 60f), 20f, 10f, 60f, StoryDialogue.OgrinHub);
             // Bart: a good story (warmth, a little nerve).
             CharacterDefinition bart = Villager(CharacterIds.Bart, new SocialTraits(20f, 40f, 50f), 20f, 5f, 80f, StoryDialogue.BartHub);
-            return new List<CharacterDefinition> { player, boog, pip, narration, musashi, maximo, kaloren, grim, ogrin, bart };
+            // 4h Checkpoint D: Gimp, a Hollower. Daring and good work earn his respect; warmth bores him. He starts cold toward the keeper
+            // (the owner's canon: he doesn't warm up because the keeper is the protagonist).
+            CharacterDefinition gimp = Villager(CharacterIds.Gimp, new SocialTraits(70f, 90f, -20f), -20f, 0f, 5f, StoryDialogue.GimpHub);
+            gimp.kind = CharacterKind.Hollower;
+            gimp.affinityToTavern = 30f;
+            EditorUtility.SetDirty(gimp);
+            return new List<CharacterDefinition> { player, boog, pip, narration, musashi, maximo, kaloren, grim, ogrin, bart, gimp };
         }
 
         static void Configure(CharacterDefinition c, string id, CharacterKind kind, LocalizedString name, Dictionary<string, PortraitDefinition> portraits, string conversation)

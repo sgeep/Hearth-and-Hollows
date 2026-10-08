@@ -17,6 +17,8 @@ namespace Hearthdelve.Shared.Characters
         Resident,
         /// <summary>Anyone else the story needs (Old Phi, Ser Aldric Vane).</summary>
         Story,
+        /// <summary>4h Checkpoint D: someone who lives in the Hollows and isn't an enemy (Gimp); never shown as a category.</summary>
+        Hollower,
     }
 
     /// <summary>
@@ -53,6 +55,8 @@ namespace Hearthdelve.Shared.Characters
         public const string Ogrin = "ogrin";
         /// <summary>Bart: an orc bard, the first Visitor who stayed; lives in the painted wagon on the green.</summary>
         public const string Bart = "bart";
+        /// <summary>4h Checkpoint D: Gimp, a half-elf ranger who lives in and around the Hollows and comes up the hatch to see Boog.</summary>
+        public const string Gimp = "gimp";
 
         /// <summary>Generated Visitors are <c>visitor/&lt;day&gt;/&lt;visit&gt;</c>: unique for the evening, never saved.</summary>
         public const string VisitorPrefix = "visitor/";

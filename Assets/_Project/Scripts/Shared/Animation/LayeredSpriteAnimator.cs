@@ -63,6 +63,13 @@ namespace Hearthdelve.Shared.Animation
             Show();
         }
 
+        /// <summary>A different shadow (a figure with its own: a named villager at dinner, 4h Checkpoint D).</summary>
+        public void SetShadow(SpriteAnimationSet shadow)
+        {
+            m_ShadowSet = shadow;
+            Show();
+        }
+
         /// <summary>Holds a facing (a seated customer faces the table) until <see cref="ReleaseFacing"/>.</summary>
         public void LockFacing(Facing4 facing)
         {

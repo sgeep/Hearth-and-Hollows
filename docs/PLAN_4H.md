@@ -945,6 +945,68 @@ Over one full 8:00 → 17:00 day: count each person's moves (planned: Maximo 3, 
 
 ---
 
+## As built: Checkpoint D, "This is a community" (2026-10-07, built; waiting for the owner's final 4h playtest)
+
+Steps 11–14, following the owner's Checkpoint D brief, which revised §23 (Gimp's first meeting) and added a new open story direction (Gimp and Maximo). Music (Checkpoint C's follow-up) is unchanged; the night scene holds a new `MusicCue.Silence`. `milestone-4h` is not tagged.
+
+### Gimp's night (the owner's revision of §23)
+
+- **When:** the first morning after a delve of the keeper's own: day 3 or later (the opening's delve is night 1, the first free day's night 2), opening complete, on waking (the day's first minutes, not a mid-day Continue), once per save (`CommunityRules.GimpIntroDue`). Every morning in the loop follows a completed delve, so a keeper who has never been below can't meet him. **The old day-6 fallback is gone**: a save that skipped day 3 meets him the next morning.
+- **How:** `NightVisitor` (in Tally Ho!'s scene) listens to `TavernDirector.Woke`, so it runs after `DayRules.Sleep` has already grown the garden, refilled Vigor, set the clock to the morning and saved. The keeper's room goes dark (a night tint over the room's own lighting, re-applied after `TavernMood` each frame), a lantern glows at the hatch, the clock holds (`SurfacePause`), the music is silent, Gimp stands a step off the hatch facing the bed, and `Gimp/Intruder` plays. Afterwards he goes back down, the light comes up on an ordinary morning, the beat is recorded (`beat:gimp_intro` in `StoryState.SeenHints`, like Orik's five o'clock: **no save change**) and the game saves. Nothing else about the day changes; no night free-roam.
+- **The conversation** (`Gimp/Intruder`, seeded once): "oh. you're awake. don't shout. Boog's asleep…"; he saw the keeper go down and come back up ("most don't, the first few times"); the keeper asks who he is or why he's coming out of the floor ("it was Phi's floor. it had a hatch in it. i didn't build the house."); "where's Phi? i haven't seen her in a while."; "...gone down. and nobody thought to tell me."; the arrangement ("i come up her hatch, i see Boog, i have a drink, i go back down. nobody screams."); "it just needs a new name on it" / Boog "always knows"; "if she turns up, tell her Gimp asked. don't tell her i asked twice."; "go back to sleep, keeper. i know my own way down." Nothing about his past, the sealing or why Phi went down.
+- **His look:** `soldier_headband` (Modern Soldiers) with its backpack (the `backpack1` back and front layers); the rifle layer is not used (the firearms question stays open). Portrait: the Portrait Generator's elf (soft skin, pointed ears) with short brown hair, a red headband, angry brows, mutton chops, a green vest and a grimace (`Tools/portraits/gimp.json`). `CharacterKind.Hollower`; values craft 70, nerve 90, warmth −20; affinity −20 (standoffish).
+
+### His visits
+
+- `DayRule.GimpVisit`: a seeded 40% roll each day, never two days running (pure, worked forward a fortnight), so the gaps are uneven; about one day in four. Only after his night (`ScheduleCondition.Beat`, new). `Schedule_gimp`: 14:00–16:30 at `tavern.gimp` (the seat of today's furniture nearest Boog's corner), "boog".
+- His tavern copy has its **own entrance: the stairs** (he came up the hatch upstairs), never the front door; seen, he walks down from the stairs' foot and back.
+- `Gimp/Hub`: once, the troll ("not bad. for someone from up here."); his greeting while visiting ("Boog says you can cook. Boog says a lot of things."); three questions: Boog ("he blew up a tunnel i was standing in. i liked him at once."), Phi ("you'd be the second to know. Boog's first."), **Maximo** ("the old tin can. don't say that name in this house." → "what did he do to you?" → "nothing you'd understand. drop it.").
+
+### Gimp and Maximo (open, not locked)
+
+He detests Maximo and won't say why: his hub and one overheard exchange with Boog ("don't say that name while i'm drinking"). The owner's proposed direction (that Gimp was at the sealing beside Maximo and Karias) is recorded as an **open story question** in the GDD (§13 Open 12), not canon; a test keeps sealing, Karias, war, age and "old friend" words out of his lines.
+
+### The village among themselves
+
+- **Barks are Dialogue System conversations** (`Ambient/…`, seeded once, the node editor's): from START the first variant whose condition holds (once-only callbacks first, marking `hh_amb_…` variables), then its lines in order. `AmbientBarks` (Story.Presentation, on the Boot dialogue canvas) shows each line in **one small bubble** over the speaker (`Speakers`: villagers and staff register their transforms by stable id), never interactive, never holding the clock; a conversation, a menu or a held moment (Decorate Mode, panels) stops it at once. Gameplay reaches it only through `StoryServices.Barks` (`IBarkService`).
+- **When** is the village's (`AmbientMoments`, one list in Kariaston, one in Tally Ho!): both people about, standing still, close together and (optionally) doing the right thing, the keeper within 12 tiles of both, each pair at most once a day, and **35 real seconds of quiet** between any two exchanges anywhere.
+- **The pairs:** Grim and Ogrin in the yard (the troll once; herb mornings; "can i see the Hollows today?" "no." …); Kaloren and Grim at the herbs ("steep them, Grim. don't boil them."); Bart and Ogrin on the green (Boog's bomb once; "play the goat one!"); Bart and Musashi at the cart (the troll once, Musashi on troll stew; the onions); Maximo and Musashi of a morning; Maximo and Orik at lunch (his account "has its own book now"); Gimp and Boog (the bomb once; Maximo once; powder and tunnels).
+- **Community reactions** come through these (the troll, Boog's bomb) and the C hubs' callbacks; no rumor network, no numbers.
+
+### Familiar faces at dinner
+
+`CommunityRules.Tonight` picks none to two named villagers each evening (seeded by the world seed and the day, so a reload keeps the evening; on average about one): Maximo 35%, Bart 25%, Grim 20%, Musashi 15%, Kaloren 10% (on `TavernContent.namedPatrons`, tunable). They arrive as the 2nd and 4th customers, are **ordinary customers** (ordering, seating, eating, paying, requests) in their own Kariaston looks (`CustomerAgent.WearAs`; the customer prefab gained a sixth layer for Kaloren's gloves), and carry their stable id into the service facts (`DishServed`, requests). Nobody is in the village after five, so nobody is in two places. **Not built:** Bart's performance spot, and Kaloren's not eating (both would be new customer behaviour); daytime Visitors (plan step 13) were left out of this brief.
+
+### Glimmer's light
+
+`WindowLight` at Ogrin's ground-floor window: after five, on a seeded evening (`DayRule.GlimmerEvening`, about one in four, only once Gimp has come up), while Ogrin is in: the Naughty Fairy's flight (back-facing frames, pale blue), drawn unlit and pale with a faint glow, drifting at the glass and fading in and out. Ogrin's hub has one new line those evenings (a one-off author's edit, guarded on his good-night line being as written): "my light came again. no, i won't say what it is. i don't know what it is." Nothing names or explains it.
+
+### Checkpoint C's issues
+
+- **Walking through each other:** a villager gives way for up to 1.2 s to someone standing or walking just ahead, then carries on (walk-through, as before, so nobody locks).
+- **The first-walk hitch:** Kariaston's grid is baked when the scene loads (behind the fade).
+- **Decorate Mode:** villagers in Tally Ho! stand still while it's open; afterwards each finds their spot in the new layout (`Villager.Resettle`).
+
+### Deviations
+
+Bart doesn't perform and Kaloren eats like anyone (no new customer mechanics); no daytime Visitors; the rifle layer isn't shown; the night scene is a dark room and a lantern rather than a full night state (no night free-roam, per the brief).
+
+### Tests
+
+EditMode `CommunityTests` (Gimp's night due-rule, silence, his irregular visits and schedule, familiar faces, Glimmer's evenings, what his night and hub say and don't, every overheard line fitting the bubble, Gimp's data, Ogrin's light line). PlayMode `VillageCheckpointDTests` (the night: once, after an own delve, the morning intact, not on Continue, not the next night; his visit down the stairs and his hub; an overheard exchange, one bubble, giving way to a conversation, then a quiet; never in Decorate Mode or a menu; a familiar face as an ordinary customer; the light on its evenings and never before five; Decorate Mode holding the room still). Checkpoint C's tests mark the night as already happened (they test C).
+
+### Playtest checklist (final 4h)
+
+1. A new game to day 3: does the bedroom scene surprise, amuse and unsettle? Is Gimp abrasive but not a joke? Does his arrangement with Phi say something about her?
+2. Find Gimp at the bar with Boog on one of his afternoons; ask him about Maximo.
+3. Wander near the market at midday, the green in the afternoon, the cottage on a herb morning: do the overheard lines make people feel like old neighbours, and is it never chatter?
+4. Run a few services: who came to dinner, and did it feel like the village's evening?
+5. Be by Ogrin's window after five on several evenings.
+6. Decorate Tally Ho! while Maximo's at lunch.
+7. Save and Continue after Gimp's night: it never replays.
+
+---
+
 ## Documentation during 4h
 
 - `docs/PLAN_4H.md` (this file): approval record, then "As built" per checkpoint.

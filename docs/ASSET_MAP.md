@@ -426,6 +426,15 @@ Figures registered in `Editor/Setup/KariastonSheets.cs` (`CastFigures`, 32×32 f
 
 **Window glow:** Ogrin's window is a URP point light (warm, 1.3 radius) at the cottage's ground-floor right window, on while he's in bed.
 
+**4h Checkpoint D:**
+
+| Who / what | Pack folder / files | Source | Notes |
+|---|---|---|---|
+| **Gimp** (locked figure) | `ModernSoldiers/Gimp{Idle,Walk}`, `GimpPackBack{Idle,Walk}`, `GimpPackFront{Idle,Walk}`, `Gimp{Idle,Walk}Shadow` | *All Exclusives › Creatures › Modern Soldiers*: `{Idle,Walk}/Soldiers/{a}_soldier_headband.png`, `{a}/Backpack/{a}_backpack1_{b,f}.png`, `{a}/Soldiers/_Shadow/{a}_shadow.png` | Idle 16 and walk 4 frames at 200 ms; back to front: pack (back), soldier, pack (front). The `Gun/{a}_gun_f.png` rifle layer and the shot animations are unused (the firearms question is open). The beret and helmet soldiers and `backpack2` are unused. |
+| **Glimmer's light** | `NaughtyFairy/FairyFly` | *Creatures › Naughty Fairy* `Fly_Idle.png` (192×128: six 32×32 frames, four facing rows, 100 ms) | Row 2 (the back-facing, pale blue wings) drawn unlit at a pale tint with a faint point light, drifting at Ogrin's window: a light, not a figure. Appear, disappear, dust and transformation unused. |
+| Gimp's portrait | `Portraits/gimp_portrait` | Portrait Generator (`Tools/portraits/gimp.json`) | Elf, soft skin (the half-elf stand-in: pointed ears, human-looking face), suspicious eyes, pointy nose, tall ears, short brown hair, angry brown brows, green vest, brown mutton chops, a grimace, a red bandana as his headband; light green background. |
+| Familiar faces at dinner | (the figures above) | | Customers wear the villagers' own sets; the customer prefab has a sixth layer for Kaloren's gloves. |
+
 ## The garden (4h Checkpoint B, imported → `Farm/`)
 
 Registered in `Editor/Setup/KariastonSheets.cs` (`Crops`, `CropStages`, `Actions`). Each crop cell is 8×16, pivoted at its foot, on a 16-px row; a crop's group is 80 px wide: seed pack (8), one seed (16), seeds (24), growth 1–3 (32, 40, 48), grown icon (64).

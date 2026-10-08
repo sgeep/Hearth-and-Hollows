@@ -33,6 +33,43 @@ namespace Hearthdelve.Shared.Story
     }
 
     /// <summary>
+    /// Overheard exchanges (4h Checkpoint D): a short authored conversation between characters, shown line by line over the
+    /// speakers' heads (<see cref="Speakers"/>), never interactive, never holding the clock. One at a time; it gives way to a
+    /// conversation, a menu or a held moment (Decorate Mode, a panel) at once.
+    /// </summary>
+    public interface IBarkService
+    {
+        bool IsBarking { get; }
+        /// <summary>Plays the exchange titled <paramref name="title"/>; false if none is playing and it had nothing to say now.</summary>
+        bool Play(string title);
+        void Stop();
+    }
+
+    /// <summary>
+    /// Who is standing where, by stable character id (4h Checkpoint D): villagers and staff register themselves while they're
+    /// about, so an overheard line can be shown over the right head without the story knowing any scene.
+    /// </summary>
+    public static class Speakers
+    {
+        static readonly System.Collections.Generic.Dictionary<string, UnityEngine.Transform> s_All = new();
+
+        public static void Set(string id, UnityEngine.Transform at)
+        {
+            if (!string.IsNullOrEmpty(id) && at != null) s_All[id] = at;
+        }
+
+        public static void Remove(string id, UnityEngine.Transform at)
+        {
+            if (id != null && s_All.TryGetValue(id, out UnityEngine.Transform t) && t == at) s_All.Remove(id);
+        }
+
+        public static UnityEngine.Transform Find(string id) => id != null && s_All.TryGetValue(id, out UnityEngine.Transform t) && t != null ? t : null;
+
+        /// <summary>Tests.</summary>
+        public static void Clear() => s_All.Clear();
+    }
+
+    /// <summary>
     /// Where the story layer registers its services (4g). Gameplay assemblies reach the story only through these interfaces and
     /// the facts they publish, never through Pixel Crushers types; with no story layer loaded, both are null and nothing happens.
     /// </summary>
@@ -40,6 +77,15 @@ namespace Hearthdelve.Shared.Story
     {
         public static IStoryStateParticipant State { get; private set; }
         public static IConversationService Conversations { get; private set; }
+        /// <summary>4h Checkpoint D: short overheard exchanges between characters (null with no story layer).</summary>
+        public static IBarkService Barks { get; private set; }
+
+        public static void RegisterBarks(IBarkService barks) => Barks = barks;
+
+        public static void UnregisterBarks(IBarkService barks)
+        {
+            if (Barks == barks) Barks = null;
+        }
 
         public static void Register(IStoryStateParticipant state, IConversationService conversations)
         {
@@ -59,6 +105,7 @@ namespace Hearthdelve.Shared.Story
         {
             State = null;
             Conversations = null;
+            Barks = null;
         }
     }
 }

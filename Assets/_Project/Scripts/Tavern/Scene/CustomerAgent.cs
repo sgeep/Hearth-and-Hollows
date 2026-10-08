@@ -117,6 +117,21 @@ namespace Hearthdelve.Tavern.Scene
             m_Upset = upset;
         }
 
+        /// <summary>
+        /// A named villager at dinner (4h Checkpoint D): their own look from Kariaston instead of a generated one. Everything else
+        /// (ordering, seating, eating, paying) is any customer's.
+        /// </summary>
+        public void WearAs(Hearthdelve.Shared.Animation.SpriteAnimationSet[] layers, Hearthdelve.Shared.Animation.SpriteAnimationSet shadow, string characterId)
+        {
+            if (m_Look != null && layers != null)
+            {
+                m_Look.SetAppearance(layers);
+                if (shadow != null) m_Look.SetShadow(shadow);
+            }
+            if (Logic != null) Logic.CharacterId = characterId;
+            name = $"Customer_{characterId}_{(Logic != null ? Logic.Id : 0)}";
+        }
+
         public void Initialize(CustomerLogic logic, TavernDirector director, int seed)
         {
             Logic = logic;

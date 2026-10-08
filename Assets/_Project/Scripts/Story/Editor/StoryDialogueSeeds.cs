@@ -18,7 +18,7 @@ namespace Hearthdelve.Story.Editor
     {
         public sealed class Cast
         {
-            public Actor Player, Boog, Orik, Narration, Musashi, Maximo, Kaloren, Grim, Ogrin, Bart;
+            public Actor Player, Boog, Orik, Narration, Musashi, Maximo, Kaloren, Grim, Ogrin, Bart, Gimp;
         }
 
         /// <summary>A conversation to seed: its title, and how to write it (into conversation id <c>id</c>, or a new id when −1).</summary>
@@ -31,7 +31,7 @@ namespace Hearthdelve.Story.Editor
         public const string BoogBomb = "Boog/Bomb";
 
         /// <summary>In writing order: Boog/Bomb before the conversations that link into it.</summary>
-        public static readonly Seed[] All =
+        public static readonly Seed[] All = new Seed[]
         {
             new() { Title = BoogBomb, Write = WriteBoogBomb },
             new() { Title = StoryDialogue.BoogTalk, Write = WriteBoogTalk },
@@ -61,7 +61,10 @@ namespace Hearthdelve.Story.Editor
             new() { Title = StoryDialogue.GrimHub, Write = WriteGrimHub },
             new() { Title = StoryDialogue.OgrinHub, Write = WriteOgrinHub },
             new() { Title = StoryDialogue.BartHub, Write = WriteBartHub },
-        };
+            // 4h Checkpoint D: Gimp, and the village among themselves.
+            new() { Title = StoryDialogue.GimpIntruder, Write = WriteGimpIntruder },
+            new() { Title = StoryDialogue.GimpHub, Write = WriteGimpHub },
+        }.Concat(AmbientSeeds()).ToArray();
 
         // ---------- The writer ----------
 
@@ -835,6 +838,145 @@ namespace Hearthdelve.Story.Editor
             w.Link(askFive, half);
             w.Link(w.Start, howdy, heard, song, tuning, gossip, playing, evening);
         }
+
+        // ---------- Gimp and the village among themselves (4h Checkpoint D) ----------
+
+        /// <summary>
+        /// Gimp in the night (the owner's approved first meeting): he comes up the hatch in the keeper's room as he always has, asks
+        /// after Phi, explains his arrangement with her, and goes back down. Played once, by <c>NightVisitor</c>, the first morning
+        /// after a delve of the keeper's own. Nothing about his past, nothing about why Phi went down.
+        /// </summary>
+        static void WriteGimpIntruder(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.GimpIntruder, c.Player, c.Gimp,
+                "Gimp in the night (4h Checkpoint D): up through the hatch in the keeper's room, by his old arrangement with Phi. Plays once.");
+            DialogueEntry awake = w.Npc("oh. you're awake. don't shout. Boog's asleep, and he sleeps light. for a goblin.", 0, 1);
+            DialogueEntry saw = w.Npc("i saw you go down tonight. and come back up. most don't, the first few times.", 0, 2);
+            DialogueEntry askWho = w.Player("who are you?", 0, 3);
+            DialogueEntry askFloor = w.Player("you just climbed out of my floor.", 1, 3);
+            DialogueEntry gimp = w.Npc("Gimp. i live down there, mostly. up here, sometimes.", 0, 4);
+            DialogueEntry phisFloor = w.Npc("it was Phi's floor. it had a hatch in it. i didn't build the house.", 1, 4);
+            DialogueEntry wherePhi = w.Npc("where's Phi? i haven't seen her in a while.", 0, 5);
+            DialogueEntry gone = w.Player("she went below. no word since.", 0, 6);
+            DialogueEntry hoping = w.Player("i was hoping you'd know.", 1, 6);
+            DialogueEntry nobody = w.Npc("...gone down. and nobody thought to tell me.", 0, 7);
+            DialogueEntry arrangement = w.Npc("she and i had an arrangement. i come up her hatch, i see Boog, i have a drink, i go back down. nobody screams.", 0, 8);
+            DialogueEntry askBedroom = w.Player("this is my bedroom now.", 0, 9);
+            DialogueEntry askBoog = w.Player("does Boog know you're here?", 1, 9);
+            DialogueEntry newName = w.Npc("it's still a good arrangement. it just needs a new name on it.", 0, 10);
+            DialogueEntry boogKnows = w.Npc("Boog always knows. it's the only sensible thing about him. that, and the powder.", 1, 10);
+            DialogueEntry twice = w.Npc("if she turns up, tell her Gimp asked. don't tell her i asked twice.", 0, 11);
+            DialogueEntry sleep = w.Npc("go back to sleep, keeper. i know my own way down.", 0, 12);
+            w.Link(w.Start, awake);
+            w.Link(awake, saw);
+            w.Link(saw, askWho, askFloor);
+            w.Link(askWho, gimp);
+            w.Link(askFloor, phisFloor);
+            w.Link(gimp, wherePhi);
+            w.Link(phisFloor, wherePhi);
+            w.Link(wherePhi, gone, hoping);
+            w.Link(gone, nobody);
+            w.Link(hoping, nobody);
+            w.Link(nobody, arrangement);
+            w.Link(arrangement, askBedroom, askBoog);
+            w.Link(askBedroom, newName);
+            w.Link(askBoog, boogKnows);
+            w.Link(newName, twice);
+            w.Link(boogKnows, twice);
+            w.Link(twice, sleep);
+        }
+
+        /// <summary>
+        /// Gimp, when he's up seeing Boog: standoffish, a grudging line once about the troll, and three things to ask. Maximo's name
+        /// gets a reaction and nothing more: why is not for 4h (an open story question).
+        /// </summary>
+        static void WriteGimpHub(DialogueDatabase db, Template template, Cast c, int id)
+        {
+            var w = new Writer(db, template, id, StoryDialogue.GimpHub, c.Player, c.Gimp,
+                "Gimp, up to see Boog (4h Checkpoint D): a once-only callback, then his greeting and three questions. Standoffish by design.");
+            const string troll = "hh_gimp_troll";
+            DialogueEntry notBad = w.Npc("heard you put the Larder Troll down. not bad. for someone from up here.", 0, 1,
+                $"{TrollFelled} and {Unsaid(troll)}", Said(troll));
+            DialogueEntry visiting = w.Npc("keeper. Boog says you can cook. Boog says a lot of things.", 1, 1, Doing("gimp", "boog"));
+            DialogueEntry what = w.Npc("what.", 2, 1);
+            DialogueEntry askBoog = w.Player("how do you know Boog?", 0, 3);
+            DialogueEntry askPhi = w.Player("any word of Phi?", 1, 3);
+            DialogueEntry askMaximo = w.Player("do you know Maximo?", 2, 3);
+            DialogueEntry bye = w.Player("i'll leave you to it.", 3, 3);
+            DialogueEntry tunnel = w.Npc("he blew up a tunnel i was standing in. i liked him at once.", 0, 4);
+            DialogueEntry second = w.Npc("if i had any, you'd be the second to know. Boog's first.", 1, 4);
+            DialogueEntry tinCan = w.Npc("the old tin can. don't say that name in this house.", 2, 4);
+            DialogueEntry askWhy = w.Player("what did he do to you?", 2, 5);
+            DialogueEntry drop = w.Npc("nothing you'd understand. drop it.", 2, 6);
+            DialogueEntry goOn = w.Npc("go on, then.", 3, 4);
+            foreach (DialogueEntry greeting in new[] { notBad, visiting, what }) w.Link(greeting, askBoog, askPhi, askMaximo, bye);
+            w.Link(askBoog, tunnel);
+            w.Link(askPhi, second);
+            w.Link(askMaximo, tinCan);
+            w.Link(tinCan, askWhy);
+            w.Link(askWhy, drop);
+            w.Link(bye, goOn);
+            w.Link(w.Start, notBad, visiting, what);
+        }
+
+        /// <summary>
+        /// An overheard exchange (4h Checkpoint D): played as bubbles over the speakers, never with the keeper. From START the first
+        /// variant whose condition holds (callbacks once, first), then its lines in order. Each variant is (condition, once-flag or
+        /// null, then speaker and line pairs).
+        /// </summary>
+        static void WriteAmbient(DialogueDatabase db, Template template, Cast c, int id, string title, string description,
+            params (string condition, string onceFlag, (Actor who, string line)[] lines)[] variants)
+        {
+            var w = new Writer(db, template, id, title, c.Player, variants[0].lines[0].who, description);
+            var starts = new List<DialogueEntry>();
+            for (int v = 0; v < variants.Length; v++)
+            {
+                var (condition, once, lines) = variants[v];
+                string cond = once == null ? condition : string.IsNullOrEmpty(condition) ? Unsaid(once) : $"{condition} and {Unsaid(once)}";
+                DialogueEntry previous = null;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    DialogueEntry e = w.Say(lines[i].who, lines[i].line, v, i + 1, i == 0 ? cond : null, i == 0 && once != null ? Said(once) : null);
+                    if (previous == null) starts.Add(e);
+                    else w.Link(previous, e);
+                    previous = e;
+                }
+            }
+            w.Link(w.Start, starts.ToArray());
+        }
+
+        static readonly string BombHomeAgain = $"HH_QuestObject({Bomb}) == \"delivered\"";
+
+        static Seed[] AmbientSeeds() => new Seed[]
+        {
+            new() { Title = StoryDialogue.AmbientGrimOgrin, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientGrimOgrin,
+                "Overheard (4h Checkpoint D): Grim and Ogrin in the yard of a morning.",
+                (TrollFelled, "hh_amb_grimogrin_troll", new[] { (c.Ogrin, "the keeper killed the troll, Grim!"), (c.Grim, "aye, i heard. dinnae get ideas.") }),
+                ("HH_Today(\"herbs\")", null, new[] { (c.Ogrin, "the leaves taste like a cellar."), (c.Grim, "then they're working. drink up.") }),
+                (null, null, new[] { (c.Ogrin, "can i see the Hollows today?"), (c.Grim, "no."), (c.Ogrin, "tomorrow?"), (c.Grim, "ask me tomorrow.") })) },
+            new() { Title = StoryDialogue.AmbientKalorenGrim, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientKalorenGrim,
+                "Overheard (4h Checkpoint D): Kaloren at the cottage door with the herbs, Grim in the yard.",
+                (null, null, new[] { (c.Kaloren, "steep them, Grim. don't boil them."), (c.Grim, "aye. i know. thank you."), (c.Kaloren, "you always say that like it costs you.") })) },
+            new() { Title = StoryDialogue.AmbientBartOgrin, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientBartOgrin,
+                "Overheard (4h Checkpoint D): Bart playing on the green, Ogrin listening.",
+                (BombHomeAgain, "hh_amb_bartogrin_bomb", new[] { (c.Ogrin, "write one about Boog's bomb!"), (c.Bart, "a love song, then. it'd have to be.") }),
+                (null, null, new[] { (c.Ogrin, "play the goat one!"), (c.Bart, "the goat one it is. third time today."), (c.Ogrin, "the goat deserves it.") })) },
+            new() { Title = StoryDialogue.AmbientMusashiBart, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientMusashiBart,
+                "Overheard (4h Checkpoint D): Bart gossiping at the market cart, Musashi selling.",
+                (TrollFelled, "hh_amb_musashibart_troll", new[] { (c.Bart, "heard the keeper laid out the Larder Troll."), (c.Musashi, "troll is tough meat. long stew. i hope keeper knows.") }),
+                (null, null, new[] { (c.Bart, "how're the onions today, Musashi?"), (c.Musashi, "loud. Grim says good. i trust Grim's nose."), (c.Bart, "might put that in a song."), (c.Musashi, "please, no.") })) },
+            new() { Title = StoryDialogue.AmbientMaximoMusashi, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientMaximoMusashi,
+                "Overheard (4h Checkpoint D): Maximo proclaiming at the memorial, Musashi at his cart.",
+                (null, null, new[] { (c.Maximo, "Musashi! a fine morning for commerce!"), (c.Musashi, "every morning, you say. every morning, true.") })) },
+            new() { Title = StoryDialogue.AmbientMaximoOrik, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientMaximoOrik,
+                "Overheard (4h Checkpoint D): Maximo at lunch in Tally Ho!, Orik at his post.",
+                (null, null, new[] { (c.Maximo, "Orik! put it on my account!"), (c.Orik, "aye. your account has its own book now."), (c.Maximo, "a fine book!"), (c.Orik, "a thick one.") })) },
+            new() { Title = StoryDialogue.AmbientGimpBoog, Write = (db, t, c, id) => WriteAmbient(db, t, c, id, StoryDialogue.AmbientGimpBoog,
+                "Overheard (4h Checkpoint D): Gimp up to see Boog.",
+                (BombHomeAgain, "hh_amb_gimpboog_bomb", new[] { (c.Gimp, "you got the old girl back, then."), (c.Boog, "the keeper went all the way down for her."), (c.Gimp, "...huh.") }),
+                ("HH_Day() >= 5", "hh_amb_gimpboog_maximo", new[] { (c.Boog, "Maximo was in for lunch."), (c.Gimp, "don't say that name while i'm drinking.") }),
+                (null, null, new[] { (c.Boog, "Gimp! did you bring powder?"), (c.Gimp, "half. the other half went off in a tunnel."), (c.Boog, "a good tunnel?"), (c.Gimp, "it was.") })) },
+        };
 
         // ---------- Checkpoint A's proofs (only to recognise them unedited) ----------
 

@@ -214,6 +214,7 @@ namespace Hearthdelve.Tavern.Scene
 
         void OnDestroy()
         {
+            Speakers.Remove(CharacterId, transform);
             if (m_Goal != null) Destroy(m_Goal.gameObject);
         }
 
@@ -237,6 +238,8 @@ namespace Hearthdelve.Tavern.Scene
                 IConversationService talk = StoryServices.Conversations;
                 m_Talk.SetAvailable(Member != null && m_Carrying == null && AtGoal && talk != null && !talk.IsTalking && talk.CanTalk(CharacterId));
             }
+            // 4h Checkpoint D: findable for an overheard line (Boog and Gimp at the bar).
+            if (Member != null) Speakers.Set(CharacterId, transform);
             if (m_Director == null) return;
             ServiceSession session = m_Director.Session;
             if (session != m_Session)

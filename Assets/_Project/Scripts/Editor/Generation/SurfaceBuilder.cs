@@ -150,10 +150,56 @@ namespace Hearthdelve.Editor
             Dictionary<string, VillageContent.Figure> figures = VillageContent.Figures();
             VillageContent.BuildVillager(people, "Maximo", CharacterIds.Maximo, "villager.maximo", PropertyArea.TavernId, figures[CharacterIds.Maximo], null,
                 VillageContent.TavernTableNear, startHidden: true);
+            // 4h Checkpoint D: Gimp, up to see Boog on his days, at the table nearest Boog's corner. He comes and goes by the stairs
+            // (the hatch is upstairs), never the front door.
+            VillageContent.Anchor(people, VillageContent.TavernGimp, PropertyArea.TavernId, VillageContent.TavernGimpNear, Hearthdelve.Core.Movement.Facing4.FrontRight, tavernSeat: true);
+            Hearthdelve.Village.Villager gimp = VillageContent.BuildVillager(people, "Gimp", CharacterIds.Gimp, "villager.gimp", PropertyArea.TavernId,
+                figures[CharacterIds.Gimp], null, VillageContent.TavernGimpNear, startHidden: true);
+            gimp.ConfigureEntrance(GuestRoomBuilder.TavernArrival);
+            people.gameObject.AddComponent<Hearthdelve.Village.AmbientMoments>().Configure(PropertyArea.TavernId, VillageContent.TavernMoments());
+            BuildNightVisitor(people, figures[CharacterIds.Gimp]);
 
             BuildClockFace(ui);
             BuildPrepConfirm(ui);
             BuildGardenPanel(ui);
+        }
+
+        /// <summary>
+        /// Gimp in the night (4h Checkpoint D): his figure (not a villager: the scene moves it), a lantern's glow at the hatch in the
+        /// keeper's room, and the <see cref="Hearthdelve.Village.NightVisitor"/> that plays it once.
+        /// </summary>
+        static void BuildNightVisitor(Transform people, VillageContent.Figure figure)
+        {
+            Vector2 hatch = GuestRoomBuilder.Origin + GuestRoomBuilder.HatchCell + new Vector2(0.5f, 0.5f);
+            Vector2 stand = hatch + new Vector2(0f, -1f);
+            var root = new GameObject("Gimp in the Night");
+            root.transform.SetParent(people, false);
+            var model = new GameObject("Model");
+            model.transform.SetParent(root.transform, false);
+            var group = model.AddComponent<UnityEngine.Rendering.SortingGroup>();
+            group.sortingLayerName = SortingLayers.YSorted;
+            SpriteRenderer Layer(string name, int order)
+            {
+                SpriteRenderer r = LookTestContent.AddSprite(model.transform, name, null, SortingLayers.YSorted, order, Vector3.zero);
+                r.spriteSortPoint = SpriteSortPoint.Pivot;
+                return r;
+            }
+            SpriteRenderer shadow = Layer("Shadow", 0);
+            SpriteRenderer[] layers = figure.Layers.Select((_, i) => Layer($"Layer {i}", i + 1)).ToArray();
+            var look = model.AddComponent<Hearthdelve.Shared.Animation.LayeredSpriteAnimator>();
+            look.Configure(layers, shadow, figure.Shadow);
+            look.SetAppearance(figure.Layers);
+            var lanternGo = new GameObject("Lantern");
+            lanternGo.transform.SetParent(people, false);
+            lanternGo.transform.position = hatch;
+            Light2D lantern = lanternGo.AddComponent<Light2D>();
+            lantern.lightType = Light2D.LightType.Point;
+            lantern.color = new Color(1f, 0.72f, 0.4f);
+            lantern.intensity = 1.2f;
+            lantern.pointLightOuterRadius = 3f;
+            lantern.pointLightInnerRadius = 0.4f;
+            lantern.enabled = false;
+            people.gameObject.AddComponent<Hearthdelve.Village.NightVisitor>().Configure(root, look, lantern, hatch, stand);
         }
 
         static PropertyArea Area(string id) =>

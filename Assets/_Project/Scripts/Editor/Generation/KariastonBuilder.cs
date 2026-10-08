@@ -603,6 +603,38 @@ namespace Hearthdelve.Editor
             presence.AddComponent<VillagePresence>();
             Sprite herbs = AssetDatabase.LoadAssetAtPath<GameDatabase>(EditorPaths.Data + "/GameDatabase.asset")?.Ingredient("herbs")?.icon;
             presence.AddComponent<HerbVisit>().Configure(herbs, MinifantasyImporter.Sprite(MinifantasySheets.UIOverhaul, "Emotions", "Heart"));
+            // 4h Checkpoint D: the village talking among itself, and a light at Ogrin's window on some evenings.
+            presence.AddComponent<AmbientMoments>().Configure(SurfaceArea.KariastonId, VillageContent.KariastonMoments());
+            BuildWindowLight(people);
+        }
+
+        /// <summary>
+        /// A small pale mote at Ogrin's window on some evenings (4h Checkpoint D, foreshadowing only): the Naughty Fairy's flight,
+        /// drawn unlit and pale so it reads as a light, with a faint glow. Nothing names it.
+        /// </summary>
+        static void BuildWindowLight(Transform people)
+        {
+            var root = new GameObject("Ogrin's Window Light");
+            root.transform.SetParent(people, false);
+            root.transform.localPosition = new Vector2(53.0f, 13.9f);
+            var moteGo = new GameObject("Mote");
+            moteGo.transform.SetParent(root.transform, false);
+            SpriteRenderer mote = moteGo.AddComponent<SpriteRenderer>();
+            mote.sortingLayerName = SortingLayers.Above;
+            mote.sortingOrder = 4;
+            var unlit = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            if (unlit != null) mote.sharedMaterial = unlit;
+            mote.enabled = false;
+            // The back-facing flight (its pale blue wings), six frames.
+            Sprite[] frames = MinifantasyImporter.Row(KariastonSheets.FairyPack, "FairyFly", 2, 6);
+            Light2D glow = root.AddComponent<Light2D>();
+            glow.lightType = Light2D.LightType.Point;
+            glow.color = new Color(0.7f, 0.85f, 1f);
+            glow.intensity = 0f;
+            glow.pointLightOuterRadius = 1.1f;
+            glow.pointLightInnerRadius = 0.1f;
+            glow.enabled = false;
+            root.AddComponent<WindowLight>().Configure(mote, frames, glow);
         }
 
         /// <summary>The garden's four beds (4h Checkpoint B), on the soil painted in the blockout: ids in reading order.</summary>

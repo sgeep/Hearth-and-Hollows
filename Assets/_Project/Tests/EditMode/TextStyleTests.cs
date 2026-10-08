@@ -85,6 +85,8 @@ namespace Hearthdelve.Tests
             "Hearth", "Hollows", "Orik", "Boog", "Phi", "Phi'rai", "Old", "Fortunate", "Five", "Karias", "Kariaston", "Musashi", "Toshi", "Grim", "Cellars", "Larder", "Troll", "Tally", "Ho",
             // 4h Checkpoint C: Kariaston's people (and the name Ogrin wants for Boog's bomb).
             "Maximo", "Kaloren", "Frosthand", "Ogrin", "Bart", "Gerald",
+            // 4h Checkpoint D.
+            "Gimp",
             "Essence", "Renown", "Morale", "Cheer", "Delve", "Marks",
             "WASD", "E", "A", "B", "X", "Space", "F2", "F3", "F4",
         };

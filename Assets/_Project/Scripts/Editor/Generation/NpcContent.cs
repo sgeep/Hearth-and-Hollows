@@ -27,7 +27,7 @@ namespace Hearthdelve.Editor
         const string k_Npcs = EditorPaths.Animations + "/Npc";
         const string k_UnlitSprite = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
         /// <summary>Back to front: the order <see cref="NpcAppearancePool.Layers"/> returns.</summary>
-        static readonly string[] k_LayerNames = { "Body", "Trousers", "Top", "Beard", "Head" };
+        static readonly string[] k_LayerNames = { "Body", "Trousers", "Top", "Beard", "Head", "Extra" };   // Extra: a named villager's sixth layer (Kaloren, 4h Checkpoint D)
 
         public sealed class Built
         {

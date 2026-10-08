@@ -111,6 +111,31 @@ namespace Hearthdelve.Story.Editor
         public const float ChoicesWidth = 262f, ChoiceLeft = 16f, ChoiceWidth = 241f, ChoiceHeight = 14f, ChoicePitch = 15f, ChoicePad = 4f;
         public const int ChoiceRows = 4;
 
+        /// <summary>The overheard lines' bubble (4h Checkpoint D): one small panel, up to two lines, placed over the speaker.</summary>
+        public const float BarkWidth = 152f, BarkTextWidth = 144f;
+
+        static void BuildBarkBubble(Canvas canvas)
+        {
+            RectTransform panel = LookTestBuilder.UIRect(canvas.transform, "Bark", Vector2.zero, Vector2.zero, Vector2.zero, new Vector2(BarkWidth, SilverMetrics.LinePixels * 2f + 8f));
+            panel.pivot = new Vector2(0.5f, 0f);
+            Image back = DungeonUI.AddImage(panel, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
+            back.raycastTarget = false;
+            var centre = new Vector2(0.5f, 0.5f);
+            LocalizedSuperText text = LookTestBuilder.Text(panel, "Line", TavernLocKeys.Plain, TextStyle.Body, DungeonUI.k_Ink, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, centre, Vector2.zero, Vector2.zero);
+            var textRect = (RectTransform)text.transform;
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(4f, 4f);
+            textRect.offsetMax = new Vector2(-4f, -4f);
+            // The runner lives beside the bubble, so the bubble can be hidden without stopping it.
+            var runner = new GameObject("Overheard");
+            runner.transform.SetParent(canvas.transform, false);
+            runner.AddComponent<RectTransform>();
+            runner.AddComponent<AmbientBarks>().Configure(panel.gameObject, panel, text);
+            panel.gameObject.SetActive(false);
+        }
+
         static HearthDialogueUI BuildDialogueCanvas()
         {
             GameObject old = Root(k_DialogueCanvas);
@@ -179,6 +204,7 @@ namespace Hearthdelve.Story.Editor
             ui.ConfigureSettings(StoryBuilder.LoadOrCreate<DialogueSettings>(StoryPaths.Root + "/DialogueSettings.asset"));
             group.alpha = 0f;
             group.blocksRaycasts = false;
+            BuildBarkBubble(canvas);
             return ui;
         }
     }

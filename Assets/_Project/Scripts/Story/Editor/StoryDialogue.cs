@@ -34,6 +34,16 @@ namespace Hearthdelve.Story.Editor
         public const string GrimHub = "Grim/Hub";
         public const string OgrinHub = "Ogrin/Hub";
         public const string BartHub = "Bart/Hub";
+        /// <summary>4h Checkpoint D: Gimp's night in the keeper's room (once) and his hub; the village's overheard exchanges.</summary>
+        public const string GimpIntruder = "Gimp/Intruder";
+        public const string GimpHub = "Gimp/Hub";
+        public const string AmbientGrimOgrin = "Ambient/GrimOgrin";
+        public const string AmbientKalorenGrim = "Ambient/KalorenGrim";
+        public const string AmbientBartOgrin = "Ambient/BartOgrin";
+        public const string AmbientMusashiBart = "Ambient/MusashiBart";
+        public const string AmbientMaximoMusashi = "Ambient/MaximoMusashi";
+        public const string AmbientMaximoOrik = "Ambient/MaximoOrik";
+        public const string AmbientGimpBoog = "Ambient/GimpBoog";
 
         /// <param name="seedLog">The seed log (tests use their own); the project's by default.</param>
         public static DialogueDatabase Ensure(string path, string seedLog = null)
@@ -62,6 +72,7 @@ namespace Hearthdelve.Story.Editor
             cast.Grim = EnsureActor(db, template, "Grim", CharacterIds.Grim, false);
             cast.Ogrin = EnsureActor(db, template, "Ogrin", CharacterIds.Ogrin, false);
             cast.Bart = EnsureActor(db, template, "Bart", CharacterIds.Bart, false);
+            cast.Gimp = EnsureActor(db, template, "Gimp", CharacterIds.Gimp, false);
             Seed(db, template, cast, seedLog);
             EnsureGuids(db);
             EditorUtility.SetDirty(db);

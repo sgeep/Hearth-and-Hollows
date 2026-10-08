@@ -93,7 +93,7 @@ namespace Hearthdelve.Story.Dialogue
         /// </summary>
         [Preserve] public static string HH_Doing(string characterId) => Shared.Village.VillageLife.Doing(characterId);
 
-        /// <summary>4h Checkpoint C: whether today is one of the village's seeded days: "herbs" (Kaloren's visit), "ogrin_well", "vigil".</summary>
+        /// <summary>Whether today is one of the village's seeded days: "herbs" (Kaloren's visit), "ogrin_well", "vigil" (4h C); "gimp", "glimmer" (D).</summary>
         [Preserve] public static bool HH_Today(string rule)
         {
             Shared.Village.ScheduleWorld? world = Shared.Village.VillageLife.World();
@@ -103,6 +103,9 @@ namespace Hearthdelve.Story.Dialogue
                 "herbs" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.HerbDay, world.Value),
                 "ogrin_well" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.OgrinWell, world.Value),
                 "vigil" => Shared.Village.VillageDays.Holds(Shared.Village.DayRule.MaximoVigil, world.Value),
+                // 4h Checkpoint D: both only once Gimp has come up (as the schedules have them).
+                "gimp" => world.Value.BeatSeen(Shared.Village.CommunityRules.GimpIntro) && Shared.Village.VillageDays.Holds(Shared.Village.DayRule.GimpVisit, world.Value),
+                "glimmer" => world.Value.BeatSeen(Shared.Village.CommunityRules.GimpIntro) && Shared.Village.VillageDays.Holds(Shared.Village.DayRule.GlimmerEvening, world.Value),
                 _ => false,
             };
         }

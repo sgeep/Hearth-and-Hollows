@@ -130,7 +130,7 @@ namespace Hearthdelve.Editor
         /// </summary>
         public const string Portraits = "Portraits";
         /// <summary>The characters with a portrait recipe (Tools/portraits/&lt;id&gt;.json), by stable id.</summary>
-        public static readonly string[] PortraitIds = { "gunta", "pip", "musashi", "maximo", "kaloren", "grim", "ogrin", "bart" };
+        public static readonly string[] PortraitIds = { "gunta", "pip", "musashi", "maximo", "kaloren", "grim", "ogrin", "bart", "gimp" };
         public const int PortraitFrame = 32;
 
         public static Sheet PortraitSheet(string id) => new()
