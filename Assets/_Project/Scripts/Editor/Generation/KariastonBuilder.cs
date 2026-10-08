@@ -205,6 +205,52 @@ namespace Hearthdelve.Editor
             Paint(pond, cells, "Water");
         }
 
+        public const string LitWindowName = "Lit Window";
+
+        /// <summary>
+        /// A building's lit window (2026-10-08): the derived lit glass over the building's own window, a child with the building's pivot
+        /// (so it moves with the building), drawn unlit (it's a light) just in front of it, shown by <see cref="LitWindow"/> while the
+        /// schedule anchor <paramref name="anchor"/> has someone behind it.
+        /// </summary>
+        static void AddLitWindow(Transform building, string anchor)
+        {
+            Sprite glass = Single(KariastonSheets.TownsIIPack, "BrownCottageWindowLit");
+            SpriteRenderer lit = LookTestContent.AddSprite(building, LitWindowName, glass, SortingLayers.YSorted, 1, Vector2.zero);
+            lit.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat");
+            lit.enabled = false;
+            lit.gameObject.AddComponent<LitWindow>().Configure(anchor);
+        }
+
+        /// <summary>
+        /// Batch, once (2026-10-08): <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.AddLitWindowBatch</c> lays the lit window over
+        /// Grim and Ogrin's cottage in the existing, hand-owned village. Nothing else is touched; it does nothing if the cottage has one.
+        /// </summary>
+        public static void AddLitWindowBatch()
+        {
+            try
+            {
+                MinifantasyImporter.Import(KariastonSheets.Sheets());
+                var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+                Transform cottage = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true))
+                    .FirstOrDefault(t => t.name == "Grim and Ogrin's Cottage");
+                if (cottage == null) throw new InvalidOperationException($"{ScenePath} has no Grim and Ogrin's Cottage.");
+                if (cottage.Find(LitWindowName) != null) Debug.Log("[Hearthdelve] The cottage already has its lit window.");
+                else
+                {
+                    AddLitWindow(cottage, VillageContent.OgrinWindow);
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                    Debug.Log("[Hearthdelve] The cottage's lit window added.");
+                }
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
         /// <summary>Batch, once: <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.AddPondBatch</c> adds the pond to the existing,
         /// hand-owned village (nothing else is touched; does nothing if a Pond tilemap is already there).</summary>
         public static void AddPondBatch()
@@ -304,6 +350,7 @@ namespace Hearthdelve.Editor
 
             Transform grim = Put(parent, "Grim and Ogrin's Cottage", Art(KariastonSheets.TownsIIPack, KariastonSheets.Buildings, "BrownCottage"), GrimCottage).transform;
             Block(grim, "Body", new Rect(GrimCottage.x - 3.4f, GrimCottage.y + 0.2f, 6.8f, 6f));
+            AddLitWindow(grim, VillageContent.OgrinWindow);
 
             Transform tower = Put(parent, "Kaloren's Tower", Single(KariastonSheets.WizardTowerPack, KariastonSheets.Tower), KalorenTower).transform;
             Block(tower, "Base", new Rect(KalorenTower.x - 1.5f, KalorenTower.y + 0.3f, 3f, 2.2f));
@@ -487,10 +534,69 @@ namespace Hearthdelve.Editor
             BuildGarden(root, gameplay);
             BuildMemorialLook(gameplay);
             BuildEdges(gameplay);
+            BuildDressingCollision(gameplay);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[Hearthdelve] {ScenePath}: gameplay objects updated (the blockout untouched).");
+        }
+
+        /// <summary>
+        /// The drawings that block wherever they stand (2026-10-08): fences, sign posts and Tally Ho!'s board, with footprints measured
+        /// from each drawing's own pixels (<see cref="Measure"/>). <see cref="DressingCollision"/> also makes the water solid by tile.
+        /// To make another drawing solid, add it here and run the surface updater.
+        /// </summary>
+        static void BuildDressingCollision(Transform gameplay)
+        {
+            var go = new GameObject("Dressing Collision");
+            go.transform.SetParent(gameplay, false);
+            var solids = new List<DressingCollision.Solid>
+            {
+                Measure(Art(KariastonSheets.FarmPack, KariastonSheets.FarmTiles, "FenceRun"), depthPixels: 3),
+                Measure(Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "PostSign"), depthPixels: 2),
+                Measure(Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "TankardBoard"), depthPixels: 2),
+            };
+            go.AddComponent<DressingCollision>().Configure(solids);
+        }
+
+        /// <summary>
+        /// A drawing's footprint from its pixels: its lowest opaque row and <paramref name="depthPixels"/> above it, as wide as the
+        /// opaque pixels in those rows (a sign's post, not its board). The bottom edge is the art's own bottom (the Y-sort rule).
+        /// </summary>
+        internal static DressingCollision.Solid Measure(Sprite sprite, int depthPixels)
+        {
+            if (sprite == null) throw new InvalidOperationException("Kariaston: a solid drawing is missing.");
+            var source = new Texture2D(2, 2);
+            source.LoadImage(System.IO.File.ReadAllBytes(AssetDatabase.GetAssetPath(sprite.texture)));
+            Rect r = sprite.rect;
+            int x0 = (int)r.x, y0 = (int)r.y, w = (int)r.width, h = (int)r.height;
+            bool Opaque(int x, int y) => source.GetPixel(x0 + x, y0 + y).a > 0.5f;
+            int bottom = -1;
+            for (int y = 0; y < h && bottom < 0; y++)
+                for (int x = 0; x < w; x++)
+                    if (Opaque(x, y))
+                    {
+                        bottom = y;
+                        break;
+                    }
+            if (bottom < 0) throw new InvalidOperationException($"Kariaston: {sprite.name} has no opaque pixels.");
+            int top = Mathf.Min(h - 1, bottom + depthPixels - 1), left = w, right = -1;
+            for (int y = bottom; y <= top; y++)
+                for (int x = 0; x < w; x++)
+                    if (Opaque(x, y))
+                    {
+                        left = Mathf.Min(left, x);
+                        right = Mathf.Max(right, x);
+                    }
+            Object.DestroyImmediate(source);
+            float ppu = sprite.pixelsPerUnit;
+            Vector2 pivot = sprite.pivot;
+            return new DressingCollision.Solid
+            {
+                sprite = sprite,
+                offset = new Vector2(((left + right + 1) / 2f - pivot.x) / ppu, (bottom + (top - bottom + 1) / 2f - pivot.y) / ppu),
+                size = new Vector2((right - left + 1) / ppu, (top - bottom + 1) / ppu),
+            };
         }
 
         static void BuildMarket(Transform gameplay)

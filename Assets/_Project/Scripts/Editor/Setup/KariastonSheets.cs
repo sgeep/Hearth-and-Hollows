@@ -242,6 +242,9 @@ namespace Hearthdelve.Editor
                     new SheetRect("PostSign", 147, 94, 10, 9, k_Bottom), new SheetRect("CupboardJars", 66, 244, 11, 15, k_Bottom),
                 },
             };
+            // Lit windows (Tools/village/lit_window.py, 2026-10-08): a building's own window glass in the lamp post's flame colours, as an
+            // overlay the size of the building (same pivot), shown while someone's home behind it.
+            yield return new Sheet { Source = "derived:Tools/village/derived/BrownCottageWindowLit.png", Pack = TownsIIPack, File = "BrownCottageWindowLit", Mode = SliceMode.Single, Pivot = k_Bottom };
             // Phi's framed portrait (Tools/portraits/framed.py, from the Portrait Generator and Minifantasy's own frame colours).
             yield return new Sheet { Source = "derived:Tools/portraits/derived/phi_framed.png", Pack = MinifantasySheets.Portraits, File = "PhiFramed", Mode = SliceMode.Single, Pivot = k_Bottom };
             yield return new Sheet { Source = $"{k_Cart}/Idle_Shop_Open.png", Pack = MerchantPack, File = CartOpen, Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Cart", 0, 0, 64, 64, k_Bottom) } };

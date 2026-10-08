@@ -424,6 +424,114 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/community_dinner.png");
         }
 
+        // ---------- 2026-10-08: collision by what things are, and Ogrin's lit window ----------
+
+        static DressingCollision Dressing => Object.FindAnyObjectByType<DressingCollision>();
+
+        [UnityTest]
+        public IEnumerator TheWater_IsSolid_ForTheKeeperAndTheVillagersWalkingGrid()
+        {
+            yield return Daytime();
+            Outside();
+            yield return new WaitForFixedUpdate();
+            int obstacles = LayerMask.GetMask("Obstacles");
+            foreach (Vector2 tile in new[] { new Vector2(12f, 25f), new Vector2(8f, 24.5f), new Vector2(13f, 27f) })
+                Assert.That(Physics2D.OverlapPoint(k_Origin + tile, obstacles), Is.Not.Null, $"the pond at {tile} is solid");
+            // The keeper, moving north from the bank, is stopped by the water.
+            KeeperAtVillage(new Vector2(12f, 22.6f));
+            yield return new WaitForFixedUpdate();
+            var hits = new RaycastHit2D[4];
+            int n = Keeper.Cast(Vector2.up, hits, 3f);
+            Assert.That(Enumerable.Range(0, n).Any(i => hits[i].collider.name == "Pond"), Is.True, "walking north runs into the pond");
+            var grid = Object.FindObjectsByType<Hearthdelve.Shared.Navigation.NavGrid>(FindObjectsSortMode.None).Single(g => g.gameObject.scene == Dressing.gameObject.scene);
+            if (!grid.IsBaked) grid.Bake();
+            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(k_Origin + new Vector2(12f, 25f))), Is.False, "villagers path round it too");
+        }
+
+        [UnityTest]
+        public IEnumerator EveryFence_Sign_AndTheTavernBoard_IsSolidAtItsOwnBase()
+        {
+            yield return Daytime();
+            Outside();
+            yield return new WaitForFixedUpdate();
+            var drawings = Dressing.Solids.Select(s => s.sprite).ToHashSet();
+            var props = Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None).Where(r => drawings.Contains(r.sprite)).ToList();
+            Assert.That(props.Count(r => r.sprite.name.Contains("FenceRun")), Is.GreaterThan(10), "the fences");
+            Assert.That(props.Any(r => r.sprite.name.Contains("TankardBoard")), Is.True, "Tally Ho!'s board");
+            Assert.That(props.Any(r => r.sprite.name.Contains("PostSign")), Is.True, "the sign posts");
+            foreach (SpriteRenderer prop in props)
+            {
+                Collider2D footprint = prop.GetComponentInChildren<Collider2D>();
+                Assert.That(footprint, Is.Not.Null, $"{prop.name} is solid");
+                Assert.That(footprint.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("Obstacles")));
+                // The footprint sits at the bottom of the art: inside the drawing, at its foot (the Y-sort rule).
+                Assert.That(footprint.bounds.min.y, Is.GreaterThanOrEqualTo(prop.bounds.min.y - 0.01f), prop.name);
+                Assert.That(footprint.bounds.max.y, Is.LessThanOrEqualTo(prop.bounds.min.y + 0.6f), $"{prop.name}: only the base, not the whole drawing");
+            }
+        }
+
+        [UnityTest]
+        public IEnumerator AFencePutAnywhere_IsSolid_WithoutAnyWallBeingPlaced()
+        {
+            yield return Daytime();
+            Outside();
+            Sprite fence = Dressing.Solids.First(s => s.sprite.name.Contains("FenceRun")).sprite;
+            var go = new GameObject("A New Fence");
+            SceneManager.MoveGameObjectToScene(go, Dressing.gameObject.scene);
+            go.transform.position = k_Origin + new Vector2(30f, 5f);
+            go.AddComponent<SpriteRenderer>().sprite = fence;
+            Dressing.Apply();
+            yield return new WaitForFixedUpdate();
+            Collider2D footprint = go.GetComponentInChildren<Collider2D>();
+            Assert.That(footprint, Is.Not.Null, "solid where it was put");
+            Assert.That(Physics2D.OverlapPoint(footprint.bounds.center, LayerMask.GetMask("Obstacles")), Is.EqualTo(footprint));
+            go.transform.position += new Vector3(4f, 2f, 0f);
+            yield return new WaitForFixedUpdate();
+            Assert.That(Physics2D.OverlapPoint(go.GetComponentInChildren<Collider2D>().bounds.center, LayerMask.GetMask("Obstacles")), Is.Not.Null, "and still solid once moved");
+            Object.Destroy(go);
+        }
+
+        [UnityTest]
+        public IEnumerator OgrinsWindow_IsLitWhileHesInBed_AndDarkWhileHesOut()
+        {
+            yield return Daytime();
+            Outside();
+            bool sawLit = false, sawDark = false;
+            for (int day = 0; day < 4 && !(sawLit && sawDark); day++)
+            {
+                foreach (int minute in new[] { 9 * 60, 12 * 60 + 30, 15 * 60 + 30, 17 * 60 })
+                {
+                    yield return At(minute);
+                    yield return WaitUntil(() => Villager.All.Where(v => v.CharacterId == CharacterIds.Ogrin && v.Shown).All(v => !v.Walking), 30f, "Ogrin settled");
+                    yield return Frames(2);
+                    bool indoors = Villager.All.Any(v => v.CharacterId == CharacterIds.Ogrin && v.Shown && v.Indoors);
+                    bool lit = LitWindow.IsLitAt("ogrin.window");
+                    Assert.That(lit, Is.EqualTo(indoors), $"day {Flow.State.Day} at {minute / 60}:{minute % 60:00}: the window lit exactly while he's behind it");
+                    sawLit |= lit;
+                    sawDark |= !lit;
+                }
+                if (!(sawLit && sawDark)) yield return NextDay();
+                Outside();
+            }
+            Assert.That(sawLit, Is.True, "lit when he's in bed");
+            Assert.That(sawDark, Is.True, "dark when he's out");
+        }
+
+        [UnityTest, Explicit]
+        public IEnumerator CaptureOgrinsWindow()
+        {
+            yield return Daytime();
+            Outside();
+            KeeperAtVillage(new Vector2(50f, 9.5f));
+            yield return At(17 * 60);
+            yield return WaitUntil(() => Villager.All.Any(v => v.CharacterId == CharacterIds.Ogrin && v.Shown && v.Indoors), 60f, "Ogrin home");
+            yield return new WaitForSecondsRealtime(1f);
+            TavernEveningCaptures.Capture($"BatchLogs/window_{(LitWindow.IsLitAt("ogrin.window") ? "lit" : "dark")}_evening.png");
+            yield return At(12 * 60 + 30);
+            yield return new WaitForSecondsRealtime(6f);
+            TavernEveningCaptures.Capture($"BatchLogs/window_{(LitWindow.IsLitAt("ogrin.window") ? "lit" : "dark")}_midday.png");
+        }
+
         // ---------- 4i-A: candidate stills for the main menu's backdrop (run by hand: BatchLogs/menu/*.png) ----------
 
         [UnityTest, Explicit]

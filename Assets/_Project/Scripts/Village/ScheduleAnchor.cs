@@ -106,6 +106,8 @@ namespace Hearthdelve.Village
         public void SetOccupied(bool occupied)
         {
             if (m_Occupied != null && m_Occupied.activeSelf != occupied) m_Occupied.SetActive(occupied);
+            // 2026-10-08: the window itself, lit while someone's behind it.
+            if (m_Window) LitWindow.Set(m_Id, occupied);
         }
     }
 }

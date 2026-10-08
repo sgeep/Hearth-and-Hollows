@@ -426,6 +426,8 @@ Figures registered in `Editor/Setup/KariastonSheets.cs` (`CastFigures`, 32×32 f
 
 **Window glow:** Ogrin's window is a URP point light (warm, 1.3 radius) at the cottage's ground-floor right window, on while he's in bed.
 
+**Lit window (2026-10-08, derived):** `TownsII/BrownCottageWindowLit` from `Tools/village/lit_window.py` (output `Tools/village/derived/BrownCottageWindowLit.png`, read through a `derived:` source). Towns II draws no lit windows, so the cottage's own right-hand ground-floor window glass (Towns II *More Building Samples*, BrownCottage cell 319,160 58×64; glass box 43,55 4×4) is recoloured to the flame of Medieval City's lamp post (*Props.png*, LampPost cell 112,98: `ffa700` orange, `ffe185` pale yellow; the darkest glass shade becomes the pale core). Saved building-sized and transparent elsewhere, so it shares the cottage's bottom pivot and lines up exactly; drawn unlit (it's a light) one order in front of the cottage, shown while Ogrin is behind the window (`LitWindow`). Add another building's window by adding a row to the script's `WINDOWS`.
+
 **4h Checkpoint D:**
 
 | Who / what | Pack folder / files | Source | Notes |
