@@ -128,7 +128,7 @@ namespace Hearthdelve.UI.Screens
                     }, () => GameOptions.Current.vibration);
                     break;
                 case Tab.Display:
-                    if (IsWeb) Add(MenuLocKeys.OptFullscreen, () => OnOff(Screen.fullScreen), _ => Screen.fullScreen = !Screen.fullScreen);
+                    if (IsWeb) Add(MenuLocKeys.OptFullscreen, () => OnOff(WebFullscreenShown), _ => ToggleWebFullscreen());
                     else
                     {
                         Add(MenuLocKeys.OptFullscreen, () => OnOff(GameOptions.Current.fullscreen), _ => GameOptions.Change(o => o.fullscreen = !o.fullscreen, display: true));
@@ -166,6 +166,35 @@ namespace Hearthdelve.UI.Screens
                 n.selectOnLeft = n.selectOnRight = null;
                 m_Shown[i].navigation = n;
             }
+        }
+
+        // ---------- the web's fullscreen (the owner's 4i-B note) ----------
+        // The browser enters or leaves fullscreen a moment after it's asked, so right after the change Screen.fullScreen still
+        // says the old thing. The line shows what was asked for until the browser catches up (or a couple of seconds pass, if it
+        // refused), and follows the real state whenever it changes (Esc in the browser leaves fullscreen too).
+
+        const float WebFullscreenGrace = 2f;
+        bool m_WebFullscreenAsked;
+        float m_WebFullscreenAskedAt = -10f;
+        bool m_WebFullscreenSeen;
+
+        bool WebFullscreenShown => Time.unscaledTime - m_WebFullscreenAskedAt < WebFullscreenGrace ? m_WebFullscreenAsked : Screen.fullScreen;
+
+        void ToggleWebFullscreen()
+        {
+            m_WebFullscreenAsked = !WebFullscreenShown;
+            m_WebFullscreenAskedAt = Time.unscaledTime;
+            Screen.fullScreen = m_WebFullscreenAsked;
+        }
+
+        void Update()
+        {
+            if (!IsOpen || m_Tab != Tab.Display) return;
+            bool now = Screen.fullScreen;
+            if (now == m_WebFullscreenSeen && Time.unscaledTime - m_WebFullscreenAskedAt > WebFullscreenGrace + 0.1f) return;
+            if (now == m_WebFullscreenAsked) m_WebFullscreenAskedAt = -10f;
+            m_WebFullscreenSeen = now;
+            RefreshAll();
         }
 
         void OnEnable() => GameOptions.Changed += RefreshAll;

@@ -633,6 +633,9 @@ namespace Hearthdelve.Editor
             root.transform.localPosition = MusashiSpot;
             var model = new GameObject("Model");
             model.transform.SetParent(root.transform, false);
+            // One figure, sorted by his feet like every other villager (without it his layers' orders, 1–5, drew him over the keeper
+            // standing in front of him: the owner's 4i-B note).
+            model.AddComponent<UnityEngine.Rendering.SortingGroup>().sortingLayerName = SortingLayers.YSorted;
             SpriteRenderer Layer(string name, int order)
             {
                 SpriteRenderer r = LookTestContent.AddSprite(model.transform, name, null, SortingLayers.YSorted, order, Vector3.zero);
