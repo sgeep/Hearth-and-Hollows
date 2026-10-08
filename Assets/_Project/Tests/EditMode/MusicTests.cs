@@ -13,11 +13,24 @@ namespace Hearthdelve.Tests
         [TearDown]
         public void ClearHolds() => MusicHolds.Clear();
 
-        [TestCase(DayPhase.Daytime, MusicCue.Day)]
-        [TestCase(DayPhase.Evening, MusicCue.Service)]
-        [TestCase(DayPhase.Delve, MusicCue.Cellars)]
-        [TestCase(DayPhase.Night, MusicCue.None)]
-        public void EachPartOfTheDay_HasItsTune(DayPhase phase, MusicCue cue) => Assert.That(MusicRules.Pick(true, phase, MusicCue.None), Is.EqualTo(cue));
+        // 2026-10-08 (the owner's call): the day's tune only outdoors in Kariaston; the evening's only once service has begun.
+        [TestCase(DayPhase.Daytime, true, false, MusicCue.Day)]
+        [TestCase(DayPhase.Daytime, false, false, MusicCue.None)]
+        [TestCase(DayPhase.Evening, false, true, MusicCue.Service)]
+        [TestCase(DayPhase.Evening, false, false, MusicCue.None)]
+        [TestCase(DayPhase.Delve, false, false, MusicCue.Cellars)]
+        [TestCase(DayPhase.Night, true, false, MusicCue.None)]
+        public void EachPartOfTheDay_HasItsTune(DayPhase phase, bool outdoors, bool serving, MusicCue cue) =>
+            Assert.That(MusicRules.Pick(true, phase, MusicCue.None, outdoors: outdoors, serving: serving), Is.EqualTo(cue));
+
+        [Test]
+        public void TheEveningsTune_IsServiceAndItsResults_NeverPrep()
+        {
+            Assert.That(MusicRules.IsServing("Service"), Is.True);
+            Assert.That(MusicRules.IsServing("Results"), Is.True);
+            Assert.That(MusicRules.IsServing("Prep"), Is.False);
+            Assert.That(MusicRules.IsServing(null), Is.False);
+        }
 
         [Test]
         public void ArrivalDay_IsQuiet_TheFirstMusicIsTheHollows()
@@ -47,7 +60,8 @@ namespace Hearthdelve.Tests
             Assert.That(MusicRules.PausesFor(MusicCue.Day, MusicCue.Decorate), "the day's tune waits, paused");
             Assert.That(MusicRules.PausesFor(MusicCue.Day, MusicCue.Service), Is.False, "the evening starts the day's afresh tomorrow");
             MusicHolds.Release(decorate);
-            Assert.That(MusicRules.Pick(true, DayPhase.Daytime, MusicHolds.Current), Is.EqualTo(MusicCue.Day));
+            Assert.That(MusicRules.Pick(true, DayPhase.Daytime, MusicHolds.Current), Is.EqualTo(MusicCue.None), "Tally Ho! is quiet again");
+            Assert.That(MusicRules.Pick(true, DayPhase.Daytime, MusicHolds.Current, outdoors: true), Is.EqualTo(MusicCue.Day), "and Kariaston has its tune");
         }
 
         [Test]

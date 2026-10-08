@@ -1,5 +1,7 @@
 using System.Collections;
+using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Engine;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Story;
 using Hearthdelve.Shared.Surface;
 using Hearthdelve.Story.Dialogue;
@@ -26,9 +28,12 @@ namespace Hearthdelve.Story.Presentation
         [SerializeField] RectTransform m_Panel;
         [SerializeField] LocalizedSuperText m_Text;
         [SerializeField, Tooltip("From the speaker's feet to the bubble's bottom, in tiles.")] float m_Above = 2.3f;
-        [SerializeField, Min(0.5f)] float m_MinSeconds = 2.4f;
+        [SerializeField, Min(0.5f), Tooltip("The least time any line stays up, however short (3.5 since the owner's playtest: a one-word answer went by too fast).")]
+        float m_MinSeconds = 3.5f;
         [SerializeField, Min(0f), Tooltip("Extra seconds a line stays up per character.")] float m_PerCharacter = 0.05f;
-        [SerializeField, Min(0f)] float m_Gap = 0.35f;
+        [SerializeField, Min(0f), Tooltip("Seconds between one line and the next.")] float m_Gap = 0.6f;
+        [SerializeField, Min(0f), Tooltip("How far past the screen's edge (a fraction of it) a speaker may be before the exchange is cut.")]
+        float m_OffScreen = 0.1f;
 
         Coroutine m_Running;
         Transform m_Speaker;
@@ -63,8 +68,31 @@ namespace Hearthdelve.Story.Presentation
             if (m_Bubble != null) m_Bubble.SetActive(false);
         }
 
-        void OnEnable() => StoryServices.RegisterBarks(this);
-        void OnDisable() => StoryServices.UnregisterBarks(this);
+        void OnEnable()
+        {
+            StoryServices.RegisterBarks(this);
+            EventBus<KeeperEnteredArea>.Subscribe(OnKeeperEnteredArea);
+        }
+
+        void OnDisable()
+        {
+            StoryServices.UnregisterBarks(this);
+            EventBus<KeeperEnteredArea>.Unsubscribe(OnKeeperEnteredArea);
+        }
+
+        // 2026-10-08 (the owner's playtest): an exchange in the square stopped following the keeper into Tally Ho!. Going through a
+        // door or the stairs ends whatever was being overheard where they were.
+        void OnKeeperEnteredArea(KeeperEnteredArea _) => Stop();
+
+        /// <summary>The speaker is on screen (or nearly): an exchange the keeper can't see isn't shown.</summary>
+        bool InView(Transform speaker)
+        {
+            if (speaker == null) return false;
+            FindCamera();
+            if (m_Camera == null) return true;
+            Vector3 v = m_Camera.WorldToViewportPoint(speaker.position);
+            return v.x > -m_OffScreen && v.x < 1f + m_OffScreen && v.y > -m_OffScreen && v.y < 1f + m_OffScreen;
+        }
 
         /// <summary>Something more important is on screen: nothing is overheard now.</summary>
         public static bool Blocked =>
@@ -77,6 +105,9 @@ namespace Hearthdelve.Story.Presentation
             if (conversation == null) return false;
             DialogueEntry first = Next(conversation, conversation.GetFirstDialogueEntry());
             if (first == null) return false;
+            // Only what the keeper can see: an exchange whose first speaker is off screen doesn't start (and so isn't used up).
+            Actor opener = DialogueManager.masterDatabase.GetActor(first.ActorID);
+            if (!InView(Speakers.Find(opener != null ? Field.LookupValue(opener.fields, DialogueAdapter.CharacterIdField) : null))) return false;
             m_Running = StartCoroutine(Run(conversation, first));
             return true;
         }
@@ -110,19 +141,19 @@ namespace Hearthdelve.Story.Presentation
                 string speaker = actor != null ? Field.LookupValue(actor.fields, DialogueAdapter.CharacterIdField) : null;
                 m_Speaker = Speakers.Find(speaker);
                 string line = DialogueText.Entry(entry);
-                if (m_Speaker == null || string.IsNullOrEmpty(line)) break;
+                if (m_Speaker == null || string.IsNullOrEmpty(line) || !InView(m_Speaker)) break;
                 Show(line, speaker);
                 float seconds = Mathf.Max(m_MinSeconds, m_MinSeconds + line.Length * m_PerCharacter - 1f);
                 bool cut = false;
                 for (float t = 0f; t < seconds && !cut; t += Time.unscaledDeltaTime)
                 {
-                    cut = Blocked || m_Speaker == null;
+                    cut = Blocked || m_Speaker == null || !InView(m_Speaker);
                     if (!cut) yield return null;
                 }
                 Hide();
                 if (cut) break;
                 yield return new WaitForSecondsRealtime(m_Gap);
-                if (Blocked) break;
+                if (Blocked || !InView(m_Speaker)) break;
                 entry = Next(conversation, entry);
             }
             Hide();
@@ -153,11 +184,7 @@ namespace Hearthdelve.Story.Presentation
         void Place()
         {
             if (m_Speaker == null || m_Panel == null || m_Canvas == null) return;
-            if (m_Camera == null)
-            {
-                m_Camera = Camera.main;
-                if (m_Camera != null) m_PixelPerfect = m_Camera.GetComponent<PixelPerfectCamera>();
-            }
+            FindCamera();
             if (m_Camera == null) return;
             // Fit the panel to the lines the text took (one or two), then keep it on screen.
             if (m_Stm != null && m_Stm.lineHeights != null && m_Stm.lineHeights.Count > 1)
@@ -172,6 +199,18 @@ namespace Hearthdelve.Story.Presentation
             m_Panel.anchorMin = m_Panel.anchorMax = Vector2.zero;
             m_Panel.pivot = new Vector2(0.5f, 0f);
             m_Panel.anchoredPosition = new Vector2(Mathf.Round(at.x), Mathf.Round(at.y));
+        }
+
+        /// <summary>
+        /// The camera the world is drawn from now (2026-10-08): never a remembered one, which after a scene change could be another
+        /// camera than the one showing the keeper (the bubble then judged speakers off screen, and placed itself from the wrong view).
+        /// </summary>
+        void FindCamera()
+        {
+            Camera main = Camera.main;
+            if (main == m_Camera) return;
+            m_Camera = main;
+            m_PixelPerfect = main != null ? main.GetComponent<PixelPerfectCamera>() : null;
         }
 
         const float SilverMetricsLine = 12f;

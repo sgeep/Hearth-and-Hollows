@@ -25,6 +25,8 @@ namespace Hearthdelve.Shared.Audio
         public float effectsInHollows = 0.75f;
         [Min(0f), Tooltip("Seconds to fade one tune out and the next in (real time: dialogue and pauses don't stop a fade).")]
         public float fadeSeconds = 1.5f;
+        [Min(0f), Tooltip("Seconds of quiet before a tune starts to fade in (1.5, the owner's call, 2026-10-08). Real time.")]
+        public float startDelay = 1.5f;
 
         public AudioClip Clip(MusicCue cue) => Track(cue)?.clip;
 

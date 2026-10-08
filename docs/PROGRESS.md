@@ -1285,6 +1285,13 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 - **No idle head turn for the keeper:** Minifantasy's 16-frame idles turn the head over frames 8–10 and blink at 3, 5 and 13; the keeper's idles (all four bodies and their shadows) now hold frame 7 through 8–10, keeping the blinks and the loop's timing (`LookTestContent.StillHead`; `KeeperIdleTests`). The 4a look scenes share the townsfolk set, so their idle changes too. Villagers and customers keep theirs.
 - **Considered and not built (the owner's call):** a campfire room between the last floor and the Larder Troll's arena.
 
+### Overheard bubbles and the music (2026-10-08, the owner's playtest)
+
+- **An exchange in the square followed the keeper into Tally Ho!** Overheard exchanges now end the moment the keeper goes through a door or the stairs (`KeeperEnteredArea`), end if a speaker goes off screen, and never start (or get used up for the day) when the first speaker isn't in view. The bubble also always uses the camera showing the world now, not one remembered from before a scene change.
+- **Short answers went by too fast:** every line now stays up at least 3.5 s (was 2.4), with 0.6 s between lines (was 0.35); tunable on the bubble (`AmbientBarks`, in Boot).
+- **Music (the owner's call):** "Quirkii" only out in Kariaston by day; Tally Ho! (and the keeper's room) quiet by day except Decorate Mode's "Continue"; Prep quiet; "Coastal Market" from the moment service starts, through the results; every tune waits 1.5 s before fading in (`MusicConfig.startDelay`).
+- Tests: `Overheard_Stops_WhenTheKeeperGoesIndoors…`, the music rules (EditMode) and `TheMusic_FollowsTheDay…` (PlayMode) rewritten to the new rules.
+
 ### Kariaston: collision by what things are, and Ogrin's lit window (2026-10-08, the owner's request)
 
 - **The pond was never solid:** its tilemap collider made 40 cell shapes, but merging them through the composite collider produced none. Now `DressingCollision` (on `Kariaston/Gameplay`, tool-owned) makes every tilemap holding colliding tiles collide cell by cell, as the scene loads: **water painted anywhere later is solid too** (and the villagers' walking grid paths round it). Ready for fishing from the bank.

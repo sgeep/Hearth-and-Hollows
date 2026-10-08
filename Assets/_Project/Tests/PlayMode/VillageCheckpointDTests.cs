@@ -194,7 +194,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Story.SeenHints, Has.Member(CommunityRules.GimpIntro), "once per save");
             Assert.That(roomLight.intensity, Is.EqualTo(day).Within(1e-3f), "the light is back exactly");
             yield return Frames(3);
-            Assert.That(MusicDirector.Instance.Current, Is.EqualTo(MusicCue.Day), "the day's tune");
+            Assert.That(MusicHolds.Current, Is.EqualTo(MusicCue.None), "the night's silence let go");
+            Assert.That(MusicDirector.Instance.Current, Is.EqualTo(MusicCue.None), "and the room is as quiet as Tally Ho! is by day");
             Assert.That(Flow.State.Day, Is.EqualTo(3), "an ordinary morning of the same day");
 
             // Continue: never again.
@@ -282,6 +283,42 @@ namespace Hearthdelve.Tests.PlayMode
             while (Time.realtimeSinceStartup < until)
             {
                 Assert.That(barks.IsBarking, Is.False, "a cooldown between exchanges");
+                yield return null;
+            }
+        }
+
+        /// <summary>2026-10-08 (the owner's playtest): an exchange in the square kept showing after the keeper went into Tally Ho!.</summary>
+        [UnityTest]
+        public IEnumerator Overheard_Stops_WhenTheKeeperGoesIndoors_AndShortLinesStayUpLongEnough()
+        {
+            yield return Daytime();
+            SurfacePause.Release(m_Hold);
+            SurfaceTime.SettingsOverride = new SurfaceClockSettings
+            {
+                dayStartMinute = 480, cutoffMinute = 1020, afternoonStartMinute = 720, realSecondsPerGameMinute = 1000f,
+                maxRealSecondsPerFrame = 0.1f, displayStepMinutes = 10, marketOpenMinute = 480, marketCloseMinute = 1020,
+            };
+            Outside();
+            KeeperAtVillage(new Vector2(38f, 9f));
+            yield return At(12 * 60);
+            yield return WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market");
+            IBarkService barks = StoryServices.Barks;
+            var bubbles = Object.FindAnyObjectByType<AmbientBarks>();
+            yield return WaitUntil(() => barks.IsBarking, 6f, "an exchange overheard");
+            // A line stays up at least the minimum, however short.
+            string first = bubbles.Showing;
+            float shown = Time.realtimeSinceStartup;
+            yield return WaitUntil(() => bubbles.Showing != first, 15f, "the next line");
+            Assert.That(Time.realtimeSinceStartup - shown, Is.GreaterThanOrEqualTo(3.4f), "long enough to read");
+            yield return WaitUntil(() => barks.IsBarking && bubbles.Showing != null, 6f, "still talking");
+            // In through the front door: it ends at once and doesn't follow the keeper in.
+            SurfaceDoor.Find(SurfaceDoor.FrontOutside).Pass(Keeper);
+            yield return Frames(2);
+            Assert.That(barks.IsBarking, Is.False, "the square's exchange ended at the door");
+            Assert.That(bubbles.Bubbles, Is.Zero);
+            for (int i = 0; i < 60; i++)
+            {
+                Assert.That(bubbles.Bubbles, Is.Zero, "nothing from outside shows indoors");
                 yield return null;
             }
         }
@@ -380,6 +417,9 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => DialogueManager.IsConversationActive, 6f, "Gimp's night");
             yield return new WaitForSecondsRealtime(2f);
             TavernEveningCaptures.Capture("BatchLogs/community_night.png");
+            // The capture renders into a 320x180 texture; give the camera its own projection back (batch mode leaves it stale).
+            Camera.main.ResetProjectionMatrix();
+            Camera.main.ResetWorldToCameraMatrix();
             DialogueManager.StopConversation();
             yield return WaitUntil(() => !NightVisitor.Instance.Playing, 10f, "the morning");
 

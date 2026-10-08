@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Hearthdelve.Core.Events;
 using Hearthdelve.Shared.Game;
 using UnityEngine;
 
@@ -22,7 +23,19 @@ namespace Hearthdelve.Shared.Audio
             public float Level;
             public bool PauseAtSilence;
             public MusicCue Cue;
+            /// <summary>Real time before which a wanted tune doesn't start (the quiet before it fades in).</summary>
+            public float StartAt;
         }
+
+        /// <summary>The tavern's part of the evening, as last announced ("Prep", "Service", "Results", …).</summary>
+        static string s_TavernPhase;
+
+        void OnEnable() => EventBus<TavernPhaseStarted>.Subscribe(OnTavernPhase);
+        void OnDisable() => EventBus<TavernPhaseStarted>.Unsubscribe(OnTavernPhase);
+        static void OnTavernPhase(TavernPhaseStarted e) => s_TavernPhase = e.Phase;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => s_TavernPhase = null;
 
         readonly Dictionary<MusicCue, Voice> m_Voices = new();
 
@@ -58,7 +71,8 @@ namespace Hearthdelve.Shared.Audio
                 GameFlow flow = GameFlow.Instance;
                 bool inGame = flow != null && flow.InGame;
                 return MusicRules.Pick(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, MusicHolds.Current,
-                    inGame && flow.State.Story.Opening == Hearthdelve.Shared.Story.OpeningStage.Arrival);
+                    inGame && flow.State.Story.Opening == Hearthdelve.Shared.Story.OpeningStage.Arrival,
+                    outdoors: !SurfaceTime.Indoors, serving: MusicRules.IsServing(s_TavernPhase));
             }
         }
 
@@ -98,6 +112,7 @@ namespace Hearthdelve.Shared.Audio
             }
             voice.Target = 1f;
             voice.PauseAtSilence = false;
+            if (!voice.Source.isPlaying) voice.StartAt = Time.unscaledTime + m_Config.startDelay;
             Begin(voice);
         }
 
@@ -111,7 +126,8 @@ namespace Hearthdelve.Shared.Audio
             if (voice.Source.isPlaying) return;
             AudioClip clip = voice.Source.clip;
             if (clip.loadState == AudioDataLoadState.Unloaded || clip.loadState == AudioDataLoadState.Failed) clip.LoadAudioData();
-            if (clip.loadState != AudioDataLoadState.Loaded) return;
+            // Loading starts at once; playing waits out the quiet before the tune.
+            if (clip.loadState != AudioDataLoadState.Loaded || Time.unscaledTime < voice.StartAt) return;
             // Paused: picks up where it was. Stopped: from the top.
             if (voice.Source.time > 0f) voice.Source.UnPause();
             else voice.Source.Play();

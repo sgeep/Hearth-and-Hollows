@@ -455,23 +455,47 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator TheMusic_FollowsTheDay_DecorateModeHasItsOwn_AndTheEveningItsOwn()
         {
+            // 2026-10-08 (the owner's call): Tally Ho! is quiet by day, Kariaston has the day's tune, Decorate Mode its own; Prep is
+            // quiet and the evening's tune begins with service; every tune waits a moment before it fades in.
             yield return Daytime(outside: false);
             var music = Hearthdelve.Shared.Audio.MusicDirector.Instance;
             Assert.That(music, Is.Not.Null, "the music lives in Boot");
-            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Day));
-            AudioSource day = music.GetComponents<AudioSource>().Single(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.None), "Tally Ho! by day: quiet");
+            AudioSource day = music.GetComponents<AudioSource>().FirstOrDefault(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
+            Assert.That(day == null || !day.isPlaying, "nothing playing indoors");
+            Outside();
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Day), "out in Kariaston");
+            float wanted = Time.realtimeSinceStartup;
+            day = music.GetComponents<AudioSource>().Single(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
             Assert.That(day.loop, "it loops");
+            yield return WaitUntil(() => day.isPlaying, 10f, "the day's tune");
+            Assert.That(Time.realtimeSinceStartup - wanted, Is.GreaterThanOrEqualTo(music.Config.startDelay - 0.1f), "a quiet moment before it fades in");
+            Inside();
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.None), "back indoors: quiet");
             DecorateMode.Instance.Enter();
             yield return Frames(3);
-            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Decorate));
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Decorate), "decorating has its tune");
             DecorateMode.Instance.Leave();
             yield return Frames(3);
-            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Day), "back to the day's tune");
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.None), "and Tally Ho! is quiet again");
             SurfacePause.Release(m_Hold);
             Flow.StartEvening();
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
-            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Service));
-            Flow.SkipService();
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.None), "Prep: quiet");
+            Director.FillStoreroom();
+            Director.OpenDebugEvening();
+            yield return WaitUntil(() => Director.Phase == TavernPhase.Service, 10f, "service");
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Service), "service begins the evening's tune");
+            Director.EndServiceNow();
+            yield return WaitUntil(() => Director.Phase == TavernPhase.Results, 10f, "the results");
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Service), "and carries through the results");
+            Director.FinishEvening();
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the delve");
             Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Cellars));
         }
@@ -480,8 +504,9 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator OneListener_OnEveryFrame_ThroughAChangeOfScenes()
         {
-            yield return Daytime(outside: false);
+            yield return Daytime(outside: true);
             var music = Hearthdelve.Shared.Audio.MusicDirector.Instance;
+            yield return Frames(3);
             AudioSource day = music.GetComponents<AudioSource>().Single(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
             yield return WaitUntil(() => day.isPlaying, 10f, "the day's tune, once its clip has loaded");
             Assert.That(Object.FindAnyObjectByType<Hearthdelve.Shared.Audio.ListenerKeeper>(), Is.Not.Null, "Boot keeps a fallback ear");

@@ -7,11 +7,11 @@ namespace Hearthdelve.Shared.Audio
     public enum MusicCue
     {
         None,
-        /// <summary>The free day, in Tally Ho! and Kariaston ("Quirkii").</summary>
+        /// <summary>The free day out in Kariaston ("Quirkii"; since 2026-10-08 Tally Ho! itself is quiet).</summary>
         Day,
         /// <summary>Decorate Mode ("Continue").</summary>
         Decorate,
-        /// <summary>The evening at Tally Ho!: Prep, service, the results ("Coastal Market").</summary>
+        /// <summary>The evening's service and its results ("Coastal Market"; since 2026-10-08 not during Prep).</summary>
         Service,
         /// <summary>The first region of the Hollows, the Cellars ("Otherworld"). Later regions add their own cue.</summary>
         Cellars,
@@ -20,24 +20,29 @@ namespace Hearthdelve.Shared.Audio
     }
 
     /// <summary>
-    /// Which music the moment wants (pure). The day's phase decides; something that holds a cue (Decorate Mode) wins over it.
-    /// The menu, arrival day (the opening: the first music is the Hollows', the owner's call) and the night's summary are quiet.
+    /// Which music the moment wants (pure). Something that holds a cue (Decorate Mode) wins over the rest. Otherwise (the owner's
+    /// call, 2026-10-08): the day's tune only out in Kariaston (<paramref name="outdoors"/>), Tally Ho! itself quiet by day; the
+    /// evening's tune only once service has begun (<paramref name="serving"/>: service and its results), so Prep is quiet; the Hollows
+    /// their own. The menu, arrival day (the first music is the Hollows', the owner's call) and the night's summary are quiet.
     /// </summary>
     public static class MusicRules
     {
-        public static MusicCue Pick(bool inGame, DayPhase phase, MusicCue held, bool arriving = false)
+        public static MusicCue Pick(bool inGame, DayPhase phase, MusicCue held, bool arriving = false, bool outdoors = false, bool serving = false)
         {
             if (!inGame || arriving) return MusicCue.None;
             if (held == MusicCue.Silence) return MusicCue.None;
             if (held != MusicCue.None) return held;
             return phase switch
             {
-                DayPhase.Daytime => MusicCue.Day,
-                DayPhase.Evening => MusicCue.Service,
+                DayPhase.Daytime => outdoors ? MusicCue.Day : MusicCue.None,
+                DayPhase.Evening => serving ? MusicCue.Service : MusicCue.None,
                 DayPhase.Delve => MusicCue.Cellars,
                 _ => MusicCue.None,
             };
         }
+
+        /// <summary>The tavern's parts of the evening that have the evening's music: service and its results (never Prep).</summary>
+        public static bool IsServing(string tavernPhase) => tavernPhase is "Service" or "Results";
 
         /// <summary>
         /// Leaving <paramref name="from"/> for <paramref name="to"/>: whether to pause it (and resume it later where it was)
