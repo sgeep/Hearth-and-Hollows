@@ -97,13 +97,23 @@ namespace Hearthdelve.Shared.Audio
             }
             voice.Target = 1f;
             voice.PauseAtSilence = false;
-            if (clip.loadState == AudioDataLoadState.Unloaded) clip.LoadAudioData();
-            if (!voice.Source.isPlaying)
-            {
-                // Paused: picks up where it was. Stopped: from the top.
-                if (voice.Source.time > 0f) voice.Source.UnPause();
-                else voice.Source.Play();
-            }
+            Begin(voice);
+        }
+
+        /// <summary>
+        /// Starts a wanted voice once its audio is in memory (2026-10-08). Loading runs in the background (on the web, the
+        /// browser decodes the whole track), and a clip told to play before it has finished is left to the platform to sort
+        /// out, so a voice waits, silent, until its clip has loaded.
+        /// </summary>
+        static void Begin(Voice voice)
+        {
+            if (voice.Source.isPlaying) return;
+            AudioClip clip = voice.Source.clip;
+            if (clip.loadState == AudioDataLoadState.Unloaded || clip.loadState == AudioDataLoadState.Failed) clip.LoadAudioData();
+            if (clip.loadState != AudioDataLoadState.Loaded) return;
+            // Paused: picks up where it was. Stopped: from the top.
+            if (voice.Source.time > 0f) voice.Source.UnPause();
+            else voice.Source.Play();
         }
 
         void Fade(float dt)
@@ -112,6 +122,12 @@ namespace Hearthdelve.Shared.Audio
             foreach (KeyValuePair<MusicCue, Voice> pair in m_Voices)
             {
                 Voice v = pair.Value;
+                if (v.Target > 0f && !v.Source.isPlaying)
+                {
+                    // Waiting for its clip: the fade begins when the music does.
+                    Begin(v);
+                    if (!v.Source.isPlaying) continue;
+                }
                 float level = Mathf.MoveTowards(v.Level, v.Target, step);
                 v.Level = level;
                 v.Source.volume = Mathf.Min(1f, level * m_Config.volume / Mathf.Max(0.01f, AudioListener.volume));
@@ -121,7 +137,7 @@ namespace Hearthdelve.Shared.Audio
                 {
                     v.Source.Stop();
                     v.Source.time = 0f;
-                    if (v.Source.clip != null) v.Source.clip.UnloadAudioData();
+                    if (v.Source.clip != null && v.Source.clip.loadState == AudioDataLoadState.Loaded) v.Source.clip.UnloadAudioData();
                 }
             }
         }

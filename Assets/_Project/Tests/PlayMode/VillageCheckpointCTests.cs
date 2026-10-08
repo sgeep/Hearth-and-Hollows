@@ -476,6 +476,28 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Cellars));
         }
 
+        /// <summary>2026-10-08: someone is always listening, never two, across a change of scenes; the day's tune is heard.</summary>
+        [UnityTest]
+        public IEnumerator OneListener_OnEveryFrame_ThroughAChangeOfScenes()
+        {
+            yield return Daytime(outside: false);
+            var music = Hearthdelve.Shared.Audio.MusicDirector.Instance;
+            AudioSource day = music.GetComponents<AudioSource>().Single(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
+            yield return WaitUntil(() => day.isPlaying, 10f, "the day's tune, once its clip has loaded");
+            Assert.That(Object.FindAnyObjectByType<Hearthdelve.Shared.Audio.ListenerKeeper>(), Is.Not.Null, "Boot keeps a fallback ear");
+            SurfacePause.Release(m_Hold);
+            Flow.StartEvening();
+            int frames = 0;
+            while (frames < 3 || Flow.IsLoading)
+            {
+                yield return null;
+                int hearing = Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None).Count(l => l.isActiveAndEnabled);
+                Assert.That(hearing, Is.EqualTo(1), $"listeners hearing on frame {frames} of the load");
+                if (++frames > 2000) Assert.Fail("the evening never loaded");
+            }
+            Assert.That(Object.FindAnyObjectByType<Hearthdelve.Shared.Audio.ListenerKeeper>().Hearing, Is.False, "the scene's own camera hears once it's loaded");
+        }
+
         // ---------- nobody traps the keeper ----------
 
         [UnityTest]

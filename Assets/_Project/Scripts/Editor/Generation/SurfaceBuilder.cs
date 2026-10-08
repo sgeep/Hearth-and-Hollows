@@ -94,6 +94,14 @@ namespace Hearthdelve.Editor
             // 2026-10-07: the background music, beside the clock.
             MusicDirector music = flow.GetComponent<MusicDirector>() ?? flow.gameObject.AddComponent<MusicDirector>();
             music.Configure(MusicContent.Build());
+            // 2026-10-08: the fallback ear, for the moments between one set of scenes and the next.
+            if (Object.FindAnyObjectByType<ListenerKeeper>(FindObjectsInactive.Include) == null)
+            {
+                var ear = new GameObject("Listener");
+                ear.transform.SetParent(flow.transform, false);
+                ear.AddComponent<AudioListener>().enabled = false;
+                ear.AddComponent<ListenerKeeper>();
+            }
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
         }
