@@ -6,7 +6,11 @@ using Hearthdelve.Shared.Audio;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Settings;
+using Hearthdelve.Shared.Story;
 using Hearthdelve.Shared.Surface;
+using Hearthdelve.Story.Presentation;
+using Hearthdelve.Tavern.Scene;
+using PixelCrushers.DialogueSystem;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Screens;
 using NUnit.Framework;
@@ -150,6 +154,59 @@ namespace Hearthdelve.Tests.PlayMode
             Pause.Close();
             yield return null;
             Assert.That(Pause.Credits.IsOpen, Is.False, "closing the pause menu closes the credits");
+        }
+
+        // ---------- the new sounds (4i-C) ----------
+
+        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
+        static TavernDirector Director => TavernDirector.Instance;
+
+        IEnumerator Daytime(OpeningStage opening)
+        {
+            yield return Menu();
+            Flow.QuickNewGame();
+            Flow.MarkHintSeen(Hearthdelve.Shared.Village.CommunityRules.GimpIntro);
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
+            yield return Revealed();
+            Flow.State.Story.Opening = opening;
+            Flow.CompleteDelve(DelveReport.Empty);
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
+            yield return Revealed();
+            Flow.Sleep();
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
+            yield return Revealed();
+            yield return Frames(3);
+        }
+
+        [UnityTest]
+        public IEnumerator Walking_IsHeard_TheStairsAreHeard_AndAConversationBlipsOverDuckedMusic()
+        {
+            yield return Daytime(OpeningStage.FirstEvening);
+            m_Pad = InputSystem.AddDevice<Gamepad>();
+            Footsteps steps = Keeper.GetComponentInChildren<Footsteps>(true);
+            Assert.That(steps, Is.Not.Null, "the keeper has footsteps");
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState { leftStick = new Vector2(1f, 0f) });
+            yield return new WaitForSeconds(1f);
+            InputSystem.QueueStateEvent(m_Pad, new GamepadState());
+            yield return Frames(3);
+            Assert.That(steps.Steps, Is.GreaterThan(0), "walking is heard, on the walk's footfalls");
+
+            PassageSounds passages = Object.FindAnyObjectByType<PassageSounds>(FindObjectsInactive.Include);
+            Assert.That(passages, Is.Not.Null);
+            AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).Single(p => p.To != null && p.To.Id == PropertyArea.TavernId);
+            down.Pass(Keeper);
+            yield return null;
+            Assert.That(passages.Stairs.IsPlaying, Is.True, "the stairs are heard");
+
+            yield return WaitUntil(() => DialogueManager.IsConversationActive, 5f, "the first morning");
+            var box = Object.FindAnyObjectByType<HearthDialogueUI>();
+            Assert.That(box.Blips, Is.Not.Null);
+            yield return new WaitForSecondsRealtime(1.5f);
+            Assert.That(box.Blips.Blips, Is.GreaterThan(0), "a line being written is heard");
+            Assert.That(MusicDirector.Instance.Duck, Is.LessThan(1f), "the music steps back while someone talks");
+            DialogueManager.StopConversation();
+            yield return new WaitForSecondsRealtime(1f);
+            Assert.That(MusicDirector.Instance.Duck, Is.EqualTo(1f).Within(1e-3f), "and comes back after");
         }
 
         // ---------- Options at a human pace ----------

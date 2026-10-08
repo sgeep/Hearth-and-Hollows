@@ -136,9 +136,17 @@ namespace Hearthdelve.Shared.Audio
             else voice.Source.Play();
         }
 
+        float m_Duck = 1f;
+
+        /// <summary>The music's dialogue duck now (1: none). Tests.</summary>
+        public float Duck => m_Duck;
+
         void Fade(float dt)
         {
             float step = m_Config.fadeSeconds > 0f ? dt / m_Config.fadeSeconds : 1f;
+            // 4i-C: a little down while someone's talking (MusicRules.Duck; the config's level, 1 turns it off).
+            bool talking = Hearthdelve.Shared.Story.StoryServices.Conversations != null && Hearthdelve.Shared.Story.StoryServices.Conversations.IsTalking;
+            m_Duck = Mathf.MoveTowards(m_Duck, MusicRules.Duck(talking, m_Config.duckUnderDialogue), dt / Mathf.Max(0.01f, m_Config.duckSeconds));
             foreach (KeyValuePair<MusicCue, Voice> pair in m_Voices)
             {
                 Voice v = pair.Value;
@@ -150,7 +158,7 @@ namespace Hearthdelve.Shared.Audio
                 }
                 float level = Mathf.MoveTowards(v.Level, v.Target, step);
                 v.Level = level;
-                v.Source.volume = Mathf.Min(1f, level * m_Config.volume * m_Config.Level(v.Cue));
+                v.Source.volume = Mathf.Min(1f, level * m_Config.volume * m_Config.Level(v.Cue) * m_Duck);
                 if (v.Target > 0f || level > 0f || !v.Source.isPlaying) continue;
                 if (v.PauseAtSilence) v.Source.Pause();
                 else

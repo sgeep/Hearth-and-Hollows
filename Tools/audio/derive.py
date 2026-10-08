@@ -6,6 +6,9 @@ docs/CREDITS.md). Run:  python Tools/audio/derive.py
   TapPourLoop.wav   OwlishMedia "tap-water-1.wav": a steady 1.6 s stretch of the running tap, crossfaded end into start so it
                     loops seamlessly (the tap's pour loop).
   GardenWater.wav   OwlishMedia "spray-bottle.wav": the first spray, from its onset, 0.5 s with a short fade out (tending a bed).
+  fruit1-3, scrape1-2, clamour1-11 (.wav)
+                    OwlishMedia's Impacts, peak-normalised to -1 dBFS (the 4i-C balance pass: as recorded they peak near -17 dBFS,
+                    some 10 dB under the Kenney packs, too quiet to reach their level at full volume). Nothing else changes.
 """
 import os
 import struct
@@ -53,7 +56,19 @@ def onset(frames, threshold):
     return 0
 
 
+def normalise(name, peak_db=-1.0):
+    frames, ch, rate = read(os.path.join(SFX, "Impacts", name))
+    peak = max(abs(v) for f in frames for v in f) or 1
+    gain = (32767 * 10 ** (peak_db / 20.0)) / peak
+    write(os.path.join(OUT, name), [[v * gain for v in f] for f in frames], ch, rate)
+
+
+NORMALISED = ["fruit1.wav", "fruit2.wav", "fruit3.wav", "scrape1.wav", "scrape2.wav"] + ["clamour%d.wav" % i for i in range(1, 12)]
+
+
 def main():
+    for name in NORMALISED:
+        normalise(name)
     frames, ch, rate = read(os.path.join(SFX, "Water", "tap-water-1.wav"))
     pour = loop(frames, start=int(4.0 * rate), length=int(1.6 * rate), fade=int(0.12 * rate))
     write(os.path.join(OUT, "TapPourLoop.wav"), pour, ch, rate)

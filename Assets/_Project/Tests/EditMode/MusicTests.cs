@@ -70,9 +70,14 @@ namespace Hearthdelve.Tests
             var config = AssetDatabase.LoadAssetAtPath<MusicConfig>(MusicContent.ConfigPath);
             Assert.That(config, Is.Not.Null);
             Assert.That(config.volume, Is.EqualTo(0.5625f).Within(1e-4f), "a quarter down, twice");
+            // The owner's Quirkii at 0.75; 4i-C's balance pass evened the rest by their measured loudness (Coastal Market about
+            // 1.5 dB hot, Otherworld about 4 dB; Continue is already quieter).
             Assert.That(config.Level(MusicCue.Day), Is.EqualTo(0.75f).Within(1e-4f), "Quirkii a quarter under the rest");
-            foreach (MusicCue other in new[] { MusicCue.Decorate, MusicCue.Service, MusicCue.Cellars })
-                Assert.That(config.Level(other), Is.EqualTo(1f).Within(1e-4f), $"{other} at the music volume");
+            Assert.That(config.Level(MusicCue.Decorate), Is.EqualTo(1f).Within(1e-4f));
+            Assert.That(config.Level(MusicCue.Service), Is.EqualTo(0.85f).Within(1e-4f));
+            Assert.That(config.Level(MusicCue.Cellars), Is.EqualTo(0.6f).Within(1e-4f));
+            Assert.That(MusicRules.Duck(true, config.duckUnderDialogue), Is.EqualTo(0.7f).Within(1e-4f), "about 3 dB down while someone talks");
+            Assert.That(MusicRules.Duck(false, config.duckUnderDialogue), Is.EqualTo(1f));
             Assert.That(config.effectsInHollows, Is.EqualTo(0.75f).Within(1e-4f));
             foreach (MusicCue cue in new[] { MusicCue.Day, MusicCue.Decorate, MusicCue.Service, MusicCue.Cellars })
             {

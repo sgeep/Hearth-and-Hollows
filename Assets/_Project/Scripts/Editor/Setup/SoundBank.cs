@@ -19,11 +19,52 @@ namespace Hearthdelve.Editor
         public const string Folder = EditorPaths.Root + "/Audio/SFX/Library";
         const string Library = @"C:\Dev\Music\SFX";
 
+        /// <summary>How loud a kind of sound sits (the 4i-C balance pass): its target RMS in dBFS over the sounding part.</summary>
+        public enum Kind
+        {
+            /// <summary>Hits, the troll, gates slamming, crashes, deaths: the loudest moments.</summary>
+            Impact,
+            /// <summary>The work and the world: chopping, plates, pours, doors, coins, pickups.</summary>
+            Action,
+            /// <summary>Menus and notices.</summary>
+            Interface,
+            /// <summary>What repeats under everything: footsteps, dialogue blips.</summary>
+            Quiet,
+        }
+
+        public static float TargetDb(Kind kind) => kind switch
+        {
+            Kind.Impact => -16f,
+            Kind.Action => -20f,
+            Kind.Interface => -24f,
+            _ => -28f,
+        };
+
         public sealed class Family
         {
             public string Key;
             public string[] Sources;
             public float MinPitch = 1f, MaxPitch = 1f, Volume = 1f;
+            public Kind Target = Kind.Action;
+        }
+
+        static readonly string[] k_Impact = { "Hit", "HitHeavy", "Hurt", "TrollImpact", "GateSlam", "Crash", "EnemyDeath" };
+        static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "FurnitureTurn", "FurnitureUndo", "Discovery", "Blip" };
+        static readonly string[] k_Quiet = { "Footsteps.Village", "Footsteps.Tavern", "Footsteps.Hollows" };
+
+        static Kind KindOf(string key) =>
+            k_Impact.Contains(key) ? Kind.Impact : k_Interface.Contains(key) ? Kind.Interface : k_Quiet.Contains(key) ? Kind.Quiet : Kind.Action;
+
+        /// <summary>
+        /// The family's playing volume: what brings its measured loudness to its kind's target (never above 1: a quiet clip plays
+        /// at full), times its own trim. A family that can't be measured plays at its trim.
+        /// </summary>
+        public static float Volume(Family family)
+        {
+            var level = SoundLevels.Measure(family);
+            if (!level.HasValue) return family.Volume;
+            float gain = Mathf.Pow(10f, (TargetDb(family.Target) - level.Value.rms) / 20f);
+            return Mathf.Clamp(gain * family.Volume, 0.05f, 1f);
         }
 
         static string K(string name) => Path.Combine(Library, "Kenney Audio", name);
@@ -33,7 +74,7 @@ namespace Hearthdelve.Editor
             Enumerable.Range(start, count).Select(i => K($"{stem}{i.ToString().PadLeft(digits, '0')}.ogg")).ToArray();
 
         static Family F(string key, string[] sources, float pitch = 0f, float volume = 1f) =>
-            new() { Key = key, Sources = sources, MinPitch = 1f - pitch, MaxPitch = 1f + pitch, Volume = volume };
+            new() { Key = key, Sources = sources, MinPitch = 1f - pitch, MaxPitch = 1f + pitch, Volume = volume, Target = KindOf(key) };
 
         /// <summary>The families (the listening list's numbers in comments).</summary>
         public static readonly Family[] Families =
@@ -47,14 +88,14 @@ namespace Hearthdelve.Editor
             F("HitHeavy", Ks("impactPunch_heavy_", 5), 0.04f),                                                           // 7 A
             F("Hurt", Ks("impactSoft_heavy_", 5), 0.04f),                                                                // 8 A
             F("Telegraph", new[] { K("impactBell_heavy_004.ogg") }),                                                     // 9 A
-            F("EnemyDeath", new[] { O(@"Impacts\fruit1.wav"), O(@"Impacts\fruit2.wav"), O(@"Impacts\fruit3.wav") }, 0.06f), // 10 A
+            F("EnemyDeath", new[] { D("fruit1.wav"), D("fruit2.wav"), D("fruit3.wav") }, 0.06f), // 10 A
             F("Pickup", new[] { K("handleSmallLeather.ogg"), K("handleSmallLeather2.ogg") }, 0.05f),                    // 11 A
             F("SatchelFull", new[] { K("error_004.ogg"), K("error_008.ogg"), K("error_001.ogg") }),                     // 12 A
             F("Coins", new[] { K("handleCoins.ogg"), K("handleCoins2.ogg") }, 0.04f),                                    // 13 A
             F("Door", new[] { K("doorClose_1.ogg"), K("doorClose_2.ogg"), K("doorClose_3.ogg"), K("doorClose_4.ogg") }, 0f, 0.8f), // 14 A
             F("Stairs", Ks("impactPlank_medium_", 5), 0.05f, 0.7f),                                                      // 15 B (the owner's choice)
             F("GateSlam", Ks("impactMining_", 5), 0.03f),                                                                // 16 A
-            F("GateRise", new[] { O(@"Impacts\scrape1.wav"), O(@"Impacts\scrape2.wav") }),                               // 16 C
+            F("GateRise", new[] { D("scrape1.wav"), D("scrape2.wav") }),                               // 16 C
             F("GrillFlip", new[] { O(@"Impacts\flip.wav") }, 0.05f),                                                     // 17 A
             F("TapPour", new[] { D("TapPourLoop.wav") }),                                                                // 18 A (an edit)
             F("Clink", Ks("impactGlass_light_", 5), 0.04f),                                                              // 18 B
@@ -62,7 +103,7 @@ namespace Hearthdelve.Editor
             F("Knife", new[] { K("chop.ogg"), K("knifeSlice.ogg"), K("knifeSlice2.ogg") }, 0.05f),                     // 19 B
             F("Butchery", Ks("impactWood_medium_", 5), 0.05f),                                                           // 19 C
             F("Plate", Ks("impactPlate_light_", 5), 0.04f),                                                              // 20 A
-            F("Crash", Enumerable.Range(1, 11).Select(i => O($@"Impacts\clamour{i}.wav")).ToArray()),                   // 20 C
+            F("Crash", Enumerable.Range(1, 11).Select(i => D($"clamour{i}.wav")).ToArray()),                   // 20 C
             F("Stew", new[] { K("metalPot1.ogg"), K("metalPot2.ogg"), K("metalPot3.ogg") }),                           // 21 A
             F("UiConfirm", new[] { K("select_001.ogg"), K("select_002.ogg"), K("select_007.ogg") }),                   // 22 A
             F("UiTick", new[] { K("tick_002.ogg") }),                                                                    // 22 B (tick_002)
@@ -78,7 +119,7 @@ namespace Hearthdelve.Editor
             F("FurnitureUndo", new[] { K("minimize_007.ogg") }),                                                         // 25 C
             F("Soil", Ks("impactSoft_medium_", 5), 0.05f),                                                               // 26 A (plant)
             F("Water", new[] { D("GardenWater.wav") }, 0.04f),                                                           // 26 B (an edit; tend)
-            F("Harvest", new[] { O(@"Impacts\fruit1.wav"), O(@"Impacts\fruit2.wav") }, 0.05f),                           // 26 C
+            F("Harvest", new[] { D("fruit1.wav"), D("fruit2.wav") }, 0.05f),                           // 26 C
             F("Blip", new[] { K("pluck_001.ogg"), K("pluck_002.ogg") }),                                                 // 27 A
             F("TrollImpact", Ks("impactMining_", 5), 0.04f),                                                             // 28 A
             F("Gulp", new[] { O(@"Impacts\gulp1.wav"), O(@"Impacts\gulp2.wav") }),                                       // 28 B
@@ -143,6 +184,11 @@ namespace Hearthdelve.Editor
                 File.Copy(source, target);
                 copied++;
             }
+            // Anything imported that the bank no longer uses (a clip replaced by its edited copy) goes: only approved, used files stay.
+            var used = new HashSet<string>(Sources.Select(s => AssetPath(s).Replace('\\', '/')));
+            if (Directory.Exists(Folder))
+                foreach (string file in Directory.GetFiles(Folder, "*", SearchOption.AllDirectories).Where(f => !f.EndsWith(".meta")))
+                    if (!used.Contains(file.Replace('\\', '/'))) AssetDatabase.DeleteAsset(file.Replace('\\', '/'));
             AssetDatabase.Refresh();
             foreach (string source in Sources)
             {
@@ -180,7 +226,7 @@ namespace Hearthdelve.Editor
             sound.RandomSfx = clips.Length == 1 ? new AudioClip[0] : clips;
             sound.MinPitch = family.MinPitch;
             sound.MaxPitch = family.MaxPitch;
-            sound.MinVolume = sound.MaxVolume = family.Volume;
+            sound.MinVolume = sound.MaxVolume = Volume(family);
             sound.Label = $"Sound ({family.Key})";
             return true;
         }

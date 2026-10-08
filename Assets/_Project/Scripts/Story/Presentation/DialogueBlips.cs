@@ -32,6 +32,13 @@ namespace Hearthdelve.Story.Presentation
 
         public int Blips { get; private set; }
 
+        /// <summary>How loud a blip plays (set by the balance pass from the clips' measured loudness).</summary>
+        public float Volume
+        {
+            get => m_Volume;
+            set => m_Volume = Mathf.Clamp01(value);
+        }
+
         public void Configure(AudioClip[] clips) => m_Clips = clips;
 
         void Awake()

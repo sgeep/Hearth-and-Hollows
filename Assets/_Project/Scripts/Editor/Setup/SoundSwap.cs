@@ -64,7 +64,7 @@ namespace Hearthdelve.Editor
                 GameObject root = PrefabUtility.LoadPrefabContents(path);
                 try
                 {
-                    int n = Swap(root);
+                    int n = Swap(root) + Relevel(root);
                     int e = 0;
                     if (path == LookTestContent.PlayerPrefab) e += EquipKeeper(root, hollows: true);
                     if (path == LookTestContent.TavernPlayerPrefab) e += EquipKeeper(root, hollows: false);
@@ -84,7 +84,7 @@ namespace Hearthdelve.Editor
                 int n = 0, e = 0;
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    n += Swap(root);
+                    n += Swap(root) + Relevel(root);
                     foreach (UiFeedback ui in root.GetComponentsInChildren<UiFeedback>(true)) e += EquipWater(ui);
                     foreach (TavernFeedback tavern in root.GetComponentsInChildren<TavernFeedback>(true)) e += EquipPassages(tavern.transform);
                     if (EquipScene != null) e += EquipScene(root);
@@ -130,6 +130,55 @@ namespace Hearthdelve.Editor
             }
             return n;
         }
+
+        /// <summary>
+        /// The balance pass: every approved sound under <paramref name="root"/> at its family's measured volume (and the footsteps
+        /// and blips). Only what differs changes, so it runs again harmlessly.
+        /// </summary>
+        public static int Relevel(GameObject root)
+        {
+            int n = 0;
+            foreach (MMF_Player player in root.GetComponentsInChildren<MMF_Player>(true))
+            {
+                if (player.FeedbacksList == null) continue;
+                foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
+                {
+                    if (sound.Label == null || !sound.Label.StartsWith("Sound (")) continue;
+                    SoundBank.Family family = SoundBank.Get(sound.Label.Substring(7).TrimEnd(')'));
+                    if (family == null) continue;
+                    // The family's clips changed (an edited copy replaced a clip): put them on again.
+                    AudioClip[] clips = SoundBank.Clips(family);
+                    AudioClip[] current = sound.Sfx != null ? new[] { sound.Sfx } : sound.RandomSfx ?? new AudioClip[0];
+                    if (!current.SequenceEqual(clips))
+                    {
+                        SoundBank.Apply(sound, family);
+                        EditorUtility.SetDirty(player);
+                        n++;
+                    }
+                    float volume = SoundBank.Volume(family);
+                    if (Mathf.Approximately(sound.MinVolume, volume) && Mathf.Approximately(sound.MaxVolume, volume)) continue;
+                    sound.MinVolume = sound.MaxVolume = volume;
+                    EditorUtility.SetDirty(player);
+                    n++;
+                }
+            }
+            foreach (Footsteps steps in root.GetComponentsInChildren<Footsteps>(true))
+            {
+                float village = SoundBank.Volume(SoundBank.Get("Footsteps.Village")), tavern = SoundBank.Volume(SoundBank.Get("Footsteps.Tavern")),
+                    stone = SoundBank.Volume(SoundBank.Get("Footsteps.Hollows"));
+                if (Mathf.Approximately(steps.Volume, village) && Mathf.Approximately(steps.TavernVolume, tavern) && Mathf.Approximately(steps.StoneVolume, stone)) continue;
+                steps.Volume = village;
+                steps.TavernVolume = tavern;
+                steps.StoneVolume = stone;
+                EditorUtility.SetDirty(steps);
+                n++;
+            }
+            if (RelevelScene != null) n += RelevelScene(root);
+            return n;
+        }
+
+        /// <summary>The Story editor's part of the balance pass (the blips).</summary>
+        public static Func<GameObject, int> RelevelScene;
 
         static MMF_Player Player(Transform parent, string name, string family, HapticPattern haptic = null)
         {

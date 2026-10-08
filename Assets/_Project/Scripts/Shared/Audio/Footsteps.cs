@@ -18,7 +18,9 @@ namespace Hearthdelve.Shared.Audio
         [SerializeField] AudioClip[] m_Village;
         [SerializeField] AudioClip[] m_Tavern;
         [SerializeField] AudioClip[] m_Stone;
-        [SerializeField, Range(0f, 1f)] float m_Volume = 0.35f;
+        [SerializeField, Range(0f, 1f), Tooltip("Kariaston's paths.")] float m_Volume = 0.35f;
+        [SerializeField, Range(0f, 1f), Tooltip("Tally Ho!'s boards.")] float m_TavernVolume = 0.35f;
+        [SerializeField, Range(0f, 1f), Tooltip("The Hollows' stone.")] float m_StoneVolume = 0.35f;
         [SerializeField] Vector2 m_Pitch = new(0.94f, 1.06f);
 
         AudioSource m_Source;
@@ -26,6 +28,25 @@ namespace Hearthdelve.Shared.Audio
         int m_LastClip = -1;
 
         public int Steps { get; private set; }
+
+        /// <summary>How loud a step plays (set by the balance pass from the clips' measured loudness).</summary>
+        public float Volume
+        {
+            get => m_Volume;
+            set => m_Volume = Mathf.Clamp01(value);
+        }
+
+        public float TavernVolume
+        {
+            get => m_TavernVolume;
+            set => m_TavernVolume = Mathf.Clamp01(value);
+        }
+
+        public float StoneVolume
+        {
+            get => m_StoneVolume;
+            set => m_StoneVolume = Mathf.Clamp01(value);
+        }
 
         public void Configure(CharacterSpriteAnimator animator, bool hollows, AudioClip[] village, AudioClip[] tavern, AudioClip[] stone)
         {
@@ -68,7 +89,7 @@ namespace Hearthdelve.Shared.Audio
             if (clips.Length > 1 && i == m_LastClip) i = (i + 1) % clips.Length;
             m_LastClip = i;
             m_Source.pitch = Random.Range(m_Pitch.x, m_Pitch.y);
-            m_Source.PlayOneShot(clips[i], m_Volume);
+            m_Source.PlayOneShot(clips[i], m_Hollows ? m_StoneVolume : SurfaceTime.Indoors ? m_TavernVolume : m_Volume);
             Steps++;
         }
     }

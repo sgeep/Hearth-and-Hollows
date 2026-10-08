@@ -9,7 +9,25 @@ namespace Hearthdelve.Story.Editor
     public static class StorySounds
     {
         [InitializeOnLoadMethod]
-        static void Register() => SoundSwap.EquipScene = Equip;
+        static void Register()
+        {
+            SoundSwap.EquipScene = Equip;
+            SoundSwap.RelevelScene = Relevel;
+        }
+
+        public static int Relevel(GameObject root)
+        {
+            int n = 0;
+            float volume = SoundBank.Volume(SoundBank.Get("Blip"));
+            foreach (DialogueBlips blips in root.GetComponentsInChildren<DialogueBlips>(true))
+            {
+                if (Mathf.Approximately(blips.Volume, volume)) continue;
+                blips.Volume = volume;
+                EditorUtility.SetDirty(blips);
+                n++;
+            }
+            return n;
+        }
 
         public static int Equip(GameObject root)
         {

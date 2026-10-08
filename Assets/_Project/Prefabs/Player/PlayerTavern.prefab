@@ -259,7 +259,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 71ed2c09ae3e6da4a93884d181d8a6a1, type: 3}
   - {fileID: 8300000, guid: f391063aa04be3a4bbd122e633a0f0a5, type: 3}
   - {fileID: 8300000, guid: edf09edb1fd87a4468e2d727a7fd1e15, type: 3}
-  m_Volume: 0.35
+  m_Volume: 0.16258222
+  m_TavernVolume: 0.104779065
+  m_StoneVolume: 0.12436254
   m_Pitch: {x: 0.94, y: 1.06}
 --- !u!1 &919576573409569715
 GameObject:
@@ -568,8 +570,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
+        MinVolume: 0.6142947
+        MaxVolume: 0.6142947
         MinPitch: 0.95
         MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

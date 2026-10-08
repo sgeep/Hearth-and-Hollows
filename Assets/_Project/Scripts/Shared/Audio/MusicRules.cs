@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using Hearthdelve.Shared.Game;
 
 namespace Hearthdelve.Shared.Audio
@@ -52,6 +53,9 @@ namespace Hearthdelve.Shared.Audio
 
         /// <summary>How loud everything but the music is: quieter in the Hollows (the owner's call, 2026-10-07).</summary>
         public static float EffectsLevel(bool inGame, DayPhase phase, float inHollows) => inGame && phase == DayPhase.Delve ? inHollows : 1f;
+
+        /// <summary>4i-C: the music's level while someone's talking (<paramref name="underDialogue"/>), otherwise full.</summary>
+        public static float Duck(bool talking, float underDialogue) => talking ? Mathf.Clamp01(underDialogue) : 1f;
     }
 
     /// <summary>
