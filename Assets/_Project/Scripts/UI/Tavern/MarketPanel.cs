@@ -8,6 +8,7 @@ using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Ingredients;
 using Hearthdelve.Shared.Inventory;
 using Hearthdelve.UI.Localization;
+using Hearthdelve.UI.Screens;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -125,6 +126,8 @@ namespace Hearthdelve.UI.Tavern
             if (!Available || index < 0 || index >= m_Rows.Length || index >= market.offers.Count) return false;
             SupplyOffer offer = market.offers[index];
             bool bought = Flow.BuyFromMarket(offer);
+            // 4i-C (a gap in the feedback audit): a purchase is heard and felt like any other.
+            if (bought) UiFeedback.Play(UiMoment.Buy);
             if (m_Message != null)
             {
                 m_Message.gameObject.SetActive(!bought);

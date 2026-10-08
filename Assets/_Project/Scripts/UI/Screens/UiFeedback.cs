@@ -21,6 +21,8 @@ namespace Hearthdelve.UI.Screens
         Vigor,
         /// <summary>A harvest into the storeroom (4h Checkpoint B): a small chime and a gentle pulse.</summary>
         Harvest,
+        /// <summary>Tending a bed (4i-C): water on the soil and a light tap.</summary>
+        Water,
     }
 
     /// <summary>
@@ -37,6 +39,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] MMF_Player m_Takings;
         [SerializeField] MMF_Player m_Vigor;
         [SerializeField] MMF_Player m_Harvest;
+        [SerializeField] MMF_Player m_Water;
 
         public static UiFeedback Instance { get; private set; }
         /// <summary>The last moment asked for (tests).</summary>
@@ -58,6 +61,10 @@ namespace Hearthdelve.UI.Screens
             m_Harvest = harvest;
         }
 
+        /// <summary>4i-C: tending a bed.</summary>
+        public void ConfigureWater(MMF_Player water) => m_Water = water;
+        public MMF_Player WaterPlayer => m_Water;
+
         void OnEnable() => Instance = this;
 
         void OnDisable()
@@ -77,6 +84,7 @@ namespace Hearthdelve.UI.Screens
                 UiMoment.Takings => Instance.m_Takings,
                 UiMoment.Vigor => Instance.m_Vigor,
                 UiMoment.Harvest => Instance.m_Harvest,
+                UiMoment.Water => Instance.m_Water != null ? Instance.m_Water : Instance.m_Vigor,
                 _ => Instance.m_Confirm,
             };
             if (player != null) player.PlayFeedbacks();

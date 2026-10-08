@@ -347,7 +347,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -217101175
-        Label: Sound (placeholder)
+        Label: Sound (Stairs)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -417,8 +417,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 3933785521362045785}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: e1ca3ac825a5a45469192a06e875c9a8, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 92997bbe0a433584ca91e33d73825a25, type: 3}
+        - {fileID: 8300000, guid: 163d7407c63feeb4b8df85a19ae52cf8, type: 3}
+        - {fileID: 8300000, guid: 1e4498122caa6584b9feb98268d5dfca, type: 3}
+        - {fileID: 8300000, guid: aeaa7c4123542df46a0e45ce7380dfbd, type: 3}
+        - {fileID: 8300000, guid: 3485c743507689f4e85b5befcfeceb94, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -427,10 +432,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinVolume: 0.7
+        MaxVolume: 0.7
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

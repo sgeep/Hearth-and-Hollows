@@ -21,6 +21,8 @@ namespace Hearthdelve.Shared.Characters
         public PortraitDefinition portrait;
         [Tooltip("The conversation (its Dialogue System title) that talking to them opens. Empty: nothing to say yet.")]
         public string conversation;
+        [Range(0.5f, 2f), Tooltip("4i-C: the pitch of their dialogue blips (1 ordinary; lower is deeper).")]
+        public float voicePitch = 1f;
 
         [Header("Relationship (Love/Hate)")]
         [Tooltip("Their opinion of the player is tracked: affinity, respect and remembered deeds.")]

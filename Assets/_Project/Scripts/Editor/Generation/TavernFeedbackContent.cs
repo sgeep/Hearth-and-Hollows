@@ -96,6 +96,12 @@ namespace Hearthdelve.Editor
             go.transform.SetParent(parent, false);
             var source = go.AddComponent<AudioSource>();
             source.clip = Sfx(sound);
+            // 4i-C: the approved loop, where there is one (the tap's pour); the sizzle stays a placeholder.
+            if (SoundBank.ByPlaceholder.TryGetValue(sound, out string family))
+            {
+                AudioClip approved = System.Linq.Enumerable.FirstOrDefault(SoundBank.Clips(SoundBank.Get(family)));
+                if (approved != null) source.clip = approved;
+            }
             source.loop = true;
             source.playOnAwake = false;
             source.volume = 0f;
@@ -183,6 +189,8 @@ namespace Hearthdelve.Editor
             };
             var feedback = root.gameObject.AddComponent<TavernFeedback>();
             feedback.Configure(config, moments, Loop(root, "SizzleLoop", "PH_SizzleLoop"), Loop(root, "PourLoop", "PH_PourLoop"));
+            // 4i-C: doors and stairs heard.
+            SoundSwap.EquipPassages(root);
             return feedback;
         }
     }

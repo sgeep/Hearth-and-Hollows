@@ -53,6 +53,10 @@ namespace Hearthdelve.Shared.Animation
         /// <summary>The body's renderer.</summary>
         public SpriteRenderer Renderer => m_Renderer;
         public CharacterAnim Current => m_Current;
+
+        /// <summary>The frame of the current animation on screen, and how many it has (4i-C: footsteps land on the walk's footfalls).</summary>
+        public int ShownFrame { get; private set; }
+        public int ShownFrames { get; private set; }
         /// <summary>Whether the drawing is mirrored (a one-facing sheet shown for a left facing).</summary>
         public bool Mirrored => m_Renderer != null && m_Renderer.flipX;
         public SpriteAnimationSet Set => m_Set;
@@ -290,7 +294,9 @@ namespace Hearthdelve.Shared.Animation
             Sprite[] frames = anim.For(Facing, out bool mirrored);
             if (frames == null || frames.Length == 0) return;
             target.flipX = mirrored;
-            target.sprite = frames[SpriteAnimationMath.FrameAt(m_Time, frames.Length, anim.frameDuration, anim.loop)];
+            ShownFrame = SpriteAnimationMath.FrameAt(m_Time, frames.Length, anim.frameDuration, anim.loop);
+            ShownFrames = frames.Length;
+            target.sprite = frames[ShownFrame];
         }
     }
 }

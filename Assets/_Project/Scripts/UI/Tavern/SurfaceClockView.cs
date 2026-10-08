@@ -115,7 +115,7 @@ namespace Hearthdelve.UI.Tavern
 
         void OnSpent(VigorSpent e)
         {
-            UiFeedback.Play(UiMoment.Vigor);
+            UiFeedback.Play(e.Activity == VigorActivity.TendBed ? UiMoment.Water : UiMoment.Vigor);
             if (m_Pips == null || !isActiveAndEnabled) return;
             // The pips just emptied: the ones from what's left up to what was there before.
             for (int i = e.Remaining; i < Mathf.Min(e.Remaining + e.Amount, m_Pips.Length); i++)

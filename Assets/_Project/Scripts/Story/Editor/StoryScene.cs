@@ -202,6 +202,8 @@ namespace Hearthdelve.Story.Editor
             ui.Configure(group, portrait, frame.gameObject, name, body, (RectTransform)more.transform, click, choices, buttons, labels, pointers);
             // 4g Checkpoint B: the typewriter's speed lives in one asset (made once; tune it there).
             ui.ConfigureSettings(StoryBuilder.LoadOrCreate<DialogueSettings>(StoryPaths.Root + "/DialogueSettings.asset"));
+            // 4i-C: the blips of a line being written.
+            StorySounds.Equip(root.gameObject);
             group.alpha = 0f;
             group.blocksRaycasts = false;
             BuildBarkBubble(canvas);

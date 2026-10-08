@@ -337,7 +337,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1824514976
-        Label: Sound (placeholder)
+        Label: Sound (Coins)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -407,8 +407,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 7389227252478435734}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 83e7656df4e453a41ae97005260f68cb, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: fadd55ba8493ae4479080c1737c3da6b, type: 3}
+        - {fileID: 8300000, guid: a6e3c6d484b63d6429112d69b3c46464, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -419,8 +421,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

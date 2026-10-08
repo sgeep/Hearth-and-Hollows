@@ -32,6 +32,8 @@ namespace Hearthdelve.Editor
             feedback.ConfigureSurface(
                 Moment(root, "Feedback_Vigor", "PH_UiTick", HapticIds.TapLight, 0.3f),
                 Moment(root, "Feedback_Harvest", "PH_UiChime", HapticIds.PulseSuccess, 0.4f));
+            // 4i-C: tending a bed.
+            SoundSwap.EquipWater(feedback);
             return feedback;
         }
 

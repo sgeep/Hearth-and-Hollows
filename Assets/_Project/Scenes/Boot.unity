@@ -2688,7 +2688,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1625459833
-        Label: Sound (placeholder)
+        Label: Sound (Soil)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -2758,8 +2758,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 226785177}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: d2c2e50fe51af5c4cb9bd3cd0788c717, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: ce5d3f0886e0db14a8b5211f6f3834bd, type: 3}
+        - {fileID: 8300000, guid: 6d1b970cfc5f9cf4bac78f177f23b7c1, type: 3}
+        - {fileID: 8300000, guid: 4d0590a9b19165a4a9465ffd466508f9, type: 3}
+        - {fileID: 8300000, guid: f3e3ffa58215b8e44aa5ff417d7f651b, type: 3}
+        - {fileID: 8300000, guid: 9c6ef8bf6d3f82f499038d6db1999655, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -2770,8 +2775,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -2919,6 +2924,7 @@ RectTransform:
   m_Children:
   - {fileID: 969431675}
   - {fileID: 1441684339}
+  - {fileID: 1486934993}
   m_Father: {fileID: 430624065}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6565,7 +6571,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 206195543
-        Label: Sound (placeholder)
+        Label: Sound (UiTick)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -6635,7 +6641,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 460382901}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: d2c2e50fe51af5c4cb9bd3cd0788c717, type: 3}
+        Sfx: {fileID: 8300000, guid: 9e5906ff7f50bca4bbb21508b48917de, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -8880,6 +8886,363 @@ MonoBehaviour:
   currentUnReadTime: 0
   preParsedText: <c=rainbow><w>Hello, World!
   rebuildOnRectChange: 1
+--- !u!1 &626464665
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 626464666}
+  - component: {fileID: 626464667}
+  m_Layer: 0
+  m_Name: Feedback_Water
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &626464666
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626464665}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 795459271}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &626464667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626464665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da43522623d4704e979466dc7650b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.Tools::MoreMountains.Feedbacks.MMF_Player
+  Feedbacks: []
+  InitializationMode: 2
+  AutoInitialization: 1
+  SafeMode: 3
+  Direction: 0
+  AutoChangeDirectionOnEnd: 0
+  AutoPlayOnStart: 0
+  AutoPlayOnEnable: 0
+  LogMissingTargets: 1
+  ForceTimescaleMode: 0
+  ForcedTimescaleMode: 1
+  DurationMultiplier: 1
+  TimescaleMultiplier: 1
+  RandomizeDuration: 0
+  RandomDurationMultiplier: {x: 0.5, y: 1.5}
+  DisplayFullDurationDetails: 0
+  PlayerTimescaleMode: 0
+  OnlyPlayIfWithinRange: 0
+  RangeCenter: {fileID: 0}
+  RangeDistance: 5
+  UseRangeFalloff: 0
+  RangeFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  RemapRangeFalloff: {x: 0, y: 1}
+  IgnoreRangeEvents: 0
+  CooldownDuration: 0
+  InitialDelay: 0
+  CanPlay: 1
+  CanPlayWhileAlreadyPlaying: 1
+  ChanceToPlay: 100
+  FeedbacksIntensity: 1
+  Events:
+    TriggerMMFeedbacksEvents: 0
+    TriggerUnityEvents: 1
+    OnPlay:
+      m_PersistentCalls:
+        m_Calls: []
+    OnPause:
+      m_PersistentCalls:
+        m_Calls: []
+    OnStop:
+      m_PersistentCalls:
+        m_Calls: []
+    OnResume:
+      m_PersistentCalls:
+        m_Calls: []
+    OnChangeDirection:
+      m_PersistentCalls:
+        m_Calls: []
+    OnComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRestoreInitialValues:
+      m_PersistentCalls:
+        m_Calls: []
+    OnSkipToTheEnd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnInitializationComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnEnable:
+      m_PersistentCalls:
+        m_Calls: []
+    OnDisable:
+      m_PersistentCalls:
+        m_Calls: []
+  DebugActive: 0
+  InScriptDrivenPause: 0
+  FeedbacksList:
+  - rid: 2696332567767941128
+  - rid: 2696332567767941129
+  PlayMode: 0
+  SequentialDelay: 0
+  KeepPlayModeChanges: 0
+  PerformanceMode: 0
+  RestoreInitialValuesOnDisable: 0
+  StopFeedbacksOnDisable: 0
+  PlayCount: 0
+  InPreviewMode: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
+  RunFirstOnEnableOnlyAfterStart: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2696332567767941128
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: -1789004871
+        Label: Sound (Water)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 626464667}
+        DebugActive: 0
+        Sfx: {fileID: 8300000, guid: 24100a8717c2dfe4085f59ff62ec9dc8, type: 3}
+        RandomSfx: []
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 2696332567767941129
+      type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
+      data:
+        Active: 1
+        UniqueID: 787048783
+        Label: Haptic Tap.Light
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: 
+        Owner: {fileID: 626464667}
+        DebugActive: 0
+        Pattern: {fileID: 11400000, guid: d12c1808a1cffec4e877593f1358e4fa, type: 2}
+        Scale: 1
+        UseFeedbackIntensity: 0
 --- !u!1 &626784801
 GameObject:
   m_ObjectHideFlags: 0
@@ -10826,8 +11189,8 @@ MonoBehaviour:
   showBetaFoldout: 0
   useSubmeshObjects: 0
   _text: 
-  drawText: Hello, World!
-  hyphenedText: "H\u200B\nell\u200B\no,\nW\u200B\norl\u200B\nd!"
+  drawText: 
+  hyphenedText: 
   font: {fileID: 12800000, guid: 10b07265084dcca4ba2eb6025aaa4f3d, type: 3}
   _color32:
     serializedVersion: 2
@@ -10882,23 +11245,23 @@ MonoBehaviour:
   textMesh: {fileID: 1208359222}
   rawTopLeftBounds: {x: 20, y: -6, z: 0}
   rawBottomRightBounds: {x: -20, y: 6, z: 0}
-  rawBottomRightTextBounds: {x: 35.5, y: -192, z: 0}
+  rawBottomRightTextBounds: {x: 0, y: 0, z: 0}
   topLeftBounds: {x: 595, y: 16, z: 0}
   topRightBounds: {x: 635, y: 16, z: 0}
   bottomLeftBounds: {x: 595, y: 4, z: 0}
   bottomRightBounds: {x: 635, y: 4, z: 0}
   centerBounds: {x: 615, y: 10, z: 0}
-  topLeftTextBounds: {x: 595, y: 16, z: 0}
-  topRightTextBounds: {x: 630.5, y: 16, z: 0}
-  bottomLeftTextBounds: {x: 595, y: -176, z: 0}
-  bottomRightTextBounds: {x: 630.5, y: -176, z: 0}
-  centerTextBounds: {x: 612.75, y: -80, z: 0}
-  finalTopLeftTextBounds: {x: 595, y: 16, z: 0}
-  finalTopRightTextBounds: {x: 630.5, y: 16, z: 0}
-  finalBottomLeftTextBounds: {x: 595, y: -176, z: 0}
-  finalBottomRightTextBounds: {x: 630.5, y: -176, z: 0}
-  finalCenterTextBounds: {x: 612.75, y: -80, z: 0}
-  unwrappedBottomRightTextBounds: {x: 183.5, y: -32, z: 0}
+  topLeftTextBounds: {x: 0, y: 0, z: 0}
+  topRightTextBounds: {x: 0, y: 0, z: 0}
+  bottomLeftTextBounds: {x: 0, y: 0, z: 0}
+  bottomRightTextBounds: {x: 0, y: 0, z: 0}
+  centerTextBounds: {x: 0, y: 0, z: 0}
+  finalTopLeftTextBounds: {x: 0, y: 0, z: 0}
+  finalTopRightTextBounds: {x: 0, y: 0, z: 0}
+  finalBottomLeftTextBounds: {x: 0, y: 0, z: 0}
+  finalBottomRightTextBounds: {x: 0, y: 0, z: 0}
+  finalCenterTextBounds: {x: 0, y: 0, z: 0}
+  unwrappedBottomRightTextBounds: {x: 0, y: 0, z: 0}
   onCompleteEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -10939,7 +11302,7 @@ MonoBehaviour:
   defaultTextureData: {fileID: 0}
   latestNumber: 20
   currentUnReadTime: 0
-  preParsedText: <c=rainbow><w>Hello, World!
+  preParsedText: 
   rebuildOnRectChange: 1
 --- !u!1 &738400685
 GameObject:
@@ -12188,6 +12551,7 @@ RectTransform:
   - {fileID: 1323613009}
   - {fileID: 226785176}
   - {fileID: 1974673343}
+  - {fileID: 626464666}
   m_Father: {fileID: 1798798087}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -12214,6 +12578,7 @@ MonoBehaviour:
   m_Takings: {fileID: 1323613010}
   m_Vigor: {fileID: 226785177}
   m_Harvest: {fileID: 1974673344}
+  m_Water: {fileID: 626464667}
 --- !u!1 &839252867
 GameObject:
   m_ObjectHideFlags: 0
@@ -12795,7 +13160,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1296577407
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -12865,8 +13230,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 856733551}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -17512,14 +17880,14 @@ Mesh:
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
-    indexCount: 126
+    indexCount: 0
     topology: 0
     baseVertex: 0
     firstVertex: 0
-    vertexCount: 84
+    vertexCount: 0
     localAABB:
-      m_Center: {x: -2.5, y: -94.20026, z: 0}
-      m_Extent: {x: 18, y: 92.25, z: 0}
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0, y: 0, z: 0}
   m_Shapes:
     vertices: []
     shapes: []
@@ -17536,10 +17904,10 @@ Mesh:
   m_KeepVertices: 0
   m_KeepIndices: 0
   m_IndexFormat: 0
-  m_IndexBuffer: 000001000200000002000300040005000600040006000700080009000a0008000a000b000c000d000e000c000e000f00100011001200100012001300140015001600140016001700180019001a0018001a001b001c001d001e001c001e001f00200021002200200022002300240025002600240026002700280029002a0028002a002b002c002d002e002c002e002f00300031003200300032003300340035003600340036003700380039003a0038003a003b003c003d003e003c003e003f00400041004200400042004300440045004600440046004700480049004a0048004a004b004c004d004e004c004e004f00500051005200500052005300y
+  m_IndexBuffer: 
   m_VertexData:
     serializedVersion: 3
-    m_VertexCount: 84
+    m_VertexCount: 0
     m_Channels:
     - stream: 0
       offset: 0
@@ -17597,8 +17965,8 @@ Mesh:
       offset: 0
       format: 0
       dimension: 0
-    m_DataSize: 6720
-    _typelessdata: 000090c128a2f9bf00000000ff0056ff00000000000000000000000000000000000080430000804300009c3d0000c03d0000803f000000420000803f0000803f0000803f0000803f3333c8420000c8420000c03f28a2f9bf00000000ff0700ff00001c3e000000000000000000000000000080430000804300009c3d0000c03d00000040000000420000803f0000803f0000803f0000803f3333c8420000c8420000c03f239acfc100000000ff0700ff00001c3e0000403e0000000000000000000080430000804300009c3d0000c03d00004040000000420000803f0000803f0000803f0000803f3333c8420000c842000090c1239acfc100000000ff0056ff000000000000403e0000000000000000000080430000804300009c3d0000c03d00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c842000040407fe5b2c100000000ff0e00ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200009cc111cd1fc200000000ff005dff00001c3e000000000000000000000000000080430000804300005e3e0000943d0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000040c011cd1fc200000000ff000eff0000903e000000000000000000000000000080430000804300005e3e0000943d00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000040c011cd69c200000000ff000eff0000903e0000143e0000000000000000000080430000804300005e3e0000943d00004040000000420000803f0000803f0000803f0000803f3333c8420000c84200009cc111cd69c200000000ff005dff00001c3e0000143e0000000000000000000080430000804300005e3e0000943d00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000000bf5600fdc100000000ff0002ff000000000000403e000000000000000000008043000080430000803c0000903e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000060405600fdc100000000ff1100ff0000003d0000403e000000000000000000008043000080430000803c0000903e00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000060402b805ec200000000ff1100ff0000003d0000c03e000000000000000000008043000080430000803c0000903e00004040000000420000803f0000803f0000803f0000803f3333c8420000c842000000bf2b805ec200000000ff0002ff000000000000c03e000000000000000000008043000080430000803c0000903e00008040000000420000803f0000803f0000803f0000803f3333c8420000c8420000d040ae92f4c100000000ff1f00ff000000000000403e000000000000000000008043000080430000803c0000903e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c84200002841ae92f4c100000000ff3200ff0000003d0000403e000000000000000000008043000080430000803c0000903e00000040000000420000803f0000803f0000803f0000803f3333c8420000c8420000284157495ac200000000ff3200ff0000003d0000c03e000000000000000000008043000080430000803c0000903e00004040000000420000803f0000803f0000803f0000803f3333c8420000c8420000d04057495ac200000000ff1f00ff000000000000c03e000000000000000000008043000080430000803c0000903e00008040000000420000803f0000803f0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c84200004041536b54c200000000ff3900ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200009cc189e68fc200000000ff005dff0000903e00000000000000000000000000008043000080430000b23e0000943d0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000020c089e68fc200000000ff000cff0000d43e00000000000000000000000000008043000080430000b23e0000943d00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000020c089e6b4c200000000ff000cff0000d43e0000143e000000000000000000008043000080430000b23e0000943d00004040000000420000803f0000803f0000803f0000803f3333c8420000c84200009cc189e6b4c200000000ff005dff0000903e0000143e000000000000000000008043000080430000b23e0000943d00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000000001540a6c200000000ff0000ff00001c3e0000143e000000000000000000008043000080430000303e00003a3e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c8420000a0401540a6c200000000ff1800ff0000443e0000143e000000000000000000008043000080430000303e00003a3e00000040000000420000803f0000803f0000803f0000803f3333c8420000c8420000a0401540b9c200000000ff1800ff0000443e0000603e000000000000000000008043000080430000303e00003a3e00004040000000420000803f0000803f0000803f0000803f3333c8420000c842000000001540b9c200000000ff0000ff00001c3e0000603e000000000000000000008043000080430000303e00003a3e00008040000000420000803f0000803f0000803f0000803f3333c8420000c8420000d0401c92aac200000000ff1f00ff000000000000c03e000000000000000000008043000080430000803b0000c23e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c8420000f0401c92aac200000000ff2400ff0000003c0000c03e000000000000000000008043000080430000803b0000c23e00000040000000420000803f0000803f0000803f0000803f3333c8420000c8420000f0401c92acc200000000ff2400ff0000003c0000c43e000000000000000000008043000080430000803b0000c23e00004040000000420000803f0000803f0000803f0000803f3333c8420000c8420000d0401c92acc200000000ff1f00ff000000000000c43e000000000000000000008043000080430000803b0000c23e00008040000000420000803f0000803f0000803f0000803f3333c8420000c8420000a4c189e6c3c200000000ff0062ff0000c23e0000c63e000000000000000000008043000080430000923e0000883e000080bf000000420000803f0000803f0000803f0000803f3333c8420000c8420000284189e6c3c200000000ff3200ff0000c23e0000143e000000000000000000008043000080430000923e0000883e000000c0000000420000803f0000803f0000803f0000803f3333c8420000c8420000284189e6f3c200000000ff3200ff0000443e0000143e000000000000000000008043000080430000923e0000883e000040c0000000420000803f0000803f0000803f0000803f3333c8420000c8420000a4c189e6f3c200000000ff0062ff0000443e0000c63e000000000000000000008043000080430000923e0000883e000080c0000000420000803f0000803f0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c8420000204126bdeac200000000ff3000ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200009cc144f307c300000000ff005dff0000903e00000000000000000000000000008043000080430000b23e0000943d0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000020c044f307c300000000ff000cff0000d43e00000000000000000000000000008043000080430000b23e0000943d00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000020c044731ac300000000ff000cff0000d43e0000143e000000000000000000008043000080430000b23e0000943d00004040000000420000803f0000803f0000803f0000803f3333c8420000c84200009cc144731ac300000000ff005dff0000903e0000143e000000000000000000008043000080430000b23e0000943d00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000000bf0ba005c300000000ff0002ff0000003d0000403e000000000000000000008043000080430000943d0000843e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000020410ba005c300000000ff3000ff0000e83d0000403e000000000000000000008043000080430000943d0000843e00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000020410ba017c300000000ff3000ff0000e83d0000a83e000000000000000000008043000080430000943d0000843e00004040000000420000803f0000803f0000803f0000803f3333c8420000c842000000bf0ba017c300000000ff0002ff0000003d0000a83e000000000000000000008043000080430000943d0000843e00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000020416226fcc200000000ff3000ff000000000000403e000000000000000000008043000080430000803c0000903e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000060416226fcc200000000ff4300ff0000003d0000403e000000000000000000008043000080430000803c0000903e00000040000000420000803f0000803f0000803f0000803f3333c8420000c84200006041311316c300000000ff4300ff0000003d0000c03e000000000000000000008043000080430000803c0000903e00004040000000420000803f0000803f0000803f0000803f3333c8420000c84200002041311316c300000000ff3000ff000000000000c03e000000000000000000008043000080430000803c0000903e00008040000000420000803f0000803f0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff00000000000000000000000000000000000080430000804300000000000000000000803f000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000000040000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000004040000000420000803c0000803c0000803f0000803f3333c8420000c84200007841bfac14c300000000ff4a00ff000000000000000000000000000000000000804300008043000000000000000000008040000000420000803c0000803c0000803f0000803f3333c8420000c84200009cc144f321c300000000ff005dff0000c23e0000143e000000000000000000008043000080430000e13e0000763e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c842000080c044f321c300000000ff0013ff0000003f0000143e000000000000000000008043000080430000e13e0000763e00000040000000420000803f0000803f0000803f0000803f3333c8420000c842000080c044733ac300000000ff0013ff0000003f0000ac3e000000000000000000008043000080430000e13e0000763e00004040000000420000803f0000803f0000803f0000803f3333c8420000c84200009cc144733ac300000000ff005dff0000c23e0000ac3e000000000000000000008043000080430000e13e0000763e00008040000000420000803f0000803f0000803f0000803f3333c8420000c842000000000ba01fc300000000ff0000ff0000e83d0000403e000000000000000000008043000080430000083e0000903e0000803f000000420000803f0000803f0000803f0000803f3333c8420000c8420000a0400ba01fc300000000ff1800ff00001c3e0000403e000000000000000000008043000080430000083e0000903e00000040000000420000803f0000803f0000803f0000803f3333c8420000c8420000a0400ba037c300000000ff1800ff00001c3e0000c03e000000000000000000008043000080430000083e0000903e00004040000000420000803f0000803f0000803f0000803f3333c8420000c842000000000ba037c300000000ff0000ff0000e83d0000c03e000000000000000000008043000080430000083e0000903e00008040000000420000803f0000803f0000803f0000803f3333c8420000c842
+    m_DataSize: 0
+    _typelessdata: 
   m_CompressedMesh:
     m_Vertices:
       m_NumItems: 0
@@ -18826,7 +19194,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -643453231
-        Label: Sound (placeholder)
+        Label: Sound (UiChime)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -18896,8 +19264,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1323613010}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: bed787c0b166dab49986240cd8c43f77, type: 3}
+        - {fileID: 8300000, guid: c8c42928509975e4dad7873f87fcb620, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -21762,7 +22132,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -727310805
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -21832,8 +22202,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1480960272}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -22089,6 +22462,155 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1486934992
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1486934993}
+  - component: {fileID: 1486934995}
+  - component: {fileID: 1486934994}
+  m_Layer: 0
+  m_Name: Blips
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1486934993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486934992}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 228951428}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1486934994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486934992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4354765c6002c254bada634a6d63b475, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Story.Presentation::Hearthdelve.Story.Presentation.DialogueBlips
+  m_Clips:
+  - {fileID: 8300000, guid: 13dc26369fe682b4db680d03bf0f2b91, type: 3}
+  - {fileID: 8300000, guid: be22eae519d1c294d8b7caf2939fb5ed, type: 3}
+  m_Every: 3
+  m_MinGap: 0.05
+  m_Volume: 0.3
+  m_Jitter: 0.05
+--- !u!82 &1486934995
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486934992}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1489247993
 GameObject:
   m_ObjectHideFlags: 0
@@ -30487,7 +31009,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1515659973
-        Label: Sound (placeholder)
+        Label: Sound (Harvest)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -30557,8 +31079,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1974673344}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -30569,8 +31093,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -31268,7 +31792,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 51665654
-        Label: Sound (placeholder)
+        Label: Sound (UiBuy)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -31338,7 +31862,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1993560206}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: c942a20aed7b56e44a1b305dad5bc17b, type: 3}
+        Sfx: {fileID: 8300000, guid: 2ce2e1b4ec7a1af4e87eda2cc525e398, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound

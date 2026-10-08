@@ -96,7 +96,7 @@ namespace Hearthdelve.Tavern.Scene
         {
             SurfaceDoor partner = Partner;
             m_Busy = partner.m_Busy = true;
-            EventBus<AreaPassageStarted>.Publish(new AreaPassageStarted(m_FadeSeconds));
+            EventBus<AreaPassageStarted>.Publish(new AreaPassageStarted(m_FadeSeconds, PassageKind.Door));
             yield return new WaitForSecondsRealtime(m_FadeSeconds);
             Arrive(player, partner);
             yield return new WaitForSecondsRealtime(m_FadeSeconds);

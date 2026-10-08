@@ -116,6 +116,8 @@ namespace Hearthdelve.Story.Presentation
         public void Open()
         {
             if (m_Mode != Mode.Closed) return;
+            // 4i-C (a gap in the feedback audit): the box opening is heard.
+            UiFeedback.Play(UiMoment.Confirm);
             m_Maps = InputMaps.Snapshot();
             InputMaps.ActivateUIOnly();
             if (!m_Paused)
@@ -235,6 +237,9 @@ namespace Hearthdelve.Story.Presentation
         void Arm() => m_ArmedAfterFrame = Time.frameCount;
 
         public float CharactersPerSecond => m_Settings != null ? m_Settings.charactersPerSecond : 45f;
+
+        DialogueBlips m_Blips;
+        public DialogueBlips Blips => m_Blips != null ? m_Blips : m_Blips = GetComponentInChildren<DialogueBlips>(true);
 
         // ---------- 4i-B: hold to hurry ----------
         /// <summary>A confirm held this long counts as holding, not tapping.</summary>
@@ -362,6 +367,13 @@ namespace Hearthdelve.Story.Presentation
             // No name (a look, the narration voice): an empty label, not "{0}" formatted to nothing (which reads as a missing string).
             m_SpeakerLabel.Set(string.IsNullOrEmpty(SpeakerName) ? null : TavernLocKeys.Plain, SpeakerName);
             m_Speaker = player || character == null ? null : character.portrait;
+            // 4i-C: the line's blips in their voice; none for a look or the narration.
+            if (m_Blips == null) m_Blips = GetComponentInChildren<DialogueBlips>(true);
+            if (m_Blips != null)
+            {
+                m_Blips.Attach(m_BodyText);
+                m_Blips.NewLine(character != null ? character.voicePitch : 1f, looked || SpeakerId == CharacterIds.Narration);
+            }
             if (m_PortraitFrame != null) m_PortraitFrame.SetActive(m_Speaker != null);
             m_NextBlink = Time.unscaledTime + NextBlinkIn();
             m_BlinkUntil = 0f;

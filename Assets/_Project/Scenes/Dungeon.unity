@@ -849,7 +849,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1316079097
-        Label: Sound (placeholder)
+        Label: Sound (EnemyDeath)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -919,8 +919,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 59060467}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 904141960ec6ca94abd4938c53fd99cc, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
+        - {fileID: 8300000, guid: 6e62a4439b7723847800f8337161f728, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -931,8 +934,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.94
+        MaxPitch: 1.06
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -4704,7 +4707,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1255441249
-        Label: Sound (placeholder)
+        Label: Sound (UiBuy)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -4774,7 +4777,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 290302126}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: c942a20aed7b56e44a1b305dad5bc17b, type: 3}
+        Sfx: {fileID: 8300000, guid: 2ce2e1b4ec7a1af4e87eda2cc525e398, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -8275,7 +8278,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 292792334
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -8345,8 +8348,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 420920335}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -18011,7 +18017,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1472092099
-        Label: Sound (placeholder)
+        Label: Sound (UiTick)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -18081,7 +18087,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 915840465}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: d2c2e50fe51af5c4cb9bd3cd0788c717, type: 3}
+        Sfx: {fileID: 8300000, guid: 9e5906ff7f50bca4bbb21508b48917de, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -18336,7 +18342,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1449211329
-        Label: Sound (placeholder)
+        Label: Sound (EnemyDeath)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -18406,8 +18412,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 925550891}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 8b41f926f7bae2348984d6883ef60a10, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
+        - {fileID: 8300000, guid: 6e62a4439b7723847800f8337161f728, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -18418,8 +18427,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.94
+        MaxPitch: 1.06
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -20347,7 +20356,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 686922955
-        Label: Sound (placeholder)
+        Label: Sound (Harvest)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -20417,8 +20426,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1040396272}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -20429,8 +20440,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -24097,7 +24108,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 2132860349
-        Label: Sound (placeholder)
+        Label: Sound (Soil)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -24167,8 +24178,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1169796431}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: d2c2e50fe51af5c4cb9bd3cd0788c717, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: ce5d3f0886e0db14a8b5211f6f3834bd, type: 3}
+        - {fileID: 8300000, guid: 6d1b970cfc5f9cf4bac78f177f23b7c1, type: 3}
+        - {fileID: 8300000, guid: 4d0590a9b19165a4a9465ffd466508f9, type: 3}
+        - {fileID: 8300000, guid: f3e3ffa58215b8e44aa5ff417d7f651b, type: 3}
+        - {fileID: 8300000, guid: 9c6ef8bf6d3f82f499038d6db1999655, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -24179,8 +24195,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -25322,7 +25338,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 645534427
-        Label: Sound (placeholder)
+        Label: Sound (UiChime)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -25392,8 +25408,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1237563065}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: bed787c0b166dab49986240cd8c43f77, type: 3}
+        - {fileID: 8300000, guid: c8c42928509975e4dad7873f87fcb620, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -26666,7 +26684,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1535588168
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -26736,8 +26754,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1303697304}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -27326,6 +27347,363 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1338275667}
   m_CullTransparentMesh: 1
+--- !u!1 &1338852254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1338852255}
+  - component: {fileID: 1338852256}
+  m_Layer: 0
+  m_Name: Feedback_Water
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1338852255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338852254}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1338917643}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1338852256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338852254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da43522623d4704e979466dc7650b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.Tools::MoreMountains.Feedbacks.MMF_Player
+  Feedbacks: []
+  InitializationMode: 2
+  AutoInitialization: 1
+  SafeMode: 3
+  Direction: 0
+  AutoChangeDirectionOnEnd: 0
+  AutoPlayOnStart: 0
+  AutoPlayOnEnable: 0
+  LogMissingTargets: 1
+  ForceTimescaleMode: 0
+  ForcedTimescaleMode: 1
+  DurationMultiplier: 1
+  TimescaleMultiplier: 1
+  RandomizeDuration: 0
+  RandomDurationMultiplier: {x: 0.5, y: 1.5}
+  DisplayFullDurationDetails: 0
+  PlayerTimescaleMode: 0
+  OnlyPlayIfWithinRange: 0
+  RangeCenter: {fileID: 0}
+  RangeDistance: 5
+  UseRangeFalloff: 0
+  RangeFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  RemapRangeFalloff: {x: 0, y: 1}
+  IgnoreRangeEvents: 0
+  CooldownDuration: 0
+  InitialDelay: 0
+  CanPlay: 1
+  CanPlayWhileAlreadyPlaying: 1
+  ChanceToPlay: 100
+  FeedbacksIntensity: 1
+  Events:
+    TriggerMMFeedbacksEvents: 0
+    TriggerUnityEvents: 1
+    OnPlay:
+      m_PersistentCalls:
+        m_Calls: []
+    OnPause:
+      m_PersistentCalls:
+        m_Calls: []
+    OnStop:
+      m_PersistentCalls:
+        m_Calls: []
+    OnResume:
+      m_PersistentCalls:
+        m_Calls: []
+    OnChangeDirection:
+      m_PersistentCalls:
+        m_Calls: []
+    OnComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRestoreInitialValues:
+      m_PersistentCalls:
+        m_Calls: []
+    OnSkipToTheEnd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnInitializationComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnEnable:
+      m_PersistentCalls:
+        m_Calls: []
+    OnDisable:
+      m_PersistentCalls:
+        m_Calls: []
+  DebugActive: 0
+  InScriptDrivenPause: 0
+  FeedbacksList:
+  - rid: 2696332567767941136
+  - rid: 2696332567767941137
+  PlayMode: 0
+  SequentialDelay: 0
+  KeepPlayModeChanges: 0
+  PerformanceMode: 0
+  RestoreInitialValuesOnDisable: 0
+  StopFeedbacksOnDisable: 0
+  PlayCount: 0
+  InPreviewMode: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
+  RunFirstOnEnableOnlyAfterStart: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2696332567767941136
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: -1460727105
+        Label: Sound (Water)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 1338852256}
+        DebugActive: 0
+        Sfx: {fileID: 8300000, guid: 24100a8717c2dfe4085f59ff62ec9dc8, type: 3}
+        RandomSfx: []
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 2696332567767941137
+      type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
+      data:
+        Active: 1
+        UniqueID: 1455178558
+        Label: Haptic Tap.Light
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: 
+        Owner: {fileID: 1338852256}
+        DebugActive: 0
+        Pattern: {fileID: 11400000, guid: d12c1808a1cffec4e877593f1358e4fa, type: 2}
+        Scale: 1
+        UseFeedbackIntensity: 0
 --- !u!1 &1338917642
 GameObject:
   m_ObjectHideFlags: 0
@@ -27362,6 +27740,7 @@ RectTransform:
   - {fileID: 1237563064}
   - {fileID: 1169796430}
   - {fileID: 1040396271}
+  - {fileID: 1338852255}
   m_Father: {fileID: 2030862930}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -27388,6 +27767,7 @@ MonoBehaviour:
   m_Takings: {fileID: 1237563065}
   m_Vigor: {fileID: 1169796431}
   m_Harvest: {fileID: 1040396272}
+  m_Water: {fileID: 1338852256}
 --- !u!1 &1351456279
 GameObject:
   m_ObjectHideFlags: 0
@@ -30607,7 +30987,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1919255839
-        Label: Sound (placeholder)
+        Label: Sound (GateRise)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -30677,8 +31057,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1451952805}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 0aa67e2ac042e5549b6caa119bd09540, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 0e55a7d81d866a14d9e0fbab6861de61, type: 3}
+        - {fileID: 8300000, guid: d17311ebf497cfe49bf32376f0de14c4, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -36085,7 +36467,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1832414865
-        Label: Sound (placeholder)
+        Label: Sound (GateSlam)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -36155,8 +36537,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1712971233}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 598b7d046d83c58459fbb29667139151, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 47e8d7492e55d754f860c1d378042c95, type: 3}
+        - {fileID: 8300000, guid: 9e10c0157af93544c85643bc54292308, type: 3}
+        - {fileID: 8300000, guid: 3821440a423500646a9511f3955e9285, type: 3}
+        - {fileID: 8300000, guid: 3b5f88431b5cfff419bbe70e949feae8, type: 3}
+        - {fileID: 8300000, guid: 9448fe479417b604ea3d9951cd29e824, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -36167,8 +36554,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.97
+        MaxPitch: 1.03
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

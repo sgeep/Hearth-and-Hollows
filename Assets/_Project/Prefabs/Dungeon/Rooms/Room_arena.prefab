@@ -22096,9 +22096,57 @@ PrefabInstance:
       value: RopeExit
       objectReference: {fileID: 0}
     - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].Sfx
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].Label
+      value: Sound (Stairs)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].MaxPitch
+      value: 1.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].MinPitch
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].MaxVolume
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].MinVolume
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
       propertyPath: managedReferences[2696332437512781854].SfxAudioMixerGroup
       value: 
       objectReference: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: managedReferences[2696332437512781854].RandomSfx.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: 'managedReferences[2696332437512781854].RandomSfx.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 92997bbe0a433584ca91e33d73825a25, type: 3}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: 'managedReferences[2696332437512781854].RandomSfx.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 163d7407c63feeb4b8df85a19ae52cf8, type: 3}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: 'managedReferences[2696332437512781854].RandomSfx.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 1e4498122caa6584b9feb98268d5dfca, type: 3}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: 'managedReferences[2696332437512781854].RandomSfx.Array.data[3]'
+      value: 
+      objectReference: {fileID: 8300000, guid: aeaa7c4123542df46a0e45ce7380dfbd, type: 3}
+    - target: {fileID: 3933785521362045785, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
+      propertyPath: 'managedReferences[2696332437512781854].RandomSfx.Array.data[4]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 3485c743507689f4e85b5befcfeceb94, type: 3}
     - target: {fileID: 5489053685391851264, guid: d5aa755409f87824b959208cb48b96ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 27.5

@@ -235,7 +235,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 91345518
-        Label: Sound (placeholder)
+        Label: Sound (TrollImpact)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -305,8 +305,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 3033620571481887467}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 4910dc1231054744386d64f4ae7354bf, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 47e8d7492e55d754f860c1d378042c95, type: 3}
+        - {fileID: 8300000, guid: 9e10c0157af93544c85643bc54292308, type: 3}
+        - {fileID: 8300000, guid: 3821440a423500646a9511f3955e9285, type: 3}
+        - {fileID: 8300000, guid: 3b5f88431b5cfff419bbe70e949feae8, type: 3}
+        - {fileID: 8300000, guid: 9448fe479417b604ea3d9951cd29e824, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -317,8 +322,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -1196,7 +1201,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -559791554
-        Label: Sound (placeholder)
+        Label: Sound (TrollImpact)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -1266,8 +1271,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 4742222040025487575}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: c868bfe28c0e4a241a381528c61e9cba, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 47e8d7492e55d754f860c1d378042c95, type: 3}
+        - {fileID: 8300000, guid: 9e10c0157af93544c85643bc54292308, type: 3}
+        - {fileID: 8300000, guid: 3821440a423500646a9511f3955e9285, type: 3}
+        - {fileID: 8300000, guid: 3b5f88431b5cfff419bbe70e949feae8, type: 3}
+        - {fileID: 8300000, guid: 9448fe479417b604ea3d9951cd29e824, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -1278,8 +1288,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -3103,7 +3113,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 830654581
-        Label: Sound (placeholder)
+        Label: Sound (Telegraph)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -3173,7 +3183,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 208959230848000249}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 04d31109b4d688442af0ebc0d881ad21, type: 3}
+        Sfx: {fileID: 8300000, guid: 69ef99d54c1092f4e91c0598c5556d17, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -3459,7 +3469,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1773190557
-        Label: Sound (placeholder)
+        Label: Sound (TrollImpact)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -3529,8 +3539,13 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 34840506380351519}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: a96d38db71223bd4b9079a29b419bc5c, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 47e8d7492e55d754f860c1d378042c95, type: 3}
+        - {fileID: 8300000, guid: 9e10c0157af93544c85643bc54292308, type: 3}
+        - {fileID: 8300000, guid: 3821440a423500646a9511f3955e9285, type: 3}
+        - {fileID: 8300000, guid: 3b5f88431b5cfff419bbe70e949feae8, type: 3}
+        - {fileID: 8300000, guid: 9448fe479417b604ea3d9951cd29e824, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -3541,8 +3556,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -4215,7 +4230,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1516194279
-        Label: Sound (placeholder)
+        Label: Sound (Gulp)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -4285,8 +4300,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 3161495337800132136}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: a3d51c6611ee3c64c822971926f49fb2, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 11e34823ce743c14cbe52cae1b44cb0e, type: 3}
+        - {fileID: 8300000, guid: 0d5c7a7056c560d47ba509c931d5b646, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -4884,7 +4901,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1858805663
-        Label: Sound (placeholder)
+        Label: Sound (Gulp)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -4954,8 +4971,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 4789140360885263311}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 5058025d7fef6b84d916c4ae8c9a0620, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 11e34823ce743c14cbe52cae1b44cb0e, type: 3}
+        - {fileID: 8300000, guid: 0d5c7a7056c560d47ba509c931d5b646, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:

@@ -435,6 +435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.confirm
+  m_Table: 
 --- !u!114 &24423276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12694,6 +12695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.curios_lost
+  m_Table: 
 --- !u!114 &142790466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12980,6 +12982,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: boss.larder_troll
+  m_Table: 
 --- !u!114 &146015082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13266,6 +13269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.title
+  m_Table: 
 --- !u!114 &150620335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13552,6 +13556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.title
+  m_Table: 
 --- !u!114 &155406461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14091,6 +14096,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.summary
+  m_Table: 
 --- !u!114 &169057975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14377,6 +14383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &184464836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15389,6 +15396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &229701482
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16025,7 +16033,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 40820284
-        Label: Sound (placeholder)
+        Label: Sound (UiBuy)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -16095,7 +16103,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 250572316}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: c942a20aed7b56e44a1b305dad5bc17b, type: 3}
+        Sfx: {fileID: 8300000, guid: 2ce2e1b4ec7a1af4e87eda2cc525e398, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -16276,6 +16284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &269349125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17471,6 +17480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.empty
+  m_Table: 
 --- !u!114 &323746663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17895,7 +17905,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1687330364
-        Label: Sound (placeholder)
+        Label: Sound (UiChime)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -17965,8 +17975,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 339229761}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: bed787c0b166dab49986240cd8c43f77, type: 3}
+        - {fileID: 8300000, guid: c8c42928509975e4dad7873f87fcb620, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -18068,6 +18080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: swap.title
+  m_Table: 
 --- !u!114 &354029296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18494,6 +18507,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: testfloor.hint
+  m_Table: 
 --- !u!222 &364559417
 CanvasRenderer:
   m_ObjectHideFlags: 2
@@ -22941,6 +22955,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.delve_again
+  m_Table: 
 --- !u!114 &535087164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24360,6 +24375,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: harvest.got
+  m_Table: 
 --- !u!114 &651527605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25703,6 +25719,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.footer
+  m_Table: 
 --- !u!114 &703009049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26019,7 +26036,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1162274795
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -26089,8 +26106,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 711459921}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -26267,6 +26287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.keep_nothing
+  m_Table: 
 --- !u!114 &730554594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27692,6 +27713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &861312659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28293,6 +28315,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: hud.curios
+  m_Table: 
 --- !u!114 &936261589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28504,6 +28527,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.title_extracted
+  m_Table: 
 --- !u!114 &939321928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28715,6 +28739,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: harvest.got
+  m_Table: 
 --- !u!114 &939367425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28926,6 +28951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.title
+  m_Table: 
 --- !u!114 &945979661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29386,6 +29412,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &960034994
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30295,6 +30322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.subtitle
+  m_Table: 
 --- !u!114 &1019425593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31510,6 +31538,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1091683821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32284,6 +32313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1107804235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32477,6 +32507,7 @@ RectTransform:
   - {fileID: 250572315}
   - {fileID: 2058507455}
   - {fileID: 339229760}
+  - {fileID: 1338852255}
   m_Father: {fileID: 404855641}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -32503,6 +32534,7 @@ MonoBehaviour:
   m_Takings: {fileID: 339229761}
   m_Vigor: {fileID: 0}
   m_Harvest: {fileID: 0}
+  m_Water: {fileID: 1338852256}
 --- !u!1001 &1110699902
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -32617,6 +32649,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: hud.campfire
+  m_Table: 
 --- !u!114 &1113091021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33267,6 +33300,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1131874829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33703,6 +33737,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: looktest.resolution
+  m_Table: 
 --- !u!222 &1161092915
 CanvasRenderer:
   m_ObjectHideFlags: 2
@@ -33933,6 +33968,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.curios_kept
+  m_Table: 
 --- !u!114 &1164156016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34183,6 +34219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: hud.exit
+  m_Table: 
 --- !u!114 &1175018423
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34609,6 +34646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1187178733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36042,6 +36080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: hud.satchel_full
+  m_Table: 
 --- !u!114 &1276399115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36554,6 +36593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.title
+  m_Table: 
 --- !u!114 &1301381158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37146,6 +37186,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.footer
+  m_Table: 
 --- !u!114 &1328455345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37380,6 +37421,363 @@ RectTransform:
   m_AnchoredPosition: {x: 1, y: -2}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!1 &1338852254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1338852255}
+  - component: {fileID: 1338852256}
+  m_Layer: 0
+  m_Name: Feedback_Water
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1338852255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338852254}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1108845081}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1338852256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1338852254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da43522623d4704e979466dc7650b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: MoreMountains.Tools::MoreMountains.Feedbacks.MMF_Player
+  Feedbacks: []
+  InitializationMode: 2
+  AutoInitialization: 1
+  SafeMode: 3
+  Direction: 0
+  AutoChangeDirectionOnEnd: 0
+  AutoPlayOnStart: 0
+  AutoPlayOnEnable: 0
+  LogMissingTargets: 1
+  ForceTimescaleMode: 0
+  ForcedTimescaleMode: 1
+  DurationMultiplier: 1
+  TimescaleMultiplier: 1
+  RandomizeDuration: 0
+  RandomDurationMultiplier: {x: 0.5, y: 1.5}
+  DisplayFullDurationDetails: 0
+  PlayerTimescaleMode: 0
+  OnlyPlayIfWithinRange: 0
+  RangeCenter: {fileID: 0}
+  RangeDistance: 5
+  UseRangeFalloff: 0
+  RangeFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  RemapRangeFalloff: {x: 0, y: 1}
+  IgnoreRangeEvents: 0
+  CooldownDuration: 0
+  InitialDelay: 0
+  CanPlay: 1
+  CanPlayWhileAlreadyPlaying: 1
+  ChanceToPlay: 100
+  FeedbacksIntensity: 1
+  Events:
+    TriggerMMFeedbacksEvents: 0
+    TriggerUnityEvents: 1
+    OnPlay:
+      m_PersistentCalls:
+        m_Calls: []
+    OnPause:
+      m_PersistentCalls:
+        m_Calls: []
+    OnStop:
+      m_PersistentCalls:
+        m_Calls: []
+    OnResume:
+      m_PersistentCalls:
+        m_Calls: []
+    OnChangeDirection:
+      m_PersistentCalls:
+        m_Calls: []
+    OnComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRestoreInitialValues:
+      m_PersistentCalls:
+        m_Calls: []
+    OnSkipToTheEnd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnInitializationComplete:
+      m_PersistentCalls:
+        m_Calls: []
+    OnEnable:
+      m_PersistentCalls:
+        m_Calls: []
+    OnDisable:
+      m_PersistentCalls:
+        m_Calls: []
+  DebugActive: 0
+  InScriptDrivenPause: 0
+  FeedbacksList:
+  - rid: 2696332567767941138
+  - rid: 2696332567767941139
+  PlayMode: 0
+  SequentialDelay: 0
+  KeepPlayModeChanges: 0
+  PerformanceMode: 0
+  RestoreInitialValuesOnDisable: 0
+  StopFeedbacksOnDisable: 0
+  PlayCount: 0
+  InPreviewMode: 0
+  MMF_ChannelMode: 0
+  MMF_Channel: 0
+  MMF_ChannelDefinition: {fileID: 0}
+  RunFirstOnEnableOnlyAfterStart: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2696332567767941138
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: 1237778062
+        Label: Sound (Water)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 1338852256}
+        DebugActive: 0
+        Sfx: {fileID: 8300000, guid: 24100a8717c2dfe4085f59ff62ec9dc8, type: 3}
+        RandomSfx: []
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 0.96
+        MaxPitch: 1.04
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+    - rid: 2696332567767941139
+      type: {class: MMF_HapticPattern, ns: Hearthdelve.Shared.Haptics, asm: Hearthdelve.Shared}
+      data:
+        Active: 1
+        UniqueID: 1114746525
+        Label: Haptic Tap.Light
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: 
+        Owner: {fileID: 1338852256}
+        DebugActive: 0
+        Pattern: {fileID: 11400000, guid: d12c1808a1cffec4e877593f1358e4fa, type: 2}
+        Scale: 1
+        UseFeedbackIntensity: 0
 --- !u!1 &1340408075
 GameObject:
   m_ObjectHideFlags: 0
@@ -37523,7 +37921,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -776673364
-        Label: Sound (placeholder)
+        Label: Sound (EnemyDeath)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -37593,8 +37991,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1340408076}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 904141960ec6ca94abd4938c53fd99cc, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
+        - {fileID: 8300000, guid: 6e62a4439b7723847800f8337161f728, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -37605,8 +38006,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.94
+        MaxPitch: 1.06
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -38056,6 +38457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: harvest.got
+  m_Table: 
 --- !u!114 &1355490580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38342,6 +38744,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.title
+  m_Table: 
 --- !u!114 &1381758073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39123,6 +39526,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1418209078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40172,6 +40576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.trophy
+  m_Table: 
 --- !u!114 &1454425668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44987,6 +45392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1483515633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45924,6 +46330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.footer
+  m_Table: 
 --- !u!114 &1542138581
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46285,6 +46692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: harvest.got
+  m_Table: 
 --- !u!114 &1545518040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46735,6 +47143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1571538023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47190,6 +47599,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1593019502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47731,6 +48141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.gold_secured
+  m_Table: 
 --- !u!114 &1605419474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -48350,6 +48761,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: swap.cancel
+  m_Table: 
 --- !u!114 &1642640989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49081,6 +49493,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1692726795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49517,6 +49930,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1706797552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49747,6 +50161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: result.boss
+  m_Table: 
 --- !u!114 &1714190390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50108,6 +50523,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: hud.run_gold
+  m_Table: 
 --- !u!114 &1718191672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50376,6 +50792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1732383480
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50587,6 +51004,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1736735413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51637,6 +52055,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1770791747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -52083,6 +52502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1787187493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53332,7 +53752,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1042905984
-        Label: Sound (placeholder)
+        Label: Sound (EnemyDeath)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -53402,8 +53822,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1835415141}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 8b41f926f7bae2348984d6883ef60a10, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: a1b2452a1c43ec741aa209e05e3a266d, type: 3}
+        - {fileID: 8300000, guid: 3be85791267642a44bc36a01eb5fe528, type: 3}
+        - {fileID: 8300000, guid: 6e62a4439b7723847800f8337161f728, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -53414,8 +53837,8 @@ MonoBehaviour:
         StopSoundOnFeedbackStop: 1
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 0.94
+        MaxPitch: 1.06
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -53673,6 +54096,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &1860446725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55035,6 +55459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: swap.subtitle
+  m_Table: 
 --- !u!114 &1921172886
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56540,6 +56965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &2001194907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -56826,6 +57252,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &2006747238
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57899,6 +58326,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &2054210563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58129,6 +58557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: slot.count
+  m_Table: 
 --- !u!114 &2054351909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58445,7 +58874,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -40250753
-        Label: Sound (placeholder)
+        Label: Sound (UiTick)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -58515,7 +58944,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 2058507456}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: d2c2e50fe51af5c4cb9bd3cd0788c717, type: 3}
+        Sfx: {fileID: 8300000, guid: 9e5906ff7f50bca4bbb21508b48917de, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -59817,6 +60246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: power.footer
+  m_Table: 
 --- !u!114 &2104160841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61003,7 +61433,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 760308265
-        Label: Sound (placeholder)
+        Label: Sound (UiConfirm)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -61073,8 +61503,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 2137265754}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
+        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
+        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -61329,6 +61762,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.UI::Hearthdelve.UI.Localization.LocalizedSuperText
   m_Key: death.selected_none
+  m_Table: 
 --- !u!114 &2141239678
 MonoBehaviour:
   m_ObjectHideFlags: 0

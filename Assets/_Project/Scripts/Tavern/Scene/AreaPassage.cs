@@ -4,11 +4,24 @@ using UnityEngine;
 
 namespace Hearthdelve.Tavern.Scene
 {
+    /// <summary>What the keeper went through (4i-C: each has its own sound).</summary>
+    public enum PassageKind
+    {
+        Stairs,
+        Door,
+    }
+
     /// <summary>Walking from one area of the property to another began: the screen fades out (4f step 6).</summary>
     public readonly struct AreaPassageStarted : IEvent
     {
         public readonly float FadeSeconds;
-        public AreaPassageStarted(float fadeSeconds) => FadeSeconds = fadeSeconds;
+        public readonly PassageKind Kind;
+
+        public AreaPassageStarted(float fadeSeconds, PassageKind kind = PassageKind.Stairs)
+        {
+            FadeSeconds = fadeSeconds;
+            Kind = kind;
+        }
     }
 
     /// <summary>The keeper is in the next area: the screen fades back in.</summary>

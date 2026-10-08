@@ -250,7 +250,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1933690390
-        Label: Sound (placeholder)
+        Label: Sound (Discovery)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -320,8 +320,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 2991736475519542604}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 9c443e5a00e6b5a4a8b657a280bfa3e7, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 47fc3c6e96f1d5d48bd0abaccae446b0, type: 3}
+        - {fileID: 8300000, guid: ecfd1f2fbf5c3ee4c9e3ea67c335235f, type: 3}
+        - {fileID: 8300000, guid: 8eae849287cf7ff419f3f93fa1fd7c5e, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:

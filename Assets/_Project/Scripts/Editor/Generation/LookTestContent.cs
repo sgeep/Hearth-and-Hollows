@@ -91,6 +91,8 @@ namespace Hearthdelve.Editor
         internal static GameObject SavePrefab(GameObject root, string path)
         {
             EditorPaths.Ensure(Path.GetDirectoryName(path)?.Replace('\\', '/'));
+            // 4i-C: every melee weapon's swing is heard (SoundSwap does the same in place).
+            SoundSwap.EquipSwing(root);
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
             return prefab;
@@ -379,7 +381,13 @@ namespace Hearthdelve.Editor
             player.FeedbacksList ??= new List<MMF_Feedback>();
             if (flashTarget != null) player.AddFeedback(new MMF_SpriteFlash { Label = "Flash", Target = flashTarget });
             if (shake > 0f) player.AddFeedback(new MMF_ScreenShake { Label = "Screen Shake", Force = shake });
-            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects });
+            if (sound != null)
+            {
+                var played = new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects };
+                // 4i-C: the approved sound for this moment, where there is one (SoundBank); otherwise the placeholder stays.
+                SoundBank.Apply(played, name);
+                player.AddFeedback(played);
+            }
             if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
             return player;
         }
@@ -463,7 +471,13 @@ namespace Hearthdelve.Editor
             player.FeedbacksList ??= new List<MMF_Feedback>();
             player.AddFeedback(new MMF_HitStop { Label = "Hit Stop", FreezeFrameDuration = 0.06f });
             player.AddFeedback(new MMF_ScreenShake { Label = "Screen Shake", Force = 0.15f });
-            if (sound != null) player.AddFeedback(new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects });
+            if (sound != null)
+            {
+                var played = new MMF_Sound { Label = "Sound (placeholder)", Sfx = sound, PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects };
+                // 4i-C: the approved sound for this moment, where there is one (SoundBank); otherwise the placeholder stays.
+                SoundBank.Apply(played, name);
+                player.AddFeedback(played);
+            }
             if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
             return player;
         }
@@ -547,6 +561,8 @@ namespace Hearthdelve.Editor
                 root.AddComponent<PlayerLook>();
                 root.GetComponentInChildren<CharacterSpriteAnimator>().FaceAim = true;
             }
+            // 4i-C: footsteps and the dodge's light rumble (SoundSwap does the same in place).
+            SoundSwap.EquipKeeper(root, hollows: dungeon);
             return SavePrefab(root, dungeon ? PlayerPrefab : TavernPlayerPrefab);
         }
 

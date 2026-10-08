@@ -10,6 +10,8 @@ The list of credits the shipped game must show, kept up to date as assets are ad
 
 - **Music:** by **HeatleyBros** (*HeatleyBros V*: "Quirkii", "Continue", "Coastal Market", "Otherworld"; added 2026-10-07), under the **HeatleyBros Attribution License** (https://heatleybros.com/index.php/heatleybros-attribution-license/): games are allowed, commercial use included, if the game credits them **in-game** (credits, a menu or end credits) **with a working link**, song-specific or to the channel; non-exclusive and revocable; the raw tracks may never be redistributed on their own; no use for AI training or generation. **In-game since 4i-C:** the Credits screen (main menu and pause menu) carries the credit and a working link to their channel, https://www.youtube.com/c/heatleybros (`CreditsLocKeys.HeatleyBrosUrl`; opened with `Application.OpenURL`, also in the web build). The WAV sources stay outside the repo in `C:\Dev\Music\Hearthdelve`; only the four used are imported (`Assets/_Project/Audio/Music`).
 
+- **Sound effects** (4i-C, CC0, credit not required; credited by courtesy): **Kenney** (kenney.nl: RPG Audio, Impact Sounds, Interface Sounds) and **OwlishMedia** (Sound Effects Pack, OpenGameArt). Placeholders (`PH_…`) remain for the sounds no library had (`docs/PLAN_4I.md`, 4i-C).
+
 ## Tools and middleware (courtesy credits)
 
 - TopDown Engine, MMFeedbacks and Nice Vibrations by More Mountains.
@@ -19,5 +21,4 @@ The list of credits the shipped game must show, kept up to date as assets are ad
 
 ## To add as they come in
 
-- Sound effects (none yet; all sound effects are placeholders). Music: HeatleyBros, above.
 - A decorative title font, if one is chosen in 4h.
