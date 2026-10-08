@@ -111,6 +111,8 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return BootToMenu();
             Flow.QuickNewGame();
+            // 4h Checkpoint D's night in the keeper's room is D's to test: here it has already happened, so the days run as 4g's.
+            Flow.MarkHintSeen(Hearthdelve.Shared.Village.CommunityRules.GimpIntro);
             yield return InDelve();
             yield return ExtractAndGoHome();
         }

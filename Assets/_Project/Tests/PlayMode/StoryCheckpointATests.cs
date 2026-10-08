@@ -485,9 +485,9 @@ namespace Hearthdelve.Tests.PlayMode
             yield return BootToMenu();
             Assert.That(StoryServices.State, Is.SameAs(Host));
             Assert.That(StoryServices.Conversations, Is.SameAs(Host));
-            Assert.That(Social.StandIns, Is.EquivalentTo(new[] { "gunta", "pip", "musashi", "maximo", "kaloren", "grim", "ogrin", "bart" }),
-                "a stand-in per tracked character, keyed by id (Musashi since 2026-10-07; Kariaston's people since 4h Checkpoint C)");
-            Assert.That(Host.GetComponentsInChildren<PixelCrushers.LoveHate.FactionMember>().Length, Is.EqualTo(9), "the eight, and the keeper as the actor");
+            Assert.That(Social.StandIns, Is.EquivalentTo(new[] { "gunta", "pip", "musashi", "maximo", "kaloren", "grim", "ogrin", "bart", "gimp" }),
+                "a stand-in per tracked character, keyed by id (Musashi since 2026-10-07; Kariaston's people since 4h Checkpoint C; Gimp since D)");
+            Assert.That(Host.GetComponentsInChildren<PixelCrushers.LoveHate.FactionMember>().Length, Is.EqualTo(10), "the nine, and the keeper as the actor");
             Assert.That(DialogueManager.masterDatabase.GetConversation("Boog/Talk"), Is.Not.Null);
             Assert.That(Lua.Run("return HH_Respect(\"gunta\")").asFloat, Is.Zero);
             Assert.That(Host.Quests.Journal, Is.Not.Null);
