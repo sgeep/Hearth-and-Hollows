@@ -19,13 +19,13 @@ namespace Hearthdelve.Shared.Audio
 
     /// <summary>
     /// Which music the moment wants (pure). The day's phase decides; something that holds a cue (Decorate Mode) wins over it.
-    /// The menu and the night's summary are quiet.
+    /// The menu, arrival day (the opening: the first music is the Hollows', the owner's call) and the night's summary are quiet.
     /// </summary>
     public static class MusicRules
     {
-        public static MusicCue Pick(bool inGame, DayPhase phase, MusicCue held)
+        public static MusicCue Pick(bool inGame, DayPhase phase, MusicCue held, bool arriving = false)
         {
-            if (!inGame) return MusicCue.None;
+            if (!inGame || arriving) return MusicCue.None;
             if (held != MusicCue.None) return held;
             return phase switch
             {
@@ -41,6 +41,9 @@ namespace Hearthdelve.Shared.Audio
         /// rather than stop it. Only the day pauses for Decorate Mode, so leaving decorating picks the day's tune up again.
         /// </summary>
         public static bool PausesFor(MusicCue from, MusicCue to) => from == MusicCue.Day && to == MusicCue.Decorate;
+
+        /// <summary>How loud everything but the music is: quieter in the Hollows (the owner's call, 2026-10-07).</summary>
+        public static float EffectsLevel(bool inGame, DayPhase phase, float inHollows) => inGame && phase == DayPhase.Delve ? inHollows : 1f;
     }
 
     /// <summary>

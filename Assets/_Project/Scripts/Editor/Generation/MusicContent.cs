@@ -46,6 +46,8 @@ namespace Hearthdelve.Editor
             }
             MusicConfig config = LookTestContent.CreateOrUpdate<MusicConfig>(ConfigPath, c =>
             {
+                // Once: the first default (0.75) becomes the owner's second call (another quarter down), unless tuned since.
+                if (Mathf.Approximately(c.volume, 0.75f)) c.volume = 0.5625f;
                 foreach (var (cue, name, _) in k_Tracks)
                 {
                     var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"{Folder}/{name}.wav");

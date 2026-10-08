@@ -1255,7 +1255,7 @@ Tests: EditMode 724/724, PlayMode 246 passed, 0 failed (26 explicit captures and
 
 ### Background music (2026-10-07, after Checkpoint C)
 
-At the owner's request: HeatleyBros tracks, looping, at 75% volume, crossfading over 1.5 s. The free day (Tally Ho! and Kariaston) plays "Quirkii"; Decorate Mode "Continue" (the day's tune pauses and picks up where it was after); the evening (Prep, service, the results) "Coastal Market"; the Cellars "Otherworld" (the only region so far). The menu and the night's summary are quiet. Tuning on `Data/Config/MusicConfig.asset`. **Licence:** an in-game credit with a working link is required before release (`docs/CREDITS.md`; the credits screen is 4i). Open: whether Prep should keep the day's tune instead of the evening's.
+At the owner's request: HeatleyBros tracks, looping, crossfading over 1.5 s; music at 56% (a quarter down, then another after the owner found it loud), and **sound effects in the Hollows a quarter down** (through the listener during the delve; the music keeps its own level). **Arrival day is silent**: a new game's first music is "Otherworld", going down into the Hollows. The free day (Tally Ho! and Kariaston) plays "Quirkii"; Decorate Mode "Continue" (the day's tune pauses and picks up where it was after); the evening (Prep, service, the results) "Coastal Market"; the Cellars "Otherworld" (the only region so far). The menu and the night's summary are quiet. Tuning on `Data/Config/MusicConfig.asset`. **Licence:** an in-game credit with a working link is required before release (`docs/CREDITS.md`; the credits screen is 4i). Open: whether Prep should keep the day's tune instead of the evening's.
 
 ### Open design questions (Phase 4)
 

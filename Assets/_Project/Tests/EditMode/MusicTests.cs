@@ -20,6 +20,22 @@ namespace Hearthdelve.Tests
         public void EachPartOfTheDay_HasItsTune(DayPhase phase, MusicCue cue) => Assert.That(MusicRules.Pick(true, phase, MusicCue.None), Is.EqualTo(cue));
 
         [Test]
+        public void ArrivalDay_IsQuiet_TheFirstMusicIsTheHollows()
+        {
+            Assert.That(MusicRules.Pick(true, DayPhase.Daytime, MusicCue.None, arriving: true), Is.EqualTo(MusicCue.None));
+            Assert.That(MusicRules.Pick(true, DayPhase.Delve, MusicCue.None), Is.EqualTo(MusicCue.Cellars));
+        }
+
+        [Test]
+        public void EffectsAreAQuarterDown_InTheHollowsOnly()
+        {
+            Assert.That(MusicRules.EffectsLevel(true, DayPhase.Delve, 0.75f), Is.EqualTo(0.75f));
+            Assert.That(MusicRules.EffectsLevel(true, DayPhase.Daytime, 0.75f), Is.EqualTo(1f));
+            Assert.That(MusicRules.EffectsLevel(true, DayPhase.Evening, 0.75f), Is.EqualTo(1f));
+            Assert.That(MusicRules.EffectsLevel(false, DayPhase.Delve, 0.75f), Is.EqualTo(1f));
+        }
+
+        [Test]
         public void TheMenu_IsQuiet() => Assert.That(MusicRules.Pick(false, DayPhase.Daytime, MusicCue.Decorate), Is.EqualTo(MusicCue.None));
 
         [Test]
@@ -39,7 +55,8 @@ namespace Hearthdelve.Tests
         {
             var config = AssetDatabase.LoadAssetAtPath<MusicConfig>(MusicContent.ConfigPath);
             Assert.That(config, Is.Not.Null);
-            Assert.That(config.volume, Is.EqualTo(0.75f).Within(1e-4f));
+            Assert.That(config.volume, Is.EqualTo(0.5625f).Within(1e-4f), "a quarter down, twice");
+            Assert.That(config.effectsInHollows, Is.EqualTo(0.75f).Within(1e-4f));
             foreach (MusicCue cue in new[] { MusicCue.Day, MusicCue.Decorate, MusicCue.Service, MusicCue.Cellars })
             {
                 AudioClip clip = config.Clip(cue);

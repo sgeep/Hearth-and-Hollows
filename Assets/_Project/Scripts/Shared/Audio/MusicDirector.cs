@@ -18,6 +18,8 @@ namespace Hearthdelve.Shared.Audio
         {
             public AudioSource Source;
             public float Target;
+            /// <summary>0–1 along the fade (the source's volume is this times the music volume).</summary>
+            public float Level;
             public bool PauseAtSilence;
         }
 
@@ -54,7 +56,8 @@ namespace Hearthdelve.Shared.Audio
             {
                 GameFlow flow = GameFlow.Instance;
                 bool inGame = flow != null && flow.InGame;
-                return MusicRules.Pick(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, MusicHolds.Current);
+                return MusicRules.Pick(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, MusicHolds.Current,
+                    inGame && flow.State.Story.Opening == Hearthdelve.Shared.Story.OpeningStage.Arrival);
             }
         }
 
@@ -63,6 +66,11 @@ namespace Hearthdelve.Shared.Audio
             if (m_Config == null) return;
             MusicCue wanted = Wanted;
             if (wanted != Current) Switch(wanted);
+            // Sound effects in the Hollows a quarter down: the listener carries it (every effect plays through it, whatever plays
+            // it), and the music divides it back out so its own level holds.
+            GameFlow flow = GameFlow.Instance;
+            bool inGame = flow != null && flow.InGame;
+            AudioListener.volume = MusicRules.EffectsLevel(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, m_Config.effectsInHollows);
             Fade(Time.unscaledDeltaTime);
         }
 
@@ -104,8 +112,9 @@ namespace Hearthdelve.Shared.Audio
             foreach (KeyValuePair<MusicCue, Voice> pair in m_Voices)
             {
                 Voice v = pair.Value;
-                float level = Mathf.MoveTowards(v.Source.volume / Mathf.Max(0.0001f, m_Config.volume), v.Target, step);
-                v.Source.volume = level * m_Config.volume;
+                float level = Mathf.MoveTowards(v.Level, v.Target, step);
+                v.Level = level;
+                v.Source.volume = Mathf.Min(1f, level * m_Config.volume / Mathf.Max(0.01f, AudioListener.volume));
                 if (v.Target > 0f || level > 0f || !v.Source.isPlaying) continue;
                 if (v.PauseAtSilence) v.Source.Pause();
                 else
