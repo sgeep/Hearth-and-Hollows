@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hearthdelve.Core;
+using Hearthdelve.Shared.Audio;
 using Hearthdelve.Shared.Characters;
 using Hearthdelve.Shared.Game;
 using Hearthdelve.Shared.Story;
@@ -90,6 +91,9 @@ namespace Hearthdelve.Editor
             if (flow == null) throw new InvalidOperationException("Boot has no GameFlow.");
             SurfaceTime time = flow.GetComponent<SurfaceTime>() ?? flow.gameObject.AddComponent<SurfaceTime>();
             time.Configure(ClockConfig());
+            // 2026-10-07: the background music, beside the clock.
+            MusicDirector music = flow.GetComponent<MusicDirector>() ?? flow.gameObject.AddComponent<MusicDirector>();
+            music.Configure(MusicContent.Build());
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
         }

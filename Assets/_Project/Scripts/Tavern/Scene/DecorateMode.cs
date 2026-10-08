@@ -125,6 +125,7 @@ namespace Hearthdelve.Tavern.Scene
         void OnDestroy()
         {
             Hearthdelve.Shared.Surface.SurfacePause.Release(this);
+            Hearthdelve.Shared.Audio.MusicHolds.Release(this);
             m_MoveReader?.Dispose();
             if (Instance == this) Instance = null;
         }
@@ -154,6 +155,8 @@ namespace Hearthdelve.Tavern.Scene
             IsActive = true;
             // 4h: decorating holds the surface clock still (it's never a race).
             Hearthdelve.Shared.Surface.SurfacePause.Hold(this);
+            // Its own tune while decorating (2026-10-07); the day's picks up where it was afterwards.
+            Hearthdelve.Shared.Audio.MusicHolds.Hold(this, Hearthdelve.Shared.Audio.MusicCue.Decorate);
             InputMaps.Activate(InputMaps.Decorate);
             m_LastPointer = m_Point != null ? m_Point.ReadValue<Vector2>() : Vector2.zero;
             Refresh();
@@ -272,6 +275,7 @@ namespace Hearthdelve.Tavern.Scene
             // Back to where the keeper is: on foot again in the daytime (4h), the screens otherwise.
             TavernView.Show(PropertyArea.Current);
             Hearthdelve.Shared.Surface.SurfacePause.Release(this);
+            Hearthdelve.Shared.Audio.MusicHolds.Release(this);
             TavernDirector.RestoreInput();
             MomentPlayed?.Invoke(DecorateMoment.Leave);
             Changed?.Invoke();

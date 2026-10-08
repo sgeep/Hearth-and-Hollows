@@ -448,6 +448,32 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/village_tavern_lunch.png");
         }
 
+        // ---------- the music (2026-10-07) ----------
+
+        [UnityTest]
+        public IEnumerator TheMusic_FollowsTheDay_DecorateModeHasItsOwn_AndTheEveningItsOwn()
+        {
+            yield return Daytime(outside: false);
+            var music = Hearthdelve.Shared.Audio.MusicDirector.Instance;
+            Assert.That(music, Is.Not.Null, "the music lives in Boot");
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Day));
+            AudioSource day = music.GetComponents<AudioSource>().Single(s => s.clip == music.Config.Clip(Hearthdelve.Shared.Audio.MusicCue.Day));
+            Assert.That(day.loop, "it loops");
+            DecorateMode.Instance.Enter();
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Decorate));
+            DecorateMode.Instance.Leave();
+            yield return Frames(3);
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Day), "back to the day's tune");
+            SurfacePause.Release(m_Hold);
+            Flow.StartEvening();
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Service));
+            Flow.SkipService();
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the delve");
+            Assert.That(music.Current, Is.EqualTo(Hearthdelve.Shared.Audio.MusicCue.Cellars));
+        }
+
         // ---------- nobody traps the keeper ----------
 
         [UnityTest]

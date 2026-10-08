@@ -609,6 +609,7 @@ GameObject:
   - component: {fileID: 258340919}
   - component: {fileID: 258340918}
   - component: {fileID: 258340923}
+  - component: {fileID: 258340924}
   m_Layer: 0
   m_Name: GameFlow
   m_TagString: Untagged
@@ -694,6 +695,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Game.SurfaceTime
   m_Config: {fileID: 11400000, guid: 8b3c7233691213a4eac723dacd6fee1a, type: 2}
+--- !u!114 &258340924
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 258340917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da2b3773aa127de4b921f7188e30c222, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Hearthdelve.Shared::Hearthdelve.Shared.Audio.MusicDirector
+  m_Config: {fileID: 11400000, guid: 7dd621b8007b3ab4c8f21f1c0dfd9738, type: 2}
 --- !u!43 &278585257
 Mesh:
   m_ObjectHideFlags: 0

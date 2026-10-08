@@ -1253,6 +1253,10 @@ Tests: EditMode 724/724, PlayMode 246 passed, 0 failed (26 explicit captures and
 
 **Known issues (Checkpoint C):** villagers walk through each other (their spots are apart); Kariaston's grid bakes on the first walk (a small hitch, once); a villager already walking keeps walking when Decorate Mode opens.
 
+### Background music (2026-10-07, after Checkpoint C)
+
+At the owner's request: HeatleyBros tracks, looping, at 75% volume, crossfading over 1.5 s. The free day (Tally Ho! and Kariaston) plays "Quirkii"; Decorate Mode "Continue" (the day's tune pauses and picks up where it was after); the evening (Prep, service, the results) "Coastal Market"; the Cellars "Otherworld" (the only region so far). The menu and the night's summary are quiet. Tuning on `Data/Config/MusicConfig.asset`. **Licence:** an in-game credit with a working link is required before release (`docs/CREDITS.md`; the credits screen is 4i). Open: whether Prep should keep the day's tune instead of the evening's.
+
 ### Open design questions (Phase 4)
 
 1. **Protagonist body:** the Human Townsfolk is a stand-in. See `docs/ASSET_MAP.md`.
