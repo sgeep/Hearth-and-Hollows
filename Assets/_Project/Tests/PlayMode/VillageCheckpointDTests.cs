@@ -424,6 +424,68 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture("BatchLogs/community_dinner.png");
         }
 
+        // ---------- the field guide's shots (run by hand: BatchLogs/guide/*.png) ----------
+
+        [UnityTest, Explicit]
+        public IEnumerator CaptureTheFieldGuide()
+        {
+            const string out_ = "BatchLogs/guide";
+            System.IO.Directory.CreateDirectory(out_);
+            yield return Daytime();
+            Flow.MarkHintSeen(CommunityRules.GimpIntro);
+            yield return new WaitForSecondsRealtime(1f);
+            TavernEveningCaptures.Capture($"{out_}/wake_room.png");
+
+            Inside();
+            KeeperAtWorld(new Vector2(14f, 6f));
+            yield return new WaitForSecondsRealtime(1.5f);
+            TavernEveningCaptures.Capture($"{out_}/tavern_day.png");
+
+            Outside();
+            KeeperAtVillage(new Vector2(36f, 15.5f));
+            yield return At(9 * 60);
+            yield return new WaitForSecondsRealtime(1.5f);
+            TavernEveningCaptures.Capture($"{out_}/village_square.png");
+
+            KeeperAtVillage(new Vector2(36.9f, 10.9f));
+            yield return Frames(3);
+            Here(CharacterIds.Musashi).Talk.Use();
+            yield return new WaitForSecondsRealtime(2f);
+            TavernEveningCaptures.Capture($"{out_}/talk_musashi.png");
+            DialogueManager.StopConversation();
+            yield return Frames(3);
+
+            GardenBed bed = GardenBed.Find(Hearthdelve.Shared.Garden.GardenConfig.Bed1);
+            KeeperAtWorld((Vector2)bed.transform.position + new Vector2(0f, -2.2f));
+            yield return new WaitForSecondsRealtime(1f);
+            TavernEveningCaptures.Capture($"{out_}/garden.png");
+            bed.Interactable.Use();
+            yield return new WaitForSecondsRealtime(0.8f);
+            TavernEveningCaptures.Capture($"{out_}/garden_plant.png");
+            Object.FindAnyObjectByType<Hearthdelve.UI.Tavern.GardenPanel>()?.Close();
+            yield return Frames(3);
+
+            KeeperAtVillage(new Vector2(24f, 19f));
+            yield return At(15 * 60);
+            yield return WaitUntil(() => !Here(CharacterIds.Bart).Walking, 40f, "Bart on the green");
+            yield return new WaitForSecondsRealtime(2f);
+            TavernEveningCaptures.Capture($"{out_}/village_green.png");
+
+            SurfacePause.Release(m_Hold);
+            Flow.StartEvening();
+            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
+            yield return Revealed();
+            Director.FillStoreroom();
+            yield return new WaitForSecondsRealtime(1f);
+            TavernEveningCaptures.Capture($"{out_}/prep.png");
+
+            Flow.SkipService();
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the delve");
+            yield return Revealed();
+            yield return new WaitForSecondsRealtime(1.5f);
+            TavernEveningCaptures.Capture($"{out_}/delve_start.png");
+        }
+
         // ---------- Decorate Mode ----------
 
         [UnityTest]
