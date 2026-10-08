@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). Next: **your review of the 4i plan** (`docs/PLAN_4I.md`, ten decisions in §3); 4i is not started until it's approved._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A built**, waiting for the owner's playtest. Next: **your 4i-A playtest**; 4i-B only after its approval._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -33,7 +33,7 @@ Each is planned, approved, built and playtested separately. The web build must w
 | 4f | Tavern Stage 1 content and customization foundation (**complete**: approved and signed off 2026-10-06; plan `docs/PLAN_4F.md`, record below) | *Added in v0.5 (approved 2026-10-05):* the customization foundation handles several areas from the start, proven with one small guest room as a second decoratable area (no guests yet); the recipe rework follows the surface and dungeon ingredient model with a few bought surface staples. Butcher Block minigame, all Biome 1 recipes, customer requests, Pip and Gunta, and **a real customization foundation** (revised 2026-10-04): Decorate Mode (move, add and remove furnishings, functional furniture where feasible), persistent layouts, Gold purchases, nav rebuild and service-layout validation, the furniture definition and data pipeline, a substantial curated Minifantasy catalog (visibly different taverns, not a token handful), one proven recolouring workflow, controller-first decorating UX. Not every possible furnishing: the pipeline and a substantial first collection, growing through Phase 5. Then **one small end-to-end reward loop in Biome 1** (added 2026-10-04): fight → a furnishing discovery drops → pick it up → extract → permanently owned → placed through Decorate Mode; a small real drop pool on suitable Biome 1 enemies, at least one rare or unique furnishing from the Biome 1 boss, persistent ownership and unlock state, visible pickup and reward feedback, and extraction and death behaviour under the rule approved when it is designed. An integration slice, not the production loot catalog. Customization may take more of 4f's budget than first planned (a learning priority). |
 | 4g | Story, quests, character creation and relationship reactivity (**complete**: signed off 2026-10-06, tag `milestone-4g`; `docs/PLAN_4G.md`) | Dialogue System for Unity, Quest Machine and Love/Hate (relationships: Affinity and Respect) behind Hearth & Hollows adapters; uGUI + Super Text Mesh dialogue; Portrait Generator portraits; character creation; the Act I opening and onboarding; the representative quest **Boog's Bomb** (a quest object from the Hollows); relationship reactivity for Boog and Pip; save/load of dialogue, quest and relationship state in `SaveSystem`. Checkpoints: A (Steps 1–3, technology), B (Steps 4–6), C (Steps 7–8). (Dialogue System replaces Yarn Spinner entirely, locked 2026-10-03.) |
 | 4h | Village and daytime slice (**complete**: signed off 2026-10-08, tag `milestone-4h`; `docs/PLAN_4H.md`) | A small part of Kariaston and the tavern grounds walkable in the daytime, replacing the Morning panel; a cheap prototype of the daytime time model (ticking clock or player-controlled phases); 3–4 named villagers with homes, simple presence or schedules, dialogue and relationship hooks; named villagers chosen into evening service alongside Visitors (today's customers become Visitors); one small farm plot feeding the storeroom; the full new day loop through `GameFlow`. Not: ranching, fishing, Inn guests, Visitor promotion, resident recruitment (Phase 5). |
-| 4i | A playtest-ready vertical slice (*was "menus, options and polish"; **proposed 2026-10-08**, `docs/PLAN_4I.md`, waiting for approval*) | The owner's objective: an unfamiliar player can launch the game, understand what to do, play several complete days and enjoy it without help. Four checkpoints: A first impressions (menu, pause, onboarding, trustworthy saves), B settings and accessibility (persistent options, audio mixer and volumes, feel, display, text speed, assists), C presentation and polish (real sound effects, audio balance, in-game credits with HeatleyBros' link, presentation bugs), D playtest-ready (release Web and Windows builds, performance, save compatibility, an external playtest). |
+| 4i | A playtest-ready vertical slice (*was "menus, options and polish"; **approved 2026-10-08** with D1–D10, `docs/PLAN_4I.md`; 4i-A built, waiting for the owner's playtest*) | The owner's objective: an unfamiliar player can launch the game, understand what to do, play several complete days and enjoy it without help. Four checkpoints: A first impressions (menu, pause, onboarding, trustworthy saves), B settings and accessibility (persistent options, audio mixer and volumes, feel, display, text speed, assists), C presentation and polish (real sound effects, audio balance, in-game credits with HeatleyBros' link, presentation bugs), D playtest-ready (release Web and Windows builds, performance, save compatibility, an external playtest). |
 
 **Roadmap v0.5 (proposed 2026-10-04, approved 2026-10-05).** The v0.5 additions above (the guest room and the surface-staple recipe rework in 4f, the villager quest in 4g, the village and daytime slice as 4h, menus and polish as 4i), and Phase 5 opening with life-sim prototypes before content build-out (the Inn and Visitors; settling residents on the three plots; fishing with its minigame; ranching; farming depth), are in GDD §11.1. Until approved, the approved plan is 4d–4h as before.
 
@@ -1285,9 +1285,23 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 - **No idle head turn for the keeper:** Minifantasy's 16-frame idles turn the head over frames 8–10 and blink at 3, 5 and 13; the keeper's idles (all four bodies and their shadows) now hold frame 7 through 8–10, keeping the blinks and the loop's timing (`LookTestContent.StillHead`; `KeeperIdleTests`). The 4a look scenes share the townsfolk set, so their idle changes too. Villagers and customers keep theirs.
 - **Considered and not built (the owner's call):** a campfire room between the last floor and the Larder Troll's arena.
 
-### Next: 4i (proposed 2026-10-08, waiting for approval)
+### 4i plan (proposed 2026-10-08; approved the same day)
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
+
+### 4i-A: first impressions (2026-10-08, built; waiting for your playtest)
+
+Following the approved plan and the owner's 4i brief (D1–D10, `docs/PLAN_4I.md` §5). Details, the phase-by-phase quit audit and the playtest checklist: `docs/PLAN_4I.md`, *As built: 4i-A*.
+
+- **Main menu:** a still of Kariaston and Tally Ho! (rendered from the game at 320×180), Continue / New Game / Controls / Quit (desktop), the version (`0.4i-a`), no more `day {0}, {1}` flash. Options and Credits arrive with 4i-B and 4i-C.
+- **Pause menu** (Esc / Start): resume, controls, quit to menu, quit game (desktop). Pauses the game, holds the clock and the keeper, gives back exactly what was on. On foot and on Prep, the results, the night and the delve's result; never over a station, panel, question, conversation, Decorate Mode or story scene (they own Esc / B).
+- **Quitting by phase:** the day and the night save and resume at the same moment; the results and the delve's result bank as their buttons would; arrival day, Prep, service and a running delve ask first and leave the last save as it was. No mid-phase serialization; save version still 10.
+- **Controls reference:** five pages, keyboard and controller side by side, the device in use lit.
+- **Prompts** follow the last meaningful input (no flicker); stations show one binding each.
+- **First free morning:** Orik and Boog, once, as the keeper comes downstairs on day 2 (`Act1/FirstMorning`, seeded once); one-time prompts at the garden, the market and the menu board.
+- **Safer saves:** the last good save kept as a backup on every write; unreadable saves set aside and explained (Continue offers the backup); newer-version saves explained and never loaded; New Game asks before replacing any save file; a brief "saved" mark.
+
+Tests: TESTS_IA. Web: WEB_IA.
 
 ### Phase 5 (direction approved; order proposed for discussion)
 
@@ -1323,11 +1337,12 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - **Data:** the enemies are the slime, bat and spider (plus the look room's training dummy). The Bat Wing icon is a placeholder (a documented art gap in `ASSET_MAP.md`).
 - **No dungeon debug panel (developer-tooling gap):** the prototype's F1 panel (god mode, refill or drain Essence, shake and hit-stop toggles, restart) wasn't rebuilt. Not planned as a whole; individual controls come back when they're genuinely useful. The look-test overlay's F2–F4 keys still work.
 - **The main menu is a plain panel** on a dark background (no art yet); settings come in 4i (`docs/PLAN_4I.md`, 4i-A and 4i-B).
-- **No pause menu:** Esc and Start are bound but open nothing outside the stations and Decorate Mode (4i-A).
+- ~~**No pause menu**~~ (4i-A built one).
 - **Settings aren't saved:** `GameSettings` (shake, flash, hit-stop, vibration) resets each launch and has no screen (4i-B).
-- **An unreadable save hides Continue** without a message, and New Game then replaces it without asking (4i-A).
-- **Station panels' controls lines overflow their boxes** with the full keyboard list (4i-A).
-- **The main menu's Continue detail shows `day {0}, {1}`** for a moment on first load (4i-A).
+- ~~**An unreadable save hides Continue** without a message~~ (4i-A: explained, the backup offered, New Game asks).
+- ~~**Station panels' controls lines overflow their boxes**~~ (4i-A: one binding each).
+- ~~**The main menu's Continue detail shows `day {0}, {1}`**~~ (4i-A: fixed).
+- **No pause menu inside Decorate Mode** (by design: its keys own Esc and Start; leave it, then pause).
 - **Music memory on the web:** each track decodes whole (about 65 MB); the day's tune stays decoded under Decorate Mode's (4i-D).
 - **In-game credits are missing**, and HeatleyBros' licence requires one with a working link before release (4i-C).
 - **The day loop starts from `Boot`.** Playing `Tavern`, `Dungeon` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.

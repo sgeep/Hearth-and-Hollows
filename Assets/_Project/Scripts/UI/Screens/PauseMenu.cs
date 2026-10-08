@@ -97,7 +97,16 @@ namespace Hearthdelve.UI.Screens
             m_QuitGame?.onClick.AddListener(() => AskQuit(app: true));
             m_ConfirmYes?.onClick.AddListener(Quit);
             m_ConfirmNo?.onClick.AddListener(ShowMain);
-            if (m_QuitGame != null) m_QuitGame.gameObject.SetActive(CanQuitApplication);
+            if (m_QuitGame != null && !CanQuitApplication)
+            {
+                // The web: no quit game, and the panel closes up round the three buttons left (whole pixels).
+                m_QuitGame.gameObject.SetActive(false);
+                if (m_Main != null && m_Main.transform is RectTransform main)
+                {
+                    main.sizeDelta -= new Vector2(0f, 20f);
+                    foreach (RectTransform child in main) child.anchoredPosition -= new Vector2(0f, 10f);
+                }
+            }
         }
 
         void OnDestroy()

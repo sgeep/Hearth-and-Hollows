@@ -39,6 +39,10 @@ namespace Hearthdelve.Editor
                 return false;
             }
 
+            // 4i-A: the game's try/catch must work in the browser (an unreadable save is caught and explained). With exception support
+            // "None", any exception, even one that's caught, stops the page.
+            PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.ExplicitlyThrownExceptionsOnly;
+
             // Localization stores its string tables in Addressables; the player needs them built.
             AddressableAssetSettings.BuildPlayerContent(out var content);
             if (!string.IsNullOrEmpty(content.Error))

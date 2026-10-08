@@ -171,6 +171,19 @@ namespace Hearthdelve.Tests.EditMode
             Assert.That(new SaveStore(m_Dir).CheckMain().Problem, Is.EqualTo(SaveProblem.Missing));
         }
 
+        [Test]
+        public void ADamagedSave_IsRecognised_WithoutTheReaderEverThrowing()
+        {
+            string whole = Save(8);
+            Assert.That(SaveSystem.LooksWhole(whole), Is.True);
+            Assert.That(SaveSystem.LooksWhole(whole.Substring(0, whole.Length / 2)), Is.False, "cut off part-way");
+            Assert.That(SaveSystem.LooksWhole("not a save"), Is.False);
+            Assert.That(SaveSystem.LooksWhole("{ \"a\": \"}{\" }"), Is.True, "braces inside a string don't count");
+            Assert.That(SaveSystem.LooksWhole("{ \"a\": \"\\\"}\" }"), Is.True, "nor an escaped quote");
+            Assert.That(SaveSystem.Check(whole.Substring(0, whole.Length / 2)).Problem, Is.EqualTo(SaveProblem.Unreadable));
+            Assert.That(SaveSystem.Check("{ \"version\": 0 }").Problem, Is.EqualTo(SaveProblem.Unreadable));
+        }
+
         // ---------- the words (A3, A5, A6) ----------
 
         static Dictionary<string, string> English => MenuLocKeys.English.ToDictionary(e => e.key, e => e.english);

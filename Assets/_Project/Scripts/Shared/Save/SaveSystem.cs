@@ -308,6 +308,21 @@ namespace Hearthdelve.Shared.Save
         /// </summary>
         public static SaveCheck Check(string json)
         {
+            // The usual damage (empty, cut off, not a save at all) is recognised without throwing: on the web an exception is costly,
+            // and in a build without exception support it stops the page.
+            if (string.IsNullOrWhiteSpace(json)) return new SaveCheck(null, SaveProblem.Unreadable, "The save file is empty.");
+            if (!LooksWhole(json)) return new SaveCheck(null, SaveProblem.Unreadable, "The save file is cut off or isn't a save.");
+            int version;
+            try
+            {
+                version = JsonUtility.FromJson<VersionProbe>(json).version;
+            }
+            catch (Exception e)
+            {
+                return new SaveCheck(null, SaveProblem.Unreadable, e.Message);
+            }
+            if (version > CurrentVersion) return new SaveCheck(null, SaveProblem.Newer, $"The save is from a newer version ({version}) of the game.");
+            if (version < 1) return new SaveCheck(null, SaveProblem.Unreadable, $"Unknown save version {version}.");
             try
             {
                 return new SaveCheck(FromJson(json), SaveProblem.None, null);
@@ -320,6 +335,38 @@ namespace Hearthdelve.Shared.Save
             {
                 return new SaveCheck(null, SaveProblem.Unreadable, e.Message);
             }
+        }
+
+        /// <summary>
+        /// A JSON object from its first brace to its last, with its braces, brackets and strings closed (4i-A): a save cut off part-way,
+        /// or a file that isn't one, fails this without the JSON reader ever being asked.
+        /// </summary>
+        public static bool LooksWhole(string json)
+        {
+            if (json == null) return false;
+            string text = json.Trim();
+            if (text.Length < 2 || text[0] != '{' || text[^1] != '}') return false;
+            int depth = 0;
+            bool inString = false, escaped = false;
+            foreach (char c in text)
+            {
+                if (inString)
+                {
+                    if (escaped) escaped = false;
+                    else if (c == '\\') escaped = true;
+                    else if (c == '"') inString = false;
+                    continue;
+                }
+                switch (c)
+                {
+                    case '"': inString = true; break;
+                    case '{': case '[': depth++; break;
+                    case '}': case ']':
+                        if (--depth < 0) return false;
+                        break;
+                }
+            }
+            return depth == 0 && !inString;
         }
 
         /// <summary>Reads any known version, migrating older ones to the current format.</summary>

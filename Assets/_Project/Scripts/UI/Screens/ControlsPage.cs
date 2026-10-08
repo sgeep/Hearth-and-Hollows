@@ -112,9 +112,17 @@ namespace Hearthdelve.UI.Screens
                 Close();
                 return true;
             }
-            InputAction navigate = InputMaps.Find(InputMaps.UI, UIActions.Navigate);
-            float x = navigate != null ? navigate.ReadValue<Vector2>().x : 0f;
-            if (Mathf.Abs(x) > 0.5f && Mathf.Abs(m_LastX) <= 0.5f) Show(m_Page + (x > 0f ? 1 : -1));
+            // A press turns the page at once (a quick tap counts); a stick pushed over turns it once per push.
+            Keyboard keys = Keyboard.current;
+            Gamepad pad = Gamepad.current;
+            bool right = (keys != null && (keys.rightArrowKey.wasPressedThisFrame || keys.dKey.wasPressedThisFrame)) ||
+                         (pad != null && (pad.dpad.right.wasPressedThisFrame || pad.rightShoulder.wasPressedThisFrame));
+            bool left = (keys != null && (keys.leftArrowKey.wasPressedThisFrame || keys.aKey.wasPressedThisFrame)) ||
+                        (pad != null && (pad.dpad.left.wasPressedThisFrame || pad.leftShoulder.wasPressedThisFrame));
+            float x = pad != null ? pad.leftStick.ReadValue().x : 0f;
+            if (right) Show(m_Page + 1);
+            else if (left) Show(m_Page - 1);
+            else if (Mathf.Abs(x) > 0.5f && Mathf.Abs(m_LastX) <= 0.5f) Show(m_Page + (x > 0f ? 1 : -1));
             m_LastX = x;
             return false;
         }

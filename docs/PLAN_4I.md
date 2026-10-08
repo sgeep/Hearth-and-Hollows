@@ -1,6 +1,6 @@
 # 4i plan: a playtest-ready vertical slice
 
-> **Status: proposed 2026-10-08, waiting for the owner's review.** Nothing in this plan is built. 4h is complete (signed off 2026-10-08, tag `milestone-4h`). This plan replaces the old one-line 4i entry ("settings, accessibility per GDD §12, audio system, web build"), keeps its intent and widens it to the owner's objective below.
+> **Status: approved 2026-10-08 (the four checkpoints, with decisions D1–D10 in §5). 4i-A is built and waiting for the owner's playtest** (*As built: 4i-A*, at the end); 4i-B, C and D wait for their own approval. 4h is complete (signed off 2026-10-08, tag `milestone-4h`). This plan replaces the old one-line 4i entry ("settings, accessibility per GDD §12, audio system, web build"), keeps its intent and widens it to the owner's objective below.
 
 **Objective (the owner's, 2026-10-08):** *an unfamiliar player can launch Hearth & Hollows, understand what to do, play several complete days, and enjoy the experience without developer assistance.*
 
@@ -157,7 +157,7 @@ Four checkpoints, each built, then stopped for the owner's playtest. Within a ch
 
 ---
 
-## 3. Decisions for the owner before 4i-A
+## 3. Decisions for the owner before 4i-A (answered 2026-10-08: see §5)
 
 1. **D1: the main menu's backdrop.** (a) A live view: the Kariaston scene behind the menu, a slow camera pan over the square at dusk (most immersive; adds a scene load before the menu, so a slower start, more on the web), or (b) a still composed from the same art at 320×180 (fast, cheap, no movement). *Recommendation: (b) for 4i, keeping (a) as a possible later upgrade.*
 2. **D2: quitting.** From the pause menu: in the daytime and evening the game saves and returns to the menu; mid-delve, quitting loses that delve (as today) after a confirmation. *Recommendation: as described; no mid-delve saves.*
@@ -172,7 +172,7 @@ Four checkpoints, each built, then stopped for the owner's playtest. Within a ch
 
 ---
 
-## 4. Phase 5 roadmap proposal (for discussion; nothing locked)
+## 4. Phase 5 roadmap proposal (for discussion; the approved baseline is in §5)
 
 **Approved direction (2026-10-07 and 2026-10-08):** a proper fantasy calendar; recurring village festivals and community events; villager birthdays; eventual seasons; fishing and further optional daytime activities; the remaining Hollows biomes; tavern and property expansion (the Sanctuary and Stronghold wording is decision 10, above); the remaining story acts. Already approved earlier (GDD §11.1): the Inn and Visitors, settling residents on the three plots, ranching, farming depth.
 
@@ -193,3 +193,78 @@ Four checkpoints, each built, then stopped for the owner's playtest. Within a ch
 | 5i+ | **Biomes 3–7, Acts II–IV**, more villagers and relationships, the growing catalog | Content build-out, in alternating slices |
 
 Open for the Phase 5 plan: whether fishing comes before the Inn (more immediate fun) or after (more structural value); whether Biome 2 comes before the calendar (combat momentum) or after (the village keeps its momentum from 4h).
+
+---
+
+## 5. The owner's decisions (approved 2026-10-08)
+
+The four-checkpoint structure is approved; each checkpoint is built, then stopped for the owner's playtest and separate approval. These supersede the questions in §3.
+
+- **D1, menu backdrop:** a still composed from owned Minifantasy game art at 320×180 (Tally Ho! or Kariaston, warm); no live village behind the menu; no new art bought or commissioned without asking.
+- **D2, quitting:** save-and-quit from the pause menu with warnings and safe resumption. The free day keeps its progress. Mid-delve quitting asks, abandons the delve (the haul and run rewards never bank), never touches banked gold, unlocks or the tavern, and adds no mid-delve saving. **Every phase audited** (below); no half-done state is serialized to make a button work; anything not resumable returns to a known checkpoint and says what will be lost. Save version 10 stays unless a bump is genuinely needed.
+- **D3, first-day guidance:** Orik and Boog, in their own voices, through the Dialogue System, brief: the village outside, Musashi's market, the garden, Vigor limiting strenuous work (not exploring), and the menu board starting Prep whenever the keeper likes. A few one-time contextual prompts; no checklist; the soft clock, optional Prep and free exploring preserved.
+- **D4, settings:** a separate persistent settings file (the player's, not the save's): survives relaunch, loading, New Game and scene changes; IndexedDB on the web; not in `SaveData` v10. Mostly 4i-B.
+- **D5, sound effects:** licensed libraries and CC0 first. Four libraries are in `C:\Dev\Music\SFX` (Kenney RPG Audio, Kenney Impact Sounds, Kenney Interface Sounds, an OwlishMedia general library); inspect the real folders and licences; nothing more bought or downloaded without approval. A reusable catalog process kept outside the repo beside the libraries (discovery; file, pack, path, format, rate, length, channels; licence; purpose; matches to the placeholders; missing categories; what needs listening or editing; approval before import). Only approved, game-ready clips are imported. Sonniss GameAudioGDC bundles are not present; they may join the catalog later. About 25 high-impact sound families for 4i-C (listed in the owner's brief); variations for repeated sounds; crisp, tactile, slightly stylized. The full pass is 4i-C; 4i-A may use a few Kenney interface sounds if trivial.
+- **D6, accessibility:** 4i-B has the master/music/effects volumes, screen shake, flashes, hit-stop, vibration on/off, intensity and reduced vibration, dialogue text speed (with instant), relaxed cooking timing, patient customers, and a colour audit; all optional, clear, no score penalty in this milestone. **Deferred and recorded:** full control remapping, full UI/text scaling, combat assists, advanced accessibility modes, extensive layout rework.
+- **D7, builds:** Windows and Web. Mono is fine for internal Windows builds; an IL2CPP Windows build validated on an independent machine before any external test. Web gets a release configuration with Brotli and the decompression fallback, keeping a development option. No Mac or Linux in 4i.
+- **D8:** no keeper dialogue portrait in 4i.
+- **D9, external playtest (4i-D):** 3–5 fresh players through a restricted itch.io page or similar; a short updated Field Guide, controls, instructions, known issues, a short questionnaire, save-reset steps and the version; no analytics. The owner publishes and invites.
+- **D10, Phase 5 story direction:** Tally Ho! and Kariaston grow naturally as an inn, a property and a village. The formal Sanctuary → Stronghold transformation is **not** revived (no fortress, defense system or construction mechanic); the story may still bring escalating threats from the Hollows, refugees and new arrivals, more people settling, more rooms and property, village improvements and greater consequences of delving. Acts II–IV are revised in 5a. Recorded in the GDD (§11.1, §13 Open 13 resolved).
+
+**Phase 5 provisional sequence** (a planning baseline, not permission to build): 5a story revision (design only) → 5b the fantasy calendar and first festival (calendar, birthdays, recurring festivals, one authored community event) → 5c Hollows Biome 2 → 5d the Inn and Visitors → 5e fishing and foraging → 5f settling residents → 5g seasons → 5h property expansion, ranching and farming depth → 5i onward: biomes, story acts, content. Not locked: month and year lengths, weekday names, birthday and festival dates, season lengths. Calendar events create anticipation, never punishing deadlines; story-critical progress is never permanently missable because of a date.
+
+---
+
+## As built: 4i-A, "First impressions" (2026-10-08; built, waiting for the owner's playtest)
+
+### Quitting, phase by phase (D2)
+
+The rule lives in one pure place (`Shared/Game/QuitRules`, EditMode-tested) and the pause menu follows it. Only the moments the save already supports are resume points; nothing new is serialized. **Save version stays 10.**
+
+| Moment | Saveable there? | Quit to menu does | Continue loads | Lost | Asks first? | Could anything duplicate? |
+|---|---|---|---|---|---|---|
+| **Free day** (Tally Ho!, Kariaston, any minute) | Yes (v10 keeps the minute, Vigor, the garden) | Saves, then the menu | The same minute of the same day | Nothing | No | No: the save is one snapshot; purchases and garden work already saved as they happened |
+| **Arrival day** (the opening) | No: its beats aren't resume points | The menu; the last save stands | Arrival day from its start (the new game's own save) | Arrival day's progress (the welcome replays) | **Yes** | No: arrival day gives no rewards |
+| **Evening prep** | No | The menu; the last save stands | The last save: normally the day as left when the evening began (`StartEvening` saves it) | Prep choices and butchery | **Yes** | No |
+| **Service** | No (customers, orders and stations aren't state) | As above | As above | Tonight's service so far: takings, dishes, requests and the evening's relationship deeds | **Yes** | No: nothing was banked |
+| **Results** | Banked exactly as "close up" banks them (`GameFlow.BankEvening`, the same `DayRules.CompleteService`) | Banks, saves (phase Delve), then the menu | The night's delve | Nothing | No | No: banked once and the evening scene is left; a test checks the gold arrives once |
+| **The delve** (running) | No mid-delve saves | The menu; the last save stands | The night's delve from its start (saved when the evening closed) | The haul, the delve's gold, powers, curios and quest objects carried; banked gold, unlocks and Tally Ho! untouched | **Yes** | No; as since 4d, the delve can be tried again from its start |
+| **The delve's result** | Brought home exactly as its button would (`CompleteDelve(report, goHome: false)`) | Brings home, saves (phase Night), then the menu | The night | Nothing | No | No: applied once; the dungeon is left |
+| **Night** | Yes (saved when the delve ended and after each purchase) | Saves, then the menu | The night | Nothing | No | No |
+| Conversations, story scenes (Gimp's night), transitions | — | The pause menu isn't offered | — | — | — | — |
+| Stations, panels, questions, Decorate Mode | — | Esc / B backs out of them first; then pause | — | — | — | — |
+
+Quit game (desktop) does exactly the same, then closes the application; on the web it isn't offered (the browser closes the page).
+
+### What was built
+
+- **Main menu (A1):** a still of Kariaston and Tally Ho! behind the title (rendered once from the village scene at 320×180 with the keeper and HUD out of frame, a little warmth and a vignette: `Art/Menu/MenuBackdrop.png`, from the explicit `CaptureMenuBackdrops`), Continue / New Game / Controls / Quit (Quit on desktop only), the version in the corner (`Application.version`, now `0.4i-a`), and the `day {0}, {1}` flash fixed (the line is invisible until its text is set). Options and Credits are not shown until 4i-B and 4i-C build them. Controller navigation is the layout's own, wrapping in the pause menu.
+- **Pause menu (A2):** in Boot on its own canvas over everything (`PauseMenu`, `Menus` canvas built by `FirstImpressionsUI`). Esc or Start opens it when `PauseRules.CanOpen` allows; Esc, B or Start closes it. While open: `MenuPause` (time stops), the surface clock holds, the keeper's controls are off; closing restores exactly the maps that were on. The rule: on foot (the day, arrival day, service, the Hollows) and on the evening's and night's own screens (Prep, the results, the night, the delve's result); never during a load, a conversation, a story scene (`PauseRules.Block`, used by Gimp's night), or while a station, panel, question or Decorate Mode owns Esc. An Esc that just closed a panel never also opens the menu (it must have been pausable the frame before).
+- **Controls reference (A3):** five pages (the day, the evening, the Hollows, decorating, menus and talking), both keyboard and controller columns on every page with the device in use lit; left/right turn the page; from the main menu and the pause menu (which opens on the page for where the keeper is). Hand-written from the actions asset in players' words (`MenuLocKeys.Pages`).
+- **Device-aware prompts (A4):** `Core/Input/InputDevices` follows the last *meaningful* input (a key or button, or a stick or trigger past half way; mouse movement and stick drift never switch it; pure rule `InputDeviceRules`). Every prompt reads it through `InputHints`; gamepad names are the ones players know (A, B, X, Y, LB, RT, Start, View). Station prompts now show one binding each ("Space", "W/A/S/D") and update if the player switches device mid-station.
+- **First free day (A5, D3):** `Act1/FirstMorning` (seeded once; the node editor owns it), Orik and Boog, seven short lines, played once as the keeper first comes downstairs on day 2 (an opening beat, `OpeningRules.Downstairs`, from a new `KeeperEnteredArea` fact; only at the opening's `FirstEvening` stage, so saves past the opening never get it). Three one-time prompts (`FirstDayPrompts`, `SurfacePrompts` over the interaction hint, seven seconds): the garden (Vigor), the market, the menu board (Prep whenever the keeper chooses). Each once per game, in the daytime after arrival day; existing saves see each once too.
+- **Safer saves (A6):** each write keeps the save it replaces as `save_slot_1.backup.json` if that one reads cleanly; an unreadable one is set aside as `save_slot_1.unreadable.json` and never becomes the backup; a save from a newer version is never loaded or touched. The menu says plainly when the save can't be read (and Continue then loads the backup, "the backup, day N"), or that it's from a newer version (no Continue). New Game asks before replacing any save file, readable or not. A brief "saved" mark in the corner on every save (`SaveIndicator`, `GameSaved` fact). The web build's IndexedDB flush covers the backup and the set-aside file (same directory, same flush).
+- **UI clarity (A7):** the station controls lines fit (compact bindings; the tap's line now "pour · tilt the glass").
+
+### Deviations and notes
+
+- **Decorate Mode has no pause menu:** its own keys own Esc (cancel) and Start (the catalog); leaving Decorate Mode (Tab / View) and pausing works. Recorded as the rule.
+- **No pause on the death screen, the swap prompt or a power choice:** those are the moment's own choices (they already pause the game).
+- **No new audio or art beyond the backdrop:** the Kenney interface sounds wait for 4i-C's catalog so they're chosen with everything else.
+- The version is set by hand (`0.4i-a`); stamping from git is 4i-D.
+- Two English strings changed: the tap prompt ("tilt the glass") and the controls header ("keyboard"). `TextStyleTests` now also covers 4h's surface and garden strings and 4i-A's, and "Vigor" joins the resource names that keep a capital.
+- Gamepad names assume the Xbox layout (as every prompt already did).
+
+### Tests
+
+EditMode `FirstImpressionsTests` (quit plan per phase, pause rules, device rule, first-morning beat and prompts once, backup and set-aside, newer-version and unreadable saves, every controls page and message fitting). PlayMode `FirstImpressionsPlayTests` (pause in the day holds the clock and controls and gives them back; pause waits for conversations, Decorate Mode and story scenes, and is there at Prep; quitting from the day, Prep, service, results, the delve, the delve's result, the night and arrival day, with what Continue loads and that nothing is banked twice; the first morning once on coming downstairs and never after the opening; the three prompts once each; the main menu's controls and version; an unreadable save with its backup; a newer-version save; the saved mark; prompts per device). Explicit captures: `CaptureFirstImpressions`, `CaptureMenuBackdrops`.
+
+### Playtest checklist (4i-A)
+
+1. Launch: is the menu clear at a glance? Try it on keyboard and controller.
+2. New Game through arrival day; on day 2 come downstairs: does Orik and Boog's morning feel natural and short?
+3. Walk to the garden, the market and the menu board: do the prompts help without nagging?
+4. Pause in the day, in service, in the Hollows, at night; open the controls on each device; resume.
+5. Quit from the day and Continue (same minute?); quit during Prep or service (is the warning clear?); quit mid-delve (clear?).
+6. Switch between keyboard and controller: do the prompts follow without flickering?
+7. Does everything look at home at 320×180?
