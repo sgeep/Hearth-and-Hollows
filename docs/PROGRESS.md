@@ -1317,11 +1317,12 @@ Tests: EditMode **816 passed, 0 failed** (1 explicit report skipped), the sound,
 
 #### 4i-C sound, round 2: Leohpaz (2026-10-09)
 
-The owner's Leohpaz packs replace the sounds they disliked and fill placeholders, by the same workflow: catalog, listening list (`_catalog\LISTENING_4iC2.md`), the owner's picks, import. Details: `docs/PLAN_4I.md`, *Sound, round 2*.
-- **Imported** (39 files and one edit, from the five licensed packs): Farm footsteps (Kariaston, the Hollows), seeds, watering and harvest; Inventory pickup, bag full and coins; Crafting II's chop, carving, the egg flip and the grill's sizzle loop; the troll's voice layered over his slam, stun and fall, and his roar; Decorate's area whoosh; the Triangular synth blips. Leohpaz is credited by courtesy.
-- **Fixes:** blips in the quiet tier, no random pitch, a 0.079 s gap, voices on whole semitones (Grim a step under Orik); footsteps 6 dB under the blips.
-- **Waiting:** four packs (Dungeon Audio, Forgotten Plains, Retro RPG 90 Battle, Retro Player 90 Movement) are loose in the folder without their licence files, and Forgotten Plains' campfire loop is missing. Their picks wait for a re-extraction one folder per pack: dodge, swing, enemy death, the tavern's steps, hits, hurt, the rope, gates, the fall, the charge tick, the splash, the campfire.
-- **Tests:** EditMode 818 passed, 0 failed (1 explicit skipped). PlayMode 287 passed, 1 failed: a timeout in a multi-day village test (`OgrinsLight_…`), which passed alone in 53 s. It now has the same 10-minute limit as its sibling. The full PlayMode suite hasn't been rerun since.
+The owner's nine Leohpaz packs (each in its own folder beside its zip, checked identical) replace the sounds they disliked and fill most placeholders, by the same workflow: catalog, listening list, the owner's picks, import. Details, the sounds by family and a correction (the "missing campfire", which was never in Forgotten Plains): `docs/PLAN_4I.md`, *Sound, round 2*.
+- **Imported:** 75 Leohpaz files and three edits: footsteps for all three grounds, the dodge, the swing, hits, heavy hits, hurt, enemy deaths, pickups, the full bag, coins, the rope, gates, the grill's flip and sizzle, chopping, butchery, the garden, the Triangular blips, the troll's voice and roar, the fall into a hole, Decorate's area change, the charge ticks and the tap's overflow. Leohpaz is credited by courtesy.
+- **Fixes (confirmed):** blips in the quiet tier, no random pitch, a 0.079 s gap, voices on whole semitones; footsteps 6 dB under the blips.
+- **Waiting for the owner:** the campfire (no fire sound in any library) and grass footsteps beside dirt (`_catalog\LISTENING_4iC3.md`).
+
+TESTS_LINE
 
 ### 4i-B: settings and accessibility (2026-10-08; signed off 2026-10-08)
 

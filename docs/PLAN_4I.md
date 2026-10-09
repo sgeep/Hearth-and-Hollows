@@ -524,55 +524,65 @@ The feedback audit's **gap** rows above are now filled, except where the placeho
 
 ### Sound, round 2: Leohpaz (2026-10-09)
 
-The owner bought nine Leohpaz packs to replace the 4i-C sounds they disliked and to fill the placeholders left. The workflow was the same: catalog, a listening list (`_catalog\LISTENING_4iC2.md`, two or three candidates per family against the current sound), then the owner's picks ("your picks"), then import and swap.
+The owner bought Leohpaz packs to replace the 4i-C sounds they disliked and to fill the placeholders left. The workflow was the same: catalog, a listening list (`_catalog\LISTENING_4iC2.md`, two or three candidates per family against the current sound), the owner's picks ("your picks"), then import and swap.
 
-**The packs.** They stay where the owner put them, in `C:\Dev\Music\Leohpaz SFX`. `catalog.py` reads that folder as a second root, and `SoundBank` has one more path helper (`L()`).
-- **Licence** (`Licensing.txt`, identical in the five packs that have one): commercial use is allowed; the pack may not be sold or redistributed; credit is optional. Leohpaz is credited by courtesy on the Credits screen and in `CREDITS.md` and `THIRD_PARTY.md`.
-- **Four packs not used yet:** Dungeon Audio, Forgotten Plains Audio, Retro RPG 90 Battle and Retro Player 90 Movement are loose at the top of the folder, mixed together, without folders or licence files, and Forgotten Plains' campfire loop is missing. Their picks wait until the packs are re-extracted one folder per pack.
+**The packs.** Nine packs, each in its own folder in `C:\Dev\Music\Leohpaz SFX` beside the zip it came from. `_catalog\verify_leohpaz.py` found every folder identical to its zip. `catalog.py` reads that folder as a second root and takes pack membership from the folders (the zips aren't counted), and `SoundBank` has one more path helper (`L()`).
 
-**Imported now** (39 Leohpaz files, plus one edit), from the five licensed packs:
+**Licence.** Commercial use is allowed; the pack may not be sold or redistributed; credit is optional, so Leohpaz is credited by courtesy (the Credits screen, `CREDITS.md`, `THIRD_PARTY.md`).
+- Five packs carry it in `Licensing.txt`: Farm, Inventory, Humanoids Grunts, Retro Dialogue, Crafting and Professions II.
+- The other four zips hold only sounds, and their licence is on their itch.io pages, read 2026-10-09: Retro RPG 90 Battle, Retro Player 90 Movement, Minifantasy Dungeon Audio, Forgotten Plains Audio.
+- All of it is recorded in `_catalog\licences\Leohpaz.txt`.
+
+**A correction.** While four packs were briefly loose and mixed at the top of the folder, I reported Forgotten Plains' "campfire loop" as missing. It never existed in that pack: its 37 sounds are rustling, fruit drops, footsteps, landings, water, waterfall, ambience loops and hits on wood and brick. The campfire loops on its store page are Patreon exclusives. The claim came from a premise in the brief, which I reported as a fact about the files without checking the pack's contents; it's removed everywhere. I also guessed which loose files belonged to which pack from their numbering. The folders show that guess was wrong (ATB is in RPG Battle; Attack, Hit and Dash evade are in Player Movement), but nothing had been imported from those files, so nothing in the game changed.
+
+**What round 2 changed** (75 Leohpaz files, plus three edits by `Tools/audio/derive.py`):
 
 | # | Family | Now | Was | Pack |
 |---|---|---|---|---|
 | 1 | Footsteps, Kariaston | `Step_dirt_1–3` | Kenney `footstep00–09` | Minifantasy Farm |
+| 2 | Footsteps, Tally Ho! | `10–12_Step_wood_01–03` | Kenney `footstep_wood_*` | Retro Player 90 Movement |
 | 3 | Footsteps, the Hollows | `Step_stone_1–3` | Kenney `footstep_concrete_*` | Minifantasy Farm |
+| 4 | Dodge | `65–67_Dash_evade_01–03` | Kenney `cloth1–4` | Retro Player 90 Movement |
+| 5 | Swing | `27_sword_miss_1–3` | Kenney `drawKnife1–3` | Minifantasy Dungeon Audio |
+| 6 | Hit | `14–18_Impact_flesh_01–05` | Kenney `impactPunch_medium_*` | Retro RPG 90 Battle |
+| 7 | Heavy hit, finisher | `09–13_Impact_01–05` | Kenney `impactPunch_heavy_*` | Retro RPG 90 Battle |
+| 8 | Hurt | `11_human_damage_1–3` | Kenney `impactSoft_heavy_*` | Minifantasy Dungeon Audio |
+| 10 | Enemy death | `69_Enemy_death_01`, `70_…_02`, `72_…_04` | OwlishMedia fruit (normalised) | Retro RPG 90 Battle |
 | 11 | Pickups | `Item_Pick` | Kenney `handleSmallLeather*` | Inventory |
 | 12 | Satchel full | `Bag_Full` | Kenney `error_*` | Inventory |
 | 13 | Coins | `Coins`, with Kenney's `handleCoins`, `…2` | Kenney only | Inventory |
-| 17 | Grill flip | `EggFlip` (the first flip of `Flipping_Eggs_single`, trimmed to 0.6 s) | OwlishMedia `flip` | Crafting and Professions II (an edit) |
+| 15 | The rope (climbing out) | `40–42_Cling_climb_01–03` | Kenney planks (the stairs keep them) | Retro Player 90 Movement |
+| 16 | Gates: slam / rise | `16_Hit_on_brick_1–2` / `19_Slide_01` | Kenney mining / OwlishMedia scrapes | Forgotten Plains Audio / Retro Player 90 Movement |
+| 17 | Grill flip | `EggFlip` (the first flip of `Flipping_Eggs_single`, 0.6 s) | OwlishMedia `flip` | Crafting and Professions II (an edit) |
 | — | Grill sizzle (was `PH_SizzleLoop`) | `Loop_with_eggs` (loop) | placeholder | Crafting and Professions II |
-| 19 | Chopping | `Food_Preparation_Cut_1–2` | Kenney `impactWood_light_*` | Crafting and Professions II |
-| 19 | Butchery done | `Carving_Butcher` | Kenney `impactWood_medium_*` | Crafting and Professions II |
+| 19 | Chopping / butchery done | `Food_Preparation_Cut_1–2` / `Carving_Butcher` | Kenney wood impacts | Crafting and Professions II |
 | 26 | Garden: plant, tend, harvest | `Seeds_1–4`, `Watering_1–2`, `Harvest_1–2` | Kenney soil / water edit / fruit | Minifantasy Farm |
 | 27 | Dialogue blips | `Triangular_High`, `Triangular_Low` | Kenney `pluck_*` | Retro Dialogue (only the allowed synth blips; tested) |
-| 28 | The troll's voice | `Troll_Attack_1–5` on his slam, `Troll_Damage_1–5` on his stun, `Troll_Death_1–2` on his fall, each a second sound over the existing impact | — | Humanoids Grunts |
+| 28 | The troll's voice | `Troll_Attack_1–5` on his slam, `Troll_Damage_1–5` on his stun, `Troll_Death_1–2` on his fall, each a second sound over his impact | — | Humanoids Grunts |
 | — | The troll's roar (was `PH_TrollRoar`) | `Troll_Wind_up_1–3` | placeholder | Humanoids Grunts |
-| — | Decorate's area change (was `PH_Whoosh` there) | `Drop_Whoosh` | placeholder | Inventory |
+| — | The fall into a hole (was `PH_Whoosh`) | `Fall1`, `Fall2` (the first half second of `43/44_Falling_Loop`) | placeholder | Retro Player 90 Movement (an edit) |
+| — | Decorate's area change (was `PH_Whoosh`) | `Drop_Whoosh` | placeholder | Inventory |
+| — | The charge ticks (was `PH_ChargeTick`) | `65_ATB_1` (level 2), `66_ATB_2` (level 3) | placeholder | Retro RPG 90 Battle |
+| — | The tap's overflow (was `PH_Splash`) | `13–15_Step_water_01–03` | placeholder | Retro Player 90 Movement |
 
-The telegraph, doors, stairs, the tap, plates, the crash, the stew and every interface sound stay as they were. Both that and the rope keeping its plank sound follow the picks.
+The telegraph, doors, the stairs, the tap's pour and clink, plates, the crash, the stew, the knife, Decorate's other sounds and every interface sound stay Kenney and OwlishMedia, as the picks said.
 
-**Waiting for the four loose packs' licences** (picked, not imported):
-- dodge (`Dash_evade`), swing (`sword_miss`), enemy death (`Enemy_death`);
-- Tally Ho!'s wooden steps (`Step_wood`);
-- hit (`Impact_flesh`), heavy hit (`Impact`), hurt (`human_damage`);
-- the rope (`Cling_climb`), gates (`Hit_on_brick`, `Slide`);
-- the fall into a hole (`Falling`, trimmed), the charge tick (`ATB_1`, `ATB_2`), the tap's splash (`Step_water`).
+**Ambience for later** (not 4i-C): Forgotten Plains' crickets, cicada, birds, wind and water loops are noted in the catalog as candidates for village and night ambience.
 
-The campfire also waits for its missing file.
-
-**The two fixes** (approved with the picks):
+**The two fixes** (approved with the picks, confirmed 2026-10-09):
 - **Blips:**
-  - moved to the quiet tier (−28 dBFS);
+  - in the quiet tier (−28 dBFS);
   - no random pitch per blip (round 1's ±5% was close to a semitone, the likely "out of tune");
-  - one blip every 0.079 s at most, Leohpaz's advice for these synths;
+  - one blip every 0.079 s at most, Leohpaz's advice;
   - one shared waveform (Triangular), its Low file for the deep voices (`CharacterDefinition.lowVoice`: Orik, Grim, Kaloren);
-  - every voice a whole number of semitones (`SoundSwap.Voices`): Orik −3, Grim −5 (a step under Orik to keep them apart), Boog +3, Ogrin +4, Maximo −1, Kaloren −4, Bart −2, Gimp +1.
-- **Footsteps:** their own tier at −34 dBFS, 6 dB under the quiet tier. It's one number (`SoundBank.TargetDb`) to tune by ear.
+  - every voice a whole number of semitones (`SoundSwap.Voices`): Orik −3, Grim −5, Boog +3, Ogrin +4, Maximo −1, Kaloren −4, Bart −2, Gimp +1.
+- **Footsteps:** their own tier at −34 dBFS, 6 dB under the blips (`SoundBank.TargetDb`).
 
-**Placeholders still left (10):**
-- waiting for the loose packs: the fall's swoosh, the charge tick, the splash;
-- the campfire and its low state (missing file);
-- no source found: the heartbeat, Decorate's brush, plate bumps, the grill's burn (Crafting II's "Fail" is a musical cue), and the spill warning.
+**Waiting for the owner** (`_catalog\LISTENING_4iC3.md`): the campfire (no fire sound in any library; two stand-ins offered) and grass footsteps beside dirt for Kariaston's paths. Forgotten Plains' walking sounds turned out to be byte-identical to the Farm pack's.
+
+**Placeholders still left (7):**
+- the campfire and its low state, waiting for the owner's choice;
+- no source found: low Essence's heartbeat, Decorate's finish and restyle brush, plate bumps, the grill's burn (Crafting II's "Fail" is a musical cue), and the tap's spill warning.
 
 ### Listening and look checklist (4i-C)
 
