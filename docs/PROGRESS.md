@@ -1322,7 +1322,7 @@ The owner's nine Leohpaz packs (each in its own folder beside its zip, checked i
 - **Fixes (confirmed):** blips in the quiet tier, no random pitch, a 0.079 s gap, voices on whole semitones; footsteps 6 dB under the blips.
 - **Waiting for the owner:** the campfire (no fire sound in any library) and grass footsteps beside dirt (`_catalog\LISTENING_4iC3.md`).
 
-TESTS_LINE
+Tests at the close of 4i-C (2026-10-09, full suites on the final code): EditMode 819 passed, 0 failed, 1 skipped (an explicit report); PlayMode 289 passed, 0 failed, 31 skipped (explicit captures and reports). The slowest PlayMode test is now 51 s (it was 176–184 s, see `TimeBaseline` in PLAN_4I). The web build (0.4i-c, 155 MB) was smoke-tested with sound; the owner's save was backed up and restored and checked identical afterwards.
 
 ### 4i-B: settings and accessibility (2026-10-08; signed off 2026-10-08)
 
