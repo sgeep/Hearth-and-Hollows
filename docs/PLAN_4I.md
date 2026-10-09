@@ -584,6 +584,20 @@ The telegraph, doors, the stairs, the tap's pour and clink, plates, the crash, t
 - the campfire and its low state, waiting for the owner's choice;
 - no source found: low Essence's heartbeat, Decorate's finish and restyle brush, plate bumps, the grill's burn (Crafting II's "Fail" is a musical cue), and the tap's spill warning.
 
+### Closing 4i-C (2026-10-09)
+
+- **Menus on a controller** (the owner's note: at night, with only "sleep" and "decorate", the stick and d-pad did nothing). uGUI moves the selection only from something already selected, and about 16 screens set a selection when they open but never restore it, so a mouse click on empty space or a screen opening with the focus elsewhere left nothing to move from. `MenuFocus` (UI; made at start-up, in no scene) fixes all of them at once. When only the menus' controls are live and the stick, the d-pad, the arrows or Submit are used with nothing usable selected, it selects the topmost menu's first usable control. It never acts on the mouse or during play. A PlayMode test reproduces the night and checks it never acts on foot.
+- **The slow village tests weren't slow.** The lit-window and Glimmer tests walked up to four in-game days until a seeded day came round, and a new game's world seed is random, so they took 45 s or 180 s by luck (the "late in the run" pattern was coincidence: they run last). Raising the limit hid that. Tests can now pin a new game's seed (`GameFlow.NewGameSeedOverride`, unset in play), chosen through the same pure day rules: the window test 180 s → 51 s, the Glimmer test 52–180 s → 19 s, Gimp's visit 77–86 s → 23 s. The 10-minute limits stay only as a guard.
+- **Credits clipping** (found in the web smoke test): Super Text Mesh draws its own meshes, which the credits' `RectMask2D` doesn't clip, so entries scrolled out over the title and the footer. Each entry now shows only while it's wholly inside the window; the credits test checks that no shown entry is outside it.
+- **Mixer balance:** groups stay at 0 dB under the player's sliders. Every family is levelled to its kind (`Hearthdelve → Report → Sound Levels`), and the music keeps its per-track levels and dialogue duck.
+- **Web smoke test** (development build 0.4i-c, the owner's browser storage backed up first and restored exactly):
+  - the menu, with Options, Controls and Credits, and the version shown;
+  - Credits scroll by keys, and Enter on HeatleyBros' link opened youtube.com/c/heatleybros in a new tab;
+  - Continue loaded the save; the pause menu has Credits;
+  - sound reaches the speakers: the page's audio context is running, and a tap on its output caught the interface confirm (peak 0.0055 over about 60 ms, silence either side);
+  - memory: the game's Chrome renderer held about 640 MB, with a peak working set of about 1.1 GB across three reloads in the same process;
+  - not driven: walking, fights and service (the browser driver's key presses are taps, not held keys).
+
 ### Listening and look checklist (4i-C)
 
 1. **Headphones, then speakers:** a full day. Wake in your room (does it feel lived in?), walk the boards, go downstairs (stairs), out the front door (the door), along Kariaston's paths (footsteps change with the ground), plant, tend (water) and harvest, buy at the market.

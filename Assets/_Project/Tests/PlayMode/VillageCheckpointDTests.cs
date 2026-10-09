@@ -93,6 +93,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
             yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
             yield return Revealed();
+            yield return Diagnose("before the new game");
             if (seed != null)
             {
                 VillageLifeSettings settings = VillageLife.Settings;
@@ -109,6 +110,21 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Sleep(hold);
         }
 
+        /// <summary>
+        /// 4i-C: evidence for the late-run slowdown (these tests ran about 3.5 times slower at the end of a full run than alone):
+        /// the frame time over 30 frames and the global state that could slow a test, logged with a [Diagnose] tag.
+        /// </summary>
+        static IEnumerator Diagnose(string when)
+        {
+            float start = Time.realtimeSinceStartup;
+            for (int i = 0; i < 30; i++) yield return null;
+            float frame = (Time.realtimeSinceStartup - start) / 30f;
+            Debug.Log($"[Diagnose] {TestContext.CurrentContext.Test.Name} {when}: frame {frame * 1000f:0.0} ms, timeScale {Time.timeScale}, " +
+                      $"targetFrameRate {Application.targetFrameRate}, vSync {QualitySettings.vSyncCount}, maxDelta {Time.maximumDeltaTime}, fixedDelta {Time.fixedDeltaTime}, baseline restored {Hearthdelve.Shared.Engine.TimeBaseline.Restored}, " +
+                      $"captureDelta {Time.captureDeltaTime}, managed {System.GC.GetTotalMemory(false) / 1048576} MB, villagers {Villager.All.Count}, " +
+                      $"objects {Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length}");
+        }
+
         IEnumerator Sleep(bool hold)
         {
             Flow.Sleep();
@@ -116,6 +132,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Revealed();
             if (hold) SurfacePause.Hold(m_Hold);
             yield return Frames(2);
+            yield return Diagnose($"day {Flow.State.Day}");
         }
 
         /// <summary>The evening kept shut, the delve, the night, sleep: the next morning (Gimp's scene, if due, plays to its end).</summary>

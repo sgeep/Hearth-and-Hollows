@@ -108,6 +108,40 @@ namespace Hearthdelve.UI.Screens
             if (m_Content == null) return;
             // Whole pixels, so Silver stays crisp while it moves.
             m_Content.anchoredPosition = new Vector2(m_Content.anchoredPosition.x, Mathf.Round(Mathf.Clamp(y, 0f, MaxScroll)));
+            ShowOnlyInside();
+        }
+
+        static readonly Vector3[] s_Corners = new Vector3[4];
+
+        /// <summary>
+        /// Super Text Mesh draws its own meshes, which the viewport's RectMask2D doesn't clip (the web smoke test, 2026-10-09: lines
+        /// ran over the title and the footer). So each entry shows only while it's wholly inside the viewport.
+        /// </summary>
+        void ShowOnlyInside()
+        {
+            if (m_Viewport == null) return;
+            m_Viewport.GetWorldCorners(s_Corners);
+            float bottom = s_Corners[0].y, top = s_Corners[1].y;
+            float slack = (top - bottom) * 0.01f;
+            for (int i = 0; i < m_Content.childCount; i++)
+            {
+                var line = (RectTransform)m_Content.GetChild(i);
+                line.GetWorldCorners(s_Corners);
+                bool inside = s_Corners[0].y >= bottom - slack && s_Corners[1].y <= top + slack;
+                if (line.gameObject.activeSelf != inside) line.gameObject.SetActive(inside);
+            }
+        }
+
+        /// <summary>Tests: how many entries show now, and whether every one shown is inside the viewport.</summary>
+        public int ShownLines
+        {
+            get
+            {
+                int n = 0;
+                for (int i = 0; i < m_Content.childCount; i++)
+                    if (m_Content.GetChild(i).gameObject.activeSelf) n++;
+                return n;
+            }
         }
 
         float m_Exact;

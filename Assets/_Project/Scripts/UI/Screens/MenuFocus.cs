@@ -11,10 +11,11 @@ namespace Hearthdelve.UI.Screens
     /// Keeps a menu usable on a controller and the keys (the owner's 4i-C note: at night, with only "sleep" and "decorate" left,
     /// the stick and d-pad did nothing). uGUI moves the selection only from something already selected; a mouse click on empty
     /// space, a screen opening while something else held the focus, or a selected button hidden or greyed out leaves nothing
-    /// to move from. So when the menus' controls are the only ones live, and the stick, the d-pad or the arrows (or Submit) are
-    /// used with nothing usable selected, the topmost menu's first usable control is selected; that first push only lands the
-    /// focus, the next moves it. It never acts on the mouse, and never during play (any gameplay controls live). Made at start-up;
-    /// no scene holds it.
+    /// to move from. So when the menus' controls are the only ones live, and the stick, the d-pad or the arrows are used with
+    /// nothing usable selected, the topmost menu's first usable control is selected; that first push only lands the focus, the
+    /// next moves it. It never acts on the mouse, never on Submit (a conversation advances on Submit with nothing selected on
+    /// purpose: the first version reacted to it and its choice landed on the screen behind the dialogue), never while someone's
+    /// talking, and never during play (any gameplay controls live). Made at start-up; no scene holds it.
     /// </summary>
     public sealed class MenuFocus : MonoBehaviour
     {
@@ -46,18 +47,20 @@ namespace Hearthdelve.UI.Screens
         /// <summary>Only the menus' controls are live (a phase screen, a panel, a pause), never on foot or at a station.</summary>
         static bool InMenus => MapOn(InputMaps.UI) && !k_Gameplay.Any(MapOn);
 
-        /// <summary>The stick, the d-pad, the arrows or Submit, this frame (the mouse never counts).</summary>
+        /// <summary>The stick, the d-pad or the arrows, this frame (never the mouse, never Submit).</summary>
         static bool Asked()
         {
             InputAction navigate = InputMaps.Find(InputMaps.UI, UIActions.Navigate);
-            InputAction submit = InputMaps.Find(InputMaps.UI, UIActions.Submit);
-            return (navigate != null && navigate.WasPerformedThisFrame()) || (submit != null && submit.WasPressedThisFrame());
+            return navigate != null && navigate.WasPerformedThisFrame();
         }
 
-        void Update()
+        /// <summary>A conversation is open: the dialogue box keeps its own focus (none while a line is spoken).</summary>
+        static bool Talking => Hearthdelve.Shared.Story.StoryServices.Conversations != null && Hearthdelve.Shared.Story.StoryServices.Conversations.IsTalking;
+
+        void LateUpdate()
         {
             EventSystem events = EventSystem.current;
-            if (events == null || !InMenus || !Asked()) return;
+            if (events == null || !InMenus || Talking || !Asked()) return;
             if (Usable(events.currentSelectedGameObject)) return;
             Selectable first = TopmostFirst();
             if (first == null) return;

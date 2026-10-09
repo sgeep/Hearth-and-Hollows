@@ -123,8 +123,14 @@ namespace Hearthdelve.Tests.PlayMode
             }
             Assert.That(credits.GetComponentsInChildren<SuperTextMesh>(true).Any(t => t.text.Contains("HeatleyBros")), Is.True);
 
+            // Nothing spills past the window (STM isn't clipped by the mask): every shown entry is wholly inside it.
+            var viewport = (RectTransform)credits.LinkButton.transform.parent.parent;
+            AssertInside(viewport);
+            Assert.That(credits.ShownLines, Is.GreaterThan(0));
             yield return new WaitForSecondsRealtime(2.5f);
             Assert.That(credits.Scroll, Is.GreaterThan(0f), "they drift up on their own");
+            credits.ScrollBy(37f);
+            AssertInside(viewport);
             credits.ScrollBy(10000f);
             Assert.That(credits.Scroll, Is.EqualTo(credits.MaxScroll), "and stop at the end");
 
@@ -134,6 +140,21 @@ namespace Hearthdelve.Tests.PlayMode
 
             credits.Close();
             Assert.That(credits.IsOpen, Is.False);
+        }
+
+        static void AssertInside(RectTransform viewport)
+        {
+            var corners = new Vector3[4];
+            viewport.GetWorldCorners(corners);
+            float bottom = corners[0].y, top = corners[1].y, slack = (top - bottom) * 0.011f;
+            RectTransform content = (RectTransform)viewport.GetChild(0);
+            for (int i = 0; i < content.childCount; i++)
+            {
+                var line = (RectTransform)content.GetChild(i);
+                if (!line.gameObject.activeSelf) continue;
+                line.GetWorldCorners(corners);
+                Assert.That(corners[0].y >= bottom - slack && corners[1].y <= top + slack, Is.True, $"{line.name} shows outside the window");
+            }
         }
 
         [UnityTest]
