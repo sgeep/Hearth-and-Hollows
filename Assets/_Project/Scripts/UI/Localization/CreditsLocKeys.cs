@@ -42,7 +42,7 @@ namespace Hearthdelve.UI.Localization
             (Kind.Link, Link, "youtube.com/c/heatleybros", 1),
             (Kind.Gap, null, null, 1),
             (Kind.Heading, "credits.sound.heading", "sound", 1),
-            (Kind.Line, "credits.sound.effects", "sound effects by Kenney (kenney.nl) and OwlishMedia", 1),
+            (Kind.Line, "credits.sound.effects", "sound effects by Kenney (kenney.nl), OwlishMedia and Leohpaz", 2),
             (Kind.Gap, null, null, 1),
             (Kind.Heading, "credits.font.heading", "font", 1),
             (Kind.Line, "credits.font.silver", "Silver by Poppy Works (poppyworks.itch.io/silver), CC BY 4.0, with Itou Hiro (PixelMplus), leedheo (DOSGothic) and ぶち; punctuation adapted for Hearth & Hollows", 3),

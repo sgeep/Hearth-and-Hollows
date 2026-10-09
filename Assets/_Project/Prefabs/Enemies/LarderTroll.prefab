@@ -139,6 +139,7 @@ MonoBehaviour:
   - rid: 2696332492429852734
   - rid: 2696332492429852735
   - rid: 2696332492429852736
+  - rid: 2696332579954229248
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -439,6 +440,137 @@ MonoBehaviour:
         Pattern: {fileID: 11400000, guid: 32b5d33062b4bf740a64b5e40dcbc224, type: 2}
         Scale: 1
         UseFeedbackIntensity: 0
+    - rid: 2696332579954229248
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: 256868438
+        Label: Sound (TrollAttackVoice)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 3033620571481887467}
+        DebugActive: 0
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: f4a1b0c95c8f7cb4aadffe9fafc38081, type: 3}
+        - {fileID: 8300000, guid: 0f32145e01697ff42be39a22c620fbbc, type: 3}
+        - {fileID: 8300000, guid: 04462ab088a035244a0ae36eaba95913, type: 3}
+        - {fileID: 8300000, guid: 4e55d53dca4af23428bef3e5cafbbdb0, type: 3}
+        - {fileID: 8300000, guid: 3702d5294ff86b84e8625808f7366a2c, type: 3}
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 0.40150148
+        MaxVolume: 0.40150148
+        MinPitch: 0.97
+        MaxPitch: 1.03
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
 --- !u!1 &771293337505679357
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,7 +898,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1597435112
-        Label: Sound (placeholder)
+        Label: Sound (TrollRoar)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -836,8 +968,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 5713483269606311646}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 57d672b6ab5893347bda0e9265ebd33c, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 1ab12e07158123b4282a01a643d02548, type: 3}
+        - {fileID: 8300000, guid: 6c5097752cd30374b8b6981b3b2b2506, type: 3}
+        - {fileID: 8300000, guid: efa97e47323962341be5a73f75efd632, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -846,8 +981,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
+        MinVolume: 0.42302403
+        MaxVolume: 0.42302403
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -1105,6 +1240,7 @@ MonoBehaviour:
   - rid: 2696332492429852741
   - rid: 2696332492429852742
   - rid: 2696332492429852743
+  - rid: 2696332579954229250
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -1553,6 +1689,134 @@ MonoBehaviour:
           EnumConditionPropertyName: TimescaleLerpMode
           EnumConditions: 0001000000000000000000000000000000000000000000000000000000000000y
         TimescaleLerpDurationOnUnfreeze: 1
+    - rid: 2696332579954229250
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: 679628984
+        Label: Sound (TrollDeathVoice)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 4742222040025487575}
+        DebugActive: 0
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: ce84a7fa10e209e4d9abced82446ee6a, type: 3}
+        - {fileID: 8300000, guid: f1eb918b91b026443b014500ae22079c, type: 3}
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 0.46629572
+        MaxVolume: 0.46629572
+        MinPitch: 1
+        MaxPitch: 1
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
 --- !u!1 &1924972003232290853
 GameObject:
   m_ObjectHideFlags: 0
@@ -3373,6 +3637,7 @@ MonoBehaviour:
   - rid: 2696332492429852737
   - rid: 2696332492429852738
   - rid: 2696332492429852739
+  - rid: 2696332579954229249
   PlayMode: 0
   SequentialDelay: 0
   KeepPlayModeChanges: 0
@@ -3673,6 +3938,137 @@ MonoBehaviour:
         Pattern: {fileID: 11400000, guid: 36ce69acae3398942ad39dc305f7ad21, type: 2}
         Scale: 1
         UseFeedbackIntensity: 0
+    - rid: 2696332579954229249
+      type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Tools}
+      data:
+        Active: 1
+        UniqueID: -26142028
+        Label: Sound (TrollDamageVoice)
+        OriginalLabel: 
+        ChannelMode: 0
+        Channel: 0
+        MMChannelDefinition: {fileID: 0}
+        Chance: 100
+        Timing:
+          TimescaleMode: 0
+          ExcludeFromHoldingPauses: 0
+          ContributeToTotalDuration: 1
+          InitialDelay: 0
+          CooldownDuration: 0
+          InterruptsOnStop: 1
+          NumberOfRepeats: 0
+          RepeatForever: 0
+          DelayBetweenRepeats: 1
+          IgnoreFeedbackDurationForRepeats: 0
+          PlayCount: 0
+          LimitPlayCount: 0
+          MaxPlayCount: 3
+          SetPlayCountToZeroOnReset: 0
+          MMFeedbacksDirectionCondition: 0
+          PlayDirection: 0
+          ConstantIntensity: 0
+          UseIntensityInterval: 0
+          IntensityIntervalMin: 0
+          IntensityIntervalMax: 0
+          Sequence: {fileID: 0}
+          TrackID: 0
+          Quantized: 0
+          TargetBPM: 120
+        AutomatedTargetAcquisition:
+          Mode: 0
+          ChildIndex: 0
+        RandomizeOutput: 0
+        RandomMultiplier: {x: 0.8, y: 1}
+        RandomizeDuration: 0
+        RandomDurationMultiplier: {x: 0.5, y: 2}
+        UseRange: 0
+        RangeDistance: 5
+        UseRangeFalloff: 0
+        RangeFalloff:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        RemapRangeFalloff: {x: 0, y: 1}
+        AutomaticShakerSetupButton:
+          ButtonText: Automatic Shaker Setup
+        Owner: {fileID: 34840506380351519}
+        DebugActive: 0
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 3533c62a5165c684a8d89fd967132f08, type: 3}
+        - {fileID: 8300000, guid: f8299d2b6e5df0647875e292bf688b9c, type: 3}
+        - {fileID: 8300000, guid: b21aa9bfe33ed74438a39ca55942ae13, type: 3}
+        - {fileID: 8300000, guid: aecefebf04fada44da3996e8bcc1323a, type: 3}
+        - {fileID: 8300000, guid: 59f36b17a3833f34dad1ea36e425b273, type: 3}
+        TestPlayButton:
+          ButtonText: Debug Play Sound
+        TestStopButton:
+          ButtonText: Debug Stop Sound
+        PlayMethod: 1
+        PoolSize: 10
+        UseLegacyEventsMode: 0
+        StopSoundOnFeedbackStop: 1
+        MinVolume: 0.39119172
+        MaxVolume: 0.39119172
+        MinPitch: 0.97
+        MaxPitch: 1.03
+        SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
+        Priority: 128
+        PanStereo: 0
+        SpatialBlend: 0
+        DopplerLevel: 1
+        Spread: 0
+        RolloffMode: 0
+        MinDistance: 1
+        MaxDistance: 500
+        UseCustomRolloffCurve: 0
+        CustomRolloffCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpatialBlendCurve: 0
+        SpatialBlendCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseReverbZoneMixCurve: 0
+        ReverbZoneMixCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        UseSpreadCurve: 0
+        SpreadCurve:
+          serializedVersion: 2
+          m_Curve: []
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
 --- !u!1 &7107685420085808898
 GameObject:
   m_ObjectHideFlags: 0
@@ -5405,7 +5801,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1500981476
-        Label: Sound (placeholder)
+        Label: Sound (TrollRoar)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -5475,8 +5871,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 2598801624067774575}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 57d672b6ab5893347bda0e9265ebd33c, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 1ab12e07158123b4282a01a643d02548, type: 3}
+        - {fileID: 8300000, guid: 6c5097752cd30374b8b6981b3b2b2506, type: 3}
+        - {fileID: 8300000, guid: efa97e47323962341be5a73f75efd632, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -5485,8 +5884,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
+        MinVolume: 0.42302403
+        MaxVolume: 0.42302403
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

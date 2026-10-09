@@ -30,12 +30,25 @@ namespace Hearthdelve.Editor
             BootBuilder.BootScene, BootBuilder.MainMenuScene, EditorPaths.TavernScene, KariastonBuilder.ScenePath, EditorPaths.DungeonScene, EditorPaths.TestFloorScene,
         };
 
-        /// <summary>Dialogue voices (CharacterDefinition.voicePitch), set once where still the default.</summary>
-        public static readonly (string id, float pitch)[] Voices =
+        /// <summary>
+        /// Dialogue voices (round 2, 2026-10-09): each a whole number of semitones from the blip's own note, so the pitched synth
+        /// blips stay in tune (snapped from round 1's 0.78–1.25; Grim a step under Orik to keep them apart), and the deep voices in
+        /// the low register. Set where the value is still the default or round 1's (an author's edit, once).
+        /// </summary>
+        public static readonly (string id, int semitones, bool low)[] Voices =
         {
-            (CharacterIds.Orik, 0.85f), (CharacterIds.Grim, 0.82f), (CharacterIds.Boog, 1.18f), (CharacterIds.Ogrin, 1.25f),
-            (CharacterIds.Maximo, 0.95f), (CharacterIds.Kaloren, 0.78f), (CharacterIds.Bart, 0.9f), (CharacterIds.Gimp, 1.05f),
+            (CharacterIds.Orik, -3, true), (CharacterIds.Grim, -5, true), (CharacterIds.Boog, 3, false), (CharacterIds.Ogrin, 4, false),
+            (CharacterIds.Maximo, -1, false), (CharacterIds.Kaloren, -4, true), (CharacterIds.Bart, -2, false), (CharacterIds.Gimp, 1, false),
         };
+
+        /// <summary>Round 1's pitches, replaced once by <see cref="Voices"/>.</summary>
+        static readonly Dictionary<string, float> k_RoundOne = new()
+        {
+            [CharacterIds.Orik] = 0.85f, [CharacterIds.Grim] = 0.82f, [CharacterIds.Boog] = 1.18f, [CharacterIds.Ogrin] = 1.25f,
+            [CharacterIds.Maximo] = 0.95f, [CharacterIds.Kaloren] = 0.78f, [CharacterIds.Bart] = 0.9f, [CharacterIds.Gimp] = 1.05f,
+        };
+
+        public static float Pitch(int semitones) => Mathf.Pow(2f, semitones / 12f);
 
         [MenuItem("Hearthdelve/Generate/Swap In the Approved Sounds", priority = 35)]
         public static void ApplyMenu() => Debug.Log($"[Hearthdelve] Sound swap: {Apply()}");
@@ -105,7 +118,7 @@ namespace Hearthdelve.Editor
         /// <summary>Every feedback under <paramref name="root"/> still on a placeholder the bank replaces, and the pour loop.</summary>
         public static int Swap(GameObject root)
         {
-            int n = 0;
+            int n = EquipLayers(root);
             foreach (MMF_Player player in root.GetComponentsInChildren<MMF_Player>(true))
             {
                 if (player.FeedbacksList == null) continue;
@@ -126,6 +139,23 @@ namespace Hearthdelve.Editor
                 if (clips.Length == 0) continue;
                 source.clip = clips[0];
                 EditorUtility.SetDirty(source);
+                n++;
+            }
+            return n;
+        }
+
+        /// <summary>Round 2: a second sound on the feedbacks <see cref="SoundBank.Layers"/> names (the troll's voice over his impacts).</summary>
+        public static int EquipLayers(GameObject root)
+        {
+            int n = 0;
+            foreach (MMF_Player player in root.GetComponentsInChildren<MMF_Player>(true))
+            {
+                if (player.FeedbacksList == null || !SoundBank.Layers.TryGetValue(player.name, out string key)) continue;
+                if (player.FeedbacksList.OfType<MMF_Sound>().Any(s => s.Label == $"Sound ({key})")) continue;
+                var layer = new MMF_Sound { PlayMethod = MMF_Sound.PlayMethods.Cached, SfxAudioMixerGroup = AudioMixerBuilder.Effects };
+                if (!SoundBank.Apply(layer, SoundBank.Get(key))) continue;
+                player.AddFeedback(layer);
+                EditorUtility.SetDirty(player);
                 n++;
             }
             return n;
@@ -273,14 +303,18 @@ namespace Hearthdelve.Editor
             foreach (string guid in AssetDatabase.FindAssets("t:CharacterDefinition"))
             {
                 var c = AssetDatabase.LoadAssetAtPath<CharacterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-                if (c == null || !Mathf.Approximately(c.voicePitch, 1f)) continue;
-                foreach (var (id, pitch) in Voices)
-                    if (c.id == id)
-                    {
-                        c.voicePitch = pitch;
-                        EditorUtility.SetDirty(c);
-                        n++;
-                    }
+                if (c == null) continue;
+                foreach (var (id, semitones, low) in Voices)
+                {
+                    if (c.id != id) continue;
+                    float pitch = Pitch(semitones);
+                    bool unchanged = Mathf.Approximately(c.voicePitch, 1f) || (k_RoundOne.TryGetValue(id, out float old) && Mathf.Approximately(c.voicePitch, old));
+                    if (!unchanged || (Mathf.Approximately(c.voicePitch, pitch) && c.lowVoice == low)) continue;
+                    c.voicePitch = pitch;
+                    c.lowVoice = low;
+                    EditorUtility.SetDirty(c);
+                    n++;
+                }
             }
             return n;
         }

@@ -259,9 +259,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 71ed2c09ae3e6da4a93884d181d8a6a1, type: 3}
   - {fileID: 8300000, guid: f391063aa04be3a4bbd122e633a0f0a5, type: 3}
   - {fileID: 8300000, guid: edf09edb1fd87a4468e2d727a7fd1e15, type: 3}
-  m_Volume: 0.16258222
-  m_TavernVolume: 0.104779065
-  m_StoneVolume: 0.12436254
+  m_Volume: 0.09013725
+  m_TavernVolume: 0.05251392
+  m_StoneVolume: 0.10424162
   m_Pitch: {x: 0.94, y: 1.06}
 --- !u!1 &2712031184785320244
 GameObject:
@@ -1836,11 +1836,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 4363897262104370144}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: 791a42a721c6c23438e4e83bce90d9bd, type: 3}
-        - {fileID: 8300000, guid: 2a464de7c954e1345b34a05207e81cd1, type: 3}
-        - {fileID: 8300000, guid: 0c6187e40dbcfdc44a801a5ea729abf4, type: 3}
+        Sfx: {fileID: 8300000, guid: 3e83de11658f64648a811eda29754c6e, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -1849,8 +1846,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.30175737
-        MaxVolume: 0.30175737
+        MinVolume: 0.3659465
+        MaxVolume: 0.3659465
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

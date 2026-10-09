@@ -409,6 +409,7 @@ MonoBehaviour:
         DebugActive: 0
         Sfx: {fileID: 0}
         RandomSfx:
+        - {fileID: 8300000, guid: 07b1081a61b7eb243bbd5efc9a210933, type: 3}
         - {fileID: 8300000, guid: fadd55ba8493ae4479080c1737c3da6b, type: 3}
         - {fileID: 8300000, guid: a6e3c6d484b63d6429112d69b3c46464, type: 3}
         TestPlayButton:
@@ -419,8 +420,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.6137987
-        MaxVolume: 0.6137987
+        MinVolume: 0.5419252
+        MaxVolume: 0.5419252
         MinPitch: 0.96
         MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

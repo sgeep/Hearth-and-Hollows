@@ -21,10 +21,12 @@ namespace Hearthdelve.Tests.EditMode
     public class SoundTests
     {
         /// <summary>The placeholders the approved sounds don't replace (the listening list's gaps and what it didn't cover).</summary>
+        /// Round 2 (2026-10-09) filled the troll's roar and the grill's sizzle; the fall's whoosh, the charge tick and the splash wait
+        /// for their Leohpaz packs' licences, the campfire for its file.
         static readonly string[] k_Left =
         {
-            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Campfire", "PH_CampfireLow", "PH_ChargeTick", "PH_Heartbeat", "PH_SizzleLoop",
-            "PH_SpillWarn", "PH_Splash", "PH_TrollRoar", "PH_Whoosh",
+            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Campfire", "PH_CampfireLow", "PH_ChargeTick", "PH_Heartbeat",
+            "PH_SpillWarn", "PH_Splash", "PH_Whoosh",
         };
 
         [Test]
@@ -42,13 +44,15 @@ namespace Hearthdelve.Tests.EditMode
         public void TheSounds_AreRecordedInTheCreditsAndThirdPartyDocs()
         {
             string credits = File.ReadAllText("docs/CREDITS.md"), third = File.ReadAllText("docs/THIRD_PARTY.md");
-            foreach (string name in new[] { "Kenney", "OwlishMedia" })
+            foreach (string name in new[] { "Kenney", "OwlishMedia", "Leohpaz" })
             {
                 Assert.That(credits, Does.Contain(name));
                 Assert.That(third, Does.Contain(name));
             }
             Assert.That(third, Does.Contain("CC0"));
-            Assert.That(third, Does.Contain($"{SoundBank.Sources.Count()} files"), "the count recorded is the count imported");
+            int leohpaz = SoundBank.Sources.Count(SoundBank.IsLeohpaz);
+            Assert.That(third, Does.Contain($"{SoundBank.Sources.Count() - leohpaz} files"), "the CC0 row's count is the count imported");
+            Assert.That(third, Does.Contain($"{leohpaz} files"), "the Leohpaz row's count is the count imported");
         }
 
         [Test]
@@ -127,8 +131,39 @@ namespace Hearthdelve.Tests.EditMode
                 EditorSceneManager.CloseScene(boot, true);
             }
             var characters = AssetDatabase.FindAssets("t:CharacterDefinition").Select(g => AssetDatabase.LoadAssetAtPath<CharacterDefinition>(AssetDatabase.GUIDToAssetPath(g))).ToList();
-            foreach (var (id, pitch) in SoundSwap.Voices)
-                Assert.That(characters.Single(c => c.id == id).voicePitch, Is.EqualTo(pitch).Within(1e-4f), id);
+            foreach (var (id, semitones, low) in SoundSwap.Voices)
+            {
+                CharacterDefinition c = characters.Single(x => x.id == id);
+                Assert.That(c.voicePitch, Is.EqualTo(SoundSwap.Pitch(semitones)).Within(1e-4f), id);
+                Assert.That(c.lowVoice, Is.EqualTo(low), id);
+            }
+        }
+
+        /// <summary>The owner's hard rule (round 2): blips only from the Sawtooth, Sine, Square and Triangular synth blips.</summary>
+        [Test]
+        public void TheBlips_AreOnlySawtoothSineSquareOrTriangularSynthBlips()
+        {
+            string folder = Path.Combine(SoundBank.Leohpaz, "Leohpaz_RetroDialogue_SFX", "RetroDialogue_SFX", "Synth_Blips");
+            foreach (string key in new[] { "Blip", "Blip.Low" })
+            foreach (string source in SoundBank.Get(key).Sources)
+            {
+                Assert.That(Path.GetDirectoryName(source), Is.EqualTo(folder), source);
+                string name = Path.GetFileName(source);
+                Assert.That(new[] { "Sawtooth_", "Sine_", "Square_", "Triangular_" }.Any(name.StartsWith), Is.True, $"{name}: not an allowed synth blip");
+                Assert.That(name, Does.Not.StartWith("Bubble"), name);
+            }
+        }
+
+        [Test]
+        public void EveryVoice_IsAWholeNumberOfSemitones_AndFootstepsSitUnderTheBlips()
+        {
+            foreach (var (id, semitones, _) in SoundSwap.Voices)
+            {
+                float steps = 12f * Mathf.Log(SoundSwap.Pitch(semitones), 2f);
+                Assert.That(steps, Is.EqualTo(Mathf.Round(steps)).Within(1e-3f), id);
+            }
+            Assert.That(SoundBank.Get("Blip").Target, Is.EqualTo(SoundBank.Kind.Quiet));
+            Assert.That(SoundBank.TargetDb(SoundBank.Kind.Footsteps), Is.EqualTo(SoundBank.TargetDb(SoundBank.Kind.Quiet) - 6f).Within(1e-3f));
         }
 
         [Test]

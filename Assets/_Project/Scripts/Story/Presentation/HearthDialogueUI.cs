@@ -372,7 +372,7 @@ namespace Hearthdelve.Story.Presentation
             if (m_Blips != null)
             {
                 m_Blips.Attach(m_BodyText);
-                m_Blips.NewLine(character != null ? character.voicePitch : 1f, looked || SpeakerId == CharacterIds.Narration);
+                m_Blips.NewLine(character != null ? character.voicePitch : 1f, character != null && character.lowVoice, looked || SpeakerId == CharacterIds.Narration);
             }
             if (m_PortraitFrame != null) m_PortraitFrame.SetActive(m_Speaker != null);
             m_NextBlink = Time.unscaledTime + NextBlinkIn();

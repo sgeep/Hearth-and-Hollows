@@ -23,7 +23,7 @@ namespace Hearthdelve.Tests.EditMode
         static readonly string[] k_Required =
         {
             "Krishna Palacio", "Minifantasy", "Portrait Generator", "Pixel_Pincher",
-            "Kenney", "OwlishMedia",
+            "Kenney", "OwlishMedia", "Leohpaz",
             "HeatleyBros", "Quirkii", "Continue", "Coastal Market", "Otherworld",
             "Silver", "Poppy Works", "CC BY 4.0", "Itou Hiro", "leedheo", "ぶち", "adapted",
             "More Mountains", "TopDown Engine", "Nice Vibrations", "Super Text Mesh", "Kai Clavier", "Pixel Crushers", "Unity",

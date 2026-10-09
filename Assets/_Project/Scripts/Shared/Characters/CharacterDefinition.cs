@@ -23,6 +23,8 @@ namespace Hearthdelve.Shared.Characters
         public string conversation;
         [Range(0.5f, 2f), Tooltip("4i-C: the pitch of their dialogue blips (1 ordinary; lower is deeper).")]
         public float voicePitch = 1f;
+        [Tooltip("Round 2 (2026-10-09): their blips use the low register (the deep voices), pitched from there.")]
+        public bool lowVoice;
 
         [Header("Relationship (Love/Hate)")]
         [Tooltip("Their opinion of the player is tracked: affinity, respect and remembered deeds.")]

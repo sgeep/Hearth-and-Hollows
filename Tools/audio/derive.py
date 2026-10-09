@@ -9,20 +9,29 @@ docs/CREDITS.md). Run:  python Tools/audio/derive.py
   fruit1-3, scrape1-2, clamour1-11 (.wav)
                     OwlishMedia's Impacts, peak-normalised to -1 dBFS (the 4i-C balance pass: as recorded they peak near -17 dBFS,
                     some 10 dB under the Kenney packs, too quiet to reach their level at full volume). Nothing else changes.
+  EggFlip.wav       Leohpaz (Crafting and Professions II) "Flipping_Eggs_single.wav": its first flip, from the onset, 0.6 s with a
+                    short fade out (the grill's flip; round 2, 2026-10-09).
 """
 import os
 import struct
 import wave
 
 SFX = r"C:\Dev\Music\SFX"
+LEOHPAZ = r"C:\Dev\Music\Leohpaz SFX"
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "derived")
 
 
 def read(path):
     with wave.open(path, "rb") as w:
         ch, width, rate, n = w.getnchannels(), w.getsampwidth(), w.getframerate(), w.getnframes()
-        assert width == 2, path
-        data = struct.unpack("<%dh" % (n * ch), w.readframes(n))
+        raw = w.readframes(n)
+    if width == 2:
+        data = struct.unpack("<%dh" % (n * ch), raw)
+    elif width == 3:
+        # 24-bit (the Leohpaz packs), brought to the 16-bit scale the rest of this script works in.
+        data = [int.from_bytes(raw[i:i + 3], "little", signed=True) / 256.0 for i in range(0, len(raw), 3)]
+    else:
+        raise ValueError(f"{path}: {width * 8}-bit isn't handled")
     frames = [data[i:i + ch] for i in range(0, len(data), ch)]
     return frames, ch, rate
 
@@ -66,9 +75,22 @@ def normalise(name, peak_db=-1.0):
 NORMALISED = ["fruit1.wav", "fruit2.wav", "fruit3.wav", "scrape1.wav", "scrape2.wav"] + ["clamour%d.wav" % i for i in range(1, 12)]
 
 
+def trim_onset(path, out, seconds, fade_seconds, threshold=4000):
+    frames, ch, rate = read(path)
+    at = max(0, onset(frames, threshold) - int(0.01 * rate))
+    clip = [list(f) for f in frames[at:at + int(seconds * rate)]]
+    fade = int(fade_seconds * rate)
+    for i in range(fade):
+        j = len(clip) - fade + i
+        clip[j] = [v * (1 - i / float(fade)) for v in clip[j]]
+    write(os.path.join(OUT, out), clip, ch, rate)
+
+
 def main():
     for name in NORMALISED:
         normalise(name)
+    trim_onset(os.path.join(LEOHPAZ, "Minifantasy_CraftingAndProfessions2_SFX", "Crafting_Professions", "Cooking", "Flipping_Eggs_single.wav"),
+               "EggFlip.wav", 0.6, 0.15)
     frames, ch, rate = read(os.path.join(SFX, "Water", "tap-water-1.wav"))
     pour = loop(frames, start=int(4.0 * rate), length=int(1.6 * rate), fade=int(0.12 * rate))
     write(os.path.join(OUT, "TapPourLoop.wav"), pour, ch, rate)

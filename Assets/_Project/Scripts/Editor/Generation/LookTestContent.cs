@@ -389,6 +389,8 @@ namespace Hearthdelve.Editor
                 player.AddFeedback(played);
             }
             if (haptic != null) player.AddFeedback(new MMF_HapticPattern { Label = $"Haptic {haptic.id}", Pattern = haptic });
+            // Round 2: a second sound layered on some moments (the troll's voice over his impacts).
+            SoundSwap.EquipLayers(go);
             return player;
         }
 

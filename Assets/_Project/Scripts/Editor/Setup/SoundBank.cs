@@ -28,8 +28,10 @@ namespace Hearthdelve.Editor
             Action,
             /// <summary>Menus and notices.</summary>
             Interface,
-            /// <summary>What repeats under everything: footsteps, dialogue blips.</summary>
+            /// <summary>What repeats under everything: dialogue blips.</summary>
             Quiet,
+            /// <summary>The keeper's footsteps, under everything else (round 2, the owner's note: 6 dB under the quiet tier).</summary>
+            Footsteps,
         }
 
         public static float TargetDb(Kind kind) => kind switch
@@ -37,6 +39,7 @@ namespace Hearthdelve.Editor
             Kind.Impact => -16f,
             Kind.Action => -20f,
             Kind.Interface => -24f,
+            Kind.Footsteps => -34f,
             _ => -28f,
         };
 
@@ -49,11 +52,13 @@ namespace Hearthdelve.Editor
         }
 
         static readonly string[] k_Impact = { "Hit", "HitHeavy", "Hurt", "TrollImpact", "GateSlam", "Crash", "EnemyDeath" };
-        static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "FurnitureTurn", "FurnitureUndo", "Discovery", "Blip" };
-        static readonly string[] k_Quiet = { "Footsteps.Village", "Footsteps.Tavern", "Footsteps.Hollows" };
+        static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "FurnitureTurn", "FurnitureUndo", "Discovery" };
+        static readonly string[] k_Quiet = { "Blip", "Blip.Low" };
+        static readonly string[] k_Footsteps = { "Footsteps.Village", "Footsteps.Tavern", "Footsteps.Hollows" };
 
         static Kind KindOf(string key) =>
-            k_Impact.Contains(key) ? Kind.Impact : k_Interface.Contains(key) ? Kind.Interface : k_Quiet.Contains(key) ? Kind.Quiet : Kind.Action;
+            k_Impact.Contains(key) ? Kind.Impact : k_Interface.Contains(key) ? Kind.Interface : k_Quiet.Contains(key) ? Kind.Quiet
+            : k_Footsteps.Contains(key) ? Kind.Footsteps : Kind.Action;
 
         /// <summary>
         /// The family's playing volume: what brings its measured loudness to its kind's target (never above 1: a quiet clip plays
@@ -70,6 +75,12 @@ namespace Hearthdelve.Editor
         static string K(string name) => Path.Combine(Library, "Kenney Audio", name);
         static string O(string relative) => Path.Combine(Library, relative);
         static string D(string name) => Path.Combine("Tools", "audio", "derived", name);
+        /// <summary>The Leohpaz packs (round 2, 2026-10-09), in their own folder beside the other libraries.</summary>
+        public const string Leohpaz = @"C:\Dev\Music\Leohpaz SFX";
+        static string L(string relative) => Path.Combine(Leohpaz, relative);
+        const string Farm = @"Farm_SFX_Pack_Minifantasy_Compatible\", Inventory = @"Inventory_SFX_Pack\Inventory_SFX\",
+            Grunts = @"LEOHPAZ_HumanoidsGrunts_SFX\", Craft = @"Minifantasy_CraftingAndProfessions2_SFX\",
+            Blips = @"Leohpaz_RetroDialogue_SFX\RetroDialogue_SFX\Synth_Blips\";
         static string[] Ks(string stem, int count, int digits = 3, int start = 0) =>
             Enumerable.Range(start, count).Select(i => K($"{stem}{i.ToString().PadLeft(digits, '0')}.ogg")).ToArray();
 
@@ -79,9 +90,9 @@ namespace Hearthdelve.Editor
         /// <summary>The families (the listening list's numbers in comments).</summary>
         public static readonly Family[] Families =
         {
-            F("Footsteps.Village", Ks("footstep", 10, digits: 2)),                                                        // 1 A
+            F("Footsteps.Village", new[] { L(Farm + @"_Generic_Human\Step_dirt_1.wav"), L(Farm + @"_Generic_Human\Step_dirt_2.wav"), L(Farm + @"_Generic_Human\Step_dirt_3.wav") }), // 1, round 2 B
             F("Footsteps.Tavern", Ks("footstep_wood_", 5)),                                                              // 2 A
-            F("Footsteps.Hollows", Ks("footstep_concrete_", 5)),                                                         // 3 A
+            F("Footsteps.Hollows", new[] { L(Farm + @"_Generic_Human\Step_stone_1.wav"), L(Farm + @"_Generic_Human\Step_stone_2.wav"), L(Farm + @"_Generic_Human\Step_stone_3.wav") }), // 3, round 2 B
             F("Dodge", new[] { K("cloth1.ogg"), K("cloth2.ogg"), K("cloth3.ogg"), K("cloth4.ogg") }, 0.05f),             // 4 A
             F("Swing", new[] { K("drawKnife1.ogg"), K("drawKnife2.ogg"), K("drawKnife3.ogg") }, 0.06f, 0.7f),           // 5 A
             F("Hit", Ks("impactPunch_medium_", 5), 0.05f),                                                               // 6 A
@@ -89,19 +100,21 @@ namespace Hearthdelve.Editor
             F("Hurt", Ks("impactSoft_heavy_", 5), 0.04f),                                                                // 8 A
             F("Telegraph", new[] { K("impactBell_heavy_004.ogg") }),                                                     // 9 A
             F("EnemyDeath", new[] { D("fruit1.wav"), D("fruit2.wav"), D("fruit3.wav") }, 0.06f), // 10 A
-            F("Pickup", new[] { K("handleSmallLeather.ogg"), K("handleSmallLeather2.ogg") }, 0.05f),                    // 11 A
-            F("SatchelFull", new[] { K("error_004.ogg"), K("error_008.ogg"), K("error_001.ogg") }),                     // 12 A
-            F("Coins", new[] { K("handleCoins.ogg"), K("handleCoins2.ogg") }, 0.04f),                                    // 13 A
+            F("Pickup", new[] { L(Inventory + @"Managing\Item_Pick.wav") }, 0.05f),                                     // 11, round 2 B
+            F("SatchelFull", new[] { L(Inventory + @"Bag\Bag_Full.wav") }),                                              // 12, round 2 A
+            F("Coins", new[] { L(Inventory + @"Drops\Coins.wav"), K("handleCoins.ogg"), K("handleCoins2.ogg") }, 0.04f), // 13, round 2 A with the Kenney pair
             F("Door", new[] { K("doorClose_1.ogg"), K("doorClose_2.ogg"), K("doorClose_3.ogg"), K("doorClose_4.ogg") }, 0f, 0.8f), // 14 A
             F("Stairs", Ks("impactPlank_medium_", 5), 0.05f, 0.7f),                                                      // 15 B (the owner's choice)
             F("GateSlam", Ks("impactMining_", 5), 0.03f),                                                                // 16 A
             F("GateRise", new[] { D("scrape1.wav"), D("scrape2.wav") }),                               // 16 C
-            F("GrillFlip", new[] { O(@"Impacts\flip.wav") }, 0.05f),                                                     // 17 A
+            F("GrillFlip", new[] { D("EggFlip.wav") }, 0.05f),                                                           // 17, round 2 A (an edit)
+            F("Sizzle", new[] { L(Craft + @"Crafting_Professions\Cooking\Loop_with_eggs.wav") }),                      // round 2: the grill's loop
             F("TapPour", new[] { D("TapPourLoop.wav") }),                                                                // 18 A (an edit)
             F("Clink", Ks("impactGlass_light_", 5), 0.04f),                                                              // 18 B
-            F("Chop", Ks("impactWood_light_", 5), 0.05f),                                                                // 19 A
+            F("Chop", new[] { L(Craft + @"Crafting_Professions\Food_Preparation\Food_Preparation_Cut_1.wav"), L(Craft + @"Crafting_Professions\Food_Preparation\Food_Preparation_Cut_2.wav") }, 0.05f), // 19, round 2 A
             F("Knife", new[] { K("chop.ogg"), K("knifeSlice.ogg"), K("knifeSlice2.ogg") }, 0.05f),                     // 19 B
             F("Butchery", Ks("impactWood_medium_", 5), 0.05f),                                                           // 19 C
+            F("ButcherDone", new[] { L(Craft + @"Gathering_Professions\Hunting\Carving_Butcher.wav") }),                 // 19, round 2 C (done)
             F("Plate", Ks("impactPlate_light_", 5), 0.04f),                                                              // 20 A
             F("Crash", Enumerable.Range(1, 11).Select(i => D($"clamour{i}.wav")).ToArray()),                   // 20 C
             F("Stew", new[] { K("metalPot1.ogg"), K("metalPot2.ogg"), K("metalPot3.ogg") }),                           // 21 A
@@ -117,12 +130,21 @@ namespace Hearthdelve.Editor
             F("FurnitureStore", new[] { K("bookPlace1.ogg"), K("bookPlace2.ogg") }),                                     // 25 B
             F("FurnitureTurn", new[] { K("switch_002.ogg") }),                                                           // 25 C
             F("FurnitureUndo", new[] { K("minimize_007.ogg") }),                                                         // 25 C
-            F("Soil", Ks("impactSoft_medium_", 5), 0.05f),                                                               // 26 A (plant)
-            F("Water", new[] { D("GardenWater.wav") }, 0.04f),                                                           // 26 B (an edit; tend)
-            F("Harvest", new[] { D("fruit1.wav"), D("fruit2.wav") }, 0.05f),                           // 26 C
-            F("Blip", new[] { K("pluck_001.ogg"), K("pluck_002.ogg") }),                                                 // 27 A
+            F("Soil", new[] { L(Farm + @"Actions\Seeds_1.wav"), L(Farm + @"Actions\Seeds_2.wav"), L(Farm + @"Actions\Seeds_3.wav"), L(Farm + @"Actions\Seeds_4.wav") }, 0.04f), // 26, round 2 A (plant)
+            F("Water", new[] { L(Farm + @"Actions\Watering_1.wav"), L(Farm + @"Actions\Watering_2.wav") }, 0.04f),    // 26, round 2 B (tend)
+            F("Harvest", new[] { L(Farm + @"Actions\Harvest_1.wav"), L(Farm + @"Actions\Harvest_2.wav") }, 0.04f),    // 26, round 2 C
+            // 27, round 2 (the owner's hard rule: only Sawtooth, Sine, Square or Triangular from Synth_Blips): Triangular, one voice
+            // for everyone, its Low file for the deep voices; no random pitch (each speaker on their own semitone).
+            F("Blip", new[] { L(Blips + "Triangular_High.wav") }),
+            F("Blip.Low", new[] { L(Blips + "Triangular_Low.wav") }),
             F("TrollImpact", Ks("impactMining_", 5), 0.04f),                                                             // 28 A
             F("Gulp", new[] { O(@"Impacts\gulp1.wav"), O(@"Impacts\gulp2.wav") }),                                       // 28 B
+            // 28, round 2: the troll's voice, layered over his impacts (a second sound in the same feedback), and his roar.
+            F("TrollAttackVoice", Enumerable.Range(1, 5).Select(i => L(Grunts + $@"Troll\Troll_Attack_{i}.wav")).ToArray(), 0.03f),
+            F("TrollDamageVoice", Enumerable.Range(1, 5).Select(i => L(Grunts + $@"Troll\Troll_Damage_{i}.wav")).ToArray(), 0.03f),
+            F("TrollDeathVoice", new[] { L(Grunts + @"Troll\Troll_Death_1.wav"), L(Grunts + @"Troll\Troll_Death_2.wav") }),
+            F("TrollRoar", Enumerable.Range(1, 3).Select(i => L(Grunts + $@"Troll\Troll_Wind_up_{i}.wav")).ToArray()),
+            F("AreaWhoosh", new[] { L(Inventory + @"Drops\Drop_Whoosh.wav") }),                                       // Decorate's area change
         };
 
         /// <summary>Each placeholder the approved families replace. Placeholders not here stay (the gaps).</summary>
@@ -133,14 +155,14 @@ namespace Hearthdelve.Editor
             ["PH_SatchelFull"] = "SatchelFull", ["PH_Coin"] = "Coins", ["PH_Climb"] = "Stairs", ["PH_GateSlam"] = "GateSlam",
             ["PH_GateRise"] = "GateRise", ["PH_Flip"] = "GrillFlip", ["PH_FlipPerfect"] = "GrillFlip", ["PH_PourLoop"] = "TapPour",
             ["PH_Clink"] = "Clink", ["PH_LineTing"] = "Clink", ["PH_Chop"] = "Chop", ["PH_ChopDone"] = "Chop", ["PH_ChopRagged"] = "Knife",
-            ["PH_KnifeIn"] = "Knife", ["PH_Cleave"] = "Butchery", ["PH_ButcherDone"] = "Butchery", ["PH_PlateUp"] = "Plate",
+            ["PH_KnifeIn"] = "Knife", ["PH_Cleave"] = "Butchery", ["PH_ButcherDone"] = "ButcherDone", ["PH_PlateUp"] = "Plate",
             ["PH_PlateDown"] = "Plate", ["PH_Serve"] = "Plate", ["PH_Crash"] = "Crash", ["PH_StewReady"] = "Stew",
             ["PH_UiConfirm"] = "UiConfirm", ["PH_UiTick"] = "UiTick", ["PH_UiBuy"] = "UiBuy", ["PH_UiChime"] = "UiChime",
             ["PH_Discovery"] = "Discovery", ["PH_PowerUp"] = "Discovery", ["PH_Homecoming"] = "Discovery", ["PH_FurnitureNo"] = "UiBack",
             ["PH_Walkout"] = "Walkout", ["PH_FurnitureLift"] = "FurnitureLift", ["PH_FurniturePlace"] = "FurniturePlace",
             ["PH_FurnitureTurn"] = "FurnitureTurn", ["PH_FurnitureStore"] = "FurnitureStore", ["PH_FurnitureUndo"] = "FurnitureUndo",
             ["PH_TrollSlam"] = "TrollImpact", ["PH_TrollThud"] = "TrollImpact", ["PH_TrollFall"] = "TrollImpact",
-            ["PH_TrollGulp"] = "Gulp", ["PH_TrollSpoil"] = "Gulp",
+            ["PH_TrollGulp"] = "Gulp", ["PH_TrollSpoil"] = "Gulp", ["PH_TrollRoar"] = "TrollRoar", ["PH_SizzleLoop"] = "Sizzle",
         };
 
         /// <summary>Feedbacks whose placeholder served another moment too: by name, first.</summary>
@@ -152,6 +174,15 @@ namespace Hearthdelve.Editor
             ["Feedback_Swing"] = "Swing",
             ["Feedback_Door"] = "Door",
             ["Feedback_Stairs"] = "Stairs",
+            ["Feedback_Area"] = "AreaWhoosh",  // Decorate's area change; the fall into a hole keeps PH_Whoosh for now
+        };
+
+        /// <summary>A second sound layered on a feedback, by its name (round 2: the troll's voice over his impacts).</summary>
+        public static readonly Dictionary<string, string> Layers = new()
+        {
+            ["Feedback_Slam"] = "TrollAttackVoice",
+            ["Feedback_Stun"] = "TrollDamageVoice",
+            ["Feedback_Defeat"] = "TrollDeathVoice",
         };
 
         public static Family Get(string key) => Families.FirstOrDefault(f => f.Key == key);
@@ -164,7 +195,10 @@ namespace Hearthdelve.Editor
         }
 
         static string PackFolder(string source) =>
-            source.StartsWith("Tools") ? "Derived" : source.Contains("Kenney Audio") ? "Kenney" : "OwlishMedia";
+            source.StartsWith("Tools") ? "Derived" : source.StartsWith(Leohpaz) ? "Leohpaz" : source.Contains("Kenney Audio") ? "Kenney" : "OwlishMedia";
+
+        /// <summary>Whether an approved file comes from Leohpaz (directly; an edit of one counts as Derived).</summary>
+        public static bool IsLeohpaz(string source) => source.StartsWith(Leohpaz);
 
         public static string AssetPath(string source) => $"{Folder}/{PackFolder(source)}/{Path.GetFileName(source)}";
 
@@ -195,7 +229,7 @@ namespace Hearthdelve.Editor
                 string target = AssetPath(source);
                 if (AssetImporter.GetAtPath(target) is not AudioImporter importer) continue;
                 AudioImporterSampleSettings s = importer.defaultSampleSettings;
-                bool loop = source.EndsWith("TapPourLoop.wav");
+                bool loop = source.EndsWith("TapPourLoop.wav") || source.EndsWith("Loop_with_eggs.wav");
                 s.loadType = loop ? AudioClipLoadType.CompressedInMemory : AudioClipLoadType.DecompressOnLoad;
                 s.compressionFormat = AudioCompressionFormat.Vorbis;
                 s.quality = 0.7f;
