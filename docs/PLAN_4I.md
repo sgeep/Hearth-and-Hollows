@@ -601,6 +601,17 @@ The telegraph, doors, the stairs, the tap's pour and clink, plates, the crash, t
   - memory: the game's Chrome renderer held about 640 MB, with a peak working set of about 1.1 GB across three reloads in the same process;
   - not driven: walking, fights and service (the browser driver's key presses are taps, not held keys).
 
+### After the owner's 4i-C playtest (2026-10-09)
+
+- **Music:** what the music slider at 25% gave is the new 100% (`MusicConfig.volume` 0.5625 → 0.140625); the slider scales down from there. An options file from before (version 1) has its music slider multiplied by four once (25% then is 100% now, up to the top), so a player who had turned it down hears the same; `PlayerOptions` is version 2.
+- **Sound effects a quarter down everywhere** (`MusicConfig.effects` 0.75, on the mixer's Effects volume under the player's slider); the Hollows' own quarter-down stays on top (0.5625 there). Footsteps stay 6 dB under the blips (both are effects).
+- **Decorate Mode keeps its generated placeholders** (the owner liked them better): every Decorate moment, lifting, placing, turning, storing, undoing, the invalid buzz, buying, selling, restyling, the area change and the trophy's homecoming, plays the sound it was built with (`SoundBank.DecoratePlaceholders`, `SoundSwap.KeepDecoratePlaceholders`, also run by the builder). The five Kenney furniture sounds and Leohpaz's area whoosh are no longer imported.
+- **The delve's first room is safe ground:** Essence doesn't drain there; the drain begins when the keeper goes through its doors and the next room loads (`FloorNode.PausesEssenceDrain` now includes the run's one `Start` room; the runner applies it as the delve opens). Later floors begin in a fight and drain as before.
+- **Sound picks:** enemy death 69 only; dodge 65 only; the upgrade pickup Kenney `maximize_006` only (its own family, `PowerUp`; discoveries keep 4–6); a full satchel Retro Dialogue's `Window\Window_Close_2` (the owner's own exception to the Retro Dialogue rule; the blips stay the four synth waveforms, and a test allows nothing else from the pack); the campfire OwlishMedia's crumpled paper (A), burning low the same, half as loud; Kariaston's footsteps dirt and grass mixed (B, Farm's `Step_grass_1–3`, the same files as Forgotten Plains').
+- **Found while doing it: round 2's footsteps had never reached the keeper.** The keeper's `Footsteps` still listed round 1's Kenney steps, which round 2's import had removed, so every step was silent; the tests counted steps, not sounds. The sound pass now keeps the steps' clips in step with the bank, a step with no clip isn't counted, and two tests guard it: the keeper's steps are the bank's, and no sound in any prefab, scene or asset points at a missing file (`SoundTests.NoSound_PointsAtAMissingFile`).
+- **Orik's cap (`Pip_OnServing…`, 0.861 against 0.85):** not a broken rule but a test measuring the wrong thing. The cap is on staff's own work (`StaffDefinition.qualityCap`: Orik's serve, Boog's and Orik's cooking, each `Mathf.Min`'d before it's used). The test compared the *dish's* quality with it, and a dish is the keeper's cooking × the ingredients × a serving factor of 0.6 + 0.4 × the serve. With the keeper's perfect cook and Orik serving at his cap, the factor is 0.94, so the dish comes out about 0.86–0.94 with these ingredients: correctly above 0.85, and still below the keeper's own perfect serve of it. Whether it failed depended on how cleanly Orik walked that run. The test now checks Orik's serve against his cap (from `StaffWorkDone`), that the dish is exactly the keeper's cooking with that serve, and that it's worse than the keeper's own perfect serve.
+- **`CameraFollowTests`** remembers the frame rate and VSync before each test and restores them after (they turned VSync off for every later test in the run).
+
 ### Listening and look checklist (4i-C)
 
 1. **Headphones, then speakers:** a full day. Wake in your room (does it feel lived in?), walk the boards, go downstairs (stairs), out the front door (the door), along Kariaston's paths (footsteps change with the ground), plant, tend (water) and harvest, buy at the market.
@@ -616,3 +627,11 @@ The telegraph, doors, the stairs, the tap's pour and clink, plates, the crash, t
 11. **Menus on a controller, the fix:** at night with "sleep" and "decorate", click empty space with the mouse, then push the stick or d-pad: the first push lands on the top choice, the next moves. Check the same in a conversation's choices and the keeper creator (they keep their own focus).
 12. **Game speed on a hitch:** in the web build, after several delves and scene changes, does anything ever feel in slow motion? (`TimeBaseline` should have ended that.)
 13. **The credits' edges:** entries now appear and leave the window whole instead of sliding under its edge. Does the pop read fine, or should they fade at the edges?
+
+After the playtest's changes (2026-10-09):
+
+14. **Walk everywhere:** footsteps should now be heard at all (they were silent since round 2), on the boards, on Kariaston's paths (dirt and grass mixed) and on the Hollows' stone. Too loud or quiet under the new effects level?
+15. **The levels:** music at 100% (where your 25% was; your saved options were moved to 100% to match), effects a quarter down. The door in particular.
+16. **Decorate Mode** with its old placeholders, every moment.
+17. **The delve's first room:** Essence holds still until you go through its doors.
+18. **The picks:** an enemy dying (69), the dodge (65), an upgrade pickup (6), a full satchel (Window_Close_2), the campfire as you warm by it and as it burns low (the crumpled paper).

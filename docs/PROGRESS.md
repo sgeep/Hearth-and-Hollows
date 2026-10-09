@@ -1322,7 +1322,7 @@ The owner's nine Leohpaz packs (each in its own folder beside its zip, checked i
 - **Fixes (confirmed):** blips in the quiet tier, no random pitch, a 0.079 s gap, voices on whole semitones; footsteps 6 dB under the blips.
 - **Waiting for the owner:** the campfire (no fire sound in any library) and grass footsteps beside dirt (`_catalog\LISTENING_4iC3.md`).
 
-Tests at the close of 4i-C (2026-10-09, full suites on the final code): EditMode 819 passed, 0 failed, 1 skipped (an explicit report); PlayMode 289 passed, 0 failed, 31 skipped (explicit captures and reports). The slowest PlayMode test is now 51 s (it was 176–184 s, see `TimeBaseline` in PLAN_4I). The web build (0.4i-c, 155 MB) was smoke-tested with sound; the owner's save was backed up and restored and checked identical afterwards.
+Tests at the close of 4i-C (2026-10-09, full suites on the final code): EditMode 819 passed, 0 failed, 1 skipped (an explicit report); PlayMode 289 passed, 0 failed, 31 skipped (explicit captures and reports). The slowest PlayMode test is now 51 s (it was 176–184 s, see `TimeBaseline` in PLAN_4I). The web build (0.4i-c, 155 MB) was smoke-tested with sound; the owner's save was backed up and restored and checked identical afterwards. After the owner's playtest changes (2026-10-09): the full suites found two expectations of mine to update (the effects level in an Options test, a file count in THIRD_PARTY); with those fixed and rerun, EditMode 823 passed, 0 failed, 1 skipped; PlayMode 289 passed, 0 failed, 31 skipped; the web build rebuilt (155 MB).
 
 ### 4i-B: settings and accessibility (2026-10-08; signed off 2026-10-08)
 
@@ -1411,13 +1411,13 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - **Silver's license has a budget condition:** CC BY 4.0 (attribution to Poppy Works), but productions over $100,000 USD in total spend or earnings are asked to contact Poppy Works to license it (`docs/THIRD_PARTY.md`). Owner decision before release; no effect on development.
 - ~~**The delve's controls line overlaps the satchel row**~~ (4i-C: retired in the day loop).
 - ~~**The death screen with an empty satchel** shows its one button right of centre~~ (4i-C: centred).
-- **A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem` failed once in a full PlayMode run during 4d step 3 (dish quality 0.909 against Pip's 0.85 cap) and passed alone three times and in the next full run. Not related to 4d; to look into with the tavern work (4f). It passed in all four complete PlayMode runs during 4d step 5.
+- ~~**A flaky tavern test:** `TavernServiceTests.Pip_OnServing_CarriesPlatesToWhoeverOrderedThem`~~ (4i-C: not flaky and no broken rule; it compared the dish's quality, which includes the keeper's cooking, with the cap on Orik's serve. It now checks his serve: `docs/PLAN_4I.md`, after the 4i-C playtest).
 - **Run length and the Essence budget are estimates** (4d step 5): the run log (development builds) measures them; your playtest should replace them.
 - **The delve meal's drain drinks and slow burn are worth less** at a low drain (0.2/s since the playtest); a playtest question, not changed.
 - **The day's story isn't saved:** a night resumed from a save shows only what that session played (the purse and Renown always).
 - **Quitting mid-delve** loses that run (by design: no mid-run saves); Continue starts the night's delve again.
 - **Not driven in the web smoke test:** combat, power choices, the death screen, the satchel swap and a controller (synthetic input can't fight); PlayMode tests cover them.
-- **Twelve sounds are still placeholders** (`PH_…`): the troll's roar, the grill's sizzle and burn, the campfire, the heartbeat, the swoosh, Decorate's brush, plate bumps, the charge tick, the tap's spill warning and overflow (`docs/PLAN_4I.md`, 4i-C). Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
+- **Five sounds are still placeholders** (`PH_…`): the grill's burn, the heartbeat, plate bumps, Decorate's brush and the tap's spill warning; Decorate Mode keeps all its placeholders by the owner's choice (`docs/PLAN_4I.md`, 4i-C). Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)
 
