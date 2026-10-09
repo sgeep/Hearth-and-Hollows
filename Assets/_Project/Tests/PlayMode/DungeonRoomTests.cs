@@ -294,16 +294,27 @@ namespace Hearthdelve.Tests.PlayMode
             essence.SetEncounterDrain(1f);
         }
 
-        /// <summary>Essence drains in an ordinary room but not at the hole down (or the rope up): safe ground (after the type pass).</summary>
+        /// <summary>
+        /// Essence doesn't drain in the delve's first room (4i-C playtest) or at the hole down (or the rope up): safe ground. It
+        /// drains from the next room on.
+        /// </summary>
         [UnityTest]
-        public IEnumerator TheHoleDown_StopsTheEssenceDrain_AndOrdinaryRoomsDon_t()
+        public IEnumerator TheFirstRoom_AndTheHoleDown_StopTheEssenceDrain_AndOrdinaryRoomsDon_t()
         {
             yield return LoadRun();
             var essence = Player.GetComponent<EssenceHealth>();
             essence.GodMode = false;
+            Assert.That(essence.DrainPaused, "the first room is safe ground");
             float before = essence.CurrentHealth;
             yield return new WaitForSeconds(1.5f);
-            Assert.That(essence.CurrentHealth, Is.LessThan(before), "the first room drains");
+            Assert.That(essence.CurrentHealth, Is.EqualTo(before), "no Essence lost before the first doors");
+            yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Combat));
+            essence = Player.GetComponent<EssenceHealth>();
+            essence.GodMode = false;
+            Assert.That(essence.DrainPaused, Is.False, "through the first doors, the drain begins");
+            before = essence.CurrentHealth;
+            yield return new WaitForSeconds(1.5f);
+            Assert.That(essence.CurrentHealth, Is.LessThan(before), "the next room drains");
             essence.GodMode = true; // the walk there goes through fights
             yield return WalkTo(RoomKind.Descent);
             essence = Player.GetComponent<EssenceHealth>();

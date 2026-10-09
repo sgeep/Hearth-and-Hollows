@@ -178,6 +178,8 @@ namespace Hearthdelve.Dungeon.Rooms
                 }
             }
             Load(first, start);
+            // The first room is safe ground (the owner's call, 4i-C playtest): the drain begins in the next room.
+            if (Player != null && Player.TryGetComponent(out EssenceHealth startEssence)) startEssence.DrainPaused = start.PausesEssenceDrain;
             PublishEntered(0f);
             if (m_Encounter.IsSealed) Seal();
         }

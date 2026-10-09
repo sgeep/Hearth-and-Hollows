@@ -38,7 +38,7 @@ namespace Hearthdelve.Tests
             foreach (FloorNode node in floor.Nodes)
             {
                 seen.Add(node.Kind);
-                Assert.That(node.PausesEssenceDrain, Is.EqualTo(node.Kind is RoomKind.Extraction or RoomKind.Descent), $"seed {seed}: {node.Kind}");
+                Assert.That(node.PausesEssenceDrain, Is.EqualTo(node.Kind is RoomKind.Start or RoomKind.Extraction or RoomKind.Descent), $"seed {seed}: {node.Kind}");
             }
             Assert.That(seen, Is.SupersetOf(new[] { RoomKind.Extraction, RoomKind.Descent, RoomKind.Combat, RoomKind.Arena }));
         }

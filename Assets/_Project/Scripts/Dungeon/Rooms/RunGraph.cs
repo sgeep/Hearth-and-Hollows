@@ -54,9 +54,11 @@ namespace Hearthdelve.Dungeon.Rooms
 
         /// <summary>
         /// The rope up and the hole down are safe ground: Essence doesn't drain there, so reaching one is a breath, and the
-        /// choice (climb out or go deeper) isn't rushed (the owner's call, after the type pass). Damage still applies.
+        /// choice (climb out or go deeper) isn't rushed (the owner's call, after the type pass). So is the delve's first room (the
+        /// only <see cref="RoomKind.Start"/>, on the first floor; the owner's call after the 4i-C playtest): the drain begins when
+        /// the keeper goes through its doors and the next room loads. Damage still applies.
         /// </summary>
-        public bool PausesEssenceDrain => Kind is RoomKind.Extraction or RoomKind.Descent;
+        public bool PausesEssenceDrain => Kind is RoomKind.Start or RoomKind.Extraction or RoomKind.Descent;
     }
 
     /// <summary>One floor of a run: a one-way graph of rooms from its first room to its ends (extraction, descent or the arena).</summary>
