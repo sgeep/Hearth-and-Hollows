@@ -522,6 +522,58 @@ Three families keep a deliberate trim: the swing (0.7: it plays on every attack)
 
 The feedback audit's **gap** rows above are now filled, except where the placeholders above remain.
 
+### Sound, round 2: Leohpaz (2026-10-09)
+
+The owner bought nine Leohpaz packs to replace the 4i-C sounds they disliked and to fill the placeholders left. The workflow was the same: catalog, a listening list (`_catalog\LISTENING_4iC2.md`, two or three candidates per family against the current sound), then the owner's picks ("your picks"), then import and swap.
+
+**The packs.** They stay where the owner put them, in `C:\Dev\Music\Leohpaz SFX`. `catalog.py` reads that folder as a second root, and `SoundBank` has one more path helper (`L()`).
+- **Licence** (`Licensing.txt`, identical in the five packs that have one): commercial use is allowed; the pack may not be sold or redistributed; credit is optional. Leohpaz is credited by courtesy on the Credits screen and in `CREDITS.md` and `THIRD_PARTY.md`.
+- **Four packs not used yet:** Dungeon Audio, Forgotten Plains Audio, Retro RPG 90 Battle and Retro Player 90 Movement are loose at the top of the folder, mixed together, without folders or licence files, and Forgotten Plains' campfire loop is missing. Their picks wait until the packs are re-extracted one folder per pack.
+
+**Imported now** (39 Leohpaz files, plus one edit), from the five licensed packs:
+
+| # | Family | Now | Was | Pack |
+|---|---|---|---|---|
+| 1 | Footsteps, Kariaston | `Step_dirt_1–3` | Kenney `footstep00–09` | Minifantasy Farm |
+| 3 | Footsteps, the Hollows | `Step_stone_1–3` | Kenney `footstep_concrete_*` | Minifantasy Farm |
+| 11 | Pickups | `Item_Pick` | Kenney `handleSmallLeather*` | Inventory |
+| 12 | Satchel full | `Bag_Full` | Kenney `error_*` | Inventory |
+| 13 | Coins | `Coins`, with Kenney's `handleCoins`, `…2` | Kenney only | Inventory |
+| 17 | Grill flip | `EggFlip` (the first flip of `Flipping_Eggs_single`, trimmed to 0.6 s) | OwlishMedia `flip` | Crafting and Professions II (an edit) |
+| — | Grill sizzle (was `PH_SizzleLoop`) | `Loop_with_eggs` (loop) | placeholder | Crafting and Professions II |
+| 19 | Chopping | `Food_Preparation_Cut_1–2` | Kenney `impactWood_light_*` | Crafting and Professions II |
+| 19 | Butchery done | `Carving_Butcher` | Kenney `impactWood_medium_*` | Crafting and Professions II |
+| 26 | Garden: plant, tend, harvest | `Seeds_1–4`, `Watering_1–2`, `Harvest_1–2` | Kenney soil / water edit / fruit | Minifantasy Farm |
+| 27 | Dialogue blips | `Triangular_High`, `Triangular_Low` | Kenney `pluck_*` | Retro Dialogue (only the allowed synth blips; tested) |
+| 28 | The troll's voice | `Troll_Attack_1–5` on his slam, `Troll_Damage_1–5` on his stun, `Troll_Death_1–2` on his fall, each a second sound over the existing impact | — | Humanoids Grunts |
+| — | The troll's roar (was `PH_TrollRoar`) | `Troll_Wind_up_1–3` | placeholder | Humanoids Grunts |
+| — | Decorate's area change (was `PH_Whoosh` there) | `Drop_Whoosh` | placeholder | Inventory |
+
+The telegraph, doors, stairs, the tap, plates, the crash, the stew and every interface sound stay as they were. Both that and the rope keeping its plank sound follow the picks.
+
+**Waiting for the four loose packs' licences** (picked, not imported):
+- dodge (`Dash_evade`), swing (`sword_miss`), enemy death (`Enemy_death`);
+- Tally Ho!'s wooden steps (`Step_wood`);
+- hit (`Impact_flesh`), heavy hit (`Impact`), hurt (`human_damage`);
+- the rope (`Cling_climb`), gates (`Hit_on_brick`, `Slide`);
+- the fall into a hole (`Falling`, trimmed), the charge tick (`ATB_1`, `ATB_2`), the tap's splash (`Step_water`).
+
+The campfire also waits for its missing file.
+
+**The two fixes** (approved with the picks):
+- **Blips:**
+  - moved to the quiet tier (−28 dBFS);
+  - no random pitch per blip (round 1's ±5% was close to a semitone, the likely "out of tune");
+  - one blip every 0.079 s at most, Leohpaz's advice for these synths;
+  - one shared waveform (Triangular), its Low file for the deep voices (`CharacterDefinition.lowVoice`: Orik, Grim, Kaloren);
+  - every voice a whole number of semitones (`SoundSwap.Voices`): Orik −3, Grim −5 (a step under Orik to keep them apart), Boog +3, Ogrin +4, Maximo −1, Kaloren −4, Bart −2, Gimp +1.
+- **Footsteps:** their own tier at −34 dBFS, 6 dB under the quiet tier. It's one number (`SoundBank.TargetDb`) to tune by ear.
+
+**Placeholders still left (10):**
+- waiting for the loose packs: the fall's swoosh, the charge tick, the splash;
+- the campfire and its low state (missing file);
+- no source found: the heartbeat, Decorate's brush, plate bumps, the grill's burn (Crafting II's "Fail" is a musical cue), and the spill warning.
+
 ### Listening and look checklist (4i-C)
 
 1. **Headphones, then speakers:** a full day. Wake in your room (does it feel lived in?), walk the boards, go downstairs (stairs), out the front door (the door), along Kariaston's paths (footsteps change with the ground), plant, tend (water) and harvest, buy at the market.

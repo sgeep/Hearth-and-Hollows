@@ -376,7 +376,8 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- Glimmer ----------
 
-        [UnityTest]
+        // Walks several days, like the lit-window test: about a minute alone, but slower late in a full run (round 2's run timed out).
+        [UnityTest, Timeout(600000)]
         public IEnumerator OgrinsLight_ShowsAtHisWindow_OnItsEvenings_AndOnlyThen()
         {
             yield return Daytime();
