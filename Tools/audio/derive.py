@@ -11,6 +11,9 @@ docs/CREDITS.md). Run:  python Tools/audio/derive.py
                     some 10 dB under the Kenney packs, too quiet to reach their level at full volume). Nothing else changes.
   EggFlip.wav       Leohpaz (Crafting and Professions II) "Flipping_Eggs_single.wav": its first flip, from the onset, 0.6 s with a
                     short fade out (the grill's flip; round 2, 2026-10-09).
+  Fall1.wav, Fall2.wav
+                    Leohpaz (Retro Player 90 Movement) "43_Falling_01_Loop.wav", "44_Falling_02_Loop.wav": their first 0.5 s, faded
+                    in and out (the fall into a hole lasts about 0.45 s; round 2).
 """
 import os
 import struct
@@ -86,11 +89,27 @@ def trim_onset(path, out, seconds, fade_seconds, threshold=4000):
     write(os.path.join(OUT, out), clip, ch, rate)
 
 
+def excerpt(path, out, seconds, fade_in, fade_out):
+    """The first `seconds` of a loop, faded in and out so it starts and stops cleanly."""
+    frames, ch, rate = read(path)
+    clip = [list(f) for f in frames[:int(seconds * rate)]]
+    fi, fo = int(fade_in * rate), int(fade_out * rate)
+    for i in range(fi):
+        clip[i] = [v * i / float(fi) for v in clip[i]]
+    for i in range(fo):
+        j = len(clip) - fo + i
+        clip[j] = [v * (1 - i / float(fo)) for v in clip[j]]
+    write(os.path.join(OUT, out), clip, ch, rate)
+
+
 def main():
     for name in NORMALISED:
         normalise(name)
     trim_onset(os.path.join(LEOHPAZ, "Minifantasy_CraftingAndProfessions2_SFX", "Crafting_Professions", "Cooking", "Flipping_Eggs_single.wav"),
                "EggFlip.wav", 0.6, 0.15)
+    movement = os.path.join(LEOHPAZ, "90 Player Movement")
+    excerpt(os.path.join(movement, "43_Falling_01_Loop.wav"), "Fall1.wav", 0.5, 0.02, 0.15)
+    excerpt(os.path.join(movement, "44_Falling_02_Loop.wav"), "Fall2.wav", 0.5, 0.02, 0.15)
     frames, ch, rate = read(os.path.join(SFX, "Water", "tap-water-1.wav"))
     pour = loop(frames, start=int(4.0 * rate), length=int(1.6 * rate), fade=int(0.12 * rate))
     write(os.path.join(OUT, "TapPourLoop.wav"), pour, ch, rate)

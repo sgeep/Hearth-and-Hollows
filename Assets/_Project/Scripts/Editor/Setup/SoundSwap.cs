@@ -174,7 +174,10 @@ namespace Hearthdelve.Editor
                 foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
                 {
                     if (sound.Label == null || !sound.Label.StartsWith("Sound (")) continue;
-                    SoundBank.Family family = SoundBank.Get(sound.Label.Substring(7).TrimEnd(')'));
+                    // A feedback named in the bank follows its name (a moment given its own family later, like the rope); otherwise its label.
+                    string key = sound.Label.Substring(7).TrimEnd(')');
+                    if (SoundBank.ByPlayer.TryGetValue(player.name, out string named) && !SoundBank.Layers.ContainsValue(key)) key = named;
+                    SoundBank.Family family = SoundBank.Get(key);
                     if (family == null) continue;
                     // The family's clips changed (an edited copy replaced a clip): put them on again.
                     AudioClip[] clips = SoundBank.Clips(family);

@@ -347,7 +347,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -217101175
-        Label: Sound (Stairs)
+        Label: Sound (Rope)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -419,11 +419,9 @@ MonoBehaviour:
         DebugActive: 0
         Sfx: {fileID: 0}
         RandomSfx:
-        - {fileID: 8300000, guid: 92997bbe0a433584ca91e33d73825a25, type: 3}
-        - {fileID: 8300000, guid: 163d7407c63feeb4b8df85a19ae52cf8, type: 3}
-        - {fileID: 8300000, guid: 1e4498122caa6584b9feb98268d5dfca, type: 3}
-        - {fileID: 8300000, guid: aeaa7c4123542df46a0e45ce7380dfbd, type: 3}
-        - {fileID: 8300000, guid: 3485c743507689f4e85b5befcfeceb94, type: 3}
+        - {fileID: 8300000, guid: 11ce9d6ee7bc57e428d92921251e77c1, type: 3}
+        - {fileID: 8300000, guid: ee250687d24f88c44b2793a6b6b3462f, type: 3}
+        - {fileID: 8300000, guid: 1dbb7e439e7033f48adfa9bb3ec262df, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -432,10 +430,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.21601135
-        MaxVolume: 0.21601135
-        MinPitch: 0.95
-        MaxPitch: 1.05
+        MinVolume: 0.4858781
+        MaxVolume: 0.4858781
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

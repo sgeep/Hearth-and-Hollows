@@ -260,7 +260,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f391063aa04be3a4bbd122e633a0f0a5, type: 3}
   - {fileID: 8300000, guid: edf09edb1fd87a4468e2d727a7fd1e15, type: 3}
   m_Volume: 0.09013725
-  m_TavernVolume: 0.05251392
+  m_TavernVolume: 0.0665276
   m_StoneVolume: 0.10424162
   m_Pitch: {x: 0.94, y: 1.06}
 --- !u!1 &919576573409569715
@@ -557,10 +557,9 @@ MonoBehaviour:
         DebugActive: 0
         Sfx: {fileID: 0}
         RandomSfx:
-        - {fileID: 8300000, guid: 083ec998ddcbf2740b37f8661cadc84c, type: 3}
-        - {fileID: 8300000, guid: ee0946d012db7eb468546d2fea50a558, type: 3}
-        - {fileID: 8300000, guid: 5d5f264251328c44cbebb3d67fb20391, type: 3}
-        - {fileID: 8300000, guid: 01e2e6d7a0f19244ba1d19a0fb81b8f0, type: 3}
+        - {fileID: 8300000, guid: dc46d89b73da4904d8252817502afc82, type: 3}
+        - {fileID: 8300000, guid: 3d1ba9245598a2c4f849f6f16ae7b740, type: 3}
+        - {fileID: 8300000, guid: 424bddfaaa7dab54bb7b23deeb78ea24, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -569,10 +568,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.6142947
-        MaxVolume: 0.6142947
-        MinPitch: 0.95
-        MaxPitch: 1.05
+        MinVolume: 0.43634853
+        MaxVolume: 0.43634853
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

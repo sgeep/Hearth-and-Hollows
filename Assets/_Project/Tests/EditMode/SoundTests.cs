@@ -21,12 +21,11 @@ namespace Hearthdelve.Tests.EditMode
     public class SoundTests
     {
         /// <summary>The placeholders the approved sounds don't replace (the listening list's gaps and what it didn't cover).</summary>
-        /// Round 2 (2026-10-09) filled the troll's roar and the grill's sizzle; the fall's whoosh, the charge tick and the splash wait
-        /// for their Leohpaz packs' licences, the campfire for its file.
+        /// Round 2 (2026-10-09) filled the troll's roar, the grill's sizzle, the fall's whoosh, the charge ticks and the splash; the
+        /// campfire waits for the owner's choice (it has no fire sound yet).
         static readonly string[] k_Left =
         {
-            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Campfire", "PH_CampfireLow", "PH_ChargeTick", "PH_Heartbeat",
-            "PH_SpillWarn", "PH_Splash", "PH_Whoosh",
+            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Campfire", "PH_CampfireLow", "PH_Heartbeat", "PH_SpillWarn",
         };
 
         [Test]

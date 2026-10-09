@@ -108921,7 +108921,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -330960919
-        Label: Sound (placeholder)
+        Label: Sound (Splash)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -108991,8 +108991,11 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1463940796}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 5a8fe069bbc5f6f46a5efa8af04ec5d5, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: d178890c5eaf82347ad20be0ab344843, type: 3}
+        - {fileID: 8300000, guid: ca5991f97f096224ab3eac8ad6063cb9, type: 3}
+        - {fileID: 8300000, guid: 4b30453b4d8e6084a8c40d754cc9c60c, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -109001,10 +109004,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinVolume: 0.5264264
+        MaxVolume: 0.5264264
+        MinPitch: 0.95
+        MaxPitch: 1.05
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

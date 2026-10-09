@@ -81,6 +81,8 @@ namespace Hearthdelve.Editor
         const string Farm = @"Farm_SFX_Pack_Minifantasy_Compatible\", Inventory = @"Inventory_SFX_Pack\Inventory_SFX\",
             Grunts = @"LEOHPAZ_HumanoidsGrunts_SFX\", Craft = @"Minifantasy_CraftingAndProfessions2_SFX\",
             Blips = @"Leohpaz_RetroDialogue_SFX\RetroDialogue_SFX\Synth_Blips\";
+        // The four packs sorted into their own folders on 2026-10-09 (their licence is on their store pages).
+        const string Movement = @"90 Player Movement\", Battle = @"90 RPG Battle\", Dungeon = @"Minifantasy Dungeon\", Plains = @"Minifantasy Forgotten Plains\";
         static string[] Ks(string stem, int count, int digits = 3, int start = 0) =>
             Enumerable.Range(start, count).Select(i => K($"{stem}{i.ToString().PadLeft(digits, '0')}.ogg")).ToArray();
 
@@ -91,22 +93,27 @@ namespace Hearthdelve.Editor
         public static readonly Family[] Families =
         {
             F("Footsteps.Village", new[] { L(Farm + @"_Generic_Human\Step_dirt_1.wav"), L(Farm + @"_Generic_Human\Step_dirt_2.wav"), L(Farm + @"_Generic_Human\Step_dirt_3.wav") }), // 1, round 2 B
-            F("Footsteps.Tavern", Ks("footstep_wood_", 5)),                                                              // 2 A
+            F("Footsteps.Tavern", new[] { L(Movement + "10_Step_wood_01.wav"), L(Movement + "11_Step_wood_02.wav"), L(Movement + "12_Step_wood_03.wav") }), // 2, round 2 A
             F("Footsteps.Hollows", new[] { L(Farm + @"_Generic_Human\Step_stone_1.wav"), L(Farm + @"_Generic_Human\Step_stone_2.wav"), L(Farm + @"_Generic_Human\Step_stone_3.wav") }), // 3, round 2 B
-            F("Dodge", new[] { K("cloth1.ogg"), K("cloth2.ogg"), K("cloth3.ogg"), K("cloth4.ogg") }, 0.05f),             // 4 A
-            F("Swing", new[] { K("drawKnife1.ogg"), K("drawKnife2.ogg"), K("drawKnife3.ogg") }, 0.06f, 0.7f),           // 5 A
-            F("Hit", Ks("impactPunch_medium_", 5), 0.05f),                                                               // 6 A
-            F("HitHeavy", Ks("impactPunch_heavy_", 5), 0.04f),                                                           // 7 A
-            F("Hurt", Ks("impactSoft_heavy_", 5), 0.04f),                                                                // 8 A
+            F("Dodge", new[] { L(Movement + "65_Dash_evade_01.wav"), L(Movement + "66_Dash_evade_02.wav"), L(Movement + "67_Dash_evade_03.wav") }, 0.04f), // 4, round 2 A
+            F("Swing", new[] { L(Dungeon + "27_sword_miss_1.wav"), L(Dungeon + "27_sword_miss_2.wav"), L(Dungeon + "27_sword_miss_3.wav") }, 0.05f, 0.7f), // 5, round 2 A
+            F("Hit", Enumerable.Range(14, 5).Select(i => L(Battle + $"{i}_Impact_flesh_0{i - 13}.wav")).ToArray(), 0.04f), // 6, round 2 B
+            F("HitHeavy", Enumerable.Range(9, 5).Select(i => L(Battle + $"{i:00}_Impact_0{i - 8}.wav")).ToArray(), 0.04f), // 7, round 2 A
+            F("Hurt", new[] { L(Dungeon + "11_human_damage_1.wav"), L(Dungeon + "11_human_damage_2.wav"), L(Dungeon + "11_human_damage_3.wav") }, 0.03f), // 8, round 2 A
             F("Telegraph", new[] { K("impactBell_heavy_004.ogg") }),                                                     // 9 A
-            F("EnemyDeath", new[] { D("fruit1.wav"), D("fruit2.wav"), D("fruit3.wav") }, 0.06f), // 10 A
+            F("EnemyDeath", new[] { L(Battle + "69_Enemy_death_01.wav"), L(Battle + "70_Enemy_death_02.wav"), L(Battle + "72_Enemy_death_04.wav") }, 0.04f), // 10, round 2 A // 10 A
             F("Pickup", new[] { L(Inventory + @"Managing\Item_Pick.wav") }, 0.05f),                                     // 11, round 2 B
             F("SatchelFull", new[] { L(Inventory + @"Bag\Bag_Full.wav") }),                                              // 12, round 2 A
             F("Coins", new[] { L(Inventory + @"Drops\Coins.wav"), K("handleCoins.ogg"), K("handleCoins2.ogg") }, 0.04f), // 13, round 2 A with the Kenney pair
             F("Door", new[] { K("doorClose_1.ogg"), K("doorClose_2.ogg"), K("doorClose_3.ogg"), K("doorClose_4.ogg") }, 0f, 0.8f), // 14 A
             F("Stairs", Ks("impactPlank_medium_", 5), 0.05f, 0.7f),                                                      // 15 B (the owner's choice)
-            F("GateSlam", Ks("impactMining_", 5), 0.03f),                                                                // 16 A
-            F("GateRise", new[] { D("scrape1.wav"), D("scrape2.wav") }),                               // 16 C
+            F("GateSlam", new[] { L(Plains + "16_Hit_on_brick_1.wav"), L(Plains + "16_Hit_on_brick_2.wav") }, 0.03f),  // 16, round 2 A
+            F("GateRise", new[] { L(Movement + "19_Slide_01.wav") }),                                                     // 16, round 2 C
+            F("Rope", new[] { L(Movement + "40_Cling_climb_01.wav"), L(Movement + "41_Cling_climb_02_.wav"), L(Movement + "42_Cling_climb_03.wav") }, 0.04f), // 15, round 2 A (the rope only)
+            F("Fall", new[] { D("Fall1.wav"), D("Fall2.wav") }),                                                         // round 2: the fall into a hole (an edit)
+            F("ChargeTick2", new[] { L(Battle + "65_ATB_1.wav") }),                                                      // round 2: the charge's second level
+            F("ChargeTick3", new[] { L(Battle + "66_ATB_2.wav") }),                                                      // and its third
+            F("Splash", new[] { L(Movement + "13_Step_water_01.wav"), L(Movement + "14_Step_water_02.wav"), L(Movement + "15_Step_water_03.wav") }, 0.05f), // round 2 B: the tap's overflow                               // 16 C
             F("GrillFlip", new[] { D("EggFlip.wav") }, 0.05f),                                                           // 17, round 2 A (an edit)
             F("Sizzle", new[] { L(Craft + @"Crafting_Professions\Cooking\Loop_with_eggs.wav") }),                      // round 2: the grill's loop
             F("TapPour", new[] { D("TapPourLoop.wav") }),                                                                // 18 A (an edit)
@@ -152,7 +159,7 @@ namespace Hearthdelve.Editor
         {
             ["PH_Dodge"] = "Dodge", ["PH_Hit"] = "Hit", ["PH_HitHeavy"] = "HitHeavy", ["PH_Finisher"] = "HitHeavy", ["PH_Hurt"] = "Hurt",
             ["PH_Telegraph"] = "Telegraph", ["PH_KillClean"] = "EnemyDeath", ["PH_Thud"] = "EnemyDeath", ["PH_Pickup"] = "Pickup",
-            ["PH_SatchelFull"] = "SatchelFull", ["PH_Coin"] = "Coins", ["PH_Climb"] = "Stairs", ["PH_GateSlam"] = "GateSlam",
+            ["PH_SatchelFull"] = "SatchelFull", ["PH_Coin"] = "Coins", ["PH_Climb"] = "Rope", ["PH_GateSlam"] = "GateSlam",
             ["PH_GateRise"] = "GateRise", ["PH_Flip"] = "GrillFlip", ["PH_FlipPerfect"] = "GrillFlip", ["PH_PourLoop"] = "TapPour",
             ["PH_Clink"] = "Clink", ["PH_LineTing"] = "Clink", ["PH_Chop"] = "Chop", ["PH_ChopDone"] = "Chop", ["PH_ChopRagged"] = "Knife",
             ["PH_KnifeIn"] = "Knife", ["PH_Cleave"] = "Butchery", ["PH_ButcherDone"] = "ButcherDone", ["PH_PlateUp"] = "Plate",
@@ -163,6 +170,7 @@ namespace Hearthdelve.Editor
             ["PH_FurnitureTurn"] = "FurnitureTurn", ["PH_FurnitureStore"] = "FurnitureStore", ["PH_FurnitureUndo"] = "FurnitureUndo",
             ["PH_TrollSlam"] = "TrollImpact", ["PH_TrollThud"] = "TrollImpact", ["PH_TrollFall"] = "TrollImpact",
             ["PH_TrollGulp"] = "Gulp", ["PH_TrollSpoil"] = "Gulp", ["PH_TrollRoar"] = "TrollRoar", ["PH_SizzleLoop"] = "Sizzle",
+            ["PH_Splash"] = "Splash",
         };
 
         /// <summary>Feedbacks whose placeholder served another moment too: by name, first.</summary>
@@ -174,7 +182,11 @@ namespace Hearthdelve.Editor
             ["Feedback_Swing"] = "Swing",
             ["Feedback_Door"] = "Door",
             ["Feedback_Stairs"] = "Stairs",
-            ["Feedback_Area"] = "AreaWhoosh",  // Decorate's area change; the fall into a hole keeps PH_Whoosh for now
+            ["Feedback_Area"] = "AreaWhoosh",  // Decorate's area change
+            ["Feedback_Fall"] = "Fall",        // the fall into a hole (both were PH_Whoosh)
+            ["Feedback_Climb"] = "Rope",       // climbing out (it shared the stairs' planks in round 1)
+            ["Feedback_ChargeLevel_2"] = "ChargeTick2",
+            ["Feedback_ChargeLevel_3"] = "ChargeTick3",
         };
 
         /// <summary>A second sound layered on a feedback, by its name (round 2: the troll's voice over his impacts).</summary>
