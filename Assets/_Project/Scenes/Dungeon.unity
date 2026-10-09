@@ -919,11 +919,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 59060467}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: ae73f43b74a3e4841b35331c084f311e, type: 3}
-        - {fileID: 8300000, guid: 197cf59f4ffe8794d98292df3648d6fc, type: 3}
-        - {fileID: 8300000, guid: d576b4d5d06ef6a46b0db80580e970cc, type: 3}
+        Sfx: {fileID: 8300000, guid: ae73f43b74a3e4841b35331c084f311e, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -932,8 +929,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.7802158
-        MaxVolume: 0.7802158
+        MinVolume: 0.8460598
+        MaxVolume: 0.8460598
         MinPitch: 0.96
         MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -18414,11 +18411,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 925550891}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: ae73f43b74a3e4841b35331c084f311e, type: 3}
-        - {fileID: 8300000, guid: 197cf59f4ffe8794d98292df3648d6fc, type: 3}
-        - {fileID: 8300000, guid: d576b4d5d06ef6a46b0db80580e970cc, type: 3}
+        Sfx: {fileID: 8300000, guid: ae73f43b74a3e4841b35331c084f311e, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -18427,8 +18421,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.7802158
-        MaxVolume: 0.7802158
+        MinVolume: 0.8460598
+        MaxVolume: 0.8460598
         MinPitch: 0.96
         MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

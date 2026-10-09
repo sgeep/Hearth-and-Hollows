@@ -146,6 +146,8 @@ namespace Hearthdelve.Editor
             };
             var feedback = root.gameObject.AddComponent<DecorateFeedback>();
             feedback.Configure(moments);
+            // Decorate Mode keeps its placeholders (the owner's call, 4i-C playtest).
+            SoundSwap.KeepDecoratePlaceholders(root.gameObject);
             return feedback;
         }
 

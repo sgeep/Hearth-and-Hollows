@@ -22,10 +22,10 @@ namespace Hearthdelve.Tests.EditMode
     {
         /// <summary>The placeholders the approved sounds don't replace (the listening list's gaps and what it didn't cover).</summary>
         /// Round 2 (2026-10-09) filled the troll's roar, the grill's sizzle, the fall's whoosh, the charge ticks and the splash; the
-        /// campfire waits for the owner's choice (it has no fire sound yet).
+        /// 4i-C playtest filled the campfire. Decorate Mode's placeholders are kept on purpose and aren't gaps.
         static readonly string[] k_Left =
         {
-            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Campfire", "PH_CampfireLow", "PH_Heartbeat", "PH_SpillWarn",
+            "PH_Brush", "PH_Bump", "PH_Burn", "PH_Heartbeat", "PH_SpillWarn",
         };
 
         [Test]
@@ -64,7 +64,71 @@ namespace Hearthdelve.Tests.EditMode
             Assert.That(SoundBank.For("Feedback_Vigor", "PH_UiTick").Key, Is.EqualTo("Soil"), "planting is heard as soil, not the interface tick");
             Assert.That(SoundBank.For("Feedback_Tick", "PH_UiTick").Key, Is.EqualTo("UiTick"));
             Assert.That(SoundBank.For("Feedback_Fall", "PH_Whoosh").Key, Is.EqualTo("Fall"), "round 2: the fall into a hole (Leohpaz, trimmed)");
-            Assert.That(SoundBank.For("Feedback_Area", "PH_Whoosh").Key, Is.EqualTo("AreaWhoosh"));
+            Assert.That(SoundBank.For("Feedback_Area", "PH_Whoosh"), Is.Null, "Decorate Mode's area change keeps its placeholder");
+            // The 4i-C playtest's picks.
+            Assert.That(SoundBank.Get("EnemyDeath").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "69_Enemy_death_01.wav" }));
+            Assert.That(SoundBank.Get("Dodge").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "65_Dash_evade_01.wav" }));
+            Assert.That(SoundBank.For("Feedback_PowerUp", "PH_PowerUp").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "maximize_006.ogg" }), "the upgrade pickup");
+            Assert.That(SoundBank.Get("SatchelFull").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "Window_Close_2.wav" }));
+            Assert.That(SoundBank.For("Feedback_Warm", "PH_Campfire").Key, Is.EqualTo("Campfire"));
+            Assert.That(SoundBank.Get("Footsteps.Village").Sources.Count(s => s.Contains("Step_grass_")), Is.EqualTo(3), "outdoors: dirt and grass mixed");
+        }
+
+        /// <summary>Decorate Mode plays its placeholders (the owner's call after the 4i-C playtest), every moment as it was built.</summary>
+        [Test]
+        public void DecorateMode_KeepsItsPlaceholders()
+        {
+            Scene scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Additive);
+            try
+            {
+                var decorate = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Hearthdelve.Tavern.Scene.DecorateFeedback>(true)).Single();
+                int checkedMoments = 0;
+                foreach (MMF_Player player in decorate.GetComponentsInChildren<MMF_Player>(true))
+                {
+                    if (!SoundBank.DecoratePlaceholders.TryGetValue(player.name, out string placeholder)) continue;
+                    foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
+                    {
+                        Assert.That(sound.Sfx != null ? sound.Sfx.name : null, Is.EqualTo(placeholder), player.name);
+                        Assert.That(sound.RandomSfx == null || sound.RandomSfx.Length == 0, Is.True, player.name);
+                        checkedMoments++;
+                    }
+                }
+                Assert.That(checkedMoments, Is.EqualTo(SoundBank.DecoratePlaceholders.Count), "every moment of Decorate Mode");
+            }
+            finally
+            {
+                EditorSceneManager.CloseScene(scene, true);
+            }
+        }
+
+        /// <summary>
+        /// No sound anywhere points at a file that's gone (4i-C: the keeper's footsteps still named round 1's removed clips, so
+        /// walking was silent while every other check passed). Reads the prefabs, scenes and assets as text: a missing clip has no
+        /// object left to inspect.
+        /// </summary>
+        [Test]
+        public void NoSound_PointsAtAMissingFile()
+        {
+            var missing = new List<string>();
+            var reference = new System.Text.RegularExpressions.Regex("fileID: 8300000, guid: ([0-9a-f]{32})");
+            foreach (string file in Directory.GetFiles("Assets/_Project", "*.*", SearchOption.AllDirectories)
+                         .Where(f => f.EndsWith(".prefab") || f.EndsWith(".unity") || f.EndsWith(".asset")))
+            foreach (System.Text.RegularExpressions.Match m in reference.Matches(File.ReadAllText(file)))
+                if (string.IsNullOrEmpty(AssetDatabase.GUIDToAssetPath(m.Groups[1].Value))) missing.Add($"{file}: {m.Groups[1].Value}");
+            Assert.That(missing, Is.Empty);
+        }
+
+        /// <summary>
+        /// From Retro Dialogue, only the four synth blips (the owner's hard rule) and the one file the owner picked themselves for
+        /// a full satchel (the 4i-C playtest).
+        /// </summary>
+        [Test]
+        public void FromRetroDialogue_OnlyTheBlips_AndTheOwnersSatchelPick()
+        {
+            string pack = Path.Combine(SoundBank.Leohpaz, "Leohpaz_RetroDialogue_SFX");
+            var used = SoundBank.Families.SelectMany(f => f.Sources.Select(s => (f.Key, s))).Where(x => x.s.StartsWith(pack)).ToList();
+            foreach (var (key, source) in used)
+                Assert.That(key is "Blip" or "Blip.Low" || (key == "SatchelFull" && source.EndsWith(Path.Combine("Window", "Window_Close_2.wav"))), Is.True, $"{key}: {source}");
         }
 
         static IEnumerable<GameObject> PrefabRoots() =>
@@ -96,7 +160,13 @@ namespace Hearthdelve.Tests.EditMode
             foreach (string path in new[] { LookTestContent.PlayerPrefab, LookTestContent.TavernPlayerPrefab })
             {
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                Assert.That(prefab.GetComponentInChildren<Footsteps>(true), Is.Not.Null, path);
+                Footsteps steps = prefab.GetComponentInChildren<Footsteps>(true);
+                Assert.That(steps, Is.Not.Null, path);
+                // The steps are the bank's, every clip present (4i-C: they pointed at removed files and were silent).
+                Assert.That(steps.VillageClips, Is.EqualTo(SoundBank.Clips(SoundBank.Get("Footsteps.Village"))), path);
+                Assert.That(steps.TavernClips, Is.EqualTo(SoundBank.Clips(SoundBank.Get("Footsteps.Tavern"))), path);
+                Assert.That(steps.StoneClips, Is.EqualTo(SoundBank.Clips(SoundBank.Get("Footsteps.Hollows"))), path);
+                Assert.That(steps.VillageClips.Concat(steps.TavernClips).Concat(steps.StoneClips), Has.None.Null, path);
                 MMF_Player dodge = prefab.transform.Find("Feedback_Dodge").GetComponent<MMF_Player>();
                 Assert.That(dodge.FeedbacksList.Any(f => f.GetType().Name.Contains("Haptic")), Is.False, $"{path}: no rumble on the dodge (4b: frequent, it would numb the hits)");
             }

@@ -237,29 +237,21 @@ MonoBehaviour:
   m_Animator: {fileID: 7579746386926957456}
   m_Hollows: 1
   m_Village:
-  - {fileID: 8300000, guid: 576bff17f33623447b868b09798a1336, type: 3}
-  - {fileID: 8300000, guid: eebafe43b6e231247bab7411d9833a59, type: 3}
-  - {fileID: 8300000, guid: 234e05b47789fe240b911e66097dbd49, type: 3}
-  - {fileID: 8300000, guid: ffdc9cff39d095b43a68fd9dcf0384e5, type: 3}
-  - {fileID: 8300000, guid: 92cd0228832b12b49a1bca51770da538, type: 3}
-  - {fileID: 8300000, guid: ed4eac48352ea2e41aa78b1f1d48fce7, type: 3}
-  - {fileID: 8300000, guid: 7a65385e190c94e4d8b74dcd3fdeee53, type: 3}
-  - {fileID: 8300000, guid: 27898afd8befd024d8cb6ea09fbff7e6, type: 3}
-  - {fileID: 8300000, guid: 76d25c190e308bf43bab2e0baf30a8b3, type: 3}
-  - {fileID: 8300000, guid: 8fbe3d3b200305c48bac99cc3c43aa04, type: 3}
+  - {fileID: 8300000, guid: 83bd205246662d04e90ca5d247fbd082, type: 3}
+  - {fileID: 8300000, guid: 37c1d326ac149ac4088d5ef649187832, type: 3}
+  - {fileID: 8300000, guid: ca484970e0506eb46bd9fc9ade201203, type: 3}
+  - {fileID: 8300000, guid: 6563f1f2eda6f874fbcc761d3b6c916c, type: 3}
+  - {fileID: 8300000, guid: 30b54f50a1b22474ea81c8970646ed31, type: 3}
+  - {fileID: 8300000, guid: 7cdf8204d1d34524f9cf551ed9683c2b, type: 3}
   m_Tavern:
-  - {fileID: 8300000, guid: 12a6d94e20558f743bc8521be1f33563, type: 3}
-  - {fileID: 8300000, guid: a5094ad8b1875164db53d85bf0b93f7a, type: 3}
-  - {fileID: 8300000, guid: 3024c1637a216df4fade0855714a88ec, type: 3}
-  - {fileID: 8300000, guid: 345c163a060adce45b761f19bed954fb, type: 3}
-  - {fileID: 8300000, guid: 44ba2c9d74053384ab67874eba1abbb0, type: 3}
+  - {fileID: 8300000, guid: 9b564b39d3a45834190aa744d131f77f, type: 3}
+  - {fileID: 8300000, guid: c4e1083c42ab06e458bfd79f285b50ba, type: 3}
+  - {fileID: 8300000, guid: f4789e077fe3c7e4489bbba6dec7804f, type: 3}
   m_Stone:
-  - {fileID: 8300000, guid: 93899ccd11ccaac4f9369a9cb60efe83, type: 3}
-  - {fileID: 8300000, guid: 33d779b4c2b58d247ae3dddc4a566ace, type: 3}
-  - {fileID: 8300000, guid: 71ed2c09ae3e6da4a93884d181d8a6a1, type: 3}
-  - {fileID: 8300000, guid: f391063aa04be3a4bbd122e633a0f0a5, type: 3}
-  - {fileID: 8300000, guid: edf09edb1fd87a4468e2d727a7fd1e15, type: 3}
-  m_Volume: 0.09013725
+  - {fileID: 8300000, guid: 711e0a0a187a1214987e25b9d4c9fe0f, type: 3}
+  - {fileID: 8300000, guid: 26f987b850f774c40a006caf400720aa, type: 3}
+  - {fileID: 8300000, guid: 1f358ede5ceddde41842704fa7b128b4, type: 3}
+  m_Volume: 0.10696137
   m_TavernVolume: 0.0665276
   m_StoneVolume: 0.10424162
   m_Pitch: {x: 0.94, y: 1.06}
@@ -1007,11 +999,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 6651200227946246712}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: dc46d89b73da4904d8252817502afc82, type: 3}
-        - {fileID: 8300000, guid: 3d1ba9245598a2c4f849f6f16ae7b740, type: 3}
-        - {fileID: 8300000, guid: 424bddfaaa7dab54bb7b23deeb78ea24, type: 3}
+        Sfx: {fileID: 8300000, guid: dc46d89b73da4904d8252817502afc82, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -1020,8 +1009,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.43634853
-        MaxVolume: 0.43634853
+        MinVolume: 0.4068341
+        MaxVolume: 0.4068341
         MinPitch: 0.96
         MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -1835,7 +1824,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 4363897262104370144}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 3e83de11658f64648a811eda29754c6e, type: 3}
+        Sfx: {fileID: 8300000, guid: 8e3712a1ba988bd4fb553e5eb5c87516, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -1845,8 +1834,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.3659465
-        MaxVolume: 0.3659465
+        MinVolume: 0.19594613
+        MaxVolume: 0.19594613
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}

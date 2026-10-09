@@ -77,7 +77,7 @@ namespace Hearthdelve.Editor
                 GameObject root = PrefabUtility.LoadPrefabContents(path);
                 try
                 {
-                    int n = Swap(root) + Relevel(root);
+                    int n = KeepDecoratePlaceholders(root) + Swap(root) + Relevel(root);
                     int e = 0;
                     if (path == LookTestContent.PlayerPrefab) e += EquipKeeper(root, hollows: true);
                     if (path == LookTestContent.TavernPlayerPrefab) e += EquipKeeper(root, hollows: false);
@@ -97,7 +97,7 @@ namespace Hearthdelve.Editor
                 int n = 0, e = 0;
                 foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    n += Swap(root) + Relevel(root);
+                    n += KeepDecoratePlaceholders(root) + Swap(root) + Relevel(root);
                     foreach (UiFeedback ui in root.GetComponentsInChildren<UiFeedback>(true)) e += EquipWater(ui);
                     foreach (TavernFeedback tavern in root.GetComponentsInChildren<TavernFeedback>(true)) e += EquipPassages(tavern.transform);
                     if (EquipScene != null) e += EquipScene(root);
@@ -121,7 +121,7 @@ namespace Hearthdelve.Editor
             int n = EquipLayers(root);
             foreach (MMF_Player player in root.GetComponentsInChildren<MMF_Player>(true))
             {
-                if (player.FeedbacksList == null) continue;
+                if (player.FeedbacksList == null || InDecorate(player)) continue;
                 bool changed = false;
                 foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
                 {
@@ -140,6 +140,36 @@ namespace Hearthdelve.Editor
                 source.clip = clips[0];
                 EditorUtility.SetDirty(source);
                 n++;
+            }
+            return n;
+        }
+
+        static bool InDecorate(Component c) => c.GetComponentInParent<DecorateFeedback>(true) != null;
+
+        /// <summary>
+        /// Decorate Mode plays its placeholders (the owner's call after the 4i-C playtest): any feedback under its feedback object
+        /// that an earlier pass gave an approved sound gets its placeholder back, at full volume and its own pitch, as it was built.
+        /// </summary>
+        public static int KeepDecoratePlaceholders(GameObject root)
+        {
+            int n = 0;
+            foreach (DecorateFeedback decorate in root.GetComponentsInChildren<DecorateFeedback>(true))
+            foreach (MMF_Player player in decorate.GetComponentsInChildren<MMF_Player>(true))
+            {
+                if (player.FeedbacksList == null || !SoundBank.DecoratePlaceholders.TryGetValue(player.name, out string placeholder)) continue;
+                AudioClip clip = LookTestContent.Sfx(placeholder);
+                if (clip == null) continue;
+                foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
+                {
+                    if (sound.Sfx == clip && (sound.RandomSfx == null || sound.RandomSfx.Length == 0) && sound.Label == "Sound (placeholder)") continue;
+                    sound.Sfx = clip;
+                    sound.RandomSfx = new AudioClip[0];
+                    sound.MinPitch = sound.MaxPitch = 1f;
+                    sound.MinVolume = sound.MaxVolume = 1f;
+                    sound.Label = "Sound (placeholder)";
+                    EditorUtility.SetDirty(player);
+                    n++;
+                }
             }
             return n;
         }
@@ -197,6 +227,16 @@ namespace Hearthdelve.Editor
             }
             foreach (Footsteps steps in root.GetComponentsInChildren<Footsteps>(true))
             {
+                // The steps' clips follow the bank (4i-C: round 2's footsteps never reached the keeper; they still pointed at
+                // round 1's files, which round 2 had removed, so every step was silent).
+                AudioClip[] villageClips = SoundBank.Clips(SoundBank.Get("Footsteps.Village")), tavernClips = SoundBank.Clips(SoundBank.Get("Footsteps.Tavern")),
+                    stoneClips = SoundBank.Clips(SoundBank.Get("Footsteps.Hollows"));
+                if (!steps.VillageClips.SequenceEqual(villageClips) || !steps.TavernClips.SequenceEqual(tavernClips) || !steps.StoneClips.SequenceEqual(stoneClips))
+                {
+                    steps.SetClips(villageClips, tavernClips, stoneClips);
+                    EditorUtility.SetDirty(steps);
+                    n++;
+                }
                 float village = SoundBank.Volume(SoundBank.Get("Footsteps.Village")), tavern = SoundBank.Volume(SoundBank.Get("Footsteps.Tavern")),
                     stone = SoundBank.Volume(SoundBank.Get("Footsteps.Hollows"));
                 if (Mathf.Approximately(steps.Volume, village) && Mathf.Approximately(steps.TavernVolume, tavern) && Mathf.Approximately(steps.StoneVolume, stone)) continue;
@@ -322,14 +362,14 @@ namespace Hearthdelve.Editor
             return n;
         }
 
-        /// <summary>Tests: placeholders still in use (the gaps), by name.</summary>
+        /// <summary>Tests: placeholders still in use (the gaps), by name; Decorate Mode's, kept on purpose, aren't gaps.</summary>
         public static SortedSet<string> PlaceholdersLeft(IEnumerable<GameObject> roots)
         {
             var left = new SortedSet<string>();
             foreach (GameObject root in roots)
             {
                 foreach (MMF_Player player in root.GetComponentsInChildren<MMF_Player>(true))
-                    if (player.FeedbacksList != null)
+                    if (player.FeedbacksList != null && !InDecorate(player))
                         foreach (MMF_Sound s in player.FeedbacksList.OfType<MMF_Sound>())
                             if (s.Sfx != null && s.Sfx.name.StartsWith("PH_")) left.Add(s.Sfx.name);
                 foreach (AudioSource a in root.GetComponentsInChildren<AudioSource>(true))

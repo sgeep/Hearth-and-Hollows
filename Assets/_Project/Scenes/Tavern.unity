@@ -352,7 +352,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1708487635
-        Label: Sound (UiBuy)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -422,7 +422,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 4338952}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 2ce2e1b4ec7a1af4e87eda2cc525e398, type: 3}
+        Sfx: {fileID: 8300000, guid: c942a20aed7b56e44a1b305dad5bc17b, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -432,8 +432,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.20597282
-        MaxVolume: 0.20597282
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -4176,7 +4176,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1953623746
-        Label: Sound (AreaWhoosh)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -4246,7 +4246,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 46998630}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: cafe4d964f2db1d42aa296cb41fa029d, type: 3}
+        Sfx: {fileID: 8300000, guid: d6b184aa52287dd4192ca0505d33ec46, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -4256,8 +4256,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.4594566
-        MaxVolume: 0.4594566
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -23028,7 +23028,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 800510132
-        Label: Sound (FurnitureTurn)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -23098,7 +23098,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 257772884}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: cd11b3da8c929954ca37904f04d3c9ff, type: 3}
+        Sfx: {fileID: 8300000, guid: 9a17e23b39b43e0448c7f47728b4c2c6, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -23108,8 +23108,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.21670602
-        MaxVolume: 0.21670602
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -46829,7 +46829,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -608595215
-        Label: Sound (FurnitureTurn)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -46899,7 +46899,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 617148847}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: cd11b3da8c929954ca37904f04d3c9ff, type: 3}
+        Sfx: {fileID: 8300000, guid: 9a17e23b39b43e0448c7f47728b4c2c6, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -46909,8 +46909,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.21670602
-        MaxVolume: 0.21670602
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -59951,7 +59951,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1935946630
-        Label: Sound (FurnitureStore)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -60021,10 +60021,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 798577482}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: 8aabf2a1aaff95a45b40f07989595765, type: 3}
-        - {fileID: 8300000, guid: 17f54d31d2a411b4282789b40ac993b4, type: 3}
+        Sfx: {fileID: 8300000, guid: 9449463efd88c49419f6c720084ce13f, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -60033,8 +60031,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.31819943
-        MaxVolume: 0.31819943
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -65201,7 +65199,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 694906655
-        Label: Sound (UiChime)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -65271,10 +65269,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 872913446}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: bed787c0b166dab49986240cd8c43f77, type: 3}
-        - {fileID: 8300000, guid: c8c42928509975e4dad7873f87fcb620, type: 3}
+        Sfx: {fileID: 8300000, guid: 334a8bd60247a7a458533f8dbab6770d, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -65283,8 +65279,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.22949962
-        MaxVolume: 0.22949962
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -70953,7 +70949,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -237755621
-        Label: Sound (FurniturePlace)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -71023,13 +71019,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 945731718}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: bd576d42f6f635342a711a9341343850, type: 3}
-        - {fileID: 8300000, guid: 58fdc6d40944f9049aa88049d21c7a17, type: 3}
-        - {fileID: 8300000, guid: 9cbcbaa34830c544fabe856801d0a2b7, type: 3}
-        - {fileID: 8300000, guid: 4b2ca9bea81e4bb489989d7ddd9ab5cb, type: 3}
-        - {fileID: 8300000, guid: c296b6121bdb4744bac08224badb2422, type: 3}
+        Sfx: {fileID: 8300000, guid: d3f2f145d2973fd44a0f8f2c10ad283d, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -71038,10 +71029,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.42041737
-        MaxVolume: 0.42041737
-        MinPitch: 0.96
-        MaxPitch: 1.04
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 1
+        MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -77296,7 +77287,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 962224008
-        Label: Sound (Discovery)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -77366,11 +77357,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1006848037}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: 47fc3c6e96f1d5d48bd0abaccae446b0, type: 3}
-        - {fileID: 8300000, guid: ecfd1f2fbf5c3ee4c9e3ea67c335235f, type: 3}
-        - {fileID: 8300000, guid: 8eae849287cf7ff419f3f93fa1fd7c5e, type: 3}
+        Sfx: {fileID: 8300000, guid: eebce023b7218f0479ee4be109755b68, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -77379,8 +77367,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.27707526
-        MaxVolume: 0.27707526
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -80644,7 +80632,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 583091430
-        Label: Sound (FurnitureLift)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -80714,7 +80702,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1046653833}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 5d5f264251328c44cbebb3d67fb20391, type: 3}
+        Sfx: {fileID: 8300000, guid: 6d7c4f0dc229d19468d9dc610285b9ad, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -80724,10 +80712,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.60001785
-        MaxVolume: 0.60001785
-        MinPitch: 0.95
-        MaxPitch: 1.05
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 1
+        MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -84685,7 +84673,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 1157505271
-        Label: Sound (FurniturePlace)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -84755,13 +84743,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1101981041}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: bd576d42f6f635342a711a9341343850, type: 3}
-        - {fileID: 8300000, guid: 58fdc6d40944f9049aa88049d21c7a17, type: 3}
-        - {fileID: 8300000, guid: 9cbcbaa34830c544fabe856801d0a2b7, type: 3}
-        - {fileID: 8300000, guid: 4b2ca9bea81e4bb489989d7ddd9ab5cb, type: 3}
-        - {fileID: 8300000, guid: c296b6121bdb4744bac08224badb2422, type: 3}
+        Sfx: {fileID: 8300000, guid: d3f2f145d2973fd44a0f8f2c10ad283d, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -84770,10 +84753,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.42041737
-        MaxVolume: 0.42041737
-        MinPitch: 0.96
-        MaxPitch: 1.04
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 1
+        MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -101201,7 +101184,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -1715241519
-        Label: Sound (FurnitureLift)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -101271,7 +101254,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1364556419}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 5d5f264251328c44cbebb3d67fb20391, type: 3}
+        Sfx: {fileID: 8300000, guid: 6d7c4f0dc229d19468d9dc610285b9ad, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -101281,10 +101264,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.60001785
-        MaxVolume: 0.60001785
-        MinPitch: 0.95
-        MaxPitch: 1.05
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 1
+        MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -108564,7 +108547,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 56226136
-        Label: Sound (UiConfirm)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -108634,11 +108617,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1461797010}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: 5e50facc88bfada4ba42568bd77e1db8, type: 3}
-        - {fileID: 8300000, guid: d24029c20fa1ff140b7085d532f0995d, type: 3}
-        - {fileID: 8300000, guid: 473a59330471f5d4e85870c76f841d59, type: 3}
+        Sfx: {fileID: 8300000, guid: b4408cf7371a867458fd82d440cd288f, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -108647,8 +108627,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.21388912
-        MaxVolume: 0.21388912
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -125314,7 +125294,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: 234408854
-        Label: Sound (UiBack)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -125384,12 +125364,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1657685161}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: bf8279323cd1d5b4db8734c80a04349a, type: 3}
-        - {fileID: 8300000, guid: d913a59cedc891c4b97e9ab8eba87497, type: 3}
-        - {fileID: 8300000, guid: 5183f7cdead3fd244978865a93a87916, type: 3}
-        - {fileID: 8300000, guid: 0b63a5e792496924ba803bab3bf0f287, type: 3}
+        Sfx: {fileID: 8300000, guid: e77a2407d7f7e1749b89feb3af440132, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -125398,8 +125374,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.18046306
-        MaxVolume: 0.18046306
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -134945,7 +134921,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -774661625
-        Label: Sound (FurnitureUndo)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -135015,7 +134991,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1801503705}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 883b0523e1fbd124b8b6d659878e4133, type: 3}
+        Sfx: {fileID: 8300000, guid: 29a2e5b450f5f5240bce4359b00338d3, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -135025,8 +135001,8 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.21519516
-        MaxVolume: 0.21519516
+        MinVolume: 1
+        MaxVolume: 1
         MinPitch: 1
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
@@ -135449,7 +135425,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -582823079
-        Label: Sound (Coins)
+        Label: Sound (placeholder)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -135519,11 +135495,8 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 1808257568}
         DebugActive: 0
-        Sfx: {fileID: 0}
-        RandomSfx:
-        - {fileID: 8300000, guid: 07b1081a61b7eb243bbd5efc9a210933, type: 3}
-        - {fileID: 8300000, guid: fadd55ba8493ae4479080c1737c3da6b, type: 3}
-        - {fileID: 8300000, guid: a6e3c6d484b63d6429112d69b3c46464, type: 3}
+        Sfx: {fileID: 8300000, guid: 83e7656df4e453a41ae97005260f68cb, type: 3}
+        RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -135532,10 +135505,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 0.5419252
-        MaxVolume: 0.5419252
-        MinPitch: 0.96
-        MaxPitch: 1.04
+        MinVolume: 1
+        MaxVolume: 1
+        MinPitch: 1
+        MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

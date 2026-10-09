@@ -211,6 +211,7 @@ namespace Hearthdelve.Tests.PlayMode
             InputSystem.QueueStateEvent(m_Pad, new GamepadState());
             yield return Frames(3);
             Assert.That(steps.Steps, Is.GreaterThan(0), "walking is heard, on the walk's footfalls");
+            Assert.That(steps.LastStep, Is.Not.Null, "a real sound, never a missing clip");
 
             PassageSounds passages = Object.FindAnyObjectByType<PassageSounds>(FindObjectsInactive.Include);
             Assert.That(passages, Is.Not.Null);

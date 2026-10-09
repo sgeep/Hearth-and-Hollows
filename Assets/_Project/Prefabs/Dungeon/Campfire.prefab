@@ -394,7 +394,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -405740362
-        Label: Sound (placeholder)
+        Label: Sound (CampfireLow)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -464,7 +464,7 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 204396358206237044}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 7599530f673c6e94382521a2d0774c60, type: 3}
+        Sfx: {fileID: 8300000, guid: 03619654515457946b6f55630751764c, type: 3}
         RandomSfx: []
         TestPlayButton:
           ButtonText: Debug Play Sound
@@ -474,10 +474,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinVolume: 0.5139779
+        MaxVolume: 0.5139779
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0
@@ -866,7 +866,7 @@ MonoBehaviour:
       data:
         Active: 1
         UniqueID: -259877174
-        Label: Sound (placeholder)
+        Label: Sound (Campfire)
         OriginalLabel: 
         ChannelMode: 0
         Channel: 0
@@ -936,8 +936,10 @@ MonoBehaviour:
           ButtonText: Automatic Shaker Setup
         Owner: {fileID: 6209626021494056302}
         DebugActive: 0
-        Sfx: {fileID: 8300000, guid: 40d0b98eecbd6254890d7ce1b425c825, type: 3}
-        RandomSfx: []
+        Sfx: {fileID: 0}
+        RandomSfx:
+        - {fileID: 8300000, guid: 866136b6dcbcd6f4480f9130ea0d6fce, type: 3}
+        - {fileID: 8300000, guid: 03619654515457946b6f55630751764c, type: 3}
         TestPlayButton:
           ButtonText: Debug Play Sound
         TestStopButton:
@@ -946,10 +948,10 @@ MonoBehaviour:
         PoolSize: 10
         UseLegacyEventsMode: 0
         StopSoundOnFeedbackStop: 1
-        MinVolume: 1
-        MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinVolume: 0.94660217
+        MaxVolume: 0.94660217
+        MinPitch: 0.96
+        MaxPitch: 1.04
         SfxAudioMixerGroup: {fileID: 527943853166698841, guid: 43ed39c5f916098448a2156e49242ecb, type: 2}
         Priority: 128
         PanStereo: 0

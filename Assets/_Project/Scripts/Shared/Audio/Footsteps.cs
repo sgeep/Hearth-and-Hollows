@@ -29,6 +29,21 @@ namespace Hearthdelve.Shared.Audio
 
         public int Steps { get; private set; }
 
+        /// <summary>The last step's clip (tests: a step is a real sound, never a missing one).</summary>
+        public AudioClip LastStep { get; private set; }
+
+        public System.Collections.Generic.IReadOnlyList<AudioClip> VillageClips => m_Village ?? new AudioClip[0];
+        public System.Collections.Generic.IReadOnlyList<AudioClip> TavernClips => m_Tavern ?? new AudioClip[0];
+        public System.Collections.Generic.IReadOnlyList<AudioClip> StoneClips => m_Stone ?? new AudioClip[0];
+
+        /// <summary>The steps on each ground (the sound pass keeps them in step with the approved sounds).</summary>
+        public void SetClips(AudioClip[] village, AudioClip[] tavern, AudioClip[] stone)
+        {
+            m_Village = village;
+            m_Tavern = tavern;
+            m_Stone = stone;
+        }
+
         /// <summary>How loud a step plays (set by the balance pass from the clips' measured loudness).</summary>
         public float Volume
         {
@@ -89,7 +104,9 @@ namespace Hearthdelve.Shared.Audio
             if (clips.Length > 1 && i == m_LastClip) i = (i + 1) % clips.Length;
             m_LastClip = i;
             m_Source.pitch = Random.Range(m_Pitch.x, m_Pitch.y);
+            if (clips[i] == null) return;
             m_Source.PlayOneShot(clips[i], m_Hollows ? m_StoneVolume : SurfaceTime.Indoors ? m_TavernVolume : m_Volume);
+            LastStep = clips[i];
             Steps++;
         }
     }

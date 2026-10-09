@@ -52,7 +52,7 @@ namespace Hearthdelve.Editor
         }
 
         static readonly string[] k_Impact = { "Hit", "HitHeavy", "Hurt", "TrollImpact", "GateSlam", "Crash", "EnemyDeath" };
-        static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "FurnitureTurn", "FurnitureUndo", "Discovery" };
+        static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "Discovery", "PowerUp" };
         static readonly string[] k_Quiet = { "Blip", "Blip.Low" };
         static readonly string[] k_Footsteps = { "Footsteps.Village", "Footsteps.Tavern", "Footsteps.Hollows" };
 
@@ -80,7 +80,7 @@ namespace Hearthdelve.Editor
         static string L(string relative) => Path.Combine(Leohpaz, relative);
         const string Farm = @"Farm_SFX_Pack_Minifantasy_Compatible\", Inventory = @"Inventory_SFX_Pack\Inventory_SFX\",
             Grunts = @"LEOHPAZ_HumanoidsGrunts_SFX\", Craft = @"Minifantasy_CraftingAndProfessions2_SFX\",
-            Blips = @"Leohpaz_RetroDialogue_SFX\RetroDialogue_SFX\Synth_Blips\";
+            Blips = @"Leohpaz_RetroDialogue_SFX\RetroDialogue_SFX\Synth_Blips\", RetroWindow = @"Leohpaz_RetroDialogue_SFX\RetroDialogue_SFX\Window\";
         // The four packs sorted into their own folders on 2026-10-09 (their licence is on their store pages).
         const string Movement = @"90 Player Movement\", Battle = @"90 RPG Battle\", Dungeon = @"Minifantasy Dungeon\", Plains = @"Minifantasy Forgotten Plains\";
         static string[] Ks(string stem, int count, int digits = 3, int start = 0) =>
@@ -92,18 +92,22 @@ namespace Hearthdelve.Editor
         /// <summary>The families (the listening list's numbers in comments).</summary>
         public static readonly Family[] Families =
         {
-            F("Footsteps.Village", new[] { L(Farm + @"_Generic_Human\Step_dirt_1.wav"), L(Farm + @"_Generic_Human\Step_dirt_2.wav"), L(Farm + @"_Generic_Human\Step_dirt_3.wav") }), // 1, round 2 B
+            // 1, round 2 B; the 4i-C playtest's B: dirt and grass mixed (Forgotten Plains' grass steps are these same Farm files).
+            F("Footsteps.Village", new[] { L(Farm + @"_Generic_Human\Step_dirt_1.wav"), L(Farm + @"_Generic_Human\Step_dirt_2.wav"), L(Farm + @"_Generic_Human\Step_dirt_3.wav"),
+                L(Farm + @"_Generic_Human\Step_grass_1.wav"), L(Farm + @"_Generic_Human\Step_grass_2.wav"), L(Farm + @"_Generic_Human\Step_grass_3.wav") }),
             F("Footsteps.Tavern", new[] { L(Movement + "10_Step_wood_01.wav"), L(Movement + "11_Step_wood_02.wav"), L(Movement + "12_Step_wood_03.wav") }), // 2, round 2 A
             F("Footsteps.Hollows", new[] { L(Farm + @"_Generic_Human\Step_stone_1.wav"), L(Farm + @"_Generic_Human\Step_stone_2.wav"), L(Farm + @"_Generic_Human\Step_stone_3.wav") }), // 3, round 2 B
-            F("Dodge", new[] { L(Movement + "65_Dash_evade_01.wav"), L(Movement + "66_Dash_evade_02.wav"), L(Movement + "67_Dash_evade_03.wav") }, 0.04f), // 4, round 2 A
+            F("Dodge", new[] { L(Movement + "65_Dash_evade_01.wav") }, 0.04f),                                          // 4, round 2 A; 65 only (4i-C playtest)
             F("Swing", new[] { L(Dungeon + "27_sword_miss_1.wav"), L(Dungeon + "27_sword_miss_2.wav"), L(Dungeon + "27_sword_miss_3.wav") }, 0.05f, 0.7f), // 5, round 2 A
             F("Hit", Enumerable.Range(14, 5).Select(i => L(Battle + $"{i}_Impact_flesh_0{i - 13}.wav")).ToArray(), 0.04f), // 6, round 2 B
             F("HitHeavy", Enumerable.Range(9, 5).Select(i => L(Battle + $"{i:00}_Impact_0{i - 8}.wav")).ToArray(), 0.04f), // 7, round 2 A
             F("Hurt", new[] { L(Dungeon + "11_human_damage_1.wav"), L(Dungeon + "11_human_damage_2.wav"), L(Dungeon + "11_human_damage_3.wav") }, 0.03f), // 8, round 2 A
             F("Telegraph", new[] { K("impactBell_heavy_004.ogg") }),                                                     // 9 A
-            F("EnemyDeath", new[] { L(Battle + "69_Enemy_death_01.wav"), L(Battle + "70_Enemy_death_02.wav"), L(Battle + "72_Enemy_death_04.wav") }, 0.04f), // 10, round 2 A // 10 A
+            F("EnemyDeath", new[] { L(Battle + "69_Enemy_death_01.wav") }, 0.04f),                                       // 10, round 2 A; 69 only (4i-C playtest)
             F("Pickup", new[] { L(Inventory + @"Managing\Item_Pick.wav") }, 0.05f),                                     // 11, round 2 B
-            F("SatchelFull", new[] { L(Inventory + @"Bag\Bag_Full.wav") }),                                              // 12, round 2 A
+            // 12: the owner's pick in the 4i-C playtest, from Retro Dialogue's Window folder (the owner's own exception: the pack's
+            // other files stay out, and the blips stay only the four synth waveforms).
+            F("SatchelFull", new[] { L(RetroWindow + "Window_Close_2.wav") }),
             F("Coins", new[] { L(Inventory + @"Drops\Coins.wav"), K("handleCoins.ogg"), K("handleCoins2.ogg") }, 0.04f), // 13, round 2 A with the Kenney pair
             F("Door", new[] { K("doorClose_1.ogg"), K("doorClose_2.ogg"), K("doorClose_3.ogg"), K("doorClose_4.ogg") }, 0f, 0.8f), // 14 A
             F("Stairs", Ks("impactPlank_medium_", 5), 0.05f, 0.7f),                                                      // 15 B (the owner's choice)
@@ -130,13 +134,13 @@ namespace Hearthdelve.Editor
             F("UiBuy", new[] { K("confirmation_001.ogg") }),                                                             // 23 A
             F("UiChime", new[] { K("confirmation_002.ogg"), K("confirmation_004.ogg") }),                                // 23 A
             F("Discovery", new[] { K("maximize_004.ogg"), K("maximize_005.ogg"), K("maximize_006.ogg") }),             // 23 B
+            F("PowerUp", new[] { K("maximize_006.ogg") }),                                                               // 23 B: the upgrade pickup, 6 only (4i-C playtest)
+            // The campfire (4i-C playtest, A): crumpled paper, fire's classic foley; burning low, the same, softer.
+            F("Campfire", new[] { O(@"Paper\crumples1.wav"), O(@"Paper\crumples2.wav") }, 0.04f),
+            F("CampfireLow", new[] { O(@"Paper\crumples2.wav") }, 0.04f, 0.5f),
             F("UiBack", Ks("back_", 4, start: 1)),                                                                       // 24 A
             F("Walkout", new[] { K("error_005.ogg") }),                                                                  // 24 B (error_005)
-            F("FurniturePlace", Ks("impactWood_medium_", 5), 0.04f),                                                     // 25 A
-            F("FurnitureLift", new[] { K("cloth3.ogg") }, 0.05f),                                                        // 25 B
-            F("FurnitureStore", new[] { K("bookPlace1.ogg"), K("bookPlace2.ogg") }),                                     // 25 B
-            F("FurnitureTurn", new[] { K("switch_002.ogg") }),                                                           // 25 C
-            F("FurnitureUndo", new[] { K("minimize_007.ogg") }),                                                         // 25 C
+            // 25 (furniture) is gone: Decorate Mode keeps its placeholders (DecoratePlaceholders; the 4i-C playtest).
             F("Soil", new[] { L(Farm + @"Actions\Seeds_1.wav"), L(Farm + @"Actions\Seeds_2.wav"), L(Farm + @"Actions\Seeds_3.wav"), L(Farm + @"Actions\Seeds_4.wav") }, 0.04f), // 26, round 2 A (plant)
             F("Water", new[] { L(Farm + @"Actions\Watering_1.wav"), L(Farm + @"Actions\Watering_2.wav") }, 0.04f),    // 26, round 2 B (tend)
             F("Harvest", new[] { L(Farm + @"Actions\Harvest_1.wav"), L(Farm + @"Actions\Harvest_2.wav") }, 0.04f),    // 26, round 2 C
@@ -151,7 +155,6 @@ namespace Hearthdelve.Editor
             F("TrollDamageVoice", Enumerable.Range(1, 5).Select(i => L(Grunts + $@"Troll\Troll_Damage_{i}.wav")).ToArray(), 0.03f),
             F("TrollDeathVoice", new[] { L(Grunts + @"Troll\Troll_Death_1.wav"), L(Grunts + @"Troll\Troll_Death_2.wav") }),
             F("TrollRoar", Enumerable.Range(1, 3).Select(i => L(Grunts + $@"Troll\Troll_Wind_up_{i}.wav")).ToArray()),
-            F("AreaWhoosh", new[] { L(Inventory + @"Drops\Drop_Whoosh.wav") }),                                       // Decorate's area change
         };
 
         /// <summary>Each placeholder the approved families replace. Placeholders not here stay (the gaps).</summary>
@@ -165,12 +168,25 @@ namespace Hearthdelve.Editor
             ["PH_KnifeIn"] = "Knife", ["PH_Cleave"] = "Butchery", ["PH_ButcherDone"] = "ButcherDone", ["PH_PlateUp"] = "Plate",
             ["PH_PlateDown"] = "Plate", ["PH_Serve"] = "Plate", ["PH_Crash"] = "Crash", ["PH_StewReady"] = "Stew",
             ["PH_UiConfirm"] = "UiConfirm", ["PH_UiTick"] = "UiTick", ["PH_UiBuy"] = "UiBuy", ["PH_UiChime"] = "UiChime",
-            ["PH_Discovery"] = "Discovery", ["PH_PowerUp"] = "Discovery", ["PH_Homecoming"] = "Discovery", ["PH_FurnitureNo"] = "UiBack",
-            ["PH_Walkout"] = "Walkout", ["PH_FurnitureLift"] = "FurnitureLift", ["PH_FurniturePlace"] = "FurniturePlace",
-            ["PH_FurnitureTurn"] = "FurnitureTurn", ["PH_FurnitureStore"] = "FurnitureStore", ["PH_FurnitureUndo"] = "FurnitureUndo",
+            ["PH_Discovery"] = "Discovery", ["PH_PowerUp"] = "PowerUp", ["PH_Homecoming"] = "Discovery",
+            ["PH_Walkout"] = "Walkout",
             ["PH_TrollSlam"] = "TrollImpact", ["PH_TrollThud"] = "TrollImpact", ["PH_TrollFall"] = "TrollImpact",
             ["PH_TrollGulp"] = "Gulp", ["PH_TrollSpoil"] = "Gulp", ["PH_TrollRoar"] = "TrollRoar", ["PH_SizzleLoop"] = "Sizzle",
-            ["PH_Splash"] = "Splash",
+            ["PH_Splash"] = "Splash", ["PH_Campfire"] = "Campfire", ["PH_CampfireLow"] = "CampfireLow",
+        };
+
+        /// <summary>
+        /// Decorate Mode keeps its placeholders (the owner's call after the 4i-C playtest: they liked them better), by feedback
+        /// name, as <c>TavernFeedbackContent.BuildDecorate</c> made them. Only feedbacks under Decorate Mode's own feedback object.
+        /// </summary>
+        public static readonly Dictionary<string, string> DecoratePlaceholders = new()
+        {
+            ["Feedback_Enter"] = "PH_UiConfirm", ["Feedback_Leave"] = "PH_UiChime", ["Feedback_PickUp"] = "PH_FurnitureLift",
+            ["Feedback_Place"] = "PH_FurniturePlace", ["Feedback_Turn"] = "PH_FurnitureTurn", ["Feedback_Flip"] = "PH_FurnitureTurn",
+            ["Feedback_Invalid"] = "PH_FurnitureNo", ["Feedback_Store"] = "PH_FurnitureStore", ["Feedback_FromStorage"] = "PH_FurnitureLift",
+            ["Feedback_Undo"] = "PH_FurnitureUndo", ["Feedback_PutBack"] = "PH_FurniturePlace", ["Feedback_Buy"] = "PH_UiBuy",
+            ["Feedback_Sell"] = "PH_Coin", ["Feedback_Restyle"] = "PH_Brush", ["Feedback_Finish"] = "PH_Brush",
+            ["Feedback_Area"] = "PH_Whoosh", ["Feedback_Homecoming"] = "PH_Homecoming",
         };
 
         /// <summary>Feedbacks whose placeholder served another moment too: by name, first.</summary>
@@ -182,7 +198,6 @@ namespace Hearthdelve.Editor
             ["Feedback_Swing"] = "Swing",
             ["Feedback_Door"] = "Door",
             ["Feedback_Stairs"] = "Stairs",
-            ["Feedback_Area"] = "AreaWhoosh",  // Decorate's area change
             ["Feedback_Fall"] = "Fall",        // the fall into a hole (both were PH_Whoosh)
             ["Feedback_Climb"] = "Rope",       // climbing out (it shared the stairs' planks in round 1)
             ["Feedback_ChargeLevel_2"] = "ChargeTick2",
