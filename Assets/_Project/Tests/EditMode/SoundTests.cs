@@ -66,7 +66,18 @@ namespace Hearthdelve.Tests.EditMode
             Assert.That(SoundBank.For("Feedback_Fall", "PH_Whoosh").Key, Is.EqualTo("Fall"), "round 2: the fall into a hole (Leohpaz, trimmed)");
             Assert.That(SoundBank.For("Feedback_Area", "PH_Whoosh"), Is.Null, "Decorate Mode's area change keeps its placeholder");
             // The 4i-C playtest's picks.
-            Assert.That(SoundBank.Get("EnemyDeath").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "69_Enemy_death_01.wav" }));
+            // The kills (the owner's picks, 2026-10-09): one file each, alone, with a small pitch spread, levelled as impacts.
+            Assert.That(SoundBank.For("Feedback_CleanKill", "PH_KillClean").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "CleanKill.wav" }), "the trimmed flesh");
+            Assert.That(SoundBank.For("Feedback_Overkill", "PH_Thud").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "impactPunch_heavy_000.ogg" }));
+            Assert.That(SoundBank.Layers.ContainsKey("Feedback_CleanKill") || SoundBank.Layers.ContainsKey("Feedback_Overkill"), Is.False, "no layered tone");
+            foreach (string kill in new[] { "CleanKill", "Overkill" })
+            {
+                SoundBank.Family family = SoundBank.Get(kill);
+                Assert.That(family.Target, Is.EqualTo(SoundBank.Kind.Impact), kill);
+                Assert.That(family.MaxPitch - family.MinPitch, Is.InRange(0.04f, 0.12f), $"{kill}: a small pitch spread");
+            }
+            Assert.That(SoundBank.Get("EnemyDeath"), Is.Null, "the old shared death sound is gone");
+            Assert.That(SoundBank.Sources.Any(s => s.Contains("Enemy_death")), Is.False);
             Assert.That(SoundBank.Get("Dodge").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "65_Dash_evade_01.wav" }));
             Assert.That(SoundBank.For("Feedback_PowerUp", "PH_PowerUp").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "maximize_006.ogg" }), "the upgrade pickup");
             Assert.That(SoundBank.Get("SatchelFull").Sources.Select(Path.GetFileName), Is.EqualTo(new[] { "Window_Close_2.wav" }));

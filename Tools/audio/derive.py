@@ -14,6 +14,8 @@ docs/CREDITS.md). Run:  python Tools/audio/derive.py
   Fall1.wav, Fall2.wav
                     Leohpaz (Retro Player 90 Movement) "43_Falling_01_Loop.wav", "44_Falling_02_Loop.wav": their first 0.5 s, faded
                     in and out (the fall into a hole lasts about 0.45 s; round 2).
+  CleanKill.wav     Leohpaz (90 RPG Battle) "77_flesh_02.wav": trimmed to its real length, where its tail falls under -60 dBFS
+                    (about 0.5 s of 0.67), with a short fade out (the clean kill; the owner's pick, 2026-10-09).
 """
 import os
 import struct
@@ -102,11 +104,31 @@ def excerpt(path, out, seconds, fade_in, fade_out):
     write(os.path.join(OUT, out), clip, ch, rate)
 
 
+def trim_tail(path, out, floor_db=-60.0, fade_seconds=0.05):
+    """The whole sound up to where it falls for good under `floor_db` (its last louder 10 ms), faded out over `fade_seconds`
+    before that point: its real length, without the silence after it."""
+    frames, ch, rate = read(path)
+    floor = 32768 * 10 ** (floor_db / 20.0)
+    win = int(0.01 * rate)
+    end = len(frames)
+    for i in range(len(frames) - win, -1, -win):
+        if max(abs(v) for f in frames[i:i + win] for v in f) >= floor:
+            end = min(len(frames), i + win)
+            break
+    clip = [list(f) for f in frames[:end]]
+    fade = min(len(clip), int(fade_seconds * rate))
+    for i in range(fade):
+        j = len(clip) - fade + i
+        clip[j] = [v * (1 - i / float(fade)) for v in clip[j]]
+    write(os.path.join(OUT, out), clip, ch, rate)
+
+
 def main():
     for name in NORMALISED:
         normalise(name)
     trim_onset(os.path.join(LEOHPAZ, "Minifantasy_CraftingAndProfessions2_SFX", "Crafting_Professions", "Cooking", "Flipping_Eggs_single.wav"),
                "EggFlip.wav", 0.6, 0.15)
+    trim_tail(os.path.join(LEOHPAZ, "90 RPG Battle", "77_flesh_02.wav"), "CleanKill.wav")
     movement = os.path.join(LEOHPAZ, "90 Player Movement")
     excerpt(os.path.join(movement, "43_Falling_01_Loop.wav"), "Fall1.wav", 0.5, 0.02, 0.15)
     excerpt(os.path.join(movement, "44_Falling_02_Loop.wav"), "Fall2.wav", 0.5, 0.02, 0.15)

@@ -51,7 +51,7 @@ namespace Hearthdelve.Editor
             public Kind Target = Kind.Action;
         }
 
-        static readonly string[] k_Impact = { "Hit", "HitHeavy", "Hurt", "TrollImpact", "GateSlam", "Crash", "EnemyDeath" };
+        static readonly string[] k_Impact = { "Hit", "HitHeavy", "Hurt", "TrollImpact", "GateSlam", "Crash", "CleanKill", "Overkill" };
         static readonly string[] k_Interface = { "UiConfirm", "UiTick", "UiBuy", "UiChime", "UiBack", "Walkout", "SatchelFull", "Discovery", "PowerUp" };
         static readonly string[] k_Quiet = { "Blip", "Blip.Low" };
         static readonly string[] k_Footsteps = { "Footsteps.Village", "Footsteps.Tavern", "Footsteps.Hollows" };
@@ -103,7 +103,11 @@ namespace Hearthdelve.Editor
             F("HitHeavy", Enumerable.Range(9, 5).Select(i => L(Battle + $"{i:00}_Impact_0{i - 8}.wav")).ToArray(), 0.04f), // 7, round 2 A
             F("Hurt", new[] { L(Dungeon + "11_human_damage_1.wav"), L(Dungeon + "11_human_damage_2.wav"), L(Dungeon + "11_human_damage_3.wav") }, 0.03f), // 8, round 2 A
             F("Telegraph", new[] { K("impactBell_heavy_004.ogg") }),                                                     // 9 A
-            F("EnemyDeath", new[] { L(Battle + "69_Enemy_death_01.wav") }, 0.04f),                                       // 10, round 2 A; 69 only (4i-C playtest)
+            // 10: the kills (the owner's picks, 2026-10-09). A clean kill is Leohpaz's flesh, trimmed to its real length; an overkill
+            // Kenney's heavy punch. One file each, so a small pitch spread keeps repeated kills from sounding identical. A plain
+            // kill (neither) plays only its hit.
+            F("CleanKill", new[] { D("CleanKill.wav") }, 0.05f),
+            F("Overkill", new[] { K("impactPunch_heavy_000.ogg") }, 0.05f),
             F("Pickup", new[] { L(Inventory + @"Managing\Item_Pick.wav") }, 0.05f),                                     // 11, round 2 B
             // 12: the owner's pick in the 4i-C playtest, from Retro Dialogue's Window folder (the owner's own exception: the pack's
             // other files stay out, and the blips stay only the four synth waveforms).
@@ -161,7 +165,7 @@ namespace Hearthdelve.Editor
         public static readonly Dictionary<string, string> ByPlaceholder = new()
         {
             ["PH_Dodge"] = "Dodge", ["PH_Hit"] = "Hit", ["PH_HitHeavy"] = "HitHeavy", ["PH_Finisher"] = "HitHeavy", ["PH_Hurt"] = "Hurt",
-            ["PH_Telegraph"] = "Telegraph", ["PH_KillClean"] = "EnemyDeath", ["PH_Thud"] = "EnemyDeath", ["PH_Pickup"] = "Pickup",
+            ["PH_Telegraph"] = "Telegraph", ["PH_KillClean"] = "CleanKill", ["PH_Thud"] = "Overkill", ["PH_Pickup"] = "Pickup",
             ["PH_SatchelFull"] = "SatchelFull", ["PH_Coin"] = "Coins", ["PH_Climb"] = "Rope", ["PH_GateSlam"] = "GateSlam",
             ["PH_GateRise"] = "GateRise", ["PH_Flip"] = "GrillFlip", ["PH_FlipPerfect"] = "GrillFlip", ["PH_PourLoop"] = "TapPour",
             ["PH_Clink"] = "Clink", ["PH_LineTing"] = "Clink", ["PH_Chop"] = "Chop", ["PH_ChopDone"] = "Chop", ["PH_ChopRagged"] = "Knife",
@@ -202,6 +206,8 @@ namespace Hearthdelve.Editor
             ["Feedback_Climb"] = "Rope",       // climbing out (it shared the stairs' planks in round 1)
             ["Feedback_ChargeLevel_2"] = "ChargeTick2",
             ["Feedback_ChargeLevel_3"] = "ChargeTick3",
+            ["Feedback_CleanKill"] = "CleanKill", // both kills shared one death sound until 2026-10-09
+            ["Feedback_Overkill"] = "Overkill",
         };
 
         /// <summary>A second sound layered on a feedback, by its name (round 2: the troll's voice over his impacts).</summary>
