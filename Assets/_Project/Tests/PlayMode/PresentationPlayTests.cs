@@ -265,6 +265,38 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Frames(4);
         }
 
+        /// <summary>
+        /// The owner's 4i-C note: at night, with only "sleep" and "decorate", the stick and d-pad did nothing once the selection was
+        /// lost (a mouse click on empty space). The first push now lands the focus on the menu; on foot it never steals it.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator AMenuWithNothingSelected_TakesTheFocus_OnTheFirstDpadPush_ButNeverOnFoot()
+        {
+            yield return Daytime(OpeningStage.Complete);
+            m_Pad = InputSystem.AddDevice<Gamepad>();
+            int before = MenuFocus.Restored;
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return PadPress(GamepadButton.DpadDown);
+            Assert.That(MenuFocus.Restored, Is.EqualTo(before), "on foot: the d-pad is the keeper's, nothing is selected for it");
+
+            Flow.StartEvening();
+            yield return WaitUntil(() => !Flow.IsLoading && Director.Phase == TavernPhase.Prep, 30f, "the evening");
+            yield return Revealed();
+            Flow.SkipService();
+            Flow.CompleteDelve(DelveReport.Empty);
+            yield return WaitUntil(() => !Flow.IsLoading && Director.Phase == TavernPhase.Night, 30f, "the night");
+            yield return Revealed();
+            var night = Object.FindAnyObjectByType<Hearthdelve.UI.Tavern.NightScreen>();
+            Assert.That(night, Is.Not.Null);
+            EventSystem.current.SetSelectedGameObject(null);
+            yield return PadPress(GamepadButton.DpadDown);
+            GameObject selected = EventSystem.current.currentSelectedGameObject;
+            Assert.That(selected, Is.Not.Null, "the first push gives the menu its focus back");
+            Assert.That(selected.GetComponentInParent<Canvas>().rootCanvas, Is.SameAs(night.SleepButton.GetComponentInParent<Canvas>().rootCanvas),
+                $"on the night's own menu ({selected.name})");
+            Assert.That(MenuFocus.Restored, Is.EqualTo(before + 1));
+        }
+
         [UnityTest]
         public IEnumerator Options_OnAGamepad_TabsWithTheShoulders_StepsWithTheDpad_AndBGoesBack()
         {

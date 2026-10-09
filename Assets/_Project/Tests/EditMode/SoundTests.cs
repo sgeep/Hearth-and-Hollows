@@ -59,10 +59,12 @@ namespace Hearthdelve.Tests.EditMode
         {
             // Family 15 is option B (the owner's choice): Kenney's plank impacts for the stairs, the hatch and the rope.
             Assert.That(SoundBank.Get("Stairs").Sources.All(s => s.Contains("impactPlank_medium_")), Is.True);
-            Assert.That(SoundBank.For("Feedback_Climb", "PH_Climb").Key, Is.EqualTo("Stairs"));
+            Assert.That(SoundBank.For("Feedback_Stairs", null).Key, Is.EqualTo("Stairs"), "the stairs keep the planks");
+            Assert.That(SoundBank.For("Feedback_Climb", "PH_Climb").Key, Is.EqualTo("Rope"), "round 2: the rope has its own climb");
             Assert.That(SoundBank.For("Feedback_Vigor", "PH_UiTick").Key, Is.EqualTo("Soil"), "planting is heard as soil, not the interface tick");
             Assert.That(SoundBank.For("Feedback_Tick", "PH_UiTick").Key, Is.EqualTo("UiTick"));
-            Assert.That(SoundBank.For("Feedback_Fall", "PH_Whoosh"), Is.Null, "no air swoosh in the libraries: the placeholder stays");
+            Assert.That(SoundBank.For("Feedback_Fall", "PH_Whoosh").Key, Is.EqualTo("Fall"), "round 2: the fall into a hole (Leohpaz, trimmed)");
+            Assert.That(SoundBank.For("Feedback_Area", "PH_Whoosh").Key, Is.EqualTo("AreaWhoosh"));
         }
 
         static IEnumerable<GameObject> PrefabRoots() =>

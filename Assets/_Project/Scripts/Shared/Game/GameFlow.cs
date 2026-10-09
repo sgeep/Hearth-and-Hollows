@@ -82,6 +82,12 @@ namespace Hearthdelve.Shared.Game
         /// <summary>Tests point saves at a temp folder.</summary>
         public static string SaveDirectoryOverride { get; set; }
 
+        /// <summary>
+        /// Tests: the next new game's world seed instead of a random one, so the seeded village days a test needs fall where it
+        /// looks (4i-C: tests that walked up to four days until a seeded day came round ran 45 s or 180 s by luck). Unset in play.
+        /// </summary>
+        public static int? NewGameSeedOverride { get; set; }
+
         public GameDatabase Database => m_Database;
         public GameState State { get; private set; }
         public bool InGame => State != null;
@@ -538,7 +544,7 @@ namespace Hearthdelve.Shared.Game
         /// <summary>A new game's world (4h Checkpoint B): its seed, the starter garden's empty beds, today's Vigor.</summary>
         void StartWorld()
         {
-            State.WorldSeed = WorldSeed.New();
+            State.WorldSeed = NewGameSeedOverride ?? WorldSeed.New();
             State.Garden.Ensure(m_Database != null ? m_Database.GardenBeds : null);
             State.Vigor.Configure(VigorSettings);
         }

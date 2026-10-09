@@ -53,6 +53,7 @@ namespace Hearthdelve.Tests.PlayMode
         public void ClearSaves()
         {
             GameFlow.SaveDirectoryOverride = null;
+            GameFlow.NewGameSeedOverride = null;
             SurfaceTime.SettingsOverride = null;
             SurfacePause.Clear();
             MusicHolds.Clear();
@@ -80,14 +81,26 @@ namespace Hearthdelve.Tests.PlayMode
             }
         }
 
-        /// <summary>A new game to its first free day (day 2), the keeper waking upstairs; the clock held unless <paramref name="hold"/> is off.</summary>
-        IEnumerator Daytime(bool hold = true)
+        /// <summary>
+        /// A new game to its first free day (day 2), the keeper waking upstairs; the clock held unless <paramref name="hold"/> is off.
+        /// <paramref name="seed"/>: the world seed must satisfy it (asked of the pure day rules with day 2 and the village's
+        /// settings), so a test of seeded days finds them at once instead of walking days until they come round (a new game's seed
+        /// is otherwise random, and such tests ran 45 s or 180 s by luck).
+        /// </summary>
+        IEnumerator Daytime(bool hold = true, System.Func<int, VillageLifeSettings, bool> seed = null)
         {
             yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
             yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
             yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
             yield return Revealed();
+            if (seed != null)
+            {
+                VillageLifeSettings settings = VillageLife.Settings;
+                int chosen = Enumerable.Range(1, 100000).First(s => seed(s, settings));
+                GameFlow.NewGameSeedOverride = chosen;
+            }
             Flow.QuickNewGame();
+            GameFlow.NewGameSeedOverride = null;
             yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
             yield return Revealed();
             Flow.CompleteDelve(DelveReport.Empty);
@@ -220,7 +233,8 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator Gimp_VisitsBoog_OnHisDays_DownTheStairs_AndTalks()
         {
-            yield return Daytime();
+            // One of his days at once (the loop below still holds if the rule ever changes).
+            yield return Daytime(seed: (s, v) => VillageDays.GimpVisit(s, 2, v));
             Flow.MarkHintSeen(CommunityRules.GimpIntro);
             for (int i = 0; i < 6 && !VillageDays.GimpVisit(World.Seed, Flow.State.Day, World.Settings); i++) yield return NextDay();
             Assert.That(VillageDays.GimpVisit(World.Seed, Flow.State.Day, World.Settings), "one of his days within six");
@@ -380,7 +394,8 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest, Timeout(600000)]
         public IEnumerator OgrinsLight_ShowsAtHisWindow_OnItsEvenings_AndOnlyThen()
         {
-            yield return Daytime();
+            // A lit evening today and a dark one tomorrow: both within two days.
+            yield return Daytime(seed: (s, v) => VillageDays.GlimmerEvening(s, 2, v) && !VillageDays.GlimmerEvening(s, 3, v));
             Flow.MarkHintSeen(CommunityRules.GimpIntro);
             Outside();
             KeeperAtVillage(new Vector2(50f, 9f));
@@ -535,7 +550,8 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest, Timeout(600000)]
         public IEnumerator OgrinsWindow_IsLitWhileHesInBed_AndDarkWhileHesOut()
         {
-            yield return Daytime();
+            // Unwell today, well tomorrow: both states within two days, whatever the luck.
+            yield return Daytime(seed: (s, v) => !VillageDays.OgrinWell(s, 2, v) && VillageDays.OgrinWell(s, 3, v));
             Outside();
             bool sawLit = false, sawDark = false;
             for (int day = 0; day < 4 && !(sawLit && sawDark); day++)
