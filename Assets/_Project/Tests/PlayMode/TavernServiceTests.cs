@@ -1,5 +1,9 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using Hearthdelve.Core.Events;
+using Hearthdelve.Shared.Economy;
+using Hearthdelve.Shared.Game;
 using Hearthdelve.Core.Input;
 using Hearthdelve.Shared.Recipes;
 using Hearthdelve.Tavern.Customers;
@@ -217,20 +221,43 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(view.PipsShown, Is.EqualTo(4), "one ladled");
         }
 
+        /// <summary>
+        /// The cap is on Orik's own work, his serve: the dish's quality also carries the keeper's cooking and the ingredients, so
+        /// a perfect cook served by Orik at his cap (a serving factor of 0.94) can come out above 0.85, and that's right. Until
+        /// 4i-C this test compared the dish's quality with the cap, which failed whenever Orik served well (0.861 on one run): the
+        /// rule held, the assertion measured the wrong thing. Now it checks his serve against the cap, and that the dish he
+        /// carries is worse than the keeper's own perfect serve of it, so the player's best always beats his.
+        /// </summary>
         [UnityTest]
         public IEnumerator Pip_OnServing_CarriesPlatesToWhoeverOrderedThem()
         {
-            yield return Open("cellar_kebab", StaffStation.Serving);
-            CustomerAgent customer = null;
-            yield return Order(c => customer = c);
-            yield return UseAt(Station(TavernInteractableKind.Grill));
-            Keeper.FinishCook(1f);
-            Teleport(Player, new Vector2(3f, 3f));
-            StaffAgent pip = Director.Staff;
-            yield return WaitUntil(() => pip.Carrying != null, 6f, "Orik to pick up the plate");
-            Assert.That(pip.GetComponent<CarryView>().IsShowing, "the plate shows over Orik's head");
-            yield return WaitUntil(() => customer.Logic.State == CustomerState.Eating, 15f, "Orik to serve it");
-            Assert.That(customer.Logic.DishQuality, Is.LessThanOrEqualTo(pip.Member.qualityCap + 1e-4f), "staff quality is capped");
+            var work = new List<StaffWorkDone>();
+            EventBus<StaffWorkDone>.Subscribe(work.Add);
+            try
+            {
+                yield return Open("cellar_kebab", StaffStation.Serving);
+                CustomerAgent customer = null;
+                yield return Order(c => customer = c);
+                yield return UseAt(Station(TavernInteractableKind.Grill));
+                Keeper.FinishCook(1f);
+                Teleport(Player, new Vector2(3f, 3f));
+                StaffAgent pip = Director.Staff;
+                yield return WaitUntil(() => pip.Carrying != null, 6f, "Orik to pick up the plate");
+                Assert.That(pip.GetComponent<CarryView>().IsShowing, "the plate shows over Orik's head");
+                Ticket ticket = TicketFor(customer);
+                yield return WaitUntil(() => customer.Logic.State == CustomerState.Eating, 15f, "Orik to serve it");
+                StaffWorkDone serve = work.Single(w => w.StaffId == pip.Member.id);
+                Assert.That(serve.Quality, Is.LessThanOrEqualTo(pip.Member.qualityCap + 1e-4f), "Orik's serve is capped");
+                DishScoringSettings scoring = Director.Session.Scoring;
+                float keepersBest = DishScoring.DishQuality(ticket.Reserved.Used, DishScoring.MinigameScore(ticket.CookScore, 1f, scoring), scoring);
+                float orik = DishScoring.DishQuality(ticket.Reserved.Used, DishScoring.MinigameScore(ticket.CookScore, serve.Quality, scoring), scoring);
+                Assert.That(customer.Logic.DishQuality, Is.EqualTo(orik).Within(1e-3f), "the dish is the keeper's cooking with Orik's capped serve");
+                Assert.That(customer.Logic.DishQuality, Is.LessThan(keepersBest), "the keeper's own perfect serve beats Orik's");
+            }
+            finally
+            {
+                EventBus<StaffWorkDone>.Unsubscribe(work.Add);
+            }
         }
 
         [UnityTest]

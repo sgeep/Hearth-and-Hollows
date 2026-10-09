@@ -28,6 +28,23 @@ namespace Hearthdelve.Tests.PlayMode
     {
         const float k_PixelsPerUnit = 8f;
 
+        int m_FrameRate, m_VSync;
+
+        /// <summary>These tests fix the frame rate at 60 with VSync off; the project's own timing comes back afterwards (4i-C).</summary>
+        [SetUp]
+        public void RememberFrameTiming()
+        {
+            m_FrameRate = Application.targetFrameRate;
+            m_VSync = QualitySettings.vSyncCount;
+        }
+
+        [TearDown]
+        public void RestoreFrameTiming()
+        {
+            Application.targetFrameRate = m_FrameRate;
+            QualitySettings.vSyncCount = m_VSync;
+        }
+
         /// <summary>Records each frame once Cinemachine has placed the camera (its brain runs in LateUpdate at order 0).</summary>
         [DefaultExecutionOrder(32000)]
         sealed class FrameSampler : MonoBehaviour

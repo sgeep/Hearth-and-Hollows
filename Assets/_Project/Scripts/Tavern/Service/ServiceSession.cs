@@ -79,6 +79,9 @@ namespace Hearthdelve.Tavern.Service
     {
         readonly ServiceSettings m_Settings;
         readonly DishScoringSettings m_Scoring;
+
+        /// <summary>How dishes are scored this evening (read-only; tests compare a staff serve with the keeper's best).</summary>
+        public DishScoringSettings Scoring => m_Scoring;
         readonly ServiceEconomySettings m_Economy;
         readonly IRandom m_Random;
         readonly List<RecipeDefinition> m_Menu;
