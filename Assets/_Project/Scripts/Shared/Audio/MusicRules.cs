@@ -52,7 +52,8 @@ namespace Hearthdelve.Shared.Audio
         public static bool PausesFor(MusicCue from, MusicCue to) => from == MusicCue.Day && to == MusicCue.Decorate;
 
         /// <summary>How loud everything but the music is: quieter in the Hollows (the owner's call, 2026-10-07).</summary>
-        public static float EffectsLevel(bool inGame, DayPhase phase, float inHollows) => inGame && phase == DayPhase.Delve ? inHollows : 1f;
+        public static float EffectsLevel(bool inGame, DayPhase phase, float inHollows, float everywhere = 1f) =>
+            everywhere * (inGame && phase == DayPhase.Delve ? inHollows : 1f);
 
         /// <summary>4i-C: the music's level while someone's talking (<paramref name="underDialogue"/>), otherwise full.</summary>
         public static float Duck(bool talking, float underDialogue) => talking ? Mathf.Clamp01(underDialogue) : 1f;

@@ -26,7 +26,8 @@ namespace Hearthdelve.Shared.Settings
     [Serializable]
     public sealed class PlayerOptions
     {
-        public const int CurrentVersion = 1;
+        /// <summary>2 (4i-C playtest): the music slider's 100% became what 25% was, so an older file's music is scaled to match.</summary>
+        public const int CurrentVersion = 2;
 
         public int version = CurrentVersion;
 
@@ -112,10 +113,17 @@ namespace Hearthdelve.Shared.Settings
             return scales.Contains(chosen) ? chosen : scales[^1];
         }
 
-        /// <summary>Anything out of range (an edited or older file) brought back into range.</summary>
+        /// <summary>
+        /// Version 2: the music's 100% is a quarter of what it was (the owner's call after the 4i-C playtest), so an older file's
+        /// music slider is multiplied by this to sound the same (25% then is 100% now), up to the top.
+        /// </summary>
+        public const float MusicRescaleFromVersion1 = 4f;
+
+        /// <summary>Anything out of range (an edited or older file) brought back into range, and an older file brought up to date.</summary>
         public static PlayerOptions Sanitized(PlayerOptions o)
         {
             o ??= new PlayerOptions();
+            if (o.version < 2) o.musicVolume = Mathf.Clamp01(o.musicVolume * MusicRescaleFromVersion1);
             o.masterVolume = StepVolume(o.masterVolume, 0);
             o.musicVolume = StepVolume(o.musicVolume, 0);
             o.effectsVolume = StepVolume(o.effectsVolume, 0);

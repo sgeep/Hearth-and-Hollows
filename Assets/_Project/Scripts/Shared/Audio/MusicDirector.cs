@@ -86,7 +86,7 @@ namespace Hearthdelve.Shared.Audio
             GameFlow flow = GameFlow.Instance;
             bool inGame = flow != null && flow.InGame;
             if (AudioMixerHub.Instance != null)
-                AudioMixerHub.Instance.HollowsLevel = MusicRules.EffectsLevel(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, m_Config.effectsInHollows);
+                AudioMixerHub.Instance.HollowsLevel = MusicRules.EffectsLevel(inGame, inGame ? flow.State.Phase : DayPhase.Daytime, m_Config.effectsInHollows, m_Config.effects);
             Fade(Time.unscaledDeltaTime);
         }
 

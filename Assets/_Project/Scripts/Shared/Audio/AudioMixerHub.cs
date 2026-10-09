@@ -37,7 +37,10 @@ namespace Hearthdelve.Shared.Audio
             m_Effects = effects;
         }
 
-        /// <summary>Effects' level from the moment of the day (a quarter down in the Hollows), on top of the player's slider.</summary>
+        /// <summary>
+        /// Effects' level under the player's slider: the game's own level for effects (a quarter down since the 4i-C playtest),
+        /// and a quarter down again in the Hollows. Set by the music director.
+        /// </summary>
         public float HollowsLevel
         {
             get => m_HollowsLevel;

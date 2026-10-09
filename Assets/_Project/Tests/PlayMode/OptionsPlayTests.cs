@@ -133,7 +133,7 @@ namespace Hearthdelve.Tests.PlayMode
             options.Rows[2].Step(-1);
             yield return null;
             Assert.That(GameOptions.Current.effectsVolume, Is.EqualTo(0.95f).Within(1e-4f));
-            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.95f)).Within(0.05f), "the mixer has it at once");
+            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.95f * 0.75f)).Within(0.05f), "the mixer has it at once (under effects' own quarter down)");
             Assert.That(File.Exists(Path.Combine(m_OptionsDir, OptionsStore.FileName)), Is.True, "and it's saved");
             for (int i = 0; i < 25; i++) options.Rows[1].Step(-1);
             Assert.That(GameOptions.Current.musicVolume, Is.EqualTo(0f), "music all the way down");
@@ -171,14 +171,14 @@ namespace Hearthdelve.Tests.PlayMode
             yield return FirstDelve();
             yield return Frames(5);
             Assert.That(AudioListener.volume, Is.EqualTo(1f), "the listener is left alone");
-            Assert.That(AudioMixerHub.Instance.HollowsLevel, Is.EqualTo(0.75f).Within(1e-4f));
-            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.8f * 0.75f)).Within(0.05f), "the player's level, a quarter down");
+            Assert.That(AudioMixerHub.Instance.HollowsLevel, Is.EqualTo(0.75f * 0.75f).Within(1e-4f), "effects' own quarter down, and the Hollows'");
+            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.8f * 0.75f * 0.75f)).Within(0.05f), "the player's level, a quarter down twice");
             foreach (AudioSource source in AudioMixerHub.Instance.GetComponentsInChildren<AudioSource>(true))
                 Assert.That(source.outputAudioMixerGroup, Is.SameAs(AudioMixerHub.MusicGroup), $"{source.name} plays through Music");
             Flow.CompleteDelve(DelveReport.Empty);
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
             yield return Frames(5);
-            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.8f)).Within(0.05f), "home: the player's level as it is");
+            Assert.That(Db(AudioMixerHub.EffectsVolume), Is.EqualTo(OptionsRules.ToDecibels(0.8f * 0.75f)).Within(0.05f), "home: the player's level, effects' own quarter down");
         }
 
         [UnityTest]

@@ -111,6 +111,17 @@ namespace Hearthdelve.Tests.EditMode
             Assert.That(o.version, Is.EqualTo(PlayerOptions.CurrentVersion));
         }
 
+        [Test]
+        public void AnOlderFile_KeepsTheMusicItHeard_UnderTheNewQuieterHundredPercent()
+        {
+            // The owner's 25% (4i-C playtest) is the new 100%; a file from before keeps sounding the same, up to the top.
+            Assert.That(OptionsRules.Sanitized(new PlayerOptions { version = 1, musicVolume = 0.25f }).musicVolume, Is.EqualTo(1f).Within(1e-5f));
+            Assert.That(OptionsRules.Sanitized(new PlayerOptions { version = 1, musicVolume = 0.1f }).musicVolume, Is.EqualTo(0.4f).Within(1e-5f));
+            Assert.That(OptionsRules.Sanitized(new PlayerOptions { version = 1, musicVolume = 1f }).musicVolume, Is.EqualTo(1f), "the old default becomes the new default");
+            Assert.That(OptionsRules.Sanitized(new PlayerOptions { version = 2, musicVolume = 0.25f }).musicVolume, Is.EqualTo(0.25f).Within(1e-5f), "a current file is left as it is");
+            Assert.That(new PlayerOptions().musicVolume, Is.EqualTo(1f), "a new player starts at 100%");
+        }
+
         // ---------- the file (never the save) ----------
 
         [Test]

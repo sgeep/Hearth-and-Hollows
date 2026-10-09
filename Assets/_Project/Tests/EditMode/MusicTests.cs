@@ -46,6 +46,9 @@ namespace Hearthdelve.Tests
             Assert.That(MusicRules.EffectsLevel(true, DayPhase.Daytime, 0.75f), Is.EqualTo(1f));
             Assert.That(MusicRules.EffectsLevel(true, DayPhase.Evening, 0.75f), Is.EqualTo(1f));
             Assert.That(MusicRules.EffectsLevel(false, DayPhase.Delve, 0.75f), Is.EqualTo(1f));
+            // The 4i-C playtest: effects a quarter down everywhere, and the Hollows' quarter on top.
+            Assert.That(MusicRules.EffectsLevel(true, DayPhase.Daytime, 0.75f, 0.75f), Is.EqualTo(0.75f));
+            Assert.That(MusicRules.EffectsLevel(true, DayPhase.Delve, 0.75f, 0.75f), Is.EqualTo(0.5625f).Within(1e-5f));
         }
 
         [Test]
@@ -69,7 +72,8 @@ namespace Hearthdelve.Tests
         {
             var config = AssetDatabase.LoadAssetAtPath<MusicConfig>(MusicContent.ConfigPath);
             Assert.That(config, Is.Not.Null);
-            Assert.That(config.volume, Is.EqualTo(0.5625f).Within(1e-4f), "a quarter down, twice");
+            Assert.That(config.volume, Is.EqualTo(0.140625f).Within(1e-5f), "the owner's 25% as the new 100% (4i-C playtest)");
+            Assert.That(config.effects, Is.EqualTo(0.75f).Within(1e-4f), "effects a quarter down (4i-C playtest)");
             // The owner's Quirkii at 0.75; 4i-C's balance pass evened the rest by their measured loudness (Coastal Market about
             // 1.5 dB hot, Otherworld about 4 dB; Continue is already quieter).
             Assert.That(config.Level(MusicCue.Day), Is.EqualTo(0.75f).Within(1e-4f), "Quirkii a quarter under the rest");
