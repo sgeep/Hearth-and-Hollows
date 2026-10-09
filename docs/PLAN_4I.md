@@ -521,3 +521,15 @@ Three families keep a deliberate trim: the swing (0.7: it plays on every attack)
 **Mixer groups:** left at 0 dB under the player's sliders, and the Hollows' level is unchanged (the owner's 0.75).
 
 The feedback audit's **gap** rows above are now filled, except where the placeholders above remain.
+
+### Listening and look checklist (4i-C)
+
+1. **Headphones, then speakers:** a full day. Wake in your room (does it feel lived in?), walk the boards, go downstairs (stairs), out the front door (the door), along Kariaston's paths (footsteps change with the ground), plant, tend (water) and harvest, buy at the market.
+2. Talk to Orik, Boog and Musashi: the box opening, the blips at each speaker's pitch (Orik deeper, Boog higher), the music stepping back while they talk and returning after.
+3. **An evening:** butchery, chopping, the grill's flips, the tap's pour, plates, the stew, coins, a walkout if one happens, the takings. Does anything stand out as too loud or too quiet?
+4. **A fight in the Hollows:** footsteps on stone, swings and hits, a telegraph, an enemy dying, pickups, gates, the troll if you reach him. Do the music and the hits sit well together under the Hollows' quarter-down?
+5. Decorate: lift, place, turn, store, undo, an invalid spot.
+6. Note any sound that still feels like a placeholder (the twelve left are listed above), and any you'd swap.
+7. **The Credits** from the main menu and the pause menu: does it read well? In the **web build**, click HeatleyBros' link: does their channel open in a new tab?
+8. The look: the fades between places (all the same now), the death screen with an empty satchel, the delve without the controls line.
+9. **On a controller** (carried from 4i-A and 4i-B): the menus, pause and controls pages, and prompts switching without flicker; Options with the d-pad, LB/RB and B; rumble at 10%, 50% and 100% strength, then reduced vibration (each sample distinctly weaker, a hit in the Hollows matching).

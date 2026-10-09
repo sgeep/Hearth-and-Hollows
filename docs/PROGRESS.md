@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C approved** (2026-10-08, with D5), in progress: the non-audio work built; the sounds wait for the owner's listening (`C:\Dev\Music\SFX\_catalog\LISTENING_4iC.md`)._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C built** (2026-10-08, with D5), waiting for the owner's listening and look playtest._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1303,6 +1303,18 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
+### 4i-C: presentation and polish (2026-10-08; waiting for the owner's listening and look playtest)
+
+Approved as written (PLAN_4I §4i-C, with D5); the owner chose every recommended sound except family 15 (option B). Details, changes from the plan, the sounds by family, the feedback audit and the balance: `docs/PLAN_4I.md`, *As built: 4i-C*. Version `0.4i-c`. Not tagged.
+
+- **Sound:** 137 CC0 files from Kenney (RPG Audio, Impact, Interface) and OwlishMedia, 18 of them edits made as copies by `Tools/audio/derive.py` (a pour loop, a watering burst, and the quiet OwlishMedia impacts normalised). Recorded in `CREDITS.md` and `THIRD_PARTY.md`, swapped in through `SoundBank` and the generators. The catalog of the libraries lives beside them (`C:\Dev\Music\SFX\_catalog`).
+- **New sounds where the audit found none:** footsteps on the walk's footfalls by ground, doors and stairs, dialogue blips in each speaker's voice, the conversation opening, the cleaver's swing, watering, market purchases.
+- **Balance:** every family at its kind's measured loudness; the music tracks evened (Coastal Market 0.85, Otherworld 0.6; Quirkii 0.75 kept) and a 3 dB duck while someone talks.
+- **Credits** from the main menu and the pause menu, with HeatleyBros' link.
+- **Presentation:** one fade timing for every change of place; no controls line over the satchel in the day loop; the death screen's lone button centred; notes that name one device; a lived-in room for a new game's keeper.
+
+Tests: EditMode **816 passed, 0 failed** (1 explicit report skipped), the sound, music and credits tests rerun after the last change (23/23). PlayMode **288 passed, 0 failed** (31 explicit captures skipped). The full run before that had three failures: the dodge's rumble, which went against 4b's decision and was removed; a test using the passage shortcut that skips the event, fixed; and the known flaky Pip test (passed alone). Web: built (0.4i-c, 208 MB development build), but **not smoke-tested**: the browser extension disconnected before the test, so sound in the browser, the HeatleyBros link in a new tab and the memory peak are unchecked.
+
 ### 4i-B: settings and accessibility (2026-10-08; signed off 2026-10-08)
 
 **Signed off by the owner (2026-10-08)** after the checklist, except the controller items (no real controller available): "everything works as described". Two notes from the playtest were fixed before sign-off (commit 5d20b427): the web fullscreen line didn't change until the tab was reopened (the browser switches a moment after it's asked; the line now shows the choice at once and follows the browser), and Musashi drew over the keeper standing in front of him (his figure had no sorting group; `FigureSortingTests` now checks every layered figure). After those fixes: EditMode 805 passed, 0 failed; PlayMode 283 passed, 0 failed. The sign-off's notes on relaxed timing and fast clicks were left blank. The owner has a controller since (2026-10-08): the controller checks (4i-A's, and 4i-B's items 1 and 4) are carried onto 4i-C's playtest checklist. Carried into 4i-C: fast clicks on an Options line. Not tagged: `milestone-4i` waits for 4i-D.
@@ -1396,7 +1408,7 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - **The day's story isn't saved:** a night resumed from a save shows only what that session played (the purse and Renown always).
 - **Quitting mid-delve** loses that run (by design: no mid-run saves); Continue starts the night's delve again.
 - **Not driven in the web smoke test:** combat, power choices, the death screen, the satchel swap and a controller (synthetic input can't fight); PlayMode tests cover them.
-- **All sound is placeholder** (`PH_…`, generated), including the tavern feedback pass's moments. Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
+- **Twelve sounds are still placeholders** (`PH_…`): the troll's roar, the grill's sizzle and burn, the campfire, the heartbeat, the swoosh, Decorate's brush, plate bumps, the charge tick, the tap's spill warning and overflow (`docs/PLAN_4I.md`, 4i-C). Rumble on real controllers is checked by you; web builds have no rumble (haptics no-op).
 
 ### Regenerating and verifying (current project)
 
