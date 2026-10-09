@@ -1,52 +1,29 @@
-using Hearthdelve.Core.Services;
 using Hearthdelve.Dungeon.Combat;
 using NUnit.Framework;
 
 namespace Hearthdelve.Tests
 {
+    /// <summary>
+    /// The damage the cleaver deals: its attack's damage scaled by the run's light or heavy multiplier (CombatMeleeWeapon). The test
+    /// review (2026-10-09) retired the tests of <c>DamageCalculator.Apply</c> and <c>ComboLogic</c> with that code, which nothing
+    /// called (the combo and the health pool are TDE's); this is the part that ships.
+    /// </summary>
     public class DamageCalculatorTests
     {
         [Test]
-        public void NonLethalHit_ReducesHealth_NoOverkill()
+        public void Scale_MultipliesTheBaseDamage()
         {
-            var r = DamageCalculator.Apply(30f, 10f);
-            Assert.That(r.Dealt, Is.EqualTo(10f));
-            Assert.That(r.RemainingHealth, Is.EqualTo(20f));
-            Assert.That(r.Killed, Is.False);
-            Assert.That(r.Overkill, Is.EqualTo(0f));
+            Assert.That(DamageCalculator.Scale(12f, 1f), Is.EqualTo(12f));
+            Assert.That(DamageCalculator.Scale(12f, 1.5f), Is.EqualTo(18f));
+            Assert.That(DamageCalculator.Scale(12f, 0.5f), Is.EqualTo(6f));
         }
 
         [Test]
-        public void LethalHit_ReportsOverkill()
+        public void Scale_NeverGoesBelowZero()
         {
-            var r = DamageCalculator.Apply(5f, 25f);
-            Assert.That(r.Killed);
-            Assert.That(r.Dealt, Is.EqualTo(5f));
-            Assert.That(r.Overkill, Is.EqualTo(20f));
-            Assert.That(r.RemainingHealth, Is.EqualTo(0f));
-        }
-
-        [Test]
-        public void ExactKill_HasZeroOverkill()
-        {
-            var r = DamageCalculator.Apply(10f, 10f);
-            Assert.That(r.Killed);
-            Assert.That(r.Overkill, Is.EqualTo(0f));
-        }
-
-        [Test]
-        public void HittingTheDead_DoesNothing()
-        {
-            var r = DamageCalculator.Apply(0f, 50f);
-            Assert.That(r.Killed, Is.False);
-            Assert.That(r.Dealt, Is.EqualTo(0f));
-        }
-
-        [Test]
-        public void NegativeDamage_IsIgnored()
-        {
-            var r = DamageCalculator.Apply(10f, -5f);
-            Assert.That(r.RemainingHealth, Is.EqualTo(10f));
+            Assert.That(DamageCalculator.Scale(12f, -1f), Is.EqualTo(0f));
+            Assert.That(DamageCalculator.Scale(-3f, 2f), Is.EqualTo(0f));
+            Assert.That(DamageCalculator.Scale(12f, 0f), Is.EqualTo(0f));
         }
     }
 }
