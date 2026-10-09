@@ -375,7 +375,9 @@ Approved as written in §4i-B with D4 and D6 (2026-10-08), with the owner's deta
 9. Press Esc as a door fade or a scene change begins: the pause menu opens when it's done.
 10. The menu with an unreadable save: does the message read clearly? Are the softer text colours (labels, gold, notes) still pleasant and in keeping?
 
-## As built: 4i-C, "Presentation and polish" (2026-10-08; waiting for the owner's listening and look playtest)
+## As built: 4i-C, "Presentation and polish" (2026-10-08; signed off 2026-10-09)
+
+**Signed off by the owner (2026-10-09)** after two playtests and the web build of the second one's changes: "All my sound picks are in and working." The second playtest's changes (footsteps outdoors and in the Hollows a third down, the dodge a quarter down, Quirkii 15% down, a dying enemy's attack ending at once, the harvest note on one line, Orik staying by the pass while a plate is coming) and the owner's kill sounds (a clean kill: Leohpaz's "77_flesh_02" alone, trimmed; an overkill: Kenney's "impactPunch_heavy_000"; `EnemyDeath` retired) are commits 50078634 and 8451b45f. Before the kill sounds: EditMode 825 passed, 0 failed; PlayMode 290 passed, 0 failed. After them EditMode 825 passed, 0 failed; PlayMode was skipped at the owner's request before that web build. Not tagged: `milestone-4i` waits for 4i-D. Next, before 4i-D: the test suite clean-up (`docs/TEST_REVIEW.md`).
 
 Approved as written in §4i-C with D5 (2026-10-08). Order: the sound catalog first, then a listening list for the owner; meanwhile the non-audio work; after approval, import, swap, fill the feedback gaps and balance.
 

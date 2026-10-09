@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C built** (2026-10-08, with D5), waiting for the owner's listening and look playtest._
+_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C signed off** (2026-10-09). Next: the test suite clean-up, then 4i-D._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1303,7 +1303,9 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
-### 4i-C: presentation and polish (2026-10-08; waiting for the owner's listening and look playtest)
+### 4i-C: presentation and polish (2026-10-08; signed off 2026-10-09)
+
+**Signed off by the owner (2026-10-09)** after two playtests and the web build of the second one's changes: "All my sound picks are in and working." The second playtest's changes (footsteps outdoors and in the Hollows a third down, the dodge a quarter down, Quirkii 15% down, a dying enemy's attack ending at once, the harvest note on one line, Orik staying by the pass while a plate is coming) and the owner's kill sounds (a clean kill: Leohpaz's "77_flesh_02" alone, trimmed; an overkill: Kenney's "impactPunch_heavy_000"; `EnemyDeath` retired) are commits 50078634 and 8451b45f. Before the kill sounds: EditMode 825 passed, 0 failed; PlayMode 290 passed, 0 failed. After them EditMode 825 passed, 0 failed; PlayMode was skipped at the owner's request before that web build. Not tagged: `milestone-4i` waits for 4i-D. Next, before 4i-D: the test suite clean-up (`docs/TEST_REVIEW.md`).
 
 Approved as written (PLAN_4I §4i-C, with D5); the owner chose every recommended sound except family 15 (option B). Details, changes from the plan, the sounds by family, the feedback audit and the balance: `docs/PLAN_4I.md`, *As built: 4i-C*. Version `0.4i-c`. Not tagged.
 
