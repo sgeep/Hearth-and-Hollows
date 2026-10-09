@@ -253,6 +253,9 @@ namespace Hearthdelve.Editor
         /// pips beside it (4h Checkpoint B), a one-line harvest note under it; indoors, the Decorate key's reminder in the bottom
         /// left corner, clear of the room (Checkpoint A's reminder sat over the room's top-left corner).
         /// </summary>
+        /// <summary>The harvest note's width (its text is 12 pixels narrower, inside the frame).</summary>
+        public const float HarvestNoteWidth = 200f;
+
         static void BuildClockFace(Canvas ui)
         {
             Transform old = ui.transform.Find("SurfaceClock");
@@ -276,8 +279,9 @@ namespace Hearthdelve.Editor
                 pips[i] = DungeonUI.AddImage(light, DungeonUI.Pixel(), Color.white);
             }
 
-            // The harvest's note, under the tab for a moment.
-            RectTransform note = LookTestBuilder.UIRect(root, "Note", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -26f), new Vector2(150f, 24f));
+            // The harvest's note, under the tab for a moment: wide enough for the longest crop's line on one line (the 4i-C
+            // playtest: "3 fine onion into the storeroom" wrapped in 150 and ran into the frame).
+            RectTransform note = LookTestBuilder.UIRect(root, "Note", new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(3f, -26f), new Vector2(HarvestNoteWidth, 24f));
             DungeonUI.AddImage(note, DungeonUI.UISprite("Panel"), Color.white, Image.Type.Sliced);
             LocalizedSuperText noteText = LookTestBuilder.Text(note, "Text", GardenLocKeys.Harvested, TextStyle.Body, DungeonUI.k_Ink, TextAnchor.MiddleCenter,
                 Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(-12f, 0f));

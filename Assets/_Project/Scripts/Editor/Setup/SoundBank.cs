@@ -94,10 +94,10 @@ namespace Hearthdelve.Editor
         {
             // 1, round 2 B; the 4i-C playtest's B: dirt and grass mixed (Forgotten Plains' grass steps are these same Farm files).
             F("Footsteps.Village", new[] { L(Farm + @"_Generic_Human\Step_dirt_1.wav"), L(Farm + @"_Generic_Human\Step_dirt_2.wav"), L(Farm + @"_Generic_Human\Step_dirt_3.wav"),
-                L(Farm + @"_Generic_Human\Step_grass_1.wav"), L(Farm + @"_Generic_Human\Step_grass_2.wav"), L(Farm + @"_Generic_Human\Step_grass_3.wav") }),
+                L(Farm + @"_Generic_Human\Step_grass_1.wav"), L(Farm + @"_Generic_Human\Step_grass_2.wav"), L(Farm + @"_Generic_Human\Step_grass_3.wav") }, 0f, 0.67f), // a third down (playtest 2)
             F("Footsteps.Tavern", new[] { L(Movement + "10_Step_wood_01.wav"), L(Movement + "11_Step_wood_02.wav"), L(Movement + "12_Step_wood_03.wav") }), // 2, round 2 A
-            F("Footsteps.Hollows", new[] { L(Farm + @"_Generic_Human\Step_stone_1.wav"), L(Farm + @"_Generic_Human\Step_stone_2.wav"), L(Farm + @"_Generic_Human\Step_stone_3.wav") }), // 3, round 2 B
-            F("Dodge", new[] { L(Movement + "65_Dash_evade_01.wav") }, 0.04f),                                          // 4, round 2 A; 65 only (4i-C playtest)
+            F("Footsteps.Hollows", new[] { L(Farm + @"_Generic_Human\Step_stone_1.wav"), L(Farm + @"_Generic_Human\Step_stone_2.wav"), L(Farm + @"_Generic_Human\Step_stone_3.wav") }, 0f, 0.67f), // 3, round 2 B; a third down (playtest 2)
+            F("Dodge", new[] { L(Movement + "65_Dash_evade_01.wav") }, 0.04f, 0.75f),                                   // 4, round 2 A; 65 only, a quarter down (4i-C playtests)
             F("Swing", new[] { L(Dungeon + "27_sword_miss_1.wav"), L(Dungeon + "27_sword_miss_2.wav"), L(Dungeon + "27_sword_miss_3.wav") }, 0.05f, 0.7f), // 5, round 2 A
             F("Hit", Enumerable.Range(14, 5).Select(i => L(Battle + $"{i}_Impact_flesh_0{i - 13}.wav")).ToArray(), 0.04f), // 6, round 2 B
             F("HitHeavy", Enumerable.Range(9, 5).Select(i => L(Battle + $"{i:00}_Impact_0{i - 8}.wav")).ToArray(), 0.04f), // 7, round 2 A

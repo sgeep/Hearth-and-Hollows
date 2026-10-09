@@ -10,7 +10,7 @@ namespace Hearthdelve.Shared.Audio
     {
         public MusicCue cue;
         public AudioClip clip;
-        [Range(0f, 1f), Tooltip("This track's own level, under the music volume, to even out tracks mastered louder than the rest (Quirkii 0.75: a quarter down, the owner's call, 2026-10-08).")]
+        [Range(0f, 1f), Tooltip("This track's own level, under the music volume, to even out tracks mastered louder than the rest (Quirkii 0.6375: a quarter down, the owner's call, 2026-10-08, then 15% down after the second 4i-C playtest).")]
         public float level = 1f;
     }
 

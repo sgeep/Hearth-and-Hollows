@@ -114,6 +114,28 @@ namespace Hearthdelve.Tavern.Service
         public IReadOnlyList<RecipeDefinition> Menu => m_Menu;
         public IReadOnlyList<Ticket> Tickets => m_Tickets;
         public IReadOnlyList<CustomerLogic> Customers => m_Customers;
+
+        /// <summary>
+        /// A plate someone is waiting for is on its way to the pass or already on it (ordered, cooking or ready; spares don't
+        /// count). A server stays by the pass while it's true (the 4i-C playtest: Orik went off tidying and was away when food came).
+        /// </summary>
+        public bool PlatesComing
+        {
+            get
+            {
+                foreach (Ticket t in m_Tickets)
+                    if (!t.IsSpare && t.State is TicketState.Queued or TicketState.Cooking or TicketState.Ready) return true;
+                return false;
+            }
+        }
+
+        /// <summary>Someone is using this seat (on their way to it, ordering, waiting, eating), not just leaving it.</summary>
+        public bool SeatTaken(int seat)
+        {
+            foreach (CustomerLogic c in m_Customers)
+                if (c.Seat == seat && c.State is not (CustomerState.Leaving or CustomerState.Gone)) return true;
+            return false;
+        }
         public int SeatCount => m_Seats.Length;
         public float Elapsed { get; private set; }
         public float Remaining => Math.Max(0f, m_Settings.lengthSeconds - Elapsed);

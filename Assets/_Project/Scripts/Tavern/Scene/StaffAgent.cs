@@ -46,6 +46,7 @@ namespace Hearthdelve.Tavern.Scene
         Sprite m_PendingFace;
         float m_PendingAt;
         Vector2? m_Tidy;
+        int m_TidySeat = -1;
         float m_TidyLeft;
 
         // A job outside service (Gunta at the Butcher Block during Prep): walk there, work a moment, report.
@@ -134,7 +135,9 @@ namespace Hearthdelve.Tavern.Scene
         {
             if (Assignment != StaffStation.Serving || customer == null || customer.Departure != Departure.Paid || m_Director == null) return;
             TavernSeat seat = m_Director.Layout.Seat(customer.Seat);
-            if (seat != null && !m_Tidy.HasValue) m_Tidy = seat.ApproachPoint;
+            if (seat == null || m_Tidy.HasValue) return;
+            m_Tidy = seat.ApproachPoint;
+            m_TidySeat = customer.Seat;
         }
 
         void OnCooked(RecipeDefinition dish, float quality)
@@ -324,8 +327,12 @@ namespace Hearthdelve.Tavern.Scene
                     m_Rest -= dt;
                     return Post;
                 }
-                // Between plates: a table a guest just left gets a wipe first (a plate waiting comes first, though).
-                if (m_Tidy.HasValue && m_Session.NextToServe(includeSpares: false) == null)
+                // A table someone new has sat at no longer wants tidying (the 4i-C playtest: Orik walked to the old spot, now a
+                // new customer's, the moment the pass emptied, and looked as if he ran to them empty-handed).
+                if (m_Tidy.HasValue && m_Session.SeatTaken(m_TidySeat)) m_Tidy = null;
+                // Between plates: a table a guest just left gets a wipe, but only while no plate is coming; otherwise he waits
+                // by the pass, ready to take the next one as it's put down.
+                if (m_Tidy.HasValue && !m_Session.PlatesComing)
                 {
                     Vector2 table = m_Tidy.Value;
                     if (!AtGoal || Vector2.Distance(transform.position, table) > 0.3f) return table;

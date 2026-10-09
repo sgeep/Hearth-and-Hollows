@@ -76,7 +76,7 @@ namespace Hearthdelve.Tests
             Assert.That(config.effects, Is.EqualTo(0.75f).Within(1e-4f), "effects a quarter down (4i-C playtest)");
             // The owner's Quirkii at 0.75; 4i-C's balance pass evened the rest by their measured loudness (Coastal Market about
             // 1.5 dB hot, Otherworld about 4 dB; Continue is already quieter).
-            Assert.That(config.Level(MusicCue.Day), Is.EqualTo(0.75f).Within(1e-4f), "Quirkii a quarter under the rest");
+            Assert.That(config.Level(MusicCue.Day), Is.EqualTo(0.6375f).Within(1e-4f), "Quirkii a quarter under the rest, then 15% down (playtest 2)");
             Assert.That(config.Level(MusicCue.Decorate), Is.EqualTo(1f).Within(1e-4f));
             Assert.That(config.Level(MusicCue.Service), Is.EqualTo(0.85f).Within(1e-4f));
             Assert.That(config.Level(MusicCue.Cellars), Is.EqualTo(0.6f).Within(1e-4f));

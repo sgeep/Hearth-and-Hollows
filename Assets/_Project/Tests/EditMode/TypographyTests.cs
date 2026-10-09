@@ -225,6 +225,31 @@ namespace Hearthdelve.Tests
             Assert.That(problems, Is.Empty, string.Join("\n", problems));
         }
 
+        /// <summary>
+        /// The harvest's note fits every real harvest on one line (the 4i-C playtest: a placeholder counts as a digit above, so a
+        /// crop's name never was; "3 fine onion into the storeroom" wrapped into the frame). Real counts and names, at 1×.
+        /// </summary>
+        [Test]
+        public void TheHarvestNote_FitsEveryCropsLine_OnOneLine()
+        {
+            Dictionary<string, string> english = English;
+            float box = SurfaceBuilder.HarvestNoteWidth - 12f;
+            var problems = new List<string>();
+            foreach (string guid in AssetDatabase.FindAssets("t:CropDefinition"))
+            {
+                var crop = AssetDatabase.LoadAssetAtPath<Hearthdelve.Shared.Garden.CropDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+                if (crop == null || crop.produce == null) continue;
+                string name = english.TryGetValue($"ingredient.{crop.produce.id}", out string n) ? n : crop.produce.id;
+                foreach (string key in new[] { GardenLocKeys.Harvested, GardenLocKeys.HarvestedFine })
+                {
+                    string line = string.Format(GardenLocKeys.English.First(e => e.key == key).english, crop.yield + 9, name);
+                    float width = Width(line);
+                    if (width > box) problems.Add($"\"{line}\" is {width} of {box} pixels");
+                }
+            }
+            Assert.That(problems, Is.Empty, string.Join("\n", problems));
+        }
+
         /// <summary>1× text beside a heading sits on the heading's baseline (Prep's count beside "evening prep").</summary>
         [Test]
         public void TheTitleRow_SharesTheHeadingsBaseline()

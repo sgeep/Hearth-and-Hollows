@@ -612,6 +612,14 @@ The telegraph, doors, the stairs, the tap's pour and clink, plates, the crash, t
 - **Orik's cap (`Pip_OnServing…`, 0.861 against 0.85):** not a broken rule but a test measuring the wrong thing. The cap is on staff's own work (`StaffDefinition.qualityCap`: Orik's serve, Boog's and Orik's cooking, each `Mathf.Min`'d before it's used). The test compared the *dish's* quality with it, and a dish is the keeper's cooking × the ingredients × a serving factor of 0.6 + 0.4 × the serve. With the keeper's perfect cook and Orik serving at his cap, the factor is 0.94, so the dish comes out about 0.86–0.94 with these ingredients: correctly above 0.85, and still below the keeper's own perfect serve of it. Whether it failed depended on how cleanly Orik walked that run. The test now checks Orik's serve against his cap (from `StaffWorkDone`), that the dish is exactly the keeper's cooking with that serve, and that it's worse than the keeper's own perfect serve.
 - **`CameraFollowTests`** remembers the frame rate and VSync before each test and restores them after (they turned VSync off for every later test in the run).
 
+### After the second 4i-C playtest (2026-10-09)
+
+- **Footsteps a third down** on Kariaston's paths and the Hollows' stone (a 0.67 trim on those families; Tally Ho!'s boards unchanged); **the dodge a quarter down** (0.75 trim). Both through the bank and the sound pass.
+- **Quirkii 15% down** (its own level 0.75 → 0.6375).
+- **Slimes hurt after dying** (any enemy could): an enemy killed during its telegraph still reached its attack's active phase, because the attack's timer kept running, and TDE leaves a child hitbox's collider on at death. Dying now ends the attack at once (`EnemyAttack` listens for `Health.OnDeath`; a dead enemy's attack never starts its active phase). Test: `ASlimeKilledMidTelegraph_NeverHurtsWhileItDies`. A web already in flight still flies.
+- **The harvest note bled into its frame:** its text box was 138 pixels, and "3 fine onion into the storeroom" needs about 150, so it wrapped onto a second line. The typography test counts a `{0}` as one digit, so the crop's name was never measured. The note is 200 wide now, and a test measures every crop's real line (`TheHarvestNote_FitsEveryCropsLine_OnOneLine`).
+- **Orik running to customers empty-handed:** when a guest paid and left, he remembered their table to tidy and went as soon as no plate was waiting on the pass. Meanwhile a new customer had often sat at that table and ordered, so the moment the keeper picked up the plate, he set off for the new customer's table with nothing. He now tidies only while no plate is coming (nothing ordered, cooking or on the pass; `ServiceSession.PlatesComing`), and forgets a table someone has sat at again (`SeatTaken`). Otherwise he waits by the pass for the next plate.
+
 ### Listening and look checklist (4i-C)
 
 1. **Headphones, then speakers:** a full day. Wake in your room (does it feel lived in?), walk the boards, go downstairs (stairs), out the front door (the door), along Kariaston's paths (footsteps change with the ground), plant, tend (water) and harvest, buy at the market.
@@ -635,3 +643,4 @@ After the playtest's changes (2026-10-09):
 16. **Decorate Mode** with its old placeholders, every moment.
 17. **The delve's first room:** Essence holds still until you go through its doors.
 18. **The picks:** an enemy dying (69), the dodge (65), an upgrade pickup (6), a full satchel (Window_Close_2), the campfire as you warm by it and as it burns low (the crumpled paper).
+19. **Second playtest's changes:** footsteps outdoors and in the Hollows a third quieter, the dodge a quarter quieter, Quirkii 15% quieter; slimes never hurting while they die; the harvest note on one line inside its frame; Orik staying by the pass while food is coming, and never walking to a customer without a plate.

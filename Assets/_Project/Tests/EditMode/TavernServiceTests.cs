@@ -120,6 +120,32 @@ namespace Hearthdelve.Tests
             Assert.That(stock.TotalCount, Is.EqualTo(1), "one haunch reserved");
         }
 
+        /// <summary>
+        /// 4i-C playtest: Orik waits by the pass while a plate is coming (ordered, cooking or ready) and tidies only when none is,
+        /// and a table someone has sat at again isn't one to tidy.
+        /// </summary>
+        [Test]
+        public void PlatesComing_AndSeatTaken_KeepTheServerByThePass()
+        {
+            var stock = new Storeroom();
+            stock.Add(Stack(Haunch, 2));
+            var s = Session(stock, 4, m_Grilled);
+            Assert.That(s.PlatesComing, Is.False, "an empty room: free to tidy");
+            var c = Seat(s, Quick());
+            Assert.That(s.PlatesComing, "ordered: a plate is coming");
+            Assert.That(s.SeatTaken(c.Seat), "their seat is taken");
+            var t = s.Tickets.First(x => x.Customer == c);
+            s.StartCooking(t, "cook");
+            Assert.That(s.PlatesComing, "cooking");
+            s.FinishCooking(t, 1f);
+            Assert.That(s.PlatesComing, "on the pass");
+            s.StartDelivery(t, "keeper");
+            Assert.That(s.PlatesComing, Is.False, "the keeper has it: nothing left coming");
+            Assert.That(s.Deliver(t, c, 1f));
+            Run(s, 3f);
+            Assert.That(s.SeatTaken(c.Seat), Is.False, "eaten, paid and gone: the table is free to tidy");
+        }
+
         [Test]
         public void LastServingReserved_MarksDishSoldOut_AndRaisesEvent()
         {

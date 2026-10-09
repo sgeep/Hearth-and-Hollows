@@ -119,9 +119,28 @@ namespace Hearthdelve.Dungeon.Enemies
             return other < definition.otherAttacks.Count ? definition.otherAttacks[other] : null;
         }
 
+        void OnEnable()
+        {
+            if (m_Health != null) m_Health.OnDeath += OnDied;
+        }
+
         void OnDisable()
         {
+            if (m_Health != null) m_Health.OnDeath -= OnDied;
             if (IsAttacking) Interrupt();
+        }
+
+        bool Dead => m_Health != null && m_Health.CurrentHealth <= 0f;
+
+        /// <summary>
+        /// Dying ends the attack at once (the 4i-C playtest: a slime killed during its telegraph still leapt and hit during its
+        /// death animation, since the attack's timer kept running and TDE leaves a child hitbox's collider on at death).
+        /// </summary>
+        void OnDied()
+        {
+            if (IsAttacking) Interrupt();
+            EndActive();
+            if (m_Alert != null) m_Alert.SetActive(false);
         }
 
         /// <summary>Whether this attack could start against <paramref name="target"/> now.</summary>
@@ -170,6 +189,11 @@ namespace Hearthdelve.Dungeon.Enemies
 
         void Update()
         {
+            if (Dead)
+            {
+                if (IsAttacking) OnDied();
+                return;
+            }
             Cycle?.Tick(Time.deltaTime);
             if (Cycle == null || Cycle.Phase != EnemyAttackPhase.Active) return;
             if (m_Dashing) m_Movement?.SetMovement(m_Direction);
@@ -199,7 +223,7 @@ namespace Hearthdelve.Dungeon.Enemies
                     break;
                 case EnemyAttackPhase.Active:
                     if (m_Alert != null) m_Alert.SetActive(false);
-                    StartActive();
+                    if (!Dead) StartActive();
                     break;
                 case EnemyAttackPhase.Recovery:
                     EndActive();

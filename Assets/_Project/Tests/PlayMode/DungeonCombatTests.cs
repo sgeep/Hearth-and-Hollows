@@ -206,6 +206,38 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator SpiderWeb_IsTelegraphedFully_BeforeItHurts() => TelegraphThenHurt("giant_spider", EnemyAttackKind.Spit, 5f);
 
+        /// <summary>
+        /// 4i-C playtest: a slime killed during its telegraph leapt anyway and hurt the player during its death animation. Death
+        /// ends the attack: no leap, no hitbox, no hurt.
+        /// </summary>
+        [UnityTest]
+        public IEnumerator ASlimeKilledMidTelegraph_NeverHurtsWhileItDies()
+        {
+            var damaged = new List<CharacterDamaged>();
+            EventBus<CharacterDamaged>.Subscribe(damaged.Add);
+            try
+            {
+                yield return Setup("green_slime", new Vector2(1.3f, 0f));
+                EnemyAttack leap = AttackOfKind(EnemyAttackKind.Leap);
+                Assert.That(leap.Begin(Player.transform));
+                yield return null;
+                Assert.That(leap.Cycle.Phase, Is.EqualTo(EnemyAttackPhase.Telegraph));
+                Enemy.GetComponent<Health>().Kill();
+                Assert.That(leap.IsAttacking, Is.False, "death ends the attack");
+                float until = Time.time + leap.Settings.telegraph + leap.Settings.active + 0.5f;
+                while (Time.time < until && Enemy != null)
+                {
+                    Assert.That(damaged.Any(d => d.TargetIsPlayer), Is.False, "nothing hurts while it dies");
+                    yield return null;
+                }
+                Assert.That(damaged.Any(d => d.TargetIsPlayer), Is.False, "nothing hurts while it dies");
+            }
+            finally
+            {
+                EventBus<CharacterDamaged>.Unsubscribe(damaged.Add);
+            }
+        }
+
         IEnumerator TelegraphThenHurt(string enemyId, EnemyAttackKind kind, float distance)
         {
             var damaged = new List<CharacterDamaged>();
