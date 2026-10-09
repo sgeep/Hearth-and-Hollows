@@ -53,21 +53,32 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => Encounter != null && Encounter.State == BossEncounterState.Fighting, 6f, "the fight");
         }
 
+        /// <summary>
+        /// Found at its meal, its entrance (the full reveal on a first meeting: the camera on it, the player waiting), then the
+        /// fight, with the camera and the controls handed back. (The test review merged the first-meeting and entrance tests into
+        /// this one: they waited for the same moments.)
+        /// </summary>
         [UnityTest]
-        public IEnumerator TheTroll_IsFoundEating_ThenEnters_ThenFights()
+        public IEnumerator TheTroll_IsFoundEating_ThenEnters_ShowingItself_ThenFights_AndHandsBack()
         {
             yield return LoadArena();
             Assert.That(Encounter, Is.Not.Null, "the arena holds the troll");
             Assert.That(Object.FindObjectsByType<EnemyIdentity>(), Has.Length.EqualTo(1), "and nothing else");
             var bar = Object.FindAnyObjectByType<BossHealthBar>();
             yield return WaitUntil(() => Encounter.State == BossEncounterState.Entrance, 4f, "the entrance");
+            Assert.That(Encounter.EntranceSeconds, Is.EqualTo(1.6f).Within(0.01f), "never beaten in this save: the full ~1.6 s");
             Assert.That(Troll.CharacterBrain.BrainActive, Is.False, "it doesn't act during the entrance");
+            Assert.That(Runner.CameraFollow, Is.SameAs(Troll.transform), "the camera finds it at its meal");
+            Assert.That(Hearthdelve.Core.Input.InputMaps.Find(Hearthdelve.Core.Input.InputMaps.Dungeon, "Attack").enabled, Is.False, "the player waits");
             yield return null;
             Assert.That(bar.IsShown, "named on the boss bar");
             Assert.That(bar.BossId, Is.EqualTo("larder_troll"));
             Assert.That(bar.Fraction, Is.EqualTo(1f).Within(1e-3f));
             yield return UntilFighting();
             Assert.That(Troll.CharacterBrain.BrainActive, "then it fights");
+            Assert.That(Runner.CameraFollow, Is.Not.Null.And.Not.SameAs(Troll.transform), "back on the player");
+            Assert.That(Vector2.Distance(Runner.CameraFollow.position, Player.transform.position), Is.LessThan(1f), "following the player again");
+            Assert.That(Hearthdelve.Core.Input.InputMaps.Find(Hearthdelve.Core.Input.InputMaps.Dungeon, "Attack").enabled, "and the player acts");
         }
 
         [UnityTest]
@@ -96,27 +107,6 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSeconds(1f);
             Assert.That(essence.Essence.Current, Is.LessThan(after), "drain is back once the fight is over");
             yield return WaitUntil(() => !bar.IsShown, 5f, "the caption to go");
-        }
-
-        [UnityTest]
-        public IEnumerator TheFirstMeeting_GetsTheFullReveal()
-        {
-            yield return LoadArena();
-            yield return WaitUntil(() => Encounter.State == BossEncounterState.Entrance, 4f, "the entrance");
-            Assert.That(Encounter.EntranceSeconds, Is.EqualTo(1.6f).Within(0.01f), "never beaten in this save: the full ~1.6 s");
-        }
-
-        [UnityTest]
-        public IEnumerator TheEntrance_ShowsTheTroll_AndHoldsThePlayer_ThenHandsBack()
-        {
-            yield return LoadArena();
-            yield return WaitUntil(() => Encounter.State == BossEncounterState.Entrance, 4f, "the entrance");
-            Assert.That(Runner.CameraFollow, Is.SameAs(Troll.transform), "the camera finds it at its meal");
-            Assert.That(Hearthdelve.Core.Input.InputMaps.Find(Hearthdelve.Core.Input.InputMaps.Dungeon, "Attack").enabled, Is.False, "the player waits");
-            yield return UntilFighting();
-            Assert.That(Runner.CameraFollow, Is.Not.Null.And.Not.SameAs(Troll.transform), "back on the player");
-            Assert.That(Vector2.Distance(Runner.CameraFollow.position, Player.transform.position), Is.LessThan(1f), "following the player again");
-            Assert.That(Hearthdelve.Core.Input.InputMaps.Find(Hearthdelve.Core.Input.InputMaps.Dungeon, "Attack").enabled, "and the player acts");
         }
 
         /// <summary>Keeps the player far off (out of the slam's reach and line), so the troll's choice is the food.</summary>
@@ -168,13 +158,13 @@ namespace Hearthdelve.Tests.PlayMode
             // Straight there, before it can reach the part where it fell.
             part.PopTo((Vector2)Room.transform.position + new Vector2(-2.5f, Room.Size.y / 2f), 0.05f);
             var eater = Troll.GetComponent<ScrapEater>();
-            // It crosses most of the arena first (some 7 s), then grinds for its give-up time.
-            yield return KeepAway(15f, () => eater.GaveUp > 0);
+            // It crosses most of the arena first (some 7 s), then grinds for its give-up time: game time, so four times as fast.
+            yield return Fast(KeepAway(15f, () => eater.GaveUp > 0));
             Assert.That(eater.GaveUp, Is.EqualTo(1), $"gave up on it (state {Troll.CharacterBrain.CurrentState?.StateName}, food {(eater.Food != null ? eater.Food.name : "none")}, " +
                 $"eaten {eater.Eaten}, best/stuck {eater.Approaching}, eating {eater.IsEating}, part at {(part != null ? (Vector2)part.transform.position : Vector2.zero)}, troll at {(Vector2)Troll.transform.position}, room {(Vector2)Room.transform.position} size {Room.Size})");
             Assert.That(eater.Eaten, Is.Zero);
             Assert.That(part != null, "the part is left where it is");
-            yield return KeepAway(3.5f, () => false);
+            yield return Fast(KeepAway(3.5f, () => false));
             Assert.That(eater.Food, Is.Null, "and never goes back for it");
             Assert.That(eater.GaveUp, Is.EqualTo(1));
         }

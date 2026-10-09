@@ -43,43 +43,26 @@ namespace Hearthdelve.Tests.PlayMode
     /// branch about the tusks; it all survives a scene change, a save, quitting and Continue. Plus the Quest Machine proof, the
     /// dialogue box's controls, the day clock and old saves.
     /// </summary>
-    public class StoryCheckpointATests : LookTestFixture
+    public class StoryCheckpointATests : BootFixture
     {
-        string m_SaveDir;
+        [SetUp]
+        public void AddPad() => m_Pad = InputSystem.AddDevice<Gamepad>();
+
+        [TearDown]
+        public void RemovePad() => InputSystem.RemoveDevice(m_Pad);
+
         Gamepad m_Pad;
 
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
         static StoryHost Host => StoryHost.Instance;
         static RelationshipAdapter Social => Host.Relationships;
         static HearthDialogueUI Box => Object.FindAnyObjectByType<HearthDialogueUI>();
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-            m_Pad = InputSystem.AddDevice<Gamepad>();
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            InputSystem.RemoveDevice(m_Pad);
-            GameFlow.SaveDirectoryOverride = null;
-            RoomRunner.StartInArenaOverride = false;
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
 
         // ---------- The way through the game ----------
 
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady && Host != null && Host.Relationships != null, 10f, "the string tables and the story");
+            yield return Boot();
+            yield return WaitUntil(() => Host != null && Host.Relationships != null, 10f, "the story");
             yield return null;
         }
 
@@ -141,7 +124,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
         }
 
-        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(m_SaveDir, SaveStore.FileName)));
+        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(SaveDir, SaveStore.FileName)));
 
         // ---------- Talking ----------
 
@@ -183,6 +166,25 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Press(Key.Space);
         }
 
+        /// <summary>Picks the choice with these words (from Checkpoint C's tests, merged here by the test review).</summary>
+        static IEnumerator Choose(string text)
+        {
+            yield return WaitUntil(() => Box.IsChoosing && !Box.ChoicesLocked, 2f, $"the choice \"{text}\"");
+            int i = Enumerable.Range(0, Box.ResponseCount).First(n => Box.ChoiceText(n) == text);
+            Box.Choose(i);
+            yield return null;
+            yield return null;
+        }
+
+        /// <summary>The first line someone says now (then the conversation is closed unheard).</summary>
+        IEnumerator FirstLine(string id, System.Action<string> line)
+        {
+            yield return Talk(id);
+            line(Box.Line);
+            DialogueManager.StopAllConversations();
+            yield return null;
+        }
+
         IEnumerator UntilClosed()
         {
             for (int i = 0; i < 6 && Box.IsOpen; i++)
@@ -212,44 +214,51 @@ namespace Hearthdelve.Tests.PlayMode
             return RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
         }
 
-        /// <summary>
-        /// What Quest Machine does at the end of the frame a quest node becomes active: its message conditions start listening.
-        /// Batch-mode tests draw no frames, so WaitForEndOfFrame never comes (a player, the editor and the web all have it);
-        /// this does the same through Quest Machine's own API, so the rest of the chain is the real one.
-        /// </summary>
-        static void ListenAsAtEndOfFrame(string questId)
-        {
-            PixelCrushers.QuestMachine.Quest quest = Host.Quests.Journal.FindQuest(questId);
-            foreach (PixelCrushers.QuestMachine.QuestNode node in quest.nodeList.Where(n => n.GetState() == PixelCrushers.QuestMachine.QuestNodeState.Active))
-            foreach (var condition in node.conditionSet.conditionList.OfType<PixelCrushers.QuestMachine.MessageQuestCondition>())
-                MessageSystem.AddListener(condition, condition.runtimeMessage, condition.runtimeParameter);
-        }
-
         static string Selected => EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null ? EventSystem.current.currentSelectedGameObject.name : null;
 
         // ---------- The proof ----------
 
         [UnityTest]
-        public IEnumerator TheTusks_ReachBoog_ChangeWhatHeSays_AndSurviveSceneChangesSaveQuitAndContinue()
+        public IEnumerator TheTrollsFall_AndTheTusks_ReachBoogAndOrik_ChangeWhatTheySay_OnceEach_AndSurviveSceneChangesSaveQuitAndContinue()
         {
             RoomRunner.StartInArenaOverride = true;
             yield return NewGameToTheDelve();
+            float trollBoog0 = Social.Respect("gunta"), trollOrik0 = Social.Respect("pip");
             yield return DefeatTheTroll();
             yield return ExtractAndGoHome();
             Assert.That(Flow.State.Furniture.PendingHomecoming, Is.EqualTo("trophy_larder_troll"));
 
-            // Before: Boog hasn't seen them. The troll's fall is a deed of its own (Checkpoint C): it's the baseline here, and the
-            // first thing he talks about. Then his everyday branch, with his bomb to ask about.
-            float boogAffinity0 = Social.Affinity("gunta"), boogRespect0 = Social.Respect("gunta"), pipAffinity0 = Social.Affinity("pip"), pipRespect0 = Social.Respect("pip");
+            // The troll's fall (Checkpoint C): both learned of it, from the first clear; each reads it by their own values.
+            Assert.That(Social.Remembers("gunta", "felled_larder_troll") && Social.Remembers("pip", "felled_larder_troll"));
+            float trollBoog = Social.Respect("gunta") - trollBoog0, trollOrik = Social.Respect("pip") - trollOrik0;
+            Assert.That(trollBoog, Is.GreaterThan(trollOrik * 1.5f), "Boog's respect for nerve");
+            Assert.That(trollOrik, Is.GreaterThan(3f), "Orik's, quieter");
+
+            // Before the tusks: Boog hasn't seen them. The troll's fall is the first thing he talks about, loudly; Orik quietly, and
+            // Phi. Then their everyday branches, with Boog's bomb to ask about.
             Assert.That(Social.Remembers("gunta", "displayed_trophy"), Is.False);
-            Assert.That(Social.Remembers("gunta", "felled_larder_troll"), "the troll's first fall");
             yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("you killed the Larder Troll"));
+            Assert.That(Box.Line, Is.EqualTo("you killed the Larder Troll. the actual Larder Troll. the one that eats the Cellars."));
             yield return NextLine();
+            Assert.That(Box.Line, Does.StartWith("i've said for years it was edible"), "no bomb to remember yet");
             yield return NextLine();
-            yield return WaitUntil(() => Box.IsChoosing, 2f, "the troll's choices");
-            yield return Press(Key.Enter);
+            yield return Choose("is it edible?");
+            Assert.That(Box.Line, Does.StartWith("parts of it. the brave parts"));
             yield return UntilClosed();
+            yield return Talk(CharacterIds.Orik);
+            Assert.That(Box.Line, Does.StartWith("aye, the Larder Troll is dead. i've moved it from 'risks' to 'resolved'"));
+            yield return NextLine();
+            Assert.That(Box.Line, Does.StartWith("Phi went after it"));
+            yield return NextLine();
+            yield return Choose("what was she after?");
+            Assert.That(Box.Line, Is.EqualTo("no' the troll, she said. whatever it was sitting on."));
+            yield return UntilClosed();
+            // Said once: next time, their everyday conversations.
+            string orikLine = null;
+            yield return FirstLine(CharacterIds.Orik, l => orikLine = l);
+            Assert.That(orikLine, Does.StartWith("good evening, Bram"));
+            // The tusks' baseline: after everything the troll's fall changed.
+            float boogAffinity0 = Social.Affinity("gunta"), boogRespect0 = Social.Respect("gunta"), pipAffinity0 = Social.Affinity("pip"), pipRespect0 = Social.Respect("pip");
             yield return Talk(CharacterIds.Boog);
             Assert.That((Box.SpeakerId, Box.SpeakerName), Is.EqualTo(("gunta", "Boog")));
             Assert.That(Box.Line, Does.StartWith("the stove's hot"));
@@ -297,6 +306,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return InTavern(TavernPhase.Daytime, "the next day");
             Assert.That((Social.Day, GameTime.mode, GameTime.time), Is.EqualTo((2, GameTimeMode.Manual, 2f)));
             Assert.That(Social.Remembers("gunta", "displayed_trophy"), "remembered the next day");
+            Assert.That(Social.Remembers("gunta", "felled_larder_troll"));
             Assert.That((Social.Affinity("gunta"), Social.Respect("gunta")), Is.EqualTo((boogAffinity, boogRespect)));
 
             // Quit and Continue: a new Boot, a new host, the same Boog.
@@ -308,14 +318,21 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Social.Respect("gunta"), Is.EqualTo(boogRespect).Within(1e-3f));
             Assert.That(Social.Affinity("pip"), Is.EqualTo(pipAffinity).Within(1e-3f));
             Assert.That((Social.Remembers("gunta", "displayed_trophy"), Social.TimesSeen("gunta", "displayed_trophy")), Is.EqualTo((true, 1)));
-            // Said once (Checkpoint C), and the dialogue's own state came back too: his everyday branch, not the tusks again.
+            Assert.That(Social.Remembers("gunta", "felled_larder_troll") && Social.Remembers("pip", "felled_larder_troll"), "the troll remembered after Continue");
+            Assert.That(Social.TimesSeen("gunta", "felled_larder_troll"), Is.EqualTo(1), "no duplicate deed after the reload");
+            yield return FirstLine(CharacterIds.Orik, l => orikLine = l);
+            // Orik's troll remark stays said (Checkpoint C); with the tusks up, his first line is now his own tusks remark.
+            Assert.That(orikLine, Does.Not.StartWith("aye, the Larder Troll is dead"), "Orik's troll remark stays said");
+            Assert.That(orikLine, Does.StartWith("the tusks over the bar"), "and the tusks have his attention");
+            // Said once (Checkpoint C), and the dialogue's own state came back too: his everyday branch, not the tusks or the troll
+            // again; and the tusks never hide the bomb offer (Checkpoint C's priority test, merged here).
             yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("the stove's hot"), "the tusks remark stays said after Continue");
+            Assert.That(Box.Line, Does.StartWith("the stove's hot"), "the tusks and the troll remarks stay said after Continue");
             yield return NextLine();
-            yield return WaitUntil(() => Box.IsChoosing, 2f, "the choices");
-            yield return Press(Key.DownArrow);
-            yield return Press(Key.Enter);
-            yield return WaitUntil(() => !Box.IsOpen, 2f, "carry on");
+            yield return Choose("about your bomb...");
+            Assert.That(Box.Line, Is.EqualTo("i lost something in the Hollows. my favorite bomb."), "the quest is never out of reach");
+            DialogueManager.StopAllConversations();
+            yield return null;
 
             // Hanging them again (Shift+F1's way): the same deed, less fresh.
             float respectBefore = Social.Respect("gunta");
@@ -340,11 +357,15 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator TheDialogueBox_TakesKeyboardMouseAndGamepad_PausesTheWorld_AndGivesTheInputBack()
+        public IEnumerator TheDialogueBox_TakesKeyboardMouseAndGamepad_PausesTheWorld_TheNightStepsAside_AndGivesTheInputBack()
         {
             yield return NewGameToTheDelve();
             yield return ExtractAndGoHome();
             string[] before = InputMaps.Snapshot();
+            // The night's summary steps aside while someone talks (Checkpoint C's presentation test, merged here by the test review).
+            var aside = Object.FindAnyObjectByType<NightScreen>().GetComponentInParent<StepAsideWhileTalking>();
+            Assert.That(aside, Is.Not.Null);
+            Assert.That(aside.SteppedAside, Is.False);
 
             // Orik, by name: the keeper's name comes from the save, through the dialogue's markup.
             yield return Talk(CharacterIds.Orik);
@@ -358,6 +379,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Press(Key.E);
             Assert.That(Box.IsRevealing, Is.False, "E finishes the reveal");
             Assert.That(Box.IsOpen, "and doesn't skip the line");
+            yield return new WaitForSecondsRealtime(0.4f);
+            Assert.That(aside.SteppedAside, "the night's summary makes way for the conversation");
             // A click on the box moves on: to his questions (Checkpoint B), where "never mind." ends it.
             Vector2 at = Centre(Object.FindAnyObjectByType<DialogueBoxClick>().transform);
             yield return ClickAt(at);
@@ -368,6 +391,8 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Box.IsOpen, 2f, "never mind: closed");
             Assert.That(Time.timeScale, Is.EqualTo(1f));
             Assert.That(InputMaps.Snapshot(), Is.EqualTo(before), "the maps that were on are on again");
+            yield return new WaitForSecondsRealtime(0.4f);
+            Assert.That(aside.SteppedAside, Is.False, "and the night's summary comes back after");
 
             // Boog's choices by mouse: hovering moves the focus and the ▶; a click chooses.
             yield return Talk(CharacterIds.Boog);
@@ -457,7 +482,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return DefeatTheTroll();
             yield return ExtractAndGoHome();
             // Rewrite it as a version 7 save (4f): no story at all.
-            string path = Path.Combine(m_SaveDir, SaveStore.FileName);
+            string path = Path.Combine(SaveDir, SaveStore.FileName);
             SaveData data = SavedGame();
             data.version = 7;
             string json = Regex.Replace(SaveSystem.ToJson(data), @",\s*""story"":.*$", "\n}", RegexOptions.Singleline);

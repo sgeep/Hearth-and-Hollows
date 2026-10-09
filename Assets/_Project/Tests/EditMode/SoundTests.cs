@@ -89,27 +89,20 @@ namespace Hearthdelve.Tests.EditMode
         [Test]
         public void DecorateMode_KeepsItsPlaceholders()
         {
-            Scene scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Additive);
-            try
+            Scene scene = ProjectScan.Open(EditorPaths.TavernScene);
+            var decorate = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Hearthdelve.Tavern.Scene.DecorateFeedback>(true)).Single();
+            int checkedMoments = 0;
+            foreach (MMF_Player player in decorate.GetComponentsInChildren<MMF_Player>(true))
             {
-                var decorate = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Hearthdelve.Tavern.Scene.DecorateFeedback>(true)).Single();
-                int checkedMoments = 0;
-                foreach (MMF_Player player in decorate.GetComponentsInChildren<MMF_Player>(true))
+                if (!SoundBank.DecoratePlaceholders.TryGetValue(player.name, out string placeholder)) continue;
+                foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
                 {
-                    if (!SoundBank.DecoratePlaceholders.TryGetValue(player.name, out string placeholder)) continue;
-                    foreach (MMF_Sound sound in player.FeedbacksList.OfType<MMF_Sound>())
-                    {
-                        Assert.That(sound.Sfx != null ? sound.Sfx.name : null, Is.EqualTo(placeholder), player.name);
-                        Assert.That(sound.RandomSfx == null || sound.RandomSfx.Length == 0, Is.True, player.name);
-                        checkedMoments++;
-                    }
+                    Assert.That(sound.Sfx != null ? sound.Sfx.name : null, Is.EqualTo(placeholder), player.name);
+                    Assert.That(sound.RandomSfx == null || sound.RandomSfx.Length == 0, Is.True, player.name);
+                    checkedMoments++;
                 }
-                Assert.That(checkedMoments, Is.EqualTo(SoundBank.DecoratePlaceholders.Count), "every moment of Decorate Mode");
             }
-            finally
-            {
-                EditorSceneManager.CloseScene(scene, true);
-            }
+            Assert.That(checkedMoments, Is.EqualTo(SoundBank.DecoratePlaceholders.Count), "every moment of Decorate Mode");
         }
 
         /// <summary>
@@ -151,15 +144,8 @@ namespace Hearthdelve.Tests.EditMode
             var left = new SortedSet<string>(SoundSwap.PlaceholdersLeft(PrefabRoots()));
             foreach (string path in new[] { BootBuilder.BootScene, EditorPaths.TavernScene, EditorPaths.DungeonScene })
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
-                {
-                    left.UnionWith(SoundSwap.PlaceholdersLeft(scene.GetRootGameObjects()));
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
-                }
+                Scene scene = ProjectScan.Open(path);
+                left.UnionWith(SoundSwap.PlaceholdersLeft(scene.GetRootGameObjects()));
             }
             Assert.That(left.Except(k_Left), Is.Empty, "a placeholder the bank replaces is still in use");
             Assert.That(left.Where(p => SoundBank.ByPlaceholder.ContainsKey(p)), Is.Empty);
@@ -190,28 +176,14 @@ namespace Hearthdelve.Tests.EditMode
         [Test]
         public void DoorsStairsBlipsAndWatering_AreInTheirScenes_AndTheVoicesAreSet()
         {
-            Scene tavern = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Additive);
-            try
-            {
-                PassageSounds passages = tavern.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<PassageSounds>(true)).Single();
-                Assert.That(passages.Door, Is.Not.Null);
-                Assert.That(passages.Stairs, Is.Not.Null);
-            }
-            finally
-            {
-                EditorSceneManager.CloseScene(tavern, true);
-            }
-            Scene boot = EditorSceneManager.OpenScene(BootBuilder.BootScene, OpenSceneMode.Additive);
-            try
-            {
-                Assert.That(boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialogueBlips>(true)).Count(), Is.EqualTo(1));
-                foreach (UiFeedback ui in boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<UiFeedback>(true)))
-                    Assert.That(ui.WaterPlayer, Is.Not.Null, "tending a bed is heard");
-            }
-            finally
-            {
-                EditorSceneManager.CloseScene(boot, true);
-            }
+            Scene tavern = ProjectScan.Open(EditorPaths.TavernScene);
+            PassageSounds passages = tavern.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<PassageSounds>(true)).Single();
+            Assert.That(passages.Door, Is.Not.Null);
+            Assert.That(passages.Stairs, Is.Not.Null);
+            Scene boot = ProjectScan.Open(BootBuilder.BootScene);
+            Assert.That(boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<DialogueBlips>(true)).Count(), Is.EqualTo(1));
+            foreach (UiFeedback ui in boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<UiFeedback>(true)))
+                Assert.That(ui.WaterPlayer, Is.Not.Null, "tending a bed is heard");
             var characters = AssetDatabase.FindAssets("t:CharacterDefinition").Select(g => AssetDatabase.LoadAssetAtPath<CharacterDefinition>(AssetDatabase.GUIDToAssetPath(g))).ToList();
             foreach (var (id, semitones, low) in SoundSwap.Voices)
             {

@@ -114,7 +114,7 @@ namespace Hearthdelve.Tests.PlayMode
             try
             {
                 CustomerAgent patron = Patron();
-                yield return WaitUntil(() => patron.Logic.State == CustomerState.WaitingForFood, 30f, "an order");
+                yield return Fast(WaitUntil(() => patron.Logic.State == CustomerState.WaitingForFood, 30f, "an order"));
                 yield return null;
                 Assert.That(patron.Logic.IsRequest);
                 Assert.That(issued.Single().RecipeId, Is.EqualTo(dish.id));
@@ -162,7 +162,7 @@ namespace Hearthdelve.Tests.PlayMode
             OpenWithRequests(max: 0);
             Assert.That(Director.Session.Ledger.RequestsIssued, Is.Zero);
             CustomerAgent next = Patron();
-            yield return WaitUntil(() => next.Logic.State == CustomerState.WaitingForFood, 30f, "an order");
+            yield return Fast(WaitUntil(() => next.Logic.State == CustomerState.WaitingForFood, 30f, "an order"));
             Assert.That(next.Logic.IsRequest, Is.False);
             Assert.That(next.ShowsRequest, Is.False);
         }
@@ -178,7 +178,7 @@ namespace Hearthdelve.Tests.PlayMode
             void Missed(CustomerRequestFailed e) => missed.Add(e);
             EventBus<CustomerRequestFailed>.Subscribe(Missed);
             CustomerAgent patron = Patron();
-            yield return WaitUntil(() => patron.Logic.State == CustomerState.WaitingForFood, 30f, "an order");
+            yield return Fast(WaitUntil(() => patron.Logic.State == CustomerState.WaitingForFood, 30f, "an order"));
             Assert.That(patron.Logic.IsRequest);
             yield return ResultsShown();
             EventBus<CustomerRequestFailed>.Unsubscribe(Missed);

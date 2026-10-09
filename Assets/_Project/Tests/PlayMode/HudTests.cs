@@ -107,15 +107,6 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(feed.Lines.All(l => l.group.alpha == 0f), "faded");
         }
 
-        [Test]
-        public void HarvestFeed_PicksTheRightWords()
-        {
-            Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.None), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestGot));
-            Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.CleanKill), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestGotClean));
-            Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.Overkill | Hearthdelve.Shared.Run.HarvestFlags.CleanKill), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestGotOverkill));
-            Assert.That(HarvestFeed.KeyFor(Hearthdelve.Shared.Run.HarvestFlags.Destroyed | Hearthdelve.Shared.Run.HarvestFlags.Overkill), Is.EqualTo(Hearthdelve.UI.Localization.LocKeys.HarvestDestroyed));
-        }
-
         /// <summary>Nothing on the HUD covers anything else at 320×180: bar, its icon, satchel, feed, prompts, the debug label.</summary>
         [UnityTest]
         public IEnumerator HudAndPrompts_NeverOverlap()

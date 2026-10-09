@@ -60,7 +60,7 @@ namespace Hearthdelve.Tests.PlayMode
                 profile.traits.orderPatience = 1000f;
             }
             CustomerAgent customer = Director.SpawnCustomer(profile);
-            yield return WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "the customer to sit and order");
+            yield return Fast(WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "the customer to sit and order"));
             got(customer);
         }
 
@@ -270,7 +270,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(grill.Hint.Kind, Is.EqualTo(TavernHintKind.Staffed), "Orik is working here");
             yield return UseAt(grill);
             Assert.That(Keeper.ActiveCook, Is.Null, "the keeper can't take over");
-            yield return WaitUntil(() => TicketFor(customer).State == TicketState.Ready, 30f, "Orik to cook it");
+            yield return Fast(WaitUntil(() => TicketFor(customer).State == TicketState.Ready, 30f, "Orik to cook it"));
         }
     }
 }

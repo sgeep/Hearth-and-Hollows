@@ -36,78 +36,16 @@ namespace Hearthdelve.Tests.PlayMode
     /// board asks before the evening begins (before five or after), and the village unloads for Prep; the storeroom, the delve meal
     /// and decorating are places in the room.
     /// </summary>
-    public class SurfaceCheckpointATests : LookTestFixture
+    public class SurfaceCheckpointATests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
         static SurfaceClock Clock => Flow.State.Surface;
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            SurfaceTime.SettingsOverride = null;
-            SurfacePause.Clear();
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
 
         // ---------- The way in ----------
 
-        /// <summary>A game past its opening, on a free daytime (day 2: a quiet delve, the night, sleep).</summary>
-        IEnumerator Daytime()
-        {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
-            yield return Revealed();
-            Flow.QuickNewGame();
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
-            yield return Revealed();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            // Wait for each reveal, as a player must (the cover takes input): back-to-back transitions overlap their fades.
-            yield return Revealed();
-            Flow.Sleep();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
-        }
-
-        /// <summary>
-        /// Until the scene is in view and settled: not loading and uncovered for several frames running (a fade from clear starts
-        /// at alpha 0, so one uncovered frame can't tell "revealed" from "about to cover").
-        /// </summary>
-        static IEnumerator Revealed()
-        {
-            int settled = 0;
-            float started = Time.realtimeSinceStartup;
-            while (settled < 5)
-            {
-                bool clear = !Flow.IsLoading && (Flow.Transition == null || !Flow.Transition.IsCovering);
-                settled = clear ? settled + 1 : 0;
-                Assert.That(Time.realtimeSinceStartup - started, Is.LessThan(8f), "the scene revealed");
-                yield return null;
-            }
-        }
-
-        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
+        /// <summary>A game past its opening, on a free daytime (day 2).</summary>
+        IEnumerator Daytime() => StartDaytime();
 
         static bool OnFootNow => InputMaps.Find(InputMaps.Tavern, TavernActions.Interact) is { enabled: true };
-
-        static IEnumerator Frames(int n)
-        {
-            for (int i = 0; i < n; i++) yield return null;
-        }
 
         static T Find<T>() where T : Object => Object.FindAnyObjectByType<T>(FindObjectsInactive.Include);
 
@@ -121,13 +59,16 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Daytime();
             Assert.That(Flow.LoadedScenes, Is.EqualTo(new[] { GameScenes.Tavern, GameScenes.Kariaston }));
             Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo(GameScenes.Tavern));
-            Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.GuestRoomId), "upstairs, in Bram's room");
+            Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.GuestRoomId), "upstairs, in the keeper's room");
             Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.GuestRoomId));
             Vector2 wake = TavernDirector.WakePoint(AreaFurniture.Find(PropertyArea.GuestRoomId));
             Assert.That(Vector2.Distance(Keeper.position, wake), Is.LessThan(0.6f), "beside the bed");
             Assert.That(OnFootNow, "the daytime is walked, not a menu");
             Assert.That(Find<MorningScreen>().IsShown, Is.False, "no morning panel");
             Assert.That(Find<SurfaceClockView>().IsShown, "the clock shows");
+            // The day starts in the morning: Prep can begin before five (every day-loop test begins its evening from the menu board
+            // in the morning, DaytimeActions.BeginEvening; FiveOClock… checks the village unloads for it).
+            Assert.That(SurfaceTime.Band, Is.EqualTo(SurfaceBand.Morning));
 
             // Walking works.
             Vector2 before = Keeper.position;
@@ -137,69 +78,20 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Keeper.position.x, Is.GreaterThan(before.x + 0.5f));
         }
 
-        [UnityTest]
-        public IEnumerator TheStairs_StillGoBothWays()
-        {
-            yield return Daytime();
-            AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId);
-            Assert.That(down.CanPass, "the stairs work in the daytime");
-            down.Pass(Keeper);
-            yield return Frames(2);
-            Assert.That((PropertyArea.Current.Id, SurfaceArea.Current.Id), Is.EqualTo((PropertyArea.TavernId, SurfaceArea.TavernId)));
-            AreaPassage up = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId);
-            up.Pass(Keeper);
-            yield return Frames(2);
-            Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.GuestRoomId));
-        }
-
-        /// <summary>The owner's Checkpoint A playtest: after a trip into the village, walking back up to the room on foot.</summary>
-        [UnityTest]
-        public IEnumerator AfterKariaston_TheKeeperWalksBackUpTheStairs()
-        {
-            yield return Daytime();
-            SurfaceDoor inside = SurfaceDoor.Find(SurfaceDoor.FrontInside), outside = SurfaceDoor.Find(SurfaceDoor.FrontOutside);
-            AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId);
-            AreaPassage up = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId);
-            down.Pass(Keeper);
-            yield return Frames(2);
-            // Out and back in through the doors on foot (their fades and busy flags, as in play).
-            Teleport(Keeper, inside.transform.position + new Vector3(0f, 1.5f, 0f));
-            yield return Frames(2);
-            Hold(Key.S);
-            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.KariastonId, 3f, "outside");
-            ReleaseKeys();
-            yield return new WaitForSecondsRealtime(0.6f);
-            Hold(Key.W);
-            yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.TavernId, 3f, "back inside");
-            ReleaseKeys();
-            yield return new WaitForSecondsRealtime(0.6f);
-            Assert.That((PropertyArea.Current.Id, SurfaceArea.Current.Id), Is.EqualTo((PropertyArea.TavernId, SurfaceArea.TavernId)));
-            Assert.That(up.CanPass, "the stairs work after coming back in");
-
-            // On foot, the way a player comes: along the kitchen's corridor past the barrels, then up into the stairs' foot.
-            yield return WalkUpTheStairs(up);
-            ReleaseKeys();
-            yield return new WaitForSecondsRealtime(0.6f);
-            Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.GuestRoomId));
-            // What the player sees: the room, lit, with the keeper in it.
-            Transform view = GameObject.Find(TavernView.CameraName).transform;
-            Assert.That((Vector2)view.position, Is.EqualTo(SurfaceArea.Current.HoldPoint), "the camera holds on the room");
-            Assert.That(SurfaceArea.Current.Lights.All(l => l.enabled), "the room is lit");
-            Assert.That(SurfaceArea.Find(SurfaceArea.KariastonId).Lights.Any(l => l.enabled), Is.False, "the village's daylight is off");
-            Assert.That(Vector2.Distance(Keeper.position, PropertyArea.Current.Arrival), Is.LessThan(1.5f), "the keeper is in the room");
-        }
-
         /// <summary>
         /// The owner's Checkpoint B playtest: doorways mustn't need an exact line. In a doorway and pushing the way through goes
-        /// through (even against the stairs' flight); standing in one doesn't; arriving never bounces back.
+        /// through (even against the stairs' flight); standing in one doesn't; arriving never bounces back. Then (the owner's
+        /// Checkpoint A playtest) after the trip into the village and back, the keeper walks up the stairs to the room, lit, the
+        /// camera on it. (The test review merged the stairs-both-ways and the back-up-the-stairs tests into this one.)
         /// </summary>
         [UnityTest]
-        public IEnumerator Doorways_GoThroughWhenPushed_FromAnywhereInThem_AndNeverBounceBack()
+        public IEnumerator Doorways_GoThroughWhenPushed_FromAnywhereInThem_NeverBounceBack_AndTheStairsWorkAfterKariaston()
         {
             yield return Daytime();
             AreaPassage down = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.GuestRoomId);
             AreaPassage up = Object.FindObjectsByType<AreaPassage>(FindObjectsSortMode.None).First(p => p.From.Id == PropertyArea.TavernId);
             Bounds stairs = up.GetComponent<Collider2D>().bounds, guestDoor = down.GetComponent<Collider2D>().bounds;
+            Assert.That(down.CanPass, "the stairs work in the daytime");
 
             // Off-centre in the guest room's doorway, pushing down.
             Teleport(Keeper, new Vector2(guestDoor.min.x + 0.15f, guestDoor.max.y + 0.3f));
@@ -210,6 +102,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSecondsRealtime(0.8f);
             ReleaseKeys();
             Assert.That(PropertyArea.Current.Id, Is.EqualTo(PropertyArea.TavernId), "arriving walking away never goes back");
+            Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.TavernId), "downstairs is Tally Ho!'s main room");
 
             // Standing in the stairs' foot, hugging the stew pot's side: nothing until pushed up.
             Teleport(Keeper, new Vector2(stairs.min.x + 0.3f, stairs.center.y - 0.2f));
@@ -248,6 +141,21 @@ namespace Hearthdelve.Tests.PlayMode
             Hold(Key.W);
             yield return WaitUntil(() => SurfaceArea.Current.Id == SurfaceArea.TavernId, 3f, "back in through the step's edge");
             ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That((PropertyArea.Current.Id, SurfaceArea.Current.Id), Is.EqualTo((PropertyArea.TavernId, SurfaceArea.TavernId)));
+            Assert.That(up.CanPass, "the stairs work after coming back in");
+
+            // On foot, the way a player comes: along the kitchen's corridor past the barrels, then up into the stairs' foot.
+            yield return WalkUpTheStairs(up);
+            ReleaseKeys();
+            yield return new WaitForSecondsRealtime(0.6f);
+            Assert.That(SurfaceArea.Current.Id, Is.EqualTo(SurfaceArea.GuestRoomId));
+            // What the player sees: the room, lit, with the keeper in it.
+            Transform view = GameObject.Find(TavernView.CameraName).transform;
+            Assert.That((Vector2)view.position, Is.EqualTo(SurfaceArea.Current.HoldPoint), "the camera holds on the room");
+            Assert.That(SurfaceArea.Current.Lights.All(l => l.enabled), "the room is lit");
+            Assert.That(SurfaceArea.Find(SurfaceArea.KariastonId).Lights.Any(l => l.enabled), Is.False, "the village's daylight is off");
+            Assert.That(Vector2.Distance(Keeper.position, PropertyArea.Current.Arrival), Is.LessThan(1.5f), "the keeper is in the room");
         }
 
         /// <summary>From the middle of the room, east along the corridor under the stew pot, then north into the stairs.</summary>
@@ -461,18 +369,6 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "Prep");
             Assert.That(Flow.LoadedScenes, Is.EqualTo(new[] { GameScenes.Tavern }), "the village unloads for the evening");
             Assert.That(Flow.Phase, Is.EqualTo(DayPhase.Evening));
-        }
-
-        [UnityTest]
-        public IEnumerator Prep_CanBeginBeforeFive()
-        {
-            yield return Daytime();
-            Assert.That(SurfaceTime.Band, Is.EqualTo(SurfaceBand.Morning));
-            EventBus<DaytimePlaceUsed>.Publish(new DaytimePlaceUsed(TavernInteractableKind.MenuBoard));
-            yield return Frames(2);
-            Find<PrepConfirm>().Confirm();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "Prep");
-            Assert.That(Flow.IsLoaded(GameScenes.Kariaston), Is.False);
         }
 
         // ---------- The storeroom and the delve meal ----------

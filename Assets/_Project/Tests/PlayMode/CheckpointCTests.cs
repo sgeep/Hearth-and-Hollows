@@ -41,42 +41,27 @@ namespace Hearthdelve.Tests.PlayMode
     /// their homecoming; the Brackenford market; the revised menu through Prep and service with Orik's ledger; the Butcher
     /// Block by hand and by Gunta; Gunta at a station; and the staff's looks and beats.
     /// </summary>
-    public class CheckpointCTests : LookTestFixture
+    public class CheckpointCTests : BootFixture
     {
-        string m_SaveDir;
-        readonly List<string> m_Patterns = new();
-
-        void Record(string id) => m_Patterns.Add(id);
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
-
         [SetUp]
-        public void UseTempSaves()
+        public void RecordPatterns()
         {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
             m_Patterns.Clear();
             Hearthdelve.Shared.Haptics.HapticService.PatternPlayed += Record;
         }
 
         [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            Hearthdelve.Shared.Haptics.HapticService.PatternPlayed -= Record;
-            RoomRunner.StartInArenaOverride = false;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
+        public void StopRecording() => Hearthdelve.Shared.Haptics.HapticService.PatternPlayed -= Record;
+
+        readonly List<string> m_Patterns = new();
+
+        void Record(string id) => m_Patterns.Add(id);
 
         // ---------- Helpers (as DayLoopTests) ----------
 
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
+            yield return Boot();
             Haptics = new RecordingHapticOutput();
             Hearthdelve.Shared.Haptics.HapticService.Instance.Output = Haptics;
             yield return null;
@@ -126,7 +111,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
         }
 
-        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(m_SaveDir, SaveStore.FileName)));
+        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(SaveDir, SaveStore.FileName)));
 
         static CurioPool Pool => RoomRunner.Active.Settings.tuning.curios;
 
@@ -291,7 +276,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return NewGameToTheDelve();
             yield return ExtractAndGoHome();
             // Rewrite the save as a version 6 save from 4e/Checkpoint B: two clears, no tusks, no Butcher Block.
-            string path = Path.Combine(m_SaveDir, SaveStore.FileName);
+            string path = Path.Combine(SaveDir, SaveStore.FileName);
             SaveData data = SavedGame();
             data.version = 6;
             data.bosses = new List<BossClearData> { new() { id = "larder_troll", clears = 2 } };

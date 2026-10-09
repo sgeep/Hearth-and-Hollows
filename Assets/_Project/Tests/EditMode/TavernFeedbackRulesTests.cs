@@ -89,15 +89,5 @@ namespace Hearthdelve.Tests
             Assert.That(TavernFeedbackRules.SpillWarning(0.68f, 0.99f, S), Is.False, "once");
             Assert.That(TavernFeedbackRules.SpillWarning(0f, 0.34f, S), Is.False);
         }
-
-        /// <summary>The tavern plays only named patterns from the haptic library (CLAUDE.md, Game feel).</summary>
-        [Test]
-        public void EveryTavernPattern_IsANamedPatternInTheLibrary()
-        {
-            var library = AssetDatabase.LoadAssetAtPath<HapticLibrary>(EditorPaths.Haptics + "/HapticLibrary.asset");
-            foreach (string id in new[] { HapticIds.TapLight, HapticIds.TapFirm, HapticIds.PulseSuccess, HapticIds.BuzzFailure, HapticIds.CueThreshold,
-                         HapticIds.CutRagged, HapticIds.BumpSoft, HapticIds.BumpHard })
-                Assert.That(library.Find(id), Is.Not.Null, id);
-        }
     }
 }

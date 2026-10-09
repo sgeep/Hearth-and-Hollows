@@ -218,35 +218,32 @@ namespace Hearthdelve.Tests
             Assert.That(PixelScale.For(200, 100), Is.EqualTo(1), "at least one");
         }
 
-        /// <summary>Every text in the day loop's scenes draws the game font at a pixel size, and every canvas scales by whole pixels.</summary>
+        /// <summary>
+        /// The test floor (a development scene the typography tests don't cover) draws every text in the game font at a pixel size,
+        /// and its canvases scale by whole pixels. The game's own scenes are checked, more strictly, by
+        /// <see cref="TypographyTests.EveryTextInTheGame_IsStyled_FromTheTypeScale"/> (the test review: this loop repeated it).
+        /// </summary>
         [Test]
-        public void TheDayLoopsScenes_DrawEveryTextInTheGameFont_OnWholePixels()
+        public void TheTestFloor_DrawsEveryTextInTheGameFont_OnWholePixels()
         {
-            string[] scenes = { EditorPaths.TavernScene, EditorPaths.TestFloorScene, BootBuilder.BootScene, BootBuilder.MainMenuScene };
+            string[] scenes = { EditorPaths.TestFloorScene };
             var problems = new List<string>();
             foreach (string path in scenes)
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
+                Scene scene = ProjectScan.Open(path);
+                foreach (GameObject root in scene.GetRootGameObjects())
                 {
-                    foreach (GameObject root in scene.GetRootGameObjects())
+                    foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
                     {
-                        foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
-                        {
-                            string name = $"{Path.GetFileNameWithoutExtension(path)}/{text.name}";
-                            if (text.font != Font) problems.Add($"{name}: font {text.font}");
-                            // A whole multiple of the native size (the type scale: 1×, 2×, 3×; TypographyTests checks each style).
-                            if (text.size < GameFonts.Native || text.size % GameFonts.Native != 0f) problems.Add($"{name}: size {text.size}");
-                            if (text.quality != GameFonts.Native || text.filterMode != FilterMode.Point) problems.Add($"{name}: quality {text.quality}, filter {text.filterMode}");
-                        }
-                        foreach (Canvas canvas in root.GetComponentsInChildren<Canvas>(true))
-                            if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace && canvas.GetComponent<PixelCanvasScaler>() == null)
-                                problems.Add($"{Path.GetFileNameWithoutExtension(path)}/{canvas.name}: no whole-pixel scaling");
+                        string name = $"{Path.GetFileNameWithoutExtension(path)}/{text.name}";
+                        if (text.font != Font) problems.Add($"{name}: font {text.font}");
+                        // A whole multiple of the native size (the type scale: 1×, 2×, 3×; TypographyTests checks each style).
+                        if (text.size < GameFonts.Native || text.size % GameFonts.Native != 0f) problems.Add($"{name}: size {text.size}");
+                        if (text.quality != GameFonts.Native || text.filterMode != FilterMode.Point) problems.Add($"{name}: quality {text.quality}, filter {text.filterMode}");
                     }
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
+                    foreach (Canvas canvas in root.GetComponentsInChildren<Canvas>(true))
+                        if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace && canvas.GetComponent<PixelCanvasScaler>() == null)
+                            problems.Add($"{Path.GetFileNameWithoutExtension(path)}/{canvas.name}: no whole-pixel scaling");
                 }
             }
             Assert.That(problems, Is.Empty, string.Join("\n", problems));

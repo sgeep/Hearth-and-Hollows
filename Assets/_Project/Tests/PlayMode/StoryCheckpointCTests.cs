@@ -36,41 +36,18 @@ namespace Hearthdelve.Tests.PlayMode
     /// values more; Boog's bomb remembered alongside the troll; the tusks never hiding the bomb offer; the tavern's panels
     /// stepping aside while someone talks.
     /// </summary>
-    public class StoryCheckpointCTests : LookTestFixture
+    public class StoryCheckpointCTests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
         static StoryHost Host => StoryHost.Instance;
         static RelationshipAdapter Social => Host.Relationships;
         static HearthDialogueUI Box => Object.FindAnyObjectByType<HearthDialogueUI>();
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            RoomRunner.StartInArenaOverride = false;
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
 
         // ---------- The way through ----------
 
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady && Host != null && Host.Relationships != null, 10f, "the story");
-            yield return WaitUntil(() => Flow.Transition == null || !Flow.Transition.IsCovering, 5f, "the menu revealed");
+            yield return Boot();
+            yield return WaitUntil(() => Host != null && Host.Relationships != null, 10f, "the story");
             yield return null;
         }
 
@@ -99,17 +76,6 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             result.Proceed();
             yield return InTavern(TavernPhase.Night, "the night");
-        }
-
-        IEnumerator DefeatTheTroll()
-        {
-            Player.GetComponent<EssenceHealth>().GodMode = true;
-            var encounter = Object.FindAnyObjectByType<BossEncounter>();
-            yield return WaitUntil(() => encounter.State == BossEncounterState.Fighting, 8f, "the troll");
-            var health = encounter.GetComponent<BossHealth>();
-            health.Damage(health.CurrentHealth + 50f, Player.gameObject, 0f, 0f, Vector3.zero);
-            health.FinishOff(Player.gameObject, finisher: false);
-            yield return WaitUntil(() => DelveRunController.Active.Loot.BossesDefeated.Count == 1, 3f, "the defeat recorded");
         }
 
         // ---------- Talking ----------
@@ -153,74 +119,8 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Box.IsOpen, Is.False);
         }
 
-        /// <summary>The first line someone says now (then the conversation is closed unheard).</summary>
-        IEnumerator FirstLine(string id, Action<string> line)
-        {
-            yield return Talk(id);
-            line(Box.Line);
-            DialogueManager.StopAllConversations();
-            yield return null;
-        }
-
-        // ---------- The troll ----------
-
-        [UnityTest]
-        public IEnumerator TheTrollsFall_BoogLoudly_OrikQuietly_SaidOnce_AndStillRememberedAfterContinue()
-        {
-            RoomRunner.StartInArenaOverride = true;
-            yield return ToTheDelve();
-            float boogRespect = Social.Respect("gunta"), orikRespect = Social.Respect("pip");
-            yield return DefeatTheTroll();
-            yield return Home();
-
-            // Both learned of it, from the first clear; each reads it by their own values.
-            Assert.That(Social.Remembers("gunta", "felled_larder_troll") && Social.Remembers("pip", "felled_larder_troll"));
-            float boogGain = Social.Respect("gunta") - boogRespect, orikGain = Social.Respect("pip") - orikRespect;
-            Assert.That(boogGain, Is.GreaterThan(orikGain * 1.5f), "Boog's respect for nerve");
-            Assert.That(orikGain, Is.GreaterThan(3f), "Orik's, quieter");
-
-            // Boog, loudly.
-            yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Is.EqualTo("you killed the Larder Troll. the actual Larder Troll. the one that eats the Cellars."));
-            yield return Next();
-            Assert.That(Box.Line, Does.StartWith("i've said for years it was edible"), "no bomb to remember yet");
-            yield return Next();
-            yield return Choose("is it edible?");
-            Assert.That(Box.Line, Does.StartWith("parts of it. the brave parts"));
-            yield return ToEnd();
-
-            // Orik, quietly, and Phi.
-            yield return Talk(CharacterIds.Orik);
-            Assert.That(Box.Line, Does.StartWith("aye, the Larder Troll is dead. i've moved it from 'risks' to 'resolved'"));
-            yield return Next();
-            Assert.That(Box.Line, Does.StartWith("Phi went after it"));
-            yield return Next();
-            yield return Choose("what was she after?");
-            Assert.That(Box.Line, Is.EqualTo("no' the troll, she said. whatever it was sitting on."));
-            yield return ToEnd();
-
-            // Said once: next time, their everyday conversations.
-            string boog = null, orik = null;
-            yield return FirstLine(CharacterIds.Boog, l => boog = l);
-            yield return FirstLine(CharacterIds.Orik, l => orik = l);
-            Assert.That(boog, Does.StartWith("the stove's hot"));
-            Assert.That(orik, Does.StartWith("good evening, Bram"));
-
-            // A scene change, a save, quit and Continue: remembered, still not repeated.
-            Object.FindAnyObjectByType<NightScreen>().SleepButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "the next day");
-            Assert.That(Social.Remembers("gunta", "felled_larder_troll"));
-            yield return BootToMenu();
-            Object.FindAnyObjectByType<MainMenuScreen>().ContinueButton.onClick.Invoke();
-            yield return InTavern(TavernPhase.Daytime, "continued");
-            Assert.That(Social.Remembers("gunta", "felled_larder_troll") && Social.Remembers("pip", "felled_larder_troll"), "remembered after Continue");
-            Assert.That(Social.Respect("gunta"), Is.EqualTo(boogRespect + boogGain).Within(1e-3f), "nothing replayed or lost");
-            Assert.That(Social.TimesSeen("gunta", "felled_larder_troll"), Is.EqualTo(1), "no duplicate deed after the reload");
-            yield return FirstLine(CharacterIds.Boog, l => boog = l);
-            yield return FirstLine(CharacterIds.Orik, l => orik = l);
-            Assert.That(boog, Does.StartWith("the stove's hot"), "the callback stays said");
-            Assert.That(orik, Does.StartWith("good evening, Bram"));
-        }
+        // (The troll's fall, the tusks' priority and the night's panel stepping aside are in StoryCheckpointATests: the test review
+        // merged them into its tests on the same path.)
 
         // ---------- Repeats, and two readings ----------
 
@@ -306,47 +206,6 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Choose("about your bomb...");
             Assert.That(Box.Line, Does.StartWith("she's on the shelf over the stove now"));
             yield return ToEnd();
-        }
-
-        // ---------- Priority ----------
-
-        [UnityTest]
-        public IEnumerator TheTusks_AreRemarkedOnce_AndNeverHideTheBombOffer()
-        {
-            yield return ToTheDelve();
-            yield return Home();
-            Host.Commit(DeedSource.TrophyDisplayed);
-            Assert.That(Social.Remembers("gunta", "displayed_trophy"));
-            yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("you hung the Larder Troll's tusks"));
-            yield return Next();
-            yield return Next();
-            yield return Choose("they do look good up there.");
-            yield return ToEnd();
-            yield return Talk(CharacterIds.Boog);
-            Assert.That(Box.Line, Does.StartWith("the stove's hot"));
-            yield return Next();
-            yield return Choose("about your bomb...");
-            Assert.That(Box.Line, Is.EqualTo("i lost something in the Hollows. my favorite bomb."), "the quest is never out of reach");
-            DialogueManager.StopAllConversations();
-        }
-
-        // ---------- Presentation ----------
-
-        [UnityTest]
-        public IEnumerator TheNightsPanel_StepsAside_WhileSomeoneTalks()
-        {
-            yield return ToTheDelve();
-            yield return Home();
-            var aside = Object.FindAnyObjectByType<NightScreen>().GetComponentInParent<StepAsideWhileTalking>();
-            Assert.That(aside, Is.Not.Null);
-            Assert.That(aside.SteppedAside, Is.False);
-            yield return Talk(CharacterIds.Orik);
-            yield return new WaitForSecondsRealtime(0.4f);
-            Assert.That(aside.SteppedAside, "the night's summary makes way for the conversation");
-            DialogueManager.StopAllConversations();
-            yield return new WaitForSecondsRealtime(0.4f);
-            Assert.That(aside.SteppedAside, Is.False, "and comes back after");
         }
     }
 }

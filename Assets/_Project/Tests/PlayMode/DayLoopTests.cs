@@ -38,37 +38,15 @@ namespace Hearthdelve.Tests.PlayMode
     /// generated delve (a power, run Gold, a haul, extract) → Night (bank, buy, save) → Sleep → day 2 → boot again →
     /// Continue; and the other ways a day goes (dying with the Lockbox, staying shut, quitting mid-delve).
     /// </summary>
-    public class DayLoopTests : LookTestFixture
+    public class DayLoopTests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
-
         // ---------- Helpers ----------
 
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
+            yield return Boot();
             Haptics = new RecordingHapticOutput();
-            HapticService.Instance.Output = Haptics;
+            Hearthdelve.Shared.Haptics.HapticService.Instance.Output = Haptics;
             yield return null;
         }
 
@@ -89,7 +67,7 @@ namespace Hearthdelve.Tests.PlayMode
         static int Legs(Storeroom storeroom) => storeroom.CountMatching(i => i.Definition == Leg);
         static Satchel PlayerSatchel => LevelManager.Instance.Players[0].GetComponent<SatchelCarrier>().Satchel;
 
-        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(m_SaveDir, SaveStore.FileName)));
+        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(SaveDir, SaveStore.FileName)));
 
         /// <summary>Extracts and goes home: the delve result, then the tavern at Night.</summary>
         IEnumerator ExtractAndGoHome()
@@ -156,7 +134,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             var results = Object.FindAnyObjectByType<EveningResultsScreen>();
             // The first press finishes the reveal, the next ends the evening.
-            for (int i = 0; i < 4 && Director.Phase == TavernPhase.Results; i++)
+            for (int i = 0; i < 4 && Director != null && Director.Phase == TavernPhase.Results; i++)
             {
                 results.DoneButton.onClick.Invoke();
                 yield return null;
@@ -168,7 +146,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- The day ----------
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator AWholeDay_InTheNewOrder_ThenSleep_ThenContinue_RestoresEverything()
         {
             yield return BootToMenu();
@@ -182,7 +160,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(transition.CaptionKey, Is.EqualTo(LoopLocKeys.TransitionFirstDelve), "straight into the Hollows");
             yield return InDungeon();
             Assert.That((Flow.State.Day, Flow.State.Phase), Is.EqualTo((1, DayPhase.Delve)));
-            Assert.That(File.Exists(Path.Combine(m_SaveDir, SaveStore.FileName)), "a new game is saved at once");
+            Assert.That(File.Exists(Path.Combine(SaveDir, SaveStore.FileName)), "a new game is saved at once");
             Assert.That(SavedGame().phase, Is.EqualTo(nameof(DayPhase.Delve)));
             PlayerSatchel.Add(new IngredientItem(Leg, Quality.Standard), 2);
             yield return ExtractAndGoHome();
@@ -348,11 +326,6 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(shown, Has.None.EqualTo("served").And.None.EqualTo("kept shut").And.None.EqualTo("banked today"));
         }
 
-        /// <summary>
-        /// 4c sign-off: the Essence and seating upgrades bought at Night reach the next day's scenes (the pure rules are
-        /// EditMode-tested; this checks the dungeon and tavern actually read them). Every seat opens, and the order rail
-        /// has a row for each.
-        /// </summary>
         /// <summary>
         /// 4e: defeating the Larder Troll in a real delve is recorded once in the save (its first clear announced for 4f's
         /// trophy and story), even across a reload, and its Gold comes home with the haul.
@@ -588,6 +561,7 @@ namespace Hearthdelve.Tests.PlayMode
         [UnityTest]
         public IEnumerator EveryFrameOfATransition_HasACameraDrawingTheCover()
         {
+            RealTransitions();   // the fade as the player sees it (the other tests' transitions are instant)
             yield return BootToMenu();
             int framesWithoutCamera = 0, frames = 0;
             GameFlow.Instance.QuickNewGame();

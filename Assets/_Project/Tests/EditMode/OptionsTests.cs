@@ -213,20 +213,13 @@ namespace Hearthdelve.Tests.EditMode
             var problems = new List<string>();
             foreach (string path in new[] { BootBuilder.BootScene, BootBuilder.MainMenuScene, EditorPaths.TavernScene, KariastonBuilder.ScenePath, EditorPaths.DungeonScene })
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
+                Scene scene = ProjectScan.Open(path);
+                foreach (GameObject root in scene.GetRootGameObjects()) AudioRouting.Collect(root, Path.GetFileNameWithoutExtension(path), problems);
+                if (path == BootBuilder.BootScene)
                 {
-                    foreach (GameObject root in scene.GetRootGameObjects()) AudioRouting.Collect(root, Path.GetFileNameWithoutExtension(path), problems);
-                    if (path == BootBuilder.BootScene)
-                    {
-                        AudioMixerHub hub = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<AudioMixerHub>(true)).FirstOrDefault();
-                        Assert.That(hub, Is.Not.Null, "Boot keeps the mixer hub");
-                        Assert.That(hub.Mixer, Is.Not.Null);
-                    }
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
+                    AudioMixerHub hub = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<AudioMixerHub>(true)).FirstOrDefault();
+                    Assert.That(hub, Is.Not.Null, "Boot keeps the mixer hub");
+                    Assert.That(hub.Mixer, Is.Not.Null);
                 }
             }
             Assert.That(problems, Is.Empty, string.Join("\n", problems));
@@ -248,34 +241,20 @@ namespace Hearthdelve.Tests.EditMode
         [Test]
         public void Options_SitsBetweenNewGameAndControls_OnTheMainMenu_AndInThePauseMenu()
         {
-            Scene menuScene = EditorSceneManager.OpenScene(BootBuilder.MainMenuScene, OpenSceneMode.Additive);
-            try
-            {
-                MainMenuScreen menu = menuScene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<MainMenuScreen>(true)).Single();
-                Assert.That(menu.OptionsButton, Is.Not.Null);
-                Assert.That(menu.Options, Is.Not.Null);
-                int newGame = menu.NewGameButton.transform.GetSiblingIndex();
-                int options = menu.OptionsButton.transform.GetSiblingIndex();
-                int controls = menu.ControlsButton.transform.GetSiblingIndex();
-                Assert.That(newGame < options && options < controls, Is.True, $"order {newGame}, {options}, {controls}");
-                Assert.That(menu.Options.Controls, Is.SameAs(menu.ControlsPage), "the controls tab is the 4i-A controls page");
-            }
-            finally
-            {
-                EditorSceneManager.CloseScene(menuScene, true);
-            }
-            Scene boot = EditorSceneManager.OpenScene(BootBuilder.BootScene, OpenSceneMode.Additive);
-            try
-            {
-                PauseMenu pause = boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<PauseMenu>(true)).Single();
-                Assert.That(pause.OptionsButton, Is.Not.Null);
-                Assert.That(pause.Options, Is.Not.Null);
-                Assert.That(pause.Options.GetComponentsInChildren<OptionRow>(true).Length, Is.EqualTo(6));
-            }
-            finally
-            {
-                EditorSceneManager.CloseScene(boot, true);
-            }
+            Scene menuScene = ProjectScan.Open(BootBuilder.MainMenuScene);
+            MainMenuScreen menu = menuScene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<MainMenuScreen>(true)).Single();
+            Assert.That(menu.OptionsButton, Is.Not.Null);
+            Assert.That(menu.Options, Is.Not.Null);
+            int newGame = menu.NewGameButton.transform.GetSiblingIndex();
+            int options = menu.OptionsButton.transform.GetSiblingIndex();
+            int controls = menu.ControlsButton.transform.GetSiblingIndex();
+            Assert.That(newGame < options && options < controls, Is.True, $"order {newGame}, {options}, {controls}");
+            Assert.That(menu.Options.Controls, Is.SameAs(menu.ControlsPage), "the controls tab is the 4i-A controls page");
+            Scene boot = ProjectScan.Open(BootBuilder.BootScene);
+            PauseMenu pause = boot.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<PauseMenu>(true)).Single();
+            Assert.That(pause.OptionsButton, Is.Not.Null);
+            Assert.That(pause.Options, Is.Not.Null);
+            Assert.That(pause.Options.GetComponentsInChildren<OptionRow>(true).Length, Is.EqualTo(6));
         }
 
         // ---------- relaxed timing and patient customers ----------

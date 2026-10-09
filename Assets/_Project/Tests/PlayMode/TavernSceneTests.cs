@@ -140,7 +140,6 @@ namespace Hearthdelve.Tests.PlayMode
             }
         }
 
-        /// <summary>Furniture can move (4f): the grid is invalidated and rebuilt, and its version tells path followers to re-plan.</summary>
         /// <summary>
         /// Step 1 and 2 playtests: the whole kitchen (oven and range) is the Grill, and the Grill and the Stew Pot
         /// can be used from behind as well as from the front: there's a walkable tile behind each, reached by walking round.

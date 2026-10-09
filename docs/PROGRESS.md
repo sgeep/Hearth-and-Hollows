@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-08 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C signed off** (2026-10-09). Next: the test suite clean-up, then 4i-D._
+_Last updated: 2026-10-09 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C signed off** (2026-10-09); the test suite cleaned up (2026-10-09). Next: 4i-D._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1302,6 +1302,10 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 ### 4i plan (proposed 2026-10-08; approved the same day)
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
+
+### Test suite clean-up (2026-10-09, before 4i-D)
+
+The owner asked for `docs/TEST_REVIEW.md`'s §7 to be applied; what was done, measured, and where the review was wrong is its §8. PlayMode **1288 s → 624 s** (290 → 273 passed, 0 failed); EditMode 28 s → 27 s (825 → 819 passed, 0 failed). A shared `BootFixture` (temp saves and options, a fixed seed, instant transitions, one full teardown; daytime tests from a written day-2 save and Continue), `Fast` walks, `ProjectScan` with new checks of the real scenes (missing keys, lit sprites, one global light per layer), 17 PlayMode tests merged, retired or moved, the dead `ComboLogic` and `DamageCalculator.Apply` removed with their tests (the owner's call), 13 tests `[Category("Slow")]`. The stricter fit check found two real overflows in the credits, fixed by one more line each (the owner's call). No gameplay code changed except deleting the dead code. Next: 4i-D.
 
 ### 4i-C: presentation and polish (2026-10-08; signed off 2026-10-09)
 

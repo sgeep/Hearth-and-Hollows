@@ -67,24 +67,17 @@ namespace Hearthdelve.Tests.EditMode
             var wrong = new List<string>();
             foreach (string path in new[] { EditorPaths.TavernScene, KariastonBuilder.ScenePath, EditorPaths.DungeonScene })
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
+                Scene scene = ProjectScan.Open(path);
+                foreach (GameObject root in scene.GetRootGameObjects())
+                foreach (var (type, fields) in PresentationUpdates.Fades)
+                foreach (Component c in root.GetComponentsInChildren(type, true))
                 {
-                    foreach (GameObject root in scene.GetRootGameObjects())
-                    foreach (var (type, fields) in PresentationUpdates.Fades)
-                    foreach (Component c in root.GetComponentsInChildren(type, true))
+                    var so = new UnityEditor.SerializedObject(c);
+                    foreach (string field in fields)
                     {
-                        var so = new UnityEditor.SerializedObject(c);
-                        foreach (string field in fields)
-                        {
-                            float value = so.FindProperty(field).floatValue;
-                            if (!Mathf.Approximately(value, PlaceFade.Seconds)) wrong.Add($"{scene.name}: {c.name} {type.Name}.{field} = {value}");
-                        }
+                        float value = so.FindProperty(field).floatValue;
+                        if (!Mathf.Approximately(value, PlaceFade.Seconds)) wrong.Add($"{scene.name}: {c.name} {type.Name}.{field} = {value}");
                     }
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
                 }
             }
             Assert.That(wrong, Is.Empty, string.Join("\n", wrong));

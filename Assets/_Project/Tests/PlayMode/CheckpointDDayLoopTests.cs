@@ -35,37 +35,14 @@ namespace Hearthdelve.Tests.PlayMode
     /// <summary>
     /// 4f Checkpoint D's integration run through <see cref="GameFlow"/> (saves in a temp folder): three days from a new game
     /// through every part of 4f (a curio and a haul home, an upgrade and a rearranged room at night, the market, the Butcher
-    /// Block, Gunta and Orik, a special request, a death that loses a curio, sleep), then Continue twice with nothing granted
+    /// Block, Boog and Orik, a special request, a death that loses a curio, sleep), then Continue twice with nothing granted
     /// again.
     /// </summary>
-    public class CheckpointDDayLoopTests : LookTestFixture
+    public class CheckpointDDayLoopTests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
-
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the string tables");
+            yield return Boot();
             yield return null;
         }
 
@@ -101,11 +78,11 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => DelveRunController.Active.Loot.Curios.Count == expected, 3f, $"{expected} curio carried");
         }
 
-        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(m_SaveDir, SaveStore.FileName)));
+        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(SaveDir, SaveStore.FileName)));
 
         static Dictionary<string, int> Owned() => Flow.State.Furniture.Owned.ToDictionary(kv => kv.Key, kv => kv.Value);
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator ThreeDays_FromANewGame_ThroughEveryPartOf4f_ThenContinueTwice()
         {
             // ---------- Day 1: the first night's delve, a curio and a haul home ----------
@@ -143,7 +120,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(SavedGame().furniture.areas.Single(a => a.id == "tavern").pieces.Any(p => p.def == "cellar_barrel" && p.x == 12 && p.y == 10));
             night.SleepButton.onClick.Invoke();
 
-            // ---------- Day 2: the market, the Butcher Block, Gunta and Orik, a special request ----------
+            // ---------- Day 2: the market, the Butcher Block, Boog and Orik, a special request ----------
             yield return InTavern(TavernPhase.Daytime, "the second day");
             var daytime = Object.FindAnyObjectByType<MorningScreen>();
             DaytimeActions.OpenMarket();
@@ -171,7 +148,7 @@ namespace Hearthdelve.Tests.PlayMode
             panel.Close();
             yield return null;
 
-            // Gunta on the grill, Orik on the plates; one special request, met.
+            // Boog on the grill, Orik on the plates; one special request, met.
             Director.AssignStaff(StaffStation.Serving);
             Director.AssignCook(StaffStation.Grill);
             RecipeDefinition grilled = Director.Content.recipes.First(r => r.id == "grilled_spider_leg");
@@ -184,7 +161,7 @@ namespace Hearthdelve.Tests.PlayMode
             EventBus<CustomerRequestCompleted>.Subscribe(Met);
             Director.SpawnCustomer(Director.Content.customers.OrderByDescending(c => c.traits.orderPatience).First());
             Time.timeScale = 4f;
-            yield return WaitUntil(() => met, 60f, "the request met by Gunta and Orik");
+            yield return WaitUntil(() => met, 60f, "the request met by Boog and Orik");
             Time.timeScale = 1f;
             EventBus<CustomerRequestCompleted>.Unsubscribe(Met);
             int takings = Director.Session.Ledger.Gold + Director.Session.Ledger.Tips;
@@ -192,7 +169,7 @@ namespace Hearthdelve.Tests.PlayMode
             Director.EndServiceNow();
             yield return WaitUntil(() => Director.Phase == TavernPhase.Results, 10f, "results");
             var results = Object.FindAnyObjectByType<EveningResultsScreen>();
-            for (int i = 0; i < 4 && Director.Phase == TavernPhase.Results; i++)
+            for (int i = 0; i < 4 && Director != null && Director.Phase == TavernPhase.Results; i++)
             {
                 results.DoneButton.onClick.Invoke();
                 yield return null;

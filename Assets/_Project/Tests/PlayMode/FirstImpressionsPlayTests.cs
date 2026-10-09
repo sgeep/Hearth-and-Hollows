@@ -29,82 +29,19 @@ namespace Hearthdelve.Tests.PlayMode
     /// giving them back), quitting from each phase and what Continue then loads (nothing lost silently, nothing given twice), the first
     /// free morning's talk and prompts (once), a save that can't be read, the saved mark, and prompts naming the device in use.
     /// </summary>
-    public class FirstImpressionsPlayTests : LookTestFixture
+    public class FirstImpressionsPlayTests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
         static PauseMenu Pause => PauseMenu.Instance;
-        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            if (Pause != null && Pause.IsOpen) Pause.Close();
-            GameFlow.SaveDirectoryOverride = null;
-            SurfacePause.Clear();
-            MusicHolds.Clear();
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            InputDevices.Set(InputDeviceKind.KeyboardMouse);
-            if (DialogueManager.IsConversationActive) DialogueManager.StopConversation();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
-
-        static IEnumerator Frames(int n)
-        {
-            for (int i = 0; i < n; i++) yield return null;
-        }
-
-        static IEnumerator Revealed()
-        {
-            int settled = 0;
-            float started = Time.realtimeSinceStartup;
-            while (settled < 5)
-            {
-                bool clear = !Flow.IsLoading && (Flow.Transition == null || !Flow.Transition.IsCovering);
-                settled = clear ? settled + 1 : 0;
-                Assert.That(Time.realtimeSinceStartup - started, Is.LessThan(8f), "the scene revealed");
-                yield return null;
-            }
-        }
-
         static bool MapOn(string map) => InputSystem.actions.FindActionMap(map).enabled;
 
         IEnumerator Menu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
-            yield return Revealed();
+            yield return Boot();
             yield return Frames(3);
         }
 
-        /// <summary>A quick new game to its first free day (day 2), the keeper waking upstairs. <paramref name="opening"/>: where the story stands.</summary>
-        IEnumerator Daytime(OpeningStage opening = OpeningStage.Complete)
-        {
-            yield return Menu();
-            Flow.QuickNewGame();
-            Flow.State.Story.Opening = opening;
-            Flow.MarkHintSeen(Hearthdelve.Shared.Village.CommunityRules.GimpIntro);
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
-            yield return Revealed();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            Flow.Sleep();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
-            yield return Frames(3);
-        }
+        /// <summary>The first free day (day 2), the keeper waking upstairs. <paramref name="opening"/>: where the story stands.</summary>
+        IEnumerator Daytime(OpeningStage opening = OpeningStage.Complete) => StartDaytime(opening: opening, gimpSeen: true);
 
         IEnumerator Evening()
         {
@@ -432,7 +369,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Daytime();
             Flow.Save();
             int day = Saved.day;
-            File.WriteAllText(Path.Combine(m_SaveDir, SaveStore.FileName), "{ damaged");
+            File.WriteAllText(Path.Combine(SaveDir, SaveStore.FileName), "{ damaged");
             yield return Menu();
             var menu = Object.FindAnyObjectByType<MainMenuScreen>();
             yield return Frames(3);
@@ -447,16 +384,16 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Day, Is.EqualTo(day));
             Flow.Save();
             Assert.That(Flow.CheckSave().Usable, Is.True, "saving again mends it");
-            Assert.That(File.Exists(Path.Combine(m_SaveDir, SaveStore.UnreadableFileName)), Is.True, "the damaged one kept aside");
+            Assert.That(File.Exists(Path.Combine(SaveDir, SaveStore.UnreadableFileName)), Is.True, "the damaged one kept aside");
         }
 
         [UnityTest]
         public IEnumerator ASaveFromANewerVersion_SaysSo_AndIsNeverLoaded()
         {
-            Directory.CreateDirectory(m_SaveDir);
+            Directory.CreateDirectory(SaveDir);
             string newer = SaveSystem.ToJson(SaveSystem.Capture(new GameState(5, DayPhase.Daytime)))
                 .Replace($"\"version\": {SaveSystem.CurrentVersion}", "\"version\": 999");
-            File.WriteAllText(Path.Combine(m_SaveDir, SaveStore.FileName), newer);
+            File.WriteAllText(Path.Combine(SaveDir, SaveStore.FileName), newer);
             yield return Menu();
             var menu = Object.FindAnyObjectByType<MainMenuScreen>();
             yield return Frames(3);
@@ -471,13 +408,11 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Daytime();
             var mark = Object.FindAnyObjectByType<SaveIndicator>();
-            yield return new WaitForSecondsRealtime(2f);
-            Assert.That(mark.IsShowing, Is.False);
+            yield return WaitUntil(() => !mark.IsShowing, 2f, "no mark before saving (any earlier save's has gone)");
             Flow.Save();
             yield return null;
             Assert.That(mark.IsShowing, Is.True);
-            yield return new WaitForSecondsRealtime(2f);
-            Assert.That(mark.IsShowing, Is.False, "gone again");
+            yield return WaitUntil(() => !mark.IsShowing, 2f, "the mark gone again within two seconds");
         }
 
         // ---------- the new screens at 320x180 (run by hand: BatchLogs/4ia/*.png) ----------

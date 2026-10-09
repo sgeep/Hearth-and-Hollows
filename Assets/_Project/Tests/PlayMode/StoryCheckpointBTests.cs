@@ -44,51 +44,35 @@ namespace Hearthdelve.Tests.PlayMode
     /// Bomb (declined, accepted, found, lost to a death, found again, brought home, handed over) → save, quit and Continue; and an
     /// old save that skips it all.
     /// </summary>
-    public class StoryCheckpointBTests : LookTestFixture
+    public class StoryCheckpointBTests : BootFixture
     {
-        const int k_Seed = 20261004;
-
-        string m_SaveDir;
-        Gamepad m_Pad;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
-        static StoryHost Host => StoryHost.Instance;
-        static HearthDialogueUI Box => Object.FindAnyObjectByType<HearthDialogueUI>();
-        static RoomRunner Runner => RoomRunner.Active;
-        static string Selected => EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null ? EventSystem.current.currentSelectedGameObject.name : null;
-
         [SetUp]
-        public void UseTempSaves()
+        public void AddPad()
         {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
             RoomRunner.SeedOverride = k_Seed;
             m_Pad = InputSystem.AddDevice<Gamepad>();
         }
 
         [TearDown]
-        public void ClearSaves()
-        {
-            InputSystem.RemoveDevice(m_Pad);
-            GameFlow.SaveDirectoryOverride = null;
-            RoomRunner.SeedOverride = 0;
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
+        public void RemovePad() => InputSystem.RemoveDevice(m_Pad);
 
-        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(m_SaveDir, SaveStore.FileName)));
+        const int k_Seed = 20261004;
+
+        Gamepad m_Pad;
+
+        static StoryHost Host => StoryHost.Instance;
+        static HearthDialogueUI Box => Object.FindAnyObjectByType<HearthDialogueUI>();
+        static RoomRunner Runner => RoomRunner.Active;
+        static string Selected => EventSystem.current != null && EventSystem.current.currentSelectedGameObject != null ? EventSystem.current.currentSelectedGameObject.name : null;
+
+        SaveData SavedGame() => SaveSystem.FromJson(File.ReadAllText(Path.Combine(SaveDir, SaveStore.FileName)));
 
         // ---------- The way through the game ----------
 
         IEnumerator BootToMenu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady && Host != null && Host.Relationships != null, 10f, "the string tables and the story");
-            // As a player would: the menu's fade from black is over (until then the cover takes the pointer).
-            yield return WaitUntil(() => Flow.Transition == null || !Flow.Transition.IsCovering, 5f, "the menu revealed");
+            yield return Boot();
+            yield return WaitUntil(() => Host != null && Host.Relationships != null, 10f, "the story");
             yield return null;
         }
 
@@ -512,7 +496,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Player.GetComponent<Hearthdelve.Dungeon.Harvest.SatchelCarrier>().Satchel.Slots.All(s => s.IsEmpty), "no satchel slot");
         }
 
-        [UnityTest]
+        [UnityTest, Timeout(180000), Category("Slow")]
         public IEnumerator BoogsBomb_DeclinedThenTaken_LostToADeath_FoundAgain_BroughtHome_AndHandedOver_AcrossSaveQuitAndContinue()
         {
             yield return QuickGameToTheNight();
@@ -634,7 +618,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return QuickGameToTheNight();
             // Rewrite it as Checkpoint A wrote it (version 8): a new game then marked its opening "not complete".
-            string path = Path.Combine(m_SaveDir, SaveStore.FileName);
+            string path = Path.Combine(SaveDir, SaveStore.FileName);
             SaveData data = SavedGame();
             data.version = 8;
             string json = SaveSystem.ToJson(data);

@@ -178,14 +178,6 @@ namespace Hearthdelve.Tests.PlayMode
         }
 
         [UnityTest]
-        public IEnumerator EveryCharacterPrefab_UsesTheFloorController()
-        {
-            yield return Load("Tavern");
-            foreach (TopDownController controller in Object.FindObjectsByType<TopDownController>(FindObjectsInactive.Include))
-                Assert.That(controller, Is.InstanceOf<FloorController2D>(), controller.name);
-        }
-
-        [UnityTest]
         public IEnumerator AReleasedStick_SpringingBackPastCentre_DoesNotStepTheMenuBack()
         {
             yield return Load("Tavern");

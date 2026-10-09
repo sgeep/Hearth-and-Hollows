@@ -136,31 +136,24 @@ namespace Hearthdelve.Tests.EditMode
             var found = new List<(string, float, Color, Color)>();
             foreach (string path in k_Scenes)
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
+                Scene scene = ProjectScan.Open(path);
+                foreach (GameObject root in scene.GetRootGameObjects())
+                foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
                 {
-                    foreach (GameObject root in scene.GetRootGameObjects())
-                    foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
-                    {
-                        // The HUD's text is drawn light over the world, which this can't measure.
-                        if (Name(text.transform).StartsWith("Hud/") || text.transform.root.name == "Hud") continue;
-                        var styled = text.GetComponent<Hearthdelve.UI.Typography.StyledText>();
-                        bool large = styled != null && (styled.Style == Hearthdelve.UI.Typography.TextStyle.Heading || styled.Style == Hearthdelve.UI.Typography.TextStyle.Display);
-                        Image image = Behind(text.transform);
-                        if (image == null) continue;
-                        Color panel = Average(image.sprite) * image.color;
-                        panel.a = 1f;
-                        Color colour = text.color;
-                        colour.a = 1f;
-                        string where = $"{Path.GetFileNameWithoutExtension(path)}: {Name(text.transform)} [on {Name(image.transform)}]";
-                        // Large text is measured against its own bar by scaling: a ratio of 3 counts as 4.5.
-                        float ratio = Ratio(colour, panel) * (large ? Minimum / LargeMinimum : 1f);
-                        found.Add((where, ratio, colour, panel));
-                    }
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
+                    // The HUD's text is drawn light over the world, which this can't measure.
+                    if (Name(text.transform).StartsWith("Hud/") || text.transform.root.name == "Hud") continue;
+                    var styled = text.GetComponent<Hearthdelve.UI.Typography.StyledText>();
+                    bool large = styled != null && (styled.Style == Hearthdelve.UI.Typography.TextStyle.Heading || styled.Style == Hearthdelve.UI.Typography.TextStyle.Display);
+                    Image image = Behind(text.transform);
+                    if (image == null) continue;
+                    Color panel = Average(image.sprite) * image.color;
+                    panel.a = 1f;
+                    Color colour = text.color;
+                    colour.a = 1f;
+                    string where = $"{Path.GetFileNameWithoutExtension(path)}: {Name(text.transform)} [on {Name(image.transform)}]";
+                    // Large text is measured against its own bar by scaling: a ratio of 3 counts as 4.5.
+                    float ratio = Ratio(colour, panel) * (large ? Minimum / LargeMinimum : 1f);
+                    found.Add((where, ratio, colour, panel));
                 }
             }
             return found;

@@ -22,18 +22,11 @@ namespace Hearthdelve.Tests.EditMode
             var loose = new List<string>();
             foreach (string path in new[] { KariastonBuilder.ScenePath, EditorPaths.TavernScene })
             {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
-                {
-                    foreach (GameObject root in scene.GetRootGameObjects())
-                    foreach (LayeredSpriteAnimator figure in root.GetComponentsInChildren<LayeredSpriteAnimator>(true))
-                        if (figure.GetComponentInParent<SortingGroup>(true) == null)
-                            loose.Add($"{scene.name}: {figure.transform.parent?.name}/{figure.name}");
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
-                }
+                Scene scene = ProjectScan.Open(path);
+                foreach (GameObject root in scene.GetRootGameObjects())
+                foreach (LayeredSpriteAnimator figure in root.GetComponentsInChildren<LayeredSpriteAnimator>(true))
+                    if (figure.GetComponentInParent<SortingGroup>(true) == null)
+                        loose.Add($"{scene.name}: {figure.transform.parent?.name}/{figure.name}");
             }
             Assert.That(loose, Is.Empty, string.Join("\n", loose));
         }

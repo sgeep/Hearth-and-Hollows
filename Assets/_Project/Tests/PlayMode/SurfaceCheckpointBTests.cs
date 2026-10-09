@@ -33,91 +33,22 @@ namespace Hearthdelve.Tests.PlayMode
     /// 4h Checkpoint B, "A day's work", in the game: Vigor's pips, the garden's beds (plant, tend, grow over days, harvest into
     /// the storeroom and the cooking), everything that must still work at 0 Vigor, and a mid-day save and Continue.
     /// </summary>
-    public class SurfaceCheckpointBTests : LookTestFixture
+    public class SurfaceCheckpointBTests : BootFixture
     {
-        string m_SaveDir;
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
         static Vigor Vigor => Flow.State.Vigor;
-        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         static bool OnFootNow => InputMaps.Find(InputMaps.Tavern, TavernActions.Interact) is { enabled: true };
         static T Find<T>() where T : Object => Object.FindAnyObjectByType<T>(FindObjectsInactive.Include);
         static GardenBed Bed(string id) => GardenBed.Find(id);
         static SurfaceClockView Hud => Find<SurfaceClockView>();
         static GardenPanel Panel => Find<GardenPanel>();
 
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-        }
+        IEnumerator Daytime() => StartDaytime();
 
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            SurfaceTime.SettingsOverride = null;
-            SurfacePause.Clear();
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
-
-        static IEnumerator Frames(int n)
-        {
-            for (int i = 0; i < n; i++) yield return null;
-        }
-
-        /// <summary>Until the scene is in view and settled (not loading, uncovered for several frames running).</summary>
-        static IEnumerator Revealed()
-        {
-            int settled = 0;
-            float started = Time.realtimeSinceStartup;
-            while (settled < 5)
-            {
-                bool clear = !Flow.IsLoading && (Flow.Transition == null || !Flow.Transition.IsCovering);
-                settled = clear ? settled + 1 : 0;
-                Assert.That(Time.realtimeSinceStartup - started, Is.LessThan(8f), "the scene revealed");
-                yield return null;
-            }
-        }
-
-        static IEnumerator Daytime()
-        {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
-            yield return Revealed();
-            Flow.QuickNewGame();
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
-            yield return Revealed();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            yield return Sleep();
-        }
-
+        /// <summary>A real sleep through GameFlow (the garden grows and Vigor refills there).</summary>
         static IEnumerator Sleep()
         {
-            Flow.Sleep();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
+            yield return SleepToTheMorning();
             yield return Frames(2);
-        }
-
-        /// <summary>The rest of the day kept quiet: the evening shut, no delve, the night, sleep.</summary>
-        static IEnumerator NextDay()
-        {
-            Flow.StartEvening();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
-            yield return Revealed();
-            Flow.SkipService();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            yield return Sleep();
         }
 
         /// <summary>Plants <paramref name="bed"/> through the bed and the panel, choosing <paramref name="crop"/>'s button.</summary>
@@ -245,7 +176,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- growing, harvesting, cooking ----------
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator Crops_GrowOverDays_SleepRefills_AndAHarvestGoesIntoTonightsFood()
         {
             yield return Daytime();

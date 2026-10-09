@@ -30,123 +30,22 @@ namespace Hearthdelve.Tests.PlayMode
     /// intact, never again on Continue), his visits to Boog by the stairs, the village overheard (one bubble, giving way to
     /// conversations), familiar faces at dinner as ordinary customers, Glimmer's light, and Decorate Mode holding the room still.
     /// </summary>
-    public class VillageCheckpointDTests : LookTestFixture
+    public class VillageCheckpointDTests : BootFixture
     {
-        string m_SaveDir;
-        readonly object m_Hold = new();
-
-        static GameFlow Flow => GameFlow.Instance;
-        static TavernDirector Director => TavernDirector.Instance;
-        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
         static VillagePresence Presence => VillagePresence.Instance;
         static readonly Vector2 k_Origin = new(200f, 0f);
 
-        [SetUp]
-        public void UseTempSaves()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-            AmbientMoments.ResetForTests();
-        }
-
-        [TearDown]
-        public void ClearSaves()
-        {
-            GameFlow.SaveDirectoryOverride = null;
-            GameFlow.NewGameSeedOverride = null;
-            SurfaceTime.SettingsOverride = null;
-            SurfacePause.Clear();
-            MusicHolds.Clear();
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (DialogueManager.IsConversationActive) DialogueManager.StopConversation();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-        }
-
-        static IEnumerator Frames(int n)
-        {
-            for (int i = 0; i < n; i++) yield return null;
-        }
-
-        static IEnumerator Revealed()
-        {
-            int settled = 0;
-            float started = Time.realtimeSinceStartup;
-            while (settled < 5)
-            {
-                bool clear = !Flow.IsLoading && (Flow.Transition == null || !Flow.Transition.IsCovering);
-                settled = clear ? settled + 1 : 0;
-                Assert.That(Time.realtimeSinceStartup - started, Is.LessThan(8f), "the scene revealed");
-                yield return null;
-            }
-        }
-
         /// <summary>
-        /// A new game to its first free day (day 2), the keeper waking upstairs; the clock held unless <paramref name="hold"/> is off.
-        /// <paramref name="seed"/>: the world seed must satisfy it (asked of the pure day rules with day 2 and the village's
-        /// settings), so a test of seeded days finds them at once instead of walking days until they come round (a new game's seed
-        /// is otherwise random, and such tests ran 45 s or 180 s by luck).
+        /// The first free day (day 2), the keeper waking upstairs; the clock held unless <paramref name="hold"/> is off.
+        /// <paramref name="seed"/>: the world seed must satisfy it, so a test of seeded days finds them at once.
         /// </summary>
-        IEnumerator Daytime(bool hold = true, System.Func<int, VillageLifeSettings, bool> seed = null)
-        {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
-            yield return Revealed();
-            yield return Diagnose("before the new game");
-            if (seed != null)
-            {
-                VillageLifeSettings settings = VillageLife.Settings;
-                int chosen = Enumerable.Range(1, 100000).First(s => seed(s, settings));
-                GameFlow.NewGameSeedOverride = chosen;
-            }
-            Flow.QuickNewGame();
-            GameFlow.NewGameSeedOverride = null;
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
-            yield return Revealed();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            yield return Sleep(hold);
-        }
-
-        /// <summary>
-        /// 4i-C: evidence for the late-run slowdown (these tests ran about 3.5 times slower at the end of a full run than alone):
-        /// the frame time over 30 frames and the global state that could slow a test, logged with a [Diagnose] tag.
-        /// </summary>
-        static IEnumerator Diagnose(string when)
-        {
-            float start = Time.realtimeSinceStartup;
-            for (int i = 0; i < 30; i++) yield return null;
-            float frame = (Time.realtimeSinceStartup - start) / 30f;
-            Debug.Log($"[Diagnose] {TestContext.CurrentContext.Test.Name} {when}: frame {frame * 1000f:0.0} ms, timeScale {Time.timeScale}, " +
-                      $"targetFrameRate {Application.targetFrameRate}, vSync {QualitySettings.vSyncCount}, maxDelta {Time.maximumDeltaTime}, fixedDelta {Time.fixedDeltaTime}, baseline restored {Hearthdelve.Shared.Engine.TimeBaseline.Restored}, " +
-                      $"captureDelta {Time.captureDeltaTime}, managed {System.GC.GetTotalMemory(false) / 1048576} MB, villagers {Villager.All.Count}, " +
-                      $"objects {Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length}");
-        }
-
-        IEnumerator Sleep(bool hold)
-        {
-            Flow.Sleep();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
-            if (hold) SurfacePause.Hold(m_Hold);
-            yield return Frames(2);
-            yield return Diagnose($"day {Flow.State.Day}");
-        }
+        IEnumerator Daytime(bool hold = true, Func<int, VillageLifeSettings, bool> seed = null, bool gimpSeen = false) =>
+            StartDaytime(seed, gimpSeen: gimpSeen, hold: hold);
 
         /// <summary>The evening kept shut, the delve, the night, sleep: the next morning (Gimp's scene, if due, plays to its end).</summary>
         IEnumerator NextDay(bool hold = true, bool finishGimp = true)
         {
-            SurfacePause.Release(m_Hold);
-            Flow.StartEvening();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
-            yield return Revealed();
-            Flow.SkipService();
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            yield return Sleep(hold);
+            yield return base.NextDay(hold);
             if (finishGimp) yield return FinishGimpsNight();
         }
 
@@ -196,7 +95,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- Gimp's night ----------
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator GimpComesUpTheHatch_TheFirstMorningAfterAnOwnDelve_Once_AndTheMorningIsIntact()
         {
             yield return Daytime();
@@ -229,13 +128,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.State.Day, Is.EqualTo(3), "an ordinary morning of the same day");
 
             // Continue: never again.
-            Flow.Save();
-            Flow.QuitToMenu();
-            yield return WaitUntil(() => !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return Revealed();
-            Assert.That(Flow.Continue());
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
+            yield return SaveQuitAndContinue(() => InDaytimeNow, "the daytime");
             yield return new WaitForSecondsRealtime(1.5f);
             Assert.That(NightVisitor.Instance.Playing, Is.False, "not on Continue");
             Assert.That(DialogueManager.IsConversationActive, Is.False);
@@ -247,7 +140,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- his visits ----------
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator Gimp_VisitsBoog_OnHisDays_DownTheStairs_AndTalks()
         {
             // One of his days at once (the loop below still holds if the rule ever changes).
@@ -282,7 +175,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator TheVillage_TalksAmongItself_OneBubble_AndGivesWayToAConversation()
         {
             yield return Daytime();
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             SurfaceTime.SettingsOverride = new SurfaceClockSettings
             {
                 dayStartMinute = 480, cutoffMinute = 1020, afternoonStartMinute = 720, realSecondsPerGameMinute = 1000f,
@@ -291,7 +184,7 @@ namespace Hearthdelve.Tests.PlayMode
             Outside();
             KeeperAtVillage(new Vector2(38f, 9f));
             yield return At(12 * 60);
-            yield return WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market");
+            yield return Fast(WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market"));
             IBarkService barks = StoryServices.Barks;
             var bubbles = Object.FindAnyObjectByType<AmbientBarks>();
             yield return WaitUntil(() => barks.IsBarking, 6f, "an exchange overheard");
@@ -323,7 +216,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Overheard_Stops_WhenTheKeeperGoesIndoors_AndShortLinesStayUpLongEnough()
         {
             yield return Daytime();
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             SurfaceTime.SettingsOverride = new SurfaceClockSettings
             {
                 dayStartMinute = 480, cutoffMinute = 1020, afternoonStartMinute = 720, realSecondsPerGameMinute = 1000f,
@@ -332,7 +225,7 @@ namespace Hearthdelve.Tests.PlayMode
             Outside();
             KeeperAtVillage(new Vector2(38f, 9f));
             yield return At(12 * 60);
-            yield return WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market");
+            yield return Fast(WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market"));
             IBarkService barks = StoryServices.Barks;
             var bubbles = Object.FindAnyObjectByType<AmbientBarks>();
             yield return WaitUntil(() => barks.IsBarking, 6f, "an exchange overheard");
@@ -358,7 +251,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator Overheard_NeverPlays_InDecorateMode_OrAMenu()
         {
             yield return Daytime();
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             MenuPause.Push();
             Assert.That(AmbientBarks.Blocked, "a menu");
             MenuPause.Pop();
@@ -382,7 +275,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator AFamiliarFace_ComesToDinner_AsAnOrdinaryCustomer_InTheirOwnLook()
         {
             yield return Daytime();
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             Flow.StartEvening();
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
             yield return Revealed();
@@ -396,9 +289,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(agent.Logic.CharacterId, Is.EqualTo(CharacterIds.Maximo));
             Assert.That(agent.Look.Layers[0].sprite.name, Does.StartWith("KnightIdle"), "the blue knight, as in Kariaston");
             Assert.That(Villager.All.Count(v => v.CharacterId == CharacterIds.Maximo && v.Shown), Is.Zero, "nobody else is him tonight");
-            Time.timeScale = 4f;
-            yield return WaitUntil(() => agent.Logic.State is CustomerState.Ordering or CustomerState.WaitingForFood, 40f, "seated and ordering");
-            Time.timeScale = 1f;
+            yield return Fast(WaitUntil(() => agent.Logic.State is CustomerState.Ordering or CustomerState.WaitingForFood, 40f, "seated and ordering"));
             Assert.That(Director.Agents.Count(a => a.Logic.CharacterId == CharacterIds.Maximo), Is.EqualTo(1));
         }
 
@@ -407,13 +298,12 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- Glimmer ----------
 
-        // Walks several days, like the lit-window test: about a minute alone, but slower late in a full run (round 2's run timed out).
-        [UnityTest, Timeout(600000)]
+        // Two days (the seed pinned: a lit evening, then a dark one).
+        [UnityTest, Timeout(120000), Category("Slow")]
         public IEnumerator OgrinsLight_ShowsAtHisWindow_OnItsEvenings_AndOnlyThen()
         {
             // A lit evening today and a dark one tomorrow: both within two days.
-            yield return Daytime(seed: (s, v) => VillageDays.GlimmerEvening(s, 2, v) && !VillageDays.GlimmerEvening(s, 3, v));
-            Flow.MarkHintSeen(CommunityRules.GimpIntro);
+            yield return Daytime(seed: (s, v) => VillageDays.GlimmerEvening(s, 2, v) && !VillageDays.GlimmerEvening(s, 3, v), gimpSeen: true);
             Outside();
             KeeperAtVillage(new Vector2(50f, 9f));
             bool sawLit = false, sawDark = false;
@@ -426,7 +316,7 @@ namespace Hearthdelve.Tests.PlayMode
                     KeeperAtVillage(new Vector2(50f, 9f));
                 }
                 yield return At(17 * 60);
-                yield return WaitUntil(() => Here(CharacterIds.Ogrin).Indoors, 30f, "Ogrin home");
+                yield return Fast(WaitUntil(() => Here(CharacterIds.Ogrin).Indoors, 30f, "Ogrin home"));
                 bool due = VillageDays.GlimmerEvening(World.Seed, Flow.State.Day, World.Settings);
                 yield return new WaitForSeconds(1.6f);
                 // Kariaston is loaded afresh each day: find tonight's.
@@ -457,7 +347,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => !NightVisitor.Instance.Playing, 10f, "the morning");
 
             // Overheard at the market.
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             SurfaceTime.SettingsOverride = new SurfaceClockSettings
             {
                 dayStartMinute = 480, cutoffMinute = 1020, afternoonStartMinute = 720, realSecondsPerGameMinute = 1000f,
@@ -501,8 +391,13 @@ namespace Hearthdelve.Tests.PlayMode
 
         static DressingCollision Dressing => Object.FindAnyObjectByType<DressingCollision>();
 
+        /// <summary>
+        /// Kariaston's dressing is solid by what it is (2026-10-08): the pond for the keeper and the villagers' grid; every fence,
+        /// sign and Tally Ho!'s board at its own base; and a fence put anywhere, without any wall being placed. (The test review
+        /// merged three tests of the one rule, each with its own day.)
+        /// </summary>
         [UnityTest]
-        public IEnumerator TheWater_IsSolid_ForTheKeeperAndTheVillagersWalkingGrid()
+        public IEnumerator KariastonsDressing_IsSolidByWhatItIs_ThePond_EveryFenceSignAndBoard_AndAFencePutAnywhere()
         {
             yield return Daytime();
             Outside();
@@ -519,14 +414,8 @@ namespace Hearthdelve.Tests.PlayMode
             var grid = Object.FindObjectsByType<Hearthdelve.Shared.Navigation.NavGrid>(FindObjectsSortMode.None).Single(g => g.gameObject.scene == Dressing.gameObject.scene);
             if (!grid.IsBaked) grid.Bake();
             Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(k_Origin + new Vector2(12f, 25f))), Is.False, "villagers path round it too");
-        }
 
-        [UnityTest]
-        public IEnumerator EveryFence_Sign_AndTheTavernBoard_IsSolidAtItsOwnBase()
-        {
-            yield return Daytime();
-            Outside();
-            yield return new WaitForFixedUpdate();
+            // Every fence, sign and Tally Ho!'s board, at its own base.
             var drawings = Dressing.Solids.Select(s => s.sprite).ToHashSet();
             var props = Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None).Where(r => drawings.Contains(r.sprite)).ToList();
             Assert.That(props.Count(r => r.sprite.name.Contains("FenceRun")), Is.GreaterThan(10), "the fences");
@@ -541,13 +430,8 @@ namespace Hearthdelve.Tests.PlayMode
                 Assert.That(footprint.bounds.min.y, Is.GreaterThanOrEqualTo(prop.bounds.min.y - 0.01f), prop.name);
                 Assert.That(footprint.bounds.max.y, Is.LessThanOrEqualTo(prop.bounds.min.y + 0.6f), $"{prop.name}: only the base, not the whole drawing");
             }
-        }
 
-        [UnityTest]
-        public IEnumerator AFencePutAnywhere_IsSolid_WithoutAnyWallBeingPlaced()
-        {
-            yield return Daytime();
-            Outside();
+            // A fence put anywhere: solid where it was put, without any wall being placed.
             Sprite fence = Dressing.Solids.First(s => s.sprite.name.Contains("FenceRun")).sprite;
             var go = new GameObject("A New Fence");
             SceneManager.MoveGameObjectToScene(go, Dressing.gameObject.scene);
@@ -555,16 +439,16 @@ namespace Hearthdelve.Tests.PlayMode
             go.AddComponent<SpriteRenderer>().sprite = fence;
             Dressing.Apply();
             yield return new WaitForFixedUpdate();
-            Collider2D footprint = go.GetComponentInChildren<Collider2D>();
-            Assert.That(footprint, Is.Not.Null, "solid where it was put");
-            Assert.That(Physics2D.OverlapPoint(footprint.bounds.center, LayerMask.GetMask("Obstacles")), Is.EqualTo(footprint));
+            Collider2D placed = go.GetComponentInChildren<Collider2D>();
+            Assert.That(placed, Is.Not.Null, "solid where it was put");
+            Assert.That(Physics2D.OverlapPoint(placed.bounds.center, LayerMask.GetMask("Obstacles")), Is.EqualTo(placed));
             go.transform.position += new Vector3(4f, 2f, 0f);
             yield return new WaitForFixedUpdate();
             Assert.That(Physics2D.OverlapPoint(go.GetComponentInChildren<Collider2D>().bounds.center, LayerMask.GetMask("Obstacles")), Is.Not.Null, "and still solid once moved");
             Object.Destroy(go);
         }
 
-        [UnityTest, Timeout(600000)]
+        [UnityTest, Timeout(120000), Category("Slow")]
         public IEnumerator OgrinsWindow_IsLitWhileHesInBed_AndDarkWhileHesOut()
         {
             // Unwell today, well tomorrow: both states within two days, whatever the luck.
@@ -576,7 +460,7 @@ namespace Hearthdelve.Tests.PlayMode
                 foreach (int minute in new[] { 9 * 60, 12 * 60 + 30, 15 * 60 + 30, 17 * 60 })
                 {
                     yield return At(minute);
-                    yield return WaitUntil(() => Villager.All.Where(v => v.CharacterId == CharacterIds.Ogrin && v.Shown).All(v => !v.Walking), 30f, "Ogrin settled");
+                    yield return Fast(WaitUntil(() => Villager.All.Where(v => v.CharacterId == CharacterIds.Ogrin && v.Shown).All(v => !v.Walking), 30f, "Ogrin settled"));
                     yield return Frames(2);
                     bool indoors = Villager.All.Any(v => v.CharacterId == CharacterIds.Ogrin && v.Shown && v.Indoors);
                     bool lit = LitWindow.IsLitAt("ogrin.window");
@@ -684,7 +568,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return new WaitForSecondsRealtime(2f);
             TavernEveningCaptures.Capture($"{out_}/village_green.png");
 
-            SurfacePause.Release(m_Hold);
+            SurfacePause.Release(ClockHold);
             Flow.StartEvening();
             yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Prep, 30f, "the evening");
             yield return Revealed();

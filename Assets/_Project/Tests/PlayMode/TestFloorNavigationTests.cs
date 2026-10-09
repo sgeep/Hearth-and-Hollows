@@ -55,7 +55,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(map.IsWalkable(grid.Space.ToCell(new Vector2(0.5f, 10.5f))), Is.False, "the outer wall blocks");
         }
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator Slime_PathsAroundAUShapedWall_WithoutTouchingIt()
         {
             yield return Chase('1', '2', speed: 0f, seconds: 20f);
@@ -67,7 +67,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Chase('3', '4', speed: 0f, seconds: 20f);
         }
 
-        [UnityTest]
+        [UnityTest, Category("Slow")]
         public IEnumerator Slime_PathsThroughADoorwayIntoTheNextRoom_WithoutTouchingTheWalls()
         {
             yield return Chase('5', '6', speed: 4f, seconds: 20f);

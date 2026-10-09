@@ -125,7 +125,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Hud.RowsShown, Is.Zero, "no orders yet");
 
             CustomerAgent customer = Director.SpawnCustomer();
-            yield return WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "an order");
+            yield return Fast(WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "an order"));
             yield return null;
             Assert.That(Hud.RowsShown, Is.EqualTo(1), "the order is on the rail");
             RailRow row = Hud.Rows[0];
@@ -163,7 +163,7 @@ namespace Hearthdelve.Tests.PlayMode
             Director.ArrivalsPaused = true;
 
             CustomerAgent customer = Director.SpawnCustomer();
-            yield return WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "the one order");
+            yield return Fast(WaitUntil(() => customer.Logic.State == CustomerState.WaitingForFood, 20f, "the one order"));
             Assert.That(Director.Session.AllSoldOut, "that was the last kebab");
             Assert.That(Director.Session.CanAdmitCustomer, Is.False, "the door closes to new customers");
             yield return null;

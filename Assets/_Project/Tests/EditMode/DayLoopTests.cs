@@ -477,7 +477,7 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void RoundTrip_KeepsAnUneatenBreakfastBuff()
+        public void RoundTrip_KeepsAnUneatenDelveMealBuff()
         {
             var state = new GameState();
             DayRules.EatMeal(state, new MealBuff(MealBuffKind.SlowerDrain, 0.25f, "gelbrew"));

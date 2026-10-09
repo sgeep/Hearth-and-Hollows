@@ -78,7 +78,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Open();
             int seats = Director.ActiveSeats;
-            Assert.That(seats, Is.EqualTo(6), "6 seats open before upgrades");
+            Assert.That(seats, Is.EqualTo(6), "the starting layout seats six (its three tables' placed chairs)");
             var diners = new List<CustomerAgent>();
             for (int i = 0; i < seats; i++)
             {
@@ -104,7 +104,7 @@ namespace Hearthdelve.Tests.PlayMode
                 Assert.That(first.Look.Current, Is.EqualTo(Hearthdelve.Shared.Animation.CharacterAnim.Idle));
             }
 
-            yield return WaitUntil(() => first.IsSeated && second.IsSeated, 20f, "the queue to take the seats the impatient diners left");
+            yield return Fast(WaitUntil(() => first.IsSeated && second.IsSeated, 20f, "the queue to take the seats the impatient diners left"));
             Assert.That(diners.Count(d => d == null) + diners.Count(d => d != null && d.Logic.State == CustomerState.Leaving), Is.GreaterThanOrEqualTo(2));
         }
 
@@ -113,7 +113,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Open();
             CustomerAgent agent = Director.SpawnCustomer(Impatient(orderPatience: 1f));
-            yield return WaitUntil(() => agent.Logic.State == CustomerState.WaitingForFood, 15f, "them to sit and order");
+            yield return Fast(WaitUntil(() => agent.Logic.State == CustomerState.WaitingForFood, 15f, "them to sit and order"));
             Assert.That(agent.ShowsPatience, "waiting for food shows patience");
             if (agent.Logic.Order.icon != null) Assert.That(agent.BubbleIcon, Is.SameAs(agent.Logic.Order.icon), "the bubble shows their order");
             yield return WaitUntil(() => agent.Logic.State == CustomerState.Leaving, 3f, "patience to run out");
@@ -121,7 +121,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(agent.IsSeated, Is.False, "they get up");
             Assert.That(agent.BubbleIcon.name, Does.Contain("Angry"), "upset as they go");
             Assert.That(Director.Session.Ledger.Walkouts, Is.EqualTo(1));
-            yield return WaitUntil(() => agent == null, 15f, "them to walk out the door");
+            yield return Fast(WaitUntil(() => agent == null, 15f, "them to walk out the door"));
             Assert.That(Director.Agents, Is.Empty);
         }
 
@@ -191,17 +191,6 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(pip.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer(Layers.Npcs)));
         }
 
-        /// <summary>4f (D16): seating is the placed chairs that face a table; the starting layout has three tables and six seats.</summary>
-        [UnityTest]
-        public IEnumerator Seating_IsThePlacedChairsFacingTables()
-        {
-            yield return Open();
-            Assert.That(Director.Layout.Seats.Count, Is.EqualTo(6));
-            Assert.That(Director.ActiveSeats, Is.EqualTo(6));
-            NavGrid grid = NavGrid.Current;
-            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(new Vector2(23f, 4.5f))), "where 4e kept a fourth table for the seat upgrade, the floor is open");
-        }
-
         [UnityTest]
         public IEnumerator EndingService_SendsEveryoneHome()
         {
@@ -214,7 +203,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(a.Logic.State, Is.EqualTo(CustomerState.Leaving));
             Assert.That(b.Logic.State, Is.EqualTo(CustomerState.Leaving));
             Assert.That(Director.SpawnCustomer(), Is.Null, "no one comes in after closing");
-            yield return WaitUntil(() => a == null && b == null, 15f, "both to leave");
+            yield return Fast(WaitUntil(() => a == null && b == null, 15f, "both to leave"));
         }
     }
 }

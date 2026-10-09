@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Hearthdelve.Editor;
+using Hearthdelve.UI;
 using Hearthdelve.UI.Localization;
 using Hearthdelve.UI.Typography;
 using NUnit.Framework;
@@ -23,8 +24,8 @@ namespace Hearthdelve.Tests
     {
         static Font Font => GameFonts.Load();
 
-        /// <summary>The game's scenes (the test floor and the look tests are development scenes).</summary>
-        static readonly string[] k_Scenes = { EditorPaths.TavernScene, EditorPaths.DungeonScene, BootBuilder.BootScene, BootBuilder.MainMenuScene };
+        /// <summary>The game's scenes (the test floor and the look tests are development scenes; Kariaston since the test review).</summary>
+        static readonly string[] k_Scenes = ProjectScan.GameScenes;
 
         static Dictionary<string, string> English =>
             LocKeys.English.Concat(TavernLocKeys.English).Concat(LoopLocKeys.English).Concat(DecorateLocKeys.English).Concat(StoryLocKeys.English).Concat(LocalizationBuilder.ContentEnglish)
@@ -45,19 +46,8 @@ namespace Hearthdelve.Tests
         static IEnumerable<(string scene, SuperTextMesh text)> SceneTexts()
         {
             foreach (string path in k_Scenes)
-            {
-                Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
-                try
-                {
-                    foreach (GameObject root in scene.GetRootGameObjects())
-                    foreach (SuperTextMesh text in root.GetComponentsInChildren<SuperTextMesh>(true))
-                        yield return (System.IO.Path.GetFileNameWithoutExtension(path), text);
-                }
-                finally
-                {
-                    EditorSceneManager.CloseScene(scene, true);
-                }
-            }
+            foreach (SuperTextMesh text in ProjectScan.All<SuperTextMesh>(path))
+                yield return (System.IO.Path.GetFileNameWithoutExtension(path), text);
         }
 
         static string PathOf(Transform t)
@@ -148,7 +138,10 @@ namespace Hearthdelve.Tests
             }
         }
 
-        /// <summary>Every text in the day loop's scenes has a style, and its settings are that style's, from the one asset.</summary>
+        /// <summary>
+        /// Every text in the game's scenes has a style, and its settings are that style's (font, size, line, quality and filter), from
+        /// the one asset; every screen canvas scales by whole pixels.
+        /// </summary>
         [Test]
         public void EveryTextInTheGame_IsStyled_FromTheTypeScale()
         {
@@ -171,6 +164,11 @@ namespace Hearthdelve.Tests
                 if (!Mathf.Approximately(text.size * text.lineSpacing, e.linePixels)) problems.Add($"{name}: line {text.size * text.lineSpacing}, {styled.Style} is {e.linePixels}");
                 if (text.quality != SilverMetrics.NativeSize || text.filterMode != FilterMode.Point) problems.Add($"{name}: quality {text.quality}, filter {text.filterMode}");
             }
+            // Every screen canvas scales by whole pixels (moved here from TextStyleTests by the test review).
+            foreach (string path in k_Scenes)
+            foreach (Canvas canvas in ProjectScan.All<Canvas>(path))
+                if (canvas.isRootCanvas && canvas.renderMode != RenderMode.WorldSpace && canvas.GetComponent<PixelCanvasScaler>() == null)
+                    problems.Add($"{System.IO.Path.GetFileNameWithoutExtension(path)}/{canvas.name}: no whole-pixel scaling");
             Assert.That(problems, Is.Empty, string.Join("\n", problems));
             Assert.That(counts.GetValueOrDefault(TextStyle.Display), Is.EqualTo(1), "the game's name");
             Assert.That(counts.GetValueOrDefault(TextStyle.Heading), Is.GreaterThanOrEqualTo(6), "the screens' titles");
@@ -180,20 +178,28 @@ namespace Hearthdelve.Tests
 
         /// <summary>
         /// Every text with fixed English words fits its box at its style: on one line where the box is one line tall, and within the
-        /// box's lines where it's taller. Headings must also leave a fifth of their width for longer languages.
+        /// box's lines where it's taller. Headings must also leave a fifth of their width for longer languages. The words are the
+        /// English table's (the test review: a dictionary built from a few key lists skipped about a hundred newer strings), and a
+        /// key the text's table doesn't have is a failure, since the game would draw the key.
         /// </summary>
         [Test]
         public void EveryFixedString_FitsItsBox_AtItsStyle()
         {
-            Dictionary<string, string> english = English;
             TypeScale scale = GameFonts.Scale();
             var problems = new List<string>();
+            int measured = 0;
             foreach (var (scene, text) in SceneTexts())
             {
                 var localized = text.GetComponent<LocalizedSuperText>();
                 var styled = text.GetComponent<StyledText>();
                 if (localized == null || styled == null || string.IsNullOrEmpty(localized.Key)) continue;
-                if (!english.TryGetValue(localized.Key, out string words) || Regex.IsMatch(words, @"^\{\d+\}$")) continue;
+                if (!ProjectScan.English(localized.Table).TryGetValue(localized.Key, out string words))
+                {
+                    problems.Add($"{scene}/{PathOf(text.transform)}: no \"{localized.Key}\" in the {localized.Table} table");
+                    continue;
+                }
+                if (Regex.IsMatch(words, @"^\{\d+\}$")) continue;
+                measured++;
                 var rect = (RectTransform)text.transform;
                 float boxWidth = rect.rect.width, boxHeight = rect.rect.height;
                 if (boxWidth <= 0f) continue;
@@ -223,6 +229,7 @@ namespace Hearthdelve.Tests
                 }
             }
             Assert.That(problems, Is.Empty, string.Join("\n", problems));
+            Assert.That(measured, Is.GreaterThan(300), "the scenes' fixed strings were measured");
         }
 
         /// <summary>
@@ -254,23 +261,15 @@ namespace Hearthdelve.Tests
         [Test]
         public void TheTitleRow_SharesTheHeadingsBaseline()
         {
-            Scene scene = EditorSceneManager.OpenScene(EditorPaths.TavernScene, OpenSceneMode.Additive);
-            try
-            {
-                Transform panel = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Transform>(true))
-                    .First(t => t.name == "Panel" && t.parent != null && t.parent.name == "Prep");
-                var title = (RectTransform)panel.Find("Title");
-                var tonight = (RectTransform)panel.Find("Tonight");
-                float Top(RectTransform r) => panel.InverseTransformPoint(r.TransformPoint(new Vector3(0f, r.rect.yMax, 0f))).y;
-                Assert.That(title.GetComponent<StyledText>().Style, Is.EqualTo(TextStyle.Heading));
-                float headingBaseline = Top(title) - 2 * SilverMetrics.BaselineFromTop;
-                float countBaseline = Top(tonight) - SilverMetrics.BaselineFromTop;
-                Assert.That(countBaseline, Is.EqualTo(headingBaseline).Within(0.01f));
-            }
-            finally
-            {
-                EditorSceneManager.CloseScene(scene, true);
-            }
+            Transform panel = ProjectScan.All<Transform>(EditorPaths.TavernScene)
+                .First(t => t.name == "Panel" && t.parent != null && t.parent.name == "Prep");
+            var title = (RectTransform)panel.Find("Title");
+            var tonight = (RectTransform)panel.Find("Tonight");
+            float Top(RectTransform r) => panel.InverseTransformPoint(r.TransformPoint(new Vector3(0f, r.rect.yMax, 0f))).y;
+            Assert.That(title.GetComponent<StyledText>().Style, Is.EqualTo(TextStyle.Heading));
+            float headingBaseline = Top(title) - 2 * SilverMetrics.BaselineFromTop;
+            float countBaseline = Top(tonight) - SilverMetrics.BaselineFromTop;
+            Assert.That(countBaseline, Is.EqualTo(headingBaseline).Within(0.01f));
         }
 
         /// <summary>The restored name: "spider-leg steaks" again (its id never changed).</summary>

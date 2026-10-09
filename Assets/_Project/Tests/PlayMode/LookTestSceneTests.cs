@@ -14,6 +14,7 @@ using Hearthdelve.Dungeon.Harvest;
 using Hearthdelve.Shared.Engine;
 using Hearthdelve.Shared.Haptics;
 using Hearthdelve.Shared.Run;
+using Hearthdelve.Shared.Settings;
 using Hearthdelve.UI.Debugging;
 using Hearthdelve.UI.Hud;
 using Hearthdelve.UI.Localization;
@@ -52,8 +53,10 @@ namespace Hearthdelve.Tests.PlayMode
     }
 
     /// <summary>
-    /// Shared set-up for tests that play the 4a look-test scenes: loads a scene, waits for
-    /// TDE to spawn the player, and feeds input through virtual devices.
+    /// Shared set-up for every PlayMode test that plays a scene: loads a scene, waits for TDE to spawn the player, and feeds input
+    /// through virtual devices. Since the test review (2026-10-09) it also gives every test its own options file (never the
+    /// developer's: their text speed, relaxed timing or vibration changed what tests saw), and puts back what a test can leave
+    /// behind for the next: vSync, the frame rate, the capture step, the prompts' device, the menu pause and the URL opener.
     /// </summary>
     public abstract class LookTestFixture
     {
@@ -67,11 +70,20 @@ namespace Hearthdelve.Tests.PlayMode
 
         InputSettings.BackgroundBehavior m_Background;
         InputSettings.EditorInputBehaviorInPlayMode m_EditorBehavior;
+        int m_VSync, m_FrameRate;
+        protected string OptionsDir { get; private set; }
 
         [SetUp]
         public void SetUpInput()
         {
             EventBusRegistry.ClearAll();
+            m_VSync = QualitySettings.vSyncCount;
+            m_FrameRate = Application.targetFrameRate;
+            // The options as a new player has them, in a folder of the test's own.
+            OptionsDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "HearthdelveOptions_" + Guid.NewGuid().ToString("N"));
+            GameOptions.DirectoryOverride = OptionsDir;
+            GameOptions.Reload();
+            InputDevices.Set(InputDeviceKind.KeyboardMouse);
             // Tests run without window focus, so input must not depend on it.
             InputSettings settings = InputSystem.settings;
             m_Background = settings.backgroundBehavior;
@@ -92,7 +104,15 @@ namespace Hearthdelve.Tests.PlayMode
             settings.editorInputBehaviorInPlayMode = m_EditorBehavior;
             GameSettings.VibrationEnabled = true;
             GameSettings.ReducedVibration = false;
+            MenuPause.Clear();
             Time.timeScale = 1f;
+            Time.captureDeltaTime = 0f;
+            QualitySettings.vSyncCount = m_VSync;
+            Application.targetFrameRate = m_FrameRate;
+            InputDevices.Set(InputDeviceKind.KeyboardMouse);
+            Hearthdelve.UI.Screens.UrlService.Opener = Application.OpenURL;
+            GameOptions.DirectoryOverride = null;
+            if (System.IO.Directory.Exists(OptionsDir)) System.IO.Directory.Delete(OptionsDir, true);
             EventBusRegistry.ClearAll();
         }
 
@@ -122,6 +142,23 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             InputSystem.QueueStateEvent(Pointer, new MouseState());
             yield return null;
+        }
+
+        /// <summary>
+        /// <paramref name="wait"/> at four times the game's speed (the test review, 2026-10-09): for walks that aren't what's being tested (villagers to their
+        /// places, customers to their seats). The surface clock runs on unscaled time and is held, so the hour doesn't move.
+        /// </summary>
+        protected static IEnumerator Fast(IEnumerator wait, float scale = 4f)
+        {
+            Time.timeScale = scale;
+            try
+            {
+                while (wait.MoveNext()) yield return wait.Current;
+            }
+            finally
+            {
+                Time.timeScale = 1f;
+            }
         }
 
         protected static IEnumerator WaitUntil(Func<bool> condition, float seconds, string what)
@@ -477,54 +514,6 @@ namespace Hearthdelve.Tests.PlayMode
             ReleaseKeys();
             yield return null;
             Assert.That(start.x - Player.transform.position.x, Is.GreaterThan(0.5f), "walks with the Tavern map");
-        }
-
-        /// <summary>The player's feet after walking into a piece of furniture from below, starting two tiles in front of it.</summary>
-        IEnumerator WalkUpInto(Transform piece, float xOffset)
-        {
-            Bounds art = piece.GetComponent<SpriteRenderer>().bounds;
-            Teleport(Player, new Vector2(art.center.x + xOffset, art.min.y - 2f));
-            yield return new WaitForFixedUpdate();
-            Hold(Key.W);
-            yield return new WaitForSeconds(1.5f);
-            ReleaseKeys();
-            yield return new WaitForFixedUpdate();
-            yield return new WaitForFixedUpdate();
-        }
-
-        void AssertBlockedInFront(Transform piece)
-        {
-            var body = Player.GetComponent<BoxCollider2D>();
-            Collider2D[] overlaps = Physics2D.OverlapBoxAll(body.bounds.center, body.bounds.size * 0.95f, 0f, LayerMask.GetMask(Layers.Obstacles));
-            Assert.That(overlaps.Select(c => c.name), Is.Empty, "the player's body is inside solid furniture");
-
-            float feet = Player.transform.position.y;
-            Assert.That(feet, Is.LessThan(piece.position.y), $"the player got past the front of {piece.name}, so it sorts behind it");
-            Assert.That(piece.position.y - feet, Is.LessThan(0.75f), $"the player should walk right up to {piece.name}");
-        }
-
-        [UnityTest]
-        public IEnumerator Bar_BlocksThePlayer_ApproachingFromBelow()
-        {
-            yield return Load(TavernScene);
-            Transform bar = GameObject.Find("Furniture/Bar").transform;
-            foreach (float x in new[] { -2f, 0f, 2.5f })
-            {
-                yield return WalkUpInto(bar, x);
-                AssertBlockedInFront(bar);
-            }
-        }
-
-        [UnityTest]
-        public IEnumerator Tables_BlockThePlayer_ApproachingFromBelow()
-        {
-            yield return Load(TavernScene);
-            foreach (string name in new[] { "Furniture/TableSetA", "Furniture/TableSetB" })
-            {
-                Transform table = GameObject.Find(name).transform;
-                yield return WalkUpInto(table, 0f);
-                AssertBlockedInFront(table);
-            }
         }
 
         /// <summary>

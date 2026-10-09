@@ -29,69 +29,25 @@ namespace Hearthdelve.Tests.PlayMode
     /// link asks to open its address); Options lines clicked at a fast human pace through a mouse each step once (the 4i-B web note);
     /// Options driven by a gamepad.
     /// </summary>
-    public class PresentationPlayTests : LookTestFixture
+    public class PresentationPlayTests : BootFixture
     {
-        string m_SaveDir, m_OptionsDir;
         Mouse m_Mouse;
         Gamepad m_Pad;
 
-        static GameFlow Flow => GameFlow.Instance;
-        static PauseMenu Pause => PauseMenu.Instance;
-
-        [SetUp]
-        public void UseTempFiles()
-        {
-            m_SaveDir = Path.Combine(Path.GetTempPath(), "HearthdelveTests_" + Guid.NewGuid().ToString("N"));
-            m_OptionsDir = Path.Combine(Path.GetTempPath(), "HearthdelveOptions_" + Guid.NewGuid().ToString("N"));
-            GameFlow.SaveDirectoryOverride = m_SaveDir;
-            GameOptions.DirectoryOverride = m_OptionsDir;
-            GameOptions.Reload();
-        }
-
         [TearDown]
-        public void ClearFiles()
+        public void RemoveDevices()
         {
             if (m_Mouse != null) InputSystem.RemoveDevice(m_Mouse);
             if (m_Pad != null) InputSystem.RemoveDevice(m_Pad);
             m_Mouse = null;
             m_Pad = null;
-            UrlService.Opener = Application.OpenURL;
-            if (Pause != null && Pause.IsOpen) Pause.Close();
-            GameFlow.SaveDirectoryOverride = null;
-            GameOptions.DirectoryOverride = null;
-            GameOptions.Reload();
-            SurfacePause.Clear();
-            MusicHolds.Clear();
-            Time.timeScale = 1f;
-            MenuPause.Clear();
-            if (Directory.Exists(m_SaveDir)) Directory.Delete(m_SaveDir, true);
-            if (Directory.Exists(m_OptionsDir)) Directory.Delete(m_OptionsDir, true);
         }
 
-        static IEnumerator Frames(int n)
-        {
-            for (int i = 0; i < n; i++) yield return null;
-        }
-
-        static IEnumerator Revealed()
-        {
-            int settled = 0;
-            float started = Time.realtimeSinceStartup;
-            while (settled < 5)
-            {
-                bool clear = !Flow.IsLoading && (Flow.Transition == null || !Flow.Transition.IsCovering);
-                settled = clear ? settled + 1 : 0;
-                Assert.That(Time.realtimeSinceStartup - started, Is.LessThan(8f), "the scene revealed");
-                yield return null;
-            }
-        }
+        static PauseMenu Pause => PauseMenu.Instance;
 
         IEnumerator Menu()
         {
-            yield return SceneManager.LoadSceneAsync(GameScenes.Boot, LoadSceneMode.Single);
-            yield return WaitUntil(() => Flow != null && !Flow.IsLoading && Object.FindAnyObjectByType<MainMenuScreen>() != null, 20f, "the main menu");
-            yield return WaitUntil(() => Loc.IsReady, 10f, "the tables");
-            yield return Revealed();
+            yield return Boot();
             yield return Frames(3);
         }
 
@@ -179,25 +135,7 @@ namespace Hearthdelve.Tests.PlayMode
 
         // ---------- the new sounds (4i-C) ----------
 
-        static Rigidbody2D Keeper => GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-        static TavernDirector Director => TavernDirector.Instance;
-
-        IEnumerator Daytime(OpeningStage opening)
-        {
-            yield return Menu();
-            Flow.QuickNewGame();
-            Flow.MarkHintSeen(Hearthdelve.Shared.Village.CommunityRules.GimpIntro);
-            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.Dungeon, 30f, "the first delve");
-            yield return Revealed();
-            Flow.State.Story.Opening = opening;
-            Flow.CompleteDelve(DelveReport.Empty);
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Night, 30f, "the night");
-            yield return Revealed();
-            Flow.Sleep();
-            yield return WaitUntil(() => !Flow.IsLoading && Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston), 30f, "the daytime");
-            yield return Revealed();
-            yield return Frames(3);
-        }
+        IEnumerator Daytime(OpeningStage opening) => StartDaytime(opening: opening, gimpSeen: true);
 
         [UnityTest]
         public IEnumerator Walking_IsHeard_TheStairsAreHeard_AndAConversationBlipsOverDuckedMusic()

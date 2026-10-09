@@ -214,51 +214,13 @@ namespace Hearthdelve.Tests.PlayMode
             yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
         }
 
-        [UnityTest]
-        public IEnumerator AFullRun_DropsThroughThreeFloors_ToTheArena_WhoseBossEndsTheRun()
-        {
-            yield return LoadRun();
-            yield return WalkTo(RoomKind.Descent);
-            Assert.That(Runner.Floor.Floor, Is.EqualTo(1));
-            Assert.That(Room.Descent, Is.Not.Null, "the hole down");
-            yield return Descend();
-            Assert.That(Runner.Floor.Floor, Is.EqualTo(2));
-            Assert.That(Node.Kind, Is.EqualTo(RoomKind.Combat), "dropped into a fight");
-            AssertRoomBound();
-
-            yield return WalkTo(RoomKind.Descent);
-            yield return Descend();
-            Assert.That(Runner.Floor.Floor, Is.EqualTo(3));
-
-            yield return WalkTo(RoomKind.Arena);
-            AssertRoomBound();
-            var rope = Room.GetComponentInChildren<DelveExit>(true);
-            Assert.That(rope, Is.Not.Null);
-            Assert.That(rope.gameObject.activeInHierarchy, Is.False, "the way out waits for the fight");
-            Assert.That(Runner.Encounter.IsSealed);
-            Assert.That(Room.LivingEnemies(), Is.EqualTo(Node.Encounter.Count));
-            Assert.That(Node.Encounter.Select(e => e.Kind), Is.EqualTo(new[] { EnemyKind.Boss }), "the Larder Troll (4e), not 4d's stand-in wave");
-            yield return ClearRoom();
-            Assert.That(rope.gameObject.activeInHierarchy, "the rope appears once the arena is clear");
-
-            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
-            Assert.That(DelveRunController.Active.Extract(), "climbed out");
-            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
-            Assert.That(Runner.RoomsEntered, Is.GreaterThanOrEqualTo(12), "a full run");
-        }
-
         /// <summary>
         /// 4e playtest: the room before the arena lights a campfire once it's clear (no other room has one), and standing by it
-        /// gives back half the delver's Essence, then it burns low.
+        /// gives back a quarter of the delver's Essence, with its prompt, then it burns low. Walked on the full run's last floor
+        /// (the test review: its own test walked the same way down).
         /// </summary>
-        [UnityTest]
-        public IEnumerator TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackAQuarter_WithItsPrompt()
+        IEnumerator TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackAQuarter_WithItsPrompt()
         {
-            yield return LoadRun();
-            yield return WalkTo(RoomKind.Descent);
-            yield return Descend();
-            yield return WalkTo(RoomKind.Descent);
-            yield return Descend();
             for (int guard = 0; guard < 10 && !Node.Next.Any(id => Runner.Floor.Node(id).Kind == RoomKind.Arena); guard++)
             {
                 if (Runner.Encounter.IsSealed) yield return ClearRoom();
@@ -292,14 +254,50 @@ namespace Hearthdelve.Tests.PlayMode
             yield return null;
             Assert.That(hint.IsShown, Is.False, "burnt low: the prompt goes");
             essence.SetEncounterDrain(1f);
+            essence.GodMode = true;
+        }
+
+        [UnityTest, Category("Slow")]
+        public IEnumerator AFullRun_DropsThroughThreeFloors_ByTheCampfireBeforeTheBoss_ToTheArena_WhoseBossEndsTheRun()
+        {
+            yield return LoadRun();
+            yield return WalkTo(RoomKind.Descent);
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(1));
+            Assert.That(Room.Descent, Is.Not.Null, "the hole down");
+            yield return Descend();
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(2));
+            Assert.That(Node.Kind, Is.EqualTo(RoomKind.Combat), "dropped into a fight");
+            AssertRoomBound();
+
+            yield return WalkTo(RoomKind.Descent);
+            yield return Descend();
+            Assert.That(Runner.Floor.Floor, Is.EqualTo(3));
+
+            // The last floor, by way of the campfire before the boss.
+            yield return TheRoomBeforeTheBoss_LightsACampfire_ThatGivesBackAQuarter_WithItsPrompt();
+            yield return TakeExit(ExitTo(n => n.Kind == RoomKind.Arena));
+            AssertRoomBound();
+            var rope = Room.GetComponentInChildren<DelveExit>(true);
+            Assert.That(rope, Is.Not.Null);
+            Assert.That(rope.gameObject.activeInHierarchy, Is.False, "the way out waits for the fight");
+            Assert.That(Runner.Encounter.IsSealed);
+            Assert.That(Room.LivingEnemies(), Is.EqualTo(Node.Encounter.Count));
+            Assert.That(Node.Encounter.Select(e => e.Kind), Is.EqualTo(new[] { EnemyKind.Boss }), "the Larder Troll (4e), not 4d's stand-in wave");
+            yield return ClearRoom();
+            Assert.That(rope.gameObject.activeInHierarchy, "the rope appears once the arena is clear");
+
+            var result = Object.FindAnyObjectByType<DelveResultScreen>(FindObjectsInactive.Include);
+            Assert.That(DelveRunController.Active.Extract(), "climbed out");
+            yield return WaitUntil(() => result.IsOpen, 5f, "the delve result");
+            Assert.That(Runner.RoomsEntered, Is.GreaterThanOrEqualTo(12), "a full run");
         }
 
         /// <summary>
         /// Essence doesn't drain in the delve's first room (4i-C playtest) or at the hole down (or the rope up): safe ground. It
         /// drains from the next room on.
         /// </summary>
-        [UnityTest]
-        public IEnumerator TheFirstRoom_AndTheHoleDown_StopTheEssenceDrain_AndOrdinaryRoomsDon_t()
+        [UnityTest, Category("Slow")]
+        public IEnumerator TheFirstRoom_AndTheHoleDown_StopTheEssenceDrain_AndOrdinaryRoomsDon_t_AndTheHolesCampfireGivesAQuarter()
         {
             yield return LoadRun();
             var essence = Player.GetComponent<EssenceHealth>();
@@ -323,24 +321,16 @@ namespace Hearthdelve.Tests.PlayMode
             before = essence.CurrentHealth;
             yield return new WaitForSeconds(1.5f);
             Assert.That(essence.CurrentHealth, Is.EqualTo(before), "no Essence lost at the hole down");
-        }
 
-        /// <summary>4e playtest: the room with the hole down has a smaller campfire, giving back a quarter of the delver's Essence.</summary>
-        [UnityTest]
-        public IEnumerator TheHoleDown_HasASmallerCampfire_ThatGivesBackAQuarter()
-        {
-            yield return LoadRun();
-            yield return WalkTo(RoomKind.Descent);
+            // 4e playtest: the room with the hole down has a smaller campfire, giving back a quarter of the delver's Essence (its own
+            // test until the test review: the same walk).
             Campfire fire = Object.FindAnyObjectByType<Campfire>();
             Assert.That(fire, Is.Not.Null, "a campfire by the hole");
             Assert.That(fire.transform.IsChildOf(Room.transform));
             Assert.That(Vector2.Distance(fire.transform.position, Room.Descent.transform.position), Is.GreaterThan(3f), "clear of the hole");
-
-            var essence = Player.GetComponent<EssenceHealth>();
-            essence.GodMode = false;
             essence.SetEncounterDrain(0f);
             essence.SetHealth(essence.MaximumHealth * 0.2f);
-            float before = essence.CurrentHealth;
+            before = essence.CurrentHealth;
             Teleport(Player, (Vector2)fire.transform.position + new Vector2(0f, -1.2f));
             yield return WaitUntil(() => fire.IsSpent, 4f, "the fire to give all it has");
             Assert.That(essence.CurrentHealth - before, Is.EqualTo(essence.MaximumHealth * 0.25f).Within(1.5f), "a quarter back");
