@@ -1,0 +1,526 @@
+{
+    "version": 7,
+    "day": 2,
+    "phase": "Daytime",
+    "gold": 0,
+    "renown": 0,
+    "storeroom": [
+        {
+            "ingredient": "spider_leg",
+            "quality": "Fine",
+            "prep": "Raw",
+            "count": 3,
+            "freshness": 0.9200000166893005
+        }
+    ],
+    "upgrades": [],
+    "meal": {
+        "kind": "None",
+        "amount": 0.0,
+        "recipe": ""
+    },
+    "bosses": [],
+    "furniture": {
+        "initialized": true,
+        "nextUid": 107,
+        "owned": [
+            {
+                "id": "bed_double",
+                "count": 1
+            },
+            {
+                "id": "bottle_shelves",
+                "count": 1
+            },
+            {
+                "id": "butcher_block",
+                "count": 1
+            },
+            {
+                "id": "candle",
+                "count": 1
+            },
+            {
+                "id": "cellar_barrel",
+                "count": 3
+            },
+            {
+                "id": "chest",
+                "count": 1
+            },
+            {
+                "id": "kitchen_range",
+                "count": 1
+            },
+            {
+                "id": "low_shelf",
+                "count": 1
+            },
+            {
+                "id": "nightstand",
+                "count": 1
+            },
+            {
+                "id": "pass_table",
+                "count": 1
+            },
+            {
+                "id": "picture",
+                "count": 1
+            },
+            {
+                "id": "rug_village",
+                "count": 1
+            },
+            {
+                "id": "shelf_glasses",
+                "count": 1
+            },
+            {
+                "id": "stew_pot",
+                "count": 1
+            },
+            {
+                "id": "table_round_a",
+                "count": 2
+            },
+            {
+                "id": "table_round_b",
+                "count": 1
+            },
+            {
+                "id": "tavern_bar",
+                "count": 1
+            },
+            {
+                "id": "tavern_chair",
+                "count": 6
+            },
+            {
+                "id": "wall_fireplace",
+                "count": 1
+            },
+            {
+                "id": "wall_sign",
+                "count": 1
+            }
+        ],
+        "areas": [
+            {
+                "id": "guest_room",
+                "pieces": [
+                    {
+                        "uid": 101,
+                        "def": "rug_village",
+                        "x": 5,
+                        "y": 5,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "maroon",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 102,
+                        "def": "bed_double",
+                        "x": 2,
+                        "y": 7,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 103,
+                        "def": "nightstand",
+                        "x": 4,
+                        "y": 8,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "brown",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 104,
+                        "def": "candle",
+                        "x": 0,
+                        "y": 0,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": 103,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 105,
+                        "def": "chest",
+                        "x": 13,
+                        "y": 8,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "wood",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 106,
+                        "def": "picture",
+                        "x": 3,
+                        "y": 10,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "hills",
+                        "palette": ""
+                    }
+                ],
+                "floor": "floor_teal",
+                "wall": "wall_cream"
+            },
+            {
+                "id": "tavern",
+                "pieces": [
+                    {
+                        "uid": 1,
+                        "def": "tavern_bar",
+                        "x": 1,
+                        "y": 11,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 2,
+                        "def": "kitchen_range",
+                        "x": 19,
+                        "y": 12,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 3,
+                        "def": "stew_pot",
+                        "x": 24,
+                        "y": 11,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 4,
+                        "def": "pass_table",
+                        "x": 20,
+                        "y": 8,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 5,
+                        "def": "table_round_a",
+                        "x": 4,
+                        "y": 7,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 6,
+                        "def": "tavern_chair",
+                        "x": 3,
+                        "y": 7,
+                        "turns": 1,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 7,
+                        "def": "tavern_chair",
+                        "x": 5,
+                        "y": 7,
+                        "turns": 3,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 8,
+                        "def": "table_round_b",
+                        "x": 9,
+                        "y": 7,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 9,
+                        "def": "tavern_chair",
+                        "x": 8,
+                        "y": 7,
+                        "turns": 1,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 10,
+                        "def": "tavern_chair",
+                        "x": 10,
+                        "y": 7,
+                        "turns": 3,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 11,
+                        "def": "table_round_a",
+                        "x": 18,
+                        "y": 4,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 12,
+                        "def": "tavern_chair",
+                        "x": 17,
+                        "y": 4,
+                        "turns": 1,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 13,
+                        "def": "tavern_chair",
+                        "x": 19,
+                        "y": 4,
+                        "turns": 3,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 14,
+                        "def": "cellar_barrel",
+                        "x": 26,
+                        "y": 8,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 15,
+                        "def": "cellar_barrel",
+                        "x": 26,
+                        "y": 9,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 16,
+                        "def": "cellar_barrel",
+                        "x": 25,
+                        "y": 8,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 17,
+                        "def": "bottle_shelves",
+                        "x": 2,
+                        "y": 14,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 18,
+                        "def": "wall_sign",
+                        "x": 17,
+                        "y": 15,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 19,
+                        "def": "wall_fireplace",
+                        "x": 14,
+                        "y": 14,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 20,
+                        "def": "low_shelf",
+                        "x": 24,
+                        "y": 14,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 21,
+                        "def": "shelf_glasses",
+                        "x": 0,
+                        "y": 0,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": 20,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    },
+                    {
+                        "uid": 22,
+                        "def": "butcher_block",
+                        "x": 22,
+                        "y": 3,
+                        "turns": 0,
+                        "flip": false,
+                        "nx": 0,
+                        "ny": 0,
+                        "host": -1,
+                        "anchor": 0,
+                        "variant": "",
+                        "palette": ""
+                    }
+                ],
+                "floor": "floor_diamonds",
+                "wall": "wall_panelling"
+            }
+        ],
+        "finishes": [
+            "floor_diamonds",
+            "floor_teal",
+            "wall_cream",
+            "wall_panelling"
+        ],
+        "tierAnnounced": 0,
+        "newPieces": [],
+        "homecoming": ""
+    }
+}

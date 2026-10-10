@@ -167,7 +167,7 @@ namespace Hearthdelve.Dungeon.Rooms
             FloorNode start = first.Start;
             // Development: straight to the arena, to practise the boss (never in the day loop or a release build).
             bool inDayLoop = Hearthdelve.Shared.Game.GameFlow.Instance != null && Hearthdelve.Shared.Game.GameFlow.Instance.InGame;
-            if (StartInArenaOverride || (m_StartInArena && Debug.isDebugBuild && !inDayLoop))
+            if (StartInArenaOverride || Hearthdelve.Shared.Game.PerfOptions.StartInArena || (m_StartInArena && Debug.isDebugBuild && !inDayLoop))
             {
                 FloorGraph last = Graph.Floors[^1];
                 FloorNode arena = last.Nodes.FirstOrDefault(n => n.Kind == RoomKind.Arena);
