@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3bfa04390ffc5c146ab8def4089837ea
+guid: 639074eece41dc04ca7f6a0fbcc53017
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -151,23 +151,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WellStatic_Well
+      name: TownsPropsShadow_TankardBoard
       rect:
         serializedVersion: 2
-        x: 0
-        y: 64
-        width: 24
-        height: 32
+        x: 8
+        y: 281
+        width: 22
+        height: 1
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.5681818, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bdb4c9c6749c5e424790bf2cb7ea9ae9
-      internalID: -2567321
+      spriteID: 8ac16c3dd07d498da432cb15f5894f10
+      internalID: -755012784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TownsPropsShadow_PostSign
+      rect:
+        serializedVersion: 2
+        x: 147
+        y: 281
+        width: 8
+        height: 1
+      alignment: 9
+      pivot: {x: 0.625, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6c329a4eae229ea2021621417affc99e
+      internalID: -1498771325
       vertices: []
       indices: 
       edges: []
@@ -176,7 +198,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 9926e68b26ef21f4faf5e3700c917e69
+    spriteID: 36037b91e7e31a8488566524408014dd
     internalID: 0
     vertices: []
     indices: 
@@ -186,7 +208,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      WellStatic_Well: -2567321
+      TownsPropsShadow_PostSign: -1498771325
+      TownsPropsShadow_TankardBoard: -755012784
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6c0c49ea77f982248b26169b81539fae
+guid: 875d1eca2ca94004192d2f37febb2f74
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -151,529 +151,463 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PlainsFoliage_TreeLarge
+      name: PlainsFoliageShadow_TreeLarge
       rect:
         serializedVersion: 2
-        x: 16
+        x: 6
         y: 76
-        width: 118
-        height: 72
+        width: 96
+        height: 55
       alignment: 9
-      pivot: {x: 0.5, y: 0.14}
+      pivot: {x: 0.71875, y: 0.18327276}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 13a35e60ca5255ba47af8533cd113867
-      internalID: -1371406967
+      spriteID: a923bf206d1c08ab3771d8aea9508172
+      internalID: 30490497
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_TreeMedium
+      name: PlainsFoliageShadow_TreeMedium
       rect:
         serializedVersion: 2
-        x: 157
+        x: 148
         y: 79
-        width: 71
-        height: 59
+        width: 58
+        height: 36
       alignment: 9
-      pivot: {x: 0.5, y: 0.12}
+      pivot: {x: 0.76724136, y: 0.19666672}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7149f3b49423c471b927a2a7e1545fcd
-      internalID: 1678315763
+      spriteID: 9557d7284aac9ba1206552afeacc5ba1
+      internalID: -1061755955
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_TreeSmall
+      name: PlainsFoliageShadow_TreeSmall
       rect:
         serializedVersion: 2
-        x: 243
+        x: 239
         y: 82
-        width: 54
-        height: 46
+        width: 45
+        height: 22
       alignment: 9
-      pivot: {x: 0.5, y: 0.12}
+      pivot: {x: 0.6888889, y: 0.2509093}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 94d7bd8932f78d4b55699b97d879bad5
-      internalID: -825466174
+      spriteID: 014984b02bafff76cec24807d429542f
+      internalID: 1176560979
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_TreeSapling
+      name: PlainsFoliageShadow_Bush0
       rect:
         serializedVersion: 2
-        x: 306
-        y: 86
-        width: 34
-        height: 34
-      alignment: 9
-      pivot: {x: 0.5, y: 0.1}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: cb62c1796857012fb157862854488d17
-      internalID: -1237463296
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Bush0
-      rect:
-        serializedVersion: 2
-        x: 43
+        x: 41
         y: 208
-        width: 26
-        height: 15
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0e485b4f6c4d8a2f4d6aaa189f8a53d7
-      internalID: 229557899
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Bush1
-      rect:
-        serializedVersion: 2
-        x: 147
-        y: 208
-        width: 26
-        height: 16
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c3f067ebb8ce6245c15a7abe2d3487c3
-      internalID: -1739156023
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Bush2
-      rect:
-        serializedVersion: 2
-        x: 250
-        y: 208
-        width: 28
-        height: 16
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d548aac32c1676e0dfe955d1ae695aa9
-      internalID: -60566992
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Bush3
-      rect:
-        serializedVersion: 2
-        x: 459
-        y: 208
-        width: 26
-        height: 17
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 160acb1bc5460cd51c8612e4a449c5a6
-      internalID: 1861698118
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Shrub0
-      rect:
-        serializedVersion: 2
-        x: 11
-        y: 210
-        width: 18
-        height: 12
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9dbab93736bbdac9ef6ebce6a998389b
-      internalID: 1757326218
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Shrub1
-      rect:
-        serializedVersion: 2
-        x: 115
-        y: 210
-        width: 18
+        width: 17
         height: 13
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.88235295, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 33e5904bb2f98afed2422c5cb6399a9d
-      internalID: -2083233466
+      spriteID: 1378cf825c24e0866b89d0bacfda3ba9
+      internalID: -1993221782
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_BushRed
+      name: PlainsFoliageShadow_Bush2
       rect:
         serializedVersion: 2
-        x: 355
+        x: 249
         y: 208
-        width: 26
-        height: 16
+        width: 17
+        height: 13
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.88235295, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 07867cbeaa76fba1cdbf777d615c49b8
-      internalID: 782070816
+      spriteID: 57170ed1e0a595e0de576138ea6949db
+      internalID: 509412648
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_ShrubPurple
+      name: PlainsFoliageShadow_Bush3
       rect:
         serializedVersion: 2
-        x: 218
+        x: 457
+        y: 208
+        width: 17
+        height: 12
+      alignment: 9
+      pivot: {x: 0.88235295, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef999ff02d70cb3f7919653f5f8a8ab4
+      internalID: 57048034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlainsFoliageShadow_BushRed
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 208
+        width: 17
+        height: 11
+      alignment: 9
+      pivot: {x: 0.88235295, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1786a47c8380945c3b57a672b4d66c7d
+      internalID: 628399745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlainsFoliageShadow_Shrub0
+      rect:
+        serializedVersion: 2
+        x: 9
         y: 210
-        width: 20
-        height: 14
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9a7b0c18a548c42db436e03a67d28e63
-      internalID: 800658270
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Flower_49_14
-      rect:
-        serializedVersion: 2
-        x: 49
-        y: 249
-        width: 14
+        width: 7
         height: 9
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 1.5714285, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0a973cffb3c3f329e3175eea0ee46bc6
-      internalID: 1026693389
+      spriteID: 9dd80c2c02729017400e4be98651d9f1
+      internalID: -468627127
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_152_13
+      name: PlainsFoliageShadow_ShrubPurple
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 210
+        width: 7
+        height: 7
+      alignment: 9
+      pivot: {x: 1.5714285, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 60daf4f3a3fff8321174da7998f60307
+      internalID: 1675629944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlainsFoliageShadow_Flower_49_14
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 249
+        width: 10
+        height: 2
+      alignment: 9
+      pivot: {x: 0.8, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9e25c260b09eebd53eb0f4917e0e7208
+      internalID: 2143912326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlainsFoliageShadow_Flower_152_13
       rect:
         serializedVersion: 2
         x: 152
         y: 249
-        width: 24
-        height: 10
+        width: 19
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6315789, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 896d7e298484c19cefe48c348935e1ba
-      internalID: 364646894
+      spriteID: d84d18be3da03bfe7018eebbad7526b5
+      internalID: 354239979
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_432_6
+      name: PlainsFoliageShadow_Flower_432_6
       rect:
         serializedVersion: 2
-        x: 432
+        x: 433
         y: 249
-        width: 24
-        height: 17
+        width: 18
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6111111, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea9f686cd2c8ae51908d626cd306d998
-      internalID: 1134250627
+      spriteID: 4aa4b22c98bc46575c9135fb1522608d
+      internalID: 1352543773
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_120_104
+      name: PlainsFoliageShadow_Flower_120_104
       rect:
         serializedVersion: 2
-        x: 120
-        y: 158
-        width: 24
-        height: 10
+        x: 122
+        y: 162
+        width: 18
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.5555556, y: -2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1ebbf9c25751fc2f5933b01325f1fa15
-      internalID: -1468403557
+      spriteID: 3aa1afa527c7e55d200c1f4cc76a791a
+      internalID: 610839019
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_152_88
+      name: PlainsFoliageShadow_Flower_152_88
       rect:
         serializedVersion: 2
-        x: 152
-        y: 174
-        width: 24
-        height: 10
+        x: 153
+        y: 178
+        width: 18
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6111111, y: -2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 77be855fbe0441ba37a1f5b44a4e3b51
-      internalID: -299020205
+      spriteID: c90dc67f3e7560513021fbda57bdbb06
+      internalID: 1183991093
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_152_104
+      name: PlainsFoliageShadow_Flower_152_104
       rect:
         serializedVersion: 2
-        x: 152
-        y: 158
-        width: 24
-        height: 10
+        x: 153
+        y: 162
+        width: 18
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6111111, y: -2}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9e29a42bb99853cd1cd4965d5819af89
-      internalID: -2040621490
+      spriteID: b708168a716245cb479f76c76b0db510
+      internalID: 922474362
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_224_72
+      name: PlainsFoliageShadow_Flower_224_72
       rect:
         serializedVersion: 2
-        x: 224
-        y: 190
-        width: 24
-        height: 10
+        x: 227
+        y: 193
+        width: 16
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.5625, y: -1.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a4424cc5ce6f2c65d97327c9f0589dcb
-      internalID: -150224960
+      spriteID: c397fa51a67757433b393cac764207c9
+      internalID: 1021442846
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_256_72
+      name: PlainsFoliageShadow_Flower_256_72
       rect:
         serializedVersion: 2
-        x: 256
-        y: 190
-        width: 24
-        height: 10
+        x: 258
+        y: 193
+        width: 16
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.625, y: -1.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8d251d1d808f9a75b70ffb9906adfc8c
-      internalID: 772108847
+      spriteID: 9a2bc099c314696af68a3b7ba106ad2b
+      internalID: 886966184
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_360_72
+      name: PlainsFoliageShadow_Flower_360_72
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 193
+        width: 16
+        height: 2
+      alignment: 9
+      pivot: {x: 0.625, y: -1.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 619115d194e2c3178edb38a2548a7d1d
+      internalID: 1979742946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlainsFoliageShadow_Flower_360_88
       rect:
         serializedVersion: 2
         x: 360
-        y: 190
-        width: 24
-        height: 10
+        y: 177
+        width: 18
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6666667, y: -1.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 97ee3b4d3b8102c6045233dbecae34ec
-      internalID: 290468104
+      spriteID: 064f9b41352f3538c510e3ccd15bb809
+      internalID: -1596428846
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_360_88
+      name: PlainsFoliageShadow_Flower_432_104
       rect:
         serializedVersion: 2
-        x: 360
-        y: 174
-        width: 24
-        height: 10
+        x: 434
+        y: 161
+        width: 17
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.5882353, y: -1.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c8ce89b5e83fe844c3634124012f59a8
-      internalID: -297418418
+      spriteID: d09df94bcbbf9a9f5ea6632afbb8ebf7
+      internalID: 1424720603
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: PlainsFoliage_Flower_432_104
+      name: PlainsFoliageShadow_Flower_464_104
       rect:
         serializedVersion: 2
-        x: 432
-        y: 158
-        width: 24
-        height: 10
+        x: 465
+        y: 161
+        width: 17
+        height: 2
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.64705884, y: -1.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1fbe8adf9a3c414b7ed21268ccad8044
-      internalID: -1232211509
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: PlainsFoliage_Flower_464_104
-      rect:
-        serializedVersion: 2
-        x: 464
-        y: 158
-        width: 24
-        height: 10
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fef5b973963ff0270f420527c555ddf8
-      internalID: -1423630762
+      spriteID: 515c23ac5c215d2da0f59d7159259210
+      internalID: -1627958173
       vertices: []
       indices: 
       edges: []
@@ -682,7 +616,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: ee6f36e20ba311e4d92855a4c6b72d33
+    spriteID: dbc8717494c49e249a000ce6750224fe
     internalID: 0
     vertices: []
     indices: 
@@ -692,30 +626,27 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      PlainsFoliage_Bush0: 229557899
-      PlainsFoliage_Bush1: -1739156023
-      PlainsFoliage_Bush2: -60566992
-      PlainsFoliage_Bush3: 1861698118
-      PlainsFoliage_BushRed: 782070816
-      PlainsFoliage_Flower_120_104: -1468403557
-      PlainsFoliage_Flower_152_104: -2040621490
-      PlainsFoliage_Flower_152_13: 364646894
-      PlainsFoliage_Flower_152_88: -299020205
-      PlainsFoliage_Flower_224_72: -150224960
-      PlainsFoliage_Flower_256_72: 772108847
-      PlainsFoliage_Flower_360_72: 290468104
-      PlainsFoliage_Flower_360_88: -297418418
-      PlainsFoliage_Flower_432_104: -1232211509
-      PlainsFoliage_Flower_432_6: 1134250627
-      PlainsFoliage_Flower_464_104: -1423630762
-      PlainsFoliage_Flower_49_14: 1026693389
-      PlainsFoliage_Shrub0: 1757326218
-      PlainsFoliage_Shrub1: -2083233466
-      PlainsFoliage_ShrubPurple: 800658270
-      PlainsFoliage_TreeLarge: -1371406967
-      PlainsFoliage_TreeMedium: 1678315763
-      PlainsFoliage_TreeSapling: -1237463296
-      PlainsFoliage_TreeSmall: -825466174
+      PlainsFoliageShadow_Bush0: -1993221782
+      PlainsFoliageShadow_Bush2: 509412648
+      PlainsFoliageShadow_Bush3: 57048034
+      PlainsFoliageShadow_BushRed: 628399745
+      PlainsFoliageShadow_Flower_120_104: 610839019
+      PlainsFoliageShadow_Flower_152_104: 922474362
+      PlainsFoliageShadow_Flower_152_13: 354239979
+      PlainsFoliageShadow_Flower_152_88: 1183991093
+      PlainsFoliageShadow_Flower_224_72: 1021442846
+      PlainsFoliageShadow_Flower_256_72: 886966184
+      PlainsFoliageShadow_Flower_360_72: 1979742946
+      PlainsFoliageShadow_Flower_360_88: -1596428846
+      PlainsFoliageShadow_Flower_432_104: 1424720603
+      PlainsFoliageShadow_Flower_432_6: 1352543773
+      PlainsFoliageShadow_Flower_464_104: -1627958173
+      PlainsFoliageShadow_Flower_49_14: 2143912326
+      PlainsFoliageShadow_Shrub0: -468627127
+      PlainsFoliageShadow_ShrubPurple: 1675629944
+      PlainsFoliageShadow_TreeLarge: 30490497
+      PlainsFoliageShadow_TreeMedium: -1061755955
+      PlainsFoliageShadow_TreeSmall: 1176560979
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

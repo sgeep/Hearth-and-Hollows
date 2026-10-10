@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 92dc3d9feb9ac8346880b7ba2b6347b6
+guid: af85e11b1d7f31b46a03be7127742ff7
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -151,221 +151,155 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CityProps_Bench
+      name: CityPropsShadow_BenchLong
       rect:
         serializedVersion: 2
-        x: 24
-        y: 72
-        width: 16
-        height: 7
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: fb8b874b0e6fc20c44094c1eb57b6f2a
-      internalID: 1530377228
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CityProps_BenchLong
-      rect:
-        serializedVersion: 2
-        x: 24
+        x: 23
         y: 35
-        width: 16
-        height: 9
+        width: 2
+        height: 5
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 4.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0f231e6a69c416968fc93e905d203c5a
-      internalID: -929296053
+      spriteID: 904ef19c9ba3cbf86a8423d132763d60
+      internalID: -1714958831
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CityProps_LampPost
+      name: CityPropsShadow_LampPost
       rect:
         serializedVersion: 2
         x: 112
         y: 64
-        width: 9
-        height: 30
+        width: 3
+        height: 12
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 1.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c938cfd669220e7d3d101448dbf305e6
-      internalID: -2089415344
+      spriteID: 10cd1f83fbba20a6dbaafab5ba7931e0
+      internalID: 1262896608
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CityProps_FlowerBox
+      name: CityPropsShadow_Barrel
       rect:
         serializedVersion: 2
-        x: 99
-        y: 139
-        width: 10
-        height: 11
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a36606013689093d837b159418b0ff3b
-      internalID: 1642781856
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CityProps_FlowerBoxRed
-      rect:
-        serializedVersion: 2
-        x: 130
-        y: 139
-        width: 12
-        height: 10
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 952789c0939ef133d7c58055111c1227
-      internalID: -825159636
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CityProps_Barrel
-      rect:
-        serializedVersion: 2
-        x: 346
+        x: 345
         y: 9
-        width: 12
-        height: 13
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9af965332cba0ded4210cb4482bb6a51
-      internalID: 415622059
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CityProps_Crate
-      rect:
-        serializedVersion: 2
-        x: 272
-        y: 8
-        width: 16
-        height: 16
-      alignment: 9
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ae1708b29a8e3ad11df69630cbbca192
-      internalID: -1623300422
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CityProps_Planter
-      rect:
-        serializedVersion: 2
-        x: 67
-        y: 139
-        width: 11
+        width: 5
         height: 10
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 1.4, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 978a246f03dde2c568eca7039c40f02e
-      internalID: -1294977566
+      spriteID: 506b3d1c4fa8534e0fb20fd6cac30881
+      internalID: 1009102305
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CityProps_PlanterSmall
+      name: CityPropsShadow_BarrelSmall
       rect:
         serializedVersion: 2
-        x: 83
-        y: 139
-        width: 10
+        x: 370
+        y: 10
+        width: 2
         height: 9
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 3, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6aa63f38d8fde5a5b570ada54ce7dd7e
-      internalID: -948075672
+      spriteID: 36b0f1ab9a19932045f4de4f9d32ce72
+      internalID: 771762627
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CityProps_BarrelSmall
+      name: CityPropsShadow_Crate
       rect:
         serializedVersion: 2
-        x: 371
-        y: 10
-        width: 10
-        height: 11
+        x: 271
+        y: 8
+        width: 13
+        height: 13
       alignment: 9
-      pivot: {x: 0.5, y: 0}
+      pivot: {x: 0.6923077, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 27969d5ed7a519b2fe4f5a885492e68f
-      internalID: -812343151
+      spriteID: b4e7a43717893b91283408d757066043
+      internalID: 1238450977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CityPropsShadow_Planter
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 139
+        width: 8
+        height: 6
+      alignment: 9
+      pivot: {x: 0.8125, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b48d500fa91d87b1240c101c95eec517
+      internalID: 1464011310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CityPropsShadow_PlanterSmall
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 139
+        width: 8
+        height: 6
+      alignment: 9
+      pivot: {x: 0.75, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f0485ecd96cb914d6929d195d744975
+      internalID: -664097476
       vertices: []
       indices: 
       edges: []
@@ -374,7 +308,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 503cf76367eabfd4393987db0037800e
+    spriteID: ec6f9841ac20bf5478569ab5658e1c8a
     internalID: 0
     vertices: []
     indices: 
@@ -384,16 +318,13 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      CityProps_Barrel: 415622059
-      CityProps_BarrelSmall: -812343151
-      CityProps_Bench: 1530377228
-      CityProps_BenchLong: -929296053
-      CityProps_Crate: -1623300422
-      CityProps_FlowerBox: 1642781856
-      CityProps_FlowerBoxRed: -825159636
-      CityProps_LampPost: -2089415344
-      CityProps_Planter: -1294977566
-      CityProps_PlanterSmall: -948075672
+      CityPropsShadow_Barrel: 1009102305
+      CityPropsShadow_BarrelSmall: 771762627
+      CityPropsShadow_BenchLong: -1714958831
+      CityPropsShadow_Crate: 1238450977
+      CityPropsShadow_LampPost: 1262896608
+      CityPropsShadow_Planter: 1464011310
+      CityPropsShadow_PlanterSmall: -664097476
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
