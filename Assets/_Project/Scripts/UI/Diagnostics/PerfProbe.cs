@@ -101,6 +101,11 @@ namespace Hearthdelve.UI.Diagnostics
                 m_Frames.Add(Time.unscaledDeltaTime * 1000f);
                 yield return null;
             }
+            if (m_Frames.Count == 0)
+            {
+                Line($"frames {name}: none (the page was hidden or stalled); {Memory()}");
+                yield break;
+            }
             var sorted = m_Frames.OrderBy(f => f).ToList();
             float p95 = sorted[Mathf.Clamp((int)(sorted.Count * 0.95f), 0, sorted.Count - 1)];
             float slow = sorted.Count(f => f > 17.5f) * 100f / sorted.Count;

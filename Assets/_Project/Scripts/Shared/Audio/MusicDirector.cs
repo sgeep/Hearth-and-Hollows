@@ -46,6 +46,9 @@ namespace Hearthdelve.Shared.Audio
 
         public MusicConfig Config => m_Config;
 
+        /// <summary>Music stays decoded once loaded (the web build; tests can set it). Elsewhere a stopped tune is unloaded.</summary>
+        public static bool KeepDecoded { get; set; } = Application.platform == RuntimePlatform.WebGLPlayer;
+
         public void Configure(MusicConfig config) => m_Config = config;
 
         void Awake()
@@ -165,6 +168,9 @@ namespace Hearthdelve.Shared.Audio
                 {
                     v.Source.Stop();
                     v.Source.time = 0f;
+                    // Not on the web (4i-D's performance pass): there, unloading doesn't free the browser's decoded copy and loading
+                    // again decodes another, so Chrome grew by about 200 MB a day; each tune is decoded once and kept instead.
+                    if (KeepDecoded) continue;
                     if (v.Source.clip != null && v.Source.clip.loadState == AudioDataLoadState.Loaded) v.Source.clip.UnloadAudioData();
                 }
             }
