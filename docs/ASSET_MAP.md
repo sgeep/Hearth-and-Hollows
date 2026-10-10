@@ -373,6 +373,10 @@ One small sprite per direction, cut by measured rectangles (x, y, w, h from the 
 | Larder Troll (boss, 4e) | Exclusive (`Ancient_Troll`) | Imported in 4e step 1 (see below). Replaces the Mother Slime candidate (2026-10-05). |
 | Mushroom People | Creatures (exclusive) | Deferred (4b decision): it has idle, jump, damage and die, but **no attack animation**. |
 
+## Kariaston layout mockups (2026-10-10, reference only)
+
+`Tools/village/mockup/` draws still mockups of Kariaston straight from the raw packs in `C:\Dev\Minifantasy` (Python 3, Pillow, NumPy; see its README). It is a **reference tool only**: the game never runs it, it imports nothing into the repo, and it never touches Unity. The owner chose **layout 2, Crossroads** (`layout2_crossroads.png`) as the village's direction; the other four layouts are kept for comparison. Its sprite catalogue (`kar.py`, `S`) and autotile specs (`AT`) record the sheet rectangles the mockups use.
+
 ## Kariaston and Tally Ho!'s daytime places (4h Checkpoint A, imported)
 
 Registered in `Editor/Setup/KariastonSheets.cs` (rects in pixels from each image's top-left), imported to `Assets/ThirdParty/Minifantasy/<Pack>/`. Built into `Kariaston.unity` once by `KariastonBuilder` (the blockout is hand-owned after that) and into the tavern by `SurfaceBuilder`.
