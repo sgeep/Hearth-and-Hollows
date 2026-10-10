@@ -233,18 +233,24 @@ namespace Hearthdelve.Tests
         }
 
         [Test]
-        public void TheVersion_FitsOnOneLine_InBothMenus()
+        public void TheVersion_FitsItsCorner_InBothMenus()
         {
             // 4i-D: a build's stamp is long, and the placeholder counts as one digit above (the release build wrapped it into its
-            // corner and cut it off). The longest stamp a build can carry, measured, against each menu's box.
+            // corner, then ran under the main menu's panel). The menus show the short form; its longest, measured: each word on
+            // a line of the box, and the box tall enough for the lines.
             string english = MenuLocKeys.English.First(e => e.key == MenuLocKeys.Version).english;
-            string longest = string.Format(english, Hearthdelve.Shared.Game.VersionStamp.Format(Hearthdelve.Shared.Game.VersionStamp.Milestone, 99999, "0123abcd", true));
-            float width = Width(longest);
+            string stamp = Hearthdelve.Shared.Game.VersionStamp.Format(Hearthdelve.Shared.Game.VersionStamp.Milestone, 99999, "0123abcd", true);
+            string longest = string.Format(english, Hearthdelve.Shared.Game.VersionStamp.Short(stamp));
+            string[] words = longest.Split(' ');
             foreach (string path in new[] { BootBuilder.MainMenuScene, BootBuilder.BootScene })
             {
                 var text = ProjectScan.All<LocalizedSuperText>(path).Single(t => t.name == "Version" && t.Key == MenuLocKeys.Version);
-                float box = ((RectTransform)text.transform).rect.width;
-                Assert.That(width, Is.LessThanOrEqualTo(box), $"{System.IO.Path.GetFileNameWithoutExtension(path)}: \"{longest}\" is {width} of {box} pixels");
+                var rect = ((RectTransform)text.transform).rect;
+                string scene = System.IO.Path.GetFileNameWithoutExtension(path);
+                foreach (string word in words)
+                    Assert.That(Width(word), Is.LessThanOrEqualTo(rect.width), $"{scene}: \"{word}\" is {Width(word)} of {rect.width} pixels");
+                int lines = Width(longest) <= rect.width ? 1 : words.Length;
+                Assert.That(lines * SilverMetrics.LinePixels, Is.LessThanOrEqualTo(rect.height + 0.5f), $"{scene}: {lines} line(s) in {rect.height} pixels");
             }
         }
 

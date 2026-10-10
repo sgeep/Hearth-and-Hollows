@@ -52,6 +52,15 @@ namespace Hearthdelve.Tests
             Assert.That(PlayerSettings.bundleVersion, Is.EqualTo(VersionStamp.Milestone), "a build puts the project's version back");
         }
 
+        /// <summary>A box laid out in the game's 320x180 screen (both sit on the full-screen menu, anchored at a point), as play lays them out.</summary>
+        static UnityEngine.Rect Box(UnityEngine.RectTransform r)
+        {
+            var screen = new UnityEngine.Vector2(320f, 180f);
+            UnityEngine.Vector2 anchor = UnityEngine.Vector2.Scale(r.anchorMin, screen) + r.anchoredPosition;
+            UnityEngine.Vector2 min = anchor - UnityEngine.Vector2.Scale(r.pivot, r.sizeDelta);
+            return new UnityEngine.Rect(min, r.sizeDelta);
+        }
+
         [Test]
         public void BothMenus_ShowTheVersion()
         {
@@ -62,10 +71,11 @@ namespace Hearthdelve.Tests
             PauseMenu pause = ProjectScan.All<PauseMenu>(BootBuilder.BootScene).Single();
             Assert.That(pause.Version, Is.Not.Null, "the pause menu shows it too");
             Assert.That(pause.Version.Key, Is.EqualTo(MenuLocKeys.Version));
-            // Wide enough for a stamped version on one line.
-            float width = ((UnityEngine.RectTransform)pause.Version.transform).rect.width;
-            Assert.That(width, Is.GreaterThanOrEqualTo(220f));
-            Assert.That(((UnityEngine.RectTransform)mainText.transform).rect.width, Is.GreaterThanOrEqualTo(220f));
+            Assert.That(VersionStamp.Short("0.4i-d.392+8ed3c8a7"), Is.EqualTo("0.4i-d.392"), "the menus show the milestone and the build");
+            // The main menu's corner never runs under its panel (the release build's did, on Windows with Quit).
+            UnityEngine.Transform panel = ProjectScan.All<UnityEngine.Transform>(BootBuilder.MainMenuScene).Single(t => t.name == "Choices").parent;
+            UnityEngine.Rect a = Box((UnityEngine.RectTransform)mainText.transform), b = Box((UnityEngine.RectTransform)panel);
+            Assert.That(a.Overlaps(b), Is.False, $"the version {a} clear of the panel {b}");
         }
     }
 }

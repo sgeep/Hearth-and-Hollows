@@ -270,7 +270,7 @@ namespace Hearthdelve.UI.Screens
             MenuPause.Push();
             SurfacePause.Hold(this);
             m_Root.SetActive(true);
-            if (m_Version != null) m_Version.Set(MenuLocKeys.Version, Application.version);
+            if (m_Version != null) m_Version.Set(MenuLocKeys.Version, VersionStamp.Short(Application.version));
             ShowMain(m_Resume);
         }
 

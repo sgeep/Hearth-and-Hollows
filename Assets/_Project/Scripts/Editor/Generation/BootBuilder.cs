@@ -220,7 +220,7 @@ namespace Hearthdelve.Editor
             // The version, small, in the corner.
             var corner = new Vector2(1f, 0f);
             LocalizedSuperText version = LookTestBuilder.Text(root, "Version", MenuLocKeys.Version, TextStyle.Secondary, DungeonUI.k_Light, TextAnchor.LowerRight,
-                corner, corner, corner, new Vector2(-4f, 2f), new Vector2(220f, 12f));
+                corner, corner, corner, new Vector2(-4f, 2f), new Vector2(76f, 24f));
 
             ControlsPage controlsPage = FirstImpressionsUI.BuildControlsPage(root);
             OptionsScreen optionsScreen = FirstImpressionsUI.BuildOptions(root, controlsPage);

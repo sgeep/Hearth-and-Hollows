@@ -296,7 +296,7 @@ namespace Hearthdelve.UI.Screens
         System.Collections.IEnumerator ShowVersion()
         {
             while (!Loc.IsReady) yield return null;
-            m_Version.Set(MenuLocKeys.Version, Application.version);
+            m_Version.Set(MenuLocKeys.Version, VersionStamp.Short(Application.version));
         }
 
         /// <summary>

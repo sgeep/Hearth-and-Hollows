@@ -25,6 +25,17 @@ namespace Hearthdelve.Shared.Game
             return $"{milestone}.{build}+{sha}{(dirty ? "-dirty" : string.Empty)}";
         }
 
+        /// <summary>
+        /// What the menus show: the milestone and the build (<c>0.4i-d.392</c>), which name one commit on main; the commit's hash
+        /// stays in the build's <c>version.txt</c> and the log (the menu's corner has room for about eighty pixels).
+        /// </summary>
+        public static string Short(string version)
+        {
+            if (string.IsNullOrEmpty(version)) return string.Empty;
+            int plus = version.IndexOf('+');
+            return plus < 0 ? version : version.Substring(0, plus);
+        }
+
         /// <summary>A stamped version's shape (the build-script test checks the builds' strings against it).</summary>
         public static bool IsStamped(string version) => !string.IsNullOrEmpty(version) && k_Pattern.IsMatch(version);
     }
