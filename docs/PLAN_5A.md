@@ -1,4 +1,4 @@
-# Phase 5a: the story revision (plan, proposed 2026-10-09)
+# Phase 5a: the story revision (plan, approved 2026-10-09)
 
 Design only (decision D10): no code, no scenes, no dialogue database edits. 5a revises Acts II–IV for the inn-and-village direction, using the material GDD §2.4 and §2.9 set aside for revision, and settles enough of the story that every later Phase 5 milestone has a reason in it. Nothing here is built; the Phase 5 sequence (GDD §11.1) stays a planning baseline.
 
@@ -60,7 +60,7 @@ The owner's sign-off on Checkpoint B closes 5a (no build, no playtest; the "play
 
 - Read Checkpoint A and choose a direction (or a mix), and answer whichever of the open questions you want settled now.
 - Read Checkpoint B and sign off, change or reject parts of it.
-- Point me at anything from your own notes or campaigns you want the story to draw on (as with the Fortunate Five and Musashi: what serves the characters, never the campaign wholesale). The campaign notes aren't on this machine.
+- The owner's two D&D campaigns are the source material (given 2026-10-09; kept outside the repo, never imported wholesale; other settings' names stay out; only the owner's own songs are used).
 
 ## 7. Risks
 
@@ -70,4 +70,4 @@ The owner's sign-off on Checkpoint B closes 5a (no build, no playtest; the "play
 
 ## 8. Gate
 
-Two stops: after Checkpoint A (the owner chooses the spine) and after Checkpoint B (the owner signs off the story bible and the GDD changes). The playtest's feedback (`docs/PLAYTEST_4I.md`) doesn't bind 5a, but anything a tester says about the story, the cast or the tone is read in at Checkpoint B.
+Checkpoint A: `docs/STORY_5A_SPINE.md` (2026-10-09). Two stops: after Checkpoint A (the owner chooses the spine) and after Checkpoint B (the owner signs off the story bible and the GDD changes). The playtest's feedback (`docs/PLAYTEST_4I.md`) doesn't bind 5a, but anything a tester says about the story, the cast or the tone is read in at Checkpoint B.
