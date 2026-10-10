@@ -273,6 +273,10 @@ namespace Hearthdelve.Editor
             menu.Configure(root.gameObject, main.gameObject, resume, controls, quitMenu, quitGame, confirm.gameObject, question, yes, no, page);
             menu.ConfigureOptions(options, optionsScreen);
             menu.ConfigureCredits(credits, creditsScreen);
+            // 4i-D: the version, small, in the corner (as on the main menu).
+            var corner = new Vector2(1f, 0f);
+            menu.ConfigureVersion(LookTestBuilder.Text(root, "Version", MenuLocKeys.Version, TextStyle.Secondary, k_Light, TextAnchor.LowerRight,
+                corner, corner, corner, new Vector2(-4f, 2f), new Vector2(150f, 12f)));
             root.gameObject.SetActive(false);
         }
 

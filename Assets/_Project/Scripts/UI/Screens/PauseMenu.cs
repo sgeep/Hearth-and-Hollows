@@ -41,6 +41,7 @@ namespace Hearthdelve.UI.Screens
         [SerializeField] OptionsScreen m_OptionsScreen;
         [SerializeField] Button m_Credits;
         [SerializeField] CreditsScreen m_CreditsScreen;
+        [SerializeField] LocalizedSuperText m_Version;
 
         InputAction m_Menu;
         bool m_PausableLastFrame;
@@ -58,6 +59,11 @@ namespace Hearthdelve.UI.Screens
         public OptionsScreen Options => m_OptionsScreen;
         public Button CreditsButton => m_Credits;
         public CreditsScreen Credits => m_CreditsScreen;
+
+        /// <summary>4i-D: the game's version in the corner, so a tester can say what they played.</summary>
+        public void ConfigureVersion(LocalizedSuperText version) => m_Version = version;
+
+        public LocalizedSuperText Version => m_Version;
 
         /// <summary>4i-C: the credits, from the pause menu.</summary>
         public void ConfigureCredits(Button credits, CreditsScreen screen)
@@ -264,6 +270,7 @@ namespace Hearthdelve.UI.Screens
             MenuPause.Push();
             SurfacePause.Hold(this);
             m_Root.SetActive(true);
+            if (m_Version != null) m_Version.Set(MenuLocKeys.Version, Application.version);
             ShowMain(m_Resume);
         }
 

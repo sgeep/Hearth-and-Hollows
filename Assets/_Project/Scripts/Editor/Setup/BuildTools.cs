@@ -20,49 +20,11 @@ namespace Hearthdelve.Editor
     {
         public const string WebBuildFolder = "Builds/Web";
 
-        [MenuItem("Hearthdelve/Build/Web (development)", priority = 200)]
-        public static void BuildWebMenu() => BuildWeb();
-
-        /// <summary>Batch entry point: <c>-executeMethod Hearthdelve.Editor.BuildTools.BuildWebBatch</c>.</summary>
+        /// <summary>Batch entry point kept for old scripts: <c>-executeMethod Hearthdelve.Editor.BuildTools.BuildWebBatch</c> (the development web build).</summary>
         public static void BuildWebBatch() => EditorApplication.Exit(BuildWeb() ? 0 : 1);
 
-        public static bool BuildWeb()
-        {
-            if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL))
-            {
-                Debug.LogError("[Hearthdelve] The Web build module is not installed for this editor. Add it in Unity Hub (Installs > Add modules > Web Build Support).");
-                return false;
-            }
-            if (!EditorUserBuildSettings.SwitchActiveBuildTarget(NamedBuildTarget.WebGL, BuildTarget.WebGL))
-            {
-                Debug.LogError("[Hearthdelve] Could not switch the active build target to Web.");
-                return false;
-            }
-
-            // 4i-A: the game's try/catch must work in the browser (an unreadable save is caught and explained). With exception support
-            // "None", any exception, even one that's caught, stops the page.
-            PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.ExplicitlyThrownExceptionsOnly;
-
-            // Localization stores its string tables in Addressables; the player needs them built.
-            AddressableAssetSettings.BuildPlayerContent(out var content);
-            if (!string.IsNullOrEmpty(content.Error))
-            {
-                Debug.LogError($"[Hearthdelve] Addressables content build failed: {content.Error}");
-                return false;
-            }
-
-            string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray();
-            BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
-            {
-                scenes = scenes,
-                locationPathName = WebBuildFolder,
-                target = BuildTarget.WebGL,
-                options = BuildOptions.Development,
-            });
-            bool ok = report.summary.result == BuildResult.Succeeded;
-            Debug.Log($"[Hearthdelve] Web build {report.summary.result}: {report.summary.totalErrors} errors, {report.summary.totalSize / (1024 * 1024)} MB at {WebBuildFolder}.");
-            return ok;
-        }
+        /// <summary>The development web build (4i-D: one of <see cref="ReleaseBuilds"/>' four, from its menu).</summary>
+        public static bool BuildWeb() => ReleaseBuilds.Build(ReleaseBuilds.Kind.WebDevelopment);
 
         /// <summary>
         /// Batch entry point (run without -nographics): renders each look-test scene's camera
