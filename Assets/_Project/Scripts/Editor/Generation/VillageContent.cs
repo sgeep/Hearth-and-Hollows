@@ -52,9 +52,9 @@ namespace Hearthdelve.Editor
         /// <summary>Kariaston's anchors: id, where they stand (village tiles), which way they face, behind a window.</summary>
         public static readonly (string id, Vector2 at, Facing4 facing, bool window)[] KariastonAnchors =
         {
-            // The Crossroads (2026-10-10): every place on open ground, reachable from Tally Ho!'s door.
+            // The Crossroads (2026-10-10, with the owner's hand adjustments): every place on open ground, reachable from Tally Ho!'s door.
             (MemorialSquare, new Vector2(30.9f, 17.3f), Facing4.BackRight, false),      // before Karias's memorial, south-west of its plaque
-            (MaximoPorch, new Vector2(17.4f, 5.3f), Facing4.FrontLeft, false),          // on the lane beside his porch
+            (MaximoPorch, new Vector2(14.9f, 5.5f), Facing4.FrontLeft, false),          // on the lane beside his porch steps
             (TallyWatch, new Vector2(27.4f, 21.0f), Facing4.BackRight, false),           // across the square, looking up at Tally Ho!, never closer
             (KalorenTower, new Vector2(57.6f, 21.8f), Facing4.FrontLeft, false),        // at his tower's door, on the road
             (SquareBench, new Vector2(38.0f, 22.8f), Facing4.FrontRight, false),        // by the square's east bench
@@ -67,7 +67,7 @@ namespace Hearthdelve.Editor
             (PondWest, new Vector2(9.6f, 23.5f), Facing4.BackLeft, false),              // the pond's south bank, drawing maps
             (GreenListen, new Vector2(25.0f, 11.5f), Facing4.BackRight, false),         // on the green by Bart's wagon, listening
             (Green, new Vector2(26.4f, 12.6f), Facing4.FrontLeft, false),               // on the green, playing
-            (BartWagon, new Vector2(23.4f, 11.8f), Facing4.FrontRight, false),          // by his painted wagon
+            (BartWagon, new Vector2(4.6f, 22.2f), Facing4.FrontRight, false),           // by his painted wagon, at the west road
             (MarketFront, new Vector2(32.4f, 13.3f), Facing4.FrontRight, false),        // beside Musashi, gossiping (clear of the stall)
             (MarketCart, new Vector2(34.4f, 14.6f), Facing4.FrontRight, false),         // Musashi's spot (KariastonBuilder.MusashiSpot)
         };
