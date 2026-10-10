@@ -647,3 +647,49 @@ After the playtest's changes (2026-10-09):
 17. **The delve's first room:** Essence holds still until you go through its doors.
 18. **The picks:** an enemy dying (69), the dodge (65), an upgrade pickup (6), a full satchel (Window_Close_2), the campfire as you warm by it and as it burns low (the crumpled paper).
 19. **Second playtest's changes:** footsteps outdoors and in the Hollows a third quieter, the dodge a quarter quieter, Quirkii 15% quieter; slimes never hurting while they die; the harvest note on one line inside its frame; Orik staying by the pass while food is coming, and never walking to a customer without a plate; a clean kill (the flesh) and an overkill (the heavy punch), each a little different every time.
+
+---
+
+## As built: 4i-D, "A playtest-ready vertical slice" (2026-10-09; waiting for the owner's checks and the external playtest)
+
+Approved as written (§4i-D, with D7 and D9). The owner's calls: IL2CPP for the external Windows build and Mono for internal ones; a Web release with Brotli and the decompression fallback, development builds kept; for the playtest, a restricted itch.io page with a password, three to five friends and family, and feedback through a form. The owner's own save wasn't needed ("I don't really care about my save"): save compatibility uses real game-written saves instead. Not tagged: `milestone-4i` waits for the playtest, the blocking fixes and the owner's sign-off.
+
+### Release builds
+
+- **One menu, `Hearthdelve → Build`, and a batch method per build** (`ReleaseBuilds`): *Web (release, Brotli)* → `Builds/WebRelease` (34 MB, no development code, the decompression fallback for hosts without Brotli's headers, which includes itch); *Web (development)* → `Builds/Web` (as before, uncompressed); *Windows (IL2CPP, for testers)* → `Builds/Windows/HearthAndHollows.exe`; *Windows (Mono, internal)* → `Builds/WindowsMono`. The Windows IL2CPP module was installed for 6000.6.4f1 through the Hub's command line (the owner's choice). The Product Name stays "Hearthdelve" (the save folder).
+- **The version**, stamped from git for the build's length and put back after (`VersionStamp`: `0.4i-d.<commits on main>+<hash>`, `-dirty` if the tree had changes): written to `version.txt` beside the build. The main menu and the pause menu show its short form, `0.4i-d.<build>`, on two lines in an 80-pixel corner (the full stamp on one line ran under the main menu's panel on Windows, where Quit makes it reach the bottom; found in the release build, now measured by tests at 320×180).
+- Build times on this machine: Web release 6–9 min, Windows IL2CPP 1.4–4.2 min (incremental), Mono under a minute. The IL2CPP folder holds `…BackUpThisFolder_ButDontShipItWithYourGame` (1.5 GB of debugging symbols): never shipped; the zip leaves it out.
+- Tests: `ReleaseBuildTests` (each build's options, the version's shape, both menus showing it, the corner clear of the panel), `TypographyTests.TheVersion_FitsItsCorner_InBothMenus`.
+
+### Save compatibility
+
+Real saves the game wrote are fixtures now (`Tests/EditMode/Fixtures/Saves`): **v7** from 4f's runs (day 2 at the delve with 25 gold; day 2's daytime), **v10** from 4h/4i (arrival day; the first delve; day 2's daytime), and **v8 and v9** as that real day-2 save in those versions' own shapes (the fields each later version added removed, read from `SaveData` at 48eec144 and `milestone-4g`; no genuine v8 or v9 file survives). Every one restores with no warnings, keeps its day, phase and gold, gains only what its version lacked (v7–v8: the opening complete; v7–v9: a seed derived from the file itself, empty beds), and saves again as v10 granting nothing twice (`SaveCompatibilityTests`); in the game each Continues from the main menu to where it was (`SaveContinueTests`: a daytime save of every version into the day; v7 at the delve into the Hollows; a 4h arrival save into arrival day, a first-delve save into the Hollows). Save version stays 10.
+
+### Performance
+
+The plan's budgets: 60 fps on a mid laptop, a change of scenes under 2 s on desktop and under 4 s on the web. Measured with `PerfProbe` (`?perf` on the web, `-perf` on Windows, in any build: a scripted day in a save folder of its own; `perfdays=N` repeats it; `-perfShots` takes pictures), on this machine (Ryzen 7 5800X3D, RTX 3080, 165 Hz display, so frame times sit at the display's refresh). **There's no mid laptop here**: the owner's clean-machine check carries the probe's one-line command for that (your checklist, A10).
+
+| | Windows IL2CPP | Chrome (release) | Firefox (release) |
+|---|---|---|---|
+| startup to the menu | 3.5–4.2 s | 3.1 s | 3.1 s |
+| each change of scenes | 1.5–1.8 s, of which 1.5 s is the fade (out, caption, in): the loads take about 0.1 s | 1.5–1.7 s | 1.5–1.7 s |
+| frames, every stretch (menu, first room, night, upstairs, Kariaston, Decorate Mode, eight customers, the troll) | 6.1 ms mean and p95; worst 18 ms once, entering Decorate Mode | 7.0 ms mean and p95; worst 27–29 ms once, entering Decorate Mode | 7–8 ms; worst 15 ms |
+| memory peak | 446 MB working set | **980 MB** renderer peak; levels at about 830–860 MB from the second day | 897 MB peak; levels at 760 MB |
+
+**The worst offender, fixed: the web build's music.** Chrome's renderer sits at about 600 MB once the game is up (the runtime, its compiled code, the data; the game's own heap is 168 MB), then rose about 100 MB with each tune first heard, and **kept rising about 200 MB a day** (1.0 GB after day 2, 1.18 after day 3, 1.4 GB after day 4: a tester playing a week in one tab would have run out). The music director unloaded each tune when it stopped and loaded it again the next time; on the web, unloading never freed the browser's decoded copy and loading decoded another. Now, on the web only, a tune stays decoded once loaded (`MusicDirector.KeepDecoded`); desktop still unloads. After the fix: 980 MB at the first day's peak, then flat over four days. Tests: `MusicMemoryTests`. Tried and dropped: a lower sample rate for the web (the importer refuses a web override in 6.6, and browsers decode to the page's own rate anyway, so it couldn't save anything). What's left if the peak still matters: music in mono would halve the four tunes' ~270 MB on the web (a stereo cost on every platform; the owner's call).
+
+### Regression
+
+- **Full suites** (`0d0b4b88`, after the music fix): EditMode **833 passed, 0 failed**, 1 explicit report skipped; PlayMode **282 passed, 0 failed**, 31 explicit captures skipped, 652 s. Since then only diagnostics, the menus' version corner and their tests changed; EditMode reran green on each (833 passed).
+- **The five-day soak** (`SoakTests`, Slow): a real new game through days 2–6 and Continue: the save every morning, herbs harvested on day 4 and barley on day 6, Vigor full each morning, one of each villager every day, Gimp's night exactly once (day 3) and never after Continue, the music's cues (quiet indoors, the day's tune outside, Prep quiet, service, the Cellars). Passes in 9 s.
+- **The final 4h checklist on the release build:** its judgements (does Gimp's night unsettle, do the overheard lines feel like old neighbours, does dinner feel like the village's) are the owner's (your checklist, C3). Its mechanical half runs inside the shipped player (`ReleaseChecklist`, `?checklist` / `-checklist`): **Windows IL2CPP, 7 of 7 passed** (Decorate Mode holding the room through Maximo's lunch; an exchange overheard at the market at midday; Gimp's night on day 3, talked through and the morning after; Save and Continue after it, never replayed; Gimp at Boog's table on his afternoon, talking; Ogrin's window lit exactly while he's home after five; familiar faces at dinner, four over three evenings). Its first run failed four items for the harness's own reasons (a launched window without focus ignores the virtual keyboard; overheard moments wait for a running clock), fixed before the second.
+
+### Tester kit (D9)
+
+`docs/tester-kit/`: **`how-to-play.html`** (published for the owner: starting the game on the web and Windows, how a day works, a few tips, the controls for keyboard and controller, known issues including the remaining stand-in sounds and the web's lack of rumble, starting over and clearing saves on each platform, what to do if something breaks; screenshots from the release build), **`questionnaire.md`** (twenty questions ready for Google Forms or Tally, including the version and which device and controller each tester used), **`itch-page.md`** (the page's settings, text and upload steps, restricted with a password), **`owner-checklist.md`** (the clean-machine IL2CPP steps, every real-controller check in one place, the release-build checks, the playtest's steps).
+
+### Changes from the plan
+
+- The performance probe and the release checklist were added to measure and check the release builds themselves (no gameplay change; they run only when asked, in a save folder of their own). `PerfOptions.StartInArena` lets the probe reach the troll.
+- The soak is an ordinary `[Category("Slow")]` PlayMode test rather than an explicit one, so the full suite runs it.
+- No mid laptop to measure on (recorded above).

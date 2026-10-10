@@ -1,6 +1,6 @@
 # Hearth & Hollows — Progress
 
-_Last updated: 2026-10-09 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C signed off** (2026-10-09); the test suite cleaned up (2026-10-09). Next: 4i-D._
+_Last updated: 2026-10-09 (**4f complete**, tag `milestone-4f`; **4g complete**, tag `milestone-4g`; **4h complete**, signed off 2026-10-08, tag `milestone-4h`). **4i approved** (2026-10-08, decisions D1–D10); **4i-A and 4i-B signed off** (2026-10-08); **4i-C signed off** (2026-10-09); the test suite cleaned up (2026-10-09); **4i-D built** (2026-10-09), waiting for the owner's checks and the external playtest._
 
 ## Phase 4 — Vertical slice, rebuilt top-down
 
@@ -1303,6 +1303,16 @@ The owner approved Checkpoint D after the final 4h playtest, and with it **Phase
 
 `docs/PLAN_4I.md`: the audit of what a stranger meets (menus, onboarding, saves, settings, audio, input, accessibility, credits, builds, performance, placeholders, playtest readiness) and four checkpoints: **4i-A** first impressions (a main menu that looks like a game, a pause menu, controls reference, device-aware hints, first-day orientation, saves the player can trust), **4i-B** settings and accessibility (persistent options, an audio mixer with volume sliders, feel and vibration, display, text speed, relaxed timing, a colour audit), **4i-C** presentation and polish (real sound effects, the audio balance, the credits screen with HeatleyBros' link, the known presentation bugs), **4i-D** a playtest-ready slice (release Web and Windows builds, a version number, a performance pass, save compatibility, a tester kit and an external playtest, then `milestone-4i`). Ten decisions wait for the owner (`PLAN_4I.md` §3). Nothing of 4i is built.
 
+### 4i-D: a playtest-ready vertical slice (2026-10-09; waiting for the owner's checks and the external playtest)
+
+Approved as written (PLAN_4I §4i-D, with D7 and D9). Details, the measurements and the checklist results: `docs/PLAN_4I.md`, *As built: 4i-D*. Not tagged.
+
+- **Builds:** one `Hearthdelve → Build` menu and a batch method each: Web release (Brotli, the fallback), Web development, Windows IL2CPP (testers), Windows Mono (internal); the version stamped from git (`0.4i-d.<build>+<hash>`) and shown in both menus.
+- **Saves:** real v7 and v10 saves and v8/v9 in their own shapes load and Continue.
+- **Performance:** every budget met on this machine (no mid laptop here); the web's music kept growing Chrome's memory about 200 MB a day, fixed (a tune stays decoded on the web): about 980 MB at peak, then flat.
+- **Regression:** EditMode 833 passed, PlayMode 282 passed, both 0 failed; the five-day soak passes; the 4h checklist's mechanical half passes 7 of 7 in the Windows IL2CPP build.
+- **Tester kit** in `docs/tester-kit/` and published for the owner: how to play, the questionnaire, the itch page, the owner's checklist.
+
 ### Test suite clean-up (2026-10-09, before 4i-D)
 
 The owner asked for `docs/TEST_REVIEW.md`'s §7 to be applied; what was done, measured, and where the review was wrong is its §8. PlayMode **1288 s → 624 s** (290 → 273 passed, 0 failed); EditMode 28 s → 27 s (825 → 819 passed, 0 failed). A shared `BootFixture` (temp saves and options, a fixed seed, instant transitions, one full teardown; daytime tests from a written day-2 save and Continue), `Fast` walks, `ProjectScan` with new checks of the real scenes (missing keys, lit sprites, one global light per layer), 17 PlayMode tests merged, retired or moved, the dead `ComboLogic` and `DamageCalculator.Apply` removed with their tests (the owner's call), 13 tests `[Category("Slow")]`. The stricter fit check found two real overflows in the credits, fixed by one more line each (the owner's call). No gameplay code changed except deleting the dead code. Next: 4i-D.
@@ -1399,7 +1409,7 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - ~~**The main menu is a plain panel**~~ (4i-A: the village still and the title).
 - ~~**No pause menu**~~ (4i-A built one).
 - ~~**Settings aren't saved**~~ (4i-B: Options, in their own file).
-- **Options on a Windows build is unchecked** (4i-D's build path; checked in the editor and on the web).
+- **Options on a Windows build** is checked by the release checklist's runs only indirectly (the owner's clean-machine check covers it: `docs/tester-kit/owner-checklist.md`, A7).
 - ~~**Fast repeated clicks on an Options line can be lost on the web**~~ (4i-C: only clicks within one frame, as a browser driver sends them; a human pace steps every click, tested).
 - ~~**Options' controls note wraps onto two lines**~~ (4i-C: it names one device, on one line).
 - **The window-size line can't preview**: a desktop window change applies at once, with no "keep these settings?" countdown.
@@ -1407,7 +1417,7 @@ Approved direction (2026-10-07 and 2026-10-08): a proper **fantasy calendar**; r
 - ~~**Station panels' controls lines overflow their boxes**~~ (4i-A: one binding each).
 - ~~**The main menu's Continue detail shows `day {0}, {1}`**~~ (4i-A: fixed).
 - **No pause menu inside Decorate Mode** (by design: its keys own Esc and Start; leave it, then pause).
-- **Music memory on the web:** each track decodes whole (about 65 MB); the day's tune stays decoded under Decorate Mode's (4i-D).
+- ~~**Music memory on the web**~~ (4i-D: reloading a tune decoded another copy each day, about 200 MB a day; a tune now stays decoded on the web, and Chrome levels off near 850 MB. Mono music would halve the rest, the owner's call).
 - ~~**In-game credits are missing**~~ (4i-C: the Credits screen with HeatleyBros' link).
 - **The day loop starts from `Boot`.** Playing `Tavern`, `Dungeon` or `Dungeon_TestFloor` on its own still gives the standalone evening or floor; playing `MainMenu` on its own loads Boot.
 - ~~**No icons for Shroom Cap and Spore Sac**~~ (they've had icons since 4f; found stale in 4i-C).
