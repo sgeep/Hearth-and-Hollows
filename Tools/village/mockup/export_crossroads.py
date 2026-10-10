@@ -197,24 +197,23 @@ def extend(cells, w, h, by=2):
             if y == h - 1: out.add((x, y + i))
     return sorted(out)
 
+KINDS = {'dirt': 'dirt', 'cobble2': 'cobble', 'water': 'water', 'soil': 'soil', 'gpatch0': 'patch0', 'gpatch1': 'patch1'}
 ground = {}
 for name, mk in m.layers:
-    kind = {'dirt': 'dirt', 'cobble2': 'cobble', 'water': 'water', 'soil': 'soil', 'gpatch0': 'patch0', 'gpatch1': 'patch1'}[name]
-    cells = [[int(x), int(y)] for y, x in zip(*mk.nonzero())]
-    if kind in ('dirt', 'cobble'): cells = [list(c) for c in extend(cells, m.w, m.h)]
-    ground.setdefault(kind, {'cells': [], 'expected': []})
-    ground[kind]['cells'] += cells
+    kind = KINDS[name]
+    cells = [(int(x), int(y)) for y, x in zip(*mk.nonzero())]
+    if kind in ('dirt', 'cobble'): cells = extend(cells, m.w, m.h)
+    ground.setdefault(kind, {'kind': kind, 'cells': [], 'expected': []})
+    for c in cells: ground[kind]['cells'] += list(c)
 for name, rows in EXPECTED.items():
-    kind = {'dirt': 'dirt', 'cobble2': 'cobble', 'water': 'water', 'soil': 'soil', 'gpatch0': 'patch0', 'gpatch1': 'patch1'}[name]
-    if name == 'dirt' and len(rows) == 72: continue      # the script's eight beds (replaced by the soil below)
-    ground[kind]['expected'] += rows
-soil = ground['soil']
-soil['expected'] = [e for e in EXPECTED['dirt'] if any(c <= e[0] < c + 3 for c in KEEP_BED_COLUMNS) and 4 <= e[1] <= 10] if 'soil' not in EXPECTED else soil['expected']
-soil['expected'] = [e for e in soil['expected'] if [e[0], e[1]] in soil['cells']]
+    for r in rows: ground[KINDS[name]]['expected'] += r
 
+# Flat int lists throughout (Unity's JsonUtility reads no nested arrays and no nulls).
+grass = []
+for g in grass_picks: grass += g if g else [-1, -1]
 beds = []
 for by in (4, 8):
-    for bx in KEEP_BED_COLUMNS: beds.append([bx, by, 3, 3])
+    for bx in KEEP_BED_COLUMNS: beds += [bx, by, 3, 3]
 
 sprites = []
 for p in placed:
@@ -224,16 +223,16 @@ for p in placed:
     else: name = NAMES[(sheet, p['rect'])]
     group = GROUP.get(name, 'Fences' if name.startswith('Fence') else 'Flowers' if name.startswith('Flower')
                       else 'Trees' if name.startswith(('Tree', 'Bush', 'Shrub')) else 'Props')
-    entry = dict(name=name, group=group, sheet=sheet, rect=list(p['rect']), left=p['left'], top=p['top'], flip=p['flip'])
-    if 'shadow' in p: entry['shadow'] = dict(sheet=p['shadow'][0], rect=list(p['shadow'][1]))
-    sprites.append(entry)
+    sprites.append(dict(name=name, group=group, sheet=sheet, rect=list(p['rect']), left=p['left'], top=p['top'], flip=p['flip'],
+                        shadow=list(p['shadow'][1]) if 'shadow' in p else []))
 
 layout = dict(
     source='Tools/village/mockup/layout2_crossroads.py', exporter='Tools/village/mockup/export_crossroads.py',
-    note='Kariaston, the Crossroads: tiles and art pixels, origin top-left, y down. Read once by KariastonBuilder.RelayoutBatch.',
-    width=m.w, height=m.h,
-    grass=grass_picks, ground=ground, beds=beds, sprites=sprites,
+    note='Kariaston, the Crossroads: tiles and art pixels, origin top-left, y down; grass is (column, row) per cell, -1 for flat; '
+         'ground cells are (x, y) pairs and expected (x, y, column, row) the script\'s own tile; beds are (x, y, w, h). '
+         'Read once by KariastonBuilder.RelayoutBatch.',
+    width=m.w, height=m.h, grass=grass, ground=list(ground.values()), beds=beds, sprites=sprites,
 )
 out = os.path.join(os.path.dirname(HERE), 'crossroads_layout.json')
 with open(out, 'w') as f: json.dump(layout, f, separators=(',', ':'))
-print(f'{out}: {len(sprites)} sprites, ground ' + ', '.join(f"{k} {len(v['cells'])}" for k, v in ground.items()))
+print(f'{out}: {len(sprites)} sprites, ground ' + ', '.join(f"{g['kind']} {len(g['cells']) // 2}" for g in ground.values()))

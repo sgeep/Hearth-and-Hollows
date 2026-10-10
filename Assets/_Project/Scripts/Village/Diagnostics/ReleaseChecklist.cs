@@ -192,7 +192,7 @@ namespace Hearthdelve.Village.Diagnostics
             // 3. Near the market at midday: an exchange is overheard. Overheard moments play only while the day goes on, so the
             // clock runs here, slowed right down (the PlayMode test does the same).
             Outside();
-            KeeperAt(k_Origin + new Vector2(38f, 9f));
+            KeeperAt(k_Origin + new Vector2(35f, 12f));   // below the square, by the market (the Crossroads)
             yield return At(12 * 60);
             Villager bart = Shown(CharacterIds.Bart);
             yield return Until(() => (bart = Shown(CharacterIds.Bart)) != null && !bart.Walking, 40f);
@@ -250,7 +250,7 @@ namespace Hearthdelve.Village.Diagnostics
 
             // 5. By Ogrin's window after five: lit exactly while he's behind it.
             Outside();
-            KeeperAt(k_Origin + new Vector2(50f, 9f));
+            KeeperAt(k_Origin + new Vector2(45f, 5.5f));   // on the lane before Grim and Ogrin's cottage
             yield return At(17 * 60);
             yield return Until(() => Villager.All.Where(v => v.CharacterId == CharacterIds.Ogrin && v.Shown).All(v => !v.Walking), 40f);
             yield return new WaitForSecondsRealtime(1.6f);

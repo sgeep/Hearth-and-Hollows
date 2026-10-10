@@ -38,6 +38,9 @@ namespace Hearthdelve.Editor
         public const string FarmCrops = "FarmCrops";
         public const string MoreVeggies = "MoreVeggies";
         public const string FarmActions = "FarmActions";
+        // The Crossroads (2026-10-10): Medieval City's dirt and cobble autotiles and More Grass Variations' patches.
+        public const string CityTiles = "CityTiles";
+        public const string MoreGrass = "MoreGrass";
 
         /// <summary>A crop's cells: the sheet, the group's left edge and the row. Each cell is 8×16, bottom-pivoted, on a 16-px row.</summary>
         public static readonly (string name, string file, int x, int row)[] Crops =
@@ -122,6 +125,8 @@ namespace Hearthdelve.Editor
         public static readonly (string name, int column, int row)[] GroundCells =
         {
             ("Grass0", 1, 1), ("Grass1", 2, 1), ("Grass2", 3, 1), ("Grass3", 4, 1), ("Grass4", 2, 4), ("Grass5", 3, 5), ("Grass6", 4, 6), ("Grass7", 2, 7),
+            // The Crossroads' meadow: one flat cell, and the sparse tufts the mockup scatters on it.
+            ("GrassFlat", 61, 5), ("Sparse_2_3", 2, 3), ("Sparse_3_3", 3, 3), ("Sparse_4_3", 4, 3), ("Sparse_2_5", 2, 5), ("Sparse_3_5", 3, 5), ("Sparse_4_5", 4, 5),
             ("Dirt_TL", 7, 3), ("Dirt_T", 8, 3), ("Dirt_TR", 9, 3), ("Dirt_L", 7, 4), ("Dirt_C", 8, 4), ("Dirt_R", 9, 4),
             ("Dirt_BL", 7, 5), ("Dirt_B", 8, 5), ("Dirt_BR", 9, 5), ("Dirt_InNW", 7, 6), ("Dirt_InNE", 8, 6), ("Dirt_InSW", 7, 7), ("Dirt_InSE", 8, 7),
             ("Stone_TL", 12, 3), ("Stone_T", 13, 3), ("Stone_TR", 14, 3), ("Stone_L", 12, 4), ("Stone_C", 13, 4), ("Stone_R", 14, 4),
@@ -174,7 +179,7 @@ namespace Hearthdelve.Editor
                 Source = k_Monuments, Pack = MonumentsPack, File = Monuments, Mode = SliceMode.Rects,
                 Rects = new[] { new SheetRect("Pedestal", 40, 16, 16, 27, k_Bottom), new SheetRect("Figure", 8, 201, 15, 17, k_Bottom), new SheetRect("Plaque", 296, 244, 16, 12, k_Bottom) },
             };
-            yield return new Sheet { Source = k_Well, Pack = WellPack, File = Well, Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Well", 0, 0, 24, 24, k_Bottom) } };
+            yield return new Sheet { Source = k_Well, Pack = WellPack, File = Well, Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Well", 0, 0, 24, 32, k_Bottom) } };
             yield return new Sheet
             {
                 Source = k_Foliage, Pack = FoliagePack, File = Foliage, Mode = SliceMode.Rects,
@@ -188,7 +193,8 @@ namespace Hearthdelve.Editor
                     new SheetRect("Bush0", 43, 49, 26, 15, k_Bottom), new SheetRect("Bush1", 147, 48, 26, 16, k_Bottom),
                     new SheetRect("Bush2", 250, 48, 28, 16, k_Bottom), new SheetRect("Bush3", 459, 47, 26, 17, k_Bottom),
                     new SheetRect("Shrub0", 11, 50, 18, 12, k_Bottom), new SheetRect("Shrub1", 115, 49, 18, 13, k_Bottom),
-                },
+                    new SheetRect("BushRed", 355, 48, 26, 16, k_Bottom), new SheetRect("ShrubPurple", 218, 48, 20, 14, k_Bottom),
+                }.Concat(Flowers.Select(f => new SheetRect(f.name, f.x, f.y, f.w, f.h, k_Bottom))).ToArray(),
             };
             yield return new Sheet
             {
@@ -199,6 +205,8 @@ namespace Hearthdelve.Editor
                     new SheetRect("LampPost", 112, 98, 9, 30, k_Bottom), new SheetRect("FlowerBox", 99, 42, 10, 11, k_Bottom),
                     new SheetRect("FlowerBoxRed", 130, 43, 12, 10, k_Bottom), new SheetRect("Barrel", 346, 170, 12, 13, k_Bottom),
                     new SheetRect("Crate", 272, 168, 16, 16, k_Bottom),
+                    new SheetRect("Planter", 67, 43, 11, 10, k_Bottom), new SheetRect("PlanterSmall", 83, 44, 10, 9, k_Bottom),
+                    new SheetRect("BarrelSmall", 371, 171, 10, 11, k_Bottom),
                 },
             };
             yield return new Sheet
@@ -214,6 +222,7 @@ namespace Hearthdelve.Editor
             var farm = new List<SheetRect>();
             farm.Add(new SheetRect("FenceRun", 448, 120, 24, 6, k_Bottom));
             farm.Add(new SheetRect("FencePost", 312, 0, 8, 24, k_Bottom));
+            foreach (var (name, c, r) in ThinFence) farm.Add(new SheetRect(name, c * 8, r * 8, 8, 8, k_Bottom));
             yield return new Sheet { Source = k_FarmTiles, Pack = FarmPack, File = FarmTiles, Mode = SliceMode.Rects, Rects = farm.ToArray() };
 
             // The garden's crops (4h Checkpoint B): each stage an 8×16 cell, pivoted at its foot.
@@ -249,6 +258,156 @@ namespace Hearthdelve.Editor
             yield return new Sheet { Source = "derived:Tools/portraits/derived/phi_framed.png", Pack = MinifantasySheets.Portraits, File = "PhiFramed", Mode = SliceMode.Single, Pivot = k_Bottom };
             yield return new Sheet { Source = $"{k_Cart}/Idle_Shop_Open.png", Pack = MerchantPack, File = CartOpen, Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Cart", 0, 0, 64, 64, k_Bottom) } };
             yield return new Sheet { Source = $"{k_Cart}/Idle_Shop_Closed_No_Merchant.png", Pack = MerchantPack, File = CartClosed, Mode = SliceMode.Rects, Rects = new[] { new SheetRect("Cart", 0, 0, 64, 64, k_Bottom) } };
+
+            // The Crossroads (2026-10-10): Medieval City's autotiles (dark dirt on grass at 14,138; cobble set in dirt at 22,138;
+            // the 3×3 block with its inner corners in the two rows below: the dirt has the two-corner pieces, the cobble doesn't).
+            var city = new List<SheetRect>();
+            foreach (var (c0, r0, pairs) in new[] { (14, 138, true), (22, 138, false) })
+                for (int c = c0; c < c0 + 3; c++)
+                for (int r = r0; r < r0 + 5; r++)
+                    if (r < r0 + 3 || pairs || c < c0 + 2) city.Add(new SheetRect($"Cell_{c}_{r}", c * 8, r * 8, 8, 8, k_Centre));
+            yield return new Sheet { Source = k_CityTiles, Pack = MinifantasySheets.MedievalCity, File = CityTiles, Mode = SliceMode.Rects, Rects = city.ToArray() };
+            // More Grass Variations: the two patches the Crossroads lays (blocks at cells 1,3 and 5,3, laid out like the dirt).
+            var grass = new List<SheetRect>();
+            foreach (int c0 in new[] { 1, 5 })
+                for (int c = c0; c < c0 + 3; c++)
+                for (int r = 3; r < 8; r++)
+                    grass.Add(new SheetRect($"Cell_{c}_{r}", c * 8, r * 8, 8, 8, k_Centre));
+            yield return new Sheet { Source = k_MoreGrass, Pack = PlainsPack, File = MoreGrass, Mode = SliceMode.Rects, Rects = grass.ToArray() };
+
+            // Every drawing's Minifantasy shadow, cut by the shadow's own extent and pivoted so it lies exactly under its drawing.
+            foreach (var group in Shadows.GroupBy(s => s.file))
+            {
+                var (pack, source) = k_ShadowFiles[group.Key];
+                yield return new Sheet { Source = source, Pack = pack, File = group.Key, Mode = SliceMode.Rects, Rects = group.Select(ShadowRect).ToArray() };
+            }
+        }
+
+        // ------------------------------------------------------------------ the Crossroads (2026-10-10)
+
+        const string k_CityTiles = "Minifantasy_Medieval_City_v1.1/Minifantasy_Medieval_City_Assets/Tileset/Tileset.png";
+        const string k_MoreGrass = "All_Exclusives_20261002/Addons/Forgotten_Plains/More_Grass_Variations/MoreGrassVariations.png";
+
+        /// <summary>Farm's thin fence (cells 50–54 × 15–19): corners, runs and each side's own post.</summary>
+        public static readonly (string name, int column, int row)[] ThinFence =
+        {
+            ("Fence_TL", 50, 15), ("Fence_Top", 51, 15), ("Fence_TR", 54, 15), ("Fence_Left", 50, 16), ("Fence_Right", 54, 16),
+            ("Fence_BL", 50, 19), ("Fence_Bottom", 51, 19), ("Fence_BR", 54, 19),
+        };
+
+        /// <summary>The flowers and tufts the Crossroads scatters (Plants &amp; Foliage, Forgotten Plains), each a whole drawing.</summary>
+        public static readonly (string name, int x, int y, int w, int h)[] Flowers =
+        {
+            ("Flower_49_14", 49, 14, 14, 9), ("Flower_152_13", 152, 13, 24, 10), ("Flower_432_6", 432, 6, 24, 17),
+            ("Flower_120_104", 120, 104, 24, 10), ("Flower_152_88", 152, 88, 24, 10), ("Flower_152_104", 152, 104, 24, 10),
+            ("Flower_224_72", 224, 72, 24, 10), ("Flower_256_72", 256, 72, 24, 10), ("Flower_360_72", 360, 72, 24, 10),
+            ("Flower_360_88", 360, 88, 24, 10), ("Flower_432_104", 432, 104, 24, 10), ("Flower_464_104", 464, 104, 24, 10),
+        };
+
+        public const string FoliageShadow = "PlainsFoliageShadow", BuildingShadow = "BuildingSamplesShadow", TowerShadow = "TowerExteriorShadow",
+            WagonShadow = "CaravansAndWagonsShadow", WellShadow = "WellStaticShadow", MonumentShadow = "MonumentsShadow", CartOpenShadow = "CartOpenShadow",
+            CartClosedShadow = "CartClosedShadow", CityPropShadow = "CityPropsShadow", FarmPropShadow = "FarmPropsShadow", TownsPropShadow = "TownsPropsShadow",
+            FenceShadow = "FarmTilesetShadow";
+
+        /// <summary>Each shadow sheet: its pack folder and source (each the size of its art's sheet, on the art's coordinates).</summary>
+        static readonly Dictionary<string, (string pack, string source)> k_ShadowFiles = new()
+        {
+            [FoliageShadow] = (FoliagePack, "Minifantasy_Plants_&_Foliage_v1.0/Minifantasy_Plants_&_Foliage_Assets/Plains_And_Forests/_Shadow.png"),
+            [BuildingShadow] = (TownsIIPack, "Minifantasy_Towns2_v1.5/Minifantasy_Towns2_Assets/Buildings/_Mix_And_Match_Samples/Minifantasy_TownsIIMoreBuildingSamplesShadows.png"),
+            [TowerShadow] = (WizardTowerPack, "All_Exclusives_20261002/Addons/_Miscellany/Wizard_Tower/Exterior/Wizard_Tower_Exterior_shadows.png"),
+            [WagonShadow] = (WagonsPack, "All_Exclusives_20261002/Addons/Medieval_Carnival/Caravans_And_Wagons/Tileset/CaravansAndWagonsShadows.png"),
+            [WellShadow] = (WellPack, "All_Exclusives_20261002/Addons/Towns_I_II/Animated_Well/_Shadows/WellStaticFramesShadow.png"),
+            [MonumentShadow] = (MonumentsPack, "All_Exclusives_20261002/Addons/Towns_I_II/Town_Monuments/Shadows.png"),
+            [CartOpenShadow] = (MerchantPack, $"{k_Cart}/_Shadows/Shop_Open_Idle_Shadow.png"),
+            [CartClosedShadow] = (MerchantPack, $"{k_Cart}/_Shadows/Shop_Closed_Idle_Shadow.png"),
+            [CityPropShadow] = (MinifantasySheets.MedievalCity, "Minifantasy_Medieval_City_v1.1/Minifantasy_Medieval_City_Assets/Props/Shadows.png"),
+            [FarmPropShadow] = (FarmPack, "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Props/Minifantasy_FarmPropsShadows.png"),
+            [TownsPropShadow] = (TownsPack, "Minifantasy_Towns_v3.0/Minifantasy_Towns_Assets/Props/Minifantasy_TownsPropsShadows.png"),
+            [FenceShadow] = (FarmPack, "Minifantasy_Farm_v3.0/Minifantasy_Farm_Assets/Tileset/Minifantasy_FarmTilesetShadowLayer.png"),
+        };
+
+        /// <summary>The pack folder a shadow sheet is imported into.</summary>
+        public static string ShadowPack(string file) => k_ShadowFiles[file].pack;
+
+        /// <summary>A drawing's shadow: the shadow sheet, the drawing's name, rectangle and pivot, and the shadow's own extent.</summary>
+        public readonly struct ShadowCut
+        {
+            public readonly string file, name;
+            public readonly RectInt art, shadow;
+            public readonly Vector2 pivot;
+
+            public ShadowCut(string file, string name, RectInt art, Vector2 pivot, RectInt shadow)
+            {
+                this.file = file;
+                this.name = name;
+                this.art = art;
+                this.pivot = pivot;
+                this.shadow = shadow;
+            }
+        }
+
+        static ShadowCut Cut(string file, string name, int ax, int ay, int aw, int ah, Vector2 pivot, int sx, int sy, int sw, int sh) =>
+            new(file, name, new RectInt(ax, ay, aw, ah), pivot, new RectInt(sx, sy, sw, sh));
+
+        /// <summary>
+        /// The shadows (extents measured by Tools/village/mockup/export_crossroads.py: the shadow pixels touching the drawing's
+        /// rectangle; a fence tile's is its own cell). The statue figure has none: it stands on its pedestal.
+        /// </summary>
+        public static readonly ShadowCut[] Shadows = BuildShadows().ToArray();
+
+        static IEnumerable<ShadowCut> BuildShadows()
+        {
+            Vector2 b = k_Bottom;
+            yield return Cut(BuildingShadow, "ThatchedHall", 9, 264, 118, 105, new Vector2(0.5f, 18f / 105f), 9, 314, 47, 52);
+            yield return Cut(BuildingShadow, "BlueRoofHall", 13, 28, 110, 93, new Vector2(0.5f, 17f / 93f), 11, 67, 45, 51);
+            yield return Cut(BuildingShadow, "BrownCottage", 319, 160, 58, 64, b, 316, 184, 36, 40);
+            yield return Cut(TowerShadow, "TowerExterior", 0, 0, 64, 136, b, 6, 85, 25, 45);
+            yield return Cut(WagonShadow, "PaintedWagon", 302, 229, 28, 61, b, 301, 243, 25, 47);
+            yield return Cut(WellShadow, "Well", 0, 0, 24, 32, b, 4, 23, 5, 9);
+            yield return Cut(MonumentShadow, "Pedestal", 40, 16, 16, 27, b, 37, 22, 4, 21);
+            yield return Cut(CartOpenShadow, "Cart", 0, 0, 64, 64, b, 12, 34, 46, 23);
+            yield return Cut(CartClosedShadow, "Cart", 0, 0, 64, 64, b, 12, 34, 46, 19);
+            yield return Cut(FoliageShadow, "TreeLarge", 16, 124, 118, 72, new Vector2(0.5f, 0.14f), 6, 141, 96, 55);
+            yield return Cut(FoliageShadow, "TreeMedium", 157, 134, 71, 59, new Vector2(0.5f, 0.12f), 148, 157, 58, 36);
+            yield return Cut(FoliageShadow, "TreeSmall", 243, 144, 54, 46, new Vector2(0.5f, 0.12f), 239, 168, 45, 22);
+            yield return Cut(FoliageShadow, "Bush0", 43, 49, 26, 15, b, 41, 51, 17, 13);
+            yield return Cut(FoliageShadow, "Bush2", 250, 48, 28, 16, b, 249, 51, 17, 13);
+            yield return Cut(FoliageShadow, "Bush3", 459, 47, 26, 17, b, 457, 52, 17, 12);
+            yield return Cut(FoliageShadow, "BushRed", 355, 48, 26, 16, b, 353, 53, 17, 11);
+            yield return Cut(FoliageShadow, "Shrub0", 11, 50, 18, 12, b, 9, 53, 7, 9);
+            yield return Cut(FoliageShadow, "ShrubPurple", 218, 48, 20, 14, b, 217, 55, 7, 7);
+            foreach (var (name, sx, sy, sw, sh) in new[]
+            {
+                ("Flower_49_14", 48, 21, 10, 2), ("Flower_152_13", 152, 21, 19, 2), ("Flower_432_6", 433, 21, 18, 2), ("Flower_120_104", 122, 108, 18, 2),
+                ("Flower_152_88", 153, 92, 18, 2), ("Flower_152_104", 153, 108, 18, 2), ("Flower_224_72", 227, 77, 16, 2), ("Flower_256_72", 258, 77, 16, 2),
+                ("Flower_360_72", 362, 77, 16, 2), ("Flower_360_88", 360, 93, 18, 2), ("Flower_432_104", 434, 109, 17, 2), ("Flower_464_104", 465, 109, 17, 2),
+            })
+            {
+                var f = Flowers.First(x => x.name == name);
+                yield return Cut(FoliageShadow, name, f.x, f.y, f.w, f.h, b, sx, sy, sw, sh);
+            }
+            yield return Cut(CityPropShadow, "BenchLong", 24, 148, 16, 9, b, 23, 152, 2, 5);
+            yield return Cut(CityPropShadow, "LampPost", 112, 98, 9, 30, b, 112, 116, 3, 12);
+            yield return Cut(CityPropShadow, "Barrel", 346, 170, 12, 13, b, 345, 173, 5, 10);
+            yield return Cut(CityPropShadow, "BarrelSmall", 371, 171, 10, 11, b, 370, 173, 2, 9);
+            yield return Cut(CityPropShadow, "Crate", 272, 168, 16, 16, b, 271, 171, 13, 13);
+            yield return Cut(CityPropShadow, "Planter", 67, 43, 11, 10, b, 66, 47, 8, 6);
+            yield return Cut(CityPropShadow, "PlanterSmall", 83, 44, 10, 9, b, 82, 47, 8, 6);
+            yield return Cut(FarmPropShadow, "Haystack", 83, 13, 20, 24, b, 82, 26, 9, 11);
+            yield return Cut(FarmPropShadow, "HayPile", 11, 13, 33, 23, b, 10, 25, 26, 11);
+            yield return Cut(FarmPropShadow, "Bales", 16, 48, 32, 8, b, 23, 55, 17, 1);
+            yield return Cut(FarmPropShadow, "Scarecrow", 76, 48, 11, 15, b, 74, 57, 4, 6);
+            yield return Cut(TownsPropShadow, "TankardBoard", 9, 86, 23, 17, b, 8, 102, 22, 1);
+            yield return Cut(TownsPropShadow, "PostSign", 147, 94, 10, 9, b, 147, 102, 8, 1);
+            foreach (var (name, c, r) in ThinFence) yield return Cut(FenceShadow, name, c * 8, r * 8, 8, 8, b, c * 8, r * 8, 8, 8);
+        }
+
+        /// <summary>A shadow's slice: its own rectangle, pivoted at its drawing's pivot (often outside it), so the two line up there.</summary>
+        static SheetRect ShadowRect(ShadowCut s)
+        {
+            float px = s.art.x + s.pivot.x * s.art.width, py = s.art.y + s.art.height - s.pivot.y * s.art.height;   // sheet pixels, y down
+            var pivot = new Vector2((px - s.shadow.x) / s.shadow.width, (s.shadow.y + s.shadow.height - py) / s.shadow.height);
+            return new SheetRect(s.name, s.shadow.x, s.shadow.y, s.shadow.width, s.shadow.height, pivot);
         }
     }
 }

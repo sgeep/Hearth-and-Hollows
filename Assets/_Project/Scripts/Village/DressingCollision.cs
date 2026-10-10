@@ -10,7 +10,8 @@ namespace Hearthdelve.Village
     /// laid out and will be rearranged, so nothing here is a wall placed at a spot.
     /// <list type="bullet">
     /// <item><b>Props by drawing:</b> every sprite in the scene showing one of the listed drawings (a fence run, a sign post, Tally Ho!'s
-    /// board) gets a footprint fitted to that drawing's own base (measured from its pixels when the list is built), as the scene
+    /// board; since the Crossroads also the tall drawings, over the ground they'd hide a figure on) gets the footprints fitted to
+    /// that drawing's own pixels (measured when the list is built), as the scene
     /// loads, wherever it was put and however it got there (copied, moved, newly dragged in). A prop that already carries its own
     /// collider is left alone.</item>
     /// <item><b>Tiles by kind:</b> every tilemap in the scene holding tiles that collide (the water) collides, one cell per tile, so
@@ -47,23 +48,31 @@ namespace Hearthdelve.Village
         {
             int layer = LayerMask.NameToLayer(m_Layer);
             if (layer < 0) layer = gameObject.layer;
-            var byDrawing = new Dictionary<Sprite, Solid>();
+            // A drawing may have several footprints (a hall's porch and body; a canopy's bands, 2026-10-10).
+            var byDrawing = new Dictionary<Sprite, List<Solid>>();
             foreach (Solid s in m_Solids)
-                if (s != null && s.sprite != null) byDrawing[s.sprite] = s;
+                if (s != null && s.sprite != null)
+                {
+                    if (!byDrawing.TryGetValue(s.sprite, out List<Solid> list)) byDrawing[s.sprite] = list = new List<Solid>();
+                    list.Add(s);
+                }
 
             foreach (GameObject root in gameObject.scene.GetRootGameObjects())
             {
                 foreach (SpriteRenderer r in root.GetComponentsInChildren<SpriteRenderer>(true))
-                    if (r.sprite != null && byDrawing.TryGetValue(r.sprite, out Solid solid)) Footprint(r, solid, layer);
+                    if (r.sprite != null && byDrawing.TryGetValue(r.sprite, out List<Solid> solids) && !HasCollider(r))
+                        foreach (Solid solid in solids) Footprint(r, solid, layer);
                 foreach (Tilemap map in root.GetComponentsInChildren<Tilemap>(true)) Tiles(map, layer);
             }
             Physics2D.SyncTransforms();
         }
 
-        /// <summary>A footprint under the prop (a child, so it moves with it), unless it already has a collider of its own.</summary>
+        /// <summary>A prop that already carries a collider (its own, or footprints from an earlier pass) is left as it is.</summary>
+        static bool HasCollider(SpriteRenderer prop) => prop.GetComponentInChildren<Collider2D>(true) != null;
+
+        /// <summary>A footprint under the prop (a child, so it moves with it).</summary>
         static void Footprint(SpriteRenderer prop, Solid solid, int layer)
         {
-            if (prop.GetComponentInChildren<Collider2D>(true) != null) return;
             var go = new GameObject(FootprintName) { layer = layer };
             go.transform.SetParent(prop.transform, false);
             Vector3 scale = prop.transform.lossyScale;

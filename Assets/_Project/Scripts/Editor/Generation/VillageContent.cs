@@ -52,23 +52,24 @@ namespace Hearthdelve.Editor
         /// <summary>Kariaston's anchors: id, where they stand (village tiles), which way they face, behind a window.</summary>
         public static readonly (string id, Vector2 at, Facing4 facing, bool window)[] KariastonAnchors =
         {
-            (MemorialSquare, new Vector2(34.4f, 17.7f), Facing4.BackRight, false),      // before Karias's memorial, south of it
-            (MaximoPorch, new Vector2(15.4f, 11.2f), Facing4.FrontLeft, false),         // by his own porch
-            (TallyWatch, new Vector2(38.8f, 25.6f), Facing4.BackLeft, false),           // looking up at Tally Ho!, never closer
-            (KalorenTower, new Vector2(63.9f, 11.0f), Facing4.FrontLeft, false),        // at his tower's door
-            (SquareBench, new Vector2(40.5f, 20.4f), Facing4.FrontRight, false),        // by the square's east bench
-            (CottageDoor, new Vector2(52.3f, 11.5f), Facing4.BackLeft, false),          // at Grim and Ogrin's door, with the herbs
-            (GrimYard, new Vector2(50.0f, 11.5f), Facing4.FrontRight, false),           // in front of his cottage
-            (MarketSide, new Vector2(42.9f, 10.6f), Facing4.BackLeft, false),           // below the market cart's right corner
-            (PondEast, new Vector2(19.7f, 25.4f), Facing4.FrontLeft, false),            // the pond's east bank
-            (OgrinYard, new Vector2(48.2f, 11.8f), Facing4.FrontRight, false),          // beside the cottage
-            (OgrinWindow, new Vector2(53.0f, 12.85f), Facing4.FrontRight, true),        // in bed, at the cottage's window
-            (PondWest, new Vector2(16.6f, 23.4f), Facing4.BackLeft, false),             // the pond's south bank, drawing maps
-            (GreenListen, new Vector2(26.4f, 17.3f), Facing4.BackRight, false),         // on the green, listening
-            (Green, new Vector2(27.9f, 18.3f), Facing4.FrontLeft, false),               // on the green, playing
-            (BartWagon, new Vector2(21.4f, 14.6f), Facing4.FrontRight, false),          // by his painted wagon
-            (MarketFront, new Vector2(34.9f, 11.2f), Facing4.FrontRight, false),        // beside Musashi, gossiping (clear of the stall)
-            (MarketCart, new Vector2(36.9f, 12.5f), Facing4.FrontRight, false),         // Musashi's spot (KariastonBuilder.MusashiSpot)
+            // The Crossroads (2026-10-10): every place on open ground, reachable from Tally Ho!'s door.
+            (MemorialSquare, new Vector2(30.9f, 17.3f), Facing4.BackRight, false),      // before Karias's memorial, south-west of its plaque
+            (MaximoPorch, new Vector2(17.4f, 5.3f), Facing4.FrontLeft, false),          // on the lane beside his porch
+            (TallyWatch, new Vector2(27.4f, 21.0f), Facing4.BackRight, false),           // across the square, looking up at Tally Ho!, never closer
+            (KalorenTower, new Vector2(57.6f, 21.8f), Facing4.FrontLeft, false),        // at his tower's door, on the road
+            (SquareBench, new Vector2(38.0f, 22.8f), Facing4.FrontRight, false),        // by the square's east bench
+            (CottageDoor, new Vector2(48.2f, 5.6f), Facing4.BackLeft, false),           // at Grim and Ogrin's door, with the herbs
+            (GrimYard, new Vector2(45.8f, 5.4f), Facing4.FrontRight, false),            // in front of his cottage, on the lane
+            (MarketSide, new Vector2(40.4f, 13.5f), Facing4.BackLeft, false),           // below the market cart's right corner
+            (PondEast, new Vector2(14.5f, 28.2f), Facing4.FrontLeft, false),            // the pond's north-east bank
+            (OgrinYard, new Vector2(42.6f, 5.9f), Facing4.FrontRight, false),           // beside the cottage
+            (OgrinWindow, new Vector2(49.0f, 7.1f), Facing4.FrontRight, true),          // in bed, at the cottage's window
+            (PondWest, new Vector2(9.6f, 23.5f), Facing4.BackLeft, false),              // the pond's south bank, drawing maps
+            (GreenListen, new Vector2(25.0f, 11.5f), Facing4.BackRight, false),         // on the green by Bart's wagon, listening
+            (Green, new Vector2(26.4f, 12.6f), Facing4.FrontLeft, false),               // on the green, playing
+            (BartWagon, new Vector2(23.4f, 11.8f), Facing4.FrontRight, false),          // by his painted wagon
+            (MarketFront, new Vector2(32.4f, 13.3f), Facing4.FrontRight, false),        // beside Musashi, gossiping (clear of the stall)
+            (MarketCart, new Vector2(34.4f, 14.6f), Facing4.FrontRight, false),         // Musashi's spot (KariastonBuilder.MusashiSpot)
         };
 
         /// <summary>Tally Ho!'s: Maximo's lunch, at the seat nearest the middle of the room (whatever the furniture is today).</summary>

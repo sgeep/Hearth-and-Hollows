@@ -27,7 +27,8 @@ namespace Hearthdelve.Editor
     /// Kariaston, the village (4h Checkpoint A; docs/PLAN_4H.md §6–7). Its own scene, loaded beside the tavern in the daytime (H1),
     /// at a world offset so the two never overlap. <b>The blockout is generated once</b> (H13): the ground, paths, the square,
     /// the buildings, trees and props are created only when the scene doesn't exist (or a rebuild is approved, like every
-    /// scene builder), and are hand-owned Unity content from then on. <see cref="UpdateGameplay"/> maintains only the named
+    /// scene builder), and are hand-owned Unity content from then on. Since 2026-10-10 the blockout is the Crossroads, read from
+    /// the mockup's export (<see cref="LayoutPath"/>); the existing scene was relaid out once (<see cref="RelayoutBatch"/>). <see cref="UpdateGameplay"/> maintains only the named
     /// gameplay objects under <c>Kariaston/Gameplay</c> (the area, Tally Ho!'s outside door, the market stall, the memorial's
     /// look, the edges), and never touches tiles or the dressing.
     /// </summary>
@@ -36,28 +37,20 @@ namespace Hearthdelve.Editor
         public const string ScenePath = EditorPaths.Scenes + "/Kariaston.unity";
         /// <summary>Where the village sits in the world: well clear of the tavern (0–28) and the guest room (50–68).</summary>
         public static readonly Vector2 Origin = new(200f, 0f);
-        public const int Width = 72, Height = 48;
+        /// <summary>The Crossroads (2026-10-10): 64×42 tiles, as the mockup.</summary>
+        public const int Width = 64, Height = 42;
 
-        // Landmarks, in village cells (y up). Tally Ho! faces south over the village: its porch steps at (36, 30.75).
-        public static readonly Vector2 TallyHo = new(36f, 33f);
-        public static readonly Vector2 TallyHoDoor = new(36f, 30.9f);
-        public static readonly Vector2 MaximoHouse = new(13f, 14f);
-        public static readonly Vector2 GrimCottage = new(51f, 12.5f);
-        public static readonly Vector2 KalorenTower = new(62f, 12f);
-        public static readonly Vector2 BartWagon = new(24f, 15f);
-        public static readonly Vector2 Memorial = new(35.5f, 19f);
-        public static readonly Vector2 Well = new(31.5f, 14.5f);
-        public static readonly Vector2 Market = new(40f, 12.6f);
-        public static readonly RectInt Square = new(29, 11, 14, 12);
-        public static readonly RectInt[] GardenBeds = { new(15, 37, 3, 2), new(19, 37, 3, 2), new(15, 33, 3, 2), new(19, 33, 3, 2) };
-        public static readonly RectInt[] Plots = { new(48, 30, 8, 7), new(58, 30, 8, 7), new(50, 1, 8, 5) };
-        /// <summary>
-        /// The pond (added after the Checkpoint A playtest, the owner's request): the meadow between Maximo's house and the garden
-        /// path, a tree at its north-west bank and the bench to its east. Stepped, two cells thick everywhere (the autotile's rule).
-        /// </summary>
-        public static readonly RectInt[] Pond = { new(7, 24, 12, 2), new(9, 26, 8, 2) };
-        /// <summary>Seconds per frame of the water's two-frame ripple (Minifantasy suggests 200–300 ms).</summary>
-        const float k_WaterFrameSeconds = 0.4f;
+        // Landmarks, in village cells (y up), where the Crossroads puts them (their art's pixels, the game's pivots).
+        // Tally Ho! faces south onto the square: its porch steps' foot at (32, 26.125).
+        public static readonly Vector2 TallyHo = new(32f, 28.375f);
+        public static readonly Vector2 TallyHoDoor = new(32f, 26.275f);
+        public static readonly Vector2 Memorial = new(32f, 19.5f);
+        public static readonly Vector2 Market = new(37.5f, 14.75f);
+        public static readonly Vector2 Cottage = new(47f, 6.75f);
+        /// <summary>The garden's four beds (garden_1..4, reading order): the cells their plants stand on.</summary>
+        public static readonly RectInt[] GardenBeds = { new(9, 35, 3, 2), new(13, 35, 3, 2), new(9, 31, 3, 2), new(13, 31, 3, 2) };
+        /// <summary>Each bed's soil: its plants' cells and one row above them (the crops' art stands tall into it).</summary>
+        public static RectInt GardenSoil(int bed) => new(GardenBeds[bed].x, GardenBeds[bed].y, GardenBeds[bed].width, GardenBeds[bed].height + 1);
 
         const string k_Root = "Kariaston";
         const string k_Gameplay = "Gameplay";
@@ -123,23 +116,256 @@ namespace Hearthdelve.Editor
             }
         }
 
-        // ------------------------------------------------------------------ the blockout (generated once)
+        // ------------------------------------------------------------------ the blockout (generated once: the Crossroads)
+
+        /// <summary>The Crossroads' layout, exported once from the mockup (Tools/village/mockup/export_crossroads.py).</summary>
+        public const string LayoutPath = "Tools/village/crossroads_layout.json";
+        const string k_RelayoutFlag = "-relayoutApproved";
 
         static void Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var root = new GameObject(k_Root).transform;
             root.position = Origin;
-            PaintGround(root);
-            Transform dressing = Child(root, "Dressing");
-            PlaceBuildings(Child(dressing, "Buildings"));
-            PlaceGarden(root, Child(dressing, "Garden"));
-            PlacePlots(Child(dressing, "Plots"));
-            PlaceTrees(Child(dressing, "Trees"));
-            PlaceProps(Child(dressing, "Props"));
+            LayOut(root);
             EditorPaths.Ensure(EditorPaths.Scenes);
             EditorSceneManager.SaveScene(scene, ScenePath);
             Debug.Log($"[Hearthdelve] {ScenePath} generated (the blockout is hand-owned from here).");
+        }
+
+        /// <summary>
+        /// Batch, once, with the owner's go-ahead (2026-10-10): <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.RelayoutBatch
+        /// -relayoutApproved</c> replaces the hand-owned village's ground and dressing with the Crossroads in the existing scene (its
+        /// asset, settings and root are kept), then maintains the gameplay objects as usual. It refuses to run without the flag, and
+        /// does nothing once the village is the Crossroads (its ground has a Cobble map), so the result is hand-owned again.
+        /// </summary>
+        public static void RelayoutBatch()
+        {
+            try
+            {
+                if (!Environment.GetCommandLineArgs().Contains(k_RelayoutFlag))
+                    throw new InvalidOperationException($"The relayout replaces Kariaston's hand-owned ground and dressing: pass {k_RelayoutFlag} with the owner's go-ahead.");
+                MinifantasyImporter.Import(KariastonSheets.Sheets());
+                var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+                Transform root = scene.GetRootGameObjects().FirstOrDefault(g => g.name == k_Root)?.transform
+                                 ?? throw new InvalidOperationException($"{ScenePath} has no {k_Root} root.");
+                if (root.Find("Ground/Cobble") != null)
+                {
+                    Debug.Log("[Hearthdelve] Kariaston is already the Crossroads: nothing replaced.");
+                }
+                else
+                {
+                    foreach (string part in new[] { "Ground", "Dressing" })
+                        for (Transform old = root.Find(part); old != null; old = root.Find(part)) Object.DestroyImmediate(old.gameObject);
+                    LayOut(root);
+                    EditorSceneManager.MarkSceneDirty(scene);
+                    EditorSceneManager.SaveScene(scene);
+                    Debug.Log("[Hearthdelve] Kariaston relaid out as the Crossroads.");
+                }
+                UpdateGameplay();
+                EditorApplication.Exit(0);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        // ---- the export (art pixels and tiles, origin top-left, y down; flat int lists for JsonUtility)
+
+        [Serializable] sealed class Layout
+        {
+            public int width, height;
+            public int[] grass, beds;
+            public Ground[] ground;
+            public Placed[] sprites;
+        }
+
+        [Serializable] sealed class Ground
+        {
+            public string kind;
+            public int[] cells, expected;
+        }
+
+        [Serializable] sealed class Placed
+        {
+            public string name, group, sheet;
+            public int[] rect, shadow;
+            public int left, top;
+            public bool flip;
+        }
+
+        static Layout ReadLayout()
+        {
+            if (!File.Exists(LayoutPath)) throw new InvalidOperationException($"Kariaston: no layout at {LayoutPath} (run Tools/village/mockup/export_crossroads.py).");
+            Layout layout = JsonUtility.FromJson<Layout>(File.ReadAllText(LayoutPath));
+            if (layout.width != Width || layout.height != Height) throw new InvalidOperationException($"Kariaston: the layout is {layout.width}×{layout.height}, the village {Width}×{Height}.");
+            return layout;
+        }
+
+        /// <summary>The export's cell (x, y down) as a village cell (y up).</summary>
+        static Vector3Int CellOf(int x, int y) => new(x, Height - 1 - y, 0);
+
+        static void LayOut(Transform root)
+        {
+            Layout layout = ReadLayout();
+            PaintGround(root, layout);
+            PlaceDressing(Child(root, "Dressing"), layout);
+        }
+
+        /// <summary>
+        /// The ground: the meadow cell by cell as the script picked it, then each region in its own map with its rule tile (the roads
+        /// run two cells past the edge, off camera, so the border reads as a road that carries on). Every cell the script drew is
+        /// checked against the rule tile's choice: a difference stops the relayout.
+        /// </summary>
+        static void PaintGround(Transform root, Layout layout)
+        {
+            var grid = new GameObject("Ground").AddComponent<Grid>();
+            grid.transform.SetParent(root, false);
+            Tilemap grass = LookTestBuilder.Layer(grid, "Grass", SortingLayers.Floor, 0, solid: false);
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+            {
+                int i = (y * Width + x) * 2;
+                grass.SetTile(CellOf(x, y), KariastonGround.Grass(KariastonGround.GrassCell(layout.grass[i], layout.grass[i + 1])));
+            }
+
+            var maps = new (string kind, string map, int order, bool solid, string tile)[]
+            {
+                ("patch0", "Grass Patches", 1, false, KariastonGround.PatchA), ("patch1", "Grass Patches", 1, false, KariastonGround.PatchB),
+                ("dirt", "Paths", 2, false, KariastonGround.Dirt), ("cobble", "Cobble", 3, false, KariastonGround.Cobble),
+                ("water", "Pond", 4, true, KariastonGround.Water), ("soil", "Garden Beds", 5, false, KariastonGround.Dirt),
+            };
+            var mismatches = new List<string>();
+            foreach (var (kind, mapName, order, solid, tileName) in maps)
+            {
+                Ground region = layout.ground.FirstOrDefault(g => g.kind == kind) ?? throw new InvalidOperationException($"Kariaston: no {kind} in the layout.");
+                Tilemap map = grid.transform.Find(mapName)?.GetComponent<Tilemap>() ?? LookTestBuilder.Layer(grid, mapName, SortingLayers.Floor, order, solid);
+                RuleTile tile = KariastonGround.Tile(tileName);
+                for (int i = 0; i < region.cells.Length; i += 2) map.SetTile(CellOf(region.cells[i], region.cells[i + 1]), tile);
+                map.RefreshAllTiles();
+                KariastonGround.Autotile a = KariastonGround.Autotiles[tileName];
+                for (int i = 0; i < region.expected.Length; i += 4)
+                {
+                    Vector3Int cell = CellOf(region.expected[i], region.expected[i + 1]);
+                    int column = region.expected[i + 2], row = region.expected[i + 3];
+                    Sprite drawn = map.GetSprite(cell);
+                    Sprite wanted = ExpectedCell(a, column, row);
+                    if (drawn != wanted) mismatches.Add($"{kind} ({region.expected[i]},{region.expected[i + 1]}): {(drawn != null ? drawn.name : "nothing")}, the script drew {column},{row}");
+                }
+            }
+            if (mismatches.Count > 0)
+                throw new InvalidOperationException($"Kariaston: {mismatches.Count} ground cells differ from the mockup:\n" + string.Join("\n", mismatches.Take(20)));
+            Debug.Log("[Hearthdelve] Kariaston's ground matches the mockup cell for cell.");
+        }
+
+        static Sprite ExpectedCell(KariastonGround.Autotile a, int column, int row)
+        {
+            if (a.file != KariastonSheets.Tiles) return MinifantasyImporter.Sprite(a.pack, a.file, $"Cell_{column}_{row}");
+            // The pond (Forgotten Plains' lake keeps its 4h part names).
+            string[,] parts = { { "TL", "L", "BL", "InNW", "InSW" }, { "T", "C", "B", "InNE", "InSE" }, { "TR", "R", "BR", "", "" } };
+            return MinifantasyImporter.Sprite(KariastonSheets.PlainsPack, KariastonSheets.Tiles, $"Water_{parts[column - a.column, row - a.row]}");
+        }
+
+        // ---- the dressing
+
+        /// <summary>Where each drawing is cut: its pack and file.</summary>
+        static (string pack, string file) SheetOf(string name) => name switch
+        {
+            "ThatchedHall" or "BlueRoofHall" or "BrownCottage" => (KariastonSheets.TownsIIPack, KariastonSheets.Buildings),
+            "TowerExterior" => (KariastonSheets.WizardTowerPack, KariastonSheets.Tower),
+            "PaintedWagon" => (KariastonSheets.WagonsPack, KariastonSheets.Wagons),
+            "Pedestal" or "Figure" or "Plaque" => (KariastonSheets.MonumentsPack, KariastonSheets.Monuments),
+            "Well" => (KariastonSheets.WellPack, KariastonSheets.Well),
+            "LampPost" or "BenchLong" or "Barrel" or "BarrelSmall" or "Crate" or "Planter" or "PlanterSmall" => (MinifantasySheets.MedievalCity, KariastonSheets.CityProps),
+            "Haystack" or "HayPile" or "Bales" or "Scarecrow" => (KariastonSheets.FarmPack, KariastonSheets.FarmProps),
+            "TankardBoard" or "PostSign" => (KariastonSheets.TownsPack, KariastonSheets.TownsProps),
+            _ when name.StartsWith("Fence_", StringComparison.Ordinal) => (KariastonSheets.FarmPack, KariastonSheets.FarmTiles),
+            _ => (KariastonSheets.FoliagePack, KariastonSheets.Foliage),
+        };
+
+        /// <summary>The scene's names for the village's landmarks (other drawings keep their own).</summary>
+        static readonly Dictionary<string, string> k_Landmarks = new()
+        {
+            ["ThatchedHall"] = "Tally Ho!", ["BlueRoofHall"] = "Maximo's House", ["BrownCottage"] = CottageName, ["TowerExterior"] = "Kaloren's Tower",
+            ["PaintedWagon"] = "Bart's Wagon", ["TankardBoard"] = "Tally Ho! Board", ["Well"] = "Well",
+        };
+
+        public const string CottageName = "Grim and Ogrin's Cottage", ShadowName = "Shadow";
+
+        public static Sprite Drawing(string name)
+        {
+            var (pack, file) = SheetOf(name);
+            return name == "TowerExterior" ? Single(pack, file) : Art(pack, file, name);
+        }
+
+        /// <summary>A drawing's Minifantasy shadow (cut by its own extent, pivoted at the drawing's pivot), or null.</summary>
+        public static Sprite ShadowOf(string name, string file = null)
+        {
+            foreach (KariastonSheets.ShadowCut cut in KariastonSheets.Shadows)
+                if (cut.name == name && (file == null || cut.file == file))
+                    return MinifantasyImporter.Sprites(KariastonSheets.ShadowPack(cut.file), cut.file).TryGetValue($"{cut.file}_{name}", out Sprite s) ? s : null;
+            return null;
+        }
+
+        /// <summary>Puts a drawing's shadow under it: a child on the floor, flipped with it.</summary>
+        public static void AddShadow(SpriteRenderer drawing, Sprite shadow)
+        {
+            if (shadow == null) return;
+            SpriteRenderer s = LookTestContent.AddSprite(drawing.transform, ShadowName, shadow, SortingLayers.Floor, 10, Vector3.zero);
+            s.flipX = drawing.flipX;
+        }
+
+        /// <summary>A drawing placed by its art's pixels (left, top, y down), whatever its pivot: exactly where the mockup draws it.</summary>
+        static Vector2 PositionOf(Placed p, Sprite sprite)
+        {
+            Vector2 pivot = sprite.pivot;
+            float w = sprite.rect.width, h = sprite.rect.height;
+            float x = p.left + (p.flip ? w - pivot.x : pivot.x);
+            float y = Height * MinifantasySheets.PixelsPerUnit - (p.top + h) + pivot.y;
+            return new Vector2(x, y) / MinifantasySheets.PixelsPerUnit;
+        }
+
+        static void PlaceDressing(Transform dressing, Layout layout)
+        {
+            Transform memorial = null;
+            Vector2 memorialAt = Vector2.zero;
+            foreach (Placed p in layout.sprites.OrderBy(s => s.name == "Pedestal" ? 0 : 1))
+            {
+                if (p.name == "CartOpen") continue;   // the market cart is a gameplay object (Market Stall)
+                Sprite sprite = Drawing(p.name) ?? throw new InvalidOperationException($"Kariaston: no drawing {p.name}.");
+                if (Mathf.RoundToInt(sprite.rect.width) != p.rect[2] || Mathf.RoundToInt(sprite.rect.height) != p.rect[3])
+                    throw new InvalidOperationException($"Kariaston: {p.name} is cut {sprite.rect.width}×{sprite.rect.height}, the layout says {p.rect[2]}×{p.rect[3]}.");
+                Vector2 at = PositionOf(p, sprite);
+                if (p.group == "Memorial")
+                {
+                    // Karias's memorial: one sorting group at the pedestal's foot; its shadow on the floor beside it.
+                    if (memorial == null)
+                    {
+                        memorial = new GameObject("Karias Memorial").transform;
+                        memorial.SetParent(Child(dressing, "Buildings"), false);
+                        memorial.localPosition = memorialAt = at;
+                        memorial.gameObject.AddComponent<SortingGroup>().sortingLayerName = SortingLayers.YSorted;
+                        var shadowGo = new GameObject("Karias Memorial Shadow");
+                        shadowGo.transform.SetParent(Child(dressing, "Buildings"), false);
+                        shadowGo.transform.localPosition = at;
+                        SpriteRenderer shadow = shadowGo.AddComponent<SpriteRenderer>();
+                        shadow.sprite = ShadowOf("Pedestal");
+                        shadow.sortingLayerName = SortingLayers.Floor;
+                        shadow.sortingOrder = 10;
+                        if (LookTestContent.LitSpriteMaterial != null) shadow.sharedMaterial = LookTestContent.LitSpriteMaterial;
+                    }
+                    SpriteRenderer part = Put(memorial, p.name, sprite, at - memorialAt);
+                    part.sortingOrder = p.name == "Pedestal" ? 0 : p.name == "Figure" ? 1 : 2;
+                    continue;
+                }
+                string name = k_Landmarks.TryGetValue(p.name, out string landmark) ? landmark : p.name;
+                SpriteRenderer r = Put(Child(dressing, p.group), name, sprite, at);
+                r.flipX = p.flip;
+                AddShadow(r, ShadowOf(p.name));
+                if (p.name == "BrownCottage") AddLitWindow(r.transform, VillageContent.OgrinWindow);
+            }
         }
 
         static Transform Child(Transform parent, string name)
@@ -149,60 +375,6 @@ namespace Hearthdelve.Editor
             var go = new GameObject(name).transform;
             go.SetParent(parent, false);
             return go;
-        }
-
-        // ---- ground: grass everywhere, dirt paths and the stone square, autotiled from Forgotten Plains' edges
-
-        static void PaintGround(Transform root)
-        {
-            var grid = new GameObject("Ground").AddComponent<Grid>();
-            grid.transform.SetParent(root, false);
-            Tilemap grass = LookTestBuilder.Layer(grid, "Grass", SortingLayers.Floor, 0, solid: false);
-            Tilemap paths = LookTestBuilder.Layer(grid, "Paths", SortingLayers.Floor, 1, solid: false);
-            Tilemap stone = LookTestBuilder.Layer(grid, "Square", SortingLayers.Floor, 2, solid: false);
-
-            var random = new System.Random(4);
-            string[] meadow = { "Grass0", "Grass0", "Grass0", "Grass1", "Grass2", "Grass3", "Grass4", "Grass5", "Grass6", "Grass7" };
-            for (int x = 0; x < Width; x++)
-            for (int y = 0; y < Height; y++)
-                grass.SetTile(new Vector3Int(x, y, 0), GroundTile(meadow[random.Next(meadow.Length)]));
-
-            var dirt = new HashSet<Vector2Int>();
-            void Rect(int x, int y, int w, int h)
-            {
-                for (int i = x; i < x + w; i++)
-                for (int j = y; j < y + h; j++)
-                    dirt.Add(new Vector2Int(i, j));
-            }
-            Rect(2, 7, Width - 3, 3);            // the main road, west to the closed road east
-            Rect(35, 9, 3, 3);                    // the road up into the square
-            Rect(35, 23, 3, 8);                   // the square up to Tally Ho!'s porch
-            Rect(20, 28, 18, 3);                  // Tally Ho!'s porch west to the garden
-            Rect(22, 30, 3, 5);                   // and up into the garden's open east side
-            Rect(12, 10, 3, 3);                   // up to Maximo's door
-            Rect(50, 10, 3, 3);                   // up to Grim and Ogrin's door
-            Rect(61, 10, 3, 3);                   // up to Kaloren's tower
-            Rect(43, 28, 4, 3);                   // east from the porch toward the empty plots
-            Paint(paths, dirt, "Dirt");
-
-            var square = new HashSet<Vector2Int>();
-            for (int x = Square.xMin; x < Square.xMax; x++)
-            for (int y = Square.yMin; y < Square.yMax; y++)
-                square.Add(new Vector2Int(x, y));
-            Paint(stone, square, "Stone");
-            PaintPond(grid);
-        }
-
-        /// <summary>The pond's own tilemap under the ground grid: animated lake tiles, solid (nobody wades in).</summary>
-        static void PaintPond(Grid grid)
-        {
-            Tilemap pond = LookTestBuilder.Layer(grid, "Pond", SortingLayers.Floor, 2, solid: true);
-            var cells = new HashSet<Vector2Int>();
-            foreach (RectInt r in Pond)
-                for (int x = r.xMin; x < r.xMax; x++)
-                for (int y = r.yMin; y < r.yMax; y++)
-                    cells.Add(new Vector2Int(x, y));
-            Paint(pond, cells, "Water");
         }
 
         public const string LitWindowName = "Lit Window";
@@ -221,108 +393,6 @@ namespace Hearthdelve.Editor
             lit.gameObject.AddComponent<LitWindow>().Configure(anchor);
         }
 
-        /// <summary>
-        /// Batch, once (2026-10-08): <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.AddLitWindowBatch</c> lays the lit window over
-        /// Grim and Ogrin's cottage in the existing, hand-owned village. Nothing else is touched; it does nothing if the cottage has one.
-        /// </summary>
-        public static void AddLitWindowBatch()
-        {
-            try
-            {
-                MinifantasyImporter.Import(KariastonSheets.Sheets());
-                var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-                Transform cottage = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true))
-                    .FirstOrDefault(t => t.name == "Grim and Ogrin's Cottage");
-                if (cottage == null) throw new InvalidOperationException($"{ScenePath} has no Grim and Ogrin's Cottage.");
-                if (cottage.Find(LitWindowName) != null) Debug.Log("[Hearthdelve] The cottage already has its lit window.");
-                else
-                {
-                    AddLitWindow(cottage, VillageContent.OgrinWindow);
-                    EditorSceneManager.MarkSceneDirty(scene);
-                    EditorSceneManager.SaveScene(scene);
-                    Debug.Log("[Hearthdelve] The cottage's lit window added.");
-                }
-                EditorApplication.Exit(0);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                EditorApplication.Exit(1);
-            }
-        }
-
-        /// <summary>Batch, once: <c>-executeMethod Hearthdelve.Editor.KariastonBuilder.AddPondBatch</c> adds the pond to the existing,
-        /// hand-owned village (nothing else is touched; does nothing if a Pond tilemap is already there).</summary>
-        public static void AddPondBatch()
-        {
-            try
-            {
-                MinifantasyImporter.Import(KariastonSheets.Sheets());
-                var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
-                GameObject rootGo = scene.GetRootGameObjects().FirstOrDefault(g => g.name == k_Root);
-                Grid ground = rootGo != null ? rootGo.transform.Find("Ground")?.GetComponent<Grid>() : null;
-                if (ground == null) throw new InvalidOperationException($"{ScenePath} has no {k_Root}/Ground grid.");
-                if (ground.transform.Find("Pond") != null) Debug.Log("[Hearthdelve] Kariaston already has its pond.");
-                else
-                {
-                    PaintPond(ground);
-                    EditorSceneManager.MarkSceneDirty(scene);
-                    EditorSceneManager.SaveScene(scene);
-                    Debug.Log("[Hearthdelve] Kariaston's pond added.");
-                }
-                EditorApplication.Exit(0);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                EditorApplication.Exit(1);
-            }
-        }
-
-        /// <summary>Autotiles a region (at least two cells wide everywhere) with the edge, corner and inner-corner pieces.</summary>
-        static void Paint(Tilemap map, HashSet<Vector2Int> cells, string kind)
-        {
-            foreach (Vector2Int c in cells)
-            {
-                bool n = cells.Contains(c + Vector2Int.up), s = cells.Contains(c + Vector2Int.down);
-                bool e = cells.Contains(c + Vector2Int.right), w = cells.Contains(c + Vector2Int.left);
-                string part =
-                    !n && !w ? "TL" : !n && !e ? "TR" : !s && !w ? "BL" : !s && !e ? "BR" :
-                    !n ? "T" : !s ? "B" : !w ? "L" : !e ? "R" :
-                    !cells.Contains(c + new Vector2Int(-1, 1)) ? "InNW" : !cells.Contains(c + new Vector2Int(1, 1)) ? "InNE" :
-                    !cells.Contains(c + new Vector2Int(-1, -1)) ? "InSW" : !cells.Contains(c + new Vector2Int(1, -1)) ? "InSE" : "C";
-                map.SetTile(new Vector3Int(c.x, c.y, 0), kind == "Water" ? WaterTile(part) : GroundTile($"{kind}_{part}"));
-            }
-        }
-
-        static Tile GroundTile(string name) => SheetTile(KariastonSheets.PlainsPack, KariastonSheets.Tiles, name, $"Kariaston_{name}");
-
-        /// <summary>One lake part, its two frames rippling; a whole-cell collider.</summary>
-        static AnimatedTile WaterTile(string part)
-        {
-            Sprite one = MinifantasyImporter.Sprite(KariastonSheets.PlainsPack, KariastonSheets.Tiles, $"Water_{part}");
-            Sprite two = MinifantasyImporter.Sprite(KariastonSheets.PlainsPack, KariastonSheets.Tiles, $"Water2_{part}");
-            if (one == null || two == null) throw new InvalidOperationException($"Kariaston: no water sprites for {part}.");
-            return LookTestContent.CreateOrUpdate<AnimatedTile>($"{EditorPaths.Tiles}/Kariaston_Water_{part}.asset", tile =>
-            {
-                tile.m_AnimatedSprites = new[] { one, two };
-                tile.m_MinSpeed = tile.m_MaxSpeed = 1f / k_WaterFrameSeconds;
-                tile.m_TileColliderType = Tile.ColliderType.Grid;
-            });
-        }
-
-        static Tile SheetTile(string pack, string file, string name, string asset)
-        {
-            Sprite sprite = MinifantasyImporter.Sprite(pack, file, name);
-            return LookTestContent.CreateOrUpdate<Tile>($"{EditorPaths.Tiles}/{asset}.asset", tile =>
-            {
-                tile.sprite = sprite;
-                tile.colliderType = Tile.ColliderType.None;
-            });
-        }
-
-        // ---- buildings and landmarks
-
         static Sprite Art(string pack, string file, string name) => MinifantasyImporter.Sprite(pack, file, name);
 
         static Sprite Single(string pack, string file) => MinifantasyImporter.Sprites(pack, file).Values.First();
@@ -331,159 +401,6 @@ namespace Hearthdelve.Editor
         {
             if (sprite == null) throw new InvalidOperationException($"Kariaston: no sprite for {name}.");
             return LookTestContent.AddSprite(parent, name, sprite, SortingLayers.YSorted, 0, at);
-        }
-
-        /// <summary>A solid footprint, in village cells, under <paramref name="parent"/> (relative to the village's origin).</summary>
-        static void Block(Transform parent, string name, Rect cells) => LookTestBuilder.Solid(parent, name, cells.center - (Vector2)parent.position + Origin, cells.size);
-
-        static void PlaceBuildings(Transform parent)
-        {
-            // Tally Ho! (the outside of it; inside is the Tavern scene): sorted at its wings' wall foot, the porch reaching lower.
-            Transform tally = Put(parent, "Tally Ho!", Art(KariastonSheets.TownsIIPack, KariastonSheets.Buildings, "ThatchedHall"), TallyHo).transform;
-            Block(tally, "Body", new Rect(TallyHo.x - 7.2f, TallyHo.y, 14.4f, 9f));
-            Block(tally, "Porch", new Rect(TallyHo.x - 1.4f, TallyHo.y - 1.8f, 2.8f, 1.8f));
-            Put(parent, "Tally Ho! Board", Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "TankardBoard"), new Vector2(40.6f, 29.9f));
-
-            Transform maximo = Put(parent, "Maximo's House", Art(KariastonSheets.TownsIIPack, KariastonSheets.Buildings, "BlueRoofHall"), MaximoHouse).transform;
-            Block(maximo, "Body", new Rect(MaximoHouse.x - 6.6f, MaximoHouse.y, 13.2f, 8f));
-            Block(maximo, "Porch", new Rect(MaximoHouse.x - 1.4f, MaximoHouse.y - 1.7f, 2.8f, 1.7f));
-
-            Transform grim = Put(parent, "Grim and Ogrin's Cottage", Art(KariastonSheets.TownsIIPack, KariastonSheets.Buildings, "BrownCottage"), GrimCottage).transform;
-            Block(grim, "Body", new Rect(GrimCottage.x - 3.4f, GrimCottage.y + 0.2f, 6.8f, 6f));
-            AddLitWindow(grim, VillageContent.OgrinWindow);
-
-            Transform tower = Put(parent, "Kaloren's Tower", Single(KariastonSheets.WizardTowerPack, KariastonSheets.Tower), KalorenTower).transform;
-            Block(tower, "Base", new Rect(KalorenTower.x - 1.5f, KalorenTower.y + 0.3f, 3f, 2.2f));
-
-            Transform wagon = Put(parent, "Bart's Wagon", Art(KariastonSheets.WagonsPack, KariastonSheets.Wagons, "PaintedWagon"), BartWagon).transform;
-            Block(wagon, "Wheels", new Rect(BartWagon.x - 1.6f, BartWagon.y + 0.1f, 3.2f, 1.6f));
-
-            // The well, and Karias's memorial (a pedestal with an old bronze figure; its look is a gameplay object).
-            Transform well = Put(parent, "Well", Art(KariastonSheets.WellPack, KariastonSheets.Well, "Well"), Well).transform;
-            Block(well, "Base", new Rect(Well.x - 1.2f, Well.y + 0.1f, 2.4f, 1.6f));
-            var memorial = new GameObject("Karias Memorial");
-            memorial.transform.SetParent(parent, false);
-            memorial.transform.localPosition = Memorial;
-            memorial.AddComponent<SortingGroup>().sortingLayerName = SortingLayers.YSorted;
-            Put(memorial.transform, "Pedestal", Art(KariastonSheets.MonumentsPack, KariastonSheets.Monuments, "Pedestal"), Vector2.zero);
-            SpriteRenderer figure = Put(memorial.transform, "Figure", Art(KariastonSheets.MonumentsPack, KariastonSheets.Monuments, "Figure"), new Vector2(0f, 2.5f));
-            figure.sortingOrder = 1;
-            SpriteRenderer plaque = Put(memorial.transform, "Plaque", Art(KariastonSheets.MonumentsPack, KariastonSheets.Monuments, "Plaque"), new Vector2(0f, -0.4f));
-            plaque.sortingOrder = 2;
-            Block(memorial.transform, "Base", new Rect(Memorial.x - 1f, Memorial.y, 2f, 1.4f));
-        }
-
-        static void PlaceGarden(Transform root, Transform parent)
-        {
-            // Four inert beds on Tally Ho!'s grounds (Checkpoint B gives them crops): tilled soil, 3×2 each, edged with grass.
-            Grid grid = root.Find("Ground").GetComponent<Grid>();
-            Tilemap beds = LookTestBuilder.Layer(grid, "Garden Beds", SortingLayers.Floor, 3, solid: false);
-            foreach (RectInt bed in GardenBeds)
-            {
-                var cells = new HashSet<Vector2Int>();
-                for (int x = bed.xMin; x < bed.xMax; x++)
-                for (int y = bed.yMin; y < bed.yMax; y++)
-                    cells.Add(new Vector2Int(x, y));
-                Paint(beds, cells, "Dirt");
-            }
-            Sprite fence = Art(KariastonSheets.FarmPack, KariastonSheets.FarmTiles, "FenceRun");
-            for (float x = 14.5f; x < 23.5f; x += 3f)
-            {
-                Put(parent, "Fence North", fence, new Vector2(x + 1.5f, 40.2f));
-                Put(parent, "Fence South", fence, new Vector2(x + 1.5f, 31.6f));
-            }
-            Put(parent, "Scarecrow", Art(KariastonSheets.FarmPack, KariastonSheets.FarmProps, "Scarecrow"), new Vector2(23.8f, 36.2f));
-            Put(parent, "Haystack", Art(KariastonSheets.FarmPack, KariastonSheets.FarmProps, "Haystack"), new Vector2(12.2f, 38.5f));
-            Put(parent, "Bales", Art(KariastonSheets.FarmPack, KariastonSheets.FarmProps, "Bales"), new Vector2(12.4f, 34.6f));
-            Put(parent, "Bucket", Art(KariastonSheets.FarmPack, KariastonSheets.FarmProps, "Bucket"), new Vector2(18.5f, 36.3f));
-        }
-
-        static void PlacePlots(Transform parent)
-        {
-            // Three empty residential plots (GDD Decided 23): fenced, with a sign. Nothing lives there yet.
-            Sprite fence = Art(KariastonSheets.FarmPack, KariastonSheets.FarmTiles, "FenceRun");
-            Sprite sign = Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "PostSign");
-            for (int i = 0; i < Plots.Length; i++)
-            {
-                RectInt plot = Plots[i];
-                Transform p = Child(parent, $"Plot {i + 1}");
-                for (float x = plot.xMin; x + 3f <= plot.xMax + 0.01f; x += 3f)
-                {
-                    Put(p, "Fence North", fence, new Vector2(x + 1.5f, plot.yMax - 0.4f));
-                    Put(p, "Fence South", fence, new Vector2(x + 1.5f, plot.yMin + 0.2f));
-                }
-                Put(p, "Sign", sign, new Vector2(plot.xMin + 0.8f, plot.yMin + 0.4f));
-            }
-            // The road east is closed for now (the expansion edge).
-            Put(parent, "Road East Sign", sign, new Vector2(68.6f, 10.6f));
-            Put(parent, "Road East Fence", fence, new Vector2(69.6f, 9.8f));
-            Put(parent, "Road East Fence Low", fence, new Vector2(69.6f, 7f));
-        }
-
-        static void PlaceTrees(Transform parent)
-        {
-            var random = new System.Random(11);
-            Sprite[] trees =
-            {
-                Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "TreeLarge"), Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "TreeMedium"),
-                Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "TreeSmall"),
-            };
-            Sprite[] bushes =
-            {
-                Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "Bush0"), Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "Bush1"),
-                Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "Bush2"), Art(KariastonSheets.FoliagePack, KariastonSheets.Foliage, "Bush3"),
-            };
-            void Tree(Vector2 at, int size)
-            {
-                SpriteRenderer t = Put(parent, "Tree", trees[size], at);
-                Block(t.transform, "Trunk", new Rect(at.x - 0.6f, at.y - 0.1f, 1.2f, 0.8f));
-            }
-            // The edges: a wood behind the village (north), and down both sides.
-            for (float x = 3f; x < Width - 2f; x += 9f + (float)random.NextDouble() * 3f) Tree(new Vector2(x, 45.2f), random.Next(2));
-            for (float y = 13f; y < 44f; y += 7f + (float)random.NextDouble() * 3f)
-            {
-                Tree(new Vector2(1.8f, y), random.Next(1, 3));
-                Tree(new Vector2(Width - 2f, y), random.Next(1, 3));
-            }
-            // A few in the village: one on the green, by the plots, behind the tower and the cottage.
-            Tree(new Vector2(6f, 33f), 1);
-            Tree(new Vector2(46f, 24f), 2);
-            Tree(new Vector2(8f, 28f), 1);
-            Tree(new Vector2(57f, 23f), 2);
-            Tree(new Vector2(29f, 3f), 1);
-            Tree(new Vector2(44f, 3f), 2);
-            // Bushes along the south edge and here and there.
-            for (float x = 2f; x < Width - 1f; x += 3.5f + (float)random.NextDouble() * 2f)
-                Put(parent, "Bush", bushes[random.Next(bushes.Length)], new Vector2(x, 0.4f));
-            foreach (Vector2 at in new[] { new Vector2(5f, 22f), new Vector2(26f, 32f), new Vector2(45f, 36f), new Vector2(66f, 26f), new Vector2(20f, 4f) })
-                Put(parent, "Bush", bushes[random.Next(bushes.Length)], at);
-        }
-
-        static void PlaceProps(Transform parent)
-        {
-            Sprite lamp = Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "LampPost");
-            foreach (Vector2 at in new[] { new Vector2(28.5f, 22.6f), new Vector2(43.5f, 22.6f), new Vector2(28.5f, 11.4f), new Vector2(43.5f, 11.4f), new Vector2(34.2f, 30.4f) })
-            {
-                SpriteRenderer l = Put(parent, "Lamp Post", lamp, at);
-                Block(l.transform, "Post", new Rect(at.x - 0.25f, at.y, 0.5f, 0.4f));
-            }
-            Sprite bench = Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "Bench");
-            foreach (Vector2 at in new[] { new Vector2(31.5f, 21.2f), new Vector2(40.5f, 21.2f), new Vector2(26.5f, 13.2f), new Vector2(22f, 24.2f) })
-            {
-                SpriteRenderer b = Put(parent, "Bench", bench, at);
-                Block(b.transform, "Seat", new Rect(at.x - 1f, at.y, 2f, 0.6f));
-            }
-            Put(parent, "Flower Box", Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "FlowerBox"), new Vector2(32f, 32.2f));
-            Put(parent, "Flower Box", Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "FlowerBoxRed"), new Vector2(40f, 32.2f));
-            Put(parent, "Flower Box", Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "FlowerBox"), new Vector2(16f, 13.2f));
-            Sprite barrel = Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "Barrel");
-            foreach (Vector2 at in new[] { new Vector2(44.2f, 31.2f), new Vector2(45.6f, 31.4f), new Vector2(44.8f, 32.6f), new Vector2(43.4f, 14.6f) })
-            {
-                SpriteRenderer b = Put(parent, "Barrel", barrel, at);
-                Block(b.transform, "Body", new Rect(at.x - 0.7f, at.y, 1.4f, 0.8f));
-            }
-            Put(parent, "Crate", Art(MinifantasySheets.MedievalCity, KariastonSheets.CityProps, "Crate"), new Vector2(42.4f, 13.4f));
-            Put(parent, "Trough", Art(KariastonSheets.FarmPack, KariastonSheets.FarmProps, "Trough"), new Vector2(55.5f, 11.4f));
         }
 
         // ------------------------------------------------------------------ gameplay objects (maintained, by name)
@@ -542,9 +459,17 @@ namespace Hearthdelve.Editor
         }
 
         /// <summary>
-        /// The drawings that block wherever they stand (2026-10-08): fences, sign posts and Tally Ho!'s board, with footprints measured
-        /// from each drawing's own pixels (<see cref="Measure"/>). <see cref="DressingCollision"/> also makes the water solid by tile.
-        /// To make another drawing solid, add it here and run the surface updater.
+        /// The drawings that block wherever they stand, by what they are (2026-10-08; the Crossroads, 2026-10-10), every footprint
+        /// measured from the drawing's own pixels:
+        /// <list type="bullet">
+        /// <item>small props (fences, signs, the board, lamps, benches, barrels, the crate, planters, the plaque) at their base
+        /// (<see cref="Measure"/>);</item>
+        /// <item>tall drawings (trees, the halls, the cottage, the tower, the wagon, the well, the memorial's pedestal) over the ground
+        /// where they would hide a figure standing behind them (<see cref="Hides"/>), so the keeper and the villagers are never lost
+        /// behind a canopy or a roof; the halls' porch steps too (<see cref="Porch"/>).</item>
+        /// </list>
+        /// Bushes, flowers, the hay and the scarecrow stay walk-through. <see cref="DressingCollision"/> also makes the water solid by
+        /// tile. To make another drawing solid, add it here and run the surface updater.
         /// </summary>
         static void BuildDressingCollision(Transform gameplay)
         {
@@ -556,7 +481,141 @@ namespace Hearthdelve.Editor
                 Measure(Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "PostSign"), depthPixels: 2),
                 Measure(Art(KariastonSheets.TownsPack, KariastonSheets.TownsProps, "TankardBoard"), depthPixels: 2),
             };
+            foreach (var (name, _, _) in KariastonSheets.ThinFence) solids.Add(Measure(Drawing(name), depthPixels: 8));
+            foreach (var (name, depth) in SmallProps) solids.Add(Measure(Drawing(name), depth));
+            foreach (string name in TallDrawings)
+            {
+                Sprite sprite = Drawing(name);
+                solids.AddRange(Hides(sprite));
+                if (name is "ThatchedHall" or "BlueRoofHall") solids.Add(Porch(sprite));
+            }
             go.AddComponent<DressingCollision>().Configure(solids);
+        }
+
+        /// <summary>Props solid at their base: the drawing and how many pixels of its foot.</summary>
+        public static readonly (string name, int depth)[] SmallProps =
+        {
+            ("LampPost", 3), ("BenchLong", 3), ("Barrel", 3), ("BarrelSmall", 3), ("Crate", 4), ("Planter", 3), ("PlanterSmall", 3), ("Plaque", 3),
+        };
+
+        /// <summary>The drawings tall enough to hide someone behind them.</summary>
+        public static readonly string[] TallDrawings =
+        {
+            "ThatchedHall", "BlueRoofHall", "BrownCottage", "TowerExterior", "PaintedWagon", "Well", "Pedestal", "TreeLarge", "TreeMedium", "TreeSmall",
+        };
+
+        /// <summary>A figure, for <see cref="Hides"/>: as wide and tall as the keeper's drawn body, in pixels; hidden past this share.</summary>
+        const float k_FigureWidth = 6.4f, k_FigureHeight = 10f, k_HiddenShare = 0.3f;
+        /// <summary>The bands <see cref="Hides"/> merges its footprint from (pixels).</summary>
+        const int k_Band = 4;
+
+        static bool[,] OpaqueMask(Sprite sprite)
+        {
+            var source = new Texture2D(2, 2);
+            source.LoadImage(File.ReadAllBytes(AssetDatabase.GetAssetPath(sprite.texture)));
+            Rect r = sprite.rect;
+            int x0 = (int)r.x, y0 = (int)r.y, w = (int)r.width, h = (int)r.height;
+            var mask = new bool[w, h];
+            for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                mask[x, y] = source.GetPixel(x0 + x, y0 + y).a > 0.5f;
+            Object.DestroyImmediate(source);
+            return mask;
+        }
+
+        /// <summary>
+        /// Where a tall drawing would hide a figure: every foot position behind its sort point (above its pivot) from which more than
+        /// <see cref="k_HiddenShare"/> of a keeper-sized body is under the drawing's opaque pixels, as boxes (bands of
+        /// <see cref="k_Band"/> pixels, runs merged), starting at the pivot (the Y-sort rule: nobody stops behind it and is drawn over).
+        /// </summary>
+        internal static List<DressingCollision.Solid> Hides(Sprite sprite)
+        {
+            bool[,] opaque = OpaqueMask(sprite);
+            int w = opaque.GetLength(0), h = opaque.GetLength(1);
+            var pivot = sprite.pivot;
+            int[,] sum = new int[w + 1, h + 1];   // summed area of the opaque pixels
+            for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++)
+                sum[x + 1, y + 1] = (opaque[x, y] ? 1 : 0) + sum[x, y + 1] + sum[x + 1, y] - sum[x, y];
+            int Count(int ax, int ay, int bx, int by)
+            {
+                ax = Mathf.Clamp(ax, 0, w); bx = Mathf.Clamp(bx, 0, w); ay = Mathf.Clamp(ay, 0, h); by = Mathf.Clamp(by, 0, h);
+                return ax >= bx || ay >= by ? 0 : sum[bx, by] - sum[ax, by] - sum[bx, ay] + sum[ax, ay];
+            }
+            bool Hidden(int fx, int fy)
+            {
+                int ax = Mathf.RoundToInt(fx - k_FigureWidth / 2f), bx = Mathf.RoundToInt(fx + k_FigureWidth / 2f);
+                int ay = fy, by = Mathf.RoundToInt(fy + k_FigureHeight);
+                return Count(ax, ay, bx, by) > k_HiddenShare * (bx - ax) * (by - ay);
+            }
+
+            var bands = new List<(int y0, int y1, List<(int x0, int x1)> runs)>();
+            for (int y0 = Mathf.CeilToInt(pivot.y); y0 < h; y0 += k_Band)
+            {
+                int y1 = Mathf.Min(h, y0 + k_Band);
+                var runs = new List<(int, int)>();
+                int start = int.MinValue;
+                for (int x = -8; x <= w + 8; x++)
+                {
+                    bool hidden = false;
+                    for (int y = y0; y < y1 && !hidden; y++) hidden = x <= w + 7 && Hidden(x, y);
+                    if (hidden && start == int.MinValue) start = x;
+                    if (!hidden && start != int.MinValue)
+                    {
+                        runs.Add((start, x));
+                        start = int.MinValue;
+                    }
+                }
+                if (runs.Count > 0) bands.Add((y0, y1, runs));
+            }
+            // Merge each run with the same run in the band above while its ends stay within a pixel.
+            var boxes = new List<RectInt>();
+            foreach (var (y0, y1, runs) in bands)
+            foreach (var (x0, x1) in runs)
+            {
+                int i = boxes.FindIndex(b => b.yMax == y0 && Mathf.Abs(b.xMin - x0) <= 1 && Mathf.Abs(b.xMax - x1) <= 1);
+                if (i >= 0) boxes[i] = new RectInt(Mathf.Min(boxes[i].xMin, x0), boxes[i].yMin, Mathf.Max(boxes[i].xMax, x1) - Mathf.Min(boxes[i].xMin, x0), y1 - boxes[i].yMin);
+                else boxes.Add(new RectInt(x0, y0, x1 - x0, y1 - y0));
+            }
+            float ppu = sprite.pixelsPerUnit;
+            int firstBand = Mathf.CeilToInt(pivot.y);
+            return boxes.Select(b =>
+            {
+                float bottom = b.yMin == firstBand ? pivot.y : b.yMin;   // the lowest boxes reach down to the pivot exactly
+                return new DressingCollision.Solid
+                {
+                    sprite = sprite,
+                    offset = new Vector2((b.center.x - pivot.x) / ppu, ((bottom + b.yMax) / 2f - pivot.y) / ppu),
+                    size = new Vector2(b.width / ppu, (b.yMax - bottom) / ppu),
+                };
+            }).ToList();
+        }
+
+        /// <summary>
+        /// A hall's porch steps, below its pivot (the wings' wall foot): solid from half a tile above the art's bottom, so the door's
+        /// trigger at the steps' foot can be stood in, as wide as the steps' pixels there.
+        /// </summary>
+        internal static DressingCollision.Solid Porch(Sprite sprite)
+        {
+            bool[,] opaque = OpaqueMask(sprite);
+            int w = opaque.GetLength(0), h = opaque.GetLength(1), top = Mathf.FloorToInt(sprite.pivot.y);
+            int bottom = Enumerable.Range(0, h).First(y => Enumerable.Range(0, w).Any(x => opaque[x, y])) + 4;
+            int left = w, right = -1;
+            for (int y = bottom; y < top; y++)
+            for (int x = 0; x < w; x++)
+                if (opaque[x, y])
+                {
+                    left = Mathf.Min(left, x);
+                    right = Mathf.Max(right, x);
+                }
+            float ppu = sprite.pixelsPerUnit;
+            Vector2 pivot = sprite.pivot;
+            return new DressingCollision.Solid
+            {
+                sprite = sprite,
+                offset = new Vector2(((left + right + 1) / 2f - pivot.x) / ppu, ((bottom + top) / 2f - pivot.y) / ppu),
+                size = new Vector2((right - left + 1) / ppu, (top - bottom) / ppu),
+            };
         }
 
         /// <summary>
@@ -599,6 +658,9 @@ namespace Hearthdelve.Editor
             };
         }
 
+        /// <summary>A solid footprint, in village cells, under <paramref name="parent"/> (relative to the village's origin).</summary>
+        static void Block(Transform parent, string name, Rect cells) => LookTestBuilder.Solid(parent, name, cells.center - (Vector2)parent.position + Origin, cells.size);
+
         static void BuildMarket(Transform gameplay)
         {
             var stall = new GameObject("Market Stall");
@@ -607,6 +669,8 @@ namespace Hearthdelve.Editor
             SpriteRenderer open = Put(stall.transform, "Open", Art(KariastonSheets.MerchantPack, KariastonSheets.CartOpen, "Cart"), Vector2.zero);
             SpriteRenderer closed = Put(stall.transform, "Closed", Art(KariastonSheets.MerchantPack, KariastonSheets.CartClosed, "Cart"), Vector2.zero);
             closed.gameObject.SetActive(false);
+            AddShadow(open, ShadowOf("Cart", KariastonSheets.CartOpenShadow));
+            AddShadow(closed, ShadowOf("Cart", KariastonSheets.CartClosedShadow));
             // Deep enough that nobody stands where the canopy (6¼ tiles of art) hides them whole (the owner's Checkpoint A playtest).
             Block(stall.transform, "Body", new Rect(Market.x - 2.6f, Market.y + 0.4f, 5.2f, 4.6f));
             var use = new GameObject("Use");
@@ -616,8 +680,8 @@ namespace Hearthdelve.Editor
             stall.AddComponent<MarketStall>().Configure(interactable, open.gameObject, closed.gameObject, SurfaceLocKeys.MarketClosed);
         }
 
-        /// <summary>Where Musashi stands (village cells): at the market cart's front-left corner, facing the square.</summary>
-        public static readonly Vector2 MusashiSpot = new(36.9f, 12.5f);
+        /// <summary>Where Musashi stands (village cells): his schedule's place, at the market cart's front-left corner.</summary>
+        public static Vector2 MusashiSpot => VillageContent.KariastonAnchors.First(a => a.id == VillageContent.MarketCart).at;
 
         /// <summary>
         /// Musashi (2026-10-07, the owner's canon), who keeps the market cart: a standing villager in A Myriad of NPCs' layers (an
@@ -684,7 +748,7 @@ namespace Hearthdelve.Editor
             // Ogrin's window: a small warm glow while he's in bed behind it.
             var glow = new GameObject("Ogrin's Window Glow");
             glow.transform.SetParent(people, false);
-            glow.transform.localPosition = new Vector2(53.0f, 13.6f);
+            glow.transform.localPosition = Cottage + new Vector2(2f, 1.1f);   // the cottage's right ground-floor window
             Light2D light = glow.AddComponent<Light2D>();
             light.lightType = Light2D.LightType.Point;
             light.color = new Color(1f, 0.78f, 0.45f);
@@ -725,7 +789,7 @@ namespace Hearthdelve.Editor
         {
             var root = new GameObject("Ogrin's Window Light");
             root.transform.SetParent(people, false);
-            root.transform.localPosition = new Vector2(53.0f, 13.9f);
+            root.transform.localPosition = Cottage + new Vector2(2f, 1.4f);
             var moteGo = new GameObject("Mote");
             moteGo.transform.SetParent(root.transform, false);
             SpriteRenderer mote = moteGo.AddComponent<SpriteRenderer>();
@@ -791,10 +855,12 @@ namespace Hearthdelve.Editor
                 var use = new GameObject("Use");
                 use.transform.SetParent(bed.transform, false);
                 var interactable = use.AddComponent<TavernInteractable>();
+                // Reached from any side: below the plants, beside them, and above the soil's back row.
                 float w = cells.width / 2f + 0.45f, h = cells.height / 2f + 0.45f;
                 interactable.Configure(TavernInteractableKind.GardenBed, GardenText.Plant, new Vector2(0f, -h), 1.2f, null,
-                    new[] { new Vector2(0f, h), new Vector2(-w, 0f), new Vector2(w, 0f) });
-                bed.AddComponent<GardenBed>().Configure(GardenBedIds[i], interactable, plants.ToArray(), soil, cells, action, plant, tend, harvest);
+                    new[] { new Vector2(0f, h + 1f), new Vector2(-w, 0f), new Vector2(w, 0f) });
+                // The whole soil (plants' cells and the row behind them) darkens when tended.
+                bed.AddComponent<GardenBed>().Configure(GardenBedIds[i], interactable, plants.ToArray(), soil, GardenSoil(i), action, plant, tend, harvest);
             }
         }
 
@@ -804,18 +870,21 @@ namespace Hearthdelve.Editor
             look.transform.SetParent(gameplay, false);
             look.transform.localPosition = Memorial;
             var interactable = look.AddComponent<TavernInteractable>();
-            interactable.Configure(TavernInteractableKind.Inspect, SurfaceLocKeys.LookMemorial, new Vector2(0f, -0.9f), 1.1f, null);
+            interactable.Configure(TavernInteractableKind.Inspect, SurfaceLocKeys.LookMemorial, new Vector2(0f, -1.6f), 1.1f, null);   // in front of the plaque
             look.AddComponent<DaytimeFixture>().Configure(SurfaceConversations.Memorial);
         }
 
-        /// <summary>The village's edges: nobody walks off the map.</summary>
+        /// <summary>
+        /// The village's edges: nobody walks off the map (one tile at every border; the trees' own footprints close the rest). Where
+        /// the roads leave, the keeper stops at the edge and the camera never shows past it.
+        /// </summary>
         static void BuildEdges(Transform gameplay)
         {
             Transform edges = Child(gameplay, "Edges");
             LookTestBuilder.Solid(edges, "West", new Vector2(0.5f, Height / 2f), new Vector2(1f, Height));
             LookTestBuilder.Solid(edges, "East", new Vector2(Width - 0.5f, Height / 2f), new Vector2(1f, Height));
-            LookTestBuilder.Solid(edges, "South", new Vector2(Width / 2f, 0.25f), new Vector2(Width, 0.5f));
-            LookTestBuilder.Solid(edges, "North", new Vector2(Width / 2f, Height - 2.5f), new Vector2(Width, 5f));
+            LookTestBuilder.Solid(edges, "South", new Vector2(Width / 2f, 0.5f), new Vector2(Width, 1f));
+            LookTestBuilder.Solid(edges, "North", new Vector2(Width / 2f, Height - 0.5f), new Vector2(Width, 1f));
         }
     }
 }
