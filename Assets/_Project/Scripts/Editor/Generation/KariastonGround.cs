@@ -98,6 +98,13 @@ namespace Hearthdelve.Editor
             yield return (diagonals, new[] { This, NotThis, NotThis, This }, new Vector2Int(2, 4));
         }
 
+        /// <summary>The sprite (first frame) a rule tile should show for a part of its block (the tests hold the tiles to the script).</summary>
+        public static Sprite PartSprite(string name, Vector2Int part)
+        {
+            Autotile a = Autotiles[name];
+            return Cell(a, a.column + part.x, a.row + part.y);
+        }
+
         static Sprite Cell(Autotile a, int column, int row)
         {
             Sprite sprite = a.file == KariastonSheets.Tiles ? PlainsCell(column, row) : MinifantasyImporter.Sprite(a.pack, a.file, $"Cell_{column}_{row}");

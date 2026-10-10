@@ -33,7 +33,7 @@ namespace Hearthdelve.Tests.PlayMode
     public class VillageCheckpointDTests : BootFixture
     {
         static VillagePresence Presence => VillagePresence.Instance;
-        static readonly Vector2 k_Origin = new(200f, 0f);
+        static readonly Vector2 k_Origin = VillageSpots.Origin;
 
         /// <summary>
         /// The first free day (day 2), the keeper waking upstairs; the clock held unless <paramref name="hold"/> is off.
@@ -182,7 +182,7 @@ namespace Hearthdelve.Tests.PlayMode
                 maxRealSecondsPerFrame = 0.1f, displayStepMinutes = 10, marketOpenMinute = 480, marketCloseMinute = 1020,
             };
             Outside();
-            KeeperAtVillage(new Vector2(38f, 9f));
+            KeeperAtVillage(VillageSpots.ByTheMarket);
             yield return At(12 * 60);
             yield return Fast(WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market"));
             IBarkService barks = StoryServices.Barks;
@@ -223,7 +223,7 @@ namespace Hearthdelve.Tests.PlayMode
                 maxRealSecondsPerFrame = 0.1f, displayStepMinutes = 10, marketOpenMinute = 480, marketCloseMinute = 1020,
             };
             Outside();
-            KeeperAtVillage(new Vector2(38f, 9f));
+            KeeperAtVillage(VillageSpots.ByTheMarket);
             yield return At(12 * 60);
             yield return Fast(WaitUntil(() => !Here(CharacterIds.Bart).Walking, 30f, "Bart at the market"));
             IBarkService barks = StoryServices.Barks;
@@ -305,7 +305,7 @@ namespace Hearthdelve.Tests.PlayMode
             // A lit evening today and a dark one tomorrow: both within two days.
             yield return Daytime(seed: (s, v) => VillageDays.GlimmerEvening(s, 2, v) && !VillageDays.GlimmerEvening(s, 3, v), gimpSeen: true);
             Outside();
-            KeeperAtVillage(new Vector2(50f, 9f));
+            KeeperAtVillage(VillageSpots.BeforeTheCottage);
             bool sawLit = false, sawDark = false;
             for (int i = 0; i < 10 && !(sawLit && sawDark); i++)
             {
@@ -313,7 +313,7 @@ namespace Hearthdelve.Tests.PlayMode
                 {
                     yield return NextDay();
                     Outside();
-                    KeeperAtVillage(new Vector2(50f, 9f));
+                    KeeperAtVillage(VillageSpots.BeforeTheCottage);
                 }
                 yield return At(17 * 60);
                 yield return Fast(WaitUntil(() => Here(CharacterIds.Ogrin).Indoors, 30f, "Ogrin home"));
@@ -355,7 +355,7 @@ namespace Hearthdelve.Tests.PlayMode
             };
             AmbientMoments.ResetForTests();
             Outside();
-            KeeperAtVillage(new Vector2(38f, 9f));
+            KeeperAtVillage(VillageSpots.ByTheMarket);
             yield return At(12 * 60);
             yield return WaitUntil(() => StoryServices.Barks.IsBarking, 30f, "an exchange");
             yield return new WaitForSecondsRealtime(0.6f);
@@ -403,22 +403,24 @@ namespace Hearthdelve.Tests.PlayMode
             Outside();
             yield return new WaitForFixedUpdate();
             int obstacles = LayerMask.GetMask("Obstacles");
-            foreach (Vector2 tile in new[] { new Vector2(12f, 25f), new Vector2(8f, 24.5f), new Vector2(13f, 27f) })
+            foreach (Vector2 tile in VillageSpots.Pond)
                 Assert.That(Physics2D.OverlapPoint(k_Origin + tile, obstacles), Is.Not.Null, $"the pond at {tile} is solid");
             // The keeper, moving north from the bank, is stopped by the water.
-            KeeperAtVillage(new Vector2(12f, 22.6f));
+            KeeperAtVillage(VillageSpots.PondSouthBank);
             yield return new WaitForFixedUpdate();
             var hits = new RaycastHit2D[4];
             int n = Keeper.Cast(Vector2.up, hits, 3f);
             Assert.That(Enumerable.Range(0, n).Any(i => hits[i].collider.name == "Pond"), Is.True, "walking north runs into the pond");
             var grid = Object.FindObjectsByType<Hearthdelve.Shared.Navigation.NavGrid>(FindObjectsSortMode.None).Single(g => g.gameObject.scene == Dressing.gameObject.scene);
             if (!grid.IsBaked) grid.Bake();
-            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(k_Origin + new Vector2(12f, 25f))), Is.False, "villagers path round it too");
+            Assert.That(grid.Map.IsWalkable(grid.Space.ToCell(k_Origin + VillageSpots.Pond[0])), Is.False, "villagers path round it too");
 
             // Every fence, sign and Tally Ho!'s board, at its own base.
             var drawings = Dressing.Solids.Select(s => s.sprite).ToHashSet();
-            var props = Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None).Where(r => drawings.Contains(r.sprite)).ToList();
-            Assert.That(props.Count(r => r.sprite.name.Contains("FenceRun")), Is.GreaterThan(10), "the fences");
+            // (The Crossroads' thin fence, tile by tile; the tall drawings' footprints, over the ground they'd hide, are KariastonWalkTests' and the layout tests'.)
+            var props = Object.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None)
+                .Where(r => drawings.Contains(r.sprite) && (r.sprite.name.Contains("_Fence_") || r.sprite.name.Contains("TankardBoard") || r.sprite.name.Contains("PostSign"))).ToList();
+            Assert.That(props.Count(r => r.sprite.name.Contains("_Fence_")), Is.GreaterThan(10), "the fences");
             Assert.That(props.Any(r => r.sprite.name.Contains("TankardBoard")), Is.True, "Tally Ho!'s board");
             Assert.That(props.Any(r => r.sprite.name.Contains("PostSign")), Is.True, "the sign posts");
             foreach (SpriteRenderer prop in props)
@@ -428,7 +430,9 @@ namespace Hearthdelve.Tests.PlayMode
                 Assert.That(footprint.gameObject.layer, Is.EqualTo(LayerMask.NameToLayer("Obstacles")));
                 // The footprint sits at the bottom of the art: inside the drawing, at its foot (the Y-sort rule).
                 Assert.That(footprint.bounds.min.y, Is.GreaterThanOrEqualTo(prop.bounds.min.y - 0.01f), prop.name);
-                Assert.That(footprint.bounds.max.y, Is.LessThanOrEqualTo(prop.bounds.min.y + 0.6f), $"{prop.name}: only the base, not the whole drawing");
+                // A fence tile's post is solid its whole (one-tile) height; a sign or the board only at its foot.
+                float depth = prop.sprite.name.Contains("_Fence_") ? 1.01f : 0.6f;
+                Assert.That(footprint.bounds.max.y, Is.LessThanOrEqualTo(prop.bounds.min.y + depth), $"{prop.name}: only the base, not the whole drawing");
             }
 
             // A fence put anywhere: solid where it was put, without any wall being placed.
@@ -480,7 +484,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Daytime();
             Outside();
-            KeeperAtVillage(new Vector2(50f, 9.5f));
+            KeeperAtVillage(VillageSpots.BeforeTheCottage);
             yield return At(17 * 60);
             yield return WaitUntil(() => Villager.All.Any(v => v.CharacterId == CharacterIds.Ogrin && v.Shown && v.Indoors), 60f, "Ogrin home");
             yield return new WaitForSecondsRealtime(1f);
@@ -504,10 +508,10 @@ namespace Hearthdelve.Tests.PlayMode
             foreach (SpriteRenderer r in Keeper.GetComponentsInChildren<SpriteRenderer>(true)) r.enabled = false;
             var shots = new (string name, Vector2 tile, int minute)[]
             {
-                ("tallyho_left", new Vector2(51f, 31f), 15 * 60 + 30),
-                ("tallyho_right", new Vector2(22f, 32f), 15 * 60 + 30),
-                ("tallyho_right_low", new Vector2(23f, 29f), 15 * 60 + 30),
-                ("tallyho_left_low", new Vector2(50f, 28f), 15 * 60 + 30),
+                ("tallyho_left", VillageSpots.TallyHoLeft, 15 * 60 + 30),
+                ("tallyho_right", VillageSpots.TallyHoRight, 15 * 60 + 30),
+                ("tallyho_right_low", VillageSpots.TallyHoRightLow, 15 * 60 + 30),
+                ("tallyho_left_low", VillageSpots.TallyHoLeftLow, 15 * 60 + 30),
             };
             foreach (var (name, tile, minute) in shots)
             {
@@ -539,12 +543,12 @@ namespace Hearthdelve.Tests.PlayMode
             TavernEveningCaptures.Capture($"{out_}/tavern_day.png");
 
             Outside();
-            KeeperAtVillage(new Vector2(36f, 15.5f));
+            KeeperAtVillage(VillageSpots.SquareSouth);
             yield return At(9 * 60);
             yield return new WaitForSecondsRealtime(1.5f);
             TavernEveningCaptures.Capture($"{out_}/village_square.png");
 
-            KeeperAtVillage(new Vector2(36.9f, 10.9f));
+            KeeperAtVillage(VillageSpots.BeforeMusashi);
             yield return Frames(3);
             Here(CharacterIds.Musashi).Talk.Use();
             yield return new WaitForSecondsRealtime(2f);
@@ -562,7 +566,7 @@ namespace Hearthdelve.Tests.PlayMode
             Object.FindAnyObjectByType<Hearthdelve.UI.Tavern.GardenPanel>()?.Close();
             yield return Frames(3);
 
-            KeeperAtVillage(new Vector2(24f, 19f));
+            KeeperAtVillage(VillageSpots.TheGreen);
             yield return At(15 * 60);
             yield return WaitUntil(() => !Here(CharacterIds.Bart).Walking, 40f, "Bart on the green");
             yield return new WaitForSecondsRealtime(2f);

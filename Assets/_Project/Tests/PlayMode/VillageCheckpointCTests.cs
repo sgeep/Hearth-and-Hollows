@@ -30,7 +30,7 @@ namespace Hearthdelve.Tests.PlayMode
     public class VillageCheckpointCTests : BootFixture
     {
         static VillagePresence Presence => VillagePresence.Instance;
-        static readonly Vector2 k_Origin = new(200f, 0f);   // Kariaston's origin (KariastonBuilder.Origin)
+        static readonly Vector2 k_Origin = VillageSpots.Origin;   // Kariaston's origin (KariastonBuilder.Origin)
 
         /// <summary>The schedules' named places (VillageContent's anchors).</summary>
         static class Spots
@@ -126,7 +126,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator EveryoneLivesInKariaston_OneOfEach_AndTalkingOpensTheirFirstMeeting()
         {
             yield return Daytime();
-            KeeperAt(new Vector2(36f, 15f));
+            KeeperAt(VillageSpots.Square);
             yield return At(9 * 60);
             foreach (string id in k_People)
             {
@@ -165,8 +165,8 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator AtABeat_TheySeenWalkToTheirNextPlace_AndTheUnseenAreSimplyThere()
         {
             yield return Daytime();
-            // Near Bart's wagon: at eleven he walks to the market (the keeper sees him go).
-            KeeperAt(new Vector2(28f, 12f));
+            // Between Bart's wagon and the market: at eleven he walks over (the keeper sees him go).
+            KeeperAt(VillageSpots.BetweenWagonAndMarket);
             yield return At(10 * 60 + 50);
             Assert.That(Here(CharacterIds.Bart).At.Id, Is.EqualTo(Spots.BartWagon));
             Vector2 from = Here(CharacterIds.Bart).transform.position;
@@ -185,7 +185,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Here(CharacterIds.Bart).Talk.IsAvailable, "talkable once he's there");
 
             // Far across the village from Kaloren's tower: at eleven he's simply at the square's bench.
-            KeeperAt(new Vector2(8f, 10f));
+            KeeperAt(VillageSpots.FarWest);
             yield return At(10 * 60 + 55);
             yield return At(11 * 60 + 10);
             Villager kaloren = Here(CharacterIds.Kaloren);
@@ -197,7 +197,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Daytime();
             // Watching him from the square: he walks to Tally Ho!'s door and in.
-            KeeperAt(new Vector2(36f, 22f));
+            KeeperAt(VillageSpots.Square);
             yield return At(10 * 60 + 50);
             Assert.That(Here(CharacterIds.Maximo).At.Id, Is.EqualTo(Spots.MemorialSquare));
             yield return At(11 * 60);
@@ -234,7 +234,7 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(VillageDays.HerbDay(world.Seed, Flow.State.Day, world.Settings), "a herb day (the seed pinned)");
             HerbVisit visit = Object.FindAnyObjectByType<HerbVisit>();
 
-            KeeperAt(new Vector2(57f, 9f));
+            KeeperAt(VillageSpots.EastRoad);
             yield return At(9 * 60 + 20);
             Assert.That(Here(CharacterIds.Kaloren).At.Id, Is.EqualTo(Spots.KalorenTower));
             yield return At(9 * 60 + 30);
@@ -253,7 +253,7 @@ namespace Hearthdelve.Tests.PlayMode
             yield return SaveQuitAndContinue(() => InDaytimeNow, "the daytime");
             SurfacePause.Hold(ClockHold);
             Outside();
-            KeeperAt(new Vector2(57f, 9f));
+            KeeperAt(VillageSpots.EastRoad);
             yield return Frames(3);
             Presence.Refresh();
             yield return Frames(2);
@@ -271,7 +271,7 @@ namespace Hearthdelve.Tests.PlayMode
             for (int i = 0; i < 2; i++)
             {
                 if (i > 0) yield return NextVillageDay(outside: true);
-                KeeperAt(new Vector2(50f, 9f));
+                KeeperAt(VillageSpots.BeforeTheCottage);
                 yield return At(9 * 60);
                 ScheduleWorld world = VillageLife.World().Value;
                 bool well = VillageDays.OgrinWell(world.Seed, Flow.State.Day, world.Settings);
@@ -302,7 +302,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator AtFive_EveryoneIsSomewhereFindable_AndNothingIsForced()
         {
             yield return Daytime();
-            KeeperAt(new Vector2(36f, 15f));
+            KeeperAt(VillageSpots.Square);
             yield return At(17 * 60);
             yield return Fast(Settled());
             foreach (string id in k_People)
@@ -319,7 +319,7 @@ namespace Hearthdelve.Tests.PlayMode
         public IEnumerator ASaveAndContinue_RebuildsTheVillage_FromTheClockAlone()
         {
             yield return Daytime();
-            KeeperAt(new Vector2(36f, 15f));
+            KeeperAt(VillageSpots.Square);
             yield return At(12 * 60 + 10);
             yield return Fast(Settled());
             var before = k_People.ToDictionary(id => id, id => (Here(id).At?.Id, Here(id).Activity));
@@ -345,9 +345,9 @@ namespace Hearthdelve.Tests.PlayMode
             yield return Daytime();
             foreach (var (minute, at, name) in new[]
             {
-                (9 * 60, new Vector2(35f, 14f), "morning_square"), (9 * 60 + 40, new Vector2(55f, 12f), "morning_cottage"),
-                (12 * 60 + 30, new Vector2(38f, 14f), "midday_market"), (15 * 60, new Vector2(24f, 20f), "afternoon_green"),
-                (17 * 60, new Vector2(30f, 14f), "evening"),
+                (9 * 60, VillageSpots.SquareSouth, "morning_square"), (9 * 60 + 40, VillageSpots.BeforeTheCottage, "morning_cottage"),
+                (12 * 60 + 30, VillageSpots.ByTheMarket, "midday_market"), (15 * 60, VillageSpots.TheGreen, "afternoon_green"),
+                (17 * 60, VillageSpots.SquareSouth, "evening"),
             })
             {
                 KeeperAt(at);
@@ -356,7 +356,7 @@ namespace Hearthdelve.Tests.PlayMode
                 yield return new WaitForSecondsRealtime(1.5f);
                 TavernEveningCaptures.Capture($"BatchLogs/village_{name}.png");
             }
-            KeeperAt(new Vector2(35f, 15.5f));
+            KeeperAt(VillageSpots.SquareSouth);
             yield return At(9 * 60);
             yield return Settled();
             Here(CharacterIds.Maximo).Talk.Use();
@@ -450,7 +450,7 @@ namespace Hearthdelve.Tests.PlayMode
         {
             yield return Daytime();
             Vector2 market = AnchorAt(Spots.MarketSide) - k_Origin;
-            KeeperAt(market + new Vector2(0f, -6f));
+            KeeperAt(market + new Vector2(-6f, -6f));
             yield return At(10 * 60 + 50);
             yield return At(11 * 60);
             KeeperAt(market);
