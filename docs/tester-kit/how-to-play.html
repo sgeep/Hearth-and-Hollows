@@ -1,0 +1,183 @@
+<title>Hearth &amp; Hollows Playtest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+  /* Layout: one reading column, the game's own pictures inline, a two-device controls table; tavern wood by night, parchment by day. */
+  :root {
+    --bg: #f3ead8;          /* parchment, the game's panels */
+    --surface: #fbf5e8;
+    --ink: #2b1d14;          /* the dialogue box's ink */
+    --muted: #6b5443;
+    --line: #d9c7a6;
+    --accent: #8a2e1c;       /* the box's red trim */
+    --gold: #b7791f;
+    --chip: #ead9b6;
+    --display: "Pixelify Sans", "Courier New", monospace;
+    --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1410; --surface: #251b15; --ink: #f1e6d2; --muted: #c3ae94; --line: #4a382b;
+      --accent: #e38a64; --gold: #e8b45a; --chip: #3a2b20; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1410; --surface: #251b15; --ink: #f1e6d2; --muted: #c3ae94; --line: #4a382b;
+    --accent: #e38a64; --gold: #e8b45a; --chip: #3a2b20; color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
+  .page { max-width: 46rem; margin: 0 auto; padding-inline: 16px; padding-block: 2.5rem 4rem; }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; }
+  h1 { font-size: clamp(2.2rem, 7vw, 3.4rem); font-weight: 700; margin: 0; }
+  h2 { font-size: 1.6rem; font-weight: 700; margin: 2.8rem 0 0.8rem; color: var(--accent); }
+  h3 { font-size: 1.15rem; margin: 1.6rem 0 0.4rem; }
+  p, li { max-width: 65ch; }
+  a { color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .kicker { font-family: var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-size: 0.85rem; margin: 0 0 0.4rem; }
+  .lede { font-size: 1.15rem; margin-top: 0.8rem; }
+  .version { display: inline-flex; gap: 0.5rem; align-items: baseline; flex-wrap: wrap; background: var(--chip); border-radius: 4px; padding: 0.35rem 0.7rem; margin-top: 1rem; font-size: 0.95rem; }
+  .version code { font-family: ui-monospace, Consolas, monospace; }
+  figure { margin: 1.4rem 0; }
+  figure img { display: block; width: 100%; height: auto; image-rendering: pixelated; border: 3px solid var(--line); border-radius: 3px; }
+  figcaption { color: var(--muted); font-size: 0.92rem; margin-top: 0.4rem; }
+  .loop { list-style: none; padding: 0; display: grid; gap: 0.7rem; }
+  .loop li { display: grid; grid-template-columns: 6.5rem 1fr; gap: 0.8rem; align-items: baseline; }
+  .loop b { font-family: var(--display); color: var(--gold); }
+  .ask { background: var(--surface); border: 2px solid var(--line); border-radius: 4px; padding: 1rem 1.2rem; }
+  .ask p { margin: 0.3rem 0; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--display); font-weight: 500; color: var(--muted); }
+  tr.group td { font-family: var(--display); color: var(--accent); padding-top: 1rem; border-bottom: none; }
+  kbd { font-family: ui-monospace, Consolas, monospace; font-size: 0.88em; background: var(--chip); border-radius: 3px; padding: 0.05rem 0.35rem; }
+  .issues li { margin-bottom: 0.5rem; }
+  .path { font-family: ui-monospace, Consolas, monospace; font-size: 0.9rem; background: var(--chip); padding: 0.1rem 0.35rem; border-radius: 3px; overflow-wrap: anywhere; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  @media (max-width: 30rem) { .loop li { grid-template-columns: 1fr; gap: 0; } }
+</style>
+
+<div class="page">
+  <p class="kicker">playtest</p>
+  <h1>Hearth &amp; Hollows</h1>
+  <p class="lede">You've inherited Tally Ho!, the tavern in the odd little village of Kariaston, from someone who vanished into the Hollows beneath it. By day you live in the village; in the evening you cook and serve; at night you go down below for what the surface can't grow.</p>
+  <div class="version"><span>Build being tested:</span> <code>0.4i-d.393</code> <span>(the menu's bottom-right corner shows yours)</span></div>
+
+  <figure>
+    <img src="shots/5_kariaston.png" alt="Kariaston in the morning: the tavern with its thatched roof, a dirt path, the village square with benches, and the clock showing 8:30 am." width="2560" height="1440">
+    <figcaption>Kariaston at half past eight. The clock and your Vigor (the yellow pips) are in the top-left corner.</figcaption>
+  </figure>
+
+  <h2>What we're asking</h2>
+  <div class="ask">
+    <p><b>Play at least two in-game days.</b> A day ends when you go to sleep. An hour is plenty.</p>
+    <p><b>Then fill in the questionnaire</b> from your invitation. It takes about five minutes.</p>
+    <p>There are no wrong answers. If something confused you, that's the game's fault, not yours, and it's exactly what we want to hear about.</p>
+  </div>
+
+  <h2>Starting the game</h2>
+  <h3>In the browser</h3>
+  <p>Open the itch page, enter the password from your invitation, and press <b>Run game</b>. Use Chrome, Edge or Firefox on a computer (phones and tablets aren't supported). The first load takes a few seconds; click once inside the game so its sound can start. The fullscreen button is under the game, at the right.</p>
+  <h3>On Windows</h3>
+  <p>Download the Windows zip from the same page, unzip it anywhere, and run <span class="path">HearthAndHollows.exe</span>. Windows may say it doesn't recognise the publisher: choose <b>More info</b>, then <b>Run anyway</b>. (The build isn't signed yet.)</p>
+
+  <h2>How a day works</h2>
+  <ul class="loop">
+    <li><b>Morning</b><span>You wake upstairs in your room. Go down, talk to Orik (the dwarf at the bar) and Boog (the goblin cook), and step outside.</span></li>
+    <li><b>Daytime</b><span>Explore Kariaston, meet the villagers, plant and tend the garden beds, and buy ingredients at Musashi's market cart. Planting and tending use Vigor; walking and talking never do. Time only runs while you're out and about.</span></li>
+    <li><b>Evening</b><span>When you're ready, use the <b>menu board</b> in the tavern to start the evening. Choose tonight's dishes, open the doors, cook at the stations and carry plates to the customers.</span></li>
+    <li><b>Night</b><span>After the evening you go down the hatch into the Hollows. Fight, harvest monster parts for tomorrow's cooking, and climb the rope out before your Essence (the blue bar) runs out.</span></li>
+    <li><b>Sleep</b><span>Back home, go to sleep. The game saves, and a new day begins.</span></li>
+  </ul>
+
+  <figure>
+    <img src="shots/3_talking.png" alt="A conversation with Orik, a red-bearded dwarf: his portrait beside the line 'good evening, Bram. the ledger and me are on speaking terms again.'" width="2560" height="1440">
+    <figcaption>Talking to Orik. Press <kbd>E</kbd> or <kbd>A</kbd> to move on.</figcaption>
+  </figure>
+
+  <h3>A few tips</h3>
+  <ul>
+    <li>The <b>pause menu</b> (<kbd>Esc</kbd> or <kbd>Start</kbd>) has the controls for every part of the game, the options, and quit.</li>
+    <li>Your first day is a little different: the story starts with an arrival and a first trip below.</li>
+    <li>In the Hollows, a clean kill gives better ingredients than smashing a monster to bits. A low, just-hit enemy can sometimes be finished off with <kbd>F</kbd> or <kbd>LT</kbd> for the best parts.</li>
+    <li>If you die in the Hollows you keep one slot of what you carried (you choose which), and nothing you've already brought home.</li>
+    <li><kbd>Tab</kbd> (or <kbd>View</kbd> on a controller) inside the tavern lets you move the furniture around.</li>
+  </ul>
+
+  <figure>
+    <img src="shots/7_service.png" alt="The tavern during the evening: customers at round tables with their orders in bubbles, the orders list on the right and the gold, tips and Renown counters on the left." width="2560" height="1440">
+    <figcaption>An evening at Tally Ho!. Orders wait on the right; each bubble shows what a table wants.</figcaption>
+  </figure>
+
+  <h2>Controls</h2>
+  <p>Keyboard and mouse, or a controller (Xbox or PlayStation). The on-screen prompts follow whichever you used last.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th scope="col">To</th><th scope="col">Keyboard and mouse</th><th scope="col">Controller</th></tr></thead>
+      <tbody>
+        <tr class="group"><td colspan="3">Out and about</td></tr>
+        <tr><td>walk</td><td><kbd>WASD</kbd> or arrows</td><td>left stick</td></tr>
+        <tr><td>look around</td><td>mouse</td><td>right stick</td></tr>
+        <tr><td>use, talk, buy</td><td><kbd>E</kbd> or <kbd>Space</kbd></td><td><kbd>A</kbd></td></tr>
+        <tr><td>decorate (in the tavern)</td><td><kbd>Tab</kbd></td><td><kbd>View</kbd></td></tr>
+        <tr><td>pause</td><td><kbd>Esc</kbd></td><td><kbd>Start</kbd></td></tr>
+        <tr class="group"><td colspan="3">The evening</td></tr>
+        <tr><td>use a station, serve</td><td><kbd>E</kbd> or <kbd>Space</kbd></td><td><kbd>A</kbd></td></tr>
+        <tr><td>flip, pour, chop</td><td><kbd>Space</kbd> or click</td><td><kbd>A</kbd></td></tr>
+        <tr><td>tilt, move the knife</td><td><kbd>WASD</kbd></td><td>left stick</td></tr>
+        <tr><td>step away</td><td><kbd>Esc</kbd></td><td><kbd>B</kbd></td></tr>
+        <tr class="group"><td colspan="3">The Hollows</td></tr>
+        <tr><td>move</td><td><kbd>WASD</kbd></td><td>left stick</td></tr>
+        <tr><td>aim</td><td>mouse</td><td>right stick</td></tr>
+        <tr><td>light combo</td><td>click</td><td><kbd>X</kbd></td></tr>
+        <tr><td>heavy spin (hold)</td><td>right click</td><td><kbd>Y</kbd></td></tr>
+        <tr><td>dodge roll</td><td><kbd>Space</kbd></td><td><kbd>B</kbd></td></tr>
+        <tr><td>harvest finisher</td><td><kbd>F</kbd></td><td><kbd>LT</kbd></td></tr>
+        <tr><td>climb the rope, swap a part</td><td><kbd>E</kbd></td><td><kbd>A</kbd></td></tr>
+        <tr class="group"><td colspan="3">Decorating</td></tr>
+        <tr><td>pick up, place</td><td><kbd>E</kbd> or click</td><td><kbd>A</kbd></td></tr>
+        <tr><td>turn, flip</td><td><kbd>R</kbd>, <kbd>F</kbd></td><td><kbd>X</kbd>, <kbd>Y</kbd></td></tr>
+        <tr><td>place to the pixel</td><td>hold <kbd>Shift</kbd></td><td>hold <kbd>LB</kbd></td></tr>
+        <tr><td>put away, undo</td><td><kbd>Del</kbd>, <kbd>Z</kbd></td><td><kbd>RT</kbd>, <kbd>LT</kbd></td></tr>
+        <tr><td>catalog and storage</td><td><kbd>Tab</kbd></td><td><kbd>Start</kbd></td></tr>
+        <tr><td>leave</td><td><kbd>Esc</kbd></td><td><kbd>B</kbd></td></tr>
+        <tr class="group"><td colspan="3">Menus and conversations</td></tr>
+        <tr><td>move, choose, back</td><td>arrows, <kbd>Enter</kbd>, <kbd>Esc</kbd></td><td>left stick, <kbd>A</kbd>, <kbd>B</kbd></td></tr>
+        <tr><td>next line</td><td><kbd>E</kbd> or click</td><td><kbd>A</kbd></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure>
+    <img src="shots/2_hollows.png" alt="The first room of the Hollows: blue stone floor, a spider, the keeper at the bottom, the blue Essence bar top-left and six empty satchel slots bottom-left." width="2560" height="1440">
+    <figcaption>The first room of the Hollows. The blue bar is your Essence; the slots at the bottom are your satchel.</figcaption>
+  </figure>
+
+  <h2>Known issues</h2>
+  <ul class="issues">
+    <li><b>A few sounds are stand-ins</b>: the grill burning, the low-Essence heartbeat, bumping into someone carrying a plate, the tap overflowing warning, and decorating's sounds. Tell us if any of them grate.</li>
+    <li><b>No controller rumble in the browser.</b> Browsers can't drive it; the Windows build does.</li>
+    <li><b>Quitting in the middle of a delve</b> loses that delve (the game asks first). Continue starts the night's delve again from the top. This is on purpose.</li>
+    <li>Customers can walk through each other and through you, and they sit with their standing pose.</li>
+    <li>Enemies' hits don't knock you back.</li>
+    <li>The main menu has no music, on purpose. The first music you hear is in the Hollows.</li>
+  </ul>
+
+  <h2>Starting over</h2>
+  <p><b>The easy way:</b> on the main menu, choose <b>New Game</b>. It asks before replacing your game.</p>
+  <p><b>Clearing everything, options too:</b></p>
+  <ul>
+    <li><b>Browser:</b> remove the game's stored data for itch. In Chrome or Edge open <span class="path">chrome://settings/content/all</span> (Edge: <span class="path">edge://settings/content/all</span>), search for <b>itch.zone</b> and delete its data. In Firefox: <b>Settings → Privacy &amp; Security → Cookies and Site Data → Manage Data</b>, then remove <b>itch.zone</b>.</li>
+    <li><b>Windows:</b> close the game and delete the folder <span class="path">%USERPROFILE%\AppData\LocalLow\sagaphy\Hearthdelve</span> (paste that into the File Explorer address bar to open it).</li>
+  </ul>
+
+  <h2>If something goes wrong</h2>
+  <p>Note what you were doing just before, and put it in the questionnaire's "Did anything break?" answer. On Windows, the file <span class="path">Player.log</span> in the folder above helps a lot if the game crashed: attach it if you can.</p>
+
+  <footer>
+    Hearth &amp; Hollows, an early playtest. Art: Minifantasy by Krishna Palacio. Music: HeatleyBros. Sounds: Leohpaz, Kenney and OwlishMedia. Font: Silver by Poppy Works. The full credits are in the game's menu.
+  </footer>
+</div>

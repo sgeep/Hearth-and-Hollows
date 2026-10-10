@@ -150,6 +150,9 @@ namespace Hearthdelve.Village.Diagnostics
         IEnumerator Start()
         {
             m_Keys = InputSystem.AddDevice<Keyboard>("ChecklistKeyboard");
+            // Launched from a script, the window may not have focus, and the Input System ignores devices without it (the PlayMode
+            // tests set the same).
+            InputSystem.settings.backgroundBehavior = InputSettings.BackgroundBehavior.IgnoreFocus;
             Line($"Hearth & Hollows {Application.version}, {Application.platform}: the final 4h checklist's mechanical half");
             yield return Until(() => Flow != null && Settled && Flow.LoadedScene == GameScenes.MainMenu, 120f);
             VillageLifeSettings settings = VillageLife.Settings;
@@ -186,15 +189,22 @@ namespace Hearthdelve.Village.Diagnostics
                 Check("6. Maximo comes in for lunch, and Decorate Mode holds the room still", still && seated, $"held {still}, at his seat after {seated}");
             }
 
-            // 3. Near the market at midday: an exchange is overheard, one bubble at a time.
+            // 3. Near the market at midday: an exchange is overheard. Overheard moments play only while the day goes on, so the
+            // clock runs here, slowed right down (the PlayMode test does the same).
             Outside();
             KeeperAt(k_Origin + new Vector2(38f, 9f));
             yield return At(12 * 60);
             Villager bart = Shown(CharacterIds.Bart);
             yield return Until(() => (bart = Shown(CharacterIds.Bart)) != null && !bart.Walking, 40f);
+            SurfaceClockSettings normal = SurfaceTime.CurrentSettings, slow = normal;
+            slow.realSecondsPerGameMinute = 1000f;
+            SurfaceTime.SettingsOverride = slow;
+            SurfacePause.Release(m_Hold);
             yield return Until(() => StoryServices.Barks != null && StoryServices.Barks.IsBarking, 45f);
             Check("3. Near the market at midday, the village is overheard", StoryServices.Barks != null && StoryServices.Barks.IsBarking);
             StoryServices.Barks?.Stop();
+            SurfacePause.Hold(m_Hold);
+            SurfaceTime.SettingsOverride = null;
             yield return Evening(2);
 
             // 1. Day 3's morning: Gimp's night in the keeper's room (it plays, and the morning follows).
