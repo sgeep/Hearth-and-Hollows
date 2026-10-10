@@ -43,6 +43,19 @@ namespace Hearthdelve.UI.Diagnostics
             go.AddComponent<PerfProbe>();
         }
 
+        /// <summary>How many days to play (<c>-perfDays=3</c>, or <c>perfdays=3</c> in the address): memory over several days.</summary>
+        static int Days
+        {
+            get
+            {
+                string arg = Environment.GetCommandLineArgs().FirstOrDefault(a => a.StartsWith("-perfDays=", StringComparison.OrdinalIgnoreCase));
+                string url = Application.absoluteURL ?? string.Empty;
+                int at = url.IndexOf("perfdays=", StringComparison.OrdinalIgnoreCase);
+                string value = arg != null ? arg.Substring("-perfDays=".Length) : at >= 0 ? new string(url.Substring(at + "perfdays=".Length).TakeWhile(char.IsDigit).ToArray()) : "1";
+                return int.TryParse(value, out int n) ? Mathf.Clamp(n, 1, 10) : 1;
+            }
+        }
+
         static GameFlow Flow => GameFlow.Instance;
         static TavernDirector Director => TavernDirector.Instance;
 
@@ -55,7 +68,10 @@ namespace Hearthdelve.UI.Diagnostics
         static string Memory()
         {
             long reserved = Profiler.GetTotalReservedMemoryLong(), allocated = Profiler.GetTotalAllocatedMemoryLong(), mono = Profiler.GetMonoUsedSizeLong();
-            return $"memory: reserved {reserved / 1048576} MB, allocated {allocated / 1048576} MB, managed {mono / 1048576} MB, gc {GC.GetTotalMemory(false) / 1048576} MB";
+            var music = Hearthdelve.Shared.Audio.MusicDirector.Instance;
+            string tracks = music == null || music.Config == null ? "none" : string.Join(" ", music.Config.tracks
+                .Where(t => t.clip != null && t.clip.loadState == AudioDataLoadState.Loaded).Select(t => t.clip.name));
+            return $"memory: reserved {reserved / 1048576} MB, allocated {allocated / 1048576} MB, managed {mono / 1048576} MB, gc {GC.GetTotalMemory(false) / 1048576} MB; music loaded: {(tracks.Length == 0 ? "none" : tracks)}";
         }
 
         IEnumerator Until(Func<bool> done, float limit)
@@ -104,41 +120,50 @@ namespace Hearthdelve.UI.Diagnostics
             yield return Stretch("the first room", 5f);
             yield return Swap("delve to the night", () => Flow.CompleteDelve(DelveReport.Empty), () => Director != null && Director.Phase == TavernPhase.Night);
             yield return Stretch("the night", 3f);
-            yield return Swap("night to the day (Tally Ho! and Kariaston)", () => Flow.Sleep(), () => Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston));
-            yield return Stretch("the day, upstairs", 5f);
-            GameObject keeper = GameObject.FindGameObjectWithTag("Player");
-            if (keeper != null && keeper.TryGetComponent(out Rigidbody2D body))
+            int days = Days;
+            for (int day = 1; day <= days; day++)
             {
-                SurfaceDoor.Find(SurfaceDoor.FrontInside)?.Pass(body);
-                yield return null;
-                yield return Stretch("the day, in Kariaston", 8f);
-                // Decorate Mode holds its own tune over the day's (the music's known memory risk on the web).
-                SurfaceDoor.Find(SurfaceDoor.FrontOutside)?.Pass(body);
-                yield return null;
-                if (DecorateMode.Instance != null)
+                if (day > 1)
                 {
-                    DecorateMode.Instance.Enter();
-                    yield return Stretch("Decorate Mode", 5f);
-                    DecorateMode.Instance.Leave();
+                    Line($"--- day {day + 1} ---");
+                    yield return Swap("the arena to the night", () => Flow.CompleteDelve(DelveReport.Empty), () => Director != null && Director.Phase == TavernPhase.Night);
                 }
+                yield return Swap("night to the day (Tally Ho! and Kariaston)", () => Flow.Sleep(), () => Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston));
+                yield return Stretch("the day, upstairs", 5f);
+                GameObject keeper = GameObject.FindGameObjectWithTag("Player");
+                if (keeper != null && keeper.TryGetComponent(out Rigidbody2D body))
+                {
+                    SurfaceDoor.Find(SurfaceDoor.FrontInside)?.Pass(body);
+                    yield return null;
+                    yield return Stretch("the day, in Kariaston", 8f);
+                    // Decorate Mode holds its own tune over the day's (the music's known memory risk on the web).
+                    SurfaceDoor.Find(SurfaceDoor.FrontOutside)?.Pass(body);
+                    yield return null;
+                    if (DecorateMode.Instance != null)
+                    {
+                        DecorateMode.Instance.Enter();
+                        yield return Stretch("Decorate Mode", 5f);
+                        DecorateMode.Instance.Leave();
+                    }
+                }
+                yield return Swap("day to the evening", () => Flow.StartEvening(), () => Director != null && Director.Phase == TavernPhase.Prep);
+                Director.FillStoreroom();
+                Director.OpenDebugEvening();
+                yield return Until(() => Director.Phase == TavernPhase.Service, 10f);
+                Director.ArrivalsPaused = true;
+                for (int i = 0; i < 8; i++)
+                {
+                    Director.SpawnCustomer();
+                    yield return new WaitForSecondsRealtime(0.5f);
+                }
+                yield return Stretch("a busy service (eight customers)", 10f);
+                Director.EndServiceNow();
+                yield return Until(() => Director.Phase == TavernPhase.Results, 15f);
+                PerfOptions.StartInArena = true;
+                yield return Swap("the evening to the arena", () => Director.FinishEvening(), () => Flow.LoadedScene == GameScenes.Dungeon);
+                yield return Stretch("the troll fight", 10f);
+                PerfOptions.StartInArena = false;
             }
-            yield return Swap("day to the evening", () => Flow.StartEvening(), () => Director != null && Director.Phase == TavernPhase.Prep);
-            Director.FillStoreroom();
-            Director.OpenDebugEvening();
-            yield return Until(() => Director.Phase == TavernPhase.Service, 10f);
-            Director.ArrivalsPaused = true;
-            for (int i = 0; i < 8; i++)
-            {
-                Director.SpawnCustomer();
-                yield return new WaitForSecondsRealtime(0.5f);
-            }
-            yield return Stretch("a busy service (eight customers)", 10f);
-            Director.EndServiceNow();
-            yield return Until(() => Director.Phase == TavernPhase.Results, 15f);
-            PerfOptions.StartInArena = true;
-            yield return Swap("the evening to the arena", () => Director.FinishEvening(), () => Flow.LoadedScene == GameScenes.Dungeon);
-            yield return Stretch("the troll fight", 10f);
-            PerfOptions.StartInArena = false;
             Line($"done at {Time.realtimeSinceStartup:0.0} s; {Memory()}");
             yield return Report();
         }

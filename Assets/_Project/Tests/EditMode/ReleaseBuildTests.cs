@@ -64,8 +64,8 @@ namespace Hearthdelve.Tests
             Assert.That(pause.Version.Key, Is.EqualTo(MenuLocKeys.Version));
             // Wide enough for a stamped version on one line.
             float width = ((UnityEngine.RectTransform)pause.Version.transform).rect.width;
-            Assert.That(width, Is.GreaterThanOrEqualTo(150f));
-            Assert.That(((UnityEngine.RectTransform)mainText.transform).rect.width, Is.GreaterThanOrEqualTo(150f));
+            Assert.That(width, Is.GreaterThanOrEqualTo(220f));
+            Assert.That(((UnityEngine.RectTransform)mainText.transform).rect.width, Is.GreaterThanOrEqualTo(220f));
         }
     }
 }

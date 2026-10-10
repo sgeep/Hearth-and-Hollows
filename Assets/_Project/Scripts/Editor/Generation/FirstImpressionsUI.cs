@@ -276,7 +276,7 @@ namespace Hearthdelve.Editor
             // 4i-D: the version, small, in the corner (as on the main menu).
             var corner = new Vector2(1f, 0f);
             menu.ConfigureVersion(LookTestBuilder.Text(root, "Version", MenuLocKeys.Version, TextStyle.Secondary, k_Light, TextAnchor.LowerRight,
-                corner, corner, corner, new Vector2(-4f, 2f), new Vector2(150f, 12f)));
+                corner, corner, corner, new Vector2(-4f, 2f), new Vector2(220f, 12f)));
             root.gameObject.SetActive(false);
         }
 

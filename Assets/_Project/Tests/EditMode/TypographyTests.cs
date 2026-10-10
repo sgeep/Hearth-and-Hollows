@@ -232,6 +232,22 @@ namespace Hearthdelve.Tests
             Assert.That(measured, Is.GreaterThan(300), "the scenes' fixed strings were measured");
         }
 
+        [Test]
+        public void TheVersion_FitsOnOneLine_InBothMenus()
+        {
+            // 4i-D: a build's stamp is long, and the placeholder counts as one digit above (the release build wrapped it into its
+            // corner and cut it off). The longest stamp a build can carry, measured, against each menu's box.
+            string english = MenuLocKeys.English.First(e => e.key == MenuLocKeys.Version).english;
+            string longest = string.Format(english, Hearthdelve.Shared.Game.VersionStamp.Format(Hearthdelve.Shared.Game.VersionStamp.Milestone, 99999, "0123abcd", true));
+            float width = Width(longest);
+            foreach (string path in new[] { BootBuilder.MainMenuScene, BootBuilder.BootScene })
+            {
+                var text = ProjectScan.All<LocalizedSuperText>(path).Single(t => t.name == "Version" && t.Key == MenuLocKeys.Version);
+                float box = ((RectTransform)text.transform).rect.width;
+                Assert.That(width, Is.LessThanOrEqualTo(box), $"{System.IO.Path.GetFileNameWithoutExtension(path)}: \"{longest}\" is {width} of {box} pixels");
+            }
+        }
+
         /// <summary>
         /// The harvest's note fits every real harvest on one line (the 4i-C playtest: a placeholder counts as a digit above, so a
         /// crop's name never was; "3 fine onion into the storeroom" wrapped into the frame). Real counts and names, at 1×.
