@@ -688,6 +688,10 @@ The plan's budgets: 60 fps on a mid laptop, a change of scenes under 2 s on desk
 
 `docs/tester-kit/`: **`how-to-play.html`** (published for the owner: starting the game on the web and Windows, how a day works, a few tips, the controls for keyboard and controller, known issues including the remaining stand-in sounds and the web's lack of rumble, starting over and clearing saves on each platform, what to do if something breaks; screenshots from the release build), **`questionnaire.md`** (twenty questions ready for Google Forms or Tally, including the version and which device and controller each tester used), **`itch-page.md`** (the page's settings, text and upload steps, restricted with a password), **`owner-checklist.md`** (the clean-machine IL2CPP steps, every real-controller check in one place, the release-build checks, the playtest's steps).
 
+### What ships
+
+`Builds/Release/HearthAndHollows-0.4i-d.395-web.zip` (34 MB; the web release, `index.html` at the top) and `HearthAndHollows-0.4i-d.394-windows.zip` (71 MB; IL2CPP, without the debugging-symbols folder). The two numbers differ only by diagnostics (the release checklist's fix at 394, docs at 395); the game is the same in both, and the checklist passed 7 of 7 in the 394 Windows build itself. The web release wasn't run through the checklist (the owner's web check covers it: `owner-checklist.md`, C1–C2).
+
 ### Changes from the plan
 
 - The performance probe and the release checklist were added to measure and check the release builds themselves (no gameplay change; they run only when asked, in a save folder of their own). `PerfOptions.StartInArena` lets the probe reach the troll.
