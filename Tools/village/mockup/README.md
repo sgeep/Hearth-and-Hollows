@@ -24,3 +24,7 @@ The output is drawn at 3x. One tile is 8 px, and coordinates in the layout scrip
 - Shadows: Plants & Foliage `Plains_And_Forests/_Shadow.png` and Towns II `MoreBuildingSamplesShadows.png` share their art's coordinates.
 - Grass patches: `More_Grass_Variations` and `Tall_Grass_Tileset`. Flowers and tufts come from Plants & Foliage `Forgotten_Plains.png`, in clusters.
 - Garden: Farm crops in Medieval City soil, inside the Farm tileset's thin fence (cells 50–54 × 15–19).
+
+## The export (2026-10-10)
+
+`export_crossroads.py` runs `layout2_crossroads.py` unchanged and applies the fixes the game needs on top (four beds, the fences' own right-hand posts and bottom runs, whole tufts, the well's whole frame, roads past the edge, every drawing's own shadow). It writes `Tools/village/crossroads_layout.json`, which `KariastonBuilder.RelayoutBatch` read once to lay out the hand-owned scene, and `layout2_crossroads_built.png`, the village as built. Rerunning it never changes the game.
