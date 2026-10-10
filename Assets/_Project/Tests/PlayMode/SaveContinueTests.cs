@@ -43,6 +43,24 @@ namespace Hearthdelve.Tests.PlayMode
             Assert.That(Flow.PeekSave().version, Is.EqualTo(SaveSystem.CurrentVersion));
         }
 
+        /// <summary>Saves the external playtest's own build wrote (playtest-0.4i.1): every later build must continue them.</summary>
+        [UnityTest]
+        public IEnumerator TheTesterBuildsSaves_ContinueAtNight_AndIntoTheDay()
+        {
+            yield return ContinueFrom("v10_tester-0.4i.1_day4_night.json");
+            yield return WaitUntil(() => IsIn(TavernPhase.Night), 30f, "the night");
+            Assert.That(Flow.State.Day, Is.EqualTo(4));
+            Flow.QuitToMenu();
+            yield return WaitUntil(() => !Flow.IsLoading && Flow.LoadedScene == GameScenes.MainMenu, 20f, "the menu");
+            File.Copy(Path.Combine(Fixtures, "v10_tester-0.4i.1_day5_daytime.json"), Path.Combine(SaveDir, SaveStore.FileName), true);
+            yield return Revealed();
+            Assert.That(Flow.Continue());
+            yield return WaitUntil(() => InDaytimeNow, 30f, "the daytime");
+            yield return Revealed();
+            Assert.That(Flow.State.Day, Is.EqualTo(5));
+            Assert.That(Flow.State.Story.Opening, Is.EqualTo(OpeningStage.Complete));
+        }
+
         [UnityTest]
         public IEnumerator AVersion7Save_AtTheNightsDelve_ContinuesIntoTheHollows()
         {

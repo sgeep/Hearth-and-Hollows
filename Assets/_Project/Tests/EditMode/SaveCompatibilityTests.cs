@@ -29,6 +29,9 @@ namespace Hearthdelve.Tests
             yield return new TestCaseData("v10_day1_arrival.json", 10, 1, DayPhase.Daytime, 0);
             yield return new TestCaseData("v10_day1_firstdelve.json", 10, 1, DayPhase.Delve, 0);
             yield return new TestCaseData("v10_day2_daytime.json", 10, 2, DayPhase.Daytime, 0);
+            // Written by the external playtest's build itself (playtest-0.4i.1, Windows 0.4i-d.394): testers' saves must always load.
+            yield return new TestCaseData("v10_tester-0.4i.1_day4_night.json", 10, 4, DayPhase.Night, 0);
+            yield return new TestCaseData("v10_tester-0.4i.1_day5_daytime.json", 10, 5, DayPhase.Daytime, 0);
         }
 
         [TestCaseSource(nameof(Fixtures))]
@@ -64,7 +67,8 @@ namespace Hearthdelve.Tests
         [Test]
         public void TheV10Saves_AreUntouchedByLoading()
         {
-            foreach (string file in new[] { "v10_day1_arrival.json", "v10_day1_firstdelve.json", "v10_day2_daytime.json" })
+            foreach (string file in new[] { "v10_day1_arrival.json", "v10_day1_firstdelve.json", "v10_day2_daytime.json",
+                         "v10_tester-0.4i.1_day4_night.json", "v10_tester-0.4i.1_day5_daytime.json" })
             {
                 string json = File.ReadAllText(Path.Combine(Folder, file));
                 SaveData data = SaveSystem.FromJson(json);
