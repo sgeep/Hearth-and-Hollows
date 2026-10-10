@@ -56,6 +56,35 @@ namespace Hearthdelve.UI.Diagnostics
             }
         }
 
+        static bool Shots => Environment.GetCommandLineArgs().Any(a => a.Equals("-perfShots", StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>With <c>-perfShots</c>: a picture of the stage (the tester kit's screenshots come from the release build).</summary>
+        IEnumerator Shot(string name)
+        {
+            if (!Shots) yield break;
+            yield return new WaitForEndOfFrame();
+            string folder = Path.Combine(Application.persistentDataPath, "shots");
+            Directory.CreateDirectory(folder);
+            ScreenCapture.CaptureScreenshot(Path.Combine(folder, name + ".png"));
+            yield return null;
+        }
+
+        /// <summary>Plays a conversation through (Space on a virtual keyboard), as a player would.</summary>
+        IEnumerator TalkThrough()
+        {
+            var keys = UnityEngine.InputSystem.InputSystem.AddDevice<UnityEngine.InputSystem.Keyboard>("ProbeKeyboard");
+            float until = Time.realtimeSinceStartup + 30f;
+            while (Hearthdelve.Shared.Story.StoryServices.Conversations != null && Hearthdelve.Shared.Story.StoryServices.Conversations.IsTalking && Time.realtimeSinceStartup < until)
+            {
+                UnityEngine.InputSystem.InputSystem.QueueStateEvent(keys, new UnityEngine.InputSystem.LowLevel.KeyboardState(UnityEngine.InputSystem.Key.Space));
+                yield return null;
+                yield return null;
+                UnityEngine.InputSystem.InputSystem.QueueStateEvent(keys, new UnityEngine.InputSystem.LowLevel.KeyboardState());
+                yield return new WaitForSecondsRealtime(0.25f);
+            }
+            UnityEngine.InputSystem.InputSystem.RemoveDevice(keys);
+        }
+
         static GameFlow Flow => GameFlow.Instance;
         static TavernDirector Director => TavernDirector.Instance;
 
@@ -120,11 +149,19 @@ namespace Hearthdelve.UI.Diagnostics
                                      && (Flow.Transition == null || !Flow.Transition.IsCovering), 120f);
             Line($"startup to the menu: {Time.realtimeSinceStartup:0.00} s; {Memory()}");
             yield return Stretch("the menu", 3f);
+            yield return Shot("1_menu");
 
             yield return Swap("menu to the first delve", () => Flow.QuickNewGame(), () => Flow.LoadedScene == GameScenes.Dungeon);
             yield return Stretch("the first room", 5f);
+            yield return Shot("2_hollows");
             yield return Swap("delve to the night", () => Flow.CompleteDelve(DelveReport.Empty), () => Director != null && Director.Phase == TavernPhase.Night);
             yield return Stretch("the night", 3f);
+            if (Shots && Hearthdelve.Shared.Story.StoryServices.Conversations != null && Hearthdelve.Shared.Story.StoryServices.Conversations.Talk("pip"))
+            {
+                yield return new WaitForSecondsRealtime(2.5f);
+                yield return Shot("3_talking");
+                yield return TalkThrough();
+            }
             int days = Days;
             for (int day = 1; day <= days; day++)
             {
@@ -135,12 +172,14 @@ namespace Hearthdelve.UI.Diagnostics
                 }
                 yield return Swap("night to the day (Tally Ho! and Kariaston)", () => Flow.Sleep(), () => Director != null && Director.Phase == TavernPhase.Daytime && Flow.IsLoaded(GameScenes.Kariaston));
                 yield return Stretch("the day, upstairs", 5f);
+                if (day == 1) yield return Shot("4_upstairs");
                 GameObject keeper = GameObject.FindGameObjectWithTag("Player");
                 if (keeper != null && keeper.TryGetComponent(out Rigidbody2D body))
                 {
                     SurfaceDoor.Find(SurfaceDoor.FrontInside)?.Pass(body);
                     yield return null;
                     yield return Stretch("the day, in Kariaston", 8f);
+                    if (day == 1) yield return Shot("5_kariaston");
                     // Decorate Mode holds its own tune over the day's (the music's known memory risk on the web).
                     SurfaceDoor.Find(SurfaceDoor.FrontOutside)?.Pass(body);
                     yield return null;
@@ -148,6 +187,7 @@ namespace Hearthdelve.UI.Diagnostics
                     {
                         DecorateMode.Instance.Enter();
                         yield return Stretch("Decorate Mode", 5f);
+                        if (day == 1) yield return Shot("6_decorate");
                         DecorateMode.Instance.Leave();
                     }
                 }
@@ -162,11 +202,13 @@ namespace Hearthdelve.UI.Diagnostics
                     yield return new WaitForSecondsRealtime(0.5f);
                 }
                 yield return Stretch("a busy service (eight customers)", 10f);
+                if (day == 1) yield return Shot("7_service");
                 Director.EndServiceNow();
                 yield return Until(() => Director.Phase == TavernPhase.Results, 15f);
                 PerfOptions.StartInArena = true;
                 yield return Swap("the evening to the arena", () => Director.FinishEvening(), () => Flow.LoadedScene == GameScenes.Dungeon);
                 yield return Stretch("the troll fight", 10f);
+                if (day == 1) yield return Shot("8_troll");
                 PerfOptions.StartInArena = false;
             }
             Line($"done at {Time.realtimeSinceStartup:0.0} s; {Memory()}");
